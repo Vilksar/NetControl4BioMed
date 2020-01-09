@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +15,8 @@ using Microsoft.Extensions.Hosting;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Services;
 
 namespace NetControl4BioMed
 {
@@ -57,6 +60,10 @@ namespace NetControl4BioMed
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddHangfire(options =>
+            {
+                options.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"));
+            });
             // Add the default Identity functions for users and roles.
             services.AddIdentity<User, Role>(options =>
             {
@@ -88,6 +95,9 @@ namespace NetControl4BioMed
                     facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
                     facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
                 });
+            // Add the dependency injection for the partial view renderer and the e-mail sender.
+            services.AddTransient<IPartialViewRenderer, PartialViewRenderer>();
+            services.AddTransient<ISendGridEmailSender, SendGridEmailSender>();
             // Add Razor pages.
             services.AddRazorPages();
         }
@@ -129,6 +139,15 @@ namespace NetControl4BioMed
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+            });
+            // Use Hangfire.
+            app.UseHangfireDashboard("/Hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new HangfireAuthorizationFilter() }
+            });
+            app.UseHangfireServer(new BackgroundJobServerOptions
+            {
+                WorkerCount = (Environment.ProcessorCount - 1) * 2 > 0 ? (Environment.ProcessorCount - 1) * 2 : 1
             });
             // Seed the database.
             app.SeedDatabaseAsync(Configuration).Wait();
