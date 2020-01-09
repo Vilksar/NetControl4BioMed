@@ -6,9 +6,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NetControl4BioMed.Data;
+using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Extensions;
 
 namespace NetControl4BioMed
 {
@@ -47,6 +52,42 @@ namespace NetControl4BioMed
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            // Add the database context and connection.
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            });
+            // Add the default Identity functions for users and roles.
+            services.AddIdentity<User, Role>(options =>
+            {
+                options.SignIn.RequireConfirmedEmail = false;
+            })
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+            // Configure the path options.
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.AccessDeniedPath = "/Identity/AccessDenied";
+                options.LoginPath = "/Identity/Login";
+                options.LogoutPath = "/Identity/Logout";
+            });
+            // Add the external authentication options.
+            services.AddAuthentication()
+                .AddGoogle(googleOptions =>
+                {
+                    googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                    googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                })
+                .AddMicrosoftAccount(microsoftOptions =>
+                {
+                    microsoftOptions.ClientId = Configuration["Authentication:Microsoft:ClientId"];
+                    microsoftOptions.ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"];
+                })
+                .AddFacebook(facebookOptions =>
+                {
+                    facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+                    facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                });
             // Add Razor pages.
             services.AddRazorPages();
         }
@@ -82,12 +123,15 @@ namespace NetControl4BioMed
             app.UseCookiePolicy();
             app.UseRouting();
             // Use authentication.
+            app.UseAuthentication();
             app.UseAuthorization();
             // Use Razor pages.
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
             });
+            // Seed the database.
+            app.SeedDatabaseAsync(Configuration).Wait();
         }
     }
 }
