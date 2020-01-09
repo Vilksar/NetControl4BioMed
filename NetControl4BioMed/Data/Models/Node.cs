@@ -56,6 +56,11 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<NodeCollectionNode> NodeCollectionNodes { get; set; }
 
         /// <summary>
+        /// Gets or sets the databases in which appear the node appears.
+        /// </summary>
+        public ICollection<DatabaseNode> DatabaseNodes { get; set; }
+
+        /// <summary>
         /// Gets or sets the node database fields which have a value corresponding to the node.
         /// </summary>
         public ICollection<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }

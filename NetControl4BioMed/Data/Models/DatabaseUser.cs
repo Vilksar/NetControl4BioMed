@@ -18,7 +18,7 @@ namespace NetControl4BioMed.Data.Models
         /// <summary>
         /// Gets or sets the database of the relationship.
         /// </summary>
-        public Database Analysis { get; set; }
+        public Database Database { get; set; }
 
         /// <summary>
         /// Gets or sets the user ID of the relationship.
