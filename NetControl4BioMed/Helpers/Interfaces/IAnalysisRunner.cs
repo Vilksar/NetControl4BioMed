@@ -17,6 +17,6 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// </summary>
         /// <param name="viewModel">The model of the analysis to run.</param>
         /// <returns></returns>
-        Task Run(AnalysisRunnerModel model);
+        Task Run(AnalysisRunnerViewModel model);
     }
 }

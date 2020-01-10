@@ -8,7 +8,7 @@ namespace NetControl4BioMed.Helpers.Models
     /// <summary>
     /// Represents the model of an analysis runner.
     /// </summary>
-    public class AnalysisRunnerModel
+    public class AnalysisRunnerViewModel
     {
         /// <summary>
         /// Gets or sets the analysis ID.
@@ -16,7 +16,7 @@ namespace NetControl4BioMed.Helpers.Models
         public string Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the analysis URL.
+        /// Gets or sets the URL to the analysis page.
         /// </summary>
         public string Url { get; set; }
 

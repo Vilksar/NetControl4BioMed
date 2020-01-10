@@ -42,7 +42,7 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the analysis to run.</param>
         /// <returns></returns>
-        public async Task Run(AnalysisRunnerModel model)
+        public async Task Run(Models.AnalysisRunnerViewModel model)
         {
             // Get the analysis with the given ID.
             var analysis = _context.Analyses
