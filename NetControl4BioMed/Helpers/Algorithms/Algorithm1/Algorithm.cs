@@ -103,11 +103,15 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 return;
             }
             // Set up the first iteration.
+            var random = new Random(parameters.RandomSeed);
             var currentIteration = analysis.CurrentIteration;
             var currentIterationWithoutImprovement = analysis.CurrentIterationWithoutImprovement;
             var bestSolutionSize = targets.Count() + 1;
             var bestControlPaths = new List<Dictionary<string, List<string>>>();
-            var rand = new Random(parameters.RandomSeed);
+            // Update the analysis status.
+            analysis.Status = AnalysisStatus.Ongoing;
+            // Save the changes in the database.
+            await context.SaveChangesAsync();
             // Run as long as the analysis exists and the final iteration hasn't been reached.
             while (analysis != null && analysis.Status == AnalysisStatus.Ongoing && currentIteration < parameters.MaximumIterations && currentIterationWithoutImprovement < parameters.MaximumIterationsWithoutImprovement)
             {
@@ -117,6 +121,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 // Update the iteration count.
                 analysis.CurrentIteration = currentIteration;
                 analysis.CurrentIterationWithoutImprovement = currentIterationWithoutImprovement;
+                // Save the changes to the analysis.
+                await context.SaveChangesAsync();
                 // Define a variable to store the control paths.
                 var controlPath = new Dictionary<string, List<string>>();
                 // Set up the control path to start from the target nodes.
@@ -171,7 +177,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                             var right = new List<string>(); right.AddRange(unmatched);
                             var currentEdges = new List<(string, string)>();
                             currentEdges = GetSingleHeuristicEdges(left, right, edges, heuristic, controlPath, sources);
-                            var matchingEdges = GetMaximumMatching(left, right, currentEdges, rand);
+                            var matchingEdges = GetMaximumMatching(left, right, currentEdges, random);
                             // For all matching edges, add them to the maximal matchings, and remove their corresponding nodes from free and unmatched lists.
                             foreach (var edge in matchingEdges)
                             {
@@ -241,8 +247,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                         bestControlPaths.Add(controlPath);
                     }
                 }
-                // Save the changes to the analysis.
-                await context.SaveChangesAsync();
                 // And reload it for the next iteration.
                 await context.Entry(analysis).ReloadAsync();
             }
@@ -264,7 +268,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                         .ToList();
                     var pathEdges = item1
                         .Zip(item1.Skip(1), (item2, item3) => (item2.ToString(), item3.ToString()))
-                        .Select(item2 => analysis.AnalysisEdges.First(item3 => item3.Edge.EdgeNodes.First(item4 => item4.Type == EdgeNodeType.Source).Node.Id == item2.Item1 && item3.Edge.EdgeNodes.First(item4 => item4.Type == EdgeNodeType.Target).Node.Id == item2.Item2).Edge)
+                        .Select(item2 => analysis.AnalysisEdges.First(item3 => item3.Edge.EdgeNodes.First(item4 => item4.Type == EdgeNodeType.Source).Node.Id == item2.Item2 && item3.Edge.EdgeNodes.First(item4 => item4.Type == EdgeNodeType.Target).Node.Id == item2.Item1).Edge)
                         .ToList();
                     // Return the path.
                     return new Path

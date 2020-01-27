@@ -41,7 +41,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                     break;
                 case AnalysisAlgorithm.Algorithm2:
                     // Run the algorithm on the analysis.
-                    //await Algorithms.Algorithm2.Algorithm.Run(context, analysis);
+                    await Algorithms.Algorithm2.Algorithm.Run(context, analysis);
                     // End the switch.
                     break;
                 default:
