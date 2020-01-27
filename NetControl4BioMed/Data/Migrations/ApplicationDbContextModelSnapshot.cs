@@ -116,6 +116,12 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<int>("Algorithm")
                         .HasColumnType("int");
 
+                    b.Property<int>("CurrentIteration")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CurrentIterationWithoutImprovement")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("DateTimeEnded")
                         .HasColumnType("datetime2");
 
@@ -136,9 +142,6 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.Property<string>("Parameters")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Progress")
-                        .HasColumnType("float");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");

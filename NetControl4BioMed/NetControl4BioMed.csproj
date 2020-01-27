@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>b1887300-a539-4538-a0af-c382024f6955</UserSecretsId>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.9.1" />
     <PackageReference Include="HangFire" Version="1.7.8" />
