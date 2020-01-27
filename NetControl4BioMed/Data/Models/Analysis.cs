@@ -47,14 +47,19 @@ namespace NetControl4BioMed.Data.Models
         public AnalysisStatus Status { get; set; }
 
         /// <summary>
-        /// Gets or sets the message log of the analysis, with an underlying format of List&lt;string&gt;.
+        /// Gets or sets the message log of the analysis, with an underlying format of List&lt;LogEntry&gt;.
         /// </summary>
         public string Log { get; set; }
 
         /// <summary>
-        /// Gets or sets the current progress of the analysis.
+        /// Gets or sets the current iteration of the algorithm that the analysis uses.
         /// </summary>
-        public double Progress { get; set; }
+        public int CurrentIteration { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current iteration without improvement of the algorithm that the analysis uses.
+        /// </summary>
+        public int CurrentIterationWithoutImprovement { get; set; }
 
         /// <summary>
         /// Gets or sets the algorithm used by the analysis.

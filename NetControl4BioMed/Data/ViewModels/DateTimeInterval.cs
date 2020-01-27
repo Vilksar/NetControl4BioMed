@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NetControl4BioMed.Data.HelperModels
+namespace NetControl4BioMed.Data.ViewModels
 {
     /// <summary>
     /// Represents a date and time interval in which an analysis runs (used instead of Tuple&lt;DateTime?, DateTime?&gt;).

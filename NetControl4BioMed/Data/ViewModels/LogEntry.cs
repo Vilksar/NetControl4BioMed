@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NetControl4BioMed.Data.HelperModels
+namespace NetControl4BioMed.Data.ViewModels
 {
     /// <summary>
     /// Represents a entry in the analysis log (used instead of Tuple&lt;DateTime, string&gt;).
