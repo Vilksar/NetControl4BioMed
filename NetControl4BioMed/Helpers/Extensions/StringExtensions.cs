@@ -12,31 +12,27 @@ namespace NetControl4BioMed.Helpers.Extensions
     public static class StringExtensions
     {
         /// <summary>
-        /// Checks if a specified string is a valid JSON object of the specified type.
+        /// Tries to deserialize the given JSON string as the specified type.
         /// </summary>
-        /// <typeparam name="T">Represents the type of the object to check the JSON string against.</typeparam>
+        /// <typeparam name="T">Represents the type of the JSON object.</typeparam>
         /// <param name="jsonString">Represents a JSON string.</param>
-        /// <returns>Returns "true" if the specified JSON string is valid, and "false" otherwise.</returns>
-        public static bool IsNullOrInvalidJsonObject<T>(this string jsonString)
+        /// <returns>Returns the object of type T if the deserialization was successful, null otherwise.</returns>
+        public static bool TryDeserializeJsonObject<T>(this string jsonString, out T value)
         {
-            // Check if the string is null or empty.
-            if (string.IsNullOrEmpty(jsonString))
-            {
-                // Return true.
-                return true;
-            }
-            // Try to deserialize the given string as the chosen object.
+            // Try to deserialize the given string.
             try
             {
-                // Deserialize the given JSON string as the given type.
-                JsonSerializer.Deserialize<T>(jsonString);
-                // Everything went alright, so return false.
-                return false;
+                // Get the deserialized object and assign the output value.
+                value = JsonSerializer.Deserialize<T>(jsonString);
+                // Return it.
+                return true;
             }
             catch (Exception)
             {
-                // If anything went wrong, return true.
-                return true;
+                // Assign the default value.
+                value = default;
+                // Return null.
+                return false;
             }
         }
     }

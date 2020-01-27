@@ -1,6 +1,6 @@
 ﻿using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
-using NetControl4BioMed.Data.HelperModels;
+using NetControl4BioMed.Data.ViewModels;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Models;
 using System;
@@ -41,7 +41,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                     break;
                 case AnalysisAlgorithm.Algorithm2:
                     // Run the algorithm on the analysis.
-                    await Algorithms.Algorithm2.Algorithm.Run(context, analysis);
+                    //await Algorithms.Algorithm2.Algorithm.Run(context, analysis);
                     // End the switch.
                     break;
                 default:
