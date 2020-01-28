@@ -1,0 +1,19 @@
+﻿@model Helpers.ViewModels.EmailAddedToAnalysisViewModel
+
+<div>
+    <div>
+        <span>Hello @Model.Email,</span>
+    </div>
+    <div>
+        <span>You have recently given access to the analysis <a href="@Model.Url">@Model.Name</a> to the user with the e-mail <a href="mailto:@Model.AddedEmail">@Model.AddedEmail</a>.</span>
+    </div>
+    <div>
+        <span>If you recognize this activity, then no further action is needed on your part. If it wasn't you, then your account might have been compromised. We recommend changing the password as soon as possible and inspecting the recent account activity.</span>
+    </div>
+    <div>
+        <span>Thank you for using our application!</span>
+    </div>
+    <div>
+        <span>This message was sent automatically by the <a href="@Model.ApplicationUrl">NetControl4BioMed</a> application from an unmonitored address. Please do not reply to this e-mail.</span>
+    </div>
+</div>

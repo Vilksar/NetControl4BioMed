@@ -1,0 +1,16 @@
+﻿@model Helpers.ViewModels.EmailAnalysisEndedViewModel
+
+<div>
+    <div>
+        <span>Hello @Model.Email,</span>
+    </div>
+    <div>
+        <span>The analysis <a href="@Model.Url">@Model.Name</a> (@Model.Id) has ended with the status <strong>@Model.Status</strong>.</span>
+    </div>
+    <div>
+        <span>Thank you for using our application!</span>
+    </div>
+    <div>
+        <span>This message was sent automatically by the <a href="@Model.ApplicationUrl">NetControl4BioMed</a> application from an unmonitored address. Please do not reply to this e-mail.</span>
+    </div>
+</div>

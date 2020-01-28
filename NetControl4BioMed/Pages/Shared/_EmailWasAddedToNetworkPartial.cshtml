@@ -1,0 +1,16 @@
+﻿@model Helpers.ViewModels.EmailWasAddedToNetworkViewModel
+
+<div>
+    <div>
+        <span>Hello @Model.Email,</span>
+    </div>
+    <div>
+        <span>You have been given access to the network <a href="@Model.Url">@Model.Name</a> by the user with the e-mail <a href="mailto:@Model.AddedByEmail">@Model.AddedByEmail</a>.</span>
+    </div>
+    <div>
+        <span>Thank you for using our application!</span>
+    </div>
+    <div>
+        <span>This message was sent automatically by the <a href="@Model.ApplicationUrl">NetControl4BioMed</a> application from an unmonitored address. Please do not reply to this e-mail.</span>
+    </div>
+</div>

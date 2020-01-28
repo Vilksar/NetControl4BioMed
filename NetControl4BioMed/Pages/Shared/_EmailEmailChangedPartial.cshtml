@@ -1,0 +1,19 @@
+﻿@model Helpers.ViewModels.EmailEmailChangedViewModel
+
+<div>
+    <div>
+        <span>Hello @Model.Email,</span>
+    </div>
+    <div>
+        <span>You have recently changed the e-mail associated with your <a href="@Model.ApplicationUrl">NetControl4BioMed</a> account.</span>
+    </div>
+    <div>
+        <span>If you recognize this activity, then no further action is needed on your part. If it wasn't you, then your account might have been compromised. We recommend resetting the password as soon as possible and inspecting the recent account activity.</span>
+    </div>
+    <div>
+        <span>Thank you for using our application!</span>
+    </div>
+    <div>
+        <span>This message was sent automatically by the <a href="@Model.ApplicationUrl">NetControl4BioMed</a> application from an unmonitored address. Please do not reply to this e-mail.</span>
+    </div>
+</div>
