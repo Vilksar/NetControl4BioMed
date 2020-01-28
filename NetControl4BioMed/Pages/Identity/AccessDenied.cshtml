@@ -1,0 +1,48 @@
+﻿@page
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Access denied";
+}
+
+<div class="flex-grow-1 d-flex flex-column justify-content-center">
+    <div class="row flex-md-row-reverse">
+        <div class="col-md-4 my-2 my-md-0 d-none d-md-flex flex-column justify-content-center align-items-center">
+            <span class="h4 text-danger"><i class="fas fa-exclamation-triangle fa-5x"></i></span>
+        </div>
+        <div class="col-md-8 my-2 my-md-0 d-flex flex-column justify-content-center">
+            <div class="text-center text-md-left">
+                <div class="my-3">
+                    <span class="h4">Access denied</span>
+                </div>
+                <div class="my-3">
+                    <span>You do not have permission to access this page! You can try to log out and log in again (maybe with a different account?).</span>
+                </div>
+                <div class="my-3">
+                    <div class="row">
+                        <div class="col-md-6 my-2 my-md-0">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <form asp-page="/Logout" method="post">
+                                    <button type="submit" title="Log out" class="btn btn-danger btn-block">
+                                        <span>Log out</span>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a asp-page="/Index" class="btn btn-danger btn-block" title="Log in">
+                                    <span>Log in</span>
+                                </a>
+                            }
+                        </div>
+                        <div class="col-md-6 my-2 my-md-0">
+                            <a asp-page="/Index" class="btn btn-outline-dark btn-block" title="Home">
+                                <span>Home</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+﻿@page
+@model ExternalLoginModel
+@{
+    ViewData["Title"] = "External login";
+}
+
+<div class="flex-grow-1 d-flex flex-column justify-content-center">
+    <div class="row">
+        <div class="offset-md-2 col-md-8 offset-lg-3 col-lg-6">
+            <div class="card shadow-sm my-3">
+                <div class="card-header font-weight-bold">
+                    <div class="d-flex flex-column flex-md-row-reverse justify-content-center align-items-center justify-content-md-between">
+                        <div>
+                            <span><i class="fas fa-external-link-alt"></i></span>
+                        </div>
+                        <div>
+                            <span>External login</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info text-wrap">
+                        <span><i class="fas fa-info-circle"></i></span>
+                        <span>You've successfully authenticated with <span class="font-weight-bold">@Model.View.LoginProvider</span>. Please enter an e-mail address to use on this website and click the button to finish logging in.</span>
+                    </div>
+                    <form method="post" asp-page-handler="Confirmation" asp-route-returnUrl="@Model.View.ReturnUrl">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <div class="form-group">
+                            <label asp-for="Input.Email" class="font-weight-bold">E-mail</label>
+                            <input asp-for="Input.Email" class="form-control" />
+                            <span asp-description-for="Input.Email" class="text-muted small">The e-mail address to be associated with your account.</span>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+                        <button type="submit" title="Submit" class="btn btn-block btn-success">
+                            <span>Submit</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+}

@@ -1,0 +1,54 @@
+﻿@page
+@model LoginWithExternalAccountModel
+@{
+    ViewData["Title"] = "Log in with external account";
+}
+
+<div class="flex-grow-1 d-flex flex-column justify-content-center">
+    <div class="row">
+        <div class="offset-md-2 col-md-8 offset-lg-3 col-lg-6">
+            @if (Model.View.ExternalLogins.Any())
+            {
+                <div class="card shadow-sm my-3">
+                    <div class="card-header font-weight-bold">
+                        <div class="d-flex flex-column flex-md-row-reverse justify-content-center align-items-center justify-content-md-between">
+                            <div>
+                                <span><i class="fas fa-external-link-alt"></i></span>
+                            </div>
+                            <div>
+                                <span>Log in (external account)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.View.ExternalLogins.Any())
+                        {
+                            <form method="post" asp-page="/ExternalLogin" asp-route-returnUrl="@Model.View.ReturnUrl">
+                                <div class="form-group">
+                                    <label class="font-weight-bold">External login</label>
+                                    @foreach (var provider in Model.View.ExternalLogins)
+                                    {
+                                        <button asp-route-provider="@provider.Name" type="submit" title="Log in using your @provider.DisplayName account" class="btn btn-dark btn-block">
+                                            <span><i class="fab fa-@provider.DisplayName.ToLower()"></i></span>
+                                            <span>@provider.DisplayName</span>
+                                        </button>
+                                    }
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info text-wrap my-0">
+                                <span>There are no external login providers available.</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+}

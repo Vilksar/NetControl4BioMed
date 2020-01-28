@@ -1,0 +1,74 @@
+﻿@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<div class="flex-grow-1 d-flex flex-column justify-content-center">
+    <div class="row">
+        <div class="offset-md-2 col-md-8 offset-lg-3 col-lg-6">
+            <div class="card shadow-sm my-3">
+                <div class="card-header font-weight-bold">
+                    <div class="d-flex flex-column flex-md-row-reverse justify-content-center align-items-center justify-content-md-between">
+                        <div>
+                            <span><i class="fas fa-sign-in-alt"></i></span>
+                        </div>
+                        <div>
+                            <span>Log in (local account)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-route-returnUrl="@Model.View.ReturnUrl">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <div class="form-group">
+                            <label asp-for="Input.Email" class="font-weight-bold">E-mail</label>
+                            <input asp-for="Input.Email" class="form-control" />
+                            <span asp-description-for="Input.Email" class="text-muted small">The e-mail address associated with your account.</span>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.Password" class="font-weight-bold">Password</label>
+                            <input asp-for="Input.Password" class="form-control" />
+                            <span asp-description-for="Input.Password" class="text-muted small">The password for your account.</span>
+                            <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                        </div>
+                        <div class="form-group">
+                            <div class="row align-items-center">
+                                <div class="col-md-6 my-2 my-md-0 text-center text-md-left">
+                                    <div class="custom-control custom-checkbox">
+                                        <input asp-for="Input.RememberMe" class="custom-control-input" />
+                                        <label asp-for="Input.RememberMe" class="custom-control-label">Remember me?</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 my-2 my-md-0 text-center text-md-right">
+                                    <div>
+                                        <a asp-page="/Identity/ForgotPassword">
+                                            <span>Forgot the password?</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" title="Log in" class="btn btn-block btn-success">
+                            <span>Log in</span>
+                        </button>
+                        <a asp-page="/Identity/Register" class="btn btn-primary btn-block" title="Register">
+                            <span>Register</span>
+                        </a>
+                        @if (Model.View.ExternalLogins.Any())
+                        {
+                            <a asp-page="/Identity/LoginWithExternalAccount" class="btn btn-dark btn-block" title="External login">
+                                <span>Log in with an external account</span>
+                            </a>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+}
