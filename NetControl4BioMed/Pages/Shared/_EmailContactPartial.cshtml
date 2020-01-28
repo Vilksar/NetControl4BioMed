@@ -1,0 +1,22 @@
+﻿@model Helpers.ViewModels.EmailContactViewModel
+
+<div>
+    <div>
+        <span>Hello,</span>
+    </div>
+    <div>
+        <span>You have received a new message via the contact form of the <strong>NetControl4BioMed</strong> application at @DateTime.Now.ToString().</span>
+    </div>
+    <div>
+        <span><strong>From:</strong> @Model.Name (<a href="mailto:@Model.Email">@Model.Email</a>)</span>
+    </div>
+    <div>
+        <span><strong>Message:</strong> @Model.Message</span>
+    </div>
+    <div>
+        <span>Have a nice day!</span>
+    </div>
+    <div>
+        <span>This message was sent automatically by the <a href="@Model.ApplicationUrl">NetControl4BioMed</a> application from an unmonitored address. Please do not reply to this e-mail.</span>
+    </div>
+</div>

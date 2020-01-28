@@ -9,3 +9,13 @@ html {
 body {
     min-height: 100%;
 }
+
+/* Style for the validation errors. */
+.validation-summary-errors ul {
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+}
+
+.input-validation-error {
+    border-color: #dc3545;
+}
