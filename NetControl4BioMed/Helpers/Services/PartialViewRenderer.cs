@@ -64,7 +64,7 @@ namespace NetControl4BioMed.Helpers.Services
             if (!getPartialResult.Success)
             {
                 // Throw an error.
-                throw new InvalidOperationException($"Error: Unable to find the requested partial {partialName} in {string.Join(", ", getPartialResult.SearchedLocations)}.");
+                throw new InvalidOperationException($"Unable to find the requested partial {partialName} in {string.Join(", ", getPartialResult.SearchedLocations)}.");
             }
             // Get the actual partial view.
             var partial = getPartialResult.View;
