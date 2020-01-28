@@ -1,0 +1,46 @@
+﻿@model string
+
+@if (!string.IsNullOrEmpty(Model))
+{
+    var messageType = Model.StartsWith("Error") ? "Error" : Model.StartsWith("Success") ? "Success" : "Info";
+    var messageText = Model.Substring(Model.IndexOf(" ") + 1);
+    @if (messageType == "Error")
+    {
+        <div class="alert alert-danger alert-dismissible text-wrap">
+            <div class="">
+                <span><i class="fas fa-exclamation-circle"></i></span>
+                <span class="sr-only">@messageType!</span>
+                <span>@messageText</span>
+            </div>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span><i class="fas fa-times"></i></span>
+            </button>
+        </div>
+    }
+    else if (messageType == "Success")
+    {
+        <div class="alert alert-success alert-dismissible text-wrap">
+            <div class="">
+                <span><i class="fas fa-check-circle"></i></span>
+                <span class="sr-only">@messageType!</span>
+                <span>@messageText</span>
+            </div>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span><i class="fas fa-times"></i></span>
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info alert-dismissible text-wrap">
+            <div class="">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span class="sr-only">@messageType!</span>
+                <span>@messageText</span>
+            </div>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span><i class="fas fa-times"></i></span>
+            </button>
+        </div>
+    }
+}

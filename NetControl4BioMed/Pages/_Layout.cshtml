@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - NetControl4BioMed</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" asp-fallback-href="~/lib/twitter-bootstrap/css/bootstrap.min.css" asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" integrity="sha256-L/W5Wfqfa0sdBNIKN9cG6QA5F2qx4qICmU2VgLruv9Y=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="false" />
+</head>
+<body class="d-flex flex-column">
+    <header class="flex-grow-0">
+        <div class="container">
+            <nav class="navbar navbar-expand-md navbar-light">
+                <a asp-page="/Index" class="navbar-brand">
+                    <img src="~/img/netcontrol4biomed-icon.png" width="30" height="30" class="align-top" />
+                    <span>NetControl4BioMed</span>
+                </a>
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target=".navbar-collapse" aria-controls=".navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span><i class="fas fa-bars"></i></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end">
+                    <div class="navbar-nav align-items-center">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a class="nav-item nav-link" asp-page="/Content/Index">
+                                <span>Content</span>
+                            </a>
+                            @if (User.IsInRole("Administrator"))
+                            {
+                                <a class="nav-item nav-link" asp-page="/Administrator/Index">
+                                    <span>Administrator</span>
+                                </a>
+                            }
+                            <a class="nav-item nav-link" asp-page="/Account/Index">
+                                <span>Account</span>
+                            </a>
+                            <form asp-page="/Identity/Logout" method="post">
+                                <button type="submit" title="Log out" class="btn nav-item nav-link">
+                                    <span>Log out</span>
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="nav-item nav-link" asp-page="/Identity/Login">
+                                <span>Log in</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <main class="flex-grow-1 d-flex flex-column">
+        <partial name="_ScriptsCookieConsentPartial" />
+        @RenderSection("Banner", required: false)
+        <div class="flex-grow-1 container d-flex flex-column py-2">
+            @if (IsSectionDefined("Breadcrumb"))
+            {
+                <nav class="breadcrumb my-0 my-md-2">
+                    <a asp-page="/Index" class="breadcrumb-item"><span>Home</span></a>
+                    @RenderSection("Breadcrumb", required: false)
+                </nav>
+            }
+            <partial name="_NavigationStatusMessagePartial" model="@TempData["StatusMessage"]" />
+            <div class="flex-grow-1 row my-0 my-md-2">
+                @if (IsSectionDefined("Navigation"))
+                {
+                    <div class="col-md-5 col-lg-4 col-xl-3 my-2 my-md-0 d-flex flex-column">
+                        @RenderSection("Navigation", required: false)
+                    </div>
+                }
+                <div class="col-md my-2 my-md-0 d-flex flex-column">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="flex-grow-0">
+        <div class="container">
+            <nav class="navbar navbar-expand-md navbar-light flex-column flex-md-row align-items-center justify-content-between">
+                <div class="navbar-nav align-items-center">
+                    <span class="navbar-text">
+                        <span>&copy; @DateTime.Now.Year - NetControl4BioMed</span>
+                    </span>
+                </div>
+                <div class="navbar-nav align-items-center">
+                    <a class="nav-item nav-link" asp-page="/About">
+                        <span>About</span>
+                    </a>
+                    <a class="nav-item nav-link" asp-page="/Privacy">
+                        <span>Privacy</span>
+                    </a>
+                    <a class="nav-item nav-link" asp-page="/TermsOfService">
+                        <span>Terms of service</span>
+                    </a>
+                    <a class="nav-item nav-link" asp-page="/Contact">
+                        <span>Contact</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" asp-fallback-src="~/lib/jquery/jquery.min.js" asp-fallback-test="window.jQuery" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.bundle.min.js" asp-fallback-src="~/lib/twitter-bootstrap/js/bootstrap.bundle.min.js" asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal" integrity="sha256-OUFW7hFO0/r5aEGTQOz9F/aXQOt+TwqI1Z4fbVvww04=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.min.js" asp-fallback-src="~/lib/font-awesome/js/all.min.js" asp-fallback-test="" integrity="sha256-qM7QTJSlvtPSxVRjVWNM2OfTAz/3k5ovHOKmKXuYMO4=" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="false"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
