@@ -86,7 +86,7 @@ namespace NetControl4BioMed.Helpers.Services
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
-            var to = new EmailAddress(viewModel.Email, viewModel.Email);
+            var to = new EmailAddress(viewModel.OldEmail, viewModel.OldEmail);
             var subject = "NetControl4BioMed - Your e-mail has been changed";
             var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailEmailChangedPartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
@@ -213,8 +213,8 @@ namespace NetControl4BioMed.Helpers.Services
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var to = new EmailAddress(viewModel.Email, viewModel.Email);
-            var subject = "NetControl4BioMed - Generic analysis ended";
-            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailGenericAnalysisEndedPartial", viewModel);
+            var subject = "NetControl4BioMed - Analysis ended";
+            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailAnalysisEndedPartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail.
             await client.SendEmailAsync(msg);

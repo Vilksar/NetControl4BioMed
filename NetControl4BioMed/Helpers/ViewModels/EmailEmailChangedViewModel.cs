@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 namespace NetControl4BioMed.Helpers.ViewModels
 {
     /// <summary>
-    /// Represents the variables for a password changed e-mail.
+    /// Represents the variables for an e-mail changed e-mail.
     /// </summary>
     public class EmailEmailChangedViewModel
     {
         /// <summary>
-        /// Gets or sets the user e-mail.
+        /// Gets or sets the old user e-mail.
         /// </summary>
-        public string Email { get; set; }
+        public string OldEmail { get; set; }
 
         /// <summary>
-        /// Gets or sets the URL to undo the changes.
+        /// Gets or sets the old user e-mail.
         /// </summary>
-        public string Url { get; set; }
+        public string NewEmail { get; set; }
 
         /// <summary>
         /// Gets or sets the URL to the home page of the application.
