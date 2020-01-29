@@ -67,10 +67,10 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// </summary>
         /// <param name="analysis">The current analysis.</param>
         /// <returns>Returns the log of the analysis.</returns>
-        public static List<LogEntry> GetLog(this Analysis analysis)
+        public static List<LogEntryViewModel> GetLog(this Analysis analysis)
         {
             // Return the list of log entries.
-            return JsonSerializer.Deserialize<List<LogEntry>>(analysis.Log);
+            return JsonSerializer.Deserialize<List<LogEntryViewModel>>(analysis.Log);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace NetControl4BioMed.Helpers.Extensions
         public static string AppendToLog(this Analysis analysis, string message)
         {
             // Return the log entries.
-            return JsonSerializer.Serialize(analysis.GetLog().Append(new LogEntry(message)));
+            return JsonSerializer.Serialize(analysis.GetLog().Append(new LogEntryViewModel(message)));
         }
 
         /// <summary>
@@ -90,10 +90,10 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// </summary>
         /// <param name="analysis">The current analysis.</param>
         /// <returns>Returns the log of the analysis.</returns>
-        public static List<DateTimeInterval> GetDateTimeIntervals(this Analysis analysis)
+        public static List<DateTimeIntervalViewModel> GetDateTimeIntervals(this Analysis analysis)
         {
             // Return the list of intervals.
-            return JsonSerializer.Deserialize<List<DateTimeInterval>>(analysis.DateTimeIntervals);
+            return JsonSerializer.Deserialize<List<DateTimeIntervalViewModel>>(analysis.DateTimeIntervals);
         }
 
         /// <summary>
@@ -106,7 +106,20 @@ namespace NetControl4BioMed.Helpers.Extensions
         public static string AppendToDateTimeIntervals(this Analysis analysis, DateTime? dateTimeStarted, DateTime? dateTimeEnded)
         {
             // Return the intervals.
-            return JsonSerializer.Serialize(analysis.GetDateTimeIntervals().Append(new DateTimeInterval(dateTimeStarted, dateTimeEnded)));
+            return JsonSerializer.Serialize(analysis.GetDateTimeIntervals().Append(new DateTimeIntervalViewModel(dateTimeStarted, dateTimeEnded)));
+        }
+
+        /// <summary>
+        /// Appends to the list a new interval in which the analysis was running and returns the updated list.
+        /// </summary>
+        /// <param name="analysis">The current analysis.</param>
+        /// <param name="dateTimeStarted">The starting date and time of the interval.</param>
+        /// <param name="dateTimeEnded">The ending date and time of the interval.</param>
+        /// <returns>Returns the updated log of the analysis.</returns>
+        public static string AppendToDateTimeIntervalsSkipLast(this Analysis analysis, DateTime? dateTimeStarted, DateTime? dateTimeEnded)
+        {
+            // Return the intervals.
+            return JsonSerializer.Serialize(analysis.GetDateTimeIntervals().SkipLast(1).Append(new DateTimeIntervalViewModel(dateTimeStarted, dateTimeEnded)));
         }
     }
 }

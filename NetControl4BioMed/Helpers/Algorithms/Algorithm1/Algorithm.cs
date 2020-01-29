@@ -285,7 +285,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             analysis.ControlPaths = controlPaths;
             analysis.Status = currentIteration < parameters.MaximumIterations && currentIterationWithoutImprovement < parameters.MaximumIterationsWithoutImprovement ? AnalysisStatus.Stopped : AnalysisStatus.Completed;
             analysis.DateTimeEnded = DateTime.Now;
-            analysis.DateTimeIntervals = JsonSerializer.Serialize(JsonSerializer.Deserialize<List<DateTimeInterval>>(analysis.DateTimeIntervals).SkipLast(1).Append(new DateTimeInterval(analysis.DateTimeStarted, analysis.DateTimeEnded)));
+            analysis.DateTimeIntervals = analysis.AppendToDateTimeIntervalsSkipLast(analysis.DateTimeStarted, analysis.DateTimeEnded);
             // Save the changes in the database.
             await context.SaveChangesAsync();
             // End the function.

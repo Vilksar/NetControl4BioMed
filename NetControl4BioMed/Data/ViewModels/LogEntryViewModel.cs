@@ -6,40 +6,39 @@ using System.Threading.Tasks;
 namespace NetControl4BioMed.Data.ViewModels
 {
     /// <summary>
-    /// Represents a date and time interval in which an analysis runs (used instead of Tuple&lt;DateTime?, DateTime?&gt;).
+    /// Represents a entry in the analysis log (used instead of Tuple&lt;DateTime, string&gt;).
     /// </summary>
-    public class DateTimeInterval
+    public class LogEntryViewModel
     {
         /// <summary>
         /// Represents the start time of the interval.
         /// </summary>
-        public DateTime? DateTimeStarted { get; set; }
+        public DateTime DateTime { get; set; }
 
         /// <summary>
         /// Represents the end time of the interval.
         /// </summary>
-        public DateTime? DateTimeEnded { get; set; }
+        public string Message { get; set; }
 
         /// <summary>
         /// Initializes a new default instance of the class.
         /// </summary>
-        public DateTimeInterval()
+        public LogEntryViewModel()
         {
             // Assign the default value for each property.
-            DateTimeStarted = null;
-            DateTimeEnded = null;
+            DateTime = DateTime.Now;
+            Message = null;
         }
 
         /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
-        /// <param name="dateTimeStarted">The start time of the interval.</param>
-        /// <param name="dateTimeEnded">The end time of the interval.</param>
-        public DateTimeInterval(DateTime? dateTimeStarted, DateTime? dateTimeEnded)
+        /// <param name="message">The message of the log entry.</param>
+        public LogEntryViewModel(string message)
         {
             // Assign the value for each property.
-            DateTimeStarted = dateTimeStarted;
-            DateTimeEnded = dateTimeEnded;
+            DateTime = DateTime.Now;
+            Message = message;
         }
     }
 }
