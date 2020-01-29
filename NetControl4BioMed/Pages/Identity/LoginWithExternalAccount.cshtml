@@ -23,7 +23,8 @@
                     <div class="card-body">
                         @if (Model.View.ExternalLogins.Any())
                         {
-                            <form method="post" asp-page="/ExternalLogin" asp-route-returnUrl="@Model.View.ReturnUrl">
+                            <form method="post" asp-page="/ExternalLogin" asp-route-returnUrl="@Model.View.ReturnUrl" class="text-justify">
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
                                 <div class="form-group">
                                     <label class="font-weight-bold">External login</label>
                                     @foreach (var provider in Model.View.ExternalLogins)
@@ -38,7 +39,7 @@
                         }
                         else
                         {
-                            <div class="alert alert-info text-wrap my-0">
+                            <div class="alert alert-info text-justify text-wrap my-0">
                                 <span>There are no external login providers available.</span>
                             </div>
                         }

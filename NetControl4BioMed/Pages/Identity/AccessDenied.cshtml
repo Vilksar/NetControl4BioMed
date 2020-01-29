@@ -22,7 +22,8 @@
                         <div class="col-md-6 my-2 my-md-0">
                             @if (User.Identity.IsAuthenticated)
                             {
-                                <form asp-page="/Logout" method="post">
+                                <form asp-page="/Logout" method="post" class="text-justify">
+                                    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
                                     <button type="submit" title="Log out" class="btn btn-danger btn-block">
                                         <span>Log out</span>
                                     </button>
