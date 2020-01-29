@@ -1,0 +1,28 @@
+﻿@page
+@model PersonalDataModel
+@{
+    ViewData["Title"] = "Personal Data";
+    ViewData["ActivePage"] = "PersonalData";
+}
+
+<div class="alert alert-info text-justify text-wrap">
+    <span><i class="fas fa-info-circle"></i></span>
+    <span>Your account contains personal data that you have given us. This page allows you to download or delete that data.</span>
+</div>
+<div class="alert alert-danger text-justify text-wrap">
+    <span><i class="fas fa-exclamation-circle"></i></span>
+    <span>Deleting this data will permanently remove your account, and this cannot be recovered.</span>
+</div>
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+    <button type="submit" title="Download" class="btn btn-block btn-primary">
+        <span>Download</span>
+    </button>
+    <a asp-page="/Account/Manage/DeletePersonalData" class="btn btn-block btn-danger">
+        <span>Delete</span>
+    </a>
+</form>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+}
