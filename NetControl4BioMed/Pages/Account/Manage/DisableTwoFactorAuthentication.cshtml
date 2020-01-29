@@ -1,0 +1,22 @@
+﻿@page
+@model DisableTwoFactorAuthenticationModel
+@{
+    ViewData["Title"] = "Disable two-factor authentication";
+    ViewData["ActivePage"] = "TwoFactorAuthentication";
+}
+
+<div class="alert alert-info text-justify text-wrap">
+    <span><i class="fas fa-info-circle"></i></span>
+    <span><span class="font-weight-bold">This action only disables two-factor authentication.</span> Disabling 2FA does not change the keys used in authenticator apps. If you wish to change the key used in an authenticator app, you should <a asp-page="/Account/Manage/ResetAuthenticator" class="alert-link">reset your authenticator keys</a>.</span>
+</div>
+<hr />
+<form method="post" class="text-justify">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+    <button type="submit" title="Disable two-factor authentication" class="btn btn-block btn-primary">
+        <span>Disable two-factor authentication</span>
+    </button>
+</form>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+}
