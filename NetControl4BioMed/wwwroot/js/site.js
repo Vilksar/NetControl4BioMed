@@ -14,4 +14,16 @@ $(window).on('load', () => {
         });
     }
 
+    // Check if there is a QR code on the page.
+    if ($('.qr-code').length !== 0) {
+        // Load the QR generation script.
+        $.getScript('/lib/jquery-qrcode/jquery.qrcode.min.js', () => {
+            // Go over all of the QR codes on the page.
+            $('.qr-code').each((index, element) => {
+                // And generate the QR code based on the given uri.
+                $(element).qrcode($(element).data('uri'));
+            });
+        });
+    }
+
 });
