@@ -2,7 +2,6 @@
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.ViewModels;
 using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Helpers.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

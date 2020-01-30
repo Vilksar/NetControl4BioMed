@@ -2,7 +2,6 @@
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.Interfaces;
-using NetControl4BioMed.Helpers.Models;
 using NetControl4BioMed.Helpers.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -42,7 +41,7 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the analysis to run.</param>
         /// <returns></returns>
-        public async Task Run(Models.AnalysisRunnerViewModel model)
+        public async Task Run(AnalysisRunnerViewModel model)
         {
             // Get the analysis with the given ID.
             var analysis = _context.Analyses

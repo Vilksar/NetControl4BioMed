@@ -1,5 +1,4 @@
-﻿using NetControl4BioMed.Helpers.Models;
-using NetControl4BioMed.Helpers.ViewModels;
+﻿using NetControl4BioMed.Helpers.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

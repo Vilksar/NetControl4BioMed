@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NetControl4BioMed.Helpers.Models
+namespace NetControl4BioMed.Helpers.ViewModels
 {
     /// <summary>
     /// Represents the model of an analysis runner.
