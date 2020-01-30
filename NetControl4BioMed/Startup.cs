@@ -58,11 +58,11 @@ namespace NetControl4BioMed
             // Add the database context and connection.
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]);
             });
             services.AddHangfire(options =>
             {
-                options.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServerStorage(Configuration["ConnectionStrings:DefaultConnection"]);
             });
             // Add the default Identity functions for users and roles.
             services.AddIdentity<User, Role>(options =>
@@ -95,8 +95,11 @@ namespace NetControl4BioMed
                     facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
                     facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
                 });
-            // Add the dependency injection for the partial view renderer and the e-mail sender.
+            // Add the HTTP client dependency.
+            services.AddHttpClient();
+            // Add the dependency injection for the partial view renderer, reCaptcha checker and the e-mail sender.
             services.AddTransient<IPartialViewRenderer, PartialViewRenderer>();
+            services.AddTransient<IReCaptchaChecker, ReCaptchaChecker>();
             services.AddTransient<ISendGridEmailSender, SendGridEmailSender>();
             // Add Razor pages.
             services.AddRazorPages();
