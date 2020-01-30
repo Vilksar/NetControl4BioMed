@@ -23,13 +23,15 @@ namespace NetControl4BioMed.Pages.Identity
         private readonly ISendGridEmailSender _emailSender;
         private readonly ApplicationDbContext _context;
         private readonly LinkGenerator _linkGenerator;
+        private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public RegisterModel(UserManager<User> userManager, ISendGridEmailSender emailSender, ApplicationDbContext context, LinkGenerator linkGenerator)
+        public RegisterModel(UserManager<User> userManager, ISendGridEmailSender emailSender, ApplicationDbContext context, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
             _userManager = userManager;
             _emailSender = emailSender;
             _context = context;
             _linkGenerator = linkGenerator;
+            _reCaptchaChecker = reCaptchaChecker;
         }
 
         [BindProperty]
@@ -50,6 +52,8 @@ namespace NetControl4BioMed.Pages.Identity
             [Required(ErrorMessage = "This field is required.")]
             [Compare(nameof(Password), ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            public string ReCaptchaToken { get; set; }
         }
 
         public ViewModel View { get; set; }
@@ -77,6 +81,14 @@ namespace NetControl4BioMed.Pages.Identity
             {
                 ReturnUrl = returnUrl ?? Url.Content("~/")
             };
+            // Check if the reCaptcha is valid.
+            if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The reCaptcha verification failed.");
+                // Return the page.
+                return Page();
+            }
             // Check if the provided model is not valid.
             if (!ModelState.IsValid)
             {

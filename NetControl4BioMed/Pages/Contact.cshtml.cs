@@ -17,11 +17,13 @@ namespace NetControl4BioMed.Pages
     {
         private readonly ISendGridEmailSender _emailSender;
         private readonly LinkGenerator _linkGenerator;
+        private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public ContactModel(ISendGridEmailSender emailSender, LinkGenerator linkGenerator)
+        public ContactModel(ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
             _emailSender = emailSender;
             _linkGenerator = linkGenerator;
+            _reCaptchaChecker = reCaptchaChecker;
         }
 
         [BindProperty]
@@ -31,15 +33,17 @@ namespace NetControl4BioMed.Pages
         {
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string Name { get; set; } = string.Empty;
+            public string Name { get; set; }
 
             [DataType(DataType.EmailAddress)]
             [Required(ErrorMessage = "This field is required.")]
-            public string Email { get; set; } = string.Empty;
+            public string Email { get; set; }
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
-            public string Message { get; set; } = string.Empty;
+            public string Message { get; set; }
+
+            public string ReCaptchaToken { get; set; }
         }
 
         public IActionResult OnGet(string name = null, string email = null, string message = null)
@@ -57,6 +61,14 @@ namespace NetControl4BioMed.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Check if the reCaptcha is valid.
+            if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The reCaptcha verification failed.");
+                // Return the page.
+                return Page();
+            }
             // Check if the provided model is not valid.
             if (!ModelState.IsValid)
             {

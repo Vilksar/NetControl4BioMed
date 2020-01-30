@@ -39,6 +39,12 @@
                             <span asp-description-for="Input.Password" class="text-muted small">Confirm the new password for your account.</span>
                             <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
                         </div>
+                        <div class="form-group" hidden>
+                            <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+                            <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+                            <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+                            <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+                        </div>
                         <button type="submit" title="Register" class="btn btn-block btn-success">
                             <span>Register</span>
                         </button>
