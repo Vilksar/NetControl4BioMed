@@ -1,0 +1,183 @@
+﻿@{
+    Layout = "/Pages/_Layout.cshtml";
+    var activeGroup = (string)ViewData["ActiveGroup"] ?? string.Empty;
+    var activePage = (string)ViewData["ActivePage"] ?? string.Empty;
+}
+
+@section Banner {
+    <div class="bg-primary text-white py-0 py-md-2">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 my-2 my-md-0">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 col-lg-2 d-flex flex-column justify-content-center align-items-center mt-2 mb-1 my-md-0">
+                            <span><i class="fas fa-cogs fa-3x"></i></span>
+                        </div>
+                        <div class="col-md-9 col-lg-10 d-flex flex-column justify-content-center align-items-center align-items-md-start mt-1 mb-2 my-md-0">
+                            <span class="h4 my-0">Administration</span>
+                            <span>@ViewData["Title"]</span>
+                        </div>
+                    </div>
+                </div>
+                @if (IsSectionDefined("Search"))
+                {
+                    <div class="col-md-6 my-2 my-md-0">
+                        @RenderSection("Search", required: false)
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@section Navigation {
+    <div class="accordion list-group list-group-flush" id="area-menu-accordion">
+        <a asp-page="/Administration/Index" class="list-group-item list-group-item-action list-group-item-primary @(activeGroup == string.Empty && activePage == "Index" ? "active" : string.Empty)">
+            <div class="row">
+                <span class="col-2 text-center"><i class="fas fa-chart-bar"></i></span>
+                <span class="col-8 text-left text-wrap">Overview</span>
+            </div>
+        </a>
+        <a asp-page="/Administration/Hangfire" class="list-group-item list-group-item-action list-group-item-primary @(activeGroup == string.Empty && activePage == "Hangfire" ? "active" : string.Empty)">
+            <div class="row">
+                <span class="col-2 text-center"><i class="fas fa-fire"></i></span>
+                <span class="col-8 text-left text-wrap">Hangfire</span>
+            </div>
+        </a>
+        <a href="" class="list-group-item list-group-item-action list-group-item-primary @(activeGroup == "Accounts" ? "active" : string.Empty)" data-toggle="collapse" data-target="#area-menu-accounts" aria-expanded="@(activeGroup == "Accounts" ? "true" : "false")">
+            <div class="row">
+                <span class="col-2 text-center"><i class="fas fa-users"></i></span>
+                <span class="col-8 text-left text-wrap">Accounts</span>
+                <span class="col-2 text-center"><i class="fas fa-angle-down"></i></span>
+            </div>
+        </a>
+        <div id="area-menu-accounts" class="list-group list-group-flush collapse @(activeGroup == "Accounts" ? "show" : string.Empty)" data-parent="#area-menu-accordion">
+            <a asp-page="/Administration/Accounts/Users/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Accounts" && activePage == "Users" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Users</span>
+                    <span class="col-3 text-center"><i class="fas fa-user"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Accounts/Roles/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Accounts" && activePage == "Roles" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Roles</span>
+                    <span class="col-3 text-center"><i class="fas fa-user-tag"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Accounts/UserRoles/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Accounts" && activePage == "UserRoles" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">User roles</span>
+                    <span class="col-3 text-center"><i class="fas fa-user-tie"></i></span>
+                </div>
+            </a>
+        </div>
+        <a href="" class="list-group-item list-group-item-action list-group-item-primary @(activeGroup == "Data" ? "active" : string.Empty)" data-toggle="collapse" data-target="#area-menu-data" aria-expanded="@(activeGroup == "Data" ? "true" : "false")">
+            <div class="row">
+                <span class="col-2 text-center"><i class="fas fa-database"></i></span>
+                <span class="col-8 text-left text-wrap">Data</span>
+                <span class="col-2 text-center"><i class="fas fa-angle-down"></i></span>
+            </div>
+        </a>
+        <div id="area-menu-data" class="list-group list-group-flush collapse @(activeGroup == "Data" ? "show" : string.Empty)" data-parent="#area-menu-accordion">
+            <a asp-page="/Administration/Data/DatabaseTypes/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Data" && activePage == "DatabaseTypes" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Database types</span>
+                    <span class="col-3 text-center"><i class="fas fa-list"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Data/DatabaseUsers/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Data" && activePage == "DatabaseUsers" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Database users</span>
+                    <span class="col-3 text-center"><i class="fas fa-user"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Data/Databases/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Data" && activePage == "Databases" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Databases</span>
+                    <span class="col-3 text-center"><i class="fas fa-database"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Data/DatabaseNodes/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Data" && activePage == "DatabaseNodes" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Database nodes</span>
+                    <span class="col-3 text-center"><i class="fas fa-dot-circle"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Data/DatabaseEdges/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Data" && activePage == "DatabaseEdges" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Database edges</span>
+                    <span class="col-3 text-center"><i class="fas fa-minus-circle"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Data/DatabaseNodeFields/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Data" && activePage == "DatabaseNodeFields" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Database node fields</span>
+                    <span class="col-3 text-center"><i class="fas fa-dot-circle"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Data/DatabaseEdgeFields/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Data" && activePage == "DatabaseEdgeFields" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Database edge fields</span>
+                    <span class="col-3 text-center"><i class="fas fa-minus-circle"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Data/Nodes/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Data" && activePage == "Nodes" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Nodes</span>
+                    <span class="col-3 text-center"><i class="fas fa-circle"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Data/Edges/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Data" && activePage == "Edges" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Edges</span>
+                    <span class="col-3 text-center"><i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Data/EdgeNodes/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Data" && activePage == "EdgeNodes" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Edge nodes</span>
+                    <span class="col-3 text-center"><i class="fas fa-arrow-circle-right"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Data/NodeCollections/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Data" && activePage == "NodeCollections" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Node collections</span>
+                    <span class="col-3 text-center"><i class="fas fa-folder"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Data/NodeCollectionNodes/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Data" && activePage == "NodeCollectionNodes" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Node collection nodes</span>
+                    <span class="col-3 text-center"><i class="fas fa-folder-open"></i></span>
+                </div>
+            </a>
+        </div>
+        <a href="" class="list-group-item list-group-item-action list-group-item-primary @(activeGroup == "Content" ? "active" : string.Empty)" data-toggle="collapse" data-target="#area-menu-content" aria-expanded="@(activeGroup == "Content" ? "true" : "false")">
+            <div class="row">
+                <span class="col-2 text-center"><i class="fas fa-table"></i></span>
+                <span class="col-8 text-left text-wrap">Content</span>
+                <span class="col-2 text-center"><i class="fas fa-angle-down"></i></span>
+            </div>
+        </a>
+        <div id="area-menu-content" class="list-group list-group-flush collapse @(activeGroup == "Content" ? "show" : string.Empty)" data-parent="#area-menu-accordion">
+            <a asp-page="/Administration/Content/Networks/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Content" && activePage == "Networks" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Networks</span>
+                    <span class="col-3 text-center"><i class="fas fa-share-alt"></i></span>
+                </div>
+            </a>
+            <a asp-page="/Administration/Content/Analyses/Index" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Content" && activePage == "Analyses" ? "active" : string.Empty)">
+                <div class="row align-items-center">
+                    <span class="col-9 text-left text-wrap">Analyses</span>
+                    <span class="col-3 text-center"><i class="fas fa-desktop"></i></span>
+                </div>
+            </a>
+        </div>
+    </div>
+}
+
+@RenderBody()
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}
