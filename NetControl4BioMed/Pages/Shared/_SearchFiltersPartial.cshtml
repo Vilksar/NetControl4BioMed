@@ -1,0 +1,11 @@
+﻿@model Dictionary<string, string>
+
+<div>
+    @foreach (var item in Model)
+    {
+        <a href="@item.Value" class="badge badge-pill badge-warning">
+            <span class="mr-2">@item.Key</span>
+            <span class="ml-2"><i class="fas fa-times"></i></span>
+        </a>
+    }
+</div>

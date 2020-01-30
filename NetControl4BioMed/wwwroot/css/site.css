@@ -19,3 +19,10 @@ body {
 .input-validation-error {
     border-color: #dc3545;
 }
+
+/* Style for the dropdown menus. */
+.dropdown-menu {
+    min-width: 15rem;
+    max-height: 30rem;
+    overflow: auto;
+}

@@ -1,0 +1,100 @@
+﻿@model Helpers.ViewModels.SearchInputViewModel
+
+<form method="get">
+    @if (Context.Request.Query.Keys.Contains("id"))
+    {
+        <input type="hidden" name="id" class="form-control" value="@Context.Request.Query["id"].ToString()" />
+    }
+    <div class="input-group">
+        <input asp-for="SearchString" class="form-control" name="searchString" placeholder="Search..." autocomplete="off" />
+        <div class="input-group-append">
+            <button class="btn btn-outline-light" type="button" title="Filter" data-toggle="dropdown">
+                <span><i class="fas fa-filter"></i></span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right dropdown-menu-form px-3 py-2">
+                @if (Model.Options.SearchIn.Any())
+                {
+                    <label asp-for="SearchIn" class="dropdown-item-text font-weight-bold">Search in</label>
+                    @foreach (var option in Model.Options.SearchIn)
+                    {
+                        <div class="dropdown-item">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" id="search-in-@option.Key" name="searchIn" value="@option.Key" checked="@(Model.SearchIn.Contains(option.Key) ? "checked" : null)" class="custom-control-input" />
+                                <label for="search-in-@option.Key" class="custom-control-label">@option.Value</label>
+                            </div>
+                        </div>
+                    }
+                    <div class="dropdown-divider"></div>
+                }
+                @if (Model.Options.Filter.Any())
+                {
+                    <label asp-for="Filter" class="dropdown-item-text font-weight-bold">Filter</label>
+                    @foreach (var option in Model.Options.Filter)
+                    {
+                        <div class="dropdown-item">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" id="filter-@option.Key" name="filter" value="@option.Key" checked="@(Model.Filter.Contains(option.Key) ? "checked" : null)" class="custom-control-input" />
+                                <label for="filter-@option.Key" class="custom-control-label">@option.Value</label>
+                            </div>
+                        </div>
+                    }
+                    <div class="dropdown-divider"></div>
+                }
+            </div>
+        </div>
+        <div class="input-group-append">
+            <button class="btn btn-outline-light" type="button" title="Sort" data-toggle="dropdown">
+                <span><i class="fas fa-sort-alpha-down"></i></span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right dropdown-menu-form px-3 py-2">
+                @if (Model.Options.SortBy.Any())
+                {
+                    <label asp-for="SortBy" class="dropdown-item-text font-weight-bold">Sort by</label>
+                    @foreach (var option in Model.Options.SortBy)
+                    {
+                        <div class="dropdown-item">
+                            <div class="custom-control custom-radio">
+                                <input asp-for="SortBy" type="radio" id="sort-by-@option.Key" name="sortBy" value="@option.Key" class="custom-control-input" />
+                                <label for="sort-by-@option.Key" class="custom-control-label">@option.Value</label>
+                            </div>
+                        </div>
+                    }
+                    <div class="dropdown-divider"></div>
+                }
+                @if (Model.Options.SortDirection.Any())
+                {
+                    <label asp-for="SortDirection" class="dropdown-item-text font-weight-bold">Sort direction</label>
+                    @foreach (var option in Model.Options.SortDirection)
+                    {
+                        <div class="dropdown-item">
+                            <div class="custom-control custom-radio">
+                                <input asp-for="SortDirection" type="radio" id="sort-direction-@option.Key" name="sortDirection" value="@option.Key" class="custom-control-input" />
+                                <label for="sort-direction-@option.Key" class="custom-control-label">@option.Value</label>
+                            </div>
+                        </div>
+                    }
+                    <div class="dropdown-divider"></div>
+                }
+                @if (Model.Options.ItemsPerPage.Any())
+                {
+                    <label asp-for="ItemsPerPage" class="dropdown-item-text font-weight-bold">Items per page</label>
+                    @foreach (var option in Model.Options.ItemsPerPage)
+                    {
+                        <div class="dropdown-item">
+                            <div class="custom-control custom-radio">
+                                <input asp-for="ItemsPerPage" type="radio" id="items-per-page-@option.Key" name="itemsPerPage" value="@option.Key" class="custom-control-input" />
+                                <label for="items-per-page-@option.Key" class="custom-control-label">@option.Value</label>
+                            </div>
+                        </div>
+                    }
+                    <div class="dropdown-divider"></div>
+                }
+            </div>
+        </div>
+        <div class="input-group-append">
+            <button class="btn btn-outline-light" type="submit" title="Search">
+                <span><i class="fas fa-search"></i></span>
+            </button>
+        </div>
+    </div>
+</form>
