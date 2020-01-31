@@ -54,12 +54,12 @@
     <main class="flex-grow-1 d-flex flex-column">
         <partial name="_ScriptsCookieConsentPartial" />
         @RenderSection("Banner", required: false)
-        <div class="flex-grow-1 container d-flex flex-column py-2">
-            @if (IsSectionDefined("Breadcrumb"))
+        <div class="flex-grow-1 container d-flex flex-column">
+            @if (IsSectionDefined("Breadcrumbs"))
             {
-                <nav class="breadcrumb my-0 my-lg-2">
+                <nav class="breadcrumb my-2">
                     <a asp-page="/Index" class="breadcrumb-item"><span>Home</span></a>
-                    @RenderSection("Breadcrumb", required: false)
+                    @RenderSection("Breadcrumbs", required: false)
                 </nav>
             }
             <partial name="_StatusMessagePartial" model="@TempData["StatusMessage"]" />

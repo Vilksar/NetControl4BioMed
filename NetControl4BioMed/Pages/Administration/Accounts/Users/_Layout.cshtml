@@ -2,8 +2,9 @@
     Layout = "/Pages/Administration/Accounts/_Layout.cshtml";
 }
 
-@section Search {
-    @RenderSection("Search", required: false)
+@section Breadcrumbs {
+    <a asp-page="/Administration/Accounts/Users/Index" class="breadcrumb-item"><span>Users</span></a>
+    @RenderSection("Breadcrumbs", required: false)
 }
 
 @RenderBody()

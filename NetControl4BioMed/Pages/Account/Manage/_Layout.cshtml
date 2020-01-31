@@ -2,6 +2,10 @@
     Layout = "/Pages/Account/_Layout.cshtml";
 }
 
+@section Breadcrumbs {
+    @RenderSection("Breadcrumbs", required: false)
+}
+
 @RenderBody()
 
 @section Scripts {
