@@ -17,45 +17,43 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public SearchOptionsViewModel Options { get; set; }
 
         /// <summary>
+        /// Gets or sets the ID of the currently displayed item (if it exists).
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         /// Gets or sets the text to search for.
         /// </summary>
-        [Display(Name = "Search for", Description = "The text to search for.")]
         public string SearchString { get; set; }
 
         /// <summary>
         /// Gets or sets the JSON string containing the fields in which to search for the text.
         /// </summary>
-        [Display(Name = "Search in", Description = "The fields in which to search for the text.")]
         public IEnumerable<string> SearchIn { get; set; }
 
         /// <summary>
         /// Gets or sets the JSON string containing the filters to be applied to the results.
         /// </summary>
-        [Display(Name = "Filters", Description = "The filters to be applied to the results. The results need to match all of the filters.")]
         public IEnumerable<string> Filter { get; set; }
 
         /// <summary>
         /// Gets or sets the field based which to sort the results.
         /// </summary>
-        [Display(Name = "Sort by", Description = "The field based on which to sort the results.")]
         public string SortBy { get; set; }
 
         /// <summary>
         /// Gets or sets the direction in which to sort the results.
         /// </summary>
-        [Display(Name = "Sort direction", Description = "The direction in which to sort the results.")]
         public string SortDirection { get; set; }
 
         /// <summary>
         /// Gets or sets the number of items to be displayed at one time, on a single page.
         /// </summary>
-        [Display(Name = "Items per page", Description = "The number of items displayed at one time, on a single page.")]
         public int ItemsPerPage { get; set; }
 
         /// <summary>
         /// Gets or sets the current page of the search.
         /// </summary>
-        [Display(Name = "Current page", Description = "The current page of the search.")]
         public int CurrentPage { get; set; }
 
         /// <summary>
@@ -74,7 +72,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <param name="sortDirection">Represents the direction in which to sort the results.</param>
         /// <param name="itemsPerPage">Represents the number of items to be displayed at one time, on a single page.</param>
         /// <param name="currentPage">Represents the current page of the search.</param>
-        public SearchInputViewModel(SearchOptionsViewModel options, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
+        public SearchInputViewModel(SearchOptionsViewModel options, string id = null, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
         {
             // Check the search options for possible errors.
             if (options.Filter == null || options.ItemsPerPage == null || options.SearchIn == null || options.SortBy == null || options.SortDirection == null)
@@ -95,6 +93,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             itemsPerPage = itemsPerPage == null || itemsPerPage.Value < 1 ? Options.ItemsPerPage.FirstOrDefault().Key : itemsPerPage.Value;
             currentPage = currentPage == null || currentPage.Value < 1 ? 1 : currentPage.Value;
             // Define the properties.
+            Id = id;
             SearchString = searchString;
             SortBy = sortBy;
             SortDirection = sortDirection;
