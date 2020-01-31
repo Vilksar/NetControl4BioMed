@@ -21,12 +21,14 @@ namespace NetControl4BioMed.Pages.Identity
         private readonly UserManager<User> _userManager;
         private readonly ISendGridEmailSender _emailSender;
         private readonly LinkGenerator _linkGenerator;
+        private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public ForgotPasswordModel(UserManager<User> userManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator)
+        public ForgotPasswordModel(UserManager<User> userManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
             _userManager = userManager;
             _emailSender = emailSender;
             _linkGenerator = linkGenerator;
+            _reCaptchaChecker = reCaptchaChecker;
         }
 
         [BindProperty]
@@ -37,6 +39,8 @@ namespace NetControl4BioMed.Pages.Identity
             [DataType(DataType.EmailAddress)]
             [Required(ErrorMessage = "This field is required.")]
             public string Email { get; set; }
+
+            public string ReCaptchaToken { get; set; }
         }
 
         public IActionResult OnGet()
@@ -47,6 +51,14 @@ namespace NetControl4BioMed.Pages.Identity
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Check if the reCaptcha is valid.
+            if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The reCaptcha verification failed.");
+                // Return the page.
+                return Page();
+            }
             // Check if the provided model is not valid.
             if (!ModelState.IsValid)
             {
