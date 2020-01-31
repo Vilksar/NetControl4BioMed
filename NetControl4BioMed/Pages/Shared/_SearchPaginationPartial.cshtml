@@ -2,10 +2,10 @@
 
 <li class="list-group-item">
     <div class="row align-items-center">
-        <div class="col-sm-6 text-center text-md-left">
+        <div class="col-md-6 text-center text-md-left">
             <span class="text-muted small">Showing items @Model.ItemsPerPageFirst to @Model.ItemsPerPageLast out of @Model.TotalItems.</span>
         </div>
-        <div class="col-sm-6 text-center text-md-right">
+        <div class="col-md-6 text-center text-md-right">
             <div class="btn-group">
                 <a href="@Model.PreviousPageLink" class="btn @(string.IsNullOrEmpty(Model.PreviousPageLink) ? "disabled" : string.Empty)" title="Previous page">
                     <span><i class="fas fa-angle-left"></i></span>
