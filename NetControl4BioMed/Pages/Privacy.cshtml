@@ -2,26 +2,44 @@
 @model PrivacyModel
 @{
     ViewData["Title"] = "Privacy policy";
+    var navigationBanner = new Helpers.ViewModels.NavigationBannerViewModel
+    {
+        Id = "Privacy",
+        Title = "Privacy policy",
+        Icon = "fa-lock",
+        Color = "secondary"
+    };
 }
 
-@section Banner {
-    <div class="bg-secondary text-white py-3">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6 my-2 my-md-0">
-                    <div class="row align-items-center">
-                        <div class="col-md-1 d-flex flex-column justify-content-center align-items-center">
-                            <span class="h4 my-0"><i class="fas fa-lock"></i></span>
-
+<div class="flex-grow-1 d-flex flex-column justify-content-center">
+    <div class="row">
+        <div class="offset-lg-3 col-lg-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                        <div>
+                            <span><i class="fas fa-lock"></i></span>
                         </div>
-                        <div class="col-md-11 d-flex flex-column justify-content-center align-items-center align-items-md-start">
-                            <span class="h4 my-0">@ViewData["Title"]</span>
+                        <div>
+                            <span>Privacy policy</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column justify-content-center">
+                        <div class="text-justify">
+                            <span>This page will provide the privacy policy of the website.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center justify-content-lg-end">
+                        <div class="small">
+                            <span>Last updated: February 3rd, 2020</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-}
-
-<p>This page will provide the privacy policy of the website.</p>
+</div>
