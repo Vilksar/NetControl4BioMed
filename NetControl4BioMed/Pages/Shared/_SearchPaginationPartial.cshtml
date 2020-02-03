@@ -1,22 +1,25 @@
 ﻿@model Helpers.ViewModels.SearchPaginationViewModel
 
-<li class="list-group-item">
-    <div class="row align-items-center">
-        <div class="col-md-6 text-center text-md-left">
-            <span class="text-muted small">Showing items @Model.ItemsPerPageFirst to @Model.ItemsPerPageLast out of @Model.TotalItems.</span>
-        </div>
-        <div class="col-md-6 text-center text-md-right">
-            <div class="btn-group">
-                <a href="@Model.PreviousPageLink" class="btn @(string.IsNullOrEmpty(Model.PreviousPageLink) ? "disabled" : string.Empty)" title="Previous page">
-                    <span><i class="fas fa-angle-left"></i></span>
-                </a>
-                <button type="button" class="btn" title="Current page" disabled>
-                    <span>@Model.CurrentPage / @Model.TotalPages</span>
-                </button>
-                <a href="@Model.NextPageLink" class="btn @(string.IsNullOrEmpty(Model.NextPageLink) ? "disabled" : string.Empty)" title="Next page">
-                    <span><i class="fas fa-angle-right"></i></span>
-                </a>
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <div class="row align-items-center">
+            <div class="col-lg-6 text-center text-lg-left">
+                <span class="text-muted">Showing items @Model.ItemsPerPageFirst to @Model.ItemsPerPageLast out of @Model.TotalItems.</span>
+            </div>
+            <div class="col-lg-6 text-center text-lg-right">
+                <div class="btn-group">
+                    <a href="@Model.PreviousPageLink" class="btn @(string.IsNullOrEmpty(Model.PreviousPageLink) ? "disabled" : string.Empty)" title="Previous page">
+                        <span><i class="fas fa-angle-left"></i></span>
+                    </a>
+                    <a href="#" class="btn disabled">
+                        <span>@Model.CurrentPage / @Model.TotalPages</span>
+                    </a>
+                    <a href="@Model.NextPageLink" class="btn @(string.IsNullOrEmpty(Model.NextPageLink) ? "disabled" : string.Empty)" title="Next page">
+                        <span><i class="fas fa-angle-right"></i></span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-</li>
+</div>
+

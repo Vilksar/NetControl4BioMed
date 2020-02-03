@@ -7,19 +7,20 @@
 
 @if (showBanner)
 {
-    <div class="cookie-consent-alert alert alert-info fade show">
+    <div class="cookie-consent-alert fixed-bottom fade show bg-dark text-light">
         <div class="container">
-            <div>
-                <span>This website uses cookies to keep you logged in between sessions, and nothing more.</span>
-            </div>
-            <div class="text-right">
-                <a asp-page="/Privacy" class="btn btn-link">
-                    <span>Learn More</span>
-                </a>
-                <span>|</span>
-                <button type="button" class="cookie-consent-alert-dismiss btn btn-link" data-cookie-consent-string="@cookieString" data-dismiss="alert">
-                    <span>Accept</span>
-                </button>
+            <div class="row align-items-center">
+                <div class="col-lg-6 py-3">
+                    <span>This website uses cookies to keep you logged in between sessions, and nothing more.</span>
+                </div>
+                <div class="col-lg-6 py-3 d-flex flex-column">
+                    <a asp-page="/Privacy" class="btn btn-primary btn-block">
+                        <span>Learn more</span>
+                    </a>
+                    <button type="button" class="cookie-consent-alert-dismiss btn btn-success btn-block" data-cookie-consent-string="@cookieString" data-toggle="collapse" data-target=".cookie-consent-alert">
+                        <span>Accept</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

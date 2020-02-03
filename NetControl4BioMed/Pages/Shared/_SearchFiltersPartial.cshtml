@@ -2,7 +2,7 @@
 
 @if (Model.Any())
 {
-    <div class="d-flex flex-row flex-wrap my-2">
+    <div class="d-flex flex-row flex-wrap mb-3">
         @foreach (var item in Model)
         {
             var color = item.Type == "SearchIn" ? "success" : item.Type == "Filter" ? "info" : item.Type == "All" ? "danger" : "dark";

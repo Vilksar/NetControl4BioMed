@@ -42,11 +42,11 @@ $(window).on('load', () => {
             // Get all of the list group items.
             const items = $(groupElement).find('.item-group-item');
             // Remove the active class from all list items.
-            $(items).removeClass('active');
+            $(items).removeClass('table-active');
             // Go over all of the checked elements and get the corresponding list group items.
             const selectedItems = $(groupElement).find('input[type="checkbox"]:checked').closest('.item-group-item');
             // Go over each of the selected items and mark them as active.
-            $(selectedItems).addClass('active');
+            $(selectedItems).addClass('table-active');
             // Check how many elements are selected.
             if (selectedItems.length === 0) {
                 // Disable the group buttons.
