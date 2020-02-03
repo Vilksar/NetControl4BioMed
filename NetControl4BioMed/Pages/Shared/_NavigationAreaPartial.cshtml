@@ -1,0 +1,41 @@
+﻿@model Helpers.ViewModels.NavigationAreaViewModel
+@{
+    var activeGroup = (string)ViewData["ActiveGroup"] ?? string.Empty;
+    var activePage = (string)ViewData["ActivePage"] ?? string.Empty;
+}
+
+<div class="accordion list-group list-group-flush border" id="navigation-area">
+    @foreach (var navigationGroup in Model.Groups)
+    {
+        @if (navigationGroup.Pages == null || !navigationGroup.Pages.Any())
+        {
+            <a asp-page="@navigationGroup.Link" class="list-group-item list-group-item-action list-group-item-@navigationGroup.Color @(activeGroup == string.Empty && activePage == navigationGroup.Id ? "active" : string.Empty)" title="@navigationGroup.Description">
+                <div class="row">
+                    <span class="col-2 text-center"><i class="fas @navigationGroup.Icon"></i></span>
+                    <span class="col-8 text-left text-wrap">@navigationGroup.Title</span>
+                </div>
+            </a>
+        }
+        else
+        {
+            <a asp-page="@navigationGroup.Link" class="list-group-item list-group-item-action list-group-item-@navigationGroup.Color @(activeGroup == navigationGroup.Id ? "active" : string.Empty)" data-toggle="collapse" data-target="#navigation-area-@navigationGroup.Id.ToLower()" title="@navigationGroup.Description">
+                <div class="row">
+                    <span class="col-2 text-center"><i class="fas @navigationGroup.Icon"></i></span>
+                    <span class="col-8 text-left text-wrap">@navigationGroup.Title</span>
+                    <span class="col-2 text-center"><i class="fas fa-angle-down"></i></span>
+                </div>
+            </a>
+            <div id="navigation-area-@navigationGroup.Id.ToLower()" class="list-group list-group-flush collapse @(activeGroup == navigationGroup.Id ? "show" : string.Empty)" data-parent="#navigation-area">
+                @foreach (var navigationPage in navigationGroup.Pages)
+                {
+                    <a asp-page="@navigationPage.Link" class="list-group-item list-group-item-action list-group-item-@navigationPage.Color @(activeGroup == navigationGroup.Id && activePage == navigationPage.Id ? "active" : string.Empty)" title="@navigationPage.Description">
+                        <div class="row align-items-center">
+                            <span class="col-9 text-left text-wrap">@navigationPage.Title</span>
+                            <span class="col-3 text-center"><i class="fas @navigationPage.Icon"></i></span>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+    }
+</div>

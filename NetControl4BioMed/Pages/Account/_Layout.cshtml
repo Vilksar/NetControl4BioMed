@@ -1,23 +1,94 @@
-﻿@{
+﻿@using Helpers.ViewModels
+@{
     Layout = "/Pages/_Layout.cshtml";
-    var activeGroup = (string)ViewData["ActiveGroup"] ?? string.Empty;
-    var activePage = (string)ViewData["ActivePage"] ?? string.Empty;
+    var navigationBanner = new NavigationBannerViewModel
+    {
+        Id = "Account",
+        Title = "Account",
+        Icon = "fa-user-circle",
+        Color = "info"
+    };
+    var navigationArea = new NavigationAreaViewModel
+    {
+        Id = "Account",
+        Title = "Account",
+        Description = string.Empty,
+        Icon = "fa-user",
+        Color = "info",
+        Groups = new List<NavigationGroupViewModel>
+        {
+            new NavigationGroupViewModel
+            {
+                Id = "Index",
+                Title = "Overview",
+                Description = string.Empty,
+                Icon = "fa-chart-bar",
+                Color = "info",
+                Link = "/Account/Index"
+            },
+            new NavigationGroupViewModel
+            {
+                Id = "Manage",
+                Title = "Manage",
+                Description = string.Empty,
+                Icon = "fa-cog",
+                Color = "info",
+                Link = "/Account/Manage/Index",
+                Pages = new List<NavigationPageViewModel>
+                {
+                    new NavigationPageViewModel
+                    {
+                        Id = "Profile",
+                        Title = "Profile",
+                        Description = string.Empty,
+                        Icon = "fa-user-edit",
+                        Color = "light",
+                        Link = "/Account/Manage/Profile"
+                    },
+                    new NavigationPageViewModel
+                    {
+                        Id = "Password",
+                        Title = "Password",
+                        Description = string.Empty,
+                        Icon = "fa-user-lock",
+                        Color = "light",
+                        Link = "/Account/Manage/ChangePassword"
+                    },
+                    new NavigationPageViewModel
+                    {
+                        Id = "ExternalLogins",
+                        Title = "External logins",
+                        Description = string.Empty,
+                        Icon = "fa-user-cog",
+                        Color = "light",
+                        Link = "/Account/Manage/ExternalLogins"
+                    },
+                    new NavigationPageViewModel
+                    {
+                        Id = "TwoFactorAuthentication",
+                        Title = "Two-factor authentication",
+                        Description = string.Empty,
+                        Icon = "fa-user-shield",
+                        Color = "light",
+                        Link = "/Account/Manage/TwoFactorAuthentication"
+                    },
+                    new NavigationPageViewModel
+                    {
+                        Id = "PersonalData",
+                        Title = "Personal data",
+                        Description = string.Empty,
+                        Icon = "fa-user-check",
+                        Color = "light",
+                        Link = "/Account/Manage/PersonalData"
+                    }
+                }
+            }
+        }
+    };
 }
 
 @section Banner {
-    <div class="bg-info text-white mb-2 py-2">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-2 d-flex flex-column justify-content-center align-items-center my-1 my-lg-0">
-                    <span><i class="fas fa-user-circle fa-3x"></i></span>
-                </div>
-                <div class="col-lg-10 d-flex flex-column justify-content-center align-items-center align-items-lg-start my-1 my-lg-0">
-                    <span class="h4 my-0">Account</span>
-                    <span>@ViewData["Title"]</span>
-                </div>
-            </div>
-        </div>
-    </div>
+    <partial name="_NavigationBannerPartial" model="@navigationBanner" />
 }
 
 @section Breadcrumbs {
@@ -26,53 +97,7 @@
 }
 
 @section Navigation {
-    <div class="accordion list-group list-group-flush border" id="area-menu-accordion">
-        <a asp-page="/Account/Index" class="list-group-item list-group-item-action list-group-item-info @(activeGroup == string.Empty && activePage == "Index" ? "active" : string.Empty)">
-            <div class="row">
-                <span class="col-2 text-center"><i class="fas fa-chart-bar"></i></span>
-                <span class="col-8 text-left text-wrap">Overview</span>
-            </div>
-        </a>
-        <a href="" class="list-group-item list-group-item-action list-group-item-info @(activeGroup == "Manage" ? "active" : string.Empty)" data-toggle="collapse" data-target="#area-menu-accounts" aria-expanded="@(activeGroup == "Manage" ? "true" : "false")">
-            <div class="row">
-                <span class="col-2 text-center"><i class="fas fa-user"></i></span>
-                <span class="col-8 text-left text-wrap">Manage</span>
-                <span class="col-2 text-center"><i class="fas fa-angle-down"></i></span>
-            </div>
-        </a>
-        <div id="area-menu-accounts" class="list-group list-group-flush collapse @(activeGroup == "Manage" ? "show" : string.Empty)" data-parent="#area-menu-accordion">
-            <a asp-page="/Account/Manage/Profile" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Manage" && activePage == "Profile" ? "active" : string.Empty)">
-                <div class="row align-items-center">
-                    <span class="col-9 text-left text-wrap">Profile</span>
-                    <span class="col-3 text-center"><i class="fas fa-user-edit"></i></span>
-                </div>
-            </a>
-            <a asp-page="/Account/Manage/ChangePassword" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Manage" && activePage == "Password" ? "active" : string.Empty)">
-                <div class="row align-items-center">
-                    <span class="col-9 text-left text-wrap">Password</span>
-                    <span class="col-3 text-center"><i class="fas fa-user-lock"></i></span>
-                </div>
-            </a>
-            <a asp-page="/Account/Manage/ExternalLogins" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Manage" && activePage == "ExternalLogins" ? "active" : string.Empty)">
-                <div class="row align-items-center">
-                    <span class="col-9 text-left text-wrap">External logins</span>
-                    <span class="col-3 text-center"><i class="fas fa-user-cog"></i></span>
-                </div>
-            </a>
-            <a asp-page="/Account/Manage/TwoFactorAuthentication" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Manage" && activePage == "TwoFactorAuthentication" ? "active" : string.Empty)">
-                <div class="row align-items-center">
-                    <span class="col-9 text-left text-wrap">Two-factor authentication</span>
-                    <span class="col-3 text-center"><i class="fas fa-user-shield"></i></span>
-                </div>
-            </a>
-            <a asp-page="/Account/Manage/PersonalData" class="list-group-item list-group-item-action list-group-item-light @(activeGroup == "Manage" && activePage == "PersonalData" ? "active" : string.Empty)">
-                <div class="row align-items-center">
-                    <span class="col-9 text-left text-wrap">Personal data</span>
-                    <span class="col-3 text-center"><i class="fas fa-user-check"></i></span>
-                </div>
-            </a>
-        </div>
-    </div>
+    <partial name="_NavigationAreaPartial" model="@navigationArea" />
 }
 
 @RenderBody()

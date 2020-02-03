@@ -11,7 +11,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
     public class SearchFilterViewModel
     {
         /// <summary>
-        /// Gets or sets the text to be displayed for the filter.
+        /// Gets or sets the title (displayed text) of the filter.
         /// </summary>
         public string Text { get; set; }
 

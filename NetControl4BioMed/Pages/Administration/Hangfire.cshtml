@@ -5,13 +5,31 @@
     ViewData["ActivePage"] = "Hangfire";
 }
 
-<div class="alert alert-primary text-justify text-wrap">
-    <span><i class="fas fa-info-circle"></i></span>
-    <span>This application uses Hangfire to manage the background tasks. You can access the corresponding dashboard by clicking on the button below.</span>
+@section Breadcrumbs {
+    <a asp-page="/Administration/Hangfire" class="breadcrumb-item"><span>Hangfire</span></a>
+}
+
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-md-row-reverse justify-content-center align-items-center justify-content-md-between">
+            <div>
+                <span><i class="fas fa-fire"></i></span>
+            </div>
+            <div>
+                <span>Hangfire</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>This application uses Hangfire to manage the background tasks. You can access the corresponding dashboard by clicking on the button below.</span>
+        </div>
+        <form method="post" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <button type="submit" title="Open Hangfire dashboard" class="btn btn-block btn-primary">
+                <span>Open Hangfire dashboard</span>
+            </button>
+        </form>
+    </div>
 </div>
-<form method="post" class="text-justify">
-    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-    <button type="submit" title="Open Hangfire dashboard" class="btn btn-block btn-primary">
-        <span>Open Hangfire dashboard</span>
-    </button>
-</form>

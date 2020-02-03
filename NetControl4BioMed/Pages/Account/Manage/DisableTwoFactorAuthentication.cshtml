@@ -5,17 +5,35 @@
     ViewData["ActivePage"] = "TwoFactorAuthentication";
 }
 
-<div class="alert alert-info text-justify text-wrap">
-    <span><i class="fas fa-info-circle"></i></span>
-    <span><span class="font-weight-bold">This action only disables two-factor authentication.</span> Disabling 2FA does not change the keys used in authenticator apps. If you wish to change the key used in an authenticator app, you should <a asp-page="/Account/Manage/ResetAuthenticator" class="alert-link">reset your authenticator keys</a>.</span>
+@section Breadcrumbs {
+    <a asp-page="/Accounts/Manage/DisableTwoFactorAuthentication" class="breadcrumb-item"><span>Disable two-factor authentication</span></a>
+}
+
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-md-row-reverse justify-content-center align-items-center justify-content-md-between">
+            <div>
+                <span><i class="fas fa-user-shield"></i></span>
+            </div>
+            <div>
+                <span>Reset authenticator key</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span><span class="font-weight-bold">This action only disables two-factor authentication.</span> Disabling 2FA does not change the keys used in authenticator apps. If you wish to change the key used in an authenticator app, you should <a asp-page="/Account/Manage/ResetAuthenticator" class="alert-link">reset your authenticator keys</a>.</span>
+        </div>
+        <hr />
+        <form method="post" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <button type="submit" title="Disable two-factor authentication" class="btn btn-block btn-primary">
+                <span>Disable two-factor authentication</span>
+            </button>
+        </form>
+    </div>
 </div>
-<hr />
-<form method="post" class="text-justify">
-    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-    <button type="submit" title="Disable two-factor authentication" class="btn btn-block btn-primary">
-        <span>Disable two-factor authentication</span>
-    </button>
-</form>
 
 @section Scripts {
     <partial name="_ScriptsValidationPartial" />

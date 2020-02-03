@@ -1,0 +1,18 @@
+﻿@model Helpers.ViewModels.NavigationBannerViewModel
+@{ 
+    var pageTitle = ViewData["Title"];
+}
+
+<div class="bg-@Model.Color text-white mb-2 py-2">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-2 d-flex flex-column justify-content-center align-items-center my-1 my-lg-0">
+                <span><i class="fas @Model.Icon fa-3x"></i></span>
+            </div>
+            <div class="col-lg-10 d-flex flex-column justify-content-center align-items-center align-items-lg-start my-1 my-lg-0">
+                <span class="h4 my-0">@Model.Title</span>
+                <span>@pageTitle</span>
+            </div>
+        </div>
+    </div>
+</div>

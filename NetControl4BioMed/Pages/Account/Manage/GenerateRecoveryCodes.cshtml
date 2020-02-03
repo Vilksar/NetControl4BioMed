@@ -5,20 +5,38 @@
     ViewData["ActivePage"] = "TwoFactorAuthentication";
 }
 
-<div class="alert alert-info text-justify text-wrap">
-    <span><i class="fas fa-info-circle"></i></span>
-    <span>Generating new recovery codes does not change the keys used in authenticator apps. If you wish to change the key used in an authenticator app you should <a asp-page="/Account/Manage/ResetAuthenticator" class="alert-link">reset your authenticator keys</a>.</span>
+@section Breadcrumbs {
+    <a asp-page="/Accounts/Manage/GenerateRecoveryCodes" class="breadcrumb-item"><span>Generate two-factor authentication recovery codes</span></a>
+}
+
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-md-row-reverse justify-content-center align-items-center justify-content-md-between">
+            <div>
+                <span><i class="fas fa-user-shield"></i></span>
+            </div>
+            <div>
+                <span>Generate recovery codes</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>Generating new recovery codes does not change the keys used in authenticator apps. If you wish to change the key used in an authenticator app you should <a asp-page="/Account/Manage/ResetAuthenticator" class="alert-link">reset your authenticator keys</a>.</span>
+        </div>
+        <div class="alert alert-danger text-justify text-wrap">
+            <span><i class="fas fa-exclamation-circle"></i></span>
+            <span><span class="font-weight-bold">Put these codes in a safe place.</span> If you lose your device and don't have the recovery codes you will lose access to your account.</span>
+        </div>
+        <form method="post" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <button type="submit" title="Generate recovery codes" class="btn btn-block btn-success">
+                <span>Generate recovery codes</span>
+            </button>
+        </form>
+    </div>
 </div>
-<div class="alert alert-danger text-justify text-wrap">
-    <span><i class="fas fa-exclamation-circle"></i></span>
-    <span><span class="font-weight-bold">Put these codes in a safe place.</span> If you lose your device and don't have the recovery codes you will lose access to your account.</span>
-</div>
-<form method="post" class="text-justify">
-    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-    <button type="submit" title="Generate recovery codes" class="btn btn-block btn-success">
-        <span>Generate recovery codes</span>
-    </button>
-</form>
 
 @section Scripts {
     <partial name="_ScriptsValidationPartial" />

@@ -5,49 +5,81 @@
     ViewData["ActivePage"] = "Profile";
 }
 
-<form method="post" class="text-justify">
-    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-    <div class="form-group">
-        <label asp-for="Input.Email" class="font-weight-bold">E-mail</label>
-        <input asp-for="Input.Email" class="form-control" />
-        <span asp-description-for="Input.Email" class="text-muted small">The e-mail address associated with your account.</span>
-        <span asp-validation-for="Input.Email" class="text-danger small"></span>
+@section Breadcrumbs {
+    <a asp-page="/Accounts/Manage/Profile" class="breadcrumb-item"><span>Profile</span></a>
+}
+
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-md-row-reverse justify-content-center align-items-center justify-content-md-between">
+            <div>
+                <span><i class="fas fa-user-edit"></i></span>
+            </div>
+            <div>
+                <span>Profile</span>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="Input.PhoneNumber" class="font-weight-bold">Phone number</label>
-        <input asp-for="Input.PhoneNumber" class="form-control" />
-        <span asp-description-for="Input.PhoneNumber" class="text-muted small">The phone number associated with your account.</span>
-        <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
+    <div class="card-body">
+        <form method="post" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label asp-for="Input.Email" class="font-weight-bold">E-mail</label>
+                <input asp-for="Input.Email" class="form-control" />
+                <span asp-description-for="Input.Email" class="text-muted small">The e-mail address associated with your account.</span>
+                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.PhoneNumber" class="font-weight-bold">Phone number</label>
+                <input asp-for="Input.PhoneNumber" class="form-control" />
+                <span asp-description-for="Input.PhoneNumber" class="text-muted small">The phone number associated with your account.</span>
+                <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+                <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+                <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+                <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+            </div>
+            <button type="submit" title="Update" class="btn btn-block btn-success">
+                <span>Update</span>
+            </button>
+        </form>
     </div>
-    <div class="form-group" hidden>
-        <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
-        <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
-        <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
-        <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
-    </div>
-    <button type="submit" title="Update" class="btn btn-block btn-success">
-        <span>Update</span>
-    </button>
-</form>
+</div>
 @if (!Model.View.IsEmailConfirmed)
 {
-    <div class="alert alert-info text-justify text-wrap">
-        <span><i class="fas fa-info-circle"></i></span>
-        <span class="font-weight-bold">Your e-mail address is not cofirmed. This might prevent you from logging in.</span>
-        <span>Please click the button below to receive an e-mail containing instructions on confirming it.</span>
-    </div>
-    <form method="post" asp-page-handler="SendVerificationEmail" class="text-justify">
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-        <div class="form-group" hidden>
-            <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
-            <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
-            <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
-            <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-md-row-reverse justify-content-center align-items-center justify-content-md-between">
+                <div>
+                    <span><i class="fas fa-user-edit"></i></span>
+                </div>
+                <div>
+                    <span>Confirm e-mail address</span>
+                </div>
+            </div>
         </div>
-        <button type="submit" title="Send verification e-mail" class="btn btn-block btn-primary">
-            <span>Send verification e-mail</span>
-        </button>
-    </form>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-danger-circle"></i></span>
+                <span class="font-weight-bold">Your e-mail address is not cofirmed. This might prevent you from logging in.</span>
+                <span>Please click the button below to receive an e-mail containing instructions on confirming it.</span>
+            </div>
+            <form method="post" asp-page-handler="SendVerificationEmail" class="text-justify">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+                <div class="form-group" hidden>
+                    <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+                    <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+                    <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+                    <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+                </div>
+                <button type="submit" title="Send verification e-mail" class="btn btn-block btn-success">
+                    <span>Send verification e-mail</span>
+                </button>
+            </form>
+        </div>
+    </div>
 }
 
 @section Scripts {

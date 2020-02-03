@@ -1,27 +1,59 @@
 ﻿@page
 @model PersonalDataModel
 @{
-    ViewData["Title"] = "Personal Data";
+    ViewData["Title"] = "Personal data";
     ViewData["ActivePage"] = "PersonalData";
 }
 
-<div class="alert alert-info text-justify text-wrap">
-    <span><i class="fas fa-info-circle"></i></span>
-    <span>Your account contains personal data that you have given us. This page allows you to download or delete that data.</span>
+@section Breadcrumbs {
+    <a asp-page="/Accounts/Manage/PersonalData" class="breadcrumb-item"><span>Personal data</span></a>
+}
+
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-md-row-reverse justify-content-center align-items-center justify-content-md-between">
+            <div>
+                <span><i class="fas fa-user-check"></i></span>
+            </div>
+            <div>
+                <span>Download personal data</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>Your account contains personal data that you have given us. Click the button below to download that data.</span>
+        </div>
+        <form method="post" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <button type="submit" title="Download" class="btn btn-block btn-primary">
+                <span>Download</span>
+            </button>
+        </form>
+    </div>
 </div>
-<div class="alert alert-danger text-justify text-wrap">
-    <span><i class="fas fa-exclamation-circle"></i></span>
-    <span>Deleting this data will permanently remove your account, and this cannot be recovered.</span>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-md-row-reverse justify-content-center align-items-center justify-content-md-between">
+            <div>
+                <span><i class="fas fa-user-check"></i></span>
+            </div>
+            <div>
+                <span>Delete personal data</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger text-justify text-wrap">
+            <span><i class="fas fa-exclamation-circle"></i></span>
+            <span>Your account contains personal data that you have given us. Click the button below to delete that data. Deleting it will permanently remove your account, and this cannot be recovered.</span>
+        </div>
+        <a asp-page="/Account/Manage/DeletePersonalData" class="btn btn-block btn-danger">
+            <span>Delete</span>
+        </a>
+    </div>
 </div>
-<form method="post" class="text-justify">
-    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-    <button type="submit" title="Download" class="btn btn-block btn-primary">
-        <span>Download</span>
-    </button>
-    <a asp-page="/Account/Manage/DeletePersonalData" class="btn btn-block btn-danger">
-        <span>Delete</span>
-    </a>
-</form>
 
 @section Scripts {
     <partial name="_ScriptsValidationPartial" />
