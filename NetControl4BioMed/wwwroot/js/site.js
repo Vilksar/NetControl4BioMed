@@ -26,13 +26,10 @@ $(window).on('load', () => {
         });
     }
 
-    // Check if there is a dropdown menu form on the page.
-    if ($('.dropdown-menu-form').length !== 0) {
-        // Add a listener for licking inside the dropdown menu.
-        $('.dropdown-menu.dropdown-menu-form').on('click', (event) => {
-            // Stop the propagation.
-            event.stopPropagation();
-        });
+    // Check if there is a datatable on the page.
+    if ($('.table-datatable').length !== 0) {
+        // Format the table as datatable.
+        $('.table-datatable').DataTable();
     }
 
     // Check if there is a list group of items on the page.
