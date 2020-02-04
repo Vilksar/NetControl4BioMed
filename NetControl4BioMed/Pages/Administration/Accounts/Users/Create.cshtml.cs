@@ -1,0 +1,129 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using NetControl4BioMed.Data;
+using NetControl4BioMed.Data.Models;
+
+namespace NetControl4BioMed.Pages.Administration.Accounts.Users
+{
+    [Authorize(Roles = "Administrator")]
+    public class CreateModel : PageModel
+    {
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
+        private readonly ApplicationDbContext _context;
+
+        public CreateModel(UserManager<User> userManager, RoleManager<Role> roleManager, ApplicationDbContext context)
+        {
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _context = context;
+        }
+
+        [BindProperty]
+        public InputModel Input { get; set; }
+
+        public class InputModel
+        {
+            [DataType(DataType.EmailAddress)]
+            [Required(ErrorMessage = "This field is required.")]
+            public string Email { get; set; }
+
+            [DataType(DataType.Password)]
+            [Required(ErrorMessage = "This field is required.")]
+            [StringLength(100, ErrorMessage = "The password must be at least {2} characters long.", MinimumLength = 6)]
+            public string Password { get; set; }
+
+            [DataType(DataType.Password)]
+            [Required(ErrorMessage = "This field is required.")]
+            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            public string ConfirmPassword { get; set; }
+
+            [Required(ErrorMessage = "This field is required.")]
+            public bool EmailConfirmed { get; set; }
+        }
+
+        public IActionResult OnGet()
+        {
+            // Return the page.
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            // Check if the provided model isn't valid.
+            if (!ModelState.IsValid)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "An error has been encountered. Please check again the input fields.");
+                // Redisplay the page.
+                return Page();
+            }
+            // Define the new user.
+            var user = new User
+            {
+                UserName = Input.Email,
+                Email = Input.Email,
+                DateTimeCreated = DateTime.Now
+            };
+            // Try to create the new user.
+            var result = await _userManager.CreateAsync(user, Input.Password);
+            // Check if we should set the e-mail as confirmed.
+            if (result.Succeeded && Input.EmailConfirmed)
+            {
+                // Generate the token for e-mail confirmation.
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                // Confirm the e-mail address.
+                result = await _userManager.ConfirmEmailAsync(user, token);
+            }
+            // Check if any of the operations has failed.
+            if (!result.Succeeded)
+            {
+                // Go over each of the encountered errors.
+                foreach (var error in result.Errors)
+                {
+                    // Add the error to the model.
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                // Redisplay the page.
+                return Page();
+            }
+            // Get all the databases, networks and analyses that already use the e-mail address of the new user.
+            var databaseUsers = _context.DatabaseUsers.Where(item => item.Email == Input.Email);
+            var networkUsers = _context.NetworkUsers.Where(item => item.Email == Input.Email);
+            var analysisUsers = _context.AnalysisUsers.Where(item => item.Email == Input.Email);
+            // Go over all of them and update the user.
+            foreach (var item in databaseUsers)
+            {
+                item.UserId = user.Id;
+                item.User = user;
+            }
+            foreach (var item in networkUsers)
+            {
+                item.UserId = user.Id;
+                item.User = user;
+            }
+            foreach (var item in analysisUsers)
+            {
+                item.UserId = user.Id;
+                item.User = user;
+            }
+            // Mark the items for update.
+            _context.DatabaseUsers.UpdateRange(databaseUsers);
+            _context.NetworkUsers.UpdateRange(networkUsers);
+            _context.AnalysisUsers.UpdateRange(analysisUsers);
+            // Save the changes in the database.
+            await _context.SaveChangesAsync();
+            // Display a message.
+            TempData["StatusMessage"] = "Success: 1 user created successfully.";
+            // Redirect to the index page.
+            return RedirectToPage("/Administration/Accounts/Users/Index");
+        }
+    }
+}
