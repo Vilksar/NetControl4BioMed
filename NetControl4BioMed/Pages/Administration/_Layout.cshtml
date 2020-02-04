@@ -59,7 +59,7 @@
                         Id = "Roles",
                         Title = "Roles",
                         Description = string.Empty,
-                        Icon = "fa-tag",
+                        Icon = "fa-user-tag",
                         Color = "light",
                         Link = "/Administration/Accounts/Roles/Index"
                     },
@@ -68,9 +68,18 @@
                         Id = "UserRoles",
                         Title = "User roles",
                         Description = string.Empty,
-                        Icon = "fa-user-tag",
+                        Icon = "fa-user-cog",
                         Color = "light",
                         Link = "/Administration/Accounts/UserRoles/Index"
+                    },
+                    new NavigationPageViewModel
+                    {
+                        Id = "DatabaseUsers",
+                        Title = "Database users",
+                        Description = string.Empty,
+                        Icon = "fa-user-shield",
+                        Color = "light",
+                        Link = "/Administration/Data/DatabaseUsers/Index"
                     }
                 }
             },
@@ -101,15 +110,6 @@
                         Icon = "fa-font",
                         Color = "light",
                         Link = "/Administration/Data/DatabaseTypes/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "DatabaseUsers",
-                        Title = "Database users",
-                        Description = string.Empty,
-                        Icon = "fa-user-cog",
-                        Color = "light",
-                        Link = "/Administration/Data/DatabaseUsers/Index"
                     },
                     new NavigationPageViewModel
                     {
