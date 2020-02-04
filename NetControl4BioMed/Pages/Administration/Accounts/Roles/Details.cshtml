@@ -1,0 +1,125 @@
+﻿@page
+@model DetailsModel
+@{
+    ViewData["Title"] = "Role details";
+}
+
+@section Breadcrumbs {
+    <a asp-page="/Administration/Accounts/Roles/Details" class="breadcrumb-item"><span>Details</span></a>
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Accounts/Roles/Edit" asp-route-id="@Model.View.Role.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Accounts/Roles/Delete" asp-route-ids="@Model.View.Role.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div>
+                <span>Details</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label asp-for="View.Role.Id" class="font-weight-bold">ID</label>
+                <input asp-for="View.Role.Id" class="form-control" readonly />
+                <span asp-description-for="View.Role.Id" class="text-muted small">The internal ID of the user.</span>
+                <span asp-validation-for="View.Role.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Role.DateTimeCreated" class="font-weight-bold">Date</label>
+                <input asp-for="View.Role.DateTimeCreated" class="form-control" />
+                <span asp-description-for="View.Role.DateTimeCreated" class="text-muted small">The date and time when the user was created or signed up for an account.</span>
+                <span asp-validation-for="View.Role.DateTimeCreated" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Role.Name" class="font-weight-bold">Name</label>
+                <input asp-for="View.Role.Name" class="form-control" readonly />
+                <span asp-description-for="View.Role.Name" class="text-muted small">The name of the role.</span>
+                <span asp-validation-for="View.Role.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <div class="row align-items-center mb-2">
+                    <div class="col-lg-6">
+                        <label asp-for="View.Role.UserRoles" class="font-weight-bold mb-0">Users</label>
+                        <span class="badge badge-dark">@Model.View.Role.UserRoles.Count()</span>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="d-flex flex-row justify-content-end align-items-center">
+                            <a asp-page="/Administration/Accounts/UserRoles/Index" asp-route-searchString="@Model.View.Role.Id" asp-route-searchIn="RoleId" class="btn btn-outline-dark btn-block">
+                                <span>View</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                @if (!Model.View.Role.UserRoles.Any())
+                {
+                    <div class="alert alert-info text-justify text-wrap">
+                        <span><i class="fas fa-info-circle"></i></span>
+                        <span>No users have been found.</span>
+                    </div>
+                }
+                else
+                {
+                    <table class="table table-striped table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="text-center text-break">
+                                    <span>#</span>
+                                </th>
+                                <th class="text-left text-break">
+                                    <span>E-mail</span>
+                                </th>
+                                <th class="text-left text-break">
+                                    <span>ID</span>
+                                </th>
+                                <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                    <span>Links</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var (user, index) in Model.View.Role.UserRoles.Select(item => item.User).Select((item, index) => (item, index + 1)))
+                            {
+                                <tr>
+                                    <td class="text-center text-break">
+                                        <span>@index</span>
+                                    </td>
+                                    <td class="text-left text-break">
+                                        <span title="@user.Email" class="font-weight-bold">@user.Email</span>
+                                    </td>
+                                    <td class="text-left text-break">
+                                        <span title="@user.Id">@user.Id</span>
+                                    </td>
+                                    <td class="text-center text-break">
+                                        <a asp-page="/Administration/Accounts/Users/Details" asp-route-id="@user.Id" title="Details">
+                                            <span>Details</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                <span asp-description-for="View.Role.UserRoles" class="text-muted small">The roles assigned to the user.</span>
+                <span asp-validation-for="View.Role.UserRoles" class="text-danger small"></span>
+            </div>
+        </form>
+    </div>
+</div>
