@@ -5,7 +5,7 @@
 }
 
 @section Breadcrumbs {
-    <a asp-page="/Administration/Accounts/Users/Details" asp-route-id="@Model.View.User.Id" class="breadcrumb-item"><span>Details</span></a>
+    <a asp-page="/Administration/Accounts/Users/Details" class="breadcrumb-item"><span>Details</span></a>
 }
 
 <div class="row align-items-center">
@@ -29,31 +29,36 @@
                 <span><i class="fas fa-info-circle"></i></span>
             </div>
             <div>
-                <span>User details</span>
+                <span>Details</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <form method="get" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
             <div class="form-group">
                 <label asp-for="View.User.Id" class="font-weight-bold">ID</label>
                 <input asp-for="View.User.Id" class="form-control" readonly />
                 <span asp-description-for="View.User.Id" class="text-muted small">The internal ID of the user.</span>
+                <span asp-validation-for="View.User.Id" class="text-danger small"></span>
             </div>
             <div class="form-group">
                 <label asp-for="View.User.DateTimeCreated" class="font-weight-bold">Date</label>
                 <input asp-for="View.User.DateTimeCreated" class="form-control" readonly />
                 <span asp-description-for="View.User.DateTimeCreated" class="text-muted small">The date and time when the user was created or signed up for an account.</span>
+                <span asp-validation-for="View.User.DateTimeCreated" class="text-danger small"></span>
             </div>
             <div class="form-group">
                 <label asp-for="View.User.Email" class="font-weight-bold">E-mail</label>
                 <input asp-for="View.User.Email" class="form-control" readonly />
                 <span asp-description-for="View.User.Email" class="text-muted small">The e-mail of the user.</span>
+                <span asp-validation-for="View.User.Email" class="text-danger small"></span>
             </div>
             <div class="form-group">
                 <label asp-for="View.User.EmailConfirmed" class="font-weight-bold">Is the e-mail confirmed?</label>
                 <input asp-for="View.User.EmailConfirmed" type="text" class="form-control" readonly />
-                <span asp-description-for="View.User.Email" class="text-muted small">The e-mail confirmation status of the user.</span>
+                <span asp-description-for="View.User.EmailConfirmed" class="text-muted small">The e-mail confirmation status of the user.</span>
+                <span asp-validation-for="View.User.EmailConfirmed" class="text-danger small"></span>
             </div>
             <div class="form-group">
                 <div class="row align-items-center mb-2">
@@ -78,7 +83,7 @@
                 }
                 else
                 {
-                    <table class="table table-striped table-bordered" data-paging="true" data-info="true" data-searching="true">
+                    <table class="table table-striped table-bordered">
                         <thead class="thead-light">
                             <tr>
                                 <th class="text-center text-break">
@@ -184,6 +189,7 @@
                     </table>
                 }
                 <span asp-description-for="View.User.DatabaseUsers" class="text-muted small">The databases that the user has access to. In addition, the user also has access to all public databases.</span>
+                <span asp-validation-for="View.User.DatabaseUsers" class="text-danger small"></span>
             </div>
         </form>
     </div>

@@ -16,13 +16,11 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
     public class CreateModel : PageModel
     {
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Role> _roleManager;
         private readonly ApplicationDbContext _context;
 
-        public CreateModel(UserManager<User> userManager, RoleManager<Role> roleManager, ApplicationDbContext context)
+        public CreateModel(UserManager<User> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
-            _roleManager = roleManager;
             _context = context;
         }
 

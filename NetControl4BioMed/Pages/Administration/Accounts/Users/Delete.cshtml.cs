@@ -85,7 +85,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Users/Index");
             }
-            // Check if there aren't any (valid) IDs provided.
+            // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())
             {
                 // Display a message.

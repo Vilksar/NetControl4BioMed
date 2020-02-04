@@ -38,27 +38,25 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Users/Index");
             }
-            // Get the item.
-            var user = _context.Users
-                .Where(item => item.Id == id)
-                .Include(item => item.UserRoles)
-                    .ThenInclude(item => item.Role)
-                .Include(item => item.DatabaseUsers)
-                    .ThenInclude(item => item.Database)
-                .FirstOrDefault();
-            // Check if the item has not been found.
-            if (user == null)
+            // Define the view.
+            View = new ViewModel
+            {
+                User = _context.Users
+                    .Where(item => item.Id == id)
+                    .Include(item => item.UserRoles)
+                        .ThenInclude(item => item.Role)
+                    .Include(item => item.DatabaseUsers)
+                        .ThenInclude(item => item.Database)
+                    .FirstOrDefault()
+            };
+            // Check if there was no item found.
+            if (View.User == null)
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Users/Index");
             }
-            // Define the view.
-            View = new ViewModel
-            {
-                User = user
-            };
             // Return the page.
             return Page();
         }

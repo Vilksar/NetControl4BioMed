@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
 
@@ -16,12 +17,12 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
     [Authorize(Roles = "Administrator")]
     public class IndexModel : PageModel
     {
-        private readonly UserManager<User> _userManager;
+        private readonly ApplicationDbContext _context;
         private readonly LinkGenerator _linkGenerator;
 
-        public IndexModel(UserManager<User> userManager, LinkGenerator linkGenerator)
+        public IndexModel(ApplicationDbContext context, LinkGenerator linkGenerator)
         {
-            _userManager = userManager;
+            _context = context;
             _linkGenerator = linkGenerator;
         }
 
@@ -30,17 +31,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
         public class ViewModel
         {
             public SearchViewModel<User> Search { get; set; }
-        }
-
-        public class ItemModel
-        {
-            public string Id { get; set; }
-
-            public string Email { get; set; }
-
-            public DateTime DateTimeCreated { get; set; }
-
-            public int RoleCount { get; set; }
         }
 
         public IActionResult OnGet(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -77,7 +67,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 return RedirectToPage(new { searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
             // Start with all of the items in the database.
-            var query = _userManager.Users;
+            var query = _context.Users
+                .Where(item => true);
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||

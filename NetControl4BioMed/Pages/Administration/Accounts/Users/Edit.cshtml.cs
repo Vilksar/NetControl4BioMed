@@ -71,12 +71,12 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
             View = new ViewModel
             {
                 User = _context.Users
-                .Where(item => item.Id == id)
-                .Include(item => item.UserRoles)
-                    .ThenInclude(item => item.Role)
-                .Include(item => item.DatabaseUsers)
-                    .ThenInclude(item => item.Database)
-                .FirstOrDefault()
+                    .Where(item => item.Id == id)
+                    .Include(item => item.UserRoles)
+                        .ThenInclude(item => item.Role)
+                    .Include(item => item.DatabaseUsers)
+                        .ThenInclude(item => item.Database)
+                    .FirstOrDefault()
             };
             // Check if the item hasn't been found.
             if (View.User == null)
@@ -116,14 +116,14 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
             View = new ViewModel
             {
                 User = _context.Users
-                .Where(item => item.Id == Input.Id)
-                .Include(item => item.UserRoles)
-                    .ThenInclude(item => item.Role)
-                .Include(item => item.DatabaseUsers)
-                    .ThenInclude(item => item.Database)
-                .Include(item => item.NetworkUsers)
-                .Include(item => item.AnalysisUsers)
-                .FirstOrDefault()
+                    .Where(item => item.Id == Input.Id)
+                    .Include(item => item.UserRoles)
+                        .ThenInclude(item => item.Role)
+                    .Include(item => item.DatabaseUsers)
+                        .ThenInclude(item => item.Database)
+                    .Include(item => item.NetworkUsers)
+                    .Include(item => item.AnalysisUsers)
+                    .FirstOrDefault()
             };
             // Check if the item hasn't been found.
             if (View.User == null)

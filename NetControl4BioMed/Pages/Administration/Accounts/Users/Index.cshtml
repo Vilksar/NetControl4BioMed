@@ -11,13 +11,13 @@
         <div class="col-lg-6 mb-3">
             <a asp-page="/Administration/Accounts/Users/Create" class="btn btn-success btn-block" title="Create">
                 <span><i class="fas fa-plus"></i></span>
-                <span>Add a new user</span>
+                <span>Add a new item</span>
             </a>
         </div>
         <div class="col-lg-6 mb-3">
             <button type="submit" asp-page="/Administration/Accounts/Users/Delete" class="btn btn-danger btn-block item-group-button" title="Delete" disabled>
                 <span><i class="fas fa-trash"></i></span>
-                <span>Delete selected users</span>
+                <span>Delete selected items</span>
             </button>
         </div>
     </div>
@@ -25,15 +25,15 @@
     {
         <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>No users have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty). <a asp-page="./Create" title="Create" class="alert-link">Create a new one?</a></span>
+            <span>No items have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty). <a asp-page="/Administration/Accounts/Users/Create" title="Create" class="alert-link">Create a new one?</a></span>
         </div>
     }
     else
     {
-        <table class="table table-hover table-bordered item-group">
+        <table class="table table-hover table-bordered item-group" data-paging="false" data-info="false" data-searching="false">
             <thead class="thead-light">
                 <tr>
-                    <th class="text-center text-break">
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" id="select" class="custom-control-input item-group-select" title="Select" />
                             <label for="select" class="custom-control-label"></label>
@@ -48,7 +48,7 @@
                     <th class="d-none d-lg-table-cell text-center text-break">
                         <span>Roles</span>
                     </th>
-                    <th class="text-center text-break">
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
                         <span>Actions</span>
                     </th>
                 </tr>
