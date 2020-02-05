@@ -40,19 +40,19 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                 SearchIn = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
-                    { "Email", "E-mail" },
-                    { "Users", "Users" }
+                    { "Name", "Name" }
                 },
                 Filter = new Dictionary<string, string>
                 {
                     { "HasUsers", "Has users" },
-                    { "HasNoUsers", "Has no users" }
+                    { "HasNoUsers", "Does not have users" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
                     { "DateTimeCreated", "Date created" },
-                    { "Name", "Name" }
+                    { "Name", "Name" },
+                    { "UserCount", "Number of users" }
                 }
             };
             // Define the search input.
@@ -65,13 +65,12 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             }
             // Start with all of the items in the database.
             var query = _context.Roles
-                .Where(item => true);
+                .AsQueryable();
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Users") && item.UserRoles.Any(item1 => item1.User.Email.Contains(input.SearchString)));
+                    input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
                 .Where(item => input.Filter.Contains("HasUsers") ? item.UserRoles.Any() : true)
@@ -96,6 +95,12 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                     break;
                 case var sort when sort == ("Name", "Descending"):
                     query = query.OrderByDescending(item => item.Name);
+                    break;
+                case var sort when sort == ("UserCount", "Ascending"):
+                    query = query.OrderBy(item => item.UserRoles.Count());
+                    break;
+                case var sort when sort == ("UserCount", "Descending"):
+                    query = query.OrderByDescending(item => item.UserRoles.Count());
                     break;
                 default:
                     break;

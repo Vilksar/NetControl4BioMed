@@ -6,7 +6,7 @@
         @foreach (var item in Model)
         {
             var color = item.Type == "SearchIn" ? "success" : item.Type == "Filter" ? "info" : item.Type == "All" ? "danger" : "dark";
-            <a href="@item.Link" class="badge badge-pill badge-@color mx-2" title="Unapply filter">
+            <a href="@item.Link" class="badge badge-pill badge-@color mx-2 my-1" title="Unapply filter">
                 <span class="mr-2">@item.Text</span>
                 <span class="ml-2"><i class="fas fa-times"></i></span>
             </a>

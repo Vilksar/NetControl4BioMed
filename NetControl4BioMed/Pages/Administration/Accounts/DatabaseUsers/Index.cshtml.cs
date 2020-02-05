@@ -47,7 +47,9 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
                 Filter = new Dictionary<string, string>
                 {
                     { "IsUserRegistered", "User is registered" },
-                    { "IsUserNotRegistered", "User is not registered" }
+                    { "IsNotUserRegistered", "User is not registered" },
+                    { "IsDatabasePublic", "Database is public" },
+                    { "IsNotDatabasePublic", "Database is not public" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -68,7 +70,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
             }
             // Start with all of the items in the database.
             var query = _context.DatabaseUsers
-                .Where(item => true);
+                .AsQueryable();
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
@@ -79,7 +81,9 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
             // Select the results matching the filter parameter.
             query = query
                 .Where(item => input.Filter.Contains("IsUserRegistered") ? item.User != null : true)
-                .Where(item => input.Filter.Contains("IsUserNotRegistered") ? item.User == null : true);
+                .Where(item => input.Filter.Contains("IsNotUserRegistered") ? item.User == null : true)
+                .Where(item => input.Filter.Contains("IsDatabasePublic") ? item.Database.IsPublic : true)
+                .Where(item => input.Filter.Contains("IsNotDatabasePublic") ? !item.Database.IsPublic : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {

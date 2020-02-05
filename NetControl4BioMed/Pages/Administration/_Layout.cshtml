@@ -16,7 +16,7 @@
         Icon = "fa-cog",
         Color = "primary",
         Groups = new List<NavigationGroupViewModel>
-{
+        {
             new NavigationGroupViewModel
             {
                 Id = "Index",
@@ -44,7 +44,7 @@
                 Color = "primary",
                 Link = "/Administration/Accounts/Index",
                 Pages = new List<NavigationPageViewModel>
-{
+                {
                     new NavigationPageViewModel
                     {
                         Id = "Users",
@@ -92,16 +92,7 @@
                 Color = "primary",
                 Link = "/Administration/Data/Index",
                 Pages = new List<NavigationPageViewModel>
-{
-                    new NavigationPageViewModel
-                    {
-                        Id = "Databases",
-                        Title = "Databases",
-                        Description = string.Empty,
-                        Icon = "fa-database",
-                        Color = "light",
-                        Link = "/Administration/Data/Databases/Index"
-                    },
+                {
                     new NavigationPageViewModel
                     {
                         Id = "DatabaseTypes",
@@ -113,21 +104,12 @@
                     },
                     new NavigationPageViewModel
                     {
-                        Id = "Nodes",
-                        Title = "Nodes",
+                        Id = "Databases",
+                        Title = "Databases",
                         Description = string.Empty,
-                        Icon = "fa-circle",
+                        Icon = "fa-database",
                         Color = "light",
-                        Link = "/Administration/Data/Nodes/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "DatabaseNodes",
-                        Title = "Database nodes",
-                        Description = string.Empty,
-                        Icon = "fa-circle",
-                        Color = "light",
-                        Link = "/Administration/Data/DatabaseNodes/Index"
+                        Link = "/Administration/Data/Databases/Index"
                     },
                     new NavigationPageViewModel
                     {
@@ -140,6 +122,24 @@
                     },
                     new NavigationPageViewModel
                     {
+                        Id = "DatabaseEdgeFields",
+                        Title = "Database edge fields",
+                        Description = string.Empty,
+                        Icon = "fa-arrow-right",
+                        Color = "light",
+                        Link = "/Administration/Data/DatabaseEdgeFields/Index"
+                    },
+                    new NavigationPageViewModel
+                    {
+                        Id = "Nodes",
+                        Title = "Nodes",
+                        Description = string.Empty,
+                        Icon = "fa-circle",
+                        Color = "light",
+                        Link = "/Administration/Data/Nodes/Index"
+                    },
+                    new NavigationPageViewModel
+                    {
                         Id = "Edges",
                         Title = "Edges",
                         Description = string.Empty,
@@ -149,21 +149,21 @@
                     },
                     new NavigationPageViewModel
                     {
+                        Id = "DatabaseNodes",
+                        Title = "Database nodes",
+                        Description = string.Empty,
+                        Icon = "fa-circle",
+                        Color = "light",
+                        Link = "/Administration/Data/DatabaseNodes/Index"
+                    },
+                    new NavigationPageViewModel
+                    {
                         Id = "DatabaseEdges",
                         Title = "Database edges",
                         Description = string.Empty,
                         Icon = "fa-arrow-right",
                         Color = "light",
                         Link = "/Administration/Data/DatabaseEdges/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "DatabaseEdgeFields",
-                        Title = "Database edge fields",
-                        Description = string.Empty,
-                        Icon = "fa-arrow-right",
-                        Color = "light",
-                        Link = "/Administration/Data/DatabaseEdgeFields/Index"
                     },
                     new NavigationPageViewModel
                     {
@@ -179,7 +179,7 @@
                         Id = "NodeCollectionNodes",
                         Title = "Node collection nodes",
                         Description = string.Empty,
-                        Icon = "fa-folder-open",
+                        Icon = "fa-folder",
                         Color = "light",
                         Link = "/Administration/Data/NodeCollectionNodes/Index"
                     }
@@ -194,7 +194,7 @@
                 Color = "primary",
                 Link = "/Administration/Content/Index",
                 Pages = new List<NavigationPageViewModel>
-{
+                {
                     new NavigationPageViewModel
                     {
                         Id = "Networks",

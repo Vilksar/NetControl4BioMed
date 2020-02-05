@@ -41,13 +41,14 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 SearchIn = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
-                    { "Email", "E-mail" },
-                    { "Roles", "Roles" }
+                    { "Email", "E-mail" }
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "HasRoles", "Has roles" },
+                    { "HasNoRoles", "Does not have roles" },
                     { "HasEmailConfirmed", "Has e-mail confirmed" },
-                    { "HasEmailNotConfirmed", "Does not have e-mail confirmed" },
+                    { "HasNoEmailConfirmed", "Does not have e-mail confirmed" },
                     { "IsAdministrator", "Is administrator" },
                     { "IsNotAdministrator", "Is not administrator" }
                 },
@@ -55,7 +56,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 {
                     { "Id", "ID" },
                     { "DateTimeCreated", "Date created" },
-                    { "Email", "E-mail" }
+                    { "Email", "E-mail" },
+                    { "RoleCount", "Number of roles" }
                 }
             };
             // Define the search input.
@@ -68,17 +70,18 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
             }
             // Start with all of the items in the database.
             var query = _context.Users
-                .Where(item => true);
+                .AsQueryable();
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Email") && item.Email.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Roles") && item.UserRoles.Any(item1 => item1.Role.Name.Contains(input.SearchString)));
+                    input.SearchIn.Contains("Email") && item.Email.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
+                .Where(item => input.Filter.Contains("HasRoles") ? item.UserRoles.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoRoles") ? !item.UserRoles.Any() : true)
                 .Where(item => input.Filter.Contains("HasEmailConfirmed") ? item.EmailConfirmed : true)
-                .Where(item => input.Filter.Contains("HasEmailNotConfirmed") ? !item.EmailConfirmed : true)
+                .Where(item => input.Filter.Contains("HasNoEmailConfirmed") ? !item.EmailConfirmed : true)
                 .Where(item => input.Filter.Contains("IsAdministrator") ? item.UserRoles.Any(ur => ur.Role.Name == "Administrator") : true)
                 .Where(item => input.Filter.Contains("IsNotAdministrator") ? !item.UserRoles.Any(ur => ur.Role.Name == "Administrator") : true);
             // Sort it according to the parameters.
@@ -101,6 +104,12 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                     break;
                 case var sort when sort == ("Email", "Descending"):
                     query = query.OrderByDescending(item => item.Email);
+                    break;
+                case var sort when sort == ("RoleCount", "Ascending"):
+                    query = query.OrderBy(item => item.UserRoles.Count());
+                    break;
+                case var sort when sort == ("RoleCount", "Descending"):
+                    query = query.OrderByDescending(item => item.UserRoles.Count());
                     break;
                 default:
                     break;
