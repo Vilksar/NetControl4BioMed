@@ -29,7 +29,23 @@ $(window).on('load', () => {
     // Check if there is a datatable on the page.
     if ($('.table-datatable').length !== 0) {
         // Format the table as datatable.
-        $('.table-datatable').DataTable();
+        //$('.table-datatable').DataTable();
+        $('.table-datatable').each((index, element) => {
+            // Format the table as datatable.
+            const table = $(element).DataTable();
+            // Get the index of the index column.
+            const columnIndex = table.column('index:name').index();
+            // Check if there is any index column.
+            if (typeof (columnIndex) !== 'undefined') {
+                // Add a listener for ordering or searching in the table.
+                table.on('order.dt search.dt', () => {
+                    // Update the corresponding column on searching or ordering.
+                    table.column(columnIndex, { search: 'applied', order: 'applied' }).nodes().each((cell, index) => {
+                        $(cell).find('span').html(index + 1);
+                    });
+                }).draw();
+            }
+        });
     }
 
     // Check if there is a list group of items on the page.

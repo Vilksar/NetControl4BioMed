@@ -60,10 +60,10 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             View = new ViewModel
             {
                 Role = _context.Roles
-                .Where(item => item.Id == id)
-                .Include(item => item.UserRoles)
-                    .ThenInclude(item => item.User)
-                .FirstOrDefault()
+                    .Where(item => item.Id == id)
+                    .Include(item => item.UserRoles)
+                        .ThenInclude(item => item.User)
+                    .FirstOrDefault()
             };
             // Check if the item hasn't been found.
             if (View.Role == null)
@@ -105,10 +105,10 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             View = new ViewModel
             {
                 Role = _context.Roles
-                .Where(item => item.Id == Input.Id)
-                .Include(item => item.UserRoles)
-                    .ThenInclude(item => item.User)
-                .FirstOrDefault()
+                    .Where(item => item.Id == Input.Id)
+                    .Include(item => item.UserRoles)
+                        .ThenInclude(item => item.User)
+                    .FirstOrDefault()
             };
             // Check if the item hasn't been found.
             if (View.Role == null)
