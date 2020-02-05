@@ -51,7 +51,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             // Define the view.
             View = new ViewModel
             {
-                Items = _roleManager.Roles.Where(item => ids.Contains(item.Id))
+                Items = _context.Roles.Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -94,7 +94,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             // Define the view.
             View = new ViewModel
             {
-                Items = _roleManager.Roles.Where(item => Input.Ids.Contains(item.Id))
+                Items = _context.Roles.Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())

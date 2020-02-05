@@ -51,7 +51,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
             // Define the view.
             View = new ViewModel
             {
-                Items = _userManager.Users.Where(item => ids.Contains(item.Id))
+                Items = _context.Users.Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -96,7 +96,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
             // Define the view.
             View = new ViewModel
             {
-                Items = _userManager.Users.Where(item => Input.Ids.Contains(item.Id))
+                Items = _context.Users.Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
