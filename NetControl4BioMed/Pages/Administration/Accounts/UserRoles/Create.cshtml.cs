@@ -33,20 +33,20 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
         {
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string UserString { get; set; }
+            public string UserEmail { get; set; }
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string RoleString { get; set; }
+            public string RoleId { get; set; }
         }
 
-        public IActionResult OnGet(string userString = null, string roleString = null)
+        public IActionResult OnGet(string userEmail = null, string roleId = null)
         {
             // Define the input.
             Input = new InputModel
             {
-                UserString = userString ?? string.Empty,
-                RoleString = roleString ?? string.Empty
+                UserEmail = userEmail ?? string.Empty,
+                RoleId = roleId ?? string.Empty
             };
             // Return the page.
             return Page();
@@ -63,7 +63,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return Page();
             }
             // Get the user based on the provided string.
-            var user = _context.Users.FirstOrDefault(item => item.Id == Input.UserString || item.NormalizedEmail == Input.UserString.ToUpper());
+            var user = _context.Users.FirstOrDefault(item => item.Email == Input.UserEmail);
             // Check if there was no user found.
             if (user == null)
             {
@@ -73,7 +73,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return Page();
             }
             // Get the role based on the provided string.
-            var role = _context.Roles.FirstOrDefault(item => item.Id == Input.RoleString || item.NormalizedName == Input.RoleString.ToUpper());
+            var role = _context.Roles.FirstOrDefault(item => item.Id == Input.RoleId);
             // Check if there was no role found.
             if (role == null)
             {

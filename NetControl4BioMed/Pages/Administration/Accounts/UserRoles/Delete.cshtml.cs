@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
 
         public class InputModel
         {
-            public IEnumerable<string> UserIds { get; set; }
+            public IEnumerable<string> UserEmails { get; set; }
 
             public IEnumerable<string> RoleIds { get; set; }
         }
@@ -46,28 +46,28 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
             public bool IsCurrentUserSelected { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(IEnumerable<string> userIds, IEnumerable<string> roleIds)
+        public async Task<IActionResult> OnGetAsync(IEnumerable<string> userEmails, IEnumerable<string> roleIds)
         {
-            // Check if there aren't any (valid) IDs provided.
-            if (userIds == null || roleIds == null || !userIds.Any() || !roleIds.Any() || userIds.Count() != roleIds.Count())
+            // Check if there aren't any e-mails or IDs provided.
+            if (userEmails == null || roleIds == null || !userEmails.Any() || !roleIds.Any() || userEmails.Count() != roleIds.Count())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
+                TempData["StatusMessage"] = "Error: No or invalid e-mails or IDs have been provided.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/UserRoles/Index");
             }
             // Get the IDs of all selected users and roles.
-            var ids = userIds.Zip(roleIds);
+            var ids = userEmails.Zip(roleIds);
             // Define the view.
             View = new ViewModel
             {
                 Items = _context.UserRoles
-                    .Where(item => userIds.Contains(item.User.Id) && roleIds.Contains(item.Role.Id))
+                    .Where(item => userEmails.Contains(item.User.Email) && roleIds.Contains(item.Role.Id))
                     .Include(item => item.User)
                     .Include(item => item.Role)
                     .AsEnumerable()
-                    .Where(item => ids.Contains((item.User.Id, item.Role.Id))),
-                IsCurrentUserSelected = userIds.Contains(_userManager.GetUserId(User))
+                    .Where(item => ids.Contains((item.User.Email, item.Role.Id))),
+                IsCurrentUserSelected = userEmails.Contains((await _userManager.GetUserAsync(User)).Email)
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -99,8 +99,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/UserRoles/Index");
             }
-            // Check if there aren't any IDs provided.
-            if (Input.UserIds == null || Input.RoleIds == null || !Input.UserIds.Any() || !Input.RoleIds.Any() || Input.UserIds.Count() != Input.RoleIds.Count())
+            // Check if there aren't any e-mails or IDs provided.
+            if (Input.UserEmails == null || Input.RoleIds == null || !Input.UserEmails.Any() || !Input.RoleIds.Any() || Input.UserEmails.Count() != Input.RoleIds.Count())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
@@ -108,17 +108,17 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return RedirectToPage("/Administration/Accounts/UserRoles/Index");
             }
             // Get the IDs of all selected users and roles.
-            var ids = Input.UserIds.Zip(Input.RoleIds);
+            var ids = Input.UserEmails.Zip(Input.RoleIds);
             // Define the view.
             View = new ViewModel
             {
                 Items = _context.UserRoles
-                    .Where(item => Input.UserIds.Contains(item.User.Id) && Input.RoleIds.Contains(item.Role.Id))
+                    .Where(item => Input.UserEmails.Contains(item.User.Id) && Input.RoleIds.Contains(item.Role.Id))
                     .Include(item => item.User)
                     .Include(item => item.Role)
                     .AsEnumerable()
-                    .Where(item => ids.Contains((item.User.Id, item.Role.Id))),
-                IsCurrentUserSelected = Input.UserIds.Contains(_userManager.GetUserId(User))
+                    .Where(item => ids.Contains((item.User.Email, item.Role.Id))),
+                IsCurrentUserSelected = Input.UserEmails.Contains((await _userManager.GetUserAsync(User)).Email)
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
