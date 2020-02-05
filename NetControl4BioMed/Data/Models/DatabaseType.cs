@@ -16,6 +16,11 @@ namespace NetControl4BioMed.Data.Models
         public string Id { get; set; }
 
         /// <summary>
+        /// Gets or sets the date when the database type was created.
+        /// </summary>
+        public DateTime DateTimeCreated { get; set; }
+
+        /// <summary>
         /// Gets or sets the name of the database type.
         /// </summary>
         public string Name { get; set; }

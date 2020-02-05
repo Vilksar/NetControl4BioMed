@@ -75,6 +75,7 @@ namespace NetControl4BioMed.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
+                    DateTimeCreated = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true)
                 },
