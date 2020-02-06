@@ -34,6 +34,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseTypes
         {
             public IEnumerable<DatabaseType> Items { get; set; }
         }
+
         public IActionResult OnGet(IEnumerable<string> ids)
         {
             // Check if there aren't any IDs provided.
@@ -111,7 +112,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseTypes
             // Save the number of items found.
             var databaseTypeCount = View.Items.Count();
             // Mark the items for deletion.
-            _context.RemoveRange(View.Items);
+            _context.DatabaseTypes.RemoveRange(View.Items);
             // Save the changes to the database.
             await _context.SaveChangesAsync();
             // Display a message.

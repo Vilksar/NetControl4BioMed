@@ -73,7 +73,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseTypes
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Data/DatabaseTypes/Index");
             }
-            // Check if the role is the administrator role.
+            // Check if the database type is the generic database type.
             if (View.DatabaseType.Name == "Generic")
             {
                 // Display a message.
@@ -118,7 +118,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseTypes
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Data/DatabaseTypes/Index");
             }
-            // Check if the role is the administrator role.
+            // Check if the database type is the generic database type.
             if (View.DatabaseType.Name == "Generic")
             {
                 // Display a message.

@@ -42,8 +42,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
             // Define the input.
             Input = new InputModel
             {
-                UserEmail = userEmail ?? string.Empty,
-                DatabaseId = databaseId ?? string.Empty
+                UserEmail = userEmail,
+                DatabaseId = databaseId
             };
             // Return the page.
             return Page();

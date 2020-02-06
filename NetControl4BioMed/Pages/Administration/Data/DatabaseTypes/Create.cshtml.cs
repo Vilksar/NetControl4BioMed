@@ -51,6 +51,14 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseTypes
                 // Redisplay the page.
                 return Page();
             }
+            // Check if there is another database type with the same name.
+            if (_context.DatabaseTypes.Any(item => item.Name == Input.Name))
+            {
+                // Add an error to the model
+                ModelState.AddModelError(string.Empty, $"A database type with the name \"{Input.Name}\" already exists.");
+                // Redisplay the page.
+                return Page();
+            }
             // Define the new database type.
             var databaseType = new DatabaseType
             {
@@ -65,7 +73,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseTypes
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 database type created successfully.";
             // Redirect to the index page.
-            return RedirectToPage("/Administration/Accounts/DatabaseTypes/Index");
+            return RedirectToPage("/Administration/Data/DatabaseTypes/Index");
         }
     }
 }

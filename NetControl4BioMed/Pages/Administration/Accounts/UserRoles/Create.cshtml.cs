@@ -45,8 +45,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
             // Define the input.
             Input = new InputModel
             {
-                UserEmail = userEmail ?? string.Empty,
-                RoleId = roleId ?? string.Empty
+                UserEmail = userEmail,
+                RoleId = roleId
             };
             // Return the page.
             return Page();
