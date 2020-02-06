@@ -46,8 +46,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                     .Include(item => item.DatabaseType)
                     .Include(item => item.DatabaseNodeFields)
                     .Include(item => item.DatabaseEdgeFields)
-                    .Include(item => item.DatabaseNodes)
-                    .Include(item => item.DatabaseEdges)
                     .Include(item => item.DatabaseUsers)
                     .FirstOrDefault()
             };

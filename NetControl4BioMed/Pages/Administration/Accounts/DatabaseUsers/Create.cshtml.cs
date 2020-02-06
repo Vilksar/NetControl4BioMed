@@ -65,7 +65,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
             if (user == null && Input.BlockUnregisteredEmail)
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No user could be found with the given e-mail string.");
+                ModelState.AddModelError(string.Empty, "No user could be found with the given e-mail.");
                 // Redisplay the page.
                 return Page();
             }

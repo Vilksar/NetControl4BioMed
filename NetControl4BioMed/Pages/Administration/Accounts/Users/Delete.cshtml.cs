@@ -142,12 +142,12 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
             var networkCount = networks.Count();
             var analysisCount = analyses.Count();
             // Mark them for removal.
-            _context.RemoveRange(analyses);
-            _context.RemoveRange(networks);
+            _context.Analyses.RemoveRange(analyses);
+            _context.Networks.RemoveRange(networks);
             // Save the changes in the database.
             await _context.SaveChangesAsync();
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {userCount.ToString()} user{(userCount != 1 ? "s" : string.Empty)} ({networkCount.ToString()} network{(networkCount != 1 ? "s" : string.Empty)}, {analysisCount.ToString()} analys{(analysisCount != 1 ? "e" : "i")}s) deleted successfully.";
+            TempData["StatusMessage"] = $"Success: {userCount.ToString()} user{(userCount != 1 ? "s" : string.Empty)}  deleted successfully.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Accounts/Users/Index");
         }

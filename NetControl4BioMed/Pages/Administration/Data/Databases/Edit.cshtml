@@ -71,7 +71,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Input.DatabaseTypeId" class="font-weight-bold">Type</label>
-                <select asp-for="Input.DatabaseTypeId" class="custom-select form-control" disabled="@(Model.View.Database.NetworkDatabases.Any() ? "disabled" : null)">
+                <select asp-for="Input.DatabaseTypeId" class="custom-select form-control">
                     @foreach (var databaseType in Model.View.DatabaseTypes)
                     {
                         <option value="@databaseType.Id">@databaseType.Name</option>
@@ -136,7 +136,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database is currently assigned to @Model.View.Database.DatabaseUsers.Count() user@(Model.View.Database.DatabaseUsers.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Data/DatabaseUsers/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current users</a>, or <a asp-page="/Administration/Data/DatabaseUsers/Create" asp-route-databaseId="@Model.View.Database.Id" class="alert-link">add a new one</a>.</span>
+            <span>The database is currently assigned to @Model.View.Database.DatabaseUsers.Count() user@(Model.View.Database.DatabaseUsers.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Accounts/DatabaseUsers/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current users</a>, or <a asp-page="/Administration/Accounts/DatabaseUsers/Create" asp-route-databaseId="@Model.View.Database.Id" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>

@@ -127,7 +127,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseTypes
                 return RedirectToPage("/Administration/Data/DatabaseTypes/Index");
             }
             // Check if there is another database type with the same name.
-            if (_context.DatabaseTypes.Any(item => item.Name == Input.Name))
+            if (_context.DatabaseTypes.Any(item => item.Id != View.DatabaseType.Id && item.Name == Input.Name))
             {
                 // Add an error to the model
                 ModelState.AddModelError(string.Empty, $"A database type with the name \"{Input.Name}\" already exists.");

@@ -36,11 +36,9 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
             public string Name { get; set; }
 
             [DataType(DataType.MultilineText)]
-            [Required(ErrorMessage = "This field is required.")]
             public string Description { get; set; }
 
             [DataType(DataType.Url)]
-            [Required(ErrorMessage = "This field is required.")]
             public string Url { get; set; }
 
             [DataType(DataType.Text)]
@@ -80,6 +78,12 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 Database = _context.Databases
                     .Where(item => item.Id == id)
                     .Include(item => item.DatabaseType)
+                    .Include(item => item.DatabaseNodeFields)
+                    .Include(item => item.DatabaseEdgeFields)
+                    .Include(item => item.DatabaseNodes)
+                    .Include(item => item.DatabaseEdges)
+                    .Include(item => item.NetworkDatabases)
+                    .Include(item => item.DatabaseUsers)
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.
@@ -131,6 +135,12 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 Database = _context.Databases
                     .Where(item => item.Id == Input.Id)
                     .Include(item => item.DatabaseType)
+                    .Include(item => item.DatabaseNodeFields)
+                    .Include(item => item.DatabaseEdgeFields)
+                    .Include(item => item.DatabaseNodes)
+                    .Include(item => item.DatabaseEdges)
+                    .Include(item => item.NetworkDatabases)
+                    .Include(item => item.DatabaseUsers)
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.
@@ -150,7 +160,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 return RedirectToPage("/Administration/Data/Databases/Index");
             }
             // Check if there is another database with the same name.
-            if (_context.Databases.Any(item => item.Name == Input.Name))
+            if (_context.Databases.Any(item => item.Id != View.Database.Id && item.Name == Input.Name))
             {
                 // Add an error to the model
                 ModelState.AddModelError(string.Empty, $"A database with the name \"{Input.Name}\" already exists.");
