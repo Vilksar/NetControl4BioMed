@@ -142,7 +142,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                         // and add them to the model
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
-                    // Return the page.
+                    // Redisplay the page.
                     return Page();
                 }
             }

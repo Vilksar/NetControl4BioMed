@@ -61,7 +61,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Roles/Index");
             }
-            // Check if the administrator role is among the roles to be deleted.
+            // Check if the administrator role is among the items to be deleted.
             if (View.Items.Any(item => item.Name == "Administrator"))
             {
                 // Display a message.
@@ -104,7 +104,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Roles/Index");
             }
-            // Check if the administrator role is among the roles to be deleted.
+            // Check if the administrator role is among the items to be deleted.
             if (View.Items.Any(item => item.Name == "Administrator"))
             {
                 // Display a message.
