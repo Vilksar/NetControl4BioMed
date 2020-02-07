@@ -33,20 +33,20 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
         {
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string UserEmail { get; set; }
+            public string UserString { get; set; }
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string RoleId { get; set; }
+            public string RoleString { get; set; }
         }
 
-        public IActionResult OnGet(string userEmail = null, string roleId = null)
+        public IActionResult OnGet(string userString = null, string roleString = null)
         {
             // Define the input.
             Input = new InputModel
             {
-                UserEmail = userEmail,
-                RoleId = roleId
+                UserString = userString,
+                RoleString = roleString
             };
             // Return the page.
             return Page();
@@ -63,7 +63,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return Page();
             }
             // Get the user based on the provided string.
-            var user = _context.Users.FirstOrDefault(item => item.Email == Input.UserEmail);
+            var user = _context.Users.FirstOrDefault(item => item.Id == Input.UserString || item.Email == Input.UserString);
             // Check if there was no user found.
             if (user == null)
             {
@@ -73,7 +73,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return Page();
             }
             // Get the role based on the provided string.
-            var role = _context.Roles.FirstOrDefault(item => item.Id == Input.RoleId);
+            var role = _context.Roles.FirstOrDefault(item => item.Id == Input.RoleString || item.Name == Input.RoleString);
             // Check if there was no role found.
             if (role == null)
             {
@@ -102,7 +102,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 // Log out the user.
                 await _signInManager.SignOutAsync();
                 // Display a message.
-                TempData["StatusMessage"] = $"Info:1 user role created successfully. The roles assigned to your account have changed, so you have been signed out.";
+                TempData["StatusMessage"] = $"Info: 1 user role created successfully. The roles assigned to your account have changed, so you have been signed out.";
                 // Redirect to the index page.
                 return RedirectToPage("/Index");
             }

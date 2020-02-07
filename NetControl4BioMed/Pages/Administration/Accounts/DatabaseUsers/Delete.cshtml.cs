@@ -26,7 +26,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
 
         public class InputModel
         {
-            public IEnumerable<string> UserEmails { get; set; }
+            public IEnumerable<string> UserIds { get; set; }
 
             public IEnumerable<string> DatabaseIds { get; set; }
         }
@@ -37,27 +37,27 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
         {
             public IEnumerable<DatabaseUser> Items { get; set; }
         }
-        public IActionResult OnGet(IEnumerable<string> userEmails, IEnumerable<string> databaseIds)
+        public IActionResult OnGet(IEnumerable<string> userIds, IEnumerable<string> databaseIds)
         {
             // Check if there aren't any e-mails or IDs provided.
-            if (userEmails == null || databaseIds == null || !userEmails.Any() || !databaseIds.Any() || userEmails.Count() != databaseIds.Count())
+            if (userIds == null || databaseIds == null || !userIds.Any() || !databaseIds.Any() || userIds.Count() != databaseIds.Count())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No or invalid e-mails or IDs have been provided.";
+                TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/DatabaseUsers/Index");
             }
             // Get the IDs of all selected users and databases.
-            var ids = userEmails.Zip(databaseIds);
+            var ids = userIds.Zip(databaseIds);
             // Define the view.
             View = new ViewModel
             {
                 Items = _context.DatabaseUsers
-                    .Where(item => userEmails.Contains(item.User.Email) && databaseIds.Contains(item.Database.Id))
+                    .Where(item => userIds.Contains(item.User.Id) && databaseIds.Contains(item.Database.Id))
                     .Include(item => item.User)
                     .Include(item => item.Database)
                     .AsEnumerable()
-                    .Where(item => ids.Contains((item.User.Email, item.Database.Id)))
+                    .Where(item => ids.Contains((item.User.Id, item.Database.Id)))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -82,24 +82,24 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
                 return RedirectToPage("/Administration/Accounts/DatabaseUsers/Index");
             }
             // Check if there aren't any e-mails or IDs provided.
-            if (Input.UserEmails == null || Input.DatabaseIds == null || !Input.UserEmails.Any() || !Input.DatabaseIds.Any() || Input.UserEmails.Count() != Input.DatabaseIds.Count())
+            if (Input.UserIds == null || Input.DatabaseIds == null || !Input.UserIds.Any() || !Input.DatabaseIds.Any() || Input.UserIds.Count() != Input.DatabaseIds.Count())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No or invalid e-mails or IDs have been provided.";
+                TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/DatabaseUsers/Index");
             }
             // Get the IDs of all selected users and databases.
-            var ids = Input.UserEmails.Zip(Input.DatabaseIds);
+            var ids = Input.UserIds.Zip(Input.DatabaseIds);
             // Define the view.
             View = new ViewModel
             {
                 Items = _context.DatabaseUsers
-                    .Where(item => Input.UserEmails.Contains(item.User.Email) && Input.DatabaseIds.Contains(item.Database.Id))
+                    .Where(item => Input.UserIds.Contains(item.User.Id) && Input.DatabaseIds.Contains(item.Database.Id))
                     .Include(item => item.User)
                     .Include(item => item.Database)
                     .AsEnumerable()
-                    .Where(item => ids.Contains((item.User.Email, item.Database.Id)))
+                    .Where(item => ids.Contains((item.User.Id, item.Database.Id)))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())

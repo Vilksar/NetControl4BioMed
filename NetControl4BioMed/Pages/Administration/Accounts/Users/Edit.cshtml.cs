@@ -141,21 +141,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                     // Return the page.
                     return Page();
                 }
-                // Get all the databases, networks and analyses that the user currently has access to.
-                var oldDatabaseUsers = _context.DatabaseUsers.Where(item => item.Email == email).AsEnumerable();
-                var oldNetworkUsers = _context.NetworkUsers.Where(item => item.Email == email).AsEnumerable();
-                var oldAnalysisUsers = _context.AnalysisUsers.Where(item => item.Email == email).AsEnumerable();
-                // Go over all of data using the old e-mail address and update it.
-                var newDatabaseUsers = oldDatabaseUsers.Select(item => new DatabaseUser { DatabaseId = item.Database.Id, Database = item.Database, UserId = View.User.Id, User = View.User, Email = View.User.Email, DateTimeCreated = item.DateTimeCreated });
-                var newNetworkUsers = oldNetworkUsers.Select(item => new NetworkUser { NetworkId = item.Network.Id, Network = item.Network, UserId = View.User.Id, User = View.User, Email = View.User.Email, DateTimeCreated = item.DateTimeCreated });
-                var newAnalysisUsers = oldAnalysisUsers.Select(item => new AnalysisUser { AnalysisId = item.Analysis.Id, Analysis = item.Analysis, UserId = View.User.Id, User = View.User, Email = View.User.Email, DateTimeCreated = item.DateTimeCreated });
-                // Mark the old data for deletion and the new data for addition.
-                _context.DatabaseUsers.RemoveRange(oldDatabaseUsers);
-                _context.NetworkUsers.RemoveRange(oldNetworkUsers);
-                _context.AnalysisUsers.RemoveRange(oldAnalysisUsers);
-                _context.DatabaseUsers.AddRange(newDatabaseUsers);
-                _context.NetworkUsers.AddRange(newNetworkUsers);
-                _context.AnalysisUsers.AddRange(newAnalysisUsers);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
             }

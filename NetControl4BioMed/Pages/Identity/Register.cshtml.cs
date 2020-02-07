@@ -132,23 +132,22 @@ namespace NetControl4BioMed.Pages.Identity
             };
             // Send the confirmation e-mail for the user.
             await _emailSender.SendEmailConfirmationEmailAsync(emailViewModel);
-            // Get all the networks and analyses that already use the e-mail address of the new user.
-            var networkUsers = _context.NetworkUsers.Where(item => item.Email == Input.Email);
-            var analysisUsers = _context.AnalysisUsers.Where(item => item.Email == Input.Email);
-            // Go over all of them and update the user.
-            foreach (var item in networkUsers)
-            {
-                item.UserId = user.Id;
-                item.User = user;
-            }
-            foreach (var item in analysisUsers)
-            {
-                item.UserId = user.Id;
-                item.User = user;
-            }
-            // Mark the items for update.
-            _context.NetworkUsers.UpdateRange(networkUsers);
-            _context.AnalysisUsers.UpdateRange(analysisUsers);
+            // Get all the databases, networks and analyses to which the user already has access.
+            var databaseUserInvitations = _context.DatabaseUserInvitations.Where(item => item.Email == user.Email);
+            var networkUserInvitations = _context.NetworkUserInvitations.Where(item => item.Email == user.Email);
+            var analysisUserInvitations = _context.AnalysisUserInvitations.Where(item => item.Email == user.Email);
+            // Create, for each, a corresponding user entry.
+            var databaseUsers = databaseUserInvitations.Select(item => new DatabaseUser { DatabaseId = item.DatabaseId, Database = item.Database, UserId = user.Id, User = user, DateTimeCreated = item.DateTimeCreated });
+            var networkUsers = networkUserInvitations.Select(item => new NetworkUser { NetworkId = item.NetworkId, Network = item.Network, UserId = user.Id, User = user, DateTimeCreated = item.DateTimeCreated });
+            var analysisUsers = analysisUserInvitations.Select(item => new AnalysisUser { AnalysisId = item.AnalysisId, Analysis = item.Analysis, UserId = user.Id, User = user, DateTimeCreated = item.DateTimeCreated });
+            // Mark the new items for addition.
+            _context.DatabaseUsers.AddRange(databaseUsers);
+            _context.NetworkUsers.AddRange(networkUsers);
+            _context.AnalysisUsers.AddRange(analysisUsers);
+            // Mark the old items for deletion.
+            _context.DatabaseUserInvitations.RemoveRange(databaseUserInvitations);
+            _context.NetworkUserInvitations.RemoveRange(networkUserInvitations);
+            _context.AnalysisUserInvitations.RemoveRange(analysisUserInvitations);
             // Try to save the changes in the database.
             try
             {

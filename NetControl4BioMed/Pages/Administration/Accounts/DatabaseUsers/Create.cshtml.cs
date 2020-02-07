@@ -26,24 +26,22 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
 
         public class InputModel
         {
-            [DataType(DataType.EmailAddress)]
+            [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string UserEmail { get; set; }
+            public string UserString { get; set; }
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string DatabaseId { get; set; }
-
-            public bool BlockUnregisteredEmail { get; set; }
+            public string DatabaseString { get; set; }
         }
 
-        public IActionResult OnGet(string userEmail = null, string databaseId = null)
+        public IActionResult OnGet(string userString = null, string databaseString = null)
         {
             // Define the input.
             Input = new InputModel
             {
-                UserEmail = userEmail,
-                DatabaseId = databaseId
+                UserString = userString,
+                DatabaseString = databaseString
             };
             // Return the page.
             return Page();
@@ -60,22 +58,22 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
                 return Page();
             }
             // Get the user based on the provided string.
-            var user = _context.Users.FirstOrDefault(item => item.Email == Input.UserEmail);
+            var user = _context.Users.FirstOrDefault(item => item.Id == Input.UserString || item.Email == Input.UserString);
             // Check if there was no user found.
-            if (user == null && Input.BlockUnregisteredEmail)
+            if (user == null)
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No user could be found with the given e-mail.");
+                ModelState.AddModelError(string.Empty, "No user could be found with the given string.");
                 // Redisplay the page.
                 return Page();
             }
             // Get the database based on the provided string.
-            var database = _context.Databases.FirstOrDefault(item => item.Id == Input.DatabaseId);
+            var database = _context.Databases.FirstOrDefault(item => item.Id == Input.DatabaseString || item.Name == Input.DatabaseString);
             // Check if there was no database found.
             if (database == null)
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No database could be found with the given ID.");
+                ModelState.AddModelError(string.Empty, "No database could be found with the given string.");
                 // Redisplay the page.
                 return Page();
             }
@@ -84,9 +82,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
             {
                 DatabaseId = database.Id,
                 Database = database,
-                UserId = user?.Id,
-                User = user,
-                Email = Input.UserEmail
+                UserId = user.Id,
+                User = user
             };
             // Mark it for addition to the database.
             _context.DatabaseUsers.Add(databaseUser);

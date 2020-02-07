@@ -46,8 +46,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "IsUserRegistered", "User is registered" },
-                    { "IsNotUserRegistered", "User is not registered" },
                     { "IsDatabasePublic", "Database is public" },
                     { "IsNotDatabasePublic", "Database is not public" }
                 },
@@ -80,8 +78,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.DatabaseUsers
                     input.SearchIn.Contains("DatabaseName") && item.Database.Name.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
-                .Where(item => input.Filter.Contains("IsUserRegistered") ? item.User != null : true)
-                .Where(item => input.Filter.Contains("IsNotUserRegistered") ? item.User == null : true)
                 .Where(item => input.Filter.Contains("IsDatabasePublic") ? item.Database.IsPublic : true)
                 .Where(item => input.Filter.Contains("IsNotDatabasePublic") ? !item.Database.IsPublic : true);
             // Sort it according to the parameters.
