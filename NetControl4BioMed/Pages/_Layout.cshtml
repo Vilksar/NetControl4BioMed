@@ -24,19 +24,23 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <a class="nav-item nav-link" asp-page="/Content/Index">
+                                <span><i class="fas fa-box-open"></i></span>
                                 <span>Content</span>
+                            </a>
+                            <a class="nav-item nav-link" asp-page="/Account/Index">
+                                <span><i class="fas fa-user"></i></span>
+                                <span>Account</span>
                             </a>
                             @if (User.IsInRole("Administrator"))
                             {
                                 <a class="nav-item nav-link" asp-page="/Administration/Index">
+                                    <span><i class="fas fa-cog"></i></span>
                                     <span>Administration</span>
                                 </a>
                             }
-                            <a class="nav-item nav-link" asp-page="/Account/Index">
-                                <span>Account</span>
-                            </a>
                             <form asp-page="/Identity/Logout" method="post">
                                 <button type="submit" title="Log out" class="btn nav-item nav-link">
+                                    <span><i class="fas fa-sign-out-alt"></i></span>
                                     <span>Log out</span>
                                 </button>
                             </form>
@@ -44,6 +48,7 @@
                         else
                         {
                             <a class="nav-item nav-link" asp-page="/Identity/Login">
+                                <span><i class="fas fa-sign-in-alt"></i></span>
                                 <span>Log in</span>
                             </a>
                         }

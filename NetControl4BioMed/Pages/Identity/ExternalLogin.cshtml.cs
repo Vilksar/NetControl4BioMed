@@ -268,19 +268,8 @@ namespace NetControl4BioMed.Pages.Identity
             _context.DatabaseUserInvitations.RemoveRange(databaseUserInvitations);
             _context.NetworkUserInvitations.RemoveRange(networkUserInvitations);
             _context.AnalysisUserInvitations.RemoveRange(analysisUserInvitations);
-            // Try to save the changes in the database.
-            try
-            {
-                // Save the changes in the database.
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception exception)
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, exception.Message);
-                // And re-display the page.
-                return Page();
-            }
+            // Save the changes in the database.
+            await _context.SaveChangesAsync();
             // Sign in the user.
             await _signInManager.SignInAsync(user, false);
             // Display a message to the user.
