@@ -16,8 +16,8 @@ namespace NetControl4BioMed.Pages.Administration.Data
     {
         public IActionResult OnGet()
         {
-            // Return the page.
-            return Page();
+            // Redirect to the index page.
+            return RedirectToPage("/Administration/Index");
         }
     }
 }

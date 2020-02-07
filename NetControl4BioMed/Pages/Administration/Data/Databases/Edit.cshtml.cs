@@ -135,12 +135,14 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 Database = _context.Databases
                     .Where(item => item.Id == Input.Id)
                     .Include(item => item.DatabaseType)
+                    .Include(item => item.DatabaseUsers)
+                    .Include(item => item.DatabaseUserInvitations)
                     .Include(item => item.DatabaseNodeFields)
                     .Include(item => item.DatabaseEdgeFields)
                     .Include(item => item.DatabaseNodes)
                     .Include(item => item.DatabaseEdges)
                     .Include(item => item.NetworkDatabases)
-                    .Include(item => item.DatabaseUsers)
+                    .Include(item => item.AnalysisDatabases)
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.

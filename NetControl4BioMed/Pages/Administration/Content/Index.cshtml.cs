@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
 using NetControl4BioMed.Data.Models;
 
-namespace NetControl4BioMed.Pages.Administration.Accounts
+namespace NetControl4BioMed.Pages.Administration.Content
 {
     [Authorize(Roles = "Administrator")]
     public class IndexModel : PageModel

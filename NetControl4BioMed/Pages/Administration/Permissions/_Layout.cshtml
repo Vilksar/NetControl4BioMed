@@ -1,0 +1,14 @@
+﻿@{
+    Layout = "/Pages/Administration/_Layout.cshtml";
+}
+
+@section Breadcrumbs {
+    <a asp-page="/Administration/Permissions/Index" class="breadcrumb-item"><span>Permissions</span></a>
+    @RenderSection("Breadcrumbs", required: false)
+}
+
+@RenderBody()
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

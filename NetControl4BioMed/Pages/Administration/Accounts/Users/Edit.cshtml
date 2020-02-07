@@ -95,7 +95,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The user currently has access to @Model.View.User.DatabaseUsers.Count() database@(Model.View.User.DatabaseUsers.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Accounts/DatabaseUsers/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="alert-link">view the current databases</a>, or <a asp-page="/Administration/Accounts/DatabaseUsers/Create" asp-route-userString="@Model.View.User.Email" class="alert-link">add a new one</a>.</span>
+            <span>The user currently has access to @Model.View.User.DatabaseUsers.Count() database@(Model.View.User.DatabaseUsers.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="alert-link">view the current databases</a>, or <a asp-page="/Administration/Permissions/DatabaseUsers/Create" asp-route-userString="@Model.View.User.Email" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>
