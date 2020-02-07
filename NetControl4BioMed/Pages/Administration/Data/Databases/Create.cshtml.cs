@@ -95,7 +95,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 // Redisplay the page.
                 return Page();
             }
-            // Check if there is another database type with the same name.
+            // Check if there is another database with the same name.
             if (_context.Databases.Any(item => item.Name == Input.Name))
             {
                 // Add an error to the model
@@ -104,16 +104,16 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 return Page();
             }
             // Get the database type.
-            var databaseType = _context.DatabaseTypes.FirstOrDefault(item => item.Id == Input.DatabaseTypeId);
-            // Check if no database type has been found or if the database type is generic.
-            if (databaseType == null || databaseType.Name == "Generic")
+            var databaseType = View.DatabaseTypes.FirstOrDefault(item => item.Id == Input.DatabaseTypeId);
+            // Check if no database type has been found.
+            if (databaseType == null)
             {
                 // Add an error to the model
                 ModelState.AddModelError(string.Empty, "No non-generic database type could be found with the provided ID.");
                 // Redisplay the page.
                 return Page();
             }
-            // Define the new database type.
+            // Define the new database.
             var database = new Database
             {
                 Name = Input.Name,
