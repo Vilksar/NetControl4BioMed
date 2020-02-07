@@ -11,8 +11,8 @@ namespace NetControl4BioMed.Pages.Account.Manage
     {
         public IActionResult OnGet()
         {
-            // Return the page.
-            return Page();
+            // Redirect to the index page.
+            return RedirectToPage("/Account/Index");
         }
     }
 }

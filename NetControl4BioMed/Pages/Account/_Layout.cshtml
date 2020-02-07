@@ -1,12 +1,13 @@
 ﻿@using Helpers.ViewModels
 @{
     Layout = "/Pages/_Layout.cshtml";
+    var _color = "info";
     var navigationBanner = new NavigationBannerViewModel
     {
         Id = "Account",
         Title = "Account",
-        Icon = "fa-user-circle",
-        Color = "info"
+        Icon = "fa-user",
+        Color = _color
     };
     var navigationArea = new NavigationAreaViewModel
     {
@@ -14,7 +15,7 @@
         Title = "Account",
         Description = string.Empty,
         Icon = "fa-user",
-        Color = "info",
+        Color = _color,
         Groups = new List<NavigationGroupViewModel>
         {
             new NavigationGroupViewModel
@@ -23,7 +24,7 @@
                 Title = "Overview",
                 Description = string.Empty,
                 Icon = "fa-chart-bar",
-                Color = "info",
+                Color = _color,
                 Link = "/Account/Index"
             },
             new NavigationGroupViewModel
@@ -32,7 +33,7 @@
                 Title = "Manage",
                 Description = string.Empty,
                 Icon = "fa-cog",
-                Color = "info",
+                Color = _color,
                 Link = "/Account/Manage/Index",
                 Pages = new List<NavigationPageViewModel>
                 {

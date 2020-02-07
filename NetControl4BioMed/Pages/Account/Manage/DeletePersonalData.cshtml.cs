@@ -127,8 +127,19 @@ namespace NetControl4BioMed.Pages.Account.Manage
             // Mark them for removal.
             _context.RemoveRange(networks);
             _context.RemoveRange(analyses);
-            // Save the changes.
-            await _context.SaveChangesAsync();
+            // Try to save the changes in the database.
+            try
+            {
+                // Save the changes in the database.
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // And re-display the page.
+                return Page();
+            }
             // Redirect to the home page.
             return RedirectToPage("/Index");
         }
