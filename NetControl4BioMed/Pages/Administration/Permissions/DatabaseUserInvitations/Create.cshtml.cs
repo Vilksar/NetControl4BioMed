@@ -57,6 +57,16 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 // Redisplay the page.
                 return Page();
             }
+            // Try to get the user with the provided e-mail.
+            var user = _context.Users.FirstOrDefault(item => item.Email == Input.Email);
+            // Check if there was any user found.
+            if (user != null)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "A user with the provided e-mail already exists.");
+                // Redisplay the page.
+                return Page();
+            }
             // Get the database based on the provided string.
             var database = _context.Databases.FirstOrDefault(item => item.Id == Input.DatabaseString || item.Name == Input.DatabaseString);
             // Check if there was no database found.
