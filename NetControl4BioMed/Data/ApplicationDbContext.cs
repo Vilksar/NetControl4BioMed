@@ -40,9 +40,14 @@ namespace NetControl4BioMed.Data
         public DbSet<AnalysisNodeCollection> AnalysisNodeCollections { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between analyses and users.
+        /// Gets or sets the database table containing the one-to-one relationship between analyses and regsitered users.
         /// </summary>
         public DbSet<AnalysisUser> AnalysisUsers { get; set; }
+
+        /// <summary>
+        /// Gets or sets the database table containing the one-to-one relationship between analyses and unregistered users.
+        /// </summary>
+        public DbSet<AnalysisUserInvitation> AnalysisUserInvitations { get; set; }
 
         /// <summary>
         /// Gets or sets the database table containing the control paths for analyses.
@@ -95,6 +100,11 @@ namespace NetControl4BioMed.Data
         public DbSet<DatabaseUser> DatabaseUsers { get; set; }
 
         /// <summary>
+        /// Gets or sets the database table containing the one-to-one relationship between databases and unregistered users.
+        /// </summary>
+        public DbSet<DatabaseUserInvitation> DatabaseUserInvitations { get; set; }
+
+        /// <summary>
         /// Gets or sets the database table containing the edges.
         /// </summary>
         public DbSet<Edge> Edges { get; set; }
@@ -133,6 +143,11 @@ namespace NetControl4BioMed.Data
         /// Gets or sets the database table containing the one-to-one relationship between networks and users.
         /// </summary>
         public DbSet<NetworkUser> NetworkUsers { get; set; }
+
+        /// <summary>
+        /// Gets or sets the database table containing the one-to-one relationship between networks and unregistered users.
+        /// </summary>
+        public DbSet<NetworkUserInvitation> NetworkUserInvitations { get; set; }
 
         /// <summary>
         /// Gets or sets the database table containing the nodes.
@@ -178,281 +193,356 @@ namespace NetControl4BioMed.Data
         {
             // Configure the schema needed for Identity.
             base.OnModelCreating(modelBuilder);
-            // Configure the one-to-many and many-to-many relationships for Identity.
-            modelBuilder.Entity<UserRole>(userRole =>
+            // Configure the IDs, one-to-many and many-to-many relationships for the data.
+            modelBuilder.Entity<Analysis>(entity =>
             {
-                userRole.HasKey(item => new { item.UserId, item.RoleId });
-                userRole.HasOne(item => item.User)
-                    .WithMany(item => item.UserRoles)
-                    .HasForeignKey(item => item.UserId)
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
+            });
+            modelBuilder.Entity<AnalysisDatabase>(entity =>
+            {
+                entity.HasKey(item => new { item.AnalysisId, item.DatabaseId });
+                entity.HasOne(item => item.Analysis)
+                    .WithMany(item => item.AnalysisDatabases)
+                    .HasForeignKey(item => item.AnalysisId)
                     .IsRequired();
-                userRole.HasOne(item => item.Role)
-                    .WithMany(item => item.UserRoles)
-                    .HasForeignKey(item => item.RoleId)
+                entity.HasOne(item => item.Database)
+                    .WithMany(item => item.AnalysisDatabases)
+                    .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
             });
-            // Configure the one-to-many and many-to-many relationships for the data.
-            modelBuilder.Entity<AnalysisEdge>(analysisEdge =>
+            modelBuilder.Entity<AnalysisEdge>(entity =>
             {
-                analysisEdge.HasKey(item => new { item.AnalysisId, item.EdgeId });
-                analysisEdge.HasOne(item => item.Analysis)
+                entity.HasKey(item => new { item.AnalysisId, item.EdgeId });
+                entity.HasOne(item => item.Analysis)
                     .WithMany(item => item.AnalysisEdges)
                     .HasForeignKey(item => item.AnalysisId)
                     .IsRequired();
-                analysisEdge.HasOne(item => item.Edge)
+                entity.HasOne(item => item.Edge)
                     .WithMany(item => item.AnalysisEdges)
                     .HasForeignKey(item => item.EdgeId)
                     .IsRequired();
             });
-            modelBuilder.Entity<AnalysisNetwork>(analysisNetwork =>
+            modelBuilder.Entity<AnalysisNetwork>(entity =>
             {
-                analysisNetwork.HasKey(item => new { item.AnalysisId, item.NetworkId });
-                analysisNetwork.HasOne(item => item.Analysis)
+                entity.HasKey(item => new { item.AnalysisId, item.NetworkId });
+                entity.HasOne(item => item.Analysis)
                     .WithMany(item => item.AnalysisNetworks)
                     .HasForeignKey(item => item.AnalysisId)
                     .IsRequired();
-                analysisNetwork.HasOne(item => item.Network)
+                entity.HasOne(item => item.Network)
                     .WithMany(item => item.AnalysisNetworks)
                     .HasForeignKey(item => item.NetworkId)
                     .IsRequired();
             });
-            modelBuilder.Entity<AnalysisNode>(analysisNode =>
+            modelBuilder.Entity<AnalysisNode>(entity =>
             {
-                analysisNode.HasKey(item => new { item.AnalysisId, item.NodeId, item.Type });
-                analysisNode.HasOne(item => item.Analysis)
+                entity.HasKey(item => new { item.AnalysisId, item.NodeId, item.Type });
+                entity.HasOne(item => item.Analysis)
                     .WithMany(item => item.AnalysisNodes)
                     .HasForeignKey(item => item.AnalysisId)
                     .IsRequired();
-                analysisNode.HasOne(item => item.Node)
+                entity.HasOne(item => item.Node)
                     .WithMany(item => item.AnalysisNodes)
                     .HasForeignKey(item => item.NodeId)
                     .IsRequired();
             });
-            modelBuilder.Entity<AnalysisNodeCollection>(analysisNodeCollection =>
+            modelBuilder.Entity<AnalysisNodeCollection>(entity =>
             {
-                analysisNodeCollection.HasKey(item => new { item.AnalysisId, item.NodeCollectionId, item.Type });
-                analysisNodeCollection.HasOne(item => item.Analysis)
+                entity.HasKey(item => new { item.AnalysisId, item.NodeCollectionId, item.Type });
+                entity.HasOne(item => item.Analysis)
                     .WithMany(item => item.AnalysisNodeCollections)
                     .HasForeignKey(item => item.AnalysisId)
                     .IsRequired();
-                analysisNodeCollection.HasOne(item => item.NodeCollection)
+                entity.HasOne(item => item.NodeCollection)
                     .WithMany(item => item.AnalysisNodeCollections)
                     .HasForeignKey(item => item.NodeCollectionId)
                     .IsRequired();
             });
-            modelBuilder.Entity<AnalysisUser>(analysisUser =>
+            modelBuilder.Entity<AnalysisUser>(entity =>
             {
-                analysisUser.HasKey(item => new { item.AnalysisId, item.Email });
-                analysisUser.HasOne(item => item.Analysis)
+                entity.HasKey(item => new { item.AnalysisId, item.UserId });
+                entity.HasOne(item => item.Analysis)
                     .WithMany(item => item.AnalysisUsers)
                     .HasForeignKey(item => item.AnalysisId)
                     .IsRequired();
-                analysisUser.HasOne(item => item.User)
+                entity.HasOne(item => item.User)
                     .WithMany(item => item.AnalysisUsers)
                     .HasForeignKey(item => item.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .IsRequired();
             });
-            modelBuilder.Entity<ControlPath>(controlPath =>
+            modelBuilder.Entity<AnalysisUserInvitation>(entity =>
             {
-                controlPath.HasOne(item => item.Analysis)
+                entity.HasKey(item => new { item.AnalysisId, item.Email });
+                entity.HasOne(item => item.Analysis)
+                    .WithMany(item => item.AnalysisUserInvitations)
+                    .HasForeignKey(item => item.AnalysisId)
+                    .IsRequired();
+            });
+            modelBuilder.Entity<ControlPath>(entity =>
+            {
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
+                entity.HasOne(item => item.Analysis)
                     .WithMany(item => item.ControlPaths)
                     .HasForeignKey(item => item.AnalysisId)
                     .IsRequired();
             });
-            modelBuilder.Entity<Database>(database =>
+            modelBuilder.Entity<Database>(entity =>
             {
-                database.HasOne(item => item.DatabaseType)
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
+                entity.HasOne(item => item.DatabaseType)
                     .WithMany(item => item.Databases)
                     .HasForeignKey(item => item.DatabaseTypeId)
                     .IsRequired();
             });
-            modelBuilder.Entity<DatabaseEdge>(databaseEdge =>
+            modelBuilder.Entity<DatabaseEdge>(entity =>
             {
-                databaseEdge.HasKey(item => new { item.DatabaseId, item.EdgeId });
-                databaseEdge.HasOne(item => item.Database)
+                entity.HasKey(item => new { item.DatabaseId, item.EdgeId });
+                entity.HasOne(item => item.Database)
                     .WithMany(item => item.DatabaseEdges)
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
-                databaseEdge.HasOne(item => item.Edge)
+                entity.HasOne(item => item.Edge)
                     .WithMany(item => item.DatabaseEdges)
                     .HasForeignKey(item => item.EdgeId)
                     .IsRequired();
             });
-            modelBuilder.Entity<DatabaseEdgeField>(databaseEdgeField =>
+            modelBuilder.Entity<DatabaseEdgeField>(entity =>
             {
-                databaseEdgeField.HasOne(item => item.Database)
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
+                entity.HasOne(item => item.Database)
                     .WithMany(item => item.DatabaseEdgeFields)
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
             });
-            modelBuilder.Entity<DatabaseEdgeFieldEdge>(databaseEdgeFieldEdge =>
+            modelBuilder.Entity<DatabaseEdgeFieldEdge>(entity =>
             {
-                databaseEdgeFieldEdge.HasKey(item => new { item.DatabaseEdgeFieldId, item.EdgeId, item.Value });
-                databaseEdgeFieldEdge.HasOne(item => item.DatabaseEdgeField)
+                entity.HasKey(item => new { item.DatabaseEdgeFieldId, item.EdgeId, item.Value });
+                entity.HasOne(item => item.DatabaseEdgeField)
                     .WithMany(item => item.DatabaseEdgeFieldEdges)
                     .HasForeignKey(item => item.DatabaseEdgeFieldId)
                     .IsRequired();
-                databaseEdgeFieldEdge.HasOne(item => item.Edge)
+                entity.HasOne(item => item.Edge)
                     .WithMany(item => item.DatabaseEdgeFieldEdges)
                     .HasForeignKey(item => item.EdgeId)
                     .IsRequired();
             });
-            modelBuilder.Entity<DatabaseNode>(databaseNode =>
+            modelBuilder.Entity<DatabaseNode>(entity =>
             {
-                databaseNode.HasKey(item => new { item.DatabaseId, item.NodeId });
-                databaseNode.HasOne(item => item.Database)
+                entity.HasKey(item => new { item.DatabaseId, item.NodeId });
+                entity.HasOne(item => item.Database)
                     .WithMany(item => item.DatabaseNodes)
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
-                databaseNode.HasOne(item => item.Node)
+                entity.HasOne(item => item.Node)
                     .WithMany(item => item.DatabaseNodes)
                     .HasForeignKey(item => item.NodeId)
                     .IsRequired();
             });
-            modelBuilder.Entity<DatabaseNodeField>(databaseNodeField =>
+            modelBuilder.Entity<DatabaseNodeField>(entity =>
             {
-                databaseNodeField.HasOne(item => item.Database)
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
+                entity.HasOne(item => item.Database)
                     .WithMany(item => item.DatabaseNodeFields)
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
             });
-            modelBuilder.Entity<DatabaseNodeFieldNode>(databaseNodeFieldNode =>
+            modelBuilder.Entity<DatabaseNodeFieldNode>(entity =>
             {
-                databaseNodeFieldNode.HasKey(item => new { item.DatabaseNodeFieldId, item.NodeId, item.Value });
-                databaseNodeFieldNode.HasOne(item => item.DatabaseNodeField)
+                entity.HasKey(item => new { item.DatabaseNodeFieldId, item.NodeId, item.Value });
+                entity.HasOne(item => item.DatabaseNodeField)
                     .WithMany(item => item.DatabaseNodeFieldNodes)
                     .HasForeignKey(item => item.DatabaseNodeFieldId)
                     .IsRequired();
-                databaseNodeFieldNode.HasOne(item => item.Node)
+                entity.HasOne(item => item.Node)
                     .WithMany(item => item.DatabaseNodeFieldNodes)
                     .HasForeignKey(item => item.NodeId)
                     .IsRequired();
             });
-            modelBuilder.Entity<DatabaseUser>(databaseUser =>
+            modelBuilder.Entity<DatabaseType>(entity =>
             {
-                databaseUser.HasKey(item => new { item.DatabaseId, item.Email });
-                databaseUser.HasOne(item => item.Database)
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
+            });
+            modelBuilder.Entity<DatabaseUser>(entity =>
+            {
+                entity.HasKey(item => new { item.DatabaseId, item.UserId });
+                entity.HasOne(item => item.Database)
                     .WithMany(item => item.DatabaseUsers)
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
-                databaseUser.HasOne(item => item.User)
+                entity.HasOne(item => item.User)
                     .WithMany(item => item.DatabaseUsers)
                     .HasForeignKey(item => item.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .IsRequired();
             });
-            modelBuilder.Entity<EdgeNode>(edgeNode =>
+            modelBuilder.Entity<DatabaseUserInvitation>(entity =>
             {
-                edgeNode.HasKey(item => new { item.EdgeId, item.NodeId, item.Type });
-                edgeNode.HasOne(item => item.Edge)
+                entity.HasKey(item => new { item.DatabaseId, item.Email });
+                entity.HasOne(item => item.Database)
+                    .WithMany(item => item.DatabaseUserInvitations)
+                    .HasForeignKey(item => item.DatabaseId)
+                    .IsRequired();
+            });
+            modelBuilder.Entity<Edge>(entity =>
+            {
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
+            });
+            modelBuilder.Entity<EdgeNode>(entity =>
+            {
+                entity.HasKey(item => new { item.EdgeId, item.NodeId, item.Type });
+                entity.HasOne(item => item.Edge)
                     .WithMany(item => item.EdgeNodes)
                     .HasForeignKey(item => item.EdgeId)
                     .IsRequired();
-                edgeNode.HasOne(item => item.Node)
+                entity.HasOne(item => item.Node)
                     .WithMany(item => item.EdgeNodes)
                     .HasForeignKey(item => item.NodeId)
                     .IsRequired();
             });
-            modelBuilder.Entity<NetworkDatabase>(networkDatabase =>
+            modelBuilder.Entity<Network>(entity =>
             {
-                networkDatabase.HasKey(item => new { item.NetworkId, item.DatabaseId });
-                networkDatabase.HasOne(item => item.Network)
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
+            });
+            modelBuilder.Entity<NetworkDatabase>(entity =>
+            {
+                entity.HasKey(item => new { item.NetworkId, item.DatabaseId });
+                entity.HasOne(item => item.Network)
                     .WithMany(item => item.NetworkDatabases)
                     .HasForeignKey(item => item.NetworkId)
                     .IsRequired();
-                networkDatabase.HasOne(item => item.Database)
+                entity.HasOne(item => item.Database)
                     .WithMany(item => item.NetworkDatabases)
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
             });
-            modelBuilder.Entity<NetworkEdge>(networkEdge =>
+            modelBuilder.Entity<NetworkEdge>(entity =>
             {
-                networkEdge.HasKey(item => new { item.NetworkId, item.EdgeId });
-                networkEdge.HasOne(item => item.Network)
+                entity.HasKey(item => new { item.NetworkId, item.EdgeId });
+                entity.HasOne(item => item.Network)
                     .WithMany(item => item.NetworkEdges)
                     .HasForeignKey(item => item.NetworkId)
                     .IsRequired();
-                networkEdge.HasOne(item => item.Edge)
+                entity.HasOne(item => item.Edge)
                     .WithMany(item => item.NetworkEdges)
                     .HasForeignKey(item => item.EdgeId)
                     .IsRequired();
             });
-            modelBuilder.Entity<NetworkNode>(networkNode =>
+            modelBuilder.Entity<NetworkNode>(entity =>
             {
-                networkNode.HasKey(item => new { item.NetworkId, item.NodeId, item.Type });
-                networkNode.HasOne(item => item.Network)
+                entity.HasKey(item => new { item.NetworkId, item.NodeId, item.Type });
+                entity.HasOne(item => item.Network)
                     .WithMany(item => item.NetworkNodes)
                     .HasForeignKey(item => item.NetworkId)
                     .IsRequired();
-                networkNode.HasOne(item => item.Node)
+                entity.HasOne(item => item.Node)
                     .WithMany(item => item.NetworkNodes)
                     .HasForeignKey(item => item.NodeId)
                     .IsRequired();
             });
-            modelBuilder.Entity<NetworkNodeCollection>(networkNodeCollection =>
+            modelBuilder.Entity<NetworkNodeCollection>(entity =>
             {
-                networkNodeCollection.HasKey(item => new { item.NetworkId, item.NodeCollectionId, item.Type });
-                networkNodeCollection.HasOne(item => item.Network)
+                entity.HasKey(item => new { item.NetworkId, item.NodeCollectionId, item.Type });
+                entity.HasOne(item => item.Network)
                     .WithMany(item => item.NetworkNodeCollections)
                     .HasForeignKey(item => item.NetworkId)
                     .IsRequired();
-                networkNodeCollection.HasOne(item => item.NodeCollection)
+                entity.HasOne(item => item.NodeCollection)
                     .WithMany(item => item.NetworkNodeCollections)
                     .HasForeignKey(item => item.NodeCollectionId)
                     .IsRequired();
             });
-            modelBuilder.Entity<NetworkUser>(networkUser =>
+            modelBuilder.Entity<NetworkUser>(entity =>
             {
-                networkUser.HasKey(item => new { item.NetworkId, item.Email });
-                networkUser.HasOne(item => item.Network)
+                entity.HasKey(item => new { item.NetworkId, item.UserId });
+                entity.HasOne(item => item.Network)
                     .WithMany(item => item.NetworkUsers)
                     .HasForeignKey(item => item.NetworkId)
                     .IsRequired();
-                networkUser.HasOne(item => item.User)
+                entity.HasOne(item => item.User)
                     .WithMany(item => item.NetworkUsers)
                     .HasForeignKey(item => item.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .IsRequired();
             });
-            modelBuilder.Entity<NodeCollectionNode>(nodeCollectionNode =>
+            modelBuilder.Entity<NetworkUserInvitation>(entity =>
             {
-                nodeCollectionNode.HasKey(item => new { item.NodeCollectionId, item.NodeId });
-                nodeCollectionNode.HasOne(item => item.NodeCollection)
+                entity.HasKey(item => new { item.NetworkId, item.Email });
+                entity.HasOne(item => item.Network)
+                    .WithMany(item => item.NetworkUserInvitations)
+                    .HasForeignKey(item => item.NetworkId)
+                    .IsRequired();
+            });
+            modelBuilder.Entity<Node>(entity =>
+            {
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
+            });
+            modelBuilder.Entity<NodeCollection>(entity =>
+            {
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
+            });
+            modelBuilder.Entity<NodeCollectionNode>(entity =>
+            {
+                entity.HasKey(item => new { item.NodeCollectionId, item.NodeId });
+                entity.HasOne(item => item.NodeCollection)
                     .WithMany(item => item.NodeCollectionNodes)
                     .HasForeignKey(item => item.NodeCollectionId)
                     .IsRequired();
-                nodeCollectionNode.HasOne(item => item.Node)
+                entity.HasOne(item => item.Node)
                     .WithMany(item => item.NodeCollectionNodes)
                     .HasForeignKey(item => item.NodeId)
                     .IsRequired();
             });
-            modelBuilder.Entity<Path>(path =>
+            modelBuilder.Entity<Path>(entity =>
             {
-                path.HasOne(item => item.ControlPath)
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
+                entity.HasOne(item => item.ControlPath)
                     .WithMany(item => item.Paths)
                     .HasForeignKey(item => item.ControlPathId)
                     .IsRequired();
             });
-            modelBuilder.Entity<PathEdge>(pathEdge =>
+            modelBuilder.Entity<PathEdge>(entity =>
             {
-                pathEdge.HasKey(item => new { item.PathId, item.EdgeId });
-                pathEdge.HasOne(item => item.Path)
+                entity.HasKey(item => new { item.PathId, item.EdgeId });
+                entity.HasOne(item => item.Path)
                     .WithMany(item => item.PathEdges)
                     .HasForeignKey(item => item.PathId)
                     .IsRequired();
-                pathEdge.HasOne(item => item.Edge)
+                entity.HasOne(item => item.Edge)
                     .WithMany(item => item.PathEdges)
                     .HasForeignKey(item => item.EdgeId)
                     .IsRequired();
             });
-            modelBuilder.Entity<PathNode>(pathNode =>
+            modelBuilder.Entity<PathNode>(entity =>
             {
-                pathNode.HasKey(item => new { item.PathId, item.NodeId, item.Type });
-                pathNode.HasOne(item => item.Path)
+                entity.HasKey(item => new { item.PathId, item.NodeId, item.Type });
+                entity.HasOne(item => item.Path)
                     .WithMany(item => item.PathNodes)
                     .HasForeignKey(item => item.PathId)
                     .IsRequired();
-                pathNode.HasOne(item => item.Node)
+                entity.HasOne(item => item.Node)
                     .WithMany(item => item.PathNodes)
                     .HasForeignKey(item => item.NodeId)
+                    .IsRequired();
+            });
+            modelBuilder.Entity<UserRole>(entity =>
+            {
+                entity.HasKey(item => new { item.UserId, item.RoleId });
+                entity.HasOne(item => item.User)
+                    .WithMany(item => item.UserRoles)
+                    .HasForeignKey(item => item.UserId)
+                    .IsRequired();
+                entity.HasOne(item => item.Role)
+                    .WithMany(item => item.UserRoles)
+                    .HasForeignKey(item => item.RoleId)
                     .IsRequired();
             });
         }

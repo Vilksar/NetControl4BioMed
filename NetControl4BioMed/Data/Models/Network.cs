@@ -42,6 +42,11 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<NetworkUser> NetworkUsers { get; set; }
 
         /// <summary>
+        /// Gets or sets the unregistered users that will have access to the network after registration.
+        /// </summary>
+        public ICollection<NetworkUserInvitation> NetworkUserInvitations { get; set; }
+
+        /// <summary>
         /// Gets or sets the nodes which appear in the network.
         /// </summary>
         public ICollection<NetworkNode> NetworkNodes { get; set; }
@@ -57,7 +62,7 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<AnalysisNetwork> AnalysisNetworks { get; set; }
 
         /// <summary>
-        /// Gets or sets the edge databases which are used by the network.
+        /// Gets or sets the databases which are used by the network.
         /// </summary>
         public ICollection<NetworkDatabase> NetworkDatabases { get; set; }
 

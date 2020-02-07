@@ -72,9 +72,14 @@ namespace NetControl4BioMed.Data.Models
         public string Parameters { get; set; }
 
         /// <summary>
-        /// Gets or sets the users which have access to the analysis.
+        /// Gets or sets the registered users that have access to the analysis.
         /// </summary>
         public ICollection<AnalysisUser> AnalysisUsers { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unregistered users that will have access to the analysis after registration.
+        /// </summary>
+        public ICollection<AnalysisUserInvitation> AnalysisUserInvitations { get; set; }
 
         /// <summary>
         /// Gets or sets the nodes which appear in the network corresponding to the analysis.
@@ -90,6 +95,11 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the networks which form the network corresponding to the analysis.
         /// </summary>
         public ICollection<AnalysisNetwork> AnalysisNetworks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the databases which are used by the analysis.
+        /// </summary>
+        public ICollection<AnalysisDatabase> AnalysisDatabases { get; set; }
 
         /// <summary>
         /// Gets or sets the node collections which are used by the analysis.

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace NetControl4BioMed.Data.Models
 {
     /// <summary>
-    /// Represents the database model of a one-to-one relationship between a network and an edge database which it uses.
+    /// Represents the database model of a one-to-one relationship between a network and a database which it uses.
     /// </summary>
     public class NetworkDatabase
     {

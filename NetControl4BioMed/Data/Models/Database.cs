@@ -51,9 +51,14 @@ namespace NetControl4BioMed.Data.Models
         public DatabaseType DatabaseType { get; set; }
 
         /// <summary>
-        /// Gets or sets the users who have access to the database even when it is not public.
+        /// Gets or sets the registered users who have access to the database, even when it is not public.
         /// </summary>
         public ICollection<DatabaseUser> DatabaseUsers { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unregistered users that will have access to the database after regsitration, even when it is not public.
+        /// </summary>
+        public ICollection<DatabaseUserInvitation> DatabaseUserInvitations { get; set; }
 
         /// <summary>
         /// Gets or sets the node fields which appear in the database.
@@ -79,5 +84,10 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the networks which use the database.
         /// </summary>
         public ICollection<NetworkDatabase> NetworkDatabases { get; set; }
+
+        /// <summary>
+        /// Gets or sets the analyses which use the database.
+        /// </summary>
+        public ICollection<AnalysisDatabase> AnalysisDatabases { get; set; }
     }
 }

@@ -142,6 +142,25 @@ namespace NetControl4BioMed.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AnalysisUserInvitations",
+                columns: table => new
+                {
+                    AnalysisId = table.Column<string>(nullable: false),
+                    Email = table.Column<string>(nullable: false),
+                    DateTimeCreated = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnalysisUserInvitations", x => new { x.AnalysisId, x.Email });
+                    table.ForeignKey(
+                        name: "FK_AnalysisUserInvitations_Analyses_AnalysisId",
+                        column: x => x.AnalysisId,
+                        principalTable: "Analyses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ControlPaths",
                 columns: table => new
                 {
@@ -185,13 +204,12 @@ namespace NetControl4BioMed.Data.Migrations
                 columns: table => new
                 {
                     AnalysisId = table.Column<string>(nullable: false),
-                    Email = table.Column<string>(nullable: false),
-                    UserId = table.Column<string>(nullable: true),
+                    UserId = table.Column<string>(nullable: false),
                     DateTimeCreated = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AnalysisUsers", x => new { x.AnalysisId, x.Email });
+                    table.PrimaryKey("PK_AnalysisUsers", x => new { x.AnalysisId, x.UserId });
                     table.ForeignKey(
                         name: "FK_AnalysisUsers_Analyses_AnalysisId",
                         column: x => x.AnalysisId,
@@ -387,17 +405,35 @@ namespace NetControl4BioMed.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "NetworkUsers",
+                name: "NetworkUserInvitations",
                 columns: table => new
                 {
                     NetworkId = table.Column<string>(nullable: false),
                     Email = table.Column<string>(nullable: false),
-                    UserId = table.Column<string>(nullable: true),
                     DateTimeCreated = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NetworkUsers", x => new { x.NetworkId, x.Email });
+                    table.PrimaryKey("PK_NetworkUserInvitations", x => new { x.NetworkId, x.Email });
+                    table.ForeignKey(
+                        name: "FK_NetworkUserInvitations_Networks_NetworkId",
+                        column: x => x.NetworkId,
+                        principalTable: "Networks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "NetworkUsers",
+                columns: table => new
+                {
+                    NetworkId = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(nullable: false),
+                    DateTimeCreated = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NetworkUsers", x => new { x.NetworkId, x.UserId });
                     table.ForeignKey(
                         name: "FK_NetworkUsers_Networks_NetworkId",
                         column: x => x.NetworkId,
@@ -580,6 +616,30 @@ namespace NetControl4BioMed.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AnalysisDatabase",
+                columns: table => new
+                {
+                    AnalysisId = table.Column<string>(nullable: false),
+                    DatabaseId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnalysisDatabase", x => new { x.AnalysisId, x.DatabaseId });
+                    table.ForeignKey(
+                        name: "FK_AnalysisDatabase_Analyses_AnalysisId",
+                        column: x => x.AnalysisId,
+                        principalTable: "Analyses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnalysisDatabase_Databases_DatabaseId",
+                        column: x => x.DatabaseId,
+                        principalTable: "Databases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DatabaseEdgeFields",
                 columns: table => new
                 {
@@ -675,17 +735,35 @@ namespace NetControl4BioMed.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DatabaseUsers",
+                name: "DatabaseUserInvitations",
                 columns: table => new
                 {
                     DatabaseId = table.Column<string>(nullable: false),
                     Email = table.Column<string>(nullable: false),
-                    UserId = table.Column<string>(nullable: true),
                     DateTimeCreated = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DatabaseUsers", x => new { x.DatabaseId, x.Email });
+                    table.PrimaryKey("PK_DatabaseUserInvitations", x => new { x.DatabaseId, x.Email });
+                    table.ForeignKey(
+                        name: "FK_DatabaseUserInvitations_Databases_DatabaseId",
+                        column: x => x.DatabaseId,
+                        principalTable: "Databases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DatabaseUsers",
+                columns: table => new
+                {
+                    DatabaseId = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(nullable: false),
+                    DateTimeCreated = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DatabaseUsers", x => new { x.DatabaseId, x.UserId });
                     table.ForeignKey(
                         name: "FK_DatabaseUsers_Databases_DatabaseId",
                         column: x => x.DatabaseId,
@@ -822,6 +900,11 @@ namespace NetControl4BioMed.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnalysisDatabase_DatabaseId",
+                table: "AnalysisDatabase",
+                column: "DatabaseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AnalysisEdges_EdgeId",
@@ -986,6 +1069,9 @@ namespace NetControl4BioMed.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AnalysisDatabase");
+
+            migrationBuilder.DropTable(
                 name: "AnalysisEdges");
 
             migrationBuilder.DropTable(
@@ -996,6 +1082,9 @@ namespace NetControl4BioMed.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AnalysisNodes");
+
+            migrationBuilder.DropTable(
+                name: "AnalysisUserInvitations");
 
             migrationBuilder.DropTable(
                 name: "AnalysisUsers");
@@ -1028,6 +1117,9 @@ namespace NetControl4BioMed.Data.Migrations
                 name: "DatabaseNodes");
 
             migrationBuilder.DropTable(
+                name: "DatabaseUserInvitations");
+
+            migrationBuilder.DropTable(
                 name: "DatabaseUsers");
 
             migrationBuilder.DropTable(
@@ -1044,6 +1136,9 @@ namespace NetControl4BioMed.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "NetworkNodes");
+
+            migrationBuilder.DropTable(
+                name: "NetworkUserInvitations");
 
             migrationBuilder.DropTable(
                 name: "NetworkUsers");

@@ -111,6 +111,7 @@ namespace NetControl4BioMed.Data.Migrations
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Analysis", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Algorithm")
@@ -149,6 +150,21 @@ namespace NetControl4BioMed.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Analyses");
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisDatabase", b =>
+                {
+                    b.Property<string>("AnalysisId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DatabaseId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AnalysisId", "DatabaseId");
+
+                    b.HasIndex("DatabaseId");
+
+                    b.ToTable("AnalysisDatabase");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisEdge", b =>
@@ -222,25 +238,39 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("AnalysisId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("AnalysisId", "Email");
+                    b.HasKey("AnalysisId", "UserId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("AnalysisUsers");
                 });
 
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisUserInvitation", b =>
+                {
+                    b.Property<string>("AnalysisId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("AnalysisId", "Email");
+
+                    b.ToTable("AnalysisUserInvitations");
+                });
+
             modelBuilder.Entity("NetControl4BioMed.Data.Models.ControlPath", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("AnalysisId")
@@ -257,6 +287,7 @@ namespace NetControl4BioMed.Data.Migrations
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Database", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("DatabaseTypeId")
@@ -303,6 +334,7 @@ namespace NetControl4BioMed.Data.Migrations
             modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseEdgeField", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("DatabaseId")
@@ -367,6 +399,7 @@ namespace NetControl4BioMed.Data.Migrations
             modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseNodeField", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("DatabaseId")
@@ -419,6 +452,7 @@ namespace NetControl4BioMed.Data.Migrations
             modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseType", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DateTimeCreated")
@@ -440,25 +474,39 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("DatabaseId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("DatabaseId", "Email");
+                    b.HasKey("DatabaseId", "UserId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("DatabaseUsers");
                 });
 
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseUserInvitation", b =>
+                {
+                    b.Property<string>("DatabaseId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("DatabaseId", "Email");
+
+                    b.ToTable("DatabaseUserInvitations");
+                });
+
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Edge", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DateTimeCreated")
@@ -496,6 +544,7 @@ namespace NetControl4BioMed.Data.Migrations
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Network", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Algorithm")
@@ -586,25 +635,39 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("NetworkId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("NetworkId", "Email");
+                    b.HasKey("NetworkId", "UserId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("NetworkUsers");
                 });
 
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkUserInvitation", b =>
+                {
+                    b.Property<string>("NetworkId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("NetworkId", "Email");
+
+                    b.ToTable("NetworkUserInvitations");
+                });
+
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Node", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DateTimeCreated")
@@ -624,6 +687,7 @@ namespace NetControl4BioMed.Data.Migrations
             modelBuilder.Entity("NetControl4BioMed.Data.Models.NodeCollection", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DateTimeCreated")
@@ -658,6 +722,7 @@ namespace NetControl4BioMed.Data.Migrations
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Path", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ControlPathId")
@@ -853,6 +918,21 @@ namespace NetControl4BioMed.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisDatabase", b =>
+                {
+                    b.HasOne("NetControl4BioMed.Data.Models.Analysis", "Analysis")
+                        .WithMany("AnalysisDatabases")
+                        .HasForeignKey("AnalysisId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NetControl4BioMed.Data.Models.Database", "Database")
+                        .WithMany("AnalysisDatabases")
+                        .HasForeignKey("DatabaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisEdge", b =>
                 {
                     b.HasOne("NetControl4BioMed.Data.Models.Analysis", "Analysis")
@@ -924,7 +1004,17 @@ namespace NetControl4BioMed.Data.Migrations
                     b.HasOne("NetControl4BioMed.Data.Models.User", "User")
                         .WithMany("AnalysisUsers")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisUserInvitation", b =>
+                {
+                    b.HasOne("NetControl4BioMed.Data.Models.Analysis", "Analysis")
+                        .WithMany("AnalysisUserInvitations")
+                        .HasForeignKey("AnalysisId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.ControlPath", b =>
@@ -1034,7 +1124,17 @@ namespace NetControl4BioMed.Data.Migrations
                     b.HasOne("NetControl4BioMed.Data.Models.User", "User")
                         .WithMany("DatabaseUsers")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseUserInvitation", b =>
+                {
+                    b.HasOne("NetControl4BioMed.Data.Models.Database", "Database")
+                        .WithMany("DatabaseUserInvitations")
+                        .HasForeignKey("DatabaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.EdgeNode", b =>
@@ -1123,7 +1223,17 @@ namespace NetControl4BioMed.Data.Migrations
                     b.HasOne("NetControl4BioMed.Data.Models.User", "User")
                         .WithMany("NetworkUsers")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkUserInvitation", b =>
+                {
+                    b.HasOne("NetControl4BioMed.Data.Models.Network", "Network")
+                        .WithMany("NetworkUserInvitations")
+                        .HasForeignKey("NetworkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.NodeCollectionNode", b =>

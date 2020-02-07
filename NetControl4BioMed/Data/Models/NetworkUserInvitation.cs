@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 namespace NetControl4BioMed.Data.Models
 {
     /// <summary>
-    /// Represents the database model of a one-to-one relationship between a network and a registered user who has access to it.
+    /// Represents the database model of a one-to-one relationship between a network and an unregistered user that will have access to it after registration.
     /// </summary>
-    public class NetworkUser
+    public class NetworkUserInvitation
     {
         /// <summary>
         /// Gets or sets the date when the relationship was created.
@@ -26,13 +26,8 @@ namespace NetControl4BioMed.Data.Models
         public Network Network { get; set; }
 
         /// <summary>
-        /// Gets or sets the user ID of the relationship.
+        /// Gets or sets the e-mail of the relationship.
         /// </summary>
-        public string UserId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the user of the relationship.
-        /// </summary>
-        public User User { get; set; }
+        public string Email { get; set; }
     }
 }
