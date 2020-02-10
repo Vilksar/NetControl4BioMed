@@ -47,15 +47,13 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string DatabaseTypeId { get; set; }
+            public string DatabaseTypeString { get; set; }
         }
 
         public ViewModel View { get; set; }
 
         public class ViewModel
         {
-            public IEnumerable<DatabaseType> DatabaseTypes { get; set; }
-
             public Database Database { get; set; }
         }
 
@@ -72,9 +70,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
             // Define the view.
             View = new ViewModel
             {
-                DatabaseTypes = _context.DatabaseTypes
-                    .Where(item => item.Name != "Generic")
-                    .AsEnumerable(),
                 Database = _context.Databases
                     .Where(item => item.Id == id)
                     .Include(item => item.DatabaseType)
@@ -96,11 +91,11 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Data/Databases/Index");
             }
-            // Check if the database is the generic database.
-            if (View.Database.Name == "Generic")
+            // Check if the database is of the generic type.
+            if (View.Database.DatabaseType.Name == "Generic")
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: The \"Generic\" database can't be edited.";
+                TempData["StatusMessage"] = "Error: Databases of \"Generic\" type can't be edited.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Data/Databases/Index");
             }
@@ -112,7 +107,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 Description = View.Database.Description,
                 Url = View.Database.Url,
                 IsPublic = View.Database.IsPublic,
-                DatabaseTypeId = View.Database.DatabaseType.Id
+                DatabaseTypeString = View.Database.DatabaseType.Name
             };
             // Return the page.
             return Page();
@@ -120,8 +115,8 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Check if the provided model is not valid.
-            if (!ModelState.IsValid)
+            // Check if there isn't any ID provided.
+            if (string.IsNullOrEmpty(Input.Id))
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No ID has been provided.";
@@ -131,9 +126,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
             // Define the view.
             View = new ViewModel
             {
-                DatabaseTypes = _context.DatabaseTypes
-                    .Where(item => item.Name != "Generic")
-                    .AsEnumerable(),
                 Database = _context.Databases
                     .Where(item => item.Id == Input.Id)
                     .Include(item => item.DatabaseType)
@@ -159,9 +151,17 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
             if (View.Database.Name == "Generic")
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: The \"Generic\" database can't be edited.";
+                TempData["StatusMessage"] = "Error: Databases of \"Generic\" type can't be edited.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Data/Databases/Index");
+            }
+            // Check if the provided model isn't valid.
+            if (!ModelState.IsValid)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "An error has been encountered. Please check again the input fields.");
+                // Redisplay the page.
+                return Page();
             }
             // Check if there is another database with the same name.
             if (_context.Databases.Any(item => item.Id != View.Database.Id && item.Name == Input.Name))
@@ -171,21 +171,23 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 // Redisplay the page.
                 return Page();
             }
-            // Check if the database type is to be changed, and the database has networks.
-            if (View.Database.DatabaseType.Id != Input.DatabaseTypeId && View.Database.NetworkDatabases.Any())
+            // Get the corresponding database type.
+            var databaseType = _context.DatabaseTypes
+                .Where(item => item.Name != "Generic")
+                .FirstOrDefault(item => item.Id == Input.DatabaseTypeString || item.Name == Input.DatabaseTypeString);
+            // Check if no database type has been found.
+            if (databaseType == null)
             {
                 // Add an error to the model
-                ModelState.AddModelError(string.Empty, "The database type can't be changed while the database has networks.");
+                ModelState.AddModelError(string.Empty, "No database of non-generic type could be found with the provided string.");
                 // Redisplay the page.
                 return Page();
             }
-            // Get the database type.
-            var databaseType = _context.DatabaseTypes.FirstOrDefault(item => item.Id == Input.DatabaseTypeId);
-            // Check if no database type has been found or if the database type is generic.
-            if (databaseType == null || databaseType.Name == "Generic")
+            // Check if the database type is to be changed, and the database has networks or analyses.
+            if (databaseType.Id != View.Database.DatabaseType.Id && (View.Database.NetworkDatabases.Any() || View.Database.AnalysisDatabases.Any()))
             {
                 // Add an error to the model
-                ModelState.AddModelError(string.Empty, "No non-generic database type could be found with the provided ID.");
+                ModelState.AddModelError(string.Empty, "The database type can't be changed while the database has networks or analyses.");
                 // Redisplay the page.
                 return Page();
             }
@@ -201,7 +203,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
             // Save the changes to the database.
             await _context.SaveChangesAsync();
             // Display a message.
-            TempData["StatusMessage"] = "Success: 1 database type updated successfully.";
+            TempData["StatusMessage"] = "Success: 1 database updated successfully.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Data/Databases/Index");
         }

@@ -91,14 +91,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Check if the provided model is not valid.
-            if (!ModelState.IsValid)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
-                // Redirect to the index page.
-                return RedirectToPage("/Administration/Accounts/UserRoles/Index");
-            }
             // Check if there aren't any e-mails or IDs provided.
             if (Input.UserEmails == null || Input.RoleIds == null || !Input.UserEmails.Any() || !Input.RoleIds.Any() || Input.UserEmails.Count() != Input.RoleIds.Count())
             {
@@ -135,6 +127,14 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 TempData["StatusMessage"] = "Error: No administrator users would remain after deleting the selected user roles.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/UserRoles/Index");
+            }
+            // Check if the provided model isn't valid.
+            if (!ModelState.IsValid)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "An error has been encountered. Please check again the input fields.");
+                // Redisplay the page.
+                return Page();
             }
             // Save the number of items found.
             var userRoleCount = View.Items.Count();

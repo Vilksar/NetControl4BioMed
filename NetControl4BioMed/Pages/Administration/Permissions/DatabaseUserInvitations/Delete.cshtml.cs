@@ -72,14 +72,6 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Check if the provided model is not valid.
-            if (!ModelState.IsValid)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No or invalid e-mails or IDs have been provided.";
-                // Redirect to the index page.
-                return RedirectToPage("/Administration/Permissions/DatabaseUserInvitations/Index");
-            }
             // Check if there aren't any e-mails or IDs provided.
             if (Input.Emails == null || Input.DatabaseIds == null || !Input.Emails.Any() || !Input.DatabaseIds.Any() || Input.Emails.Count() != Input.DatabaseIds.Count())
             {
@@ -106,6 +98,14 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 TempData["StatusMessage"] = "Error: No items have been found with the provided e-mails and IDs.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Permissions/DatabaseUserInvitations/Index");
+            }
+            // Check if the provided model isn't valid.
+            if (!ModelState.IsValid)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "An error has been encountered. Please check again the input fields.");
+                // Redisplay the page.
+                return Page();
             }
             // Save the number of items found.
             var databaseUserInvitationCount = View.Items.Count();

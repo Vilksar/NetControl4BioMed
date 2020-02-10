@@ -91,8 +91,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Check if the provided model is not valid.
-            if (!ModelState.IsValid)
+            // Check if there isn't any ID provided.
+            if (string.IsNullOrEmpty(Input.Id))
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No ID has been provided.";
@@ -119,6 +119,14 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 TempData["StatusMessage"] = "Error: No item could be found with the provided ID.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Users/Index");
+            }
+            // Check if the provided model isn't valid.
+            if (!ModelState.IsValid)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "An error has been encountered. Please check again the input fields.");
+                // Redisplay the page.
+                return Page();
             }
             // Check if the e-mail is different from the current one.
             if (Input.Email != View.User.Email)

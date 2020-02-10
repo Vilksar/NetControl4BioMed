@@ -75,14 +75,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Check if the provided model is not valid.
-            if (!ModelState.IsValid)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
-                // Redirect to the index page.
-                return RedirectToPage("/Administration/Accounts/Roles/Index");
-            }
             // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())
             {
@@ -111,6 +103,14 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                 TempData["StatusMessage"] = "Error: The \"Administrator\" role can't be deleted.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Roles/Index");
+            }
+            // Check if the provided model isn't valid.
+            if (!ModelState.IsValid)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "An error has been encountered. Please check again the input fields.");
+                // Redisplay the page.
+                return Page();
             }
             // Save the number of items found.
             var roleCount = View.Items.Count();

@@ -42,27 +42,13 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string DatabaseTypeId { get; set; }
+            public string DatabaseTypeString { get; set; }
         }
 
-        public ViewModel View { get; set; }
-
-        public class ViewModel
+        public IActionResult OnGet(string databaseTypeString = null)
         {
-            public IEnumerable<DatabaseType> DatabaseTypes { get; set; }
-        }
-
-        public IActionResult OnGet(string databaseTypeId = null)
-        {
-            // Define the view.
-            View = new ViewModel
-            {
-                DatabaseTypes = _context.DatabaseTypes
-                    .Where(item => item.Name != "Generic")
-                    .AsEnumerable()
-            };
             // Check if there aren't any database types.
-            if (!View.DatabaseTypes.Any())
+            if (!_context.DatabaseTypes.Where(item => item.Name != "Generic").Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No non-generic database types could be found. Please create a database type first.";
@@ -72,7 +58,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
             // Define the input.
             Input = new InputModel
             {
-                DatabaseTypeId = databaseTypeId
+                DatabaseTypeString = databaseTypeString
             };
             // Return the page.
             return Page();
@@ -80,13 +66,14 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Define the view.
-            View = new ViewModel
+            // Check if there aren't any database types.
+            if (!_context.DatabaseTypes.Where(item => item.Name != "Generic").Any())
             {
-                DatabaseTypes = _context.DatabaseTypes
-                    .Where(item => item.Name != "Generic")
-                    .AsEnumerable()
-            };
+                // Display a message.
+                TempData["StatusMessage"] = "Error: No non-generic database types could be found. Please create a database type first.";
+                // Redirect to the index page.
+                return RedirectToPage("/Administration/Data/Databases/Index");
+            }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
             {
@@ -103,13 +90,15 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 // Redisplay the page.
                 return Page();
             }
-            // Get the database type.
-            var databaseType = View.DatabaseTypes.FirstOrDefault(item => item.Id == Input.DatabaseTypeId);
+            // Get the corresponding database type.
+            var databaseType = _context.DatabaseTypes
+                .Where(item => item.Name != "Generic")
+                .FirstOrDefault(item => item.Id == Input.DatabaseTypeString || item.Name == Input.DatabaseTypeString);
             // Check if no database type has been found.
             if (databaseType == null)
             {
                 // Add an error to the model
-                ModelState.AddModelError(string.Empty, "No non-generic database type could be found with the provided ID.");
+                ModelState.AddModelError(string.Empty, "No database of non-generic type could be found with the provided string.");
                 // Redisplay the page.
                 return Page();
             }

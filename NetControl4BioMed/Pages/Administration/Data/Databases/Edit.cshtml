@@ -70,15 +70,10 @@
                 <span asp-validation-for="Input.IsPublic" class="text-danger small"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Input.DatabaseTypeId" class="font-weight-bold">Type</label>
-                <select asp-for="Input.DatabaseTypeId" class="custom-select form-control">
-                    @foreach (var databaseType in Model.View.DatabaseTypes)
-                    {
-                        <option value="@databaseType.Id">@databaseType.Name</option>
-                    }
-                </select>
-                <span asp-description-for="Input.DatabaseTypeId" class="text-muted small">The type of the database.</span>
-                <span asp-validation-for="Input.DatabaseTypeId" class="text-danger small"></span>
+                <label asp-for="Input.DatabaseTypeString" class="font-weight-bold">Database type ID / name</label>
+                <input asp-for="Input.DatabaseTypeString" class="form-control" />
+                <span asp-description-for="Input.DatabaseTypeString" class="text-muted small">The ID or name of the database type (case-sensitive).</span>
+                <span asp-validation-for="Input.DatabaseTypeString" class="text-danger small"></span>
             </div>
             <button type="submit" class="btn btn-block btn-success" title="Update">
                 <span>Update</span>

@@ -37,6 +37,14 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
 
         public IActionResult OnGet(string userString = null, string databaseString = null)
         {
+            // Check if there aren't any databases.
+            if (!_context.Databases.Any())
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: No databases could be found. Please create a database first.";
+                // Redirect to the index page.
+                return RedirectToPage("/Administration/Permissions/DatabaseUsers/Index");
+            }
             // Define the input.
             Input = new InputModel
             {
@@ -49,6 +57,14 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Check if there aren't any databases.
+            if (!_context.Databases.Any())
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: No databases could be found. Please create a database first.";
+                // Redirect to the index page.
+                return RedirectToPage("/Administration/Permissions/DatabaseUsers/Index");
+            }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
             {

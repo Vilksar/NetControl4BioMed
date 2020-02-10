@@ -74,14 +74,6 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Check if the provided model is not valid.
-            if (!ModelState.IsValid)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
-                // Redirect to the index page.
-                return RedirectToPage("/Administration/Permissions/DatabaseUsers/Index");
-            }
             // Check if there aren't any e-mails or IDs provided.
             if (Input.UserIds == null || Input.DatabaseIds == null || !Input.UserIds.Any() || !Input.DatabaseIds.Any() || Input.UserIds.Count() != Input.DatabaseIds.Count())
             {
@@ -109,6 +101,14 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
                 TempData["StatusMessage"] = "Error: No items have been found with the provided IDs.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Permissions/DatabaseUsers/Index");
+            }
+            // Check if the provided model isn't valid.
+            if (!ModelState.IsValid)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "An error has been encountered. Please check again the input fields.");
+                // Redisplay the page.
+                return Page();
             }
             // Save the number of items found.
             var databaseUserCount = View.Items.Count();

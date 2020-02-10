@@ -34,7 +34,7 @@ namespace NetControl4BioMed.Data.Seed
             {
                 Id = "8cd819ab-6e24-4d73-b808-090d62b06216",
                 DateTimeCreated = DateTime.Now,
-                Name = "ID",
+                Name = "Ensembl ID",
                 Description = "The protein unique identifier(s) in the Ensembl database.",
                 IsSearchable = true,
                 Url = "https://www.ensembl.org/Homo_sapiens/Gene/Summary?g=",
@@ -46,7 +46,7 @@ namespace NetControl4BioMed.Data.Seed
             {
                 Id = "f9dc5b1c-2cd2-4f07-ac4e-1200d3f02338",
                 DateTimeCreated = DateTime.Now,
-                Name = "Name",
+                Name = "HGNC Name",
                 Description = "The protein name, as set by HGNC.",
                 IsSearchable = true,
                 Url = null,
@@ -57,7 +57,7 @@ namespace NetControl4BioMed.Data.Seed
             {
                 Id = "981ae97c-326c-4955-8691-48e15508f499",
                 DateTimeCreated = DateTime.Now,
-                Name = "ID",
+                Name = "HGNC ID",
                 Description = "The unique identifier(s) in the HGNC database.",
                 IsSearchable = true,
                 Url = "https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/",
@@ -69,7 +69,7 @@ namespace NetControl4BioMed.Data.Seed
             {
                 Id = "8ee6c0ca-936a-448d-a49f-4cb46893b23f",
                 DateTimeCreated = DateTime.Now,
-                Name = "ID",
+                Name = "InnateDB ID",
                 Description = "The protein unique identifier(s) in the InnateDB database.",
                 IsSearchable = true,
                 Url = "https://www.innatedb.com/getGeneCard.do?id=",
@@ -81,7 +81,7 @@ namespace NetControl4BioMed.Data.Seed
             {
                 Id = "eb9a4caa-cbe9-4a03-a9bf-1740103d9f49",
                 DateTimeCreated = DateTime.Now,
-                Name = "ID",
+                Name = "KEGG ID",
                 Description = "The protein unique identifier(s) in the KEGG database.",
                 IsSearchable = true,
                 Url = "https://www.genome.jp/dbget-bin/www_bget?",
@@ -92,7 +92,7 @@ namespace NetControl4BioMed.Data.Seed
             {
                 Id = "cb7f1820-1e37-473b-ba82-b0e2776d46cc",
                 DateTimeCreated = DateTime.Now,
-                Name = "Type",
+                Name = "KEGG Type",
                 Description = "The protein type (gene, compound or group) in the KEGG database.",
                 IsSearchable = false,
                 Url = null,
@@ -104,7 +104,7 @@ namespace NetControl4BioMed.Data.Seed
             {
                 Id = "eeea2046-1798-42dc-9a30-785e7a3cd922",
                 DateTimeCreated = DateTime.Now,
-                Name = "ID",
+                Name = "PubChem ID",
                 Description = "The protein unique identifier(s) in the PubChem database.",
                 IsSearchable = true,
                 Url = "https://pubchem.ncbi.nlm.nih.gov/gene/",
@@ -116,7 +116,7 @@ namespace NetControl4BioMed.Data.Seed
             {
                 Id = "0347512f-dcd7-4491-bc7f-29123070eab8",
                 DateTimeCreated = DateTime.Now,
-                Name = "ID",
+                Name = "UniProt ID",
                 Description = "The protein unique identifier(s) in the UniProt database.",
                 IsSearchable = true,
                 Url = "https://www.uniprot.org/uniprot/",
