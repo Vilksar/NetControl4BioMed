@@ -1,0 +1,227 @@
+﻿@page
+@model DetailsModel
+@{
+    ViewData["Title"] = "Analysis details";
+}
+
+@section Breadcrumbs {
+    <a asp-page="/Administration/Content/Analyses/Details" class="breadcrumb-item"><span>Details</span></a>
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-12 mb-3">
+        <a asp-page="/Administration/Content/Analyses/Delete" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div>
+                <span>Details</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label asp-for="View.Analysis.Id" class="font-weight-bold">ID</label>
+                <input asp-for="View.Analysis.Id" class="form-control" readonly />
+                <span asp-description-for="View.Analysis.Id" class="text-muted small">The ID of the network.</span>
+                <span asp-validation-for="View.Analysis.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Analysis.DateTimeStarted" class="font-weight-bold">Date</label>
+                <input asp-for="View.Analysis.DateTimeStarted" class="form-control" readonly />
+                <span asp-description-for="View.Analysis.DateTimeStarted" class="text-muted small">The date and time when the analysis has started.</span>
+                <span asp-validation-for="View.Analysis.DateTimeStarted" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Analysis.DateTimeEnded" class="font-weight-bold">Date</label>
+                <input asp-for="View.Analysis.DateTimeEnded" class="form-control" readonly />
+                <span asp-description-for="View.Analysis.DateTimeEnded" class="text-muted small">The date and time when the analysis has ended.</span>
+                <span asp-validation-for="View.Analysis.DateTimeEnded" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Analysis.Name" class="font-weight-bold">Name</label>
+                <input asp-for="View.Analysis.Name" class="form-control" readonly />
+                <span asp-description-for="View.Analysis.Name" class="text-muted small">The name of the analysis.</span>
+                <span asp-validation-for="View.Analysis.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Analysis.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="View.Analysis.Description" class="form-control" readonly></textarea>
+                <span asp-description-for="View.Analysis.Description" class="text-muted small">The description of the analysis.</span>
+                <span asp-validation-for="View.Analysis.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Analysis.Status" class="font-weight-bold">Status</label>
+                <input asp-for="View.Analysis.Status" class="form-control" readonly />
+                <span asp-description-for="View.Analysis.Status" class="text-muted small">The status of the analysis.</span>
+                <span asp-validation-for="View.Analysis.Status" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Analysis.CurrentIteration" class="font-weight-bold">Current iteration</label>
+                <input asp-for="View.Analysis.CurrentIteration" class="form-control" readonly />
+                <span asp-description-for="View.Analysis.CurrentIteration" class="text-muted small">The current iteration of the analysis.</span>
+                <span asp-validation-for="View.Analysis.CurrentIteration" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Analysis.CurrentIterationWithoutImprovement" class="font-weight-bold">Current iteration without improvement</label>
+                <input asp-for="View.Analysis.CurrentIterationWithoutImprovement" class="form-control" readonly />
+                <span asp-description-for="View.Analysis.CurrentIterationWithoutImprovement" class="text-muted small">The current iteration without improvement of the analysis.</span>
+                <span asp-validation-for="View.Analysis.CurrentIterationWithoutImprovement" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Analysis.Algorithm" class="font-weight-bold">Algorithm</label>
+                <input asp-for="View.Analysis.Algorithm" class="form-control" readonly />
+                <span asp-description-for="View.Analysis.Algorithm" class="text-muted small">The algorithm used to run the analysis.</span>
+                <span asp-validation-for="View.Analysis.Algorithm" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Analysis.Parameters" class="font-weight-bold">Parameters</label>
+                <input asp-for="View.Analysis.Parameters" class="form-control" readonly />
+                <span asp-description-for="View.Analysis.Parameters" class="text-muted small">The parameters of the algorithm used to run the analysis.</span>
+                <span asp-validation-for="View.Analysis.Parameters" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Analysis.Log" class="font-weight-bold">Log</label>
+                <input asp-for="View.Analysis.Log" class="form-control" readonly />
+                <span asp-description-for="View.Analysis.Log" class="text-muted small">The log of the analysis.</span>
+                <span asp-validation-for="View.Analysis.Log" class="text-danger small"></span>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-user"></i></span>
+            </div>
+            <div>
+                <span>Users</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The analysis is currently assigned to @Model.View.Analysis.AnalysisUsers.Count() registered user@(Model.View.Analysis.AnalysisUsers.Count() != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-user"></i></span>
+            </div>
+            <div>
+                <span>User invitations</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The analysis is currently assigned to @Model.View.Analysis.AnalysisUserInvitations.Count() unregistered user@(Model.View.Analysis.AnalysisUserInvitations.Count() != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-circle"></i></span>
+            </div>
+            <div>
+                <span>Nodes</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The analysis currently contains @Model.View.Analysis.AnalysisNodes.Count() node@(Model.View.Analysis.AnalysisNodes.Count() != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div>
+                <span>Edges</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The analysis currently contains @Model.View.Analysis.AnalysisEdges.Count() edge@(Model.View.Analysis.AnalysisEdges.Count() != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-share-alt"></i></span>
+            </div>
+            <div>
+                <span>Networks</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The analysis is currently assigned to @Model.View.Analysis.AnalysisNetworks.Count() network@(Model.View.Analysis.AnalysisNetworks.Count() != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-database"></i></span>
+            </div>
+            <div>
+                <span>Databases</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The analysis is currently assigned to @Model.View.Analysis.AnalysisDatabases.Count() database@(Model.View.Analysis.AnalysisDatabases.Count() != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-folder"></i></span>
+            </div>
+            <div>
+                <span>Node collections</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The analysis is currently assigned to @Model.View.Analysis.AnalysisNodeCollections.Count() node collection@(Model.View.Analysis.AnalysisNodeCollections.Count() != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>

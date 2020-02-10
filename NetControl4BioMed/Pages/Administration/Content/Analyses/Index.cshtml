@@ -1,0 +1,99 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Analyses";
+}
+
+<partial name="_SearchInputPartial" model="Model.View.Search.Input" />
+<partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
+<form method="get" class="text-justify">
+    <div class="row align-items-center">
+        <div class="col-lg-6 mb-3">
+            <a asp-page="/Content/Analyses/Create" class="btn btn-success btn-block" title="Create">
+                <span><i class="fas fa-plus"></i></span>
+                <span>Add a new item</span>
+            </a>
+        </div>
+        <div class="col-lg-6 mb-3">
+            <button type="submit" asp-page="/Administration/Content/Analyses/Delete" class="btn btn-danger btn-block item-group-button" title="Delete" disabled>
+                <span><i class="fas fa-trash"></i></span>
+                <span>Delete selected items</span>
+            </button>
+        </div>
+    </div>
+    @if (!Model.View.Search.Items.Any())
+    {
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>No items have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty). <a asp-page="/Content/Analyses/Create" title="Create" class="alert-link">Create a new one?</a></span>
+        </div>
+    }
+    else
+    {
+        <table class="table table-hover table-bordered item-group" data-paging="false" data-info="false" data-searching="false">
+            <thead class="thead-light">
+                <tr>
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" id="select" class="custom-control-input item-group-select" title="Select" />
+                            <label for="select" class="custom-control-label"></label>
+                        </div>
+                    </th>
+                    <th class="text-left text-break">
+                        <span>Name</span>
+                    </th>
+                    <th class="d-none d-lg-table-cell text-center text-break">
+                        <span>Date created</span>
+                    </th>
+                    <th class="text-center text-break">
+                        <span>Status</span>
+                    </th>
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <span>Actions</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.View.Search.Items)
+                {
+                    <tr class="item-group-item">
+                        <td class="text-center text-break">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" id="@item.Id-checkbox" name="ids" value="@item.Id" class="custom-control-input" title="Select" />
+                                <label for="@item.Id-checkbox" class="custom-control-label"></label>
+                            </div>
+                        </td>
+                        <td class="text-left text-break">
+                            <div>
+                                <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                            </div>
+                            <div>
+                                <span title="@item.Id" class="small">@item.Id</span>
+                            </div>
+                        </td>
+                        <td class="d-none d-lg-table-cell text-center text-break">
+                            <div>
+                                <span title="@item.DateTimeStarted?.ToShortDateString()">@item.DateTimeStarted?.ToShortDateString()</span>
+                            </div>
+                            <div>
+                                <span title="@item.DateTimeStarted?.ToShortTimeString()">@item.DateTimeStarted?.ToShortTimeString()</span>
+                            </div>
+                        </td>
+                        <td class="text-center text-break">
+                            <span title="@item.Status">@item.Status</span>
+                        </td>
+                        <td class="text-center text-break">
+                            <a asp-page="/Administration/Content/Analyses/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                                <span><i class="fas fa-info-circle"></i></span>
+                            </a>
+                            <a asp-page="/Administration/Content/Analyses/Delete" asp-route-ids="@item.Id" class="btn btn-danger m-1" title="Delete">
+                                <span><i class="fas fa-trash"></i></span>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <partial name="_SearchPaginationPartial" model="Model.View.Search.Pagination" />
+    }
+</form>
