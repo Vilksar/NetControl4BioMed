@@ -1,0 +1,167 @@
+﻿@page
+@model DetailsModel
+@{
+    ViewData["Title"] = "Database edge field details";
+}
+
+@section Breadcrumbs {
+    <a asp-page="/Administration/Data/DatabaseEdgeFields/Details" class="breadcrumb-item"><span>Details</span></a>
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Data/DatabaseEdgeFields/Edit" asp-route-id="@Model.View.DatabaseEdgeField.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Data/DatabaseEdgeFields/Delete" asp-route-ids="@Model.View.DatabaseEdgeField.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div>
+                <span>Details</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseEdgeField.Id" class="font-weight-bold">ID</label>
+                <input asp-for="View.DatabaseEdgeField.Id" class="form-control" readonly />
+                <span asp-description-for="View.DatabaseEdgeField.Id" class="text-muted small">The ID of the database node field.</span>
+                <span asp-validation-for="View.DatabaseEdgeField.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseEdgeField.DateTimeCreated" class="font-weight-bold">Date</label>
+                <input asp-for="View.DatabaseEdgeField.DateTimeCreated" class="form-control" readonly />
+                <span asp-description-for="View.DatabaseEdgeField.DateTimeCreated" class="text-muted small">The date and time when the database node field was created.</span>
+                <span asp-validation-for="View.DatabaseEdgeField.DateTimeCreated" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseEdgeField.Name" class="font-weight-bold">Name</label>
+                <input asp-for="View.DatabaseEdgeField.Name" class="form-control" readonly />
+                <span asp-description-for="View.DatabaseEdgeField.Name" class="text-muted small">The name of the database node field.</span>
+                <span asp-validation-for="View.DatabaseEdgeField.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseEdgeField.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="View.DatabaseEdgeField.Description" class="form-control" readonly></textarea>
+                <span asp-description-for="View.DatabaseEdgeField.Description" class="text-muted small">The description of the database node field.</span>
+                <span asp-validation-for="View.DatabaseEdgeField.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseEdgeField.Url" class="font-weight-bold">URL</label>
+                <div class="input-group">
+                    <input asp-for="View.DatabaseEdgeField.Url" class="form-control" readonly />
+                    @if (!string.IsNullOrEmpty(Model.View.DatabaseEdgeField.Url))
+                    {
+                        <div class="input-group-append">
+                            <a href="@Model.View.DatabaseEdgeField.Url" class="btn btn-primary">
+                                <span><i class="fas fa-external-link-alt"></i></span>
+                            </a>
+                        </div>
+                    }
+                </div>
+                <span asp-description-for="View.DatabaseEdgeField.Url" class="text-muted small">The URL of the database node field.</span>
+                <span asp-validation-for="View.DatabaseEdgeField.Url" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseEdgeField.Type" class="font-weight-bold">Type</label>
+                <input asp-for="View.DatabaseEdgeField.Type" class="form-control" readonly />
+                <span asp-description-for="View.DatabaseEdgeField.Type" class="text-muted small">The type of the database node field.</span>
+                <span asp-validation-for="View.DatabaseEdgeField.Type" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseEdgeField.Database.Name" class="font-weight-bold">Database</label>
+                <div class="input-group">
+                    <input asp-for="View.DatabaseEdgeField.Database.Name" class="form-control" readonly />
+                    <div class="input-group-append">
+                        <a asp-page="/Administration/Data/Databases/Details" asp-route-id="@Model.View.DatabaseEdgeField.Database.Id" class="btn btn-info">
+                            <span><i class="fas fa-info-circle"></i></span>
+                        </a>
+                    </div>
+                </div>
+                <span asp-description-for="View.DatabaseEdgeField.Database.Name" class="text-muted small">The database containing the database node field.</span>
+                <span asp-validation-for="View.DatabaseEdgeField.Database.Name" class="text-danger small"></span>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-circle"></i></span>
+            </div>
+            <div>
+                <span>Edges</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Data/DatabaseNodeFieldNodes/Index" asp-route-searchString="@Model.View.DatabaseEdgeField.Id" asp-route-searchIn="DatabaseEdgeFieldId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        @if (!Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no edges currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Edge</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var edge in Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Select(item => item.Edge).Distinct())
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <span title="@edge.Name" class="font-weight-bold">@edge.Name</span>
+                                </div>
+                                <div>
+                                    <span title="@edge.Id" class="small">@edge.Id</span>
+                                </div>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Administration/Content/Edges/Details" asp-route-id="@edge.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

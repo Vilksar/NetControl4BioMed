@@ -1,0 +1,102 @@
+﻿@page
+@model EditModel
+@{
+    ViewData["Title"] = "Edit database edge field";
+}
+
+@section Breadcrumbs {
+    <a asp-page="/Administration/Data/DatabaseEdgeFields/Edit" class="breadcrumb-item"><span>Edit</span></a>
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Data/DatabaseEdgeFields/Details" asp-route-id="@Model.View.DatabaseEdgeField.Id" class="btn btn-info btn-block" title="Details">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>Details</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Data/DatabaseEdgeFields/Delete" asp-route-ids="@Model.View.DatabaseEdgeField.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-pencil-alt"></i></span>
+            </div>
+            <div>
+                <span>Edit</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="post" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
+            <div class="form-group">
+                <label asp-for="Input.Id" class="font-weight-bold">ID</label>
+                <input asp-for="Input.Id" class="form-control" readonly />
+                <span asp-description-for="Input.Id" class="text-muted small">The ID of the database edge field.</span>
+                <span asp-validation-for="Input.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Name" class="font-weight-bold">Name</label>
+                <input asp-for="Input.Name" class="form-control" />
+                <span asp-description-for="Input.Name" class="text-muted small">The name of the database edge field.</span>
+                <span asp-validation-for="Input.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="Input.Description" class="form-control"></textarea>
+                <span asp-description-for="Input.Description" class="text-muted small">The description of the database edge field.</span>
+                <span asp-validation-for="Input.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Url" class="font-weight-bold">URL</label>
+                <input asp-for="Input.Url" class="form-control" />
+                <span asp-description-for="Input.Url" class="text-muted small">The URL of the database edge field.</span>
+                <span asp-validation-for="Input.Url" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Type" class="font-weight-bold">Type</label>
+                <select asp-for="Input.Type" class="custom-select form-control" asp-items="Html.GetEnumSelectList<DatabaseEdgeFieldType>()"></select>
+                <span asp-description-for="Input.Type" class="text-muted small">The type of the database edge field.</span>
+                <span asp-validation-for="Input.Type" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.DatabaseString" class="font-weight-bold">Database ID / name</label>
+                <input asp-for="Input.DatabaseString" class="form-control" />
+                <span asp-description-for="Input.DatabaseString" class="text-muted small">The ID or the name of the database (case-sensitive).</span>
+                <span asp-validation-for="Input.DatabaseString" class="text-danger small"></span>
+            </div>
+            <button type="submit" class="btn btn-block btn-success" title="Update">
+                <span>Update</span>
+            </button>
+        </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-circle"></i></span>
+            </div>
+            <div>
+                <span>Edges</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The database edge field currently contains @Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Count() edge@(Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseNodeFieldNodes/Index" asp-route-searchString="@Model.View.DatabaseEdgeField.Id" asp-route-searchIn="DatabaseEdgeFieldId" class="alert-link">view the current edges</a>, or <a asp-page="/Administration/Relationships/DatabaseEdgeFieldEdges/Create" asp-route-databaseEdgeFieldString="@Model.View.DatabaseEdgeField.Name" class="alert-link">add a new one</a>.</span>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+}
