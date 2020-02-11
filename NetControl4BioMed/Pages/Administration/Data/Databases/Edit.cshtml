@@ -167,7 +167,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.Database.DatabaseNodes.Count() node@(Model.View.Database.DatabaseNodes.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Content/Nodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current nodes</a>.</span>
+            <span>The database currently contains @Model.View.Database.DatabaseNodes.Count() node@(Model.View.Database.DatabaseNodes.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseNodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current nodes</a>.</span>
         </div>
     </div>
 </div>
@@ -185,7 +185,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.Database.DatabaseEdges.Count() edge@(Model.View.Database.DatabaseNodes.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Content/Edges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current edges</a>.</span>
+            <span>The database currently contains @Model.View.Database.DatabaseEdges.Count() edge@(Model.View.Database.DatabaseNodes.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseEdges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current edges</a>.</span>
         </div>
     </div>
 </div>

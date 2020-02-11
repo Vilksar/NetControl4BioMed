@@ -48,8 +48,11 @@ namespace NetControl4BioMed.Pages.Administration.Content.Networks
                     .Include(item => item.NetworkNodes)
                     .Include(item => item.NetworkEdges)
                     .Include(item => item.AnalysisNetworks)
+                        .ThenInclude(item => item.Analysis)
                     .Include(item => item.NetworkDatabases)
+                        .ThenInclude(item => item.Database)
                     .Include(item => item.NetworkNodeCollections)
+                        .ThenInclude(item => item.NodeCollection)
                     .FirstOrDefault()
             };
             // Check if there was no item found.

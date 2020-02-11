@@ -102,6 +102,129 @@
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
+                <span><i class="fas fa-user"></i></span>
+            </div>
+            <div>
+                <span>Users</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        @if (!Model.View.Database.DatabaseUsers.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no users currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>User</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var databaseUser in Model.View.Database.DatabaseUsers)
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <span title="@databaseUser.User.Email" class="font-weight-bold">@databaseUser.User.Email</span>
+                                </div>
+                                <div>
+                                    <span title="@databaseUser.User.Id" class="small">@databaseUser.User.Id</span>
+                                </div>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Administration/Accounts/Users/Details" asp-route-id="@databaseUser.User.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-user"></i></span>
+            </div>
+            <div>
+                <span>User invitations</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        @if (!Model.View.Database.DatabaseUsers.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no user invitations currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>E-mail</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var databaseUserInvitation in Model.View.Database.DatabaseUserInvitations)
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <span title="@databaseUserInvitation.Email" class="font-weight-bold">@databaseUserInvitation.Email</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
                 <span><i class="fas fa-circle"></i></span>
             </div>
             <div>
@@ -139,7 +262,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var nodeField in Model.View.Database.DatabaseNodeFields)
+                    @foreach (var databaseNodeField in Model.View.Database.DatabaseNodeFields)
                     {
                         <tr>
                             <td class="text-center text-break">
@@ -147,14 +270,14 @@
                             </td>
                             <td class="text-left text-break">
                                 <div>
-                                    <span title="@nodeField.Name" class="font-weight-bold">@nodeField.Name</span>
+                                    <span title="@databaseNodeField.Name" class="font-weight-bold">@databaseNodeField.Name</span>
                                 </div>
                                 <div>
-                                    <span title="@nodeField.Id" class="small">@nodeField.Id</span>
+                                    <span title="@databaseNodeField.Id" class="small">@databaseNodeField.Id</span>
                                 </div>
                             </td>
                             <td class="text-center text-break">
-                                <a asp-page="/Administration/Data/DatabaseNodeFields/Details" asp-route-id="@nodeField.Id" title="Details">
+                                <a asp-page="/Administration/Data/DatabaseNodeFields/Details" asp-route-id="@databaseNodeField.Id" title="Details">
                                     <span>Details</span>
                                 </a>
                             </td>
@@ -206,7 +329,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var edgeField in Model.View.Database.DatabaseEdgeFields)
+                    @foreach (var databaseEdgeField in Model.View.Database.DatabaseEdgeFields)
                     {
                         <tr>
                             <td class="text-center text-break">
@@ -214,14 +337,14 @@
                             </td>
                             <td class="text-left text-break">
                                 <div>
-                                    <span title="@edgeField.Name" class="font-weight-bold">@edgeField.Name</span>
+                                    <span title="@databaseEdgeField.Name" class="font-weight-bold">@databaseEdgeField.Name</span>
                                 </div>
                                 <div>
-                                    <span title="@edgeField.Id" class="small">@edgeField.Id</span>
+                                    <span title="@databaseEdgeField.Id" class="small">@databaseEdgeField.Id</span>
                                 </div>
                             </td>
                             <td class="text-center text-break">
-                                <a asp-page="/Administration/Data/DatabaseEdgeFields/Details" asp-route-id="@edgeField.Id" title="Details">
+                                <a asp-page="/Administration/Data/DatabaseEdgeFields/Details" asp-route-id="@databaseEdgeField.Id" title="Details">
                                     <span>Details</span>
                                 </a>
                             </td>
@@ -236,24 +359,70 @@
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
-                <span><i class="fas fa-user"></i></span>
+                <span><i class="fas fa-circle"></i></span>
             </div>
             <div>
-                <span>Users</span>
+                <span>Nodes</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="mb-3">
-            <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+            <a asp-page="/Administration/Relationships/DatabaseNodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
                 <span>View all</span>
             </a>
         </div>
-        @if (!Model.View.Database.DatabaseUsers.Any())
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The database currently contains @Model.View.Database.DatabaseNodes.Count() node@(Model.View.Database.DatabaseNodes.Count() != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div>
+                <span>Edges</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Relationships/DatabaseEdges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The database currently contains @Model.View.Database.DatabaseEdges.Count() edge@(Model.View.Database.DatabaseEdges.Count() != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-share-alt"></i></span>
+            </div>
+            <div>
+                <span>Networks</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Content/Networks/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        @if (!Model.View.Database.NetworkDatabases.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no users currently assigned.</span>
+                <span>There are no networks currently assigned.</span>
             </div>
         }
         else
@@ -265,7 +434,7 @@
                             <span>#</span>
                         </th>
                         <th class="text-left text-break">
-                            <span>User</span>
+                            <span>Network</span>
                         </th>
                         <th class="text-center text-break" data-orderable="false" data-searchable="false">
                             <span>Links</span>
@@ -273,7 +442,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var user in Model.View.Database.DatabaseUsers.Select(item => item.User))
+                    @foreach (var networkDatabase in Model.View.Database.NetworkDatabases)
                     {
                         <tr>
                             <td class="text-center text-break">
@@ -281,14 +450,14 @@
                             </td>
                             <td class="text-left text-break">
                                 <div>
-                                    <span title="@user.Email" class="font-weight-bold">@user.Email</span>
+                                    <span title="@networkDatabase.Network.Name" class="font-weight-bold">@networkDatabase.Network.Name</span>
                                 </div>
                                 <div>
-                                    <span title="@user.Id" class="small">@user.Id</span>
+                                    <span title="@networkDatabase.Network.Id" class="small">@networkDatabase.Network.Id</span>
                                 </div>
                             </td>
                             <td class="text-center text-break">
-                                <a asp-page="/Administration/Accounts/Users/Details" asp-route-id="@user.Id" title="Details">
+                                <a asp-page="/Administration/Content/Networks/Details" asp-route-id="@networkDatabase.Network.Id" title="Details">
                                     <span>Details</span>
                                 </a>
                             </td>
@@ -303,24 +472,24 @@
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
-                <span><i class="fas fa-user"></i></span>
+                <span><i class="fas fa-desktop"></i></span>
             </div>
             <div>
-                <span>User invitations</span>
+                <span>Analyses</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="mb-3">
-            <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+            <a asp-page="/Administration/Content/Analyses/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
                 <span>View all</span>
             </a>
         </div>
-        @if (!Model.View.Database.DatabaseUsers.Any())
+        @if (!Model.View.Database.AnalysisDatabases.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no user invitations currently assigned.</span>
+                <span>There are no analyses currently assigned.</span>
             </div>
         }
         else
@@ -332,12 +501,15 @@
                             <span>#</span>
                         </th>
                         <th class="text-left text-break">
-                            <span>E-mail</span>
+                            <span>Analysis</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var userInvitation in Model.View.Database.DatabaseUserInvitations)
+                    @foreach (var analysisDatabase in Model.View.Database.AnalysisDatabases)
                     {
                         <tr>
                             <td class="text-center text-break">
@@ -345,8 +517,16 @@
                             </td>
                             <td class="text-left text-break">
                                 <div>
-                                    <span title="@userInvitation.Email" class="font-weight-bold">@userInvitation.Email</span>
+                                    <span title="@analysisDatabase.Analysis.Name" class="font-weight-bold">@analysisDatabase.Analysis.Name</span>
                                 </div>
+                                <div>
+                                    <span title="@analysisDatabase.Analysis.Id" class="small">@analysisDatabase.Analysis.Id</span>
+                                </div>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Administration/Content/Analyses/Details" asp-route-id="@analysisDatabase.Analysis.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
                             </td>
                         </tr>
                     }

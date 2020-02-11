@@ -46,7 +46,9 @@ namespace NetControl4BioMed.Pages.Administration.Content.Analyses
                     { "DatabaseId", "Database ID" },
                     { "DatabaseName", "Database name" },
                     { "NetworkId", "Network ID" },
-                    { "NetworkName", "Network name" }
+                    { "NetworkName", "Network name" },
+                    { "NodeCollectionId", "Node collection ID" },
+                    { "NodeCollectionName", "Node collection name" }
                 },
                 Filter = new Dictionary<string, string>
                 {
@@ -121,7 +123,9 @@ namespace NetControl4BioMed.Pages.Administration.Content.Analyses
                     input.SearchIn.Contains("DatabaseId") && item.AnalysisDatabases.Any(item1 => item1.Database.Id.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("DatabaseName") && item.AnalysisDatabases.Any(item1 => item1.Database.Name.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("NetworkId") && item.AnalysisNetworks.Any(item1 => item1.Network.Id.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("NetworkName") && item.AnalysisNetworks.Any(item1 => item1.Network.Name.Contains(input.SearchString)));
+                    input.SearchIn.Contains("NetworkName") && item.AnalysisNetworks.Any(item1 => item1.Network.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeCollectionId") && item.AnalysisNodeCollections.Any(item1 => item1.NodeCollection.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeCollectionName") && item.AnalysisNodeCollections.Any(item1 => item1.NodeCollection.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
                 .Where(item => input.Filter.Contains("IsScheduled") ? item.Status == AnalysisStatus.Scheduled : true)

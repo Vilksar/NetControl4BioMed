@@ -45,13 +45,16 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                     .Where(item => item.Id == id)
                     .Include(item => item.DatabaseType)
                     .Include(item => item.DatabaseUsers)
+                        .ThenInclude(item => item.User)
                     .Include(item => item.DatabaseUserInvitations)
                     .Include(item => item.DatabaseNodeFields)
                     .Include(item => item.DatabaseEdgeFields)
                     .Include(item => item.DatabaseNodes)
                     .Include(item => item.DatabaseEdges)
                     .Include(item => item.NetworkDatabases)
+                        .ThenInclude(item => item.Network)
                     .Include(item => item.AnalysisDatabases)
+                        .ThenInclude(item => item.Analysis)
                     .FirstOrDefault()
             };
             // Check if there was no item found.

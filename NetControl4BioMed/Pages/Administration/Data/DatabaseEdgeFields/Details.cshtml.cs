@@ -46,7 +46,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseEdgeFields
                     .Include(item => item.Database)
                         .ThenInclude(item => item.DatabaseType)
                     .Include(item => item.DatabaseEdgeFieldEdges)
-                        .ThenInclude(item => item.Edge)
                     .FirstOrDefault()
             };
             // Check if there was no item found.

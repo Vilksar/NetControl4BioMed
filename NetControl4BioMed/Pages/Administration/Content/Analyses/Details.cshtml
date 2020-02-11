@@ -183,10 +183,59 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The analysis is currently assigned to @Model.View.Analysis.AnalysisNetworks.Count() network@(Model.View.Analysis.AnalysisNetworks.Count() != 1 ? "s" : string.Empty).</span>
+        <div class="mb-3">
+            <a asp-page="/Administration/Content/Networks/Index" asp-route-searchString="@Model.View.Analysis.Id" asp-route-searchIn="AnalysisId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
         </div>
+        @if (!Model.View.Analysis.AnalysisNetworks.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no networks currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Network</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var analysisNetwork in Model.View.Analysis.AnalysisNetworks)
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <span title="@analysisNetwork.Network.Name" class="font-weight-bold">@analysisNetwork.Network.Name</span>
+                                </div>
+                                <div>
+                                    <span title="@analysisNetwork.Network.Id" class="small">@analysisNetwork.Network.Id</span>
+                                </div>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Administration/Content/Networks/Details" asp-route-id="@analysisNetwork.Network.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
     </div>
 </div>
 <div class="card mb-3">
@@ -201,10 +250,59 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The analysis is currently assigned to @Model.View.Analysis.AnalysisDatabases.Count() database@(Model.View.Analysis.AnalysisDatabases.Count() != 1 ? "s" : string.Empty).</span>
+        <div class="mb-3">
+            <a asp-page="/Administration/Data/Databases/Index" asp-route-searchString="@Model.View.Analysis.Id" asp-route-searchIn="NetworkId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
         </div>
+        @if (!Model.View.Analysis.AnalysisDatabases.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no databases currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Database</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var analysisDatabase in Model.View.Analysis.AnalysisDatabases)
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <span title="@analysisDatabase.Database.Name" class="font-weight-bold">@analysisDatabase.Database.Name</span>
+                                </div>
+                                <div>
+                                    <span title="@analysisDatabase.Database.Id" class="small">@analysisDatabase.Database.Id</span>
+                                </div>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Administration/Data/Databases/Details" asp-route-id="@analysisDatabase.Database.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
     </div>
 </div>
 <div class="card mb-3">
@@ -219,9 +317,64 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The analysis is currently assigned to @Model.View.Analysis.AnalysisNodeCollections.Count() node collection@(Model.View.Analysis.AnalysisNodeCollections.Count() != 1 ? "s" : string.Empty).</span>
+        <div class="mb-3">
+            <a asp-page="/Administration/Content/NodeCollections/Index" asp-route-searchString="@Model.View.Analysis.Id" asp-route-searchIn="AnalysisId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
         </div>
+        @if (!Model.View.Analysis.AnalysisNodeCollections.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no node collections currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Node collection</span>
+                        </th>
+                        <th class="text-center text-break">
+                            <span>Type</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var analysisNodeCollection in Model.View.Analysis.AnalysisNodeCollections)
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <span title="@analysisNodeCollection.NodeCollection.Name" class="font-weight-bold">@analysisNodeCollection.NodeCollection.Name</span>
+                                </div>
+                                <div>
+                                    <span title="@analysisNodeCollection.NodeCollection.Id" class="small">@analysisNodeCollection.NodeCollection.Id</span>
+                                </div>
+                            </td>
+                            <td class="text-center text-break">
+                                <span title="@analysisNodeCollection.Type.ToString()">@analysisNodeCollection.Type.ToString()</span>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Administration/Content/NodeCollections/Details" asp-route-id="@analysisNodeCollection.NodeCollection.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
     </div>
 </div>

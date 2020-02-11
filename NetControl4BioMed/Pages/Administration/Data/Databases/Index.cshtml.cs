@@ -44,7 +44,11 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                     { "Description", "Description" },
                     { "Url", "URL" },
                     { "DatabaseTypeId", "Database type ID" },
-                    { "DatabaseTypeName", "Database type name" }
+                    { "DatabaseTypeName", "Database type name" },
+                    { "NetworkId", "Network ID" },
+                    { "NetworkName", "Network name" },
+                    { "AnalysisId", "Analysis ID" },
+                    { "AnalysisName", "Analysis name" }
                 },
                 Filter = new Dictionary<string, string>
                 {
@@ -62,10 +66,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                     { "HasNoDatabaseNodes", "Does not have database nodes" },
                     { "HasDatabaseEdges", "Has database edges" },
                     { "HasNoDatabaseEdges", "Does not have database edges" },
-                    { "HasDatabaseNetworks", "Has database networks" },
-                    { "HasNoDatabaseNetworks", "Does not have database networks" },
-                    { "HasDatabaseAnalyses", "Has database analyses" },
-                    { "HasNoDatabaseAnalyses", "Does not have database analyses" },
+                    { "HasNetworkDatabases", "Has network databases" },
+                    { "HasNoNetworkDatabases", "Does not have network databases" },
+                    { "HasAnalysisDatabases", "Has analysis databases" },
+                    { "HasNoAnalysisDatabases", "Does not have analysis databases" },
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -103,7 +107,11 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Url") && item.Url.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseTypeId") && item.DatabaseType.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("DatabaseTypeName") && item.DatabaseType.Name.Contains(input.SearchString));
+                    input.SearchIn.Contains("DatabaseTypeName") && item.DatabaseType.Name.Contains(input.SearchString) ||
+                    input.SearchIn.Contains("NetworkId") && item.NetworkDatabases.Any(item1 => item1.Network.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NetworkName") && item.NetworkDatabases.Any(item1 => item1.Network.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("AnalysisId") && item.AnalysisDatabases.Any(item1 => item1.Analysis.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("AnalysisName") && item.AnalysisDatabases.Any(item1 => item1.Analysis.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
                 .Where(item => input.Filter.Contains("IsPublic") ? item.IsPublic : true)
@@ -120,10 +128,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 .Where(item => input.Filter.Contains("HasNoDatabaseNodes") ? !item.DatabaseNodes.Any() : true)
                 .Where(item => input.Filter.Contains("HasDatabaseEdges") ? item.DatabaseEdges.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoDatabaseEdges") ? !item.DatabaseEdges.Any() : true)
-                .Where(item => input.Filter.Contains("HasDatabaseNetworks") ? !item.NetworkDatabases.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoDatabaseNetworks") ? !item.NetworkDatabases.Any() : true)
-                .Where(item => input.Filter.Contains("HasDatabaseAnalyses") ? !item.AnalysisDatabases.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoDatabaseAnalyses") ? !item.AnalysisDatabases.Any() : true);
+                .Where(item => input.Filter.Contains("HasNetworkDatabases") ? !item.NetworkDatabases.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoNetworkDatabases") ? !item.NetworkDatabases.Any() : true)
+                .Where(item => input.Filter.Contains("HasAnalysisDatabases") ? !item.AnalysisDatabases.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoAnalysisDatabases") ? !item.AnalysisDatabases.Any() : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {

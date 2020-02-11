@@ -117,57 +117,13 @@
     </div>
     <div class="card-body">
         <div class="mb-3">
-            <a asp-page="/Administration/Data/DatabaseNodeFieldNodes/Index" asp-route-searchString="@Model.View.DatabaseNodeField.Id" asp-route-searchIn="DatabaseNodeFieldId" class="btn btn-info btn-block">
+            <a asp-page="/Administration/Relationships/DatabaseNodeFieldNodes/Index" asp-route-searchString="@Model.View.DatabaseNodeField.Id" asp-route-searchIn="DatabaseNodeFieldId" class="btn btn-info btn-block">
                 <span>View all</span>
             </a>
         </div>
-        @if (!Model.View.DatabaseNodeField.DatabaseNodeFieldNodes.Any())
-        {
-            <div class="alert alert-info text-justify text-wrap mb-0">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no nodes currently assigned.</span>
-            </div>
-        }
-        else
-        {
-            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
-                <thead class="thead-light">
-                    <tr>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
-                            <span>#</span>
-                        </th>
-                        <th class="text-left text-break">
-                            <span>Node</span>
-                        </th>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>Links</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var node in Model.View.DatabaseNodeField.DatabaseNodeFieldNodes.Select(item => item.Node).Distinct())
-                    {
-                        <tr>
-                            <td class="text-center text-break">
-                                <span></span>
-                            </td>
-                            <td class="text-left text-break">
-                                <div>
-                                    <span title="@node.Name" class="font-weight-bold">@node.Name</span>
-                                </div>
-                                <div>
-                                    <span title="@node.Id" class="small">@node.Id</span>
-                                </div>
-                            </td>
-                            <td class="text-center text-break">
-                                <a asp-page="/Administration/Content/Nodes/Details" asp-route-id="@node.Id" title="Details">
-                                    <span>Details</span>
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The database node field currently contains @Model.View.DatabaseNodeField.DatabaseNodeFieldNodes.Select(item => item.Node).Distinct().Count() distinct node@(Model.View.DatabaseNodeField.DatabaseNodeFieldNodes.Select(item => item.Node).Distinct().Count() != 1 ? "s" : string.Empty) with @Model.View.DatabaseNodeField.DatabaseNodeFieldNodes.Count() value@(Model.View.DatabaseNodeField.DatabaseNodeFieldNodes.Count() != 1 ? "s" : string.Empty).</span>
+        </div>
     </div>
 </div>

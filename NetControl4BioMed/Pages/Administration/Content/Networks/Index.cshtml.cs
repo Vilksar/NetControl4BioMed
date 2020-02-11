@@ -46,7 +46,9 @@ namespace NetControl4BioMed.Pages.Administration.Content.Networks
                     { "DatabaseId", "Database ID" },
                     { "DatabaseName", "Database name" },
                     { "AnalysisId", "Analysis ID" },
-                    { "AnalysisName", "Analysis name" }
+                    { "AnalysisName", "Analysis name" },
+                    { "NodeCollectionId", "Node collection ID" },
+                    { "NodeCollectionName", "Node collection name" }
                 },
                 Filter = new Dictionary<string, string>
                 {
@@ -113,7 +115,9 @@ namespace NetControl4BioMed.Pages.Administration.Content.Networks
                     input.SearchIn.Contains("DatabaseId") && item.NetworkDatabases.Any(item1 => item1.Database.Id.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("DatabaseName") && item.NetworkDatabases.Any(item1 => item1.Database.Name.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("AnalysisId") && item.AnalysisNetworks.Any(item1 => item1.Analysis.Id.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("AnalysisName") && item.AnalysisNetworks.Any(item1 => item1.Analysis.Name.Contains(input.SearchString)));
+                    input.SearchIn.Contains("AnalysisName") && item.AnalysisNetworks.Any(item1 => item1.Analysis.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeCollectionId") && item.NetworkNodeCollections.Any(item1 => item1.NodeCollection.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeCollectionName") && item.NetworkNodeCollections.Any(item1 => item1.NodeCollection.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
                 .Where(item => input.Filter.Contains("UsesAlgorithmNone") ? item.Algorithm == NetworkAlgorithm.None : true)
