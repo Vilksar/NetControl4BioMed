@@ -9,7 +9,7 @@
 <form method="get" class="text-justify">
     <div class="row align-items-center">
         <div class="col-lg-6 mb-3">
-            <a asp-page="/Administration/Content/Nodes/Create" class="btn btn-success btn-block" title="Create">
+            <a asp-page="/Administration/Content/Nodes/Update" class="btn btn-primary btn-block" title="Update">
                 <span><i class="fas fa-code"></i></span>
                 <span>Add new items</span>
             </a>
@@ -85,9 +85,6 @@
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Content/Nodes/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
                                 <span><i class="fas fa-info-circle"></i></span>
-                            </a>
-                            <a asp-page="/Administration/Content/Nodes/Edit" asp-route-id="@item.Id" class="btn btn-warning m-1" title="Edit">
-                                <span><i class="fas fa-pencil-alt"></i></span>
                             </a>
                             <a asp-page="/Administration/Content/Nodes/Delete" asp-route-ids="@item.Id" class="btn btn-danger m-1" title="Delete">
                                 <span><i class="fas fa-trash"></i></span>
