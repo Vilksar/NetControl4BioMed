@@ -50,10 +50,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 {
                     { "IsPublic", "Is public" },
                     { "IsNotPublic", "Is not public" },
-                    { "HasUsers", "Has users" },
-                    { "HasNoUsers", "Does not have users" },
-                    { "HasUserInvitations", "Has user invitations" },
-                    { "HasNoUserInvitations", "Does not have user invitations" },
+                    { "HasDatabaseUsers", "Has database users" },
+                    { "HasNoDatabaseUsers", "Does not have database users" },
+                    { "HasDatabasesUserInvitations", "Has database user invitations" },
+                    { "HasNoDatabaseUserInvitations", "Does not have database user invitations" },
                     { "HasDatabaseNodeFields", "Has database node fields" },
                     { "HasNoDatabaseNodeFields", "Does not have database node fields" },
                     { "HasDatabaseEdgeFields", "Has database edge fields" },
@@ -62,10 +62,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                     { "HasNoDatabaseNodes", "Does not have database nodes" },
                     { "HasDatabaseEdges", "Has database edges" },
                     { "HasNoDatabaseEdges", "Does not have database edges" },
-                    { "HasNetworks", "Has networks" },
-                    { "HasNoNetworks", "Does not have networks" },
-                    { "HasAnalyses", "Has analyses" },
-                    { "HasNoAnalyses", "Does not have analyses" },
+                    { "HasDatabaseNetworks", "Has database networks" },
+                    { "HasNoDatabaseNetworks", "Does not have database networks" },
+                    { "HasDatabaseAnalyses", "Has database analyses" },
+                    { "HasNoDatabaseAnalyses", "Does not have database analyses" },
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -108,10 +108,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
             query = query
                 .Where(item => input.Filter.Contains("IsPublic") ? item.IsPublic : true)
                 .Where(item => input.Filter.Contains("IsNotPublic") ? !item.IsPublic : true)
-                .Where(item => input.Filter.Contains("HasUsers") ? item.DatabaseUsers.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoUsers") ? !item.DatabaseUsers.Any() : true)
-                .Where(item => input.Filter.Contains("HasUserInvitations") ? item.DatabaseUserInvitations.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoUserInvitations") ? !item.DatabaseUserInvitations.Any() : true)
+                .Where(item => input.Filter.Contains("HasDatabaseUsers") ? item.DatabaseUsers.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseUsers") ? !item.DatabaseUsers.Any() : true)
+                .Where(item => input.Filter.Contains("HasDatabaseUserInvitations") ? item.DatabaseUserInvitations.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseUserInvitations") ? !item.DatabaseUserInvitations.Any() : true)
                 .Where(item => input.Filter.Contains("HasDatabaseNodeFields") ? item.DatabaseNodeFields.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoDatabaseNodeFields") ? !item.DatabaseNodeFields.Any() : true)
                 .Where(item => input.Filter.Contains("HasDatabaseEdgeFields") ? item.DatabaseEdgeFields.Any() : true)
@@ -120,10 +120,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
                 .Where(item => input.Filter.Contains("HasNoDatabaseNodes") ? !item.DatabaseNodes.Any() : true)
                 .Where(item => input.Filter.Contains("HasDatabaseEdges") ? item.DatabaseEdges.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoDatabaseEdges") ? !item.DatabaseEdges.Any() : true)
-                .Where(item => input.Filter.Contains("HasNetworks") ? !item.NetworkDatabases.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoNetworks") ? !item.NetworkDatabases.Any() : true)
-                .Where(item => input.Filter.Contains("HasAnalyses") ? !item.AnalysisDatabases.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoAnalyses") ? !item.AnalysisDatabases.Any() : true);
+                .Where(item => input.Filter.Contains("HasDatabaseNetworks") ? !item.NetworkDatabases.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseNetworks") ? !item.NetworkDatabases.Any() : true)
+                .Where(item => input.Filter.Contains("HasDatabaseAnalyses") ? !item.AnalysisDatabases.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseAnalyses") ? !item.AnalysisDatabases.Any() : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
