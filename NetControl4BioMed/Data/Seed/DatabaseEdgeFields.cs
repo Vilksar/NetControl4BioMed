@@ -22,7 +22,7 @@ namespace NetControl4BioMed.Data.Seed
             {
                 Id = "295790d1-b331-49ca-af2c-75358a82d6bd",
                 DateTimeCreated = DateTime.Now,
-                Name = "Name",
+                Name = "Generic Name",
                 Description = "The display name of the edge.",
                 Url = null,
                 Type = DatabaseEdgeFieldType.String,

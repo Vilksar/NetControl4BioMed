@@ -22,7 +22,7 @@ namespace NetControl4BioMed.Data.Seed
             {
                 Id = "f5981a1b-5644-4e5b-ba4d-60db4dcc9d4d",
                 DateTimeCreated = DateTime.Now,
-                Name = "Name",
+                Name = "Generic Name",
                 Description = "The display name of the node.",
                 IsSearchable = true,
                 Url = null,

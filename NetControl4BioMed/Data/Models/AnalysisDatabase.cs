@@ -21,12 +21,12 @@ namespace NetControl4BioMed.Data.Models
         public Analysis Analysis { get; set; }
 
         /// <summary>
-        /// Gets or sets the edge database ID of the relationship.
+        /// Gets or sets the database ID of the relationship.
         /// </summary>
         public string DatabaseId { get; set; }
 
         /// <summary>
-        /// Gets or sets the edge database of the relationship.
+        /// Gets or sets the database of the relationship.
         /// </summary>
         public Database Database { get; set; }
     }
