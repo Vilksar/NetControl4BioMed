@@ -1,0 +1,14 @@
+﻿@{
+    Layout = "/Pages/Administration/Content/_Layout.cshtml";
+}
+
+@section Breadcrumbs {
+    <a asp-page="/Administration/Content/Edges/Index" class="breadcrumb-item"><span>Edges</span></a>
+    @RenderSection("Breadcrumbs", required: false)
+}
+
+@RenderBody()
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}
