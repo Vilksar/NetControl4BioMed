@@ -42,6 +42,7 @@ namespace NetControl4BioMed.Pages.Administration.Content.Nodes
             View = new ViewModel
             {
                 Node = _context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => item.Id == id)
                     .Include(item => item.DatabaseNodes)
                     .Include(item => item.DatabaseNodeFieldNodes)

@@ -42,6 +42,7 @@ namespace NetControl4BioMed.Pages.Administration.Content.Edges
             View = new ViewModel
             {
                 Edge = _context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => item.Id == id)
                     .Include(item => item.DatabaseEdges)
                     .Include(item => item.DatabaseEdgeFieldEdges)

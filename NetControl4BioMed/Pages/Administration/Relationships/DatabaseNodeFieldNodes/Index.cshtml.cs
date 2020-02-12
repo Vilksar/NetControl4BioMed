@@ -71,8 +71,9 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseNodeField
                 // Redirect to the page where they are all explicitly defined.
                 return RedirectToPage(new { searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
-            // Start with all of the items in the database.
+            // Start with all of the items in the non-generic databases.
             var query = _context.DatabaseNodeFieldNodes
+                .Where(item => !item.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                 .AsQueryable();
             // Select the results matching the search string.
             query = query

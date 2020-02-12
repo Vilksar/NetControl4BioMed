@@ -29,7 +29,7 @@
                 @foreach (var navigationPage in navigationGroup.Pages)
                 {
                     <a asp-page="@navigationPage.Link" class="list-group-item list-group-item-action list-group-item-@navigationPage.Color @(activeGroup == navigationGroup.Id && activePage == navigationPage.Id ? "active" : string.Empty)" title="@navigationPage.Description">
-                        <div class="row align-items-center">
+                        <div class="row small align-items-center">
                             <span class="col-9 text-left text-wrap">@navigationPage.Title</span>
                             <span class="col-3 text-center"><i class="fas @navigationPage.Icon"></i></span>
                         </div>
