@@ -239,9 +239,9 @@ namespace NetControl4BioMed.Pages.Administration.Content.Nodes
                     // Add the new node to the list.
                     nodes.Add(node);
                 }
-                // Save the number of items.
+                // Save the number of nodes.
                 itemCount = nodes.Count();
-                // Mark all nodes in the list for addition.
+                // Mark the nodes for addition.
                 _context.Nodes.AddRange(nodes);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
@@ -261,11 +261,11 @@ namespace NetControl4BioMed.Pages.Administration.Content.Nodes
                     return Page();
                 }
                 // Get the list of IDs from the provided items.
-                var nodeIds = items.Select(item => item.Id);
+                var itemIds = items.Select(item => item.Id);
                 // Get the nodes from the database that have the given IDs.
                 var nodes = _context.Nodes
                     .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => nodeIds.Contains(item.Id))
+                    .Where(item => itemIds.Contains(item.Id))
                     .Include(item => item.DatabaseNodeFieldNodes)
                     .Include(item => item.DatabaseNodes)
                     .AsEnumerable();
@@ -278,7 +278,7 @@ namespace NetControl4BioMed.Pages.Administration.Content.Nodes
                     return Page();
                 }
                 // Get the IDs of all of the node fields that are to be updated.
-                var databaseNodeFieldIds = items
+                var itemNodeFieldIds = items
                     .Select(item => item.Fields)
                     .SelectMany(item => item)
                     .Where(item => !string.IsNullOrEmpty(item.Key) && !string.IsNullOrEmpty(item.Value))
@@ -287,7 +287,7 @@ namespace NetControl4BioMed.Pages.Administration.Content.Nodes
                 // Get the node fields that are to be updated.
                 var databaseNodeFields = _context.DatabaseNodeFields
                     .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .Where(item => databaseNodeFieldIds.Contains(item.Id))
+                    .Where(item => itemNodeFieldIds.Contains(item.Id))
                     .Include(item => item.Database)
                     .AsEnumerable();
                 // Check if there weren't any node fields found.
@@ -299,7 +299,7 @@ namespace NetControl4BioMed.Pages.Administration.Content.Nodes
                     return Page();
                 }
                 // Get the valid database node field IDs.
-                var validDatabaseNodeFieldIds = databaseNodeFields
+                var validItemNodeFieldIds = databaseNodeFields
                     .Select(item => item.Id);
                 // Save the nodes to update.
                 var nodesToUpdate = new List<Node>();
@@ -316,7 +316,7 @@ namespace NetControl4BioMed.Pages.Administration.Content.Nodes
                     }
                     // Get the valid item fields and the node field nodes to add.
                     var nodeFieldNodes = item.Fields
-                        .Where(item1 => validDatabaseNodeFieldIds.Contains(item1.Key))
+                        .Where(item1 => validItemNodeFieldIds.Contains(item1.Key))
                         .Select(item1 => new DatabaseNodeFieldNode { DatabaseNodeFieldId = item1.Key, DatabaseNodeField = databaseNodeFields.FirstOrDefault(item2 => item1.Key == item2.Id), NodeId = node.Id, Node = node, Value = item1.Value })
                         .Where(item1 => item1.DatabaseNodeField != null && item1.Node != null);
                     // Check if there weren't any node fields found.
@@ -325,8 +325,6 @@ namespace NetControl4BioMed.Pages.Administration.Content.Nodes
                         // Continue.
                         continue;
                     }
-                    // Add the new node and the node field nodes to the list.
-                    nodesToUpdate.Add(node);
                     // Update the node.
                     node.Name = nodeFieldNodes.First(item1 => item1.DatabaseNodeField.IsSearchable).Value;
                     node.Description = item.Description;
@@ -336,11 +334,31 @@ namespace NetControl4BioMed.Pages.Administration.Content.Nodes
                         .Distinct()
                         .Select(item1 => new DatabaseNode { DatabaseId = item1.Id, Database = item1, NodeId = node.Id, Node = node })
                         .ToList();
+                    // Add the node and the fields to the list.
+                    nodesToUpdate.Add(node);
                 }
-                // Save the number of items.
+                // Save the number of nodes.
                 itemCount = nodesToUpdate.Count();
-                // Mark the items for updating.
+                // Mark the nodes for updating.
                 _context.Nodes.UpdateRange(nodesToUpdate);
+                // Get the edges that contain the nodes.
+                var edges = _context.Edges
+                    .Where(item => item.EdgeNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
+                // Go over each edge.
+                foreach (var edge in edges)
+                {
+                    // Update its name.
+                    edge.Name = string.Concat(edge.EdgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " -> ", edge.EdgeNodes.First(item => item.Type == EdgeNodeType.Target).Node.Name);
+                }
+                // Mark the edges for updating.
+                _context.Edges.UpdateRange(edges);
+                // Get the networks and analyses that contain the nodes.
+                var networks = _context.Networks.Where(item => item.NetworkNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
+                var analyses = _context.Analyses.Where(item => item.AnalysisNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
+                // Mark the items for deletion.
+                _context.Nodes.RemoveRange(nodes);
+                _context.Analyses.RemoveRange(analyses);
+                _context.Networks.RemoveRange(networks);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
             }
@@ -351,14 +369,21 @@ namespace NetControl4BioMed.Pages.Administration.Content.Nodes
                 items = items
                     .Where(item => !string.IsNullOrEmpty(item.Id));
                 // Get the list of IDs from the provided items.
-                var ids = items.Select(item => item.Id);
+                var itemIds = items.Select(item => item.Id);
                 // Get the nodes from the non-generic databases that have the given IDs.
                 var nodes = _context.Nodes
                     .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => ids.Contains(item.Id));
-                // Save the number of items found.
+                    .Where(item => itemIds.Contains(item.Id));
+                // Save the number of nodes found.
                 itemCount = nodes.Count();
+                // Get the edges, networks and analyses that contain the nodes.
+                var edges = _context.Edges.Where(item => item.EdgeNodes.Any(item1 => nodes.Contains(item1.Node)));
+                var networks = _context.Networks.Where(item => item.NetworkNodes.Any(item1 => nodes.Contains(item1.Node)));
+                var analyses = _context.Analyses.Where(item => item.AnalysisNodes.Any(item1 => nodes.Contains(item1.Node)));
                 // Mark the items for deletion.
+                _context.Analyses.RemoveRange(analyses);
+                _context.Networks.RemoveRange(networks);
+                _context.Edges.RemoveRange(edges);
                 _context.Nodes.RemoveRange(nodes);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
