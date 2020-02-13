@@ -9,7 +9,7 @@
 <form method="get" class="text-justify">
     <div class="row align-items-center">
         <div class="col-lg-4 mb-3">
-            <a asp-page="/Administration/Content/Nodes/Update" asp-route-type="Create" class="btn btn-primary btn-block" title="Update">
+            <a asp-page="/Administration/Content/Nodes/Update" asp-route-type="Create" class="btn btn-success btn-block" title="Create">
                 <span><i class="fas fa-code"></i></span>
                 <span>Add new items</span>
             </a>
@@ -65,12 +65,8 @@
                     <tr class="item-group-item">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" id="@item.Database.Id-@item.Node.Id-checkbox-1" name="databaseIds" value="@item.Database.Id" class="custom-control-input" title="Select" />
-                                <label for="@item.Database.Id-@item.Node.Id-checkbox-1" class="custom-control-label"></label>
-                            </div>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" id="@item.Database.Id-@item.Node.Id-checkbox-2" name="nodeIds" value="@item.Node.Id" class="custom-control-input" title="Select" />
-                                <label for="@item.Database.Id-@item.Node.Id-checkbox-2" class="custom-control-label"></label>
+                                <input type="checkbox" id="@item.Database.Id-@item.Node.Id-checkbox" name="ids" value="@item.Node.Id" class="custom-control-input" title="Select" />
+                                <label for="@item.Database.Id-@item.Node.Id-checkbox" class="custom-control-label"></label>
                             </div>
                         </td>
                         <td class="text-left text-break">
@@ -93,10 +89,10 @@
                             <span title="@item.Node.DatabaseNodeFieldNodes.Count(item1 => item1.DatabaseNodeField.Database == item.Database)">@item.Node.DatabaseNodeFieldNodes.Count(item1 => item1.DatabaseNodeField.Database == item.Database)</span>
                         </td>
                         <td class="text-center text-break">
-                            <a asp-page="/Administration/Content/Nodes/Update" asp-route-type="Edit" asp-route-databaseIds="@item.Database.Id" asp-route-nodeIds="@item.Node.Id" class="btn btn-warning m-1" title="Edit">
+                            <a asp-page="/Administration/Content/Nodes/Update" asp-route-type="Edit" asp-route-ids="@item.Node.Id" class="btn btn-warning m-1" title="Edit">
                                 <span><i class="fas fa-pencil-alt"></i></span>
                             </a>
-                            <a asp-page="/Administration/Content/Nodes/Update" asp-route-type="Delete" asp-route-databaseIds="@item.Database.Id" asp-route-nodeIds="@item.Node.Id" class="btn btn-danger m-1" title="Delete">
+                            <a asp-page="/Administration/Content/Nodes/Update" asp-route-type="Delete" asp-route-ids="@item.Node.Id" class="btn btn-danger m-1" title="Delete">
                                 <span><i class="fas fa-trash"></i></span>
                             </a>
                         </td>

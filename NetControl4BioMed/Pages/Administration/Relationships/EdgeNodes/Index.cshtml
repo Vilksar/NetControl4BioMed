@@ -9,7 +9,7 @@
 <form method="get" class="text-justify">
     <div class="row align-items-center">
         <div class="col-lg-4 mb-3">
-            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Create" class="btn btn-primary btn-block" title="Update">
+            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Success" class="btn btn-success btn-block" title="Create">
                 <span><i class="fas fa-code"></i></span>
                 <span>Add new items</span>
             </a>
@@ -51,6 +51,9 @@
                     <th class="text-left text-break">
                         <span>Node</span>
                     </th>
+                    <th class="text-center text-break">
+                        <span>Type</span>
+                    </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
                         <span>Actions</span>
                     </th>
@@ -62,12 +65,8 @@
                     <tr class="item-group-item">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" id="@item.Edge.Id-@item.Node.Id-checkbox-1" name="edgeIds" value="@item.Edge.Id" class="custom-control-input" title="Select" />
-                                <label for="@item.Edge.Id-@item.Node.Id-checkbox-1" class="custom-control-label"></label>
-                            </div>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" id="@item.Edge.Id-@item.Node.Id-checkbox-2" name="nodeIds" value="@item.Node.Id" class="custom-control-input" title="Select" />
-                                <label for="@item.Edge.Id-@item.Node.Id-checkbox-2" class="custom-control-label"></label>
+                                <input type="checkbox" id="@item.Edge.Id-@item.Node.Id-checkbox" name="ids" value="@item.Edge.Id" class="custom-control-input" title="Select" />
+                                <label for="@item.Edge.Id-@item.Node.Id-checkbox" class="custom-control-label"></label>
                             </div>
                         </td>
                         <td class="text-left text-break">
@@ -86,11 +85,14 @@
                                 <span title="@item.Node.Id" class="small">@item.Node.Id</span>
                             </div>
                         </td>
+                        <th class="text-center text-break">
+                            <span title="@item.Type.ToString()">@item.Type.ToString()</span>
+                        </th>
                         <td class="text-center text-break">
-                            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Edit" asp-route-edgeIds="@item.Edge.Id" asp-route-nodeIds="@item.Node.Id" class="btn btn-warning m-1" title="Edit">
+                            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Edit" asp-route-ids="@item.Edge.Id" class="btn btn-warning m-1" title="Edit">
                                 <span><i class="fas fa-pencil-alt"></i></span>
                             </a>
-                            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Delete" asp-route-edgeIds="@item.Edge.Id" asp-route-nodeIds="@item.Node.Id" class="btn btn-danger m-1" title="Delete">
+                            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Delete" asp-route-ids="@item.Edge.Id" class="btn btn-danger m-1" title="Delete">
                                 <span><i class="fas fa-trash"></i></span>
                             </a>
                         </td>

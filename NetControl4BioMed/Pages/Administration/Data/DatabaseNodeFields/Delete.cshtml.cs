@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 
@@ -48,7 +49,9 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseNodeFields
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.DatabaseNodeFields.Where(item => ids.Contains(item.Id))
+                Items = _context.DatabaseNodeFields
+                    .Where(item => ids.Contains(item.Id))
+                    .Include(item => item.Database)
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -83,7 +86,9 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseNodeFields
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.DatabaseNodeFields.Where(item => Input.Ids.Contains(item.Id))
+                Items = _context.DatabaseNodeFields
+                    .Where(item => Input.Ids.Contains(item.Id))
+                    .Include(item => item.Database)
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())

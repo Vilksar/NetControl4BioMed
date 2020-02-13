@@ -9,7 +9,7 @@
 <form method="get" class="text-justify">
     <div class="row align-items-center">
         <div class="col-lg-4 mb-3">
-            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Create" class="btn btn-primary btn-block" title="Update">
+            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Create" class="btn btn-success btn-block" title="Create">
                 <span><i class="fas fa-code"></i></span>
                 <span>Add new items</span>
             </a>
@@ -45,14 +45,14 @@
                             <label for="select" class="custom-control-label"></label>
                         </div>
                     </th>
-                    <th class="d-none d-lg-table-cell text-left text-break">
-                        <span>Database</span>
-                    </th>
                     <th class="text-left text-break">
                         <span>Field</span>
                     </th>
                     <th class="text-left text-break">
                         <span>Edge</span>
+                    </th>
+                    <th class="text-center text-break">
+                        <span>Value</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
                         <span>Actions</span>
@@ -65,12 +65,8 @@
                     <tr class="item-group-item">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" id="@item.DatabaseEdgeField.Id-@item.Edge.Id-checkbox-1" name="databaseEdgeFieldIds" value="@item.DatabaseEdgeField.Id" class="custom-control-input" title="Select" />
-                                <label for="@item.DatabaseEdgeField.Id-@item.Edge.Id-checkbox-1" class="custom-control-label"></label>
-                            </div>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" id="@item.DatabaseEdgeField.Id-@item.Edge.Id-checkbox-2" name="edgeIds" value="@item.Edge.Id" class="custom-control-input" title="Select" />
-                                <label for="@item.DatabaseEdgeField.Id-@item.Edge.Id-checkbox-2" class="custom-control-label"></label>
+                                <input type="checkbox" id="@item.DatabaseEdgeField.Id-@item.Edge.Id-checkbox" name="ids" value="@item.Edge.Id" class="custom-control-input" title="Select" />
+                                <label for="@item.DatabaseEdgeField.Id-@item.Edge.Id-checkbox" class="custom-control-label"></label>
                             </div>
                         </td>
                         <td class="d-none d-lg-table-cell text-left text-break">
@@ -98,10 +94,13 @@
                             </div>
                         </td>
                         <td class="text-center text-break">
-                            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Edit" asp-route-databaseEdgeFieldIds="@item.DatabaseEdgeField.Id" asp-route-edgeIds="@item.Edge.Id" class="btn btn-warning m-1" title="Edit">
+                            <span title="@item.Value">@item.Value</span>
+                        </td>
+                        <td class="text-center text-break">
+                            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Edit" asp-route-ids="@item.Edge.Id" class="btn btn-warning m-1" title="Edit">
                                 <span><i class="fas fa-pencil-alt"></i></span>
                             </a>
-                            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Delete" asp-route-databaseEdgeFieldIds="@item.DatabaseEdgeField.Id" asp-route-edgeIds="@item.Edge.Id" class="btn btn-danger m-1" title="Delete">
+                            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Delete" asp-route-ids="@item.Edge.Id" class="btn btn-danger m-1" title="Delete">
                                 <span><i class="fas fa-trash"></i></span>
                             </a>
                         </td>
