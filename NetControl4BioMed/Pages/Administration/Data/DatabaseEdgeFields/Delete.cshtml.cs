@@ -111,7 +111,14 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseEdgeFields
             }
             // Save the number of items found.
             var databaseEdgeFieldCount = View.Items.Count();
+            // Get the related entities that use the items.
+            var edges = _context.Edges.Where(item => item.DatabaseEdgeFieldEdges.Any(item1 => View.Items.Contains(item1.DatabaseEdgeField)));
+            var networks = _context.Networks.Where(item => item.NetworkEdges.Any(item1 => edges.Contains(item1.Edge)));
+            var analyses = _context.Analyses.Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
             // Mark the items for deletion.
+            _context.Analyses.RemoveRange(analyses);
+            _context.Networks.RemoveRange(networks);
+            _context.Edges.RemoveRange(edges);
             _context.DatabaseEdgeFields.RemoveRange(View.Items);
             // Save the changes to the database.
             await _context.SaveChangesAsync();

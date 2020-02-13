@@ -111,7 +111,16 @@ namespace NetControl4BioMed.Pages.Administration.Data.Databases
             }
             // Save the number of items found.
             var databaseCount = View.Items.Count();
+            // Get the related entities that use the items.
+            var nodes = _context.Nodes.Where(item => item.DatabaseNodes.Any(item1 => View.Items.Contains(item1.Database)));
+            var edges = _context.Edges.Where(item => item.DatabaseEdges.Any(item1 => View.Items.Contains(item1.Database)));
+            var networks = _context.Networks.Where(item => item.NetworkDatabases.Any(item1 => View.Items.Contains(item1.Database)));
+            var analyses = _context.Analyses.Where(item => item.AnalysisDatabases.Any(item1 => View.Items.Contains(item1.Database)));
             // Mark the items for deletion.
+            _context.Analyses.RemoveRange(analyses);
+            _context.Networks.RemoveRange(networks);
+            _context.Edges.RemoveRange(edges);
+            _context.Nodes.RemoveRange(nodes);
             _context.Databases.RemoveRange(View.Items);
             // Save the changes to the database.
             await _context.SaveChangesAsync();

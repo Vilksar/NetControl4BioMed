@@ -135,13 +135,10 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                     return Page();
                 }
             }
-            // Go over all of the networks and analyses and remove the ones without any users.
+            // Go over all of the networks and analyses and get the ones without any users.
             var networks = _context.Networks.Where(item => !item.NetworkUsers.Any());
-            var analyses = _context.Analyses.Where(item => !item.AnalysisUsers.Any() || item.AnalysisNetworks.All(item1 => networks.Contains(item1.Network)));
-            // Update the counts.
-            var networkCount = networks.Count();
-            var analysisCount = analyses.Count();
-            // Mark them for removal.
+            var analyses = _context.Analyses.Where(item => !item.AnalysisUsers.Any() || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
+            // Mark the items for deletion.
             _context.Analyses.RemoveRange(analyses);
             _context.Networks.RemoveRange(networks);
             // Save the changes in the database.

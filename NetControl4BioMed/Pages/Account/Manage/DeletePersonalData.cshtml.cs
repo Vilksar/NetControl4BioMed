@@ -122,11 +122,11 @@ namespace NetControl4BioMed.Pages.Account.Manage
             // Sign out the user.
             await _signInManager.SignOutAsync();
             // Go over all of the networks and analyses and find the ones without any assigned users.
-            var networks = _context.Networks.Where(n => !n.NetworkUsers.Any());
-            var analyses = _context.Analyses.Where(a => !a.AnalysisUsers.Any());
-            // Mark them for removal.
-            _context.RemoveRange(networks);
-            _context.RemoveRange(analyses);
+            var networks = _context.Networks.Where(item => !item.NetworkUsers.Any());
+            var analyses = _context.Analyses.Where(item => !item.AnalysisUsers.Any() || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
+            // Mark the items for deletion.
+            _context.Analyses.RemoveRange(analyses);
+            _context.Networks.RemoveRange(networks);
             // Save the changes in the database.
             await _context.SaveChangesAsync();
             // Redirect to the home page.

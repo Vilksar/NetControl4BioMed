@@ -95,7 +95,10 @@ namespace NetControl4BioMed.Pages.Administration.Content.Networks
             }
             // Save the number of items found.
             var networkCount = View.Items.Count();
+            // Get the related entities that use the items.
+            var analyses = _context.Analyses.Where(item => item.AnalysisNetworks.Any(item1 => View.Items.Contains(item1.Network)));
             // Mark the items for deletion.
+            _context.Analyses.RemoveRange(analyses);
             _context.Networks.RemoveRange(View.Items);
             // Save the changes to the database.
             await _context.SaveChangesAsync();
