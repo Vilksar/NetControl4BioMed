@@ -42,11 +42,6 @@ namespace NetControl4BioMed.Data.Models
         public string Description { get; set; }
 
         /// <summary>
-        /// Gets or sets the type of the database edge field.
-        /// </summary>
-        public DatabaseEdgeFieldType Type { get; set; }
-
-        /// <summary>
         /// Gets or sets the URL for the database edge field. The variable in the query will be replaced with the corresponding value.
         /// </summary>
         public string Url { get; set; }

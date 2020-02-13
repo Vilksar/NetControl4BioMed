@@ -49,12 +49,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseEdgeFields
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "IsBoolean", "Is boolean" },
-                    { "IsNotBoolean", "Is not boolean" },
-                    { "IsNumber", "Is number" },
-                    { "IsNotNumber", "Is not number" },
-                    { "IsString", "Is string" },
-                    { "IsNotString", "Is not string" },
                     { "HasDatabaseEdgeFieldEdges", "Has database edge field edges" },
                     { "HasNoDatabaseEdgeFieldEdges", "Does not have database edge field edges" }
                 },
@@ -90,12 +84,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseEdgeFields
                     input.SearchIn.Contains("DatabaseName") && item.Database.Name.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
-                .Where(item => input.Filter.Contains("IsBoolean") ? item.Type == DatabaseEdgeFieldType.Boolean : true)
-                .Where(item => input.Filter.Contains("IsNotBoolean") ? item.Type != DatabaseEdgeFieldType.Boolean : true)
-                .Where(item => input.Filter.Contains("IsNumber") ? item.Type == DatabaseEdgeFieldType.Number : true)
-                .Where(item => input.Filter.Contains("IsNotNumber") ? item.Type != DatabaseEdgeFieldType.Number : true)
-                .Where(item => input.Filter.Contains("IsString") ? item.Type == DatabaseEdgeFieldType.String : true)
-                .Where(item => input.Filter.Contains("IsNotString") ? item.Type != DatabaseEdgeFieldType.String : true)
                 .Where(item => input.Filter.Contains("HasDatabaseEdgeFieldEdges") ? item.DatabaseEdgeFieldEdges.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoDatabaseEdgeFieldEdges") ? !item.DatabaseEdgeFieldEdges.Any() : true);
             // Sort it according to the parameters.

@@ -25,7 +25,6 @@ namespace NetControl4BioMed.Data.Seed
                 Name = "Generic Name",
                 Description = "The display name of the edge.",
                 Url = null,
-                Type = DatabaseEdgeFieldType.String,
                 DatabaseId = "08dff7db-d065-454b-9e4d-afef087c2b05"
             },
             // The edge fields in the InnateDb database.
@@ -35,7 +34,6 @@ namespace NetControl4BioMed.Data.Seed
                 DateTimeCreated = DateTime.Now,
                 Name = "InnateDB PubMed ID",
                 Description = "The interaction PubMed ID in the InnateDB database.",
-                Type = DatabaseEdgeFieldType.String,
                 Url = null,
                 DatabaseId = "e833d529-bceb-4cac-808e-22acf5a5bf0a"
             },
@@ -45,7 +43,6 @@ namespace NetControl4BioMed.Data.Seed
                 DateTimeCreated = DateTime.Now,
                 Name = "InnateDB ID",
                 Description = "The interaction unique identifier(s) in the InnateDB database.",
-                Type = DatabaseEdgeFieldType.String,
                 Url = null,
                 DatabaseId = "e833d529-bceb-4cac-808e-22acf5a5bf0a"
             },
@@ -56,7 +53,6 @@ namespace NetControl4BioMed.Data.Seed
                 DateTimeCreated = DateTime.Now,
                 Name = "KEGG Type",
                 Description = "The interaction type in the KEGG database.",
-                Type = DatabaseEdgeFieldType.String,
                 Url = null,
                 DatabaseId = "8364ed3b-cf03-40d8-a28d-1405c365cdee"
             },
@@ -67,7 +63,6 @@ namespace NetControl4BioMed.Data.Seed
                 DateTimeCreated = DateTime.Now,
                 Name = "KEGG Is Directed",
                 Description = "Is the interaction directed in the Omnipath database?",
-                Type = DatabaseEdgeFieldType.Boolean,
                 Url = null,
                 DatabaseId = "4aafabfc-48d6-4332-b55d-c181c8ba6c54"
             },
@@ -78,7 +73,6 @@ namespace NetControl4BioMed.Data.Seed
                 DateTimeCreated = DateTime.Now,
                 Name = "SIGNOR PubMed ID",
                 Description = "The interaction PubMed ID in the SIGNOR database.",
-                Type = DatabaseEdgeFieldType.String,
                 Url = null,
                 DatabaseId = "4f316156-8795-4173-a1b2-5d164a3e36e6"
             },
@@ -88,7 +82,6 @@ namespace NetControl4BioMed.Data.Seed
                 DateTimeCreated = DateTime.Now,
                 Name = "SIGNOR ID",
                 Description = "The interaction unique identifier(s) in the SIGNOR database.",
-                Type = DatabaseEdgeFieldType.String,
                 Url = null,
                 DatabaseId = "4f316156-8795-4173-a1b2-5d164a3e36e6"
             }

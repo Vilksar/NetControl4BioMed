@@ -41,12 +41,6 @@
                 <span asp-validation-for="Input.Url" class="text-danger small"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Input.Type" class="font-weight-bold">Type</label>
-                <select asp-for="Input.Type" class="custom-select form-control" asp-items="Html.GetEnumSelectList<DatabaseNodeFieldType>()"></select>
-                <span asp-description-for="Input.Type" class="text-muted small">The type of the new database node field.</span>
-                <span asp-validation-for="Input.Type" class="text-danger small"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="Input.IsSearchable" class="font-weight-bold">Set the database node field as searchable?</label>
                 <select asp-for="Input.IsSearchable" class="custom-select form-control">
                     <option value="false">No</option>

@@ -40,10 +40,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseNodeFields
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public DatabaseNodeFieldType Type { get; set; }
-
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
             public bool IsSearchable { get; set; }
 
             [DataType(DataType.Text)]
@@ -115,7 +111,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseNodeFields
                 Description = Input.Description,
                 Url = Input.Url,
                 IsSearchable = Input.IsSearchable,
-                Type = Input.Type,
                 DatabaseId = database.Id,
                 Database = database,
                 DateTimeCreated = DateTime.Now

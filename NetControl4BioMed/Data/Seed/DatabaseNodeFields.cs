@@ -26,7 +26,6 @@ namespace NetControl4BioMed.Data.Seed
                 Description = "The display name of the node.",
                 IsSearchable = true,
                 Url = null,
-                Type = DatabaseNodeFieldType.String,
                 DatabaseId = "08dff7db-d065-454b-9e4d-afef087c2b05"
             },
             // The node fields in the Ensembl database.
@@ -38,7 +37,6 @@ namespace NetControl4BioMed.Data.Seed
                 Description = "The protein unique identifier(s) in the Ensembl database.",
                 IsSearchable = true,
                 Url = "https://www.ensembl.org/Homo_sapiens/Gene/Summary?g=",
-                Type = DatabaseNodeFieldType.String,
                 DatabaseId = "8482602c-c0b4-4866-ba9e-7ad3266d03b9"
             },
             // The node fields in the HGNC database.
@@ -50,7 +48,6 @@ namespace NetControl4BioMed.Data.Seed
                 Description = "The protein name, as set by HGNC.",
                 IsSearchable = true,
                 Url = null,
-                Type = DatabaseNodeFieldType.String,
                 DatabaseId = "f16801a9-cc2a-4825-ac85-5ee60555439a"
             },
             new DatabaseNodeField
@@ -61,7 +58,6 @@ namespace NetControl4BioMed.Data.Seed
                 Description = "The unique identifier(s) in the HGNC database.",
                 IsSearchable = true,
                 Url = "https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/",
-                Type = DatabaseNodeFieldType.String,
                 DatabaseId = "f16801a9-cc2a-4825-ac85-5ee60555439a"
             },
             // The node fields in the InnateDB database.
@@ -73,7 +69,6 @@ namespace NetControl4BioMed.Data.Seed
                 Description = "The protein unique identifier(s) in the InnateDB database.",
                 IsSearchable = true,
                 Url = "https://www.innatedb.com/getGeneCard.do?id=",
-                Type = DatabaseNodeFieldType.String,
                 DatabaseId = "e833d529-bceb-4cac-808e-22acf5a5bf0a"
             },
             // The node fields in the KEGG database.
@@ -85,7 +80,6 @@ namespace NetControl4BioMed.Data.Seed
                 Description = "The protein unique identifier(s) in the KEGG database.",
                 IsSearchable = true,
                 Url = "https://www.genome.jp/dbget-bin/www_bget?",
-                Type = DatabaseNodeFieldType.String,
                 DatabaseId = "8364ed3b-cf03-40d8-a28d-1405c365cdee"
             },
             new DatabaseNodeField
@@ -96,7 +90,6 @@ namespace NetControl4BioMed.Data.Seed
                 Description = "The protein type (gene, compound or group) in the KEGG database.",
                 IsSearchable = false,
                 Url = null,
-                Type = DatabaseNodeFieldType.String,
                 DatabaseId = "8364ed3b-cf03-40d8-a28d-1405c365cdee"
             },
             // The node fields in the PubChem database.
@@ -108,7 +101,6 @@ namespace NetControl4BioMed.Data.Seed
                 Description = "The protein unique identifier(s) in the PubChem database.",
                 IsSearchable = true,
                 Url = "https://pubchem.ncbi.nlm.nih.gov/gene/",
-                Type = DatabaseNodeFieldType.String,
                 DatabaseId = "5386671e-818d-4eb3-a1d5-b0c93e39f786"
             },
             // The node fields in the UniProt database.
@@ -120,7 +112,6 @@ namespace NetControl4BioMed.Data.Seed
                 Description = "The protein unique identifier(s) in the UniProt database.",
                 IsSearchable = true,
                 Url = "https://www.uniprot.org/uniprot/",
-                Type = DatabaseNodeFieldType.String,
                 DatabaseId = "458258dd-794f-4eec-9fe4-bc865b04f585"
             }
         };

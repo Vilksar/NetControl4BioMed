@@ -44,10 +44,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseEdgeFields
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public DatabaseEdgeFieldType Type { get; set; }
-
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
             public string DatabaseString { get; set; }
         }
 
@@ -102,7 +98,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseEdgeFields
                 Name = View.DatabaseEdgeField.Name,
                 Description = View.DatabaseEdgeField.Description,
                 Url = View.DatabaseEdgeField.Url,
-                Type = View.DatabaseEdgeField.Type,
                 DatabaseString = View.DatabaseEdgeField.Database.Name
             };
             // Return the page.
@@ -188,7 +183,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseEdgeFields
             View.DatabaseEdgeField.Name = Input.Name;
             View.DatabaseEdgeField.Description = Input.Description;
             View.DatabaseEdgeField.Url = Input.Url;
-            View.DatabaseEdgeField.Type = Input.Type;
             View.DatabaseEdgeField.DatabaseId = database.Id;
             View.DatabaseEdgeField.Database = database;
             // Save the changes to the database.

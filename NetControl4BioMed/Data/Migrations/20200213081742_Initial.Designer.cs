@@ -10,7 +10,7 @@ using NetControl4BioMed.Data;
 namespace NetControl4BioMed.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200207075306_Initial")]
+    [Migration("20200213081742_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -352,9 +352,6 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");
 
@@ -419,9 +416,6 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");

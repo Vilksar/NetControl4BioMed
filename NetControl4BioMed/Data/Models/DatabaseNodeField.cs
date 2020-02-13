@@ -42,11 +42,6 @@ namespace NetControl4BioMed.Data.Models
         public string Description { get; set; }
 
         /// <summary>
-        /// Gets or sets the type of the database node field.
-        /// </summary>
-        public DatabaseNodeFieldType Type { get; set; }
-
-        /// <summary>
         /// Gets or sets the automatic detection state for searches of the nodes in the database node field.
         /// </summary>
         public bool IsSearchable { get; set; }

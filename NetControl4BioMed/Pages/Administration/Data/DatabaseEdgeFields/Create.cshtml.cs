@@ -40,10 +40,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseEdgeFields
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public DatabaseEdgeFieldType Type { get; set; }
-
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
             public string DatabaseString { get; set; }
         }
 
@@ -110,7 +106,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseEdgeFields
                 Name = Input.Name,
                 Description = Input.Description,
                 Url = Input.Url,
-                Type = Input.Type,
                 DatabaseId = database.Id,
                 Database = database,
                 DateTimeCreated = DateTime.Now

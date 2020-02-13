@@ -51,12 +51,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseNodeFields
                 {
                     { "IsSearchable", "Is searchable" },
                     { "IsNotSearchable", "Is not searchable" },
-                    { "IsBoolean", "Is boolean" },
-                    { "IsNotBoolean", "Is not boolean" },
-                    { "IsNumber", "Is number" },
-                    { "IsNotNumber", "Is not number" },
-                    { "IsString", "Is string" },
-                    { "IsNotString", "Is not string" },
                     { "HasDatabaseNodeFieldNodes", "Has database node field nodes" },
                     { "HasNoDatabaseNodeFieldNodes", "Does not have database node field nodes" }
                 },
@@ -94,12 +88,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseNodeFields
             query = query
                 .Where(item => input.Filter.Contains("IsSearchable") ? item.IsSearchable : true)
                 .Where(item => input.Filter.Contains("IsNotSearchable") ? !item.IsSearchable : true)
-                .Where(item => input.Filter.Contains("IsBoolean") ? item.Type == DatabaseNodeFieldType.Boolean : true)
-                .Where(item => input.Filter.Contains("IsNotBoolean") ? item.Type != DatabaseNodeFieldType.Boolean : true)
-                .Where(item => input.Filter.Contains("IsNumber") ? item.Type == DatabaseNodeFieldType.Number : true)
-                .Where(item => input.Filter.Contains("IsNotNumber") ? item.Type != DatabaseNodeFieldType.Number : true)
-                .Where(item => input.Filter.Contains("IsString") ? item.Type == DatabaseNodeFieldType.String : true)
-                .Where(item => input.Filter.Contains("IsNotString") ? item.Type != DatabaseNodeFieldType.String : true)
                 .Where(item => input.Filter.Contains("HasDatabaseNodeFieldNodes") ? item.DatabaseNodeFieldNodes.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoDatabaseNodeFieldNodes") ? !item.DatabaseNodeFieldNodes.Any() : true);
             // Sort it according to the parameters.

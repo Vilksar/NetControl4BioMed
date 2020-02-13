@@ -350,9 +350,6 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");
 
@@ -417,9 +414,6 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");

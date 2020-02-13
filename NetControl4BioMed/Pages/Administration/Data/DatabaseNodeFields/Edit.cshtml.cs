@@ -44,10 +44,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseNodeFields
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public DatabaseNodeFieldType Type { get; set; }
-
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
             public bool IsSearchable { get; set; }
 
             [DataType(DataType.Text)]
@@ -106,7 +102,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseNodeFields
                 Name = View.DatabaseNodeField.Name,
                 Description = View.DatabaseNodeField.Description,
                 Url = View.DatabaseNodeField.Url,
-                Type = View.DatabaseNodeField.Type,
                 IsSearchable = View.DatabaseNodeField.IsSearchable,
                 DatabaseString = View.DatabaseNodeField.Database.Name
             };
@@ -193,7 +188,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.DatabaseNodeFields
             View.DatabaseNodeField.Name = Input.Name;
             View.DatabaseNodeField.Description = Input.Description;
             View.DatabaseNodeField.Url = Input.Url;
-            View.DatabaseNodeField.Type = Input.Type;
             View.DatabaseNodeField.IsSearchable = Input.IsSearchable;
             View.DatabaseNodeField.DatabaseId = database.Id;
             View.DatabaseNodeField.Database = database;
