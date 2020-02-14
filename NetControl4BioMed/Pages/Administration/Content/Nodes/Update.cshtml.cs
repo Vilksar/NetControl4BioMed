@@ -349,7 +349,10 @@ namespace NetControl4BioMed.Pages.Administration.Content.Nodes
                 await _context.SaveChangesAsync();
                 // Get the edges that contain the nodes.
                 var edges = _context.Edges
-                    .Where(item => item.EdgeNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
+                    .Where(item => item.EdgeNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)))
+                    .Include(item => item.EdgeNodes)
+                        .ThenInclude(item => item.Node)
+                    .AsEnumerable();
                 // Go over each edge.
                 foreach (var edge in edges)
                 {

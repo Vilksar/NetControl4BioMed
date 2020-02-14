@@ -10,8 +10,8 @@
 
 <div class="row align-items-center">
     <div class="col-lg-6 mb-3">
-        <a asp-page="/Administration/Content/Edges/Update" asp-route-id="@Model.View.Edge.Id" class="btn btn-primary btn-block" title="Update">
-            <span><i class="fas fa-code"></i></span>
+        <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Edit" asp-route-ids="@Model.View.Edge.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
             <span>Update</span>
         </a>
     </div>

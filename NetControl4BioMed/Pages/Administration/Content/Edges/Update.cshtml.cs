@@ -114,13 +114,19 @@ namespace NetControl4BioMed.Pages.Administration.Content.Edges
             // Get the database items based on the provided IDs.
             var edges = _context.Edges
                 .Where(item => !item.DatabaseEdges.Any(item => item.Database.DatabaseType.Name == "Generic"))
-                .Where(item => ids.Contains(item.Id));
+                .Where(item => ids.Contains(item.Id))
+                .Include(item => item.EdgeNodes)
+                    .ThenInclude(item => item.Node)
+                .Include(item => item.DatabaseEdges)
+                    .ThenInclude(item => item.Database)
+                .Include(item => item.DatabaseEdgeFieldEdges);
             // Get the items for the view.
             var items = edges.Select(item =>
                 new ItemModel
                 {
                     Id = item.Id,
                     Description = item.Description,
+                    DatabaseIds = item.DatabaseEdges.Select(item1 => item1.Database.Id),
                     Nodes = item.EdgeNodes.Select(item1 => new ItemModel.NodeModel { Id = item1.Node.Id, Type = item1.Type.ToString() }),
                     Fields = item.DatabaseEdgeFieldEdges.Select(item1 => new ItemModel.FieldModel { Key = item1.DatabaseEdgeField.Id, Value = item1.Value })
                 });
@@ -328,7 +334,7 @@ namespace NetControl4BioMed.Pages.Administration.Content.Edges
             {
                 // Keep only the valid items.
                 items = items
-                    .Where(item => !string.IsNullOrEmpty(item.Id) && item.Nodes != null && item.Nodes.Any());
+                    .Where(item => !string.IsNullOrEmpty(item.Id) && item.Nodes != null && item.Nodes.Any() && ((item.DatabaseIds != null && item.DatabaseIds.Any()) || (item.Fields != null && item.Fields.Any())));
                 // Check if there weren't any valid items found.
                 if (items == null || !items.Any())
                 {
@@ -343,8 +349,11 @@ namespace NetControl4BioMed.Pages.Administration.Content.Edges
                 var edges = _context.Edges
                     .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => itemIds.Contains(item.Id))
-                    .Include(item => item.DatabaseEdgeFieldEdges)
+                    .Include(item => item.EdgeNodes)
+                        .ThenInclude(item => item.Node)
                     .Include(item => item.DatabaseEdges)
+                        .ThenInclude(item => item.Database)
+                    .Include(item => item.DatabaseEdgeFieldEdges)
                     .AsEnumerable();
                 // Check if there weren't any edges found.
                 if (edges == null || !edges.Any())

@@ -83,7 +83,7 @@ namespace NetControl4BioMed.Pages.Administration.Content.NodeCollections
                     Id = item.Id,
                     Name = item.Name,
                     Description = item.Description,
-                    NodeIds = item.NodeCollectionNodes.Select(item1 => item1.Node.Name)
+                    NodeIds = item.NodeCollectionNodes.Select(item1 => item1.Node.Id)
                 });
             // Define the input.
             Input = new InputModel
