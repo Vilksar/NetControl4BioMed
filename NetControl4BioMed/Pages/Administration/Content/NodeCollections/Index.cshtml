@@ -9,10 +9,10 @@
 <form method="get" class="text-justify">
     <div class="row align-items-center">
         <div class="col-lg-6 mb-3">
-            <a asp-page="/Administration/Content/NodeCollections/Update" class="btn btn-primary btn-block" title="Update">
+            <button type="submit" asp-page="/Administration/Content/NodeCollections/Update" class="btn btn-primary btn-block item-group-button" title="Update" disabled>
                 <span><i class="fas fa-code"></i></span>
-                <span>Create, update or delete items</span>
-            </a>
+                <span>Create, edit or delete items</span>
+            </button>
         </div>
         <div class="col-lg-6 mb-3">
             <button type="submit" asp-page="/Administration/Content/NodeCollections/Delete" class="btn btn-danger btn-block item-group-button" title="Delete" disabled>
@@ -59,8 +59,8 @@
                     <tr class="item-group-item">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" id="@item.Id-checkbox" name="ids" value="@item.Id" class="custom-control-input" title="Select" />
-                                <label for="@item.Id-checkbox" class="custom-control-label"></label>
+                                <input type="checkbox" id="checkbox-@item.Id" name="ids" value="@item.Id" class="custom-control-input" title="Select" />
+                                <label for="checkbox-@item.Id" class="custom-control-label"></label>
                             </div>
                         </td>
                         <td class="text-left text-break">
@@ -86,7 +86,7 @@
                             <a asp-page="/Administration/Content/NodeCollections/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
                                 <span><i class="fas fa-info-circle"></i></span>
                             </a>
-                            <a asp-page="/Administration/Content/NodeCollections/Edit" asp-route-id="@item.Id" class="btn btn-warning m-1" title="Edit">
+                            <a asp-page="/Administration/Content/NodeCollections/Update" asp-route-type="Edit" asp-route-ids="@item.Id" class="btn btn-warning m-1" title="Edit">
                                 <span><i class="fas fa-pencil-alt"></i></span>
                             </a>
                             <a asp-page="/Administration/Content/NodeCollections/Delete" asp-route-ids="@item.Id" class="btn btn-danger m-1" title="Delete">

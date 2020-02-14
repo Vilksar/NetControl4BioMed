@@ -8,13 +8,7 @@
 <partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
 <form method="get" class="text-justify">
     <div class="row align-items-center">
-        <div class="col-lg-6 mb-3">
-            <a asp-page="/Content/Networks/Create" class="btn btn-success btn-block" title="Create">
-                <span><i class="fas fa-plus"></i></span>
-                <span>Add a new item</span>
-            </a>
-        </div>
-        <div class="col-lg-6 mb-3">
+        <div class="col-lg-12 mb-3">
             <button type="submit" asp-page="/Administration/Content/Networks/Delete" class="btn btn-danger btn-block item-group-button" title="Delete" disabled>
                 <span><i class="fas fa-trash"></i></span>
                 <span>Delete selected items</span>
@@ -25,7 +19,7 @@
     {
         <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>No items have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty). <a asp-page="/Content/Networks/Create" title="Create" class="alert-link">Create a new one?</a></span>
+            <span>No items have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
         </div>
     }
     else
@@ -62,8 +56,8 @@
                     <tr class="item-group-item">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" id="@item.Id-checkbox" name="ids" value="@item.Id" class="custom-control-input" title="Select" />
-                                <label for="@item.Id-checkbox" class="custom-control-label"></label>
+                                <input type="checkbox" id="checkbox-@item.Id" name="ids" value="@item.Id" class="custom-control-input" title="Select" />
+                                <label for="checkbox-@item.Id" class="custom-control-label"></label>
                             </div>
                         </td>
                         <td class="text-left text-break">
@@ -91,9 +85,6 @@
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Content/Networks/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
                                 <span><i class="fas fa-info-circle"></i></span>
-                            </a>
-                            <a asp-page="/Administration/Content/Networks/Edit" asp-route-id="@item.Id" class="btn btn-warning m-1" title="Edit">
-                                <span><i class="fas fa-pencil-alt"></i></span>
                             </a>
                             <a asp-page="/Administration/Content/Networks/Delete" asp-route-ids="@item.Id" class="btn btn-danger m-1" title="Delete">
                                 <span><i class="fas fa-trash"></i></span>

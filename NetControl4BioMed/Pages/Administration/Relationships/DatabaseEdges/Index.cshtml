@@ -8,22 +8,10 @@
 <partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
 <form method="get" class="text-justify">
     <div class="row align-items-center">
-        <div class="col-lg-4 mb-3">
-            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Create" class="btn btn-success btn-block" title="Create">
+        <div class="col-lg-12 mb-3">
+            <button type="submit" asp-page="/Administration/Content/Edges/Update" class="btn btn-primary btn-block item-group-button" title="Update" disabled>
                 <span><i class="fas fa-code"></i></span>
-                <span>Add new items</span>
-            </a>
-        </div>
-        <div class="col-lg-4 mb-3">
-            <button type="submit" asp-page="/Administration/Content/Edges/Update" asp-route-type="Edit" class="btn btn-warning btn-block item-group-button" title="Edit" disabled>
-                <span><i class="fas fa-pencil-alt"></i></span>
-                <span>Edit selected items</span>
-            </button>
-        </div>
-        <div class="col-lg-4 mb-3">
-            <button type="submit" asp-page="/Administration/Content/Edges/Update" asp-route-type="Delete" class="btn btn-danger btn-block item-group-button" title="Delete" disabled>
-                <span><i class="fas fa-trash"></i></span>
-                <span>Delete selected items</span>
+                <span>Edit or delete selected items</span>
             </button>
         </div>
     </div>
@@ -65,8 +53,8 @@
                     <tr class="item-group-item">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" id="@item.Database.Id-@item.Edge.Id-checkbox" name="ids" value="@item.Edge.Id" class="custom-control-input" title="Select" />
-                                <label for="@item.Database.Id-@item.Edge.Id-checkbox" class="custom-control-label"></label>
+                                <input type="checkbox" id="checkbox-@item.Database.Id-@item.Edge.Id" name="ids" value="@item.Edge.Id" class="custom-control-input" title="Select" />
+                                <label for="checkbox-@item.Database.Id-@item.Edge.Id" class="custom-control-label"></label>
                             </div>
                         </td>
                         <td class="text-left text-break">
