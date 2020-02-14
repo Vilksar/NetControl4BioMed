@@ -12,7 +12,7 @@
     <span><i class="fas fa-exclamation-circle"></i></span>
     @if (Model.View.IsCurrentUserSelected)
     {
-        <span>Your account are set to change. This will sign you out, in order for the changes to be properly applied.</span>
+        <span>Your account is set to change. This will sign you out, in order for the changes to be properly applied.</span>
     }
     <span>The following @Model.View.Items.Count() item@(Model.View.Items.Count() != 1 ? "s" : string.Empty) will be deleted, together with all of the associated data. <span class="font-weight-bold">This action can't be reversed!</span></span>
 </div>
@@ -65,7 +65,7 @@
                             <tr>
                                 <td class="text-center text-break" hidden>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="checkbox-1-@item.User.Id-@item.Role.Id" name="Input.UserEmails" value="@item.User.Id" class="custom-control-input" title="Select" checked="checked" />
+                                        <input type="checkbox" id="checkbox-1-@item.User.Id-@item.Role.Id" name="Input.UserIds" value="@item.User.Id" class="custom-control-input" title="Select" checked="checked" />
                                         <label for="checkbox-1-@item.User.Id-@item.Role.Id" class="custom-control-label"></label>
                                     </div>
                                     <div class="custom-control custom-checkbox">
