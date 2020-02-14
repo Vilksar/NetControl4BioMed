@@ -53,12 +53,18 @@ $(window).on('load', () => {
         const updateSelectedItems = (groupElement) => {
             // Get all of the list group items.
             const items = $(groupElement).find('.item-group-item');
-            // Remove the active class from all list items.
-            $(items).removeClass('table-active');
             // Go over all of the checked elements and get the corresponding list group items.
-            const selectedItems = $(groupElement).find('input[type="checkbox"]:checked').closest('.item-group-item');
-            // Go over each of the selected items and mark them as active.
+            const selectedItems = $(groupElement).find('.item-group-item-checkbox:checked').closest('.item-group-item');
+            // Go over all of the unchecked elements and get the corresponding list group items.
+            const unselectedItems = $(groupElement).find('.item-group-item-checkbox:not(:checked)').closest('.item-group-item');
+            // Go over all of the selected items and check all of the checkboxes.
+            $(selectedItems).find('input[type="checkbox"]:not(:checked)').prop('checked', true);
+            // Go over all of the unselected items and uncheck all of the checkboxes.
+            $(unselectedItems).find('input[type="checkbox"]:checked').prop('checked', false);
+            // Go over all of the selected items and mark them as active.
             $(selectedItems).addClass('table-active');
+            // Go over all of the unselected items and mark them as not active.
+            $(unselectedItems).removeClass('table-active');
             // Check how many elements are selected.
             if (selectedItems.length === 0) {
                 // Disable the group buttons.
@@ -83,7 +89,7 @@ $(window).on('load', () => {
             }
         };
         // Add a listener for when a checkbox gets checked or unchecked.
-        $('.item-group').on('change', 'input[type="checkbox"]', (event) => {
+        $('.item-group').on('change', '.item-group-item-checkbox', (event) => {
             // Get the current list group.
             const groupElement = $(event.target).closest('.item-group');
             // Update the selected items.
@@ -96,10 +102,10 @@ $(window).on('load', () => {
             // Check if the checkbox is currently checked.
             if ($(event.target).prop('checked')) {
                 // Check all of the checkboxes on the page.
-                $(groupElement).find('input[type="checkbox"]:not(:checked)').prop('checked', true);
+                $(groupElement).find('.item-group-item-checkbox').prop('checked', true);
             } else {
                 // Uncheck all of the checkboxes on the page.
-                $(groupElement).find('input[type="checkbox"]:checked').prop('checked', false);
+                $(groupElement).find('.item-group-item-checkbox').prop('checked', false);
             }
             // Update the selected items.
             updateSelectedItems(groupElement);
@@ -113,7 +119,6 @@ $(window).on('load', () => {
             });
         })();
     }
-
 
     // Check if there is a file group on the page.
     if ($('.file-group').length !== 0) {

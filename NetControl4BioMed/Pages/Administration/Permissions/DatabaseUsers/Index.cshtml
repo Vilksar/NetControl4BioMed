@@ -56,10 +56,14 @@
                     <tr class="item-group-item">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
+                                <input type="checkbox" id="checkbox-@item.User.Id-@item.Database.Id" class="custom-control-input item-group-item-checkbox" title="Select" />
+                                <label for="checkbox-@item.User.Id-@item.Database.Id" class="custom-control-label"></label>
+                            </div>
+                            <div class="custom-control custom-checkbox" hidden>
                                 <input type="checkbox" id="checkbox-1-@item.User.Id-@item.Database.Id" name="userIds" value="@item.User.Id" class="custom-control-input" title="Select" />
                                 <label for="checkbox-1-@item.User.Id-@item.Database.Id" class="custom-control-label"></label>
                             </div>
-                            <div class="custom-control custom-checkbox">
+                            <div class="custom-control custom-checkbox" hidden>
                                 <input type="checkbox" id="checkbox-2-@item.User.Id-@item.Database.Id" name="databaseIds" value="@item.Database.Id" class="custom-control-input" title="Select" />
                                 <label for="checkbox-2-@item.User.Id-@item.Database.Id" class="custom-control-label"></label>
                             </div>
