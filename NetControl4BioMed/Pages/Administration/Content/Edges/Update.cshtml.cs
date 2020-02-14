@@ -519,7 +519,7 @@ namespace NetControl4BioMed.Pages.Administration.Content.Edges
             // Display a message.
             TempData["StatusMessage"] = $"Success: {itemCount.ToString()} item{(itemCount != 1 ? "s" : string.Empty)} of type \"{Input.Type}\" updated successfully.";
             // Redirect to the index page.
-            return RedirectToPage("/Administration/Content/Nodes/Index");
+            return RedirectToPage("/Administration/Content/Edges/Index");
         }
     }
 }
