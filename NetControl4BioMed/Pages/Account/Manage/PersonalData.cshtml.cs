@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Mime;
 using System.Text;
@@ -53,17 +54,20 @@ namespace NetControl4BioMed.Pages.Account.Manage
             }
             // Define the personal data dictionary and include all of the defined properties.
             var personalData = new Dictionary<string, string>();
-            var personalDataProps = typeof(User).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute)));
             // Iterate over the personal data properties.
-            foreach (var property in personalDataProps)
+            foreach (var property in user.GetType().GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute))))
             {
                 // Add to the personal data dictionary the name and value (if it exists).
-                personalData.Add(property.Name, property.GetValue(user)?.ToString() ?? "null");
+                personalData.Add(property.Name, property.GetValue(user)?.ToString());
             }
-            // Add to the response header the information about the attachment and the file to be downloaded.
-            Response.Headers.Add("Content-Disposition", "attachment; filename=PersonalData.json");
-            // Return a new JSON file from the personal data dictionary.
-            return File(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(personalData, new JsonSerializerOptions { WriteIndented = true })), MediaTypeNames.Application.Octet, "PersonalData.json");
+            // Define a new memory stream.
+            var stream = new MemoryStream();
+            // Serialize the personal data to the stream.
+            await JsonSerializer.SerializeAsync(stream, personalData, new JsonSerializerOptions { WriteIndented = true });
+            // Reset the stream position.
+            stream.Position = 0;
+            // Return a new JSON file.
+            return new FileStreamResult(stream, MediaTypeNames.Application.Json) { FileDownloadName = $"PersonalData.json" };
         }
     }
 }

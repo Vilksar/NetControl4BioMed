@@ -163,6 +163,14 @@ namespace NetControl4BioMed.Pages.Administration.Content.Edges
                 // Redisplay the page.
                 return Page();
             }
+            // Check if any of the items has any null values.
+            if (items.Any(item => item.Id == null || item.Description == null || item.DatabaseIds == null || item.Nodes == null || item.Nodes.Any(item1 => item1.Id == null || item1.Type == null) || item.Fields == null || item.Fields.Any(item1 => item1.Key == null || item1.Value == null)))
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The provided JSON data can't contain any \"null\" values. Please replace them, eventually with an empty string.");
+                // Redisplay the page.
+                return Page();
+            }
             // Save the number of items.
             var itemCount = 0;
             // Check if the items should be created.
