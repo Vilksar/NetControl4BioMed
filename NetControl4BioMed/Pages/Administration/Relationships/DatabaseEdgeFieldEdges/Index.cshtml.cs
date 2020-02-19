@@ -49,7 +49,8 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseEdgeField
                     { "SourceNodeId", "Source node ID" },
                     { "SourceNodeName", "Source node name" },
                     { "TargetNodeId", "Target node ID" },
-                    { "TargetNodeName", "Target node name" }
+                    { "TargetNodeName", "Target node name" },
+                    { "Value", "Value" }
                 },
                 Filter = new Dictionary<string, string>
                 {
@@ -67,7 +68,8 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseEdgeField
                     { "SourceNodeId", "Source node ID" },
                     { "SourceNodeName", "Source node name" },
                     { "TargetNodeId", "Target node ID" },
-                    { "TargetNodeName", "Target node name" }
+                    { "TargetNodeName", "Target node name" },
+                    { "Value", "Value" }
                 }
             };
             // Define the search input.
@@ -94,7 +96,8 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseEdgeField
                     input.SearchIn.Contains("SourceNodeId") && item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("SourceNodeName") && item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("TargetNodeId") && item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("TargetNodeName") && item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name.Contains(input.SearchString));
+                    input.SearchIn.Contains("TargetNodeName") && item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name.Contains(input.SearchString) ||
+                    input.SearchIn.Contains("Value") && item.Value.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
                 .Where(item => input.Filter.Contains("IsDatabasePublic") ? item.DatabaseEdgeField.Database.IsPublic : true)
@@ -161,6 +164,12 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseEdgeField
                     break;
                 case var sort when sort == ("TargetNodeName", "Descending"):
                     query = query.OrderByDescending(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name);
+                    break;
+                case var sort when sort == ("Value", "Ascending"):
+                    query = query.OrderBy(item => item.Value);
+                    break;
+                case var sort when sort == ("Value", "Descending"):
+                    query = query.OrderByDescending(item => item.Value);
                     break;
                 default:
                     break;

@@ -44,7 +44,8 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseNodeField
                     { "DatabaseNodeFieldId", "Database node field ID" },
                     { "DatabaseNodeFieldName", "Database node field name" },
                     { "NodeId", "Node ID" },
-                    { "NodeName", "Node name" }
+                    { "NodeName", "Node name" },
+                    { "Value", "Value" }
                 },
                 Filter = new Dictionary<string, string>
                 {
@@ -60,7 +61,8 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseNodeField
                     { "DatabaseNodeFieldId", "Database node field ID" },
                     { "DatabaseNodeFieldName", "Database node field name" },
                     { "NodeId", "Node ID" },
-                    { "NodeName", "NodeName" }
+                    { "NodeName", "NodeName" },
+                    { "Value", "Value" }
                 }
             };
             // Define the search input.
@@ -83,7 +85,8 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseNodeField
                     input.SearchIn.Contains("DatabaseNodeFieldId") && item.DatabaseNodeField.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseNodeFieldName") && item.DatabaseNodeField.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("NodeId") && item.Node.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("NodeName") && item.Node.Name.Contains(input.SearchString));
+                    input.SearchIn.Contains("NodeName") && item.Node.Name.Contains(input.SearchString) ||
+                    input.SearchIn.Contains("Value") && item.Value.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
                 .Where(item => input.Filter.Contains("IsDatabasePublic") ? item.DatabaseNodeField.Database.IsPublic : true)
@@ -128,6 +131,12 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseNodeField
                     break;
                 case var sort when sort == ("NodeName", "Descending"):
                     query = query.OrderByDescending(item => item.Node.Name);
+                    break;
+                case var sort when sort == ("Value", "Ascending"):
+                    query = query.OrderBy(item => item.Value);
+                    break;
+                case var sort when sort == ("Value", "Descending"):
+                    query = query.OrderByDescending(item => item.Value);
                     break;
                 default:
                     break;
