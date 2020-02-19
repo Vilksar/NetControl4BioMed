@@ -92,10 +92,7 @@ namespace NetControl4BioMed.Pages.Content.Edges
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
                     input.SearchIn.Contains("SourceNode") && item.EdgeNodes.Any(item1 => item1.Type == EdgeNodeType.Source && (item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Any(item2 => item2.DatabaseNodeField.IsSearchable && item2.Value.Contains(input.SearchString)))) ||
                     input.SearchIn.Contains("TargetNode") && item.EdgeNodes.Any(item1 => item1.Type == EdgeNodeType.Target && (item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Any(item2 => item2.DatabaseNodeField.IsSearchable && item2.Value.Contains(input.SearchString)))) ||
-                    input.SearchIn.Contains("Values") && item.DatabaseEdgeFieldEdges.Any(item1 => item1.Value.Contains(input.SearchString)));
-            // Select the results matching the filter parameter.
-            query = query
-                .Where(item => true);
+                    input.SearchIn.Contains("Values") && item.DatabaseEdgeFieldEdges.Where(item1 => item1.DatabaseEdgeField.Database.IsPublic || item1.DatabaseEdgeField.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Value.Contains(input.SearchString)));
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {

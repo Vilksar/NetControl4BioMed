@@ -95,8 +95,10 @@ namespace NetControl4BioMed.Pages.Content.Nodes
             View = new ViewModel
             {
                 Node = item,
-                DatabaseNodes = item.DatabaseNodes,
-                DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes,
+                DatabaseNodes = item.DatabaseNodes
+                    .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user)),
+                DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes
+                    .Where(item => item.DatabaseNodeField.Database.IsPublic || item.DatabaseNodeField.Database.DatabaseUsers.Any(item1 => item1.User == user)),
                 EdgeNodes = item.EdgeNodes
                     .Where(item => !item.Edge.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => item.Edge.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),

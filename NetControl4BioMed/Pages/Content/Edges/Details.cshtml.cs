@@ -73,6 +73,11 @@ namespace NetControl4BioMed.Pages.Content.Edges
                         .ThenInclude(item => item.DatabaseNodes)
                             .ThenInclude(item => item.Database)
                                 .ThenInclude(item => item.DatabaseType)
+                .Include(item => item.EdgeNodes)
+                    .ThenInclude(item => item.Node)
+                        .ThenInclude(item => item.DatabaseNodes)
+                            .ThenInclude(item => item.Database)
+                                .ThenInclude(item => item.DatabaseUsers)
                 .FirstOrDefault();
             // Check if there was no item found.
             if (item == null)
@@ -92,6 +97,7 @@ namespace NetControl4BioMed.Pages.Content.Edges
                     .Where(item => item.DatabaseEdgeField.Database.IsPublic || item.DatabaseEdgeField.Database.DatabaseUsers.Any(item1 => item1.User == user)),
                 EdgeNodes = item.EdgeNodes
                     .Where(item => !item.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Where(item => item.Node.DatabaseNodes.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
             };
             // Return the page.
             return Page();

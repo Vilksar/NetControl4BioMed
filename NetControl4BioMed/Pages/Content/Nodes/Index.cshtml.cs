@@ -81,6 +81,7 @@ namespace NetControl4BioMed.Pages.Content.Nodes
             // Start with all of the items to which the user has access.
             var query = _context.Nodes
                 .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Where(item => item.DatabaseNodes.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                 .AsQueryable();
             // Select the results matching the search string.
             query = query
@@ -88,7 +89,7 @@ namespace NetControl4BioMed.Pages.Content.Nodes
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Values") && item.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.IsSearchable && item1.Value.Contains(input.SearchString)));
+                    input.SearchIn.Contains("Values") && item.DatabaseNodeFieldNodes.Where(item1 => item1.DatabaseNodeField.Database.IsPublic || item1.DatabaseNodeField.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Value.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
                 .Where(item => input.Filter.Contains("HasNodeCollectionNodes") ? item.NodeCollectionNodes.Any() : true)
