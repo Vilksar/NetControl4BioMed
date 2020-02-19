@@ -15,12 +15,10 @@ namespace NetControl4BioMed.Pages.Account
     public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
-        private readonly ApplicationDbContext _context;
 
-        public IndexModel(UserManager<User> userManager, ApplicationDbContext context)
+        public IndexModel(UserManager<User> userManager)
         {
             _userManager = userManager;
-            _context = context;
         }
 
         public ViewModel View { get; set; }
@@ -28,10 +26,6 @@ namespace NetControl4BioMed.Pages.Account
         public class ViewModel
         {
             public User User { get; set; }
-
-            public int NetworkCount { get; set; }
-
-            public int AnalysisCount { get; set; }
 
             public string AnnouncementMessage { get; set; }
         }
@@ -48,14 +42,10 @@ namespace NetControl4BioMed.Pages.Account
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }
-            // Get the current date and time.
-            var dateTimeNow = DateTime.Now;
             // Define the view.
             View = new ViewModel
             {
-                User = user,
-                NetworkCount = _context.Networks.Count(item => item.NetworkUsers.Any(item1 => item1.User == user)),
-                AnalysisCount = _context.Analyses.Count(item => item.AnalysisUsers.Any(item1 => item1.User == user))
+                User = user
             };
             // Check for any announcements.
             View.AnnouncementMessage = null;
