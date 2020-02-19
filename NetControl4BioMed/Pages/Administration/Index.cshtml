@@ -5,4 +5,369 @@
     ViewData["ActivePage"] = "Index";
 }
 
-Administration overview
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Accounts/Users/Index" class="btn btn-info btn-block text-white py-lg-3" title="Users">
+            <span class="d-flex flex-column flex-lg-row align-items-center justify-content-around">
+                <span class="my-1 my-lg-0"><i class="fas fa-user fa-2x"></i></span>
+                <span class="d-flex flex-column align-items-center align-items-lg-start my-1 my-lg-0">
+                    <span class="font-weight-bold">@Model.View.UserCount</span>
+                    <span class="small">User@(Model.View.UserCount != 1 ? "s" : string.Empty)</span>
+                </span>
+            </span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Accounts/Roles/Index" class="btn btn-info btn-block text-white py-lg-3" title="Roles">
+            <span class="d-flex flex-column flex-lg-row align-items-center justify-content-around">
+                <span class="my-1 my-lg-0"><i class="fas fa-tag fa-2x"></i></span>
+                <span class="d-flex flex-column align-items-center align-items-lg-start my-1 my-lg-0">
+                    <span class="font-weight-bold">@Model.View.RoleCount</span>
+                    <span class="small">Role@(Model.View.RoleCount != 1 ? "s" : string.Empty)</span>
+                </span>
+            </span>
+        </a>
+    </div>
+</div>
+<div class="row align-items-center">
+    <div class="col-lg-3 mb-3">
+        <a asp-page="/Administration/Data/Databases/Index" class="btn btn-primary btn-block text-white py-lg-3" title="Databases">
+            <span class="d-flex flex-column flex-lg-row align-items-center justify-content-around">
+                <span class="my-1 my-lg-0"><i class="fas fa-database fa-2x"></i></span>
+                <span class="d-flex flex-column align-items-center align-items-lg-start my-1 my-lg-0">
+                    <span class="font-weight-bold">@Model.View.DatabaseCount</span>
+                    <span class="small">Database@(Model.View.DatabaseCount != 1 ? "s" : string.Empty)</span>
+                </span>
+            </span>
+        </a>
+    </div>
+    <div class="col-lg-3 mb-3">
+        <a asp-page="/Administration/Content/Nodes/Index" class="btn btn-success btn-block text-white py-lg-3" title="Nodes">
+            <span class="d-flex flex-column flex-lg-row align-items-center justify-content-around">
+                <span class="my-1 my-lg-0"><i class="fas fa-circle fa-2x"></i></span>
+                <span class="d-flex flex-column align-items-center align-items-lg-start my-1 my-lg-0">
+                    <span class="font-weight-bold">@Model.View.NodeCount</span>
+                    <span class="small">Node@(Model.View.NodeCount != 1 ? "s" : string.Empty)</span>
+                </span>
+            </span>
+        </a>
+    </div>
+    <div class="col-lg-3 mb-3">
+        <a asp-page="/Administration/Content/Edges/Index" class="btn btn-success btn-block text-white py-lg-3" title="Edges">
+            <span class="d-flex flex-column flex-lg-row align-items-center justify-content-around">
+                <span class="my-1 my-lg-0"><i class="fas fa-arrow-right fa-2x"></i></span>
+                <span class="d-flex flex-column align-items-center align-items-lg-start my-1 my-lg-0">
+                    <span class="font-weight-bold">@Model.View.EdgeCount</span>
+                    <span class="small">Edge@(Model.View.EdgeCount != 1 ? "s" : string.Empty)</span>
+                </span>
+            </span>
+        </a>
+    </div>
+    <div class="col-lg-3 mb-3">
+        <a asp-page="/Administration/Content/NodeCollections/Index" class="btn btn-primary btn-block text-white py-lg-3" title="Node collections">
+            <span class="d-flex flex-column flex-lg-row align-items-center justify-content-around">
+                <span class="my-1 my-lg-0"><i class="fas fa-folder fa-2x"></i></span>
+                <span class="d-flex flex-column align-items-center align-items-lg-start my-1 my-lg-0">
+                    <span class="font-weight-bold">@Model.View.NodeCollectionCount</span>
+                    <span class="small">Collection@(Model.View.NodeCollectionCount != 1 ? "s" : string.Empty)</span>
+                </span>
+            </span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-exclamation-circle"></i></span>
+            </div>
+            <div>
+                <span>Issues</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (!Model.View.IssueDetected)
+        {
+            <div class="alert alert-success text-justify text-wrap mb-0">
+                <span><i class="fas fa-check-circle"></i></span>
+                <span>There are no issues that currently require your attention. The data seems to be alright!</span>
+            </div>
+        }
+        else
+        {
+            @if (Model.View.DuplicateDatabaseTypes.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are several database types with the same name. The duplicate names are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.DuplicateDatabaseTypes)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Data/DatabaseTypes/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
+                                    <span>@item</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.View.DuplicateDatabases.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are several databases with the same name. The duplicate names are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.DuplicateDatabases)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Data/Databases/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
+                                    <span>@item</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.View.DuplicateDatabaseNodeFields.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are several database node fields with the same name. The duplicate names are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.DuplicateDatabaseNodeFields)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Data/DatabaseNodeFields/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
+                                    <span>@item</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.View.DuplicateDatabaseEdgeFields.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are several database edge fields with the same name. The duplicate names are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.DuplicateDatabaseEdgeFields)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Data/DatabaseEdgeFields/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
+                                    <span>@item</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.View.DuplicateDatabaseNodeFieldNodes.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are several database node field nodes with the same value. The duplicate values are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.DuplicateDatabaseNodeFieldNodes)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Relationships/DatabaseNodeFieldNodes/Index" asp-route-searchString="@item" asp-route-searchIn="Value" class="alert-link">
+                                    <span>@item</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.View.DuplicateNodes.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are several nodes with the same name. The duplicate names are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.DuplicateNodes)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Content/Nodes/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
+                                    <span>@item</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.View.DuplicateEdges.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are several edges with the same name. The duplicate names are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.DuplicateEdges)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Content/Edges/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
+                                    <span>@item</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.View.DuplicateNodeCollections.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are several node collections with the same name. The duplicate names are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.DuplicateNodeCollections)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Content/NodeCollections/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
+                                    <span>@item</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.View.OrphanedNodes.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are orphaned nodes in the database. They are are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.OrphanedNodes)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Content/Nodes/Details" asp-route-id="@item" class="alert-link">
+                                    <span>@item.Name</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.View.OrphanedEdges.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are orphaned edges in the database. They are are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.OrphanedEdges)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Content/Edges/Details" asp-route-id="@item" class="alert-link">
+                                    <span>@item.Name</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.View.OrphanedNodeCollections.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are orphaned node collections in the database. They are are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.OrphanedNodeCollections)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Content/NodeCollections/Details" asp-route-id="@item" class="alert-link">
+                                    <span>@item.Name</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.View.OrphanedNetworks.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are orphaned networks in the database. They are are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.OrphanedNetworks)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Content/Networks/Details" asp-route-id="@item" class="alert-link">
+                                    <span>@item.Name</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.View.OrphanedAnalyses.Any())
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span>There are orphaned analyses in the database. They are are listed below.</span>
+                    <ul>
+                        @foreach (var item in Model.View.OrphanedAnalyses)
+                        {
+                            <li>
+                                <a asp-page="/Administration/Content/Analysis/Details" asp-route-id="@item" class="alert-link">
+                                    <span>@item.Name</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            <a asp-page="/Administration/Index" class="btn btn-danger">
+                <span>Refresh the page</span>
+            </a>
+        }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-fire"></i></span>
+            </div>
+            <div>
+                <span>Hangfire</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>This application uses Hangfire to manage the background tasks. You can access the corresponding dashboard by clicking on the button below.</span>
+        </div>
+        <form method="post" asp-page-handler="Hangfire" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <button type="submit" title="Open Hangfire dashboard" class="btn btn-info btn-block">
+                <span>Open Hangfire dashboard</span>
+            </button>
+        </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-download"></i></span>
+            </div>
+            <div>
+                <span>Download</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-primary text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>You can download all of the data used by the application (namely the database types, databases, database fields, nodes and edges) by clicking on the button below.</span>
+        </div>
+        <form method="post" asp-page-handler="Download" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <button type="submit" title="Open Hangfire dashboard" class="btn btn-primary btn-block">
+                <span>Download</span>
+            </button>
+        </form>
+    </div>
+</div>
