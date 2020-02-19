@@ -1,0 +1,96 @@
+﻿@using Helpers.ViewModels
+@{
+    Layout = "/Pages/_Layout.cshtml";
+    var _color = "success";
+    var navigationBanner = new NavigationBannerViewModel
+    {
+        Id = "Content",
+        Title = "Content",
+        Icon = "fa-box-open",
+        Color = _color
+    };
+    var navigationArea = new NavigationAreaViewModel
+    {
+        Id = "Content",
+        Title = "Content",
+        Description = string.Empty,
+        Icon = "fa-box-open",
+        Color = _color,
+        Groups = new List<NavigationGroupViewModel>
+        {
+            new NavigationGroupViewModel
+            {
+                Id = "Index",
+                Title = "Overview",
+                Description = string.Empty,
+                Icon = "fa-chart-bar",
+                Color = _color,
+                Link = "/Content/Index"
+            },
+            new NavigationGroupViewModel
+            {
+                Id = "Nodes",
+                Title = "Nodes",
+                Description = string.Empty,
+                Icon = "fa-circle",
+                Color = _color,
+                Link = "/Content/Nodes/Index"
+            },
+            new NavigationGroupViewModel
+            {
+                Id = "Edges",
+                Title = "Edges",
+                Description = string.Empty,
+                Icon = "fa-arrow-right",
+                Color = _color,
+                Link = "/Content/Edges/Index"
+            },
+            new NavigationGroupViewModel
+            {
+                Id = "NodeCollections",
+                Title = "NodeCollections",
+                Description = string.Empty,
+                Icon = "fa-folder",
+                Color = _color,
+                Link = "/Content/NodeCollections/Index"
+            },
+            new NavigationGroupViewModel
+            {
+                Id = "Networks",
+                Title = "Networks",
+                Description = string.Empty,
+                Icon = "fa-share-alt",
+                Color = _color,
+                Link = "/Content/Networks/Index"
+            },
+            new NavigationGroupViewModel
+            {
+                Id = "Analyses",
+                Title = "Analyses",
+                Description = string.Empty,
+                Icon = "fa-desktop",
+                Color = _color,
+                Link = "/Content/Analyses/Index"
+            }
+        }
+    };
+}
+
+@section Banner {
+    <partial name="_NavigationBannerPartial" model="@navigationBanner" />
+}
+
+@section Breadcrumbs {
+    <a asp-page="/Content/Index" class="breadcrumb-item"><span>Content</span></a>
+    @RenderSection("Breadcrumbs", required: false)
+}
+
+@section Navigation {
+    <partial name="_NavigationAreaPartial" model="@navigationArea" />
+}
+
+@RenderBody()
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}
