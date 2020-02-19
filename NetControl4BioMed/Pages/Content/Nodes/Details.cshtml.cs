@@ -30,11 +30,13 @@ namespace NetControl4BioMed.Pages.Content.Nodes
         {
             public Node Node { get; set; }
 
+            public IEnumerable<DatabaseNode> DatabaseNodes { get; set; }
+
             public IEnumerable<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }
 
-            public IEnumerable<Edge> Edges { get; set; }
+            public IEnumerable<EdgeNode> EdgeNodes { get; set; }
 
-            public IEnumerable<NodeCollection> NodeCollections { get; set; }
+            public IEnumerable<NodeCollectionNode> NodeCollectionNodes { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -61,14 +63,23 @@ namespace NetControl4BioMed.Pages.Content.Nodes
             var item = _context.Nodes
                 .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                 .Where(item => item.Id == id)
+                .Include(item => item.DatabaseNodes)
+                    .ThenInclude(item => item.Database)
+                        .ThenInclude(item => item.DatabaseUsers)
                 .Include(item => item.DatabaseNodeFieldNodes)
                     .ThenInclude(item => item.DatabaseNodeField)
                         .ThenInclude(item => item.Database)
+                            .ThenInclude(item => item.DatabaseUsers)
                 .Include(item => item.EdgeNodes)
                     .ThenInclude(item => item.Edge)
                         .ThenInclude(item => item.DatabaseEdges)
                             .ThenInclude(item => item.Database)
                                 .ThenInclude(item => item.DatabaseUsers)
+                .Include(item => item.EdgeNodes)
+                    .ThenInclude(item => item.Edge)
+                        .ThenInclude(item => item.DatabaseEdges)
+                            .ThenInclude(item => item.Database)
+                                .ThenInclude(item => item.DatabaseType)
                 .Include(item => item.NodeCollectionNodes)
                     .ThenInclude(item => item.NodeCollection)
                 .FirstOrDefault();
@@ -84,15 +95,12 @@ namespace NetControl4BioMed.Pages.Content.Nodes
             View = new ViewModel
             {
                 Node = item,
+                DatabaseNodes = item.DatabaseNodes,
                 DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes,
-                Edges = item.EdgeNodes
-                    .Select(item => item.Edge)
-                    .Distinct()
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
-                NodeCollections = item.NodeCollectionNodes
-                    .Select(item => item.NodeCollection)
-                    .Distinct()
+                EdgeNodes = item.EdgeNodes
+                    .Where(item => !item.Edge.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Where(item => item.Edge.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
+                NodeCollectionNodes = item.NodeCollectionNodes
             };
             // Return the page.
             return Page();
