@@ -160,6 +160,11 @@ namespace NetControl4BioMed.Data
         public DbSet<NodeCollection> NodeCollections { get; set; }
 
         /// <summary>
+        /// Gets or sets the database table containing the one-to-one relationship between databases and node collections.
+        /// </summary>
+        public DbSet<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }
+
+        /// <summary>
         /// Gets or sets the database table containing the one-to-one relationship between node collections and nodes.
         /// </summary>
         public DbSet<NodeCollectionNode> NodeCollectionNodes { get; set; }
@@ -487,6 +492,18 @@ namespace NetControl4BioMed.Data
             {
                 entity.Property(item => item.Id)
                     .ValueGeneratedOnAdd();
+            });
+            modelBuilder.Entity<NodeCollectionDatabase>(entity =>
+            {
+                entity.HasKey(item => new { item.NodeCollectionId, item.DatabaseId });
+                entity.HasOne(item => item.NodeCollection)
+                    .WithMany(item => item.NodeCollectionDatabases)
+                    .HasForeignKey(item => item.NodeCollectionId)
+                    .IsRequired();
+                entity.HasOne(item => item.Database)
+                    .WithMany(item => item.NodeCollectionDatabases)
+                    .HasForeignKey(item => item.DatabaseId)
+                    .IsRequired();
             });
             modelBuilder.Entity<NodeCollectionNode>(entity =>
             {

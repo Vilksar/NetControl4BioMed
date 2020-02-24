@@ -81,6 +81,11 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<DatabaseEdge> DatabaseEdges { get; set; }
 
         /// <summary>
+        /// Gets or sets the node collections which use the database.
+        /// </summary>
+        public ICollection<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }
+
+        /// <summary>
         /// Gets or sets the networks which use the database.
         /// </summary>
         public ICollection<NetworkDatabase> NetworkDatabases { get; set; }

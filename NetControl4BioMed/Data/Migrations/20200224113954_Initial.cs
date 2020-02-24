@@ -801,6 +801,30 @@ namespace NetControl4BioMed.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "NodeCollectionDatabases",
+                columns: table => new
+                {
+                    NodeCollectionId = table.Column<string>(nullable: false),
+                    DatabaseId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NodeCollectionDatabases", x => new { x.NodeCollectionId, x.DatabaseId });
+                    table.ForeignKey(
+                        name: "FK_NodeCollectionDatabases_Databases_DatabaseId",
+                        column: x => x.DatabaseId,
+                        principalTable: "Databases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_NodeCollectionDatabases_NodeCollections_NodeCollectionId",
+                        column: x => x.NodeCollectionId,
+                        principalTable: "NodeCollections",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PathEdges",
                 columns: table => new
                 {
@@ -1044,6 +1068,11 @@ namespace NetControl4BioMed.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_NodeCollectionDatabases_DatabaseId",
+                table: "NodeCollectionDatabases",
+                column: "DatabaseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_NodeCollectionNodes_NodeId",
                 table: "NodeCollectionNodes",
                 column: "NodeId");
@@ -1140,6 +1169,9 @@ namespace NetControl4BioMed.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "NetworkUsers");
+
+            migrationBuilder.DropTable(
+                name: "NodeCollectionDatabases");
 
             migrationBuilder.DropTable(
                 name: "NodeCollectionNodes");
