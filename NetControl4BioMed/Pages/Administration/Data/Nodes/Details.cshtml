@@ -75,11 +75,9 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <a asp-page="/Administration/Relationships/DatabaseNodes/Index" asp-route-searchString="@Model.View.Node.Id" asp-route-searchIn="NodeId" class="btn btn-info btn-block">
-                <span>View all</span>
-            </a>
-        </div>
+        <a asp-page="/Administration/Relationships/DatabaseNodes/Index" asp-route-searchString="@Model.View.Node.Id" asp-route-searchIn="NodeId" class="btn btn-info btn-block mb-3">
+            <span>View all</span>
+        </a>
         @if (!Model.View.Node.DatabaseNodes.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
@@ -142,11 +140,9 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <a asp-page="/Administration/Relationships/DatabaseNodeFieldNodes/Index" asp-route-searchString="@Model.View.Node.Id" asp-route-searchIn="NodeId" class="btn btn-info btn-block">
-                <span>View all</span>
-            </a>
-        </div>
+        <a asp-page="/Administration/Relationships/DatabaseNodeFieldNodes/Index" asp-route-searchString="@Model.View.Node.Id" asp-route-searchIn="NodeId" class="btn btn-info btn-block mb-3">
+            <span>View all</span>
+        </a>
         @if (!Model.View.Node.DatabaseNodeFieldNodes.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
@@ -215,11 +211,9 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <a asp-page="/Administration/Relationships/EdgeNodes/Index" asp-route-searchString="@Model.View.Node.Id" asp-route-searchIn="NodeId" class="btn btn-info btn-block">
-                <span>View all</span>
-            </a>
-        </div>
+        <a asp-page="/Administration/Relationships/EdgeNodes/Index" asp-route-searchString="@Model.View.Node.Id" asp-route-searchIn="NodeId" class="btn btn-info btn-block mb-3">
+            <span>View all</span>
+        </a>
         @if (!Model.View.Node.EdgeNodes.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
@@ -336,11 +330,9 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <a asp-page="/Administration/Relationships/NodeCollectionNodes/Index" asp-route-searchString="@Model.View.Node.Id" asp-route-searchIn="NodeId" class="btn btn-info btn-block">
-                <span>View all</span>
-            </a>
-        </div>
+        <a asp-page="/Administration/Relationships/NodeCollectionNodes/Index" asp-route-searchString="@Model.View.Node.Id" asp-route-searchIn="NodeId" class="btn btn-info btn-block mb-3">
+            <span>View all</span>
+        </a>
         @if (!Model.View.Node.NodeCollectionNodes.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">

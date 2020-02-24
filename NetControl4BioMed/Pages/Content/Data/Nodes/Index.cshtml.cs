@@ -60,8 +60,6 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "HasNodeCollectionNodes", "Appears in node collections" },
-                    { "HasNoNodeCollectionNodes", "Does not appear in node collections" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -90,10 +88,6 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Values") && item.DatabaseNodeFieldNodes.Where(item1 => item1.DatabaseNodeField.Database.IsPublic || item1.DatabaseNodeField.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Value.Contains(input.SearchString)));
-            // Select the results matching the filter parameter.
-            query = query
-                .Where(item => input.Filter.Contains("HasNodeCollectionNodes") ? item.NodeCollectionNodes.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoNodeCollectionNodes") ? !item.NodeCollectionNodes.Any() : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {

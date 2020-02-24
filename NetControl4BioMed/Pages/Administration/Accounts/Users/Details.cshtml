@@ -75,11 +75,9 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <a asp-page="/Administration/Accounts/UserRoles/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="btn btn-info btn-block">
-                <span>View all</span>
-            </a>
-        </div>
+        <a asp-page="/Administration/Accounts/UserRoles/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="btn btn-info btn-block mb-3">
+            <span>View all</span>
+        </a>
         @if (!Model.View.User.UserRoles.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
@@ -142,11 +140,9 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="btn btn-info btn-block">
-                <span>View</span>
-            </a>
-        </div>
+        <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="btn btn-info btn-block mb-3">
+            <span>View</span>
+        </a>
         @if (!Model.View.User.DatabaseUsers.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
@@ -186,7 +182,7 @@
                                 </div>
                             </td>
                             <td class="text-center text-break">
-                                <a asp-page="/Administration/Data/Databases/Details" asp-route-id="@database.Id" title="Details">
+                                <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@database.Id" title="Details">
                                     <span>Details</span>
                                 </a>
                             </td>

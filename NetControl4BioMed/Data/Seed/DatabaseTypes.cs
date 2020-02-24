@@ -28,7 +28,7 @@ namespace NetControl4BioMed.Data.Seed
                 Id = "9c87fcad-4395-406a-80e4-faadbf6e4d14",
                 DateTimeCreated = DateTime.Now,
                 Name = "PPI",
-                Description = "Datbases of this type contain proteins and protein-protein interactions."
+                Description = "Databases of this type contain proteins and protein-protein interactions."
             }
         };
     }

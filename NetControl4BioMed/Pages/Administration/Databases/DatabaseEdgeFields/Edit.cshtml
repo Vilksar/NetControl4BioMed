@@ -84,11 +84,6 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <a asp-page="/Administration/Relationships/DatabaseEdgeFieldEdges/Index" asp-route-searchString="@Model.View.DatabaseEdgeField.Id" asp-route-searchIn="DatabaseEdgeFieldId" class="btn btn-info btn-block">
-                <span>View all</span>
-            </a>
-        </div>
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
             <span>The database edge field currently contains @Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Select(item => item.Edge).Distinct().Count() distinct edge@(Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Select(item => item.Edge).Distinct().Count() != 1 ? "s" : string.Empty) with @Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Count() value@(Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseEdgeFieldEdges/Index" asp-route-searchString="@Model.View.DatabaseEdgeField.Id" asp-route-searchIn="DatabaseEdgeFieldId" class="alert-link">view the current edge values</a>.</span>

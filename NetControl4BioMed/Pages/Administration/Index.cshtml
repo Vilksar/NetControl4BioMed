@@ -89,7 +89,7 @@
     <div class="card-body">
         @if (!Model.View.DuplicateDetected)
         {
-            <div class="alert alert-success text-justify text-wrap mb-0">
+            <div class="alert alert-success text-justify text-wrap">
                 <span><i class="fas fa-check-circle"></i></span>
                 <span>There were no duplicate items found in the data.</span>
             </div>
@@ -235,7 +235,7 @@
         }
         @if (!Model.View.OrphanDetected)
         {
-            <div class="alert alert-success text-justify text-wrap mb-0">
+            <div class="alert alert-success text-justify text-wrap">
                 <span><i class="fas fa-check-circle"></i></span>
                 <span>There were no orphaned items found in the data.</span>
             </div>
@@ -330,7 +330,7 @@
         }
         @if (!Model.View.InconsistencyDetected)
         {
-            <div class="alert alert-success text-justify text-wrap mb-0">
+            <div class="alert alert-success text-justify text-wrap">
                 <span><i class="fas fa-check-circle"></i></span>
                 <span>There were no inconsistent items found in the data.</span>
             </div>
@@ -423,7 +423,7 @@
                 </div>
             }
         }
-        <a asp-page="/Administration/Index" class="btn btn-danger">
+        <a asp-page="/Administration/Index" class="btn btn-success btn-block" title="Refresh">
             <span>Refresh the page</span>
         </a>
     </div>

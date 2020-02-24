@@ -147,11 +147,9 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <a asp-page="/Administration/Created/Analyses/Index" asp-route-searchString="@Model.View.Network.Id" asp-route-searchIn="NetworkId" class="btn btn-info btn-block">
-                <span>View all</span>
-            </a>
-        </div>
+        <a asp-page="/Administration/Created/Analyses/Index" asp-route-searchString="@Model.View.Network.Id" asp-route-searchIn="NetworkId" class="btn btn-info btn-block mb-3">
+            <span>View all</span>
+        </a>
         @if (!Model.View.Network.AnalysisNetworks.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
@@ -214,11 +212,9 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <a asp-page="/Administration/Data/Databases/Index" asp-route-searchString="@Model.View.Network.Id" asp-route-searchIn="NetworkId" class="btn btn-info btn-block">
-                <span>View all</span>
-            </a>
-        </div>
+        <a asp-page="/Administration/Databases/Databases/Index" asp-route-searchString="@Model.View.Network.Id" asp-route-searchIn="NetworkId" class="btn btn-info btn-block mb-3">
+            <span>View all</span>
+        </a>
         @if (!Model.View.Network.NetworkDatabases.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
@@ -258,7 +254,7 @@
                                 </div>
                             </td>
                             <td class="text-center text-break">
-                                <a asp-page="/Administration/Data/Databases/Details" asp-route-id="@networkDatabase.Database.Id" title="Details">
+                                <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@networkDatabase.Database.Id" title="Details">
                                     <span>Details</span>
                                 </a>
                             </td>
@@ -281,11 +277,9 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <a asp-page="/Administration/Content/NodeCollections/Index" asp-route-searchString="@Model.View.Network.Id" asp-route-searchIn="NetworkId" class="btn btn-info btn-block">
-                <span>View all</span>
-            </a>
-        </div>
+        <a asp-page="/Administration/Data/NodeCollections/Index" asp-route-searchString="@Model.View.Network.Id" asp-route-searchIn="NetworkId" class="btn btn-info btn-block mb-3">
+            <span>View all</span>
+        </a>
         @if (!Model.View.Network.NetworkNodeCollections.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
@@ -331,7 +325,7 @@
                                 <span title="@networkNodeCollection.Type.ToString()">@networkNodeCollection.Type.ToString()</span>
                             </td>
                             <td class="text-center text-break">
-                                <a asp-page="/Administration/Content/NodeCollections/Details" asp-route-id="@networkNodeCollection.NodeCollection.Id" title="Details">
+                                <a asp-page="/Administration/Data/NodeCollections/Details" asp-route-id="@networkNodeCollection.NodeCollection.Id" title="Details">
                                     <span>Details</span>
                                 </a>
                             </td>

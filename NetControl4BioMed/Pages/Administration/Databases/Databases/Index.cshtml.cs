@@ -45,8 +45,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     { "Url", "URL" },
                     { "DatabaseTypeId", "Database type ID" },
                     { "DatabaseTypeName", "Database type name" },
-                    { "NodeCollectionId", "Node collection ID" },
-                    { "NodeCollectionName", "Node collection name" },
                     { "NetworkId", "Network ID" },
                     { "NetworkName", "Network name" },
                     { "AnalysisId", "Analysis ID" },
@@ -113,8 +111,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     input.SearchIn.Contains("Url") && item.Url.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseTypeId") && item.DatabaseType.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseTypeName") && item.DatabaseType.Name.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("NodeCollectionId") && item.NodeCollectionDatabases.Any(item1 => item1.NodeCollection.Id.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("NodeCollectionName") && item.NodeCollectionDatabases.Any(item1 => item1.NodeCollection.Name.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("NetworkId") && item.NetworkDatabases.Any(item1 => item1.Network.Id.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("NetworkName") && item.NetworkDatabases.Any(item1 => item1.Network.Name.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("AnalysisId") && item.AnalysisDatabases.Any(item1 => item1.Analysis.Id.Contains(input.SearchString)) ||

@@ -69,11 +69,9 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <a asp-page="/Administration/Accounts/UserRoles/Index" asp-route-searchString="@Model.View.Role.Id" asp-route-searchIn="RoleId" class="btn btn-info btn-block">
-                <span>View all</span>
-            </a>
-        </div>
+        <a asp-page="/Administration/Accounts/UserRoles/Index" asp-route-searchString="@Model.View.Role.Id" asp-route-searchIn="RoleId" class="btn btn-info btn-block mb-3">
+            <span>View all</span>
+        </a>
         @if (!Model.View.Role.UserRoles.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
