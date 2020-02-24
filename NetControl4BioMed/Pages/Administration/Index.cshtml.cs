@@ -29,8 +29,6 @@ namespace NetControl4BioMed.Pages.Administration
 
         public class ViewModel
         {
-            public bool IssueDetected { get; set; }
-
             public int UserCount { get; set; }
 
             public int RoleCount { get; set; }
@@ -42,6 +40,8 @@ namespace NetControl4BioMed.Pages.Administration
             public int EdgeCount { get; set; }
 
             public int NodeCollectionCount { get; set; }
+
+            public bool DuplicateDetected { get; set; }
 
             public IQueryable<string> DuplicateDatabaseTypes { get; set; }
 
@@ -59,6 +59,8 @@ namespace NetControl4BioMed.Pages.Administration
 
             public IQueryable<string> DuplicateNodeCollections { get; set; }
 
+            public bool OrphanDetected { get; set; }
+
             public IQueryable<Node> OrphanedNodes { get; set; }
 
             public IQueryable<Edge> OrphanedEdges { get; set; }
@@ -68,6 +70,18 @@ namespace NetControl4BioMed.Pages.Administration
             public IQueryable<Network> OrphanedNetworks { get; set; }
 
             public IQueryable<Analysis> OrphanedAnalyses { get; set; }
+
+            public bool InconsistencyDetected { get; set; }
+
+            public IQueryable<Node> InconsistentNodes { get; set; }
+
+            public IQueryable<Edge> InconsistentEdges { get; set; }
+
+            public IQueryable<NodeCollection> InconsistentNodeCollections { get; set; }
+
+            public IQueryable<Network> InconsistentNetworks { get; set; }
+
+            public IQueryable<Analysis> InconsistentAnalyses { get; set; }
         }
 
         public IActionResult OnGet()
@@ -93,10 +107,17 @@ namespace NetControl4BioMed.Pages.Administration
                 OrphanedEdges = _context.Edges.Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2),
                 OrphanedNodeCollections = _context.NodeCollections.Where(item => !item.NodeCollectionNodes.Any()),
                 OrphanedNetworks = _context.Networks.Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any()),
-                OrphanedAnalyses = _context.Analyses.Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any())
+                OrphanedAnalyses = _context.Analyses.Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any()),
+                InconsistentNodes = _context.Nodes.Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
+                InconsistentEdges = _context.Edges.Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
+                InconsistentNodeCollections = _context.NodeCollections.Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
+                InconsistentNetworks = _context.Networks.Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
+                InconsistentAnalyses = _context.Analyses.Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
             };
             // Check if there were any issues detected.
-            View.IssueDetected = View.DuplicateDatabaseTypes.Any() || View.DuplicateDatabases.Any() || View.DuplicateDatabaseNodeFields.Any() || View.DuplicateDatabaseEdgeFields.Any() || View.DuplicateDatabaseNodeFieldNodes.Any() || View.DuplicateNodes.Any() || View.DuplicateEdges.Any() || View.DuplicateNodeCollections.Any() || View.OrphanedNodes.Any() || View.OrphanedEdges.Any() || View.OrphanedNodeCollections.Any() || View.OrphanedNetworks.Any() || View.OrphanedAnalyses.Any();
+            View.DuplicateDetected = View.DuplicateDatabaseTypes.Any() || View.DuplicateDatabases.Any() || View.DuplicateDatabaseNodeFields.Any() || View.DuplicateDatabaseEdgeFields.Any() || View.DuplicateDatabaseNodeFieldNodes.Any() || View.DuplicateNodes.Any() || View.DuplicateEdges.Any() || View.DuplicateNodeCollections.Any();
+            View.OrphanDetected = View.OrphanedNodes.Any() || View.OrphanedEdges.Any() || View.OrphanedNodeCollections.Any() || View.OrphanedNetworks.Any() || View.OrphanedAnalyses.Any();
+            View.InconsistencyDetected = View.InconsistentNodes.Any() || View.InconsistentEdges.Any() || View.InconsistentNodeCollections.Any() || View.InconsistentNetworks.Any() || View.InconsistentAnalyses.Any();
             // Return the page.
             return Page();
         }
