@@ -51,6 +51,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     .Include(item => item.DatabaseEdgeFields)
                     .Include(item => item.DatabaseNodes)
                     .Include(item => item.DatabaseEdges)
+                    .Include(item => item.NodeCollectionDatabases)
+                        .ThenInclude(item => item.NodeCollection)
                     .Include(item => item.NetworkDatabases)
                         .ThenInclude(item => item.Network)
                     .Include(item => item.AnalysisDatabases)

@@ -30,6 +30,8 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
         {
             public NodeCollection NodeCollection { get; set; }
 
+            public IEnumerable<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }
+
             public IEnumerable<NodeCollectionNode> NodeCollectionNodes { get; set; }
         }
 
@@ -71,6 +73,7 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
             View = new ViewModel
             {
                 NodeCollection = item,
+                NodeCollectionDatabases = item.NodeCollectionDatabases.Where(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)),
                 NodeCollectionNodes = item.NodeCollectionNodes.Where(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user)))
             };
             // Return the page.

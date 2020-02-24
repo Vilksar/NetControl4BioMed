@@ -45,6 +45,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     { "Url", "URL" },
                     { "DatabaseTypeId", "Database type ID" },
                     { "DatabaseTypeName", "Database type name" },
+                    { "NodeCollectionId", "Node collection ID" },
+                    { "NodeCollectionName", "Node collection name" },
                     { "NetworkId", "Network ID" },
                     { "NetworkName", "Network name" },
                     { "AnalysisId", "Analysis ID" },
@@ -66,6 +68,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     { "HasNoDatabaseNodes", "Does not have database nodes" },
                     { "HasDatabaseEdges", "Has database edges" },
                     { "HasNoDatabaseEdges", "Does not have database edges" },
+                    { "HasNodeCollectionDatabases", "Has node collection databases" },
+                    { "HasNoNodeCollectionDatabases", "Does not have node collection databases" },
                     { "HasNetworkDatabases", "Has network databases" },
                     { "HasNoNetworkDatabases", "Does not have network databases" },
                     { "HasAnalysisDatabases", "Has analysis databases" },
@@ -84,6 +88,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     { "DatabaseEdgeFieldCount", "Number of database edge fields" },
                     { "DatabaseNodeCount", "Number of database nodes" },
                     { "DatabaseEdgeCount", "Number of database edges" },
+                    { "NodeCollectionDatabaseCount", "Number of node collection databases" },
                     { "NetworkDatabaseCount", "Number of network databases" },
                     { "AnalysisDatabaseCount", "Number of analysis databases" }
                 }
@@ -108,6 +113,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     input.SearchIn.Contains("Url") && item.Url.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseTypeId") && item.DatabaseType.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseTypeName") && item.DatabaseType.Name.Contains(input.SearchString) ||
+                    input.SearchIn.Contains("NodeCollectionId") && item.NodeCollectionDatabases.Any(item1 => item1.NodeCollection.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeCollectionName") && item.NodeCollectionDatabases.Any(item1 => item1.NodeCollection.Name.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("NetworkId") && item.NetworkDatabases.Any(item1 => item1.Network.Id.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("NetworkName") && item.NetworkDatabases.Any(item1 => item1.Network.Name.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("AnalysisId") && item.AnalysisDatabases.Any(item1 => item1.Analysis.Id.Contains(input.SearchString)) ||
@@ -128,6 +135,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 .Where(item => input.Filter.Contains("HasNoDatabaseNodes") ? !item.DatabaseNodes.Any() : true)
                 .Where(item => input.Filter.Contains("HasDatabaseEdges") ? item.DatabaseEdges.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoDatabaseEdges") ? !item.DatabaseEdges.Any() : true)
+                .Where(item => input.Filter.Contains("HasNodeCollectionDatabases") ? !item.NodeCollectionDatabases.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoNodeCollectionDatabases") ? !item.NodeCollectionDatabases.Any() : true)
                 .Where(item => input.Filter.Contains("HasNetworkDatabases") ? !item.NetworkDatabases.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoNetworkDatabases") ? !item.NetworkDatabases.Any() : true)
                 .Where(item => input.Filter.Contains("HasAnalysisDatabases") ? !item.AnalysisDatabases.Any() : true)
@@ -200,6 +209,12 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     break;
                 case var sort when sort == ("DatabaseEdgeCount", "Descending"):
                     query = query.OrderByDescending(item => item.DatabaseEdges.Count());
+                    break;
+                case var sort when sort == ("NodeCollectionDatabaseCount", "Ascending"):
+                    query = query.OrderBy(item => item.NodeCollectionDatabases.Count());
+                    break;
+                case var sort when sort == ("NodeCollectionDatabaseCount", "Descending"):
+                    query = query.OrderByDescending(item => item.NodeCollectionDatabases.Count());
                     break;
                 case var sort when sort == ("NetworkDatabaseCount", "Ascending"):
                     query = query.OrderBy(item => item.NetworkDatabases.Count());

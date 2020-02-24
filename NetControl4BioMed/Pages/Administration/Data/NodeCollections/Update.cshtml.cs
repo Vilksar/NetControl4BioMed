@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
@@ -53,6 +54,8 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
 
             public string Description { get; set; }
 
+            public IEnumerable<string> DatabaseIds { get; set; }
+
             public IEnumerable<string> NodeIds { get; set; }
 
             public static ItemModel Default = new ItemModel
@@ -60,6 +63,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 Id = "Node collection ID",
                 Name = "Node collection name",
                 Description = "Node collection description",
+                DatabaseIds = new List<string> { "Database ID" },
                 NodeIds = new List<string> { "Node ID" }
             };
         }
@@ -83,6 +87,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                     Id = item.Id,
                     Name = item.Name,
                     Description = item.Description,
+                    DatabaseIds = item.NodeCollectionDatabases.Select(item1 => item1.Database.Id),
                     NodeIds = item.NodeCollectionNodes.Select(item1 => item1.Node.Id)
                 });
             // Define the input.
@@ -119,7 +124,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 return Page();
             }
             // Check if any of the items has any null values.
-            if (items.Any(item => item.Id == null || item.Name == null || item.Description == null || item.NodeIds == null))
+            if (items.Any(item => item.Id == null || item.Name == null || item.Description == null || item.DatabaseIds == null || item.NodeIds == null))
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The provided JSON data can't contain any \"null\" values. Please replace them, eventually with an empty string.");
@@ -156,6 +161,19 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                     .Except(_context.NodeCollections
                         .Where(item => itemNodeCollectionIds.Contains(item.Id))
                         .Select(item => item.Id));
+                // Get the IDs of all of the databases that are to be used by the collections.
+                var itemDatabaseIds = items
+                    .Select(item => item.DatabaseIds)
+                    .SelectMany(item => item)
+                    .Where(item => !string.IsNullOrEmpty(item))
+                    .Distinct();
+                // Get the databases that are to be used by the collections.
+                var databases = _context.Databases
+                    .Where(item => item.DatabaseType.Name != "Generic")
+                    .Where(item => itemDatabaseIds.Contains(item.Id))
+                    .Include(item => item.DatabaseNodes)
+                        .ThenInclude(item => item.Node)
+                    .AsEnumerable();
                 // Get the IDs of all of the nodes that are to be added to the collections.
                 var itemNodeIds = items
                     .Select(item => item.NodeIds)
@@ -166,7 +184,12 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 var nodes = _context.Nodes
                     .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => itemNodeIds.Contains(item.Id))
+                    .Include(item => item.DatabaseNodes)
+                        .ThenInclude(item => item.Database)
                     .AsEnumerable();
+                // Get the valid database IDs.
+                var validItemDatabaseIds = databases
+                    .Select(item => item.Id);
                 // Get the valid node IDs.
                 var validItemNodeIds = nodes
                     .Select(item => item.Id);
@@ -181,6 +204,17 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                         // Continue.
                         continue;
                     }
+                    // Get the valid databases and the node collection databases to add.
+                    var nodeCollectionDatabases = item.DatabaseIds
+                        .Where(item1 => validItemDatabaseIds.Contains(item1))
+                        .Distinct()
+                        .Select(item1 =>
+                            new NodeCollectionDatabase
+                            {
+                                DatabaseId = item1,
+                                Database = databases.FirstOrDefault(item2 => item1 == item2.Id)
+                            })
+                        .Where(item1 => item1.Database != null);
                     // Get the valid nodes and the node collection nodes to add.
                     var nodeCollectionNodes = item.NodeIds
                         .Where(item1 => validItemNodeIds.Contains(item1))
@@ -198,7 +232,12 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                         Name = item.Name,
                         Description = item.Description,
                         DateTimeCreated = DateTime.Now,
-                        NodeCollectionNodes = nodeCollectionNodes.ToList()
+                        NodeCollectionDatabases = nodeCollectionDatabases
+                            .Where(item1 => item1.Database.DatabaseNodes.Any(item2 => validItemNodeIds.Contains(item2.Node.Id)))
+                            .ToList(),
+                        NodeCollectionNodes = nodeCollectionNodes
+                            .Where(item1 => item1.Node.DatabaseNodes.Any(item1 => validItemDatabaseIds.Contains(item1.Database.Id)))
+                            .ToList()
                     };
                     // Check if there is any ID provided.
                     if (!string.IsNullOrEmpty(item.Id))
@@ -244,6 +283,19 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                     // Redisplay the page.
                     return Page();
                 }
+                // Get the IDs of all of the databases that are to be used by the collections.
+                var itemDatabaseIds = items
+                    .Select(item => item.DatabaseIds)
+                    .SelectMany(item => item)
+                    .Where(item => !string.IsNullOrEmpty(item))
+                    .Distinct();
+                // Get the databases that are to be used by the collections.
+                var databases = _context.Databases
+                    .Where(item => item.DatabaseType.Name != "Generic")
+                    .Where(item => itemDatabaseIds.Contains(item.Id))
+                    .Include(item => item.DatabaseNodes)
+                        .ThenInclude(item => item.Node)
+                    .AsEnumerable();
                 // Get the IDs of all of the nodes that are to be added to the collections.
                 var itemNodeIds = items
                     .Select(item => item.NodeIds)
@@ -254,7 +306,12 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 var nodes = _context.Nodes
                     .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => itemNodeIds.Contains(item.Id))
+                    .Include(item => item.DatabaseNodes)
+                        .ThenInclude(item => item.Database)
                     .AsEnumerable();
+                // Get the valid database IDs.
+                var validItemDatabaseIds = databases
+                    .Select(item => item.Id);
                 // Get the valid node IDs.
                 var validItemNodeIds = nodes
                     .Select(item => item.Id);
@@ -271,6 +328,19 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                         // Continue.
                         continue;
                     }
+                    // Get the valid databases and the node collection databases to add.
+                    var nodeCollectionDatabases = item.DatabaseIds
+                        .Where(item1 => validItemDatabaseIds.Contains(item1))
+                        .Distinct()
+                        .Select(item1 =>
+                            new NodeCollectionDatabase
+                            {
+                                NodeCollectionId = nodeCollection.Id,
+                                NodeCollection = nodeCollection,
+                                DatabaseId = item1,
+                                Database = databases.FirstOrDefault(item2 => item1 == item2.Id)
+                            })
+                        .Where(item1 => item1.NodeCollection != null && item1.Database != null);
                     // Get the valid nodes and the node collection nodes to add.
                     var nodeCollectionNodes = item.NodeIds
                         .Where(item1 => validItemNodeIds.Contains(item1))
@@ -287,7 +357,12 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                     // Update the node collection.
                     nodeCollection.Name = item.Name;
                     nodeCollection.Description = item.Description;
-                    nodeCollection.NodeCollectionNodes = nodeCollectionNodes.ToList();
+                    nodeCollection.NodeCollectionDatabases = nodeCollectionDatabases
+                            .Where(item1 => item1.Database.DatabaseNodes.Any(item1 => validItemNodeIds.Contains(item1.Node.Id)))
+                            .ToList();
+                    nodeCollection.NodeCollectionNodes = nodeCollectionNodes
+                            .Where(item1 => item1.Node.DatabaseNodes.Any(item1 => validItemDatabaseIds.Contains(item1.Database.Id)))
+                            .ToList();
                     // Add the node collection to the list.
                     nodeCollectionsToUpdate.Add(nodeCollection);
                 }

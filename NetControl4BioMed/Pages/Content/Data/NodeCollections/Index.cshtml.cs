@@ -56,6 +56,7 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
                     { "Id", "ID" },
                     { "Name", "Name" },
                     { "Description", "Description" },
+                    { "Databases", "Databases" },
                     { "Nodes", "Nodes" }
                 },
                 Filter = new Dictionary<string, string>
@@ -65,6 +66,7 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
                 {
                     { "Id", "ID" },
                     { "Name", "Name" },
+                    { "NodeCollectionDatabaseCount", "Number of databases" },
                     { "NodeCollectionNodeCount", "Number of nodes" }
                 }
             };
@@ -78,7 +80,8 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
             }
             // Start with all of the items to which the user has access.
             var query = _context.NodeCollections
-                .Where(item => item.NodeCollectionNodes.Any(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
+                .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                 .AsQueryable();
             // Select the results matching the search string.
             query = query
@@ -86,7 +89,8 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Nodes") && item.NodeCollectionNodes.Any(item1 => item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Where(item2 => item2.DatabaseNodeField.IsSearchable && (item2.DatabaseNodeField.Database.IsPublic || item2.DatabaseNodeField.Database.DatabaseUsers.Any(item3 => item3.User == user))).Any(item2 => item2.Value.Contains(input.SearchString))));
+                    input.SearchIn.Contains("Databases") && item.NodeCollectionDatabases.Where(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Database.Id.Contains(input.SearchString) || item1.Database.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("Nodes") && item.NodeCollectionNodes.Where(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))).Any(item1 => item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Where(item2 => item2.DatabaseNodeField.IsSearchable && (item2.DatabaseNodeField.Database.IsPublic || item2.DatabaseNodeField.Database.DatabaseUsers.Any(item3 => item3.User == user))).Any(item2 => item2.Value.Contains(input.SearchString))));
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -102,11 +106,17 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
                 case var sort when sort == ("Name", "Descending"):
                     query = query.OrderByDescending(item => item.Name);
                     break;
+                case var sort when sort == ("NodeCollectionDatabaseCount", "Ascending"):
+                    query = query.OrderBy(item => item.NodeCollectionDatabases.Where(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)).Count(item1 => item1.Database.Id.Contains(input.SearchString) || item1.Database.Name.Contains(input.SearchString)));
+                    break;
+                case var sort when sort == ("NodeCollectionDatabaseCount", "Descending"):
+                    query = query.OrderByDescending(item => item.NodeCollectionDatabases.Where(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)).Count(item1 => item1.Database.Id.Contains(input.SearchString) || item1.Database.Name.Contains(input.SearchString)));
+                    break;
                 case var sort when sort == ("NodeCollectionNodeCount", "Ascending"):
-                    query = query.OrderBy(item => item.NodeCollectionNodes.Count(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))));
+                    query = query.OrderBy(item => item.NodeCollectionNodes.Where(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))).Count(item1 => item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Where(item2 => item2.DatabaseNodeField.IsSearchable && (item2.DatabaseNodeField.Database.IsPublic || item2.DatabaseNodeField.Database.DatabaseUsers.Any(item3 => item3.User == user))).Any(item2 => item2.Value.Contains(input.SearchString))));
                     break;
                 case var sort when sort == ("NodeCollectionNodeCount", "Descending"):
-                    query = query.OrderByDescending(item => item.NodeCollectionNodes.Count(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))));
+                    query = query.OrderByDescending(item => item.NodeCollectionNodes.Where(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))).Count(item1 => item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Where(item2 => item2.DatabaseNodeField.IsSearchable && (item2.DatabaseNodeField.Database.IsPublic || item2.DatabaseNodeField.Database.DatabaseUsers.Any(item3 => item3.User == user))).Any(item2 => item2.Value.Contains(input.SearchString))));
                     break;
                 default:
                     break;

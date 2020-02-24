@@ -43,9 +43,14 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             {
                 NodeCollection = _context.NodeCollections
                     .Where(item => item.Id == id)
+                    .Include(item => item.NodeCollectionDatabases)
+                        .ThenInclude(item => item.Database)
                     .Include(item => item.NodeCollectionNodes)
+                        .ThenInclude(item => item.Node)
                     .Include(item => item.NetworkNodeCollections)
+                        .ThenInclude(item => item.Network)
                     .Include(item => item.AnalysisNodeCollections)
+                        .ThenInclude(item => item.Analysis)
                     .FirstOrDefault()
             };
             // Check if there was no item found.

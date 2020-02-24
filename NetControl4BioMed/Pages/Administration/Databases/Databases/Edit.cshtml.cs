@@ -184,10 +184,10 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 return Page();
             }
             // Check if the database type is to be changed, and the database has networks or analyses.
-            if (databaseType.Id != View.Database.DatabaseType.Id && (View.Database.NetworkDatabases.Any() || View.Database.AnalysisDatabases.Any()))
+            if (databaseType.Id != View.Database.DatabaseType.Id && (View.Database.DatabaseNodes.Any() || View.Database.DatabaseEdges.Any() || View.Database.NodeCollectionDatabases.Any() || View.Database.NetworkDatabases.Any() || View.Database.AnalysisDatabases.Any()))
             {
                 // Add an error to the model
-                ModelState.AddModelError(string.Empty, "The database type can't be changed while the database has networks or analyses.");
+                ModelState.AddModelError(string.Empty, "The database type can't be changed while the database has nodes, edges, node collections, networks or analyses.");
                 // Redisplay the page.
                 return Page();
             }

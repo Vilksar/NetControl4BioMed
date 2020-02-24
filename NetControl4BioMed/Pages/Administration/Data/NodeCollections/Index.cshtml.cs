@@ -50,6 +50,8 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "HasNodeCollectionDatabases", "Has node collection databases" },
+                    { "HasNoNodeCollectionDatabases", "Does not have node collection databases" },
                     { "HasNodeCollectionNodes", "Has node collection nodes" },
                     { "HasNoNodeCollectionNodes", "Does not have node collection nodes" },
                     { "HasNetworkNodeColections", "Has network node collections" },
@@ -62,6 +64,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                     { "Id", "ID" },
                     { "DateTimeCreated", "Date created" },
                     { "Name", "Name" },
+                    { "NodeCollectionDatabaseCount", "Number of node collection databases" },
                     { "NodeCollectionNodeCount", "Number of node collection nodes" },
                     { "NetworkNodeCollectionCount", "Number of network node collections" },
                     { "AnalysisNodeCollectionCount", "Number of analysis node collections" }
@@ -92,6 +95,8 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             query = query
                 .Where(item => input.Filter.Contains("HasNodeCollectionNodes") ? item.NodeCollectionNodes.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoNodeCollectionNodes") ? !item.NodeCollectionNodes.Any() : true)
+                .Where(item => input.Filter.Contains("HasNodeCollectionDatabases") ? item.NodeCollectionDatabases.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoNodeCollectionDatabases") ? !item.NodeCollectionDatabases.Any() : true)
                 .Where(item => input.Filter.Contains("HasNetworkNodeColections") ? item.NetworkNodeCollections.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoNetworkNodeColections") ? !item.NetworkNodeCollections.Any() : true)
                 .Where(item => input.Filter.Contains("HasAnalysisNodeCollections") ? item.AnalysisNodeCollections.Any() : true)
@@ -117,6 +122,12 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 case var sort when sort == ("Name", "Descending"):
                     query = query.OrderByDescending(item => item.Name);
                     break;
+                case var sort when sort == ("NodeCollectionDatabaseCount", "Ascending"):
+                    query = query.OrderBy(item => item.NodeCollectionDatabases.Count());
+                    break;
+                case var sort when sort == ("NodeCollectionDatabaseCount", "Descending"):
+                    query = query.OrderByDescending(item => item.NodeCollectionDatabases.Count());
+                    break;
                 case var sort when sort == ("NodeCollectionNodeCount", "Ascending"):
                     query = query.OrderBy(item => item.NodeCollectionNodes.Count());
                     break;
@@ -140,6 +151,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             }
             // Include the related entitites.
             query = query
+                .Include(item => item.NodeCollectionDatabases)
                 .Include(item => item.NodeCollectionNodes)
                 .Include(item => item.NetworkNodeCollections)
                 .Include(item => item.AnalysisNodeCollections);
