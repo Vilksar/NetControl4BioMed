@@ -9,7 +9,7 @@
 <form method="get" class="text-justify">
     <div class="row align-items-center">
         <div class="col-lg-12 mb-3">
-            <button type="submit" asp-page="/Administration/Content/Edges/Update" class="btn btn-primary btn-block item-group-button" title="Update" disabled>
+            <button type="submit" asp-page="/Administration/Data/Edges/Update" class="btn btn-primary btn-block item-group-button" title="Update" disabled>
                 <span><i class="fas fa-code"></i></span>
                 <span>Edit or delete selected items</span>
             </button>
@@ -19,7 +19,7 @@
     {
         <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>No items have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty). <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Create" title="Create" class="alert-link">Create a new one?</a></span>
+            <span>No items have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty). <a asp-page="/Administration/Data/Edges/Update" asp-route-type="Create" title="Create" class="alert-link">Create a new one?</a></span>
         </div>
     }
     else
@@ -77,10 +77,10 @@
                             <span title="@item.Type.ToString()">@item.Type.ToString()</span>
                         </th>
                         <td class="text-center text-break">
-                            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Edit" asp-route-ids="@item.Edge.Id" class="btn btn-warning m-1" title="Edit">
+                            <a asp-page="/Administration/Data/Edges/Update" asp-route-type="Edit" asp-route-ids="@item.Edge.Id" class="btn btn-warning m-1" title="Edit">
                                 <span><i class="fas fa-pencil-alt"></i></span>
                             </a>
-                            <a asp-page="/Administration/Content/Edges/Update" asp-route-type="Delete" asp-route-ids="@item.Edge.Id" class="btn btn-danger m-1" title="Delete">
+                            <a asp-page="/Administration/Data/Edges/Update" asp-route-type="Delete" asp-route-ids="@item.Edge.Id" class="btn btn-danger m-1" title="Delete">
                                 <span><i class="fas fa-trash"></i></span>
                             </a>
                         </td>
