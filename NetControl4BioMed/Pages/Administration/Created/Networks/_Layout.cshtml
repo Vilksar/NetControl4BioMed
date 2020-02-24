@@ -1,0 +1,14 @@
+﻿@{
+    Layout = "/Pages/Administration/Created/_Layout.cshtml";
+}
+
+@section Breadcrumbs {
+    <a asp-page="/Administration/Created/Networks/Index" class="breadcrumb-item"><span>Networks</span></a>
+    @RenderSection("Breadcrumbs", required: false)
+}
+
+@RenderBody()
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 
-namespace NetControl4BioMed.Pages.Administration.Content.Analyses
+namespace NetControl4BioMed.Pages.Administration.Created.Networks
 {
     [Authorize(Roles = "Administrator")]
     public class DeleteModel : PageModel
@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Administration.Content.Analyses
 
         public class ViewModel
         {
-            public IEnumerable<Analysis> Items { get; set; }
+            public IEnumerable<Network> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)
@@ -43,12 +43,12 @@ namespace NetControl4BioMed.Pages.Administration.Content.Analyses
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Analyses/Index");
+                return RedirectToPage("/Administration/Content/Networks/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.Analyses.Where(item => ids.Contains(item.Id))
+                Items = _context.Networks.Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -56,7 +56,7 @@ namespace NetControl4BioMed.Pages.Administration.Content.Analyses
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No items have been found with the provided IDs.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Analyses/Index");
+                return RedirectToPage("/Administration/Content/Networks/Index");
             }
             // Return the page.
             return Page();
@@ -70,12 +70,12 @@ namespace NetControl4BioMed.Pages.Administration.Content.Analyses
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Analyses/Index");
+                return RedirectToPage("/Administration/Content/Networks/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.Analyses.Where(item => Input.Ids.Contains(item.Id))
+                Items = _context.Networks.Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -83,7 +83,7 @@ namespace NetControl4BioMed.Pages.Administration.Content.Analyses
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No items have been found with the provided IDs.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Analyses/Index");
+                return RedirectToPage("/Administration/Content/Networks/Index");
             }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
@@ -94,15 +94,18 @@ namespace NetControl4BioMed.Pages.Administration.Content.Analyses
                 return Page();
             }
             // Save the number of items found.
-            var analysisCount = View.Items.Count();
+            var networkCount = View.Items.Count();
+            // Get the related entities that use the items.
+            var analyses = _context.Analyses.Where(item => item.AnalysisNetworks.Any(item1 => View.Items.Contains(item1.Network)));
             // Mark the items for deletion.
-            _context.Analyses.RemoveRange(View.Items);
+            _context.Analyses.RemoveRange(analyses);
+            _context.Networks.RemoveRange(View.Items);
             // Save the changes to the database.
             await _context.SaveChangesAsync();
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {analysisCount.ToString()} analys{(analysisCount != 1 ? "e" : "i")}s deleted successfully.";
+            TempData["StatusMessage"] = $"Success: {networkCount.ToString()} network{(networkCount != 1 ? "s" : string.Empty)} deleted successfully.";
             // Redirect to the index page.
-            return RedirectToPage("/Administration/Content/Analyses/Index");
+            return RedirectToPage("/Administration/Content/Networks/Index");
         }
     }
 }

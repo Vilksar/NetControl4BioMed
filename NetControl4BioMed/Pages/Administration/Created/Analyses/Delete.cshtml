@@ -1,11 +1,11 @@
 ﻿@page
 @model DeleteModel
 @{
-    ViewData["Title"] = "Delete networks";
+    ViewData["Title"] = "Delete analyses";
 }
 
 @section Breadcrumbs {
-    <a asp-page="/Administration/Content/Networks/Delete" class="breadcrumb-item"><span>Delete</span></a>
+    <a asp-page="/Administration/Created/Analyses/Delete" class="breadcrumb-item"><span>Delete</span></a>
 }
 
 <div class="alert alert-danger text-justify text-wrap">
@@ -48,7 +48,7 @@
                                 <span>#</span>
                             </th>
                             <th class="text-left text-break">
-                                <span>Network</span>
+                                <span>Analysis</span>
                             </th>
                             <th class="text-center text-break" data-orderable="false" data-searchable="false">
                                 <span>Links</span>
@@ -77,7 +77,7 @@
                                     </div>
                                 </td>
                                 <td class="text-center text-break">
-                                    <a asp-page="/Administration/Content/Networks/Details" asp-route-id="@item.Id" title="Details">
+                                    <a asp-page="/Administration/Created/Analyses/Details" asp-route-id="@item.Id" title="Details">
                                         <span>Details</span>
                                     </a>
                                 </td>

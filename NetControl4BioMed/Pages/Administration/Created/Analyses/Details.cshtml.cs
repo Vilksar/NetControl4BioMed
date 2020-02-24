@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 
-namespace NetControl4BioMed.Pages.Administration.Content.Analyses
+namespace NetControl4BioMed.Pages.Administration.Created.Analyses
 {
     [Authorize(Roles = "Administrator")]
     public class DetailsModel : PageModel

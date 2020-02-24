@@ -12,7 +12,7 @@ using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
 
-namespace NetControl4BioMed.Pages.Administration.Content.Analyses
+namespace NetControl4BioMed.Pages.Administration.Created.Analyses
 {
     [Authorize(Roles = "Administrator")]
     public class IndexModel : PageModel

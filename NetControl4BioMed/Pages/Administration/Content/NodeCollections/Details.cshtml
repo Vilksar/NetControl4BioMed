@@ -101,7 +101,7 @@
     </div>
     <div class="card-body">
         <div class="mb-3">
-            <a asp-page="/Administration/Content/Networks/Index" asp-route-searchString="@Model.View.NodeCollection.Id" asp-route-searchIn="NodeCollectionId" class="btn btn-info btn-block">
+            <a asp-page="/Administration/Created/Networks/Index" asp-route-searchString="@Model.View.NodeCollection.Id" asp-route-searchIn="NodeCollectionId" class="btn btn-info btn-block">
                 <span>View all</span>
             </a>
         </div>
@@ -150,7 +150,7 @@
                                 <span title="@networkNodeCollection.Type.ToString()">@networkNodeCollection.Type.ToString()</span>
                             </td>
                             <td class="text-center text-break">
-                                <a asp-page="/Administration/Content/Networks/Details" asp-route-id="@networkNodeCollection.Network.Id" title="Details">
+                                <a asp-page="/Administration/Created/Networks/Details" asp-route-id="@networkNodeCollection.Network.Id" title="Details">
                                     <span>Details</span>
                                 </a>
                             </td>
@@ -174,7 +174,7 @@
     </div>
     <div class="card-body">
         <div class="mb-3">
-            <a asp-page="/Administration/Content/Analyses/Index" asp-route-searchString="@Model.View.NodeCollection.Id" asp-route-searchIn="NodeCollectionId" class="btn btn-info btn-block">
+            <a asp-page="/Administration/Created/Analyses/Index" asp-route-searchString="@Model.View.NodeCollection.Id" asp-route-searchIn="NodeCollectionId" class="btn btn-info btn-block">
                 <span>View all</span>
             </a>
         </div>
@@ -223,7 +223,7 @@
                                 <span title="@analysisNodeCollection.Type.ToString()">@analysisNodeCollection.Type.ToString()</span>
                             </td>
                             <td class="text-center text-break">
-                                <a asp-page="/Administration/Content/Analyses/Details" asp-route-id="@analysisNodeCollection.Analysis.Id" title="Details">
+                                <a asp-page="/Administration/Created/Analyses/Details" asp-route-id="@analysisNodeCollection.Analysis.Id" title="Details">
                                     <span>Details</span>
                                 </a>
                             </td>

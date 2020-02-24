@@ -146,6 +146,45 @@
             },
             new NavigationGroupViewModel
             {
+                Id = "Content",
+                Title = "Content",
+                Description = string.Empty,
+                Icon = "fa-box-open",
+                Color = _color,
+                Link = "/Administration/Content/Index",
+                Pages = new List<NavigationPageViewModel>
+                {
+                    new NavigationPageViewModel
+                    {
+                        Id = "Nodes",
+                        Title = "Nodes",
+                        Description = string.Empty,
+                        Icon = "fa-circle",
+                        Color = "light",
+                        Link = "/Administration/Content/Nodes/Index"
+                    },
+                    new NavigationPageViewModel
+                    {
+                        Id = "Edges",
+                        Title = "Edges",
+                        Description = string.Empty,
+                        Icon = "fa-arrow-right",
+                        Color = "light",
+                        Link = "/Administration/Content/Edges/Index"
+                    },
+                    new NavigationPageViewModel
+                    {
+                        Id = "NodeCollections",
+                        Title = "Node collections",
+                        Description = string.Empty,
+                        Icon = "fa-folder",
+                        Color = "light",
+                        Link = "/Administration/Content/NodeCollections/Index"
+                    }
+                }
+            },
+            new NavigationGroupViewModel
+            {
                 Id = "Relationships",
                 Title = "Relationships",
                 Description = string.Empty,
@@ -212,41 +251,14 @@
             },
             new NavigationGroupViewModel
             {
-                Id = "Content",
-                Title = "Content",
+                Id = "Created",
+                Title = "Created",
                 Description = string.Empty,
-                Icon = "fa-box-open",
+                Icon = "fa-smile",
                 Color = _color,
-                Link = "/Administration/Content/Index",
+                Link = "/Administration/Created/Index",
                 Pages = new List<NavigationPageViewModel>
                 {
-                    new NavigationPageViewModel
-                    {
-                        Id = "Nodes",
-                        Title = "Nodes",
-                        Description = string.Empty,
-                        Icon = "fa-circle",
-                        Color = "light",
-                        Link = "/Administration/Content/Nodes/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "Edges",
-                        Title = "Edges",
-                        Description = string.Empty,
-                        Icon = "fa-arrow-right",
-                        Color = "light",
-                        Link = "/Administration/Content/Edges/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "NodeCollections",
-                        Title = "Node collections",
-                        Description = string.Empty,
-                        Icon = "fa-folder",
-                        Color = "light",
-                        Link = "/Administration/Content/NodeCollections/Index"
-                    },
                     new NavigationPageViewModel
                     {
                         Id = "Networks",
@@ -254,7 +266,7 @@
                         Description = string.Empty,
                         Icon = "fa-share-alt",
                         Color = "light",
-                        Link = "/Administration/Content/Networks/Index"
+                        Link = "/Administration/Created/Networks/Index"
                     },
                     new NavigationPageViewModel
                     {
@@ -263,7 +275,7 @@
                         Description = string.Empty,
                         Icon = "fa-desktop",
                         Color = "light",
-                        Link = "/Administration/Content/Analyses/Index"
+                        Link = "/Administration/Created/Analyses/Index"
                     }
                 }
             }
