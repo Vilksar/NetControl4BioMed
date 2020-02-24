@@ -98,12 +98,12 @@
             },
             new NavigationGroupViewModel
             {
-                Id = "Data",
-                Title = "Data",
+                Id = "Databases",
+                Title = "Databases",
                 Description = string.Empty,
                 Icon = "fa-database",
                 Color = _color,
-                Link = "/Administration/Data/Index",
+                Link = "/Administration/Databases/Index",
                 Pages = new List<NavigationPageViewModel>
                 {
                     new NavigationPageViewModel
@@ -113,7 +113,7 @@
                         Description = string.Empty,
                         Icon = "fa-font",
                         Color = "light",
-                        Link = "/Administration/Data/DatabaseTypes/Index"
+                        Link = "/Administration/Databases/DatabaseTypes/Index"
                     },
                     new NavigationPageViewModel
                     {
@@ -122,7 +122,7 @@
                         Description = string.Empty,
                         Icon = "fa-database",
                         Color = "light",
-                        Link = "/Administration/Data/Databases/Index"
+                        Link = "/Administration/Databases/Databases/Index"
                     },
                     new NavigationPageViewModel
                     {
@@ -131,7 +131,7 @@
                         Description = string.Empty,
                         Icon = "fa-circle",
                         Color = "light",
-                        Link = "/Administration/Data/DatabaseNodeFields/Index"
+                        Link = "/Administration/Databases/DatabaseNodeFields/Index"
                     },
                     new NavigationPageViewModel
                     {
@@ -140,18 +140,18 @@
                         Description = string.Empty,
                         Icon = "fa-arrow-right",
                         Color = "light",
-                        Link = "/Administration/Data/DatabaseEdgeFields/Index"
+                        Link = "/Administration/Databases/DatabaseEdgeFields/Index"
                     }
                 }
             },
             new NavigationGroupViewModel
             {
-                Id = "Content",
-                Title = "Content",
+                Id = "Data",
+                Title = "Data",
                 Description = string.Empty,
-                Icon = "fa-box-open",
+                Icon = "fa-table",
                 Color = _color,
-                Link = "/Administration/Content/Index",
+                Link = "/Administration/Data/Index",
                 Pages = new List<NavigationPageViewModel>
                 {
                     new NavigationPageViewModel
@@ -161,7 +161,7 @@
                         Description = string.Empty,
                         Icon = "fa-circle",
                         Color = "light",
-                        Link = "/Administration/Content/Nodes/Index"
+                        Link = "/Administration/Data/Nodes/Index"
                     },
                     new NavigationPageViewModel
                     {
@@ -170,7 +170,7 @@
                         Description = string.Empty,
                         Icon = "fa-arrow-right",
                         Color = "light",
-                        Link = "/Administration/Content/Edges/Index"
+                        Link = "/Administration/Data/Edges/Index"
                     },
                     new NavigationPageViewModel
                     {
@@ -179,7 +179,7 @@
                         Description = string.Empty,
                         Icon = "fa-folder",
                         Color = "light",
-                        Link = "/Administration/Content/NodeCollections/Index"
+                        Link = "/Administration/Data/NodeCollections/Index"
                     }
                 }
             },
@@ -190,7 +190,7 @@
                 Description = string.Empty,
                 Icon = "fa-heart",
                 Color = _color,
-                Link = "/Administration/Hangfire",
+                Link = "/Administration/Relationships/Index",
                 Pages = new List<NavigationPageViewModel>
                 {
                     new NavigationPageViewModel

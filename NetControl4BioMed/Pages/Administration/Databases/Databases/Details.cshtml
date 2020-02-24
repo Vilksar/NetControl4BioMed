@@ -1,0 +1,537 @@
+﻿@page
+@model DetailsModel
+@{
+    ViewData["Title"] = "Database details";
+}
+
+@section Breadcrumbs {
+    <a asp-page="/Administration/Databases/Databases/Details" class="breadcrumb-item"><span>Details</span></a>
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Databases/Databases/Edit" asp-route-id="@Model.View.Database.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Databases/Databases/Delete" asp-route-ids="@Model.View.Database.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div>
+                <span>Details</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label asp-for="View.Database.Id" class="font-weight-bold">ID</label>
+                <input asp-for="View.Database.Id" class="form-control" readonly />
+                <span asp-description-for="View.Database.Id" class="text-muted small">The ID of the database.</span>
+                <span asp-validation-for="View.Database.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Database.DateTimeCreated" class="font-weight-bold">Date</label>
+                <input asp-for="View.Database.DateTimeCreated" class="form-control" readonly />
+                <span asp-description-for="View.Database.DateTimeCreated" class="text-muted small">The date and time when the database was created.</span>
+                <span asp-validation-for="View.Database.DateTimeCreated" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Database.Name" class="font-weight-bold">Name</label>
+                <input asp-for="View.Database.Name" class="form-control" readonly />
+                <span asp-description-for="View.Database.Name" class="text-muted small">The name of the database.</span>
+                <span asp-validation-for="View.Database.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Database.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="View.Database.Description" class="form-control" readonly></textarea>
+                <span asp-description-for="View.Database.Description" class="text-muted small">The description of the database.</span>
+                <span asp-validation-for="View.Database.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Database.Url" class="font-weight-bold">URL</label>
+                <div class="input-group">
+                    <input asp-for="View.Database.Url" class="form-control" readonly />
+                    @if (!string.IsNullOrEmpty(Model.View.Database.Url))
+                    {
+                        <div class="input-group-append">
+                            <a href="@Model.View.Database.Url" class="btn btn-primary">
+                                <span><i class="fas fa-external-link-alt"></i></span>
+                            </a>
+                        </div>
+                    }
+                </div>
+                <span asp-description-for="View.Database.Url" class="text-muted small">The URL of the database.</span>
+                <span asp-validation-for="View.Database.Url" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Database.IsPublic" class="font-weight-bold">Set the database as public?</label>
+                <input asp-for="View.Database.IsPublic" type="text" class="form-control" readonly />
+                <span asp-description-for="View.Database.IsPublic" class="text-muted small">The public availability of the database.</span>
+                <span asp-validation-for="View.Database.IsPublic" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Database.DatabaseType.Name" class="font-weight-bold">Type</label>
+                <div class="input-group">
+                    <input asp-for="View.Database.DatabaseType.Name" class="form-control" readonly />
+                    <div class="input-group-append">
+                        <a asp-page="/Administration/Databases/DatabaseTypes/Details" asp-route-id="@Model.View.Database.DatabaseType.Id" class="btn btn-info">
+                            <span><i class="fas fa-info-circle"></i></span>
+                        </a>
+                    </div>
+                </div>
+                <span asp-description-for="View.Database.DatabaseType.Name" class="text-muted small">The type of the database.</span>
+                <span asp-validation-for="View.Database.DatabaseType.Name" class="text-danger small"></span>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-user"></i></span>
+            </div>
+            <div>
+                <span>Users</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        @if (!Model.View.Database.DatabaseUsers.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no users currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>User</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var databaseUser in Model.View.Database.DatabaseUsers)
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <span title="@databaseUser.User.Email" class="font-weight-bold">@databaseUser.User.Email</span>
+                                </div>
+                                <div>
+                                    <span title="@databaseUser.User.Id" class="small">@databaseUser.User.Id</span>
+                                </div>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Administration/Accounts/Users/Details" asp-route-id="@databaseUser.User.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-user"></i></span>
+            </div>
+            <div>
+                <span>User invitations</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        @if (!Model.View.Database.DatabaseUsers.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no user invitations currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>E-mail</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var databaseUserInvitation in Model.View.Database.DatabaseUserInvitations)
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <span title="@databaseUserInvitation.Email" class="font-weight-bold">@databaseUserInvitation.Email</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-circle"></i></span>
+            </div>
+            <div>
+                <span>Node fields</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Databases/DatabaseNodeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        @if (!Model.View.Database.DatabaseNodeFields.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no node fields currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Node field</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var databaseNodeField in Model.View.Database.DatabaseNodeFields)
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <span title="@databaseNodeField.Name" class="font-weight-bold">@databaseNodeField.Name</span>
+                                </div>
+                                <div>
+                                    <span title="@databaseNodeField.Id" class="small">@databaseNodeField.Id</span>
+                                </div>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Administration/Databases/DatabaseNodeFields/Details" asp-route-id="@databaseNodeField.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div>
+                <span>Edge fields</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Databases/DatabaseEdgeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        @if (!Model.View.Database.DatabaseEdgeFields.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no edge fields currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Edge field</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var databaseEdgeField in Model.View.Database.DatabaseEdgeFields)
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <span title="@databaseEdgeField.Name" class="font-weight-bold">@databaseEdgeField.Name</span>
+                                </div>
+                                <div>
+                                    <span title="@databaseEdgeField.Id" class="small">@databaseEdgeField.Id</span>
+                                </div>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Administration/Databases/DatabaseEdgeFields/Details" asp-route-id="@databaseEdgeField.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-circle"></i></span>
+            </div>
+            <div>
+                <span>Nodes</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Relationships/DatabaseNodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The database currently contains @Model.View.Database.DatabaseNodes.Count() node@(Model.View.Database.DatabaseNodes.Count() != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div>
+                <span>Edges</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Relationships/DatabaseEdges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The database currently contains @Model.View.Database.DatabaseEdges.Count() edge@(Model.View.Database.DatabaseEdges.Count() != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-share-alt"></i></span>
+            </div>
+            <div>
+                <span>Networks</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Created/Networks/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        @if (!Model.View.Database.NetworkDatabases.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no networks currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Network</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var networkDatabase in Model.View.Database.NetworkDatabases)
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <span title="@networkDatabase.Network.Name" class="font-weight-bold">@networkDatabase.Network.Name</span>
+                                </div>
+                                <div>
+                                    <span title="@networkDatabase.Network.Id" class="small">@networkDatabase.Network.Id</span>
+                                </div>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Administration/Created/Networks/Details" asp-route-id="@networkDatabase.Network.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-desktop"></i></span>
+            </div>
+            <div>
+                <span>Analyses</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <a asp-page="/Administration/Created/Analyses/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="btn btn-info btn-block">
+                <span>View all</span>
+            </a>
+        </div>
+        @if (!Model.View.Database.AnalysisDatabases.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no analyses currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Analysis</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var analysisDatabase in Model.View.Database.AnalysisDatabases)
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <span title="@analysisDatabase.Analysis.Name" class="font-weight-bold">@analysisDatabase.Analysis.Name</span>
+                                </div>
+                                <div>
+                                    <span title="@analysisDatabase.Analysis.Id" class="small">@analysisDatabase.Analysis.Id</span>
+                                </div>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Administration/Created/Analyses/Details" asp-route-id="@analysisDatabase.Analysis.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
