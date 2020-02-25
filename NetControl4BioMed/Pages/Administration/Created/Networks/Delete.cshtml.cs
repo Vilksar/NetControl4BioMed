@@ -43,7 +43,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Networks/Index");
+                return RedirectToPage("/Administration/Created/Networks/Index");
             }
             // Define the view.
             View = new ViewModel
@@ -56,7 +56,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No items have been found with the provided IDs.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Networks/Index");
+                return RedirectToPage("/Administration/Created/Networks/Index");
             }
             // Return the page.
             return Page();
@@ -70,7 +70,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Networks/Index");
+                return RedirectToPage("/Administration/Created/Networks/Index");
             }
             // Define the view.
             View = new ViewModel
@@ -83,7 +83,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No items have been found with the provided IDs.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Networks/Index");
+                return RedirectToPage("/Administration/Created/Networks/Index");
             }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
@@ -97,15 +97,21 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
             var networkCount = View.Items.Count();
             // Get the related entities that use the items.
             var analyses = _context.Analyses.Where(item => item.AnalysisNetworks.Any(item1 => View.Items.Contains(item1.Network)));
+            // Get the generic entities among them.
+            var genericNetworks = View.Items.Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
+            var genericNodes = _context.Nodes.Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
+            var genericEdges = _context.Edges.Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
             // Mark the items for deletion.
             _context.Analyses.RemoveRange(analyses);
             _context.Networks.RemoveRange(View.Items);
+            _context.Edges.RemoveRange(genericEdges);
+            _context.Nodes.RemoveRange(genericNodes);
             // Save the changes to the database.
             await _context.SaveChangesAsync();
             // Display a message.
             TempData["StatusMessage"] = $"Success: {networkCount.ToString()} network{(networkCount != 1 ? "s" : string.Empty)} deleted successfully.";
             // Redirect to the index page.
-            return RedirectToPage("/Administration/Content/Networks/Index");
+            return RedirectToPage("/Administration/Created/Networks/Index");
         }
     }
 }

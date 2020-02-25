@@ -43,7 +43,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Analyses/Index");
+                return RedirectToPage("/Administration/Created/Analyses/Index");
             }
             // Define the view.
             View = new ViewModel
@@ -56,7 +56,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No items have been found with the provided IDs.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Analyses/Index");
+                return RedirectToPage("/Administration/Created/Analyses/Index");
             }
             // Return the page.
             return Page();
@@ -70,7 +70,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Analyses/Index");
+                return RedirectToPage("/Administration/Created/Analyses/Index");
             }
             // Define the view.
             View = new ViewModel
@@ -83,7 +83,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No items have been found with the provided IDs.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Analyses/Index");
+                return RedirectToPage("/Administration/Created/Analyses/Index");
             }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
@@ -102,7 +102,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
             // Display a message.
             TempData["StatusMessage"] = $"Success: {analysisCount.ToString()} analys{(analysisCount != 1 ? "e" : "i")}s deleted successfully.";
             // Redirect to the index page.
-            return RedirectToPage("/Administration/Content/Analyses/Index");
+            return RedirectToPage("/Administration/Created/Analyses/Index");
         }
     }
 }

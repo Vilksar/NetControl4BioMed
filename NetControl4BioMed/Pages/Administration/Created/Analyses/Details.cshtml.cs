@@ -36,7 +36,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No ID has been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Analyses/Index");
+                return RedirectToPage("/Administration/Created/Analyses/Index");
             }
             // Define the view.
             View = new ViewModel
@@ -61,7 +61,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Content/Analyses/Index");
+                return RedirectToPage("/Administration/Created/Analyses/Index");
             }
             // Return the page.
             return Page();
