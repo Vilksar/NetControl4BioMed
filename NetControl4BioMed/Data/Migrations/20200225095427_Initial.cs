@@ -648,6 +648,7 @@ namespace NetControl4BioMed.Data.Migrations
                     DatabaseId = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
+                    IsSearchable = table.Column<bool>(nullable: false),
                     Url = table.Column<string>(nullable: true)
                 },
                 constraints: table =>

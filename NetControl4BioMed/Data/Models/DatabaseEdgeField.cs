@@ -47,6 +47,11 @@ namespace NetControl4BioMed.Data.Models
         public string Url { get; set; }
 
         /// <summary>
+        /// Gets or sets the automatic detection state for searches of the edges in the database edge field.
+        /// </summary>
+        public bool IsSearchable { get; set; }
+
+        /// <summary>
         /// Gets or sets the edges which have a value in the database edge field.
         /// </summary>
         public ICollection<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }

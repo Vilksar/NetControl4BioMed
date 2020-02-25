@@ -42,14 +42,14 @@ namespace NetControl4BioMed.Data.Models
         public string Description { get; set; }
 
         /// <summary>
-        /// Gets or sets the automatic detection state for searches of the nodes in the database node field.
-        /// </summary>
-        public bool IsSearchable { get; set; }
-
-        /// <summary>
         /// Gets or sets the URL for the database node field. The variable in the query will be replaced with the corresponding value.
         /// </summary>
         public string Url { get; set; }
+
+        /// <summary>
+        /// Gets or sets the automatic detection state for searches of the nodes in the database node field.
+        /// </summary>
+        public bool IsSearchable { get; set; }
 
         /// <summary>
         /// Gets or sets the nodes which have a value in the database node field.

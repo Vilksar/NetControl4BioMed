@@ -49,6 +49,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsSearchable", "Is searchable" },
+                    { "IsNotSearchable", "Is not searchable" },
                     { "HasDatabaseEdgeFieldEdges", "Has database edge field edges" },
                     { "HasNoDatabaseEdgeFieldEdges", "Does not have database edge field edges" }
                 },
@@ -84,6 +86,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                     input.SearchIn.Contains("DatabaseName") && item.Database.Name.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
+                .Where(item => input.Filter.Contains("IsSearchable") ? item.IsSearchable : true)
+                .Where(item => input.Filter.Contains("IsNotSearchable") ? !item.IsSearchable : true)
                 .Where(item => input.Filter.Contains("HasDatabaseEdgeFieldEdges") ? item.DatabaseEdgeFieldEdges.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoDatabaseEdgeFieldEdges") ? !item.DatabaseEdgeFieldEdges.Any() : true);
             // Sort it according to the parameters.

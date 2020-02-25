@@ -40,6 +40,10 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
+            public bool IsSearchable { get; set; }
+
+            [DataType(DataType.Text)]
+            [Required(ErrorMessage = "This field is required.")]
             public string DatabaseString { get; set; }
         }
 
@@ -106,6 +110,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 Name = Input.Name,
                 Description = Input.Description,
                 Url = Input.Url,
+                IsSearchable = Input.IsSearchable,
                 DatabaseId = database.Id,
                 Database = database,
                 DateTimeCreated = DateTime.Now

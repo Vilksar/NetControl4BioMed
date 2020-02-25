@@ -44,6 +44,10 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
+            public bool IsSearchable { get; set; }
+
+            [DataType(DataType.Text)]
+            [Required(ErrorMessage = "This field is required.")]
             public string DatabaseString { get; set; }
         }
 
@@ -98,6 +102,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 Name = View.DatabaseEdgeField.Name,
                 Description = View.DatabaseEdgeField.Description,
                 Url = View.DatabaseEdgeField.Url,
+                IsSearchable = View.DatabaseEdgeField.IsSearchable,
                 DatabaseString = View.DatabaseEdgeField.Database.Name
             };
             // Return the page.
@@ -183,6 +188,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
             View.DatabaseEdgeField.Name = Input.Name;
             View.DatabaseEdgeField.Description = Input.Description;
             View.DatabaseEdgeField.Url = Input.Url;
+            View.DatabaseEdgeField.IsSearchable = Input.IsSearchable;
             View.DatabaseEdgeField.DatabaseId = database.Id;
             View.DatabaseEdgeField.Database = database;
             // Save the changes to the database.
