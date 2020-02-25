@@ -56,6 +56,8 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
                     { "Id", "ID" },
                     { "Name", "Name" },
                     { "Description", "Description" },
+                    { "Databases", "Databases" },
+                    { "DatabaseNodeFields", "Node fields" },
                     { "Values", "Values" }
                 },
                 Filter = new Dictionary<string, string>
@@ -64,8 +66,7 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
-                    { "Name", "Name" },
-                    { "NodeCollectionNodeCount", "Number of node collections" }
+                    { "Name", "Name" }
                 }
             };
             // Define the search input.
@@ -87,7 +88,9 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Values") && item.DatabaseNodeFieldNodes.Where(item1 => item1.DatabaseNodeField.Database.IsPublic || item1.DatabaseNodeField.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Value.Contains(input.SearchString)));
+                    input.SearchIn.Contains("Databases") && item.DatabaseNodes.Where(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Database.Id.Contains(input.SearchString) || item1.Database.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("DatabaseNodeFields") && item.DatabaseNodes.Where(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Database.DatabaseNodeFields.Any(item2 => item2.Id.Contains(input.SearchString) || item2.Name.Contains(input.SearchString))) ||
+                    input.SearchIn.Contains("Values") && item.DatabaseNodeFieldNodes.Where(item1 => item1.DatabaseNodeField.Database.IsPublic || item1.DatabaseNodeField.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.DatabaseNodeField.IsSearchable && item1.Value.Contains(input.SearchString)));
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -102,12 +105,6 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
                     break;
                 case var sort when sort == ("Name", "Descending"):
                     query = query.OrderByDescending(item => item.Name);
-                    break;
-                case var sort when sort == ("NodeCollectionNodeCount", "Ascending"):
-                    query = query.OrderBy(item => item.NodeCollectionNodes.Count());
-                    break;
-                case var sort when sort == ("NodeCollectionNodeCount", "Descending"):
-                    query = query.OrderByDescending(item => item.NodeCollectionNodes.Count());
                     break;
                 default:
                     break;

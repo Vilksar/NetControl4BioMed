@@ -57,9 +57,25 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
             }
             // Get the item with the provided ID.
             var item = _context.NodeCollections
+                .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                .Where(item => item.NodeCollectionNodes.Any(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
                 .Where(item => item.Id == id)
+                .Include(item => item.NodeCollectionDatabases)
+                    .ThenInclude(item => item.Database)
+                        .ThenInclude(item => item.DatabaseUsers)
+                            .ThenInclude(item => item.User)
                 .Include(item => item.NodeCollectionNodes)
                     .ThenInclude(item => item.Node)
+                        .ThenInclude(item => item.DatabaseNodes)
+                            .ThenInclude(item => item.Database)
+                                .ThenInclude(item => item.DatabaseType)
+                .Include(item => item.NodeCollectionNodes)
+                    .ThenInclude(item => item.Node)
+                        .ThenInclude(item => item.DatabaseNodes)
+                            .ThenInclude(item => item.Database)
+                                .ThenInclude(item => item.DatabaseUsers)
+                                    .ThenInclude(item => item.User)
                 .FirstOrDefault();
             // Check if there was no item found.
             if (item == null)
@@ -73,8 +89,10 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
             View = new ViewModel
             {
                 NodeCollection = item,
-                NodeCollectionDatabases = item.NodeCollectionDatabases.Where(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)),
-                NodeCollectionNodes = item.NodeCollectionNodes.Where(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user)))
+                NodeCollectionDatabases = item.NodeCollectionDatabases
+                    .Where(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)),
+                NodeCollectionNodes = item.NodeCollectionNodes
+                    .Where(item1 => !item1.Node.DatabaseNodes.Any(item2 => item2.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user)))
             };
             // Return the page.
             return Page();

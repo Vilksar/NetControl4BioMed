@@ -60,6 +60,8 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
             // Get the item with the provided ID.
             var item = _context.Edges
                 .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                .Where(item => item.EdgeNodes.All(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
                 .Where(item => item.Id == id)
                 .Include(item => item.DatabaseEdges)
                     .ThenInclude(item => item.Database)
@@ -96,8 +98,6 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
                 DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges
                     .Where(item => item.DatabaseEdgeField.Database.IsPublic || item.DatabaseEdgeField.Database.DatabaseUsers.Any(item1 => item1.User == user)),
                 EdgeNodes = item.EdgeNodes
-                    .Where(item => !item.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => item.Node.DatabaseNodes.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
             };
             // Return the page.
             return Page();

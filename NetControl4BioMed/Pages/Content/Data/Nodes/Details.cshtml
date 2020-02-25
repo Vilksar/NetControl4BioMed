@@ -19,14 +19,16 @@
         <div class="small text-muted">
             <span title="@Model.View.Node.Id">@Model.View.Node.Id</span>
         </div>
-        @if (!string.IsNullOrEmpty(Model.View.Node.Description))
-        {
-            <div class="small">
-                <span title="Description">@Model.View.Node.Description</span>
-            </div>
-        }
     </div>
 </div>
+@if (!string.IsNullOrEmpty(Model.View.Node.Description))
+{
+    <div class="card mb-3">
+        <div class="card-body text-justify small">
+            <span title="Description">@Model.View.Node.Description</span>
+        </div>
+    </div>
+}
 @if (User.IsInRole("Administrator"))
 {
     <a asp-page="/Administration/Data/Nodes/Details" asp-route-id="@Model.View.Node.Id" class="btn btn-info btn-block mb-3" title="Details">
@@ -64,6 +66,9 @@
                         <th class="text-left text-break">
                             <span>Database</span>
                         </th>
+                        <th class="text-center text-break">
+                            <span>Type</span>
+                        </th>
                         <th class="text-center text-break" data-orderable="false" data-searchable="false">
                             <span>Internal</span>
                         </th>
@@ -81,6 +86,9 @@
                             </td>
                             <td class="text-left text-break">
                                 <span title="@databaseNode.Database.Name">@databaseNode.Database.Name</span>
+                            </td>
+                            <td class="text-center text-break">
+                                <span title="@databaseNode.Database.DatabaseType.Name">@databaseNode.Database.DatabaseType.Name</span>
                             </td>
                             <td class="text-center text-break">
                                 <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@databaseNode.Database.Id" title="Details">

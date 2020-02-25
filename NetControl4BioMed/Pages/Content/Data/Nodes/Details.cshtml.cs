@@ -62,6 +62,7 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
             // Get the item with the provided ID.
             var item = _context.Nodes
                 .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Where(item => item.DatabaseNodes.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                 .Where(item => item.Id == id)
                 .Include(item => item.DatabaseNodes)
                     .ThenInclude(item => item.Database)
@@ -70,18 +71,24 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
                     .ThenInclude(item => item.DatabaseNodeField)
                         .ThenInclude(item => item.Database)
                             .ThenInclude(item => item.DatabaseUsers)
-                .Include(item => item.EdgeNodes)
-                    .ThenInclude(item => item.Edge)
-                        .ThenInclude(item => item.DatabaseEdges)
-                            .ThenInclude(item => item.Database)
-                                .ThenInclude(item => item.DatabaseUsers)
+                                    .ThenInclude(item => item.User)
                 .Include(item => item.EdgeNodes)
                     .ThenInclude(item => item.Edge)
                         .ThenInclude(item => item.DatabaseEdges)
                             .ThenInclude(item => item.Database)
                                 .ThenInclude(item => item.DatabaseType)
+                .Include(item => item.EdgeNodes)
+                    .ThenInclude(item => item.Edge)
+                        .ThenInclude(item => item.DatabaseEdges)
+                            .ThenInclude(item => item.Database)
+                                .ThenInclude(item => item.DatabaseUsers)
+                                    .ThenInclude(item => item.User)
                 .Include(item => item.NodeCollectionNodes)
                     .ThenInclude(item => item.NodeCollection)
+                        .ThenInclude(item => item.NodeCollectionDatabases)
+                            .ThenInclude(item => item.Database)
+                                .ThenInclude(item => item.DatabaseUsers)
+                                    .ThenInclude(item => item.User)
                 .FirstOrDefault();
             // Check if there was no item found.
             if (item == null)
@@ -101,8 +108,10 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
                     .Where(item => item.DatabaseNodeField.Database.IsPublic || item.DatabaseNodeField.Database.DatabaseUsers.Any(item1 => item1.User == user)),
                 EdgeNodes = item.EdgeNodes
                     .Where(item => !item.Edge.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => item.Edge.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
+                    .Where(item => item.Edge.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                    .Where(item => item.Edge.EdgeNodes.All(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user)))),
                 NodeCollectionNodes = item.NodeCollectionNodes
+                    .Where(item => item.NodeCollection.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
             };
             // Return the page.
             return Page();

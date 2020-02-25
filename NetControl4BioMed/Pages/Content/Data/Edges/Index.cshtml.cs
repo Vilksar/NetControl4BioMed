@@ -58,6 +58,8 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
                     { "Description", "Description" },
                     { "SourceNode", "Source node" },
                     { "TargetNode", "Target node" },
+                    { "Databases", "Databases" },
+                    { "DatabasesEdgeFields", "DatabaseEdgeFields" },
                     { "Values", "Values" }
                 },
                 Filter = new Dictionary<string, string>
@@ -67,8 +69,10 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
                 {
                     { "Id", "ID" },
                     { "Name", "Name" },
-                    { "SourceNode", "Source node" },
-                    { "TargetNode", "Target node" }
+                    { "SourceNodeId", "Source node ID" },
+                    { "SourceNodeName", "Source node name" },
+                    { "TargetNodeId", "Target node ID" },
+                    { "TargetNodeName", "Target node name" }
                 }
             };
             // Define the search input.
@@ -83,6 +87,7 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
             var query = _context.Edges
                 .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                 .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                .Where(item => item.EdgeNodes.All(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
                 .AsQueryable();
             // Select the results matching the search string.
             query = query
@@ -90,8 +95,10 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("SourceNode") && item.EdgeNodes.Where(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))).Any(item1 => item1.Type == EdgeNodeType.Source && (item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Any(item2 => item2.DatabaseNodeField.IsSearchable && item2.Value.Contains(input.SearchString)))) ||
-                    input.SearchIn.Contains("TargetNode") && item.EdgeNodes.Where(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))).Any(item1 => item1.Type == EdgeNodeType.Target && (item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Any(item2 => item2.DatabaseNodeField.IsSearchable && item2.Value.Contains(input.SearchString)))) ||
+                    input.SearchIn.Contains("SourceNode") && item.EdgeNodes.Any(item1 => item1.Type == EdgeNodeType.Source && (item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Any(item2 => item2.DatabaseNodeField.IsSearchable && item2.Value.Contains(input.SearchString)))) ||
+                    input.SearchIn.Contains("TargetNode") && item.EdgeNodes.Any(item1 => item1.Type == EdgeNodeType.Target && (item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Any(item2 => item2.DatabaseNodeField.IsSearchable && item2.Value.Contains(input.SearchString)))) ||
+                    input.SearchIn.Contains("Databases") && item.DatabaseEdges.Where(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Database.Id.Contains(input.SearchString) || item1.Database.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("DatabaseEdgeFields") && item.DatabaseEdges.Where(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Database.DatabaseEdgeFields.Any(item2 => item2.Id.Contains(input.SearchString) || item2.Name.Contains(input.SearchString))) ||
                     input.SearchIn.Contains("Values") && item.DatabaseEdgeFieldEdges.Where(item1 => item1.DatabaseEdgeField.Database.IsPublic || item1.DatabaseEdgeField.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Value.Contains(input.SearchString)));
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
@@ -108,16 +115,28 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
                 case var sort when sort == ("Name", "Descending"):
                     query = query.OrderByDescending(item => item.Name);
                     break;
-                case var sort when sort == ("SourceNode", "Ascending"):
+                case var sort when sort == ("SourceNodeId", "Ascending"):
+                    query = query.OrderBy(item => item.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Id);
+                    break;
+                case var sort when sort == ("SourceNodeId", "Descending"):
+                    query = query.OrderByDescending(item => item.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Id);
+                    break;
+                case var sort when sort == ("SourceNodeName", "Ascending"):
                     query = query.OrderBy(item => item.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Name);
                     break;
-                case var sort when sort == ("SourceNode", "Descending"):
+                case var sort when sort == ("SourceNodeName", "Descending"):
                     query = query.OrderByDescending(item => item.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Name);
                     break;
-                case var sort when sort == ("TargetNode", "Ascending"):
+                case var sort when sort == ("TargetNodeId", "Ascending"):
+                    query = query.OrderBy(item => item.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Id);
+                    break;
+                case var sort when sort == ("TargetNodeId", "Descending"):
+                    query = query.OrderByDescending(item => item.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Id);
+                    break;
+                case var sort when sort == ("TargetNodeName", "Ascending"):
                     query = query.OrderBy(item => item.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name);
                     break;
-                case var sort when sort == ("TargetNode", "Descending"):
+                case var sort when sort == ("TargetNodeName", "Descending"):
                     query = query.OrderByDescending(item => item.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name);
                     break;
                 default:

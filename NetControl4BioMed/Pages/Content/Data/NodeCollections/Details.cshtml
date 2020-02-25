@@ -19,14 +19,16 @@
         <div class="small text-muted">
             <span title="@Model.View.NodeCollection.Id">@Model.View.NodeCollection.Id</span>
         </div>
-        @if (!string.IsNullOrEmpty(Model.View.NodeCollection.Description))
-        {
-            <div class="small">
-                <span title="Description">@Model.View.NodeCollection.Description</span>
-            </div>
-        }
     </div>
 </div>
+@if (!string.IsNullOrEmpty(Model.View.NodeCollection.Description))
+{
+    <div class="card mb-3">
+        <div class="card-body text-justify small">
+            <span title="Description">@Model.View.NodeCollection.Description</span>
+        </div>
+    </div>
+}
 @if (User.IsInRole("Administrator"))
 {
     <a asp-page="/Administration/Data/NodeCollections/Details" asp-route-id="@Model.View.NodeCollection.Id" class="btn btn-info btn-block mb-3" title="Details">
@@ -64,8 +66,14 @@
                         <th class="text-left text-break">
                             <span>Database</span>
                         </th>
+                        <th class="text-center text-break">
+                            <span>Type</span>
+                        </th>
                         <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>Links</span>
+                            <span>Internal</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>External</span>
                         </th>
                     </tr>
                 </thead>
@@ -80,9 +88,24 @@
                                 <span title="@nodeCollectionDatabase.Database.Name">@nodeCollectionDatabase.Database.Name</span>
                             </td>
                             <td class="text-center text-break">
+                                <span title="@nodeCollectionDatabase.Database.DatabaseType.Name">@nodeCollectionDatabase.Database.DatabaseType.Name</span>
+                            </td>
+                            <td class="text-center text-break">
                                 <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@nodeCollectionDatabase.Database.Id" title="Details">
                                     <span>Details</span>
                                 </a>
+                            </td>
+                            <td class="text-center text-break">
+                                @if (!string.IsNullOrEmpty(nodeCollectionDatabase.Database.Url))
+                                {
+                                    <a href="@nodeCollectionDatabase.Database.Url" title="Website">
+                                        <span>Website</span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
                             </td>
                         </tr>
                     }
