@@ -1,0 +1,14 @@
+﻿@{
+    Layout = "/Pages/Account/Manage/_Layout.cshtml";
+}
+
+@section Breadcrumbs {
+    <a asp-page="/Account/Manage/Profile/Index" class="breadcrumb-item"><span>Profile</span></a>
+    @RenderSection("Breadcrumbs", required: false)
+}
+
+@RenderBody()
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

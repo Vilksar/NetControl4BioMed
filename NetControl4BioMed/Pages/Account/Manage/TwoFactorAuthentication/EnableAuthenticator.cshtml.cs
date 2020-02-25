@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data.Models;
 
-namespace NetControl4BioMed.Pages.Account.Manage
+namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
 {
     [Authorize]
     public class EnableAuthenticatorModel : PageModel
@@ -140,7 +140,7 @@ namespace NetControl4BioMed.Pages.Account.Manage
             // Display a message.
             TempData["StatusMessage"] = "Success: The authenticator app was verified.";
             // Redirect to the two-factor-authentication" page.
-            return RedirectToPage("/Account/Manage/TwoFactorAuthentication");
+            return RedirectToPage("/Account/Manage/TwoFactorAuthentication/Index");
         }
     }
 }

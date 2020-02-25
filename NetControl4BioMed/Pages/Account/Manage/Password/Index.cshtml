@@ -1,12 +1,7 @@
 ﻿@page
-@model SetPasswordModel
+@model IndexModel
 @{
-    ViewData["Title"] = "Set password";
-    ViewData["ActivePage"] = "Password";
-}
-
-@section Breadcrumbs {
-    <a asp-page="/Accounts/Manage/SetPassword" class="breadcrumb-item"><span>Set password</span></a>
+    ViewData["Title"] = "Password";
 }
 
 <div class="card mb-3">
@@ -16,17 +11,22 @@
                 <span><i class="fas fa-user-lock"></i></span>
             </div>
             <div>
-                <span>Set password</span>
+                <span>Password</span>
             </div>
         </div>
     </div>
     <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>You do not have a local username and password for this site. Add a local account so you can authenticate without an external login.</span>
-        </div>
         <form method="post" class="text-justify">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            @if (Model.View.HasPassword)
+            {
+                <div class="form-group">
+                    <label asp-for="Input.OldPassword" class="font-weight-bold">Old password</label>
+                    <input asp-for="Input.OldPassword" class="form-control" />
+                    <span asp-description-for="Input.OldPassword" class="text-muted small">The current password associated with your account.</span>
+                    <span asp-validation-for="Input.OldPassword" class="text-danger small"></span>
+                </div>
+            }
             <div class="form-group">
                 <label asp-for="Input.NewPassword" class="font-weight-bold">New password</label>
                 <input asp-for="Input.NewPassword" class="form-control" />
@@ -45,8 +45,8 @@
                 <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
                 <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
             </div>
-            <button type="submit" title="Set" class="btn btn-block btn-success">
-                <span>Set</span>
+            <button type="submit" title="Update" class="btn btn-block btn-primary">
+                <span>Update</span>
             </button>
         </form>
     </div>

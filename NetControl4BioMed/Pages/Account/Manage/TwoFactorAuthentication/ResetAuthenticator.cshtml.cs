@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data.Models;
 
-namespace NetControl4BioMed.Pages.Account.Manage
+namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
 {
     [Authorize]
     public class ResetAuthenticatorModel : PageModel
@@ -59,7 +59,7 @@ namespace NetControl4BioMed.Pages.Account.Manage
             // Display a message.
             TempData["StatusMessage"] = "Success: Your authenticator app key has been reset, you will need to configure your authenticator app using the new key.";
             // Redirect to the enable authenticator page.
-            return RedirectToPage("/Account/Manage/EnableAuthenticator");
+            return RedirectToPage("/Account/Manage/TwoFactorAuthentication/EnableAuthenticator");
         }
     }
 }

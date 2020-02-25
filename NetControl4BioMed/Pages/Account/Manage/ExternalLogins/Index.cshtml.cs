@@ -9,15 +9,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data.Models;
 
-namespace NetControl4BioMed.Pages.Account.Manage
+namespace NetControl4BioMed.Pages.Account.Manage.ExternalLogins
 {
     [Authorize]
-    public class ExternalLoginsModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
 
-        public ExternalLoginsModel(UserManager<User> userManager, SignInManager<User> signInManager)
+        public IndexModel(UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -119,7 +119,7 @@ namespace NetControl4BioMed.Pages.Account.Manage
             // Clear the existing external cookie to ensure a clean login process.
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
             // Request a redirect to the external login provider to link a login for the current user
-            var redirectUrl = Url.Page("/Account/Manage/ExternalLogins", pageHandler: "LinkLoginCallback");
+            var redirectUrl = Url.Page("/Account/Manage/ExternalLogins/Index", pageHandler: "LinkLoginCallback");
             // Get the current properties of the external authentication configuration.
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, user.Id);
             // And apply the new authentication schema.

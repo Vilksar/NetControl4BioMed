@@ -12,10 +12,10 @@ using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.ViewModels;
 
-namespace NetControl4BioMed.Pages.Account.Manage
+namespace NetControl4BioMed.Pages.Account.Manage.Password
 {
     [Authorize]
-    public class ChangePasswordModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
@@ -23,7 +23,7 @@ namespace NetControl4BioMed.Pages.Account.Manage
         private readonly LinkGenerator _linkGenerator;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public ChangePasswordModel(UserManager<User> userManager, SignInManager<User> signInManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public IndexModel(UserManager<User> userManager, SignInManager<User> signInManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -54,6 +54,13 @@ namespace NetControl4BioMed.Pages.Account.Manage
             public string ReCaptchaToken { get; set; }
         }
 
+        public ViewModel View { get; set; }
+
+        public class ViewModel
+        {
+            public bool HasPassword { get; set; }
+        }
+
         public async Task<IActionResult> OnGetAsync()
         {
             // Get the current user.
@@ -66,12 +73,11 @@ namespace NetControl4BioMed.Pages.Account.Manage
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }
-            // Check if the user doesn't have a password set.
-            if (!await _userManager.HasPasswordAsync(user))
+            // Define the view.
+            View = new ViewModel
             {
-                // Redirect to the set password page.
-                return RedirectToPage("/Account/Manage/SetPassword");
-            }
+                HasPassword = await _userManager.HasPasswordAsync(user)
+            };
             // Return the page.
             return Page();
         }
@@ -88,12 +94,11 @@ namespace NetControl4BioMed.Pages.Account.Manage
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }
-            // Check if the user doesn't have a password set.
-            if (!await _userManager.HasPasswordAsync(user))
+            // Define the view.
+            View = new ViewModel
             {
-                // Redirect to the set password page.
-                return RedirectToPage("/Account/Manage/SetPassword");
-            }
+                HasPassword = await _userManager.HasPasswordAsync(user)
+            };
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
             {
@@ -110,8 +115,8 @@ namespace NetControl4BioMed.Pages.Account.Manage
                 // Return the page.
                 return Page();
             }
-            // Try to change the password with the new one.
-            var result = await _userManager.ChangePasswordAsync(user, Input.OldPassword, Input.NewPassword);
+            // Try to change the password or set a new one.
+            var result = View.HasPassword ? await _userManager.ChangePasswordAsync(user, Input.OldPassword, Input.NewPassword) : await _userManager.AddPasswordAsync(user, Input.NewPassword);
             // Check if the password update wasn't successful.
             if (!result.Succeeded)
             {
@@ -128,7 +133,7 @@ namespace NetControl4BioMed.Pages.Account.Manage
             var emailViewModel = new EmailPasswordChangedViewModel
             {
                 Email = user.Email,
-                Url = _linkGenerator.GetUriByPage(HttpContext, "/Account/Manage/ChangePassword", handler: null, values: null),
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Account/Manage/Password/Index", handler: null, values: null),
                 ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Send the e-mail changed e-mail to the user.

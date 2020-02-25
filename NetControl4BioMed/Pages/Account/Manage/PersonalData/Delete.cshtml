@@ -1,19 +1,18 @@
 ﻿@page
-@model DeletePersonalDataModel
+@model DeleteModel
 @{
     ViewData["Title"] = "Delete personal data";
-    ViewData["ActivePage"] = "PersonalData";
 }
 
 @section Breadcrumbs {
-    <a asp-page="/Accounts/Manage/DeletePersonalData" class="breadcrumb-item"><span>Delete personal data</span></a>
+    <a asp-page="/Accounts/Manage/PersonalData/Delete" class="breadcrumb-item"><span>Delete</span></a>
 }
 
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
-                <span><i class="fas fa-user-check"></i></span>
+                <span><i class="fas fa-user-times"></i></span>
             </div>
             <div>
                 <span>Delete personal data</span>
@@ -27,7 +26,7 @@
         </div>
         <form method="post" class="text-justify">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify"></div>
-            @if (Model.View.RequirePassword)
+            @if (Model.View.HasPassword)
             {
                 <div class="form-group">
                     <label asp-for="Input.Password" class="font-weight-bold">Password</label>
@@ -36,7 +35,13 @@
                     <span asp-validation-for="Input.Password" class="text-danger small"></span>
                 </div>
             }
-            <button type="submit" title="Delete personal data and close account" class="btn btn-block btn-danger">
+            <div class="form-group" hidden>
+                <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+                <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+                <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+                <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+            </div>
+            <button type="submit" title="Delete data and close account" class="btn btn-block btn-danger">
                 <span>Delete data and close account</span>
             </button>
         </form>
@@ -45,4 +50,5 @@
 
 @section Scripts {
     <partial name="_ScriptsValidationPartial" />
+    <partial name="_ScriptsReCaptchaPartial" />
 }

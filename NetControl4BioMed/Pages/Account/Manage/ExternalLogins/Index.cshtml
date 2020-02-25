@@ -1,12 +1,7 @@
 ﻿@page
-@model ExternalLoginsModel
+@model IndexModel
 @{
     ViewData["Title"] = "External logins";
-    ViewData["ActivePage"] = "ExternalLogins";
-}
-
-@section Breadcrumbs {
-    <a asp-page="/Accounts/Manage/ExternalLogins" class="breadcrumb-item"><span>External logins</span></a>
 }
 
 @if (Model.View.CurrentLogins.Any())
@@ -33,10 +28,20 @@
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
                     <input asp-for="@login.LoginProvider" type="hidden" name="loginProvider" />
                     <input asp-for="@login.ProviderKey" type="hidden" name="providerKey" />
-                    <button type="submit" title="@(Model.View.ShowRemoveButton ? "Remove this login from your account." : "The login can't be removed, as you would be locked out of your account.")" class="btn btn-block btn-success" @(Model.View.ShowRemoveButton ? null : "disabled")>
-                        <span><i class="fab fa-@login.ProviderDisplayName.ToLower()"></i></span>
-                        <span>@login.ProviderDisplayName</span>
-                    </button>
+                    @if (Model.View.ShowRemoveButton)
+                    {
+                        <button type="submit" title="Remove this login from your account." class="btn btn-block btn-success">
+                            <span><i class="fab fa-@login.ProviderDisplayName.ToLower()"></i></span>
+                            <span>@login.ProviderDisplayName</span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" title="The login can't be removed, as you would be locked out of your account." class="btn btn-block btn-success" disabled>
+                            <span><i class="fab fa-@login.ProviderDisplayName.ToLower()"></i></span>
+                            <span>@login.ProviderDisplayName</span>
+                        </button>
+                    }
                 </form>
             }
         </div>

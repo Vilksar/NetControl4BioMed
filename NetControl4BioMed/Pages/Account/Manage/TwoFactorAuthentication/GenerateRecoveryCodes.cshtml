@@ -2,11 +2,10 @@
 @model GenerateRecoveryCodesModel
 @{
     ViewData["Title"] = "Generate two-factor authentication recovery codes";
-    ViewData["ActivePage"] = "TwoFactorAuthentication";
 }
 
 @section Breadcrumbs {
-    <a asp-page="/Accounts/Manage/GenerateRecoveryCodes" class="breadcrumb-item"><span>Generate two-factor authentication recovery codes</span></a>
+    <a asp-page="/Accounts/Manage/TwoFactorAuthentication/GenerateRecoveryCodes" class="breadcrumb-item"><span>Generate two-factor authentication recovery codes</span></a>
 }
 
 <div class="card mb-3">
@@ -23,7 +22,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>Generating new recovery codes does not change the keys used in authenticator apps. If you wish to change the key used in an authenticator app you should <a asp-page="/Account/Manage/ResetAuthenticator" class="alert-link">reset your authenticator keys</a>.</span>
+            <span>Generating new recovery codes does not change the keys used in authenticator apps. If you wish to change the key used in an authenticator app you should <a asp-page="/Account/Manage/TwoFactorAuthentication/ResetAuthenticator" class="alert-link">reset your authenticator keys</a>.</span>
         </div>
         <div class="alert alert-danger text-justify text-wrap">
             <span><i class="fas fa-exclamation-circle"></i></span>

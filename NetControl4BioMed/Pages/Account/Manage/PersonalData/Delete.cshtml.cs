@@ -7,28 +7,25 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Routing;
+using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Interfaces;
-using NetControl4BioMed.Helpers.ViewModels;
 
-namespace NetControl4BioMed.Pages.Account.Manage
+namespace NetControl4BioMed.Pages.Account.Manage.PersonalData
 {
     [Authorize]
-    public class SetPasswordModel : PageModel
+    public class DeleteModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly ISendGridEmailSender _emailSender;
-        private readonly LinkGenerator _linkGenerator;
+        private readonly ApplicationDbContext _context;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public SetPasswordModel(UserManager<User> userManager, SignInManager<User> signInManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public DeleteModel(UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _emailSender = emailSender;
-            _linkGenerator = linkGenerator;
+            _context = context;
             _reCaptchaChecker = reCaptchaChecker;
         }
 
@@ -39,15 +36,16 @@ namespace NetControl4BioMed.Pages.Account.Manage
         {
             [DataType(DataType.Password)]
             [Required(ErrorMessage = "This field is required.")]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-            public string NewPassword { get; set; }
-
-            [DataType(DataType.Password)]
-            [Required(ErrorMessage = "This field is required.")]
-            [Compare(nameof(NewPassword), ErrorMessage = "The new password and confirmation password do not match.")]
-            public string ConfirmPassword { get; set; }
+            public string Password { get; set; }
 
             public string ReCaptchaToken { get; set; }
+        }
+
+        public ViewModel View { get; set; }
+
+        public class ViewModel
+        {
+            public bool HasPassword { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -62,28 +60,32 @@ namespace NetControl4BioMed.Pages.Account.Manage
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }
-            // Check if the user doesn't have a password set.
-            if (await _userManager.HasPasswordAsync(user))
+            // Define the variables for the view.
+            View = new ViewModel
             {
-                // Redirect to the change password page.
-                return RedirectToPage("/Account/Manage/ChangePassword");
-            }
+                HasPassword = await _userManager.HasPasswordAsync(user)
+            };
             // Return the page.
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // We get the current user.
+            // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // We check if the user exists or not.
+            // Check if the user exists or not.
             if (user == null)
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
+                // Redirect to the login page.
                 return RedirectToPage("/Index");
             }
+            // Define the variables to return to the view.
+            View = new ViewModel
+            {
+                HasPassword = await _userManager.HasPasswordAsync(user)
+            };
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
             {
@@ -100,34 +102,48 @@ namespace NetControl4BioMed.Pages.Account.Manage
                 // Return the page.
                 return Page();
             }
-            // Try to change the password with the new one.
-            var result = await _userManager.AddPasswordAsync(user, Input.NewPassword);
-            // Check if the password update wasn't successful.
+            // Check if the user is the last administrator user.
+            if ((await _userManager.IsInRoleAsync(user, "Administrator")) && (await _userManager.GetUsersInRoleAsync("Administrator")).Count() == 1)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "If you delete your account, then there will be no administrator users left. Please add a new administrator, and then try again.");
+                // Return the page.
+                return Page();
+            }
+            // Check if the user has password and the provided password is incorrect.
+            if (View.HasPassword && !await _userManager.CheckPasswordAsync(user, Input.Password))
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The provided password is not correct.");
+                // Return the page.
+                return Page();
+            }
+            // Try to delete the user.
+            var result = await _userManager.DeleteAsync(user);
+            // Check if the user deletion was not successful.
             if (!result.Succeeded)
             {
-                // Go over the encountered errors and add them to the model.
+                // Go over the encountered errors
                 foreach (var error in result.Errors)
                 {
+                    // and add them to the model
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
                 // Return the page.
                 return Page();
             }
-            // Define a new view model for the e-mail.
-            var emailViewModel = new EmailPasswordChangedViewModel
-            {
-                Email = user.Email,
-                Url = _linkGenerator.GetUriByPage(HttpContext, "/Account/Manage/ChangePassword", handler: null, values: null),
-                ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
-            };
-            // Send the e-mail changed e-mail to the user.
-            await _emailSender.SendPasswordChangedEmailAsync(emailViewModel);
-            // Re-sign in the user to update the changes.
-            await _signInManager.RefreshSignInAsync(user);
-            // Display a message.
-            TempData["StatusMessage"] = "Success: The password was sucessfully set.";
-            // Redirect to page.
-            return RedirectToPage();
+            // Sign out the user.
+            await _signInManager.SignOutAsync();
+            // Go over all of the networks and analyses and find the ones without any assigned users.
+            var networks = _context.Networks.Where(item => !item.NetworkUsers.Any());
+            var analyses = _context.Analyses.Where(item => !item.AnalysisUsers.Any() || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
+            // Mark the items for deletion.
+            _context.Analyses.RemoveRange(analyses);
+            _context.Networks.RemoveRange(networks);
+            // Save the changes in the database.
+            await _context.SaveChangesAsync();
+            // Redirect to the home page.
+            return RedirectToPage("/Index");
         }
     }
 }

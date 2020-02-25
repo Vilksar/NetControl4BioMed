@@ -1,12 +1,7 @@
 ﻿@page
-@model PersonalDataModel
+@model IndexModel
 @{
     ViewData["Title"] = "Personal data";
-    ViewData["ActivePage"] = "PersonalData";
-}
-
-@section Breadcrumbs {
-    <a asp-page="/Accounts/Manage/PersonalData" class="breadcrumb-item"><span>Personal data</span></a>
 }
 
 <div class="card mb-3">
@@ -25,19 +20,16 @@
             <span><i class="fas fa-info-circle"></i></span>
             <span>Your account contains personal data that you have given us. Click the button below to download that data.</span>
         </div>
-        <form method="post" class="text-justify">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-            <button type="submit" title="Download" class="btn btn-block btn-primary">
-                <span>Download</span>
-            </button>
-        </form>
+        <a asp-page="/Account/Manage/PersonalData/Download" class="btn btn-block btn-primary" title="Download personal data">
+            <span>Download</span>
+        </a>
     </div>
 </div>
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
-                <span><i class="fas fa-user-check"></i></span>
+                <span><i class="fas fa-user-times"></i></span>
             </div>
             <div>
                 <span>Delete personal data</span>
@@ -49,12 +41,8 @@
             <span><i class="fas fa-exclamation-circle"></i></span>
             <span>Your account contains personal data that you have given us. Click the button below to delete that data. Deleting it will permanently remove your account, and this cannot be recovered.</span>
         </div>
-        <a asp-page="/Account/Manage/DeletePersonalData" class="btn btn-block btn-danger">
+        <a asp-page="/Account/Manage/PersonalData/Delete" class="btn btn-block btn-danger" title="Delete personal data">
             <span>Delete</span>
         </a>
     </div>
 </div>
-
-@section Scripts {
-    <partial name="_ScriptsValidationPartial" />
-}

@@ -8,14 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data.Models;
 
-namespace NetControl4BioMed.Pages.Account.Manage
+namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
 {
     [Authorize]
-    public class DisableTwoFactorAuthenticationModel : PageModel
+    public class GenerateRecoveryCodesModel : PageModel
     {
         private readonly UserManager<User> _userManager;
 
-        public DisableTwoFactorAuthenticationModel(UserManager<User> userManager)
+        public GenerateRecoveryCodesModel(UserManager<User> userManager)
         {
             _userManager = userManager;
         }
@@ -36,9 +36,9 @@ namespace NetControl4BioMed.Pages.Account.Manage
             if (!await _userManager.GetTwoFactorEnabledAsync(user))
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: Two-factor authentication can't be disabled, as it is not currently enabled.";
+                TempData["StatusMessage"] = "Error: Recovery codes can't be generated, as you don't have two-factor authentication enabled.";
                 // Redirect to the two-factor authentication page.
-                return RedirectToPage("/Account/Manage/TwoFactorAuthentication");
+                return RedirectToPage("/Account/Manage/TwoFactorAuthentication/Index");
             }
             // Return the page.
             return Page();
@@ -60,28 +60,16 @@ namespace NetControl4BioMed.Pages.Account.Manage
             if (!await _userManager.GetTwoFactorEnabledAsync(user))
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: Two-factor authentication can't be disabled, as it is not currently enabled.";
+                TempData["StatusMessage"] = "Error: Can't generate recovery codes, becuase you don't have two-factor authentication enabled.";
                 // Redirect to the two-factor authentication page.
-                return RedirectToPage("/Account/Manage/TwoFactorAuthentication");
+                return RedirectToPage("/Account/Manage/TwoFactorAuthentication/Index");
             }
-            // Try to disable two-factor authentication.
-            var result = await _userManager.SetTwoFactorEnabledAsync(user, false);
-            // Check if the disabling was not successful.
-            if (!result.Succeeded)
-            {
-                // Go over the encountered errors
-                foreach (var error in result.Errors)
-                {
-                    // and add them to the model
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-                // Return the page.
-                return Page();
-            }
+            // Generate the new recovery codes.
+            TempData["RecoveryCodes"] = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             // Display a message.
-            TempData["StatusMessage"] = "Success: Two-factor authentication has been disabled. You can enable it again when you set up an authenticator app.";
+            TempData["StatusMessage"] = "Success: The recovery codes were successfully generated.";
             // Redirect to the two-factor authentication page.
-            return RedirectToPage("/Account/Manage/TwoFactorAuthentication");
+            return RedirectToPage("/Account/Manage/TwoFactorAuthentication/Index");
         }
     }
 }

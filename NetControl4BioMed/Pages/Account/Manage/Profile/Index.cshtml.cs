@@ -13,10 +13,10 @@ using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.ViewModels;
 
-namespace NetControl4BioMed.Pages.Account.Manage
+namespace NetControl4BioMed.Pages.Account.Manage.Profile
 {
     [Authorize]
-    public class ProfileModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
@@ -24,7 +24,7 @@ namespace NetControl4BioMed.Pages.Account.Manage
         private readonly LinkGenerator _linkGenerator;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public ProfileModel(UserManager<User> userManager, SignInManager<User> signInManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public IndexModel(UserManager<User> userManager, SignInManager<User> signInManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
             _userManager = userManager;
             _signInManager = signInManager;

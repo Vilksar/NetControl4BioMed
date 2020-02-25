@@ -1,13 +1,8 @@
 ﻿@page
-@model TwoFactorAuthenticationModel
+@model IndexModel
 @{
     ViewData["Title"] = "Two-factor authentication";
-    ViewData["ActivePage"] = "TwoFactorAuthentication";
     var recoveryCodes = (IEnumerable<string>)TempData["RecoveryCodes"];
-}
-
-@section Breadcrumbs {
-    <a asp-page="/Accounts/Manage/TwoFactorAuthentication" class="breadcrumb-item"><span>Two-factor authentication</span></a>
 }
 
 @if (recoveryCodes != null)
@@ -63,14 +58,14 @@
             {
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span><span class="font-weight-bold">You have no recovery codes left.</span> You must <a asp-page="/Account/Manage/GenerateRecoveryCodes" class="alert-link">generate a new set of recovery codes</a> before you can log in with a recovery code.</span>
+                    <span><span class="font-weight-bold">You have no recovery codes left.</span> You must <a asp-page="/Account/Manage/TwoFactorAuthentication/GenerateRecoveryCodes" class="alert-link">generate a new set of recovery codes</a> before you can log in with a recovery code.</span>
                 </div>
             }
             else if (Model.View.RecoveryCodesLeft <= 3)
             {
                 <div class="alert alert-warning text-justify text-wrap">
                     <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span><span class="font-weight-bold">You have @Model.View.RecoveryCodesLeft recovery code@(Model.View.RecoveryCodesLeft != 1 ? "s" : string.Empty) left.</span> You should <a asp-page="/Account/Manage/GenerateRecoveryCodes" class="alert-link">generate a new set of recovery codes</a>.</span>
+                    <span><span class="font-weight-bold">You have @Model.View.RecoveryCodesLeft recovery code@(Model.View.RecoveryCodesLeft != 1 ? "s" : string.Empty) left.</span> You should <a asp-page="/Account/Manage/TwoFactorAuthentication/GenerateRecoveryCodes" class="alert-link">generate a new set of recovery codes</a>.</span>
                 </div>
             }
             @if (Model.View.IsMachineRemembered)
@@ -82,10 +77,10 @@
                     </button>
                 </form>
             }
-            <a asp-page="/Account/Manage/DisableTwoFactorAuthentication" class="btn btn-block btn-danger">
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/Disable" class="btn btn-block btn-danger">
                 <span>Disable two-factor authentication</span>
             </a>
-            <a asp-page="/Account/Manage/GenerateRecoveryCodes" class="btn btn-block btn-warning">
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/GenerateRecoveryCodes" class="btn btn-block btn-warning">
                 <span>Reset recovery codes</span>
             </a>
         </div>
@@ -109,16 +104,16 @@
         </div>
         @if (!Model.View.HasAuthenticator)
         {
-            <a asp-page="/Account/Manage/EnableAuthenticator" class="btn btn-block btn-success">
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-success">
                 <span>Add authenticator app</span>
             </a>
         }
         else
         {
-            <a asp-page="/Account/Manage/EnableAuthenticator" class="btn btn-block btn-success">
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-success">
                 <span>Setup authenticator app</span>
             </a>
-            <a asp-page="/Account/Manage/ResetAuthenticator" class="btn btn-block btn-danger">
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/ResetAuthenticator" class="btn btn-block btn-danger">
                 <span>Reset authenticator app</span>
             </a>
         }
