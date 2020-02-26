@@ -9,10 +9,20 @@
 <form method="get" class="text-justify">
     <div class="row align-items-center">
         <div class="col-lg-6 mb-3">
-            <a asp-page="/Content/Created/Networks/Create" class="btn btn-success btn-block" title="Create">
-                <span><i class="fas fa-plus"></i></span>
-                <span>Create a new network</span>
-            </a>
+            <div class="input-group">
+                <select name="databaseTypeId" class="custom-select">
+                    @foreach (var item in Model.View.DatabaseTypes)
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                </select>
+                <div class="input-group-append">
+                    <button type="submit" asp-page="/Content/Created/Networks/Create" class="btn btn-success btn-block" title="Create">
+                        <span><i class="fas fa-plus"></i></span>
+                        <span>Create a new network</span>
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="col-lg-6 mb-3">
             <button type="submit" asp-page="/Content/Created/Networks/Delete" class="btn btn-danger btn-block item-group-button" title="Delete" disabled>

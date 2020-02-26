@@ -8,6 +8,7 @@
     <a asp-page="/Administration/Data/Edges/Update" class="breadcrumb-item"><span>Update</span></a>
 }
 
+<div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
 <div class="alert alert-danger text-wrap text-justify">
     <span>Editing or deleting an edge will delete all of the networks and analyses that contain it. <span class="font-weight-bold">This action can't be reversed!</span></span>
 </div>
@@ -53,7 +54,6 @@
     </div>
     <div class="card-body">
         <form method="post" class="text-justify">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
             <div class="form-group">
                 <label asp-for="Input.Type" class="font-weight-bold">Type</label>
                 <select asp-for="Input.Type" class="custom-select form-control">

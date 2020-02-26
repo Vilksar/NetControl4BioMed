@@ -98,7 +98,7 @@
                             <td class="text-center text-break">
                                 @if (!string.IsNullOrEmpty(databaseEdge.Database.Url))
                                 {
-                                    <a href="@databaseEdge.Database.Url" title="Website">
+                                    <a href="@databaseEdge.Database.Url" title="Website" target="_blank" rel="nofollow noopener noreferrer">
                                         <span>Website</span>
                                     </a>
                                 }
@@ -176,7 +176,7 @@
                             <td class="text-center text-break">
                                 @if (!string.IsNullOrEmpty(databaseEdgeFieldEdge.DatabaseEdgeField.Url))
                                 {
-                                    <a href="@(string.Concat(databaseEdgeFieldEdge.DatabaseEdgeField.Url, databaseEdgeFieldEdge.Value))" title="Details">
+                                    <a href="@databaseEdgeFieldEdge.DatabaseEdgeField.Url@databaseEdgeFieldEdge.Value" title="Details" target="_blank" rel="nofollow noopener noreferrer">
                                         <span>Details</span>
                                     </a>
                                 }

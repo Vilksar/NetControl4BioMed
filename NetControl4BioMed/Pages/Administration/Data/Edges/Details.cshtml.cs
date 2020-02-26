@@ -47,6 +47,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                     .Include(item => item.DatabaseEdges)
                         .ThenInclude(item => item.Database)
                     .Include(item => item.DatabaseEdgeFieldEdges)
+                        .ThenInclude(item => item.DatabaseEdgeField)
                     .Include(item => item.EdgeNodes)
                         .ThenInclude(item => item.Node)
                     .Include(item => item.NetworkEdges)

@@ -314,7 +314,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                     // Define the new edge.
                     var edge = new Edge
                     {
-                        Name = string.Concat(edgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Name, " -> ", edgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name),
+                        Name = string.Concat(edgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Name, " - ", edgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name),
                         Description = item.Description,
                         DateTimeCreated = DateTime.Now,
                         EdgeNodes = new List<EdgeNode> { edgeNodes.First(item1 => item1.Type == EdgeNodeType.Source), edgeNodes.First(item1 => item1.Type == EdgeNodeType.Target) },
@@ -480,7 +480,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                         continue;
                     }
                     // Update the edge.
-                    edge.Name = string.Concat(edgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Name, " -> ", edgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name);
+                    edge.Name = string.Concat(edgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Name, " - ", edgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name);
                     edge.Description = item.Description;
                     edge.EdgeNodes = new List<EdgeNode> { edgeNodes.First(item1 => item1.Type == EdgeNodeType.Source), edgeNodes.First(item1 => item1.Type == EdgeNodeType.Target) };
                     edge.DatabaseEdgeFieldEdges = edgeFieldEdges.ToList();

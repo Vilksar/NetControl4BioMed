@@ -23,7 +23,7 @@ namespace NetControl4BioMed.Data.Seed
                 DateTimeCreated = DateTime.Now,
                 Name = "Generic",
                 Description = "This is a generic database in which to store all of the generic nodes.",
-                IsPublic = false,
+                IsPublic = true,
                 Url = null,
                 DatabaseTypeId = "4d5ed537-070d-47fc-b018-43af2d2bf47f"
             },
