@@ -39,6 +39,10 @@ namespace NetControl4BioMed.Pages.Administration
 
             public int EdgeCount { get; set; }
 
+            public int GenericNodeCount { get; set; }
+
+            public int GenericEdgeCount { get; set; }
+
             public int NodeCollectionCount { get; set; }
 
             public bool DuplicateDetected { get; set; }
@@ -89,30 +93,86 @@ namespace NetControl4BioMed.Pages.Administration
             // Define the view.
             View = new ViewModel
             {
-                UserCount = _context.Users.Count(),
-                RoleCount = _context.Roles.Count(),
-                DatabaseCount = _context.Databases.Count(),
-                NodeCount = _context.Nodes.Count(),
-                EdgeCount = _context.Edges.Count(),
-                NodeCollectionCount = _context.NodeCollections.Count(),
-                DuplicateDatabaseTypes = _context.DatabaseTypes.GroupBy(item => item.Name).Where(item => item.Count() > 1).Select(item => item.Key),
-                DuplicateDatabases = _context.Databases.GroupBy(item => item.Name).Where(item => item.Count() > 1).Select(item => item.Key),
-                DuplicateDatabaseNodeFields = _context.DatabaseNodeFields.GroupBy(item => item.Name).Where(item => item.Count() > 1).Select(item => item.Key),
-                DuplicateDatabaseEdgeFields = _context.DatabaseEdgeFields.GroupBy(item => item.Name).Where(item => item.Count() > 1).Select(item => item.Key),
-                DuplicateDatabaseNodeFieldNodes = _context.DatabaseNodeFieldNodes.Where(item => item.DatabaseNodeField.IsSearchable).GroupBy(item => item.Value).Where(item => item.Count() > 1).Select(item => item.Key),
-                DuplicateNodes = _context.Nodes.GroupBy(item => item.Name).Where(item => item.Count() > 1).Select(item => item.Key),
-                DuplicateEdges = _context.Edges.GroupBy(item => item.Name).Where(item => item.Count() > 1).Select(item => item.Key),
-                DuplicateNodeCollections = _context.NodeCollections.GroupBy(item => item.Name).Where(item => item.Count() > 1).Select(item => item.Key),
-                OrphanedNodes = _context.Nodes.Where(item => !item.DatabaseNodeFieldNodes.Any()),
-                OrphanedEdges = _context.Edges.Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2),
-                OrphanedNodeCollections = _context.NodeCollections.Where(item => !item.NodeCollectionNodes.Any()),
-                OrphanedNetworks = _context.Networks.Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any()),
-                OrphanedAnalyses = _context.Analyses.Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any()),
-                InconsistentNodes = _context.Nodes.Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
-                InconsistentEdges = _context.Edges.Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
-                InconsistentNodeCollections = _context.NodeCollections.Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
-                InconsistentNetworks = _context.Networks.Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
-                InconsistentAnalyses = _context.Analyses.Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                UserCount = _context.Users
+                    .Count(),
+                RoleCount = _context.Roles
+                    .Count(),
+                DatabaseCount = _context.Databases
+                    .Count(),
+                NodeCount = _context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Count(),
+                EdgeCount = _context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Count(),
+                GenericNodeCount = _context.Nodes
+                    .Where(item => item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Count(),
+                GenericEdgeCount = _context.Edges
+                    .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Count(),
+                NodeCollectionCount = _context.NodeCollections
+                    .Count(),
+                DuplicateDatabaseTypes = _context.DatabaseTypes
+                    .Where(item => item.Name != "Generic")
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key),
+                DuplicateDatabases = _context.Databases
+                    .Where(item => item.DatabaseType.Name != "Generic")
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key),
+                DuplicateDatabaseNodeFields = _context.DatabaseNodeFields
+                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key),
+                DuplicateDatabaseEdgeFields = _context.DatabaseEdgeFields
+                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key),
+                DuplicateDatabaseNodeFieldNodes = _context.DatabaseNodeFieldNodes
+                    .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
+                    .Where(item => item.DatabaseNodeField.IsSearchable)
+                    .GroupBy(item => item.Value)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key),
+                DuplicateNodes = _context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key),
+                DuplicateEdges = _context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key),
+                DuplicateNodeCollections = _context.NodeCollections
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key),
+                OrphanedNodes = _context.Nodes
+                    .Where(item => !item.DatabaseNodeFieldNodes.Any()),
+                OrphanedEdges = _context.Edges
+                    .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2),
+                OrphanedNodeCollections = _context.NodeCollections
+                    .Where(item => !item.NodeCollectionNodes.Any()),
+                OrphanedNetworks = _context.Networks
+                    .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any()),
+                OrphanedAnalyses = _context.Analyses
+                    .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any()),
+                InconsistentNodes = _context.Nodes
+                    .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
+                InconsistentEdges = _context.Edges
+                    .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
+                InconsistentNodeCollections = _context.NodeCollections
+                    .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
+                InconsistentNetworks = _context.Networks
+                    .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
+                InconsistentAnalyses = _context.Analyses
+                    .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
             };
             // Check if there were any issues detected.
             View.DuplicateDetected = View.DuplicateDatabaseTypes.Any() || View.DuplicateDatabases.Any() || View.DuplicateDatabaseNodeFields.Any() || View.DuplicateDatabaseEdgeFields.Any() || View.DuplicateDatabaseNodeFieldNodes.Any() || View.DuplicateNodes.Any() || View.DuplicateEdges.Any() || View.DuplicateNodeCollections.Any();

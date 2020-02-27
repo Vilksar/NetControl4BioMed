@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 
@@ -103,6 +104,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 Items = _context.Networks
                     .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                     .Where(item => Input.Ids.Contains(item.Id))
+                    .Include(item => item.NetworkDatabases)
+                        .ThenInclude(item => item.Database)
+                            .ThenInclude(item => item.DatabaseType)
+                    .Include(item => item.NetworkNodes)
+                        .ThenInclude(item => item.Node)
+                    .Include(item => item.NetworkEdges)
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())

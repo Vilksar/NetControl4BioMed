@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 
@@ -48,7 +49,8 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.Networks.Where(item => ids.Contains(item.Id))
+                Items = _context.Networks
+                    .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -75,7 +77,14 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.Networks.Where(item => Input.Ids.Contains(item.Id))
+                Items = _context.Networks
+                    .Where(item => Input.Ids.Contains(item.Id))
+                    .Include(item => item.NetworkDatabases)
+                        .ThenInclude(item => item.Database)
+                            .ThenInclude(item => item.DatabaseType)
+                    .Include(item => item.NetworkNodes)
+                        .ThenInclude(item => item.Node)
+                    .Include(item => item.NetworkEdges)
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())

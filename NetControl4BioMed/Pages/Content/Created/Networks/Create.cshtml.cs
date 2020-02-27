@@ -12,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Helpers.Algorithms.Network;
 using NetControl4BioMed.Helpers.Extensions;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks
@@ -116,13 +115,23 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 IsGeneric = databaseType.Name == "Generic",
                 NodeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
-                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user)),
+                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.DatabaseNodeFields.Any(item1 => item1.IsSearchable))
+                    .Include(item => item.DatabaseNodeFields)
+                        .ThenInclude(item => item.DatabaseNodeFieldNodes),
                 EdgeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
-                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user)),
+                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.DatabaseEdges.Any())
+                    .Include(item => item.DatabaseEdges)
+                        .ThenInclude(item => item.Edge)
+                            .ThenInclude(item => item.EdgeNodes)
+                                .ThenInclude(item => item.Node),
                 SeedNodeCollections = _context.NodeCollections
                     .Where(item => !item.NodeCollectionDatabases.All(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                    .Include(item => item.NodeCollectionNodes)
+                        .ThenInclude(item => item.Node)
             };
             // Check if there weren't any node databases available.
             if (!View.NodeDatabases.Any())
@@ -230,11 +239,17 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 NodeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Include(item => item.DatabaseNodeFields),
+                    .Where(item => item.DatabaseNodeFields.Any(item1 => item1.IsSearchable))
+                    .Include(item => item.DatabaseNodeFields)
+                        .ThenInclude(item => item.DatabaseNodeFieldNodes),
                 EdgeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Include(item => item.DatabaseEdgeFields),
+                    .Where(item => item.DatabaseEdges.Any())
+                    .Include(item => item.DatabaseEdges)
+                        .ThenInclude(item => item.Edge)
+                            .ThenInclude(item => item.EdgeNodes)
+                                .ThenInclude(item => item.Node),
                 SeedNodeCollections = _context.NodeCollections
                     .Where(item => !item.NodeCollectionDatabases.All(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
@@ -322,68 +337,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     .Select(item => item.SourceNode)
                     .Concat(seedEdges.Select(item => item.TargetNode))
                     .Distinct();
-                // Define the new items to be added to the generic database.
-                var nodes = seedNodes
-                    .Select(item => new Node
-                    {
-                        DateTimeCreated = DateTime.Now,
-                        Name = item,
-                        Description = $"This is an automatically generated node for the network \"{Input.Name}\"."
-                    });
-                var databaseNodes = nodeDatabases
-                    .Select(item => nodes.Select(item1 => new DatabaseNode
-                    {
-                        Database = item,
-                        Node = item1
-                    }))
-                    .SelectMany(item => item);
-                var databaseNodeFieldNodes = nodeDatabases
-                    .Select(item => item.DatabaseNodeFields)
-                    .SelectMany(item => item)
-                    .Select(item => nodes.Select(item1 => new DatabaseNodeFieldNode
-                    {
-                        DatabaseNodeField = item,
-                        Node = item1,
-                        Value = item1.Name
-                    }))
-                    .SelectMany(item => item);
-                var edges = seedEdges
-                    .Select(item => new Edge
-                    {
-                        DateTimeCreated = DateTime.Now,
-                        Name = $"{item.SourceNode} - {item.TargetNode}",
-                        Description = $"This is an automatically generated edge for the network \"{Input.Name}\".",
-                        EdgeNodes = new List<EdgeNode>
-                        {
-                            new EdgeNode
-                            {
-                                Node = nodes.FirstOrDefault(item1 => item1.Name == item.SourceNode),
-                                Type = EdgeNodeType.Source
-                            },
-                            new EdgeNode
-                            {
-                                Node = nodes.FirstOrDefault(item1 => item1.Name == item.TargetNode),
-                                Type = EdgeNodeType.Target
-                            }
-                        }
-                    });
-                var databaseEdges = edgeDatabases
-                    .Select(item => edges.Select(item1 => new DatabaseEdge
-                    {
-                        Database = item,
-                        Edge = item1
-                    }))
-                    .SelectMany(item => item);
-                var databaseEdgeFieldEdges = nodeDatabases
-                    .Select(item => item.DatabaseEdgeFields)
-                    .SelectMany(item => item)
-                    .Select(item => edges.Select(item1 => new DatabaseEdgeFieldEdge
-                    {
-                        DatabaseEdgeField = item,
-                        Edge = item1,
-                        Value = item1.Name
-                    }))
-                    .SelectMany(item => item);
                 // Define the new network.
                 var network = new Network
                 {
@@ -399,19 +352,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                             Database = item
                         })
                         .ToList(),
-                    NetworkNodes = nodes
-                        .Select(item => new NetworkNode
-                        {
-                            Node = item,
-                            Type = NetworkNodeType.None
-                        })
-                        .ToList(),
-                    NetworkEdges = edges
-                        .Select(item => new NetworkEdge
-                        {
-                            Edge = item
-                        })
-                        .ToList(),
                     NetworkUsers = new List<NetworkUser>
                     {
                         new NetworkUser
@@ -421,13 +361,80 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                         }
                     }
                 };
+                // Define the related entities.
+                network.NetworkNodes = seedNodes
+                    .Select(item => new NetworkNode
+                    {
+                        Node = new Node
+                        {
+                            DateTimeCreated = DateTime.Now,
+                            Name = item,
+                            Description = $"This is an automatically generated node for the network \"{Input.Name}\".",
+                            DatabaseNodes = nodeDatabases
+                                .Select(item1 => new DatabaseNode
+                                {
+                                    Database = item1
+                                })
+                                .ToList(),
+                            DatabaseNodeFieldNodes = nodeDatabases
+                                .Select(item1 => item1.DatabaseNodeFields)
+                                .SelectMany(item1 => item1)
+                                .Select(item1 => new DatabaseNodeFieldNode
+                                {
+                                    DatabaseNodeField = item1,
+                                    Value = item1.Name
+                                })
+                                .ToList()
+                        },
+                        Type = NetworkNodeType.None
+                    })
+                    .ToList();
+                network.NetworkEdges = seedEdges
+                    .Select(item => new NetworkEdge
+                    {
+                        Edge = new Edge
+                        {
+                            DateTimeCreated = DateTime.Now,
+                            Name = $"{item.SourceNode} - {item.TargetNode}",
+                            Description = $"This is an automatically generated edge for the network \"{Input.Name}\".",
+                            DatabaseEdges = edgeDatabases
+                                .Select(item1 => new DatabaseEdge
+                                {
+                                    Database = item1
+                                })
+                                .ToList(),
+                            DatabaseEdgeFieldEdges = edgeDatabases
+                                .Select(item1 => item1.DatabaseEdgeFields)
+                                .SelectMany(item1 => item1)
+                                .Select(item1 => new DatabaseEdgeFieldEdge
+                                {
+                                    DatabaseEdgeField = item1,
+                                    Value = item1.Name
+                                })
+                                .ToList(),
+                            EdgeNodes = new List<EdgeNode>
+                            {
+                                new EdgeNode
+                                {
+                                    Node = network.NetworkNodes
+                                        .FirstOrDefault(item1 => item1.Node.Name == item.SourceNode)
+                                        ?.Node,
+                                    Type = EdgeNodeType.Source
+                                },
+                                new EdgeNode
+                                {
+                                    Node = network.NetworkNodes
+                                        .FirstOrDefault(item1 => item1.Node.Name == item.TargetNode)
+                                        ?.Node,
+                                    Type = EdgeNodeType.Target
+                                }
+                            }
+                            .Where(item1 => item1.Node != null)
+                            .ToList()
+                        }
+                    })
+                    .ToList();
                 // Mark the data for addition.
-                _context.Nodes.AddRange(nodes);
-                _context.DatabaseNodes.AddRange(databaseNodes);
-                _context.DatabaseNodeFieldNodes.AddRange(databaseNodeFieldNodes);
-                _context.Edges.AddRange(edges);
-                _context.DatabaseEdges.AddRange(databaseEdges);
-                _context.DatabaseEdgeFieldEdges.AddRange(databaseEdgeFieldEdges);
                 _context.Networks.Add(network);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
@@ -482,8 +489,65 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     // Redisplay the page.
                     return Page();
                 }
-                // Build the network based on the selected algorithm.
-                var edges = NetworkAlgorithms.GetEdgesFromSeed(seedNodes, seedEdges, Input.Algorithm);
+                // Define the edges of the network.
+                var edges = new List<Edge>();
+                // Check which algorithm is selected.
+                if (Input.Algorithm == NetworkAlgorithm.Neighbors)
+                {
+                    // Add all of the edges which contain the seed nodes.
+                    edges.AddRange(seedEdges.Where(item => item.EdgeNodes.Any(item1 => seedNodes.Contains(item1.Node))));
+                }
+                else if (Input.Algorithm == NetworkAlgorithm.Gap0 || Input.Algorithm == NetworkAlgorithm.Gap1 || Input.Algorithm == NetworkAlgorithm.Gap2 || Input.Algorithm == NetworkAlgorithm.Gap3 || Input.Algorithm == NetworkAlgorithm.Gap4)
+                {
+                    // Get the gap value.
+                    var gap = Input.Algorithm == NetworkAlgorithm.Gap0 ? 0 :
+                        Input.Algorithm == NetworkAlgorithm.Gap1 ? 1 :
+                        Input.Algorithm == NetworkAlgorithm.Gap2 ? 2 :
+                        Input.Algorithm == NetworkAlgorithm.Gap3 ? 3 : 4;
+                    // Define the list to store the edges.
+                    var list = new List<List<Edge>>();
+                    // For "gap" times, for all terminal nodes, add all possible edges.
+                    for (int index = 0; index < gap + 1; index++)
+                    {
+                        // Get the terminal nodes (the seed nodes for the first iteration, the target nodes of all edges in the previous iteration for the subsequent iterations).
+                        var terminalNodes = index == 0 ? seedNodes : list.Last()
+                            .Select(item => item.EdgeNodes
+                                .Where(item => item.Type == EdgeNodeType.Target)
+                                .Select(item => item.Node))
+                            .SelectMany(item => item);
+                        // Get all edges that start in the terminal nodes.
+                        var temporaryList = seedEdges
+                            .Where(item => item.EdgeNodes
+                                .Any(item1 => item1.Type == EdgeNodeType.Source && terminalNodes.Contains(item1.Node)))
+                            .ToList();
+                        // Add them to the list.
+                        list.Add(temporaryList);
+                    }
+                    // Define a variable to store, at each step, the nodes to keep.
+                    var nodesToKeep = seedNodes.AsEnumerable();
+                    // Starting from the right, mark all terminal nodes that are not seed nodes for removal.
+                    for (int index = gap; index >= 0; index--)
+                    {
+                        // Remove from the list all edges that do not end in nodes to keep.
+                        list.ElementAt(index)
+                            .RemoveAll(item => item.EdgeNodes.Any(item1 => item1.Type == EdgeNodeType.Target && !nodesToKeep.Contains(item1.Node)));
+                        // Update the nodes to keep to be the source nodes of the interactions of the current step together with the seed nodes.
+                        nodesToKeep = list.ElementAt(index)
+                            .Select(item => item.EdgeNodes.Where(item1 => item1.Type == EdgeNodeType.Source).Select(item1 => item1.Node))
+                            .SelectMany(item => item)
+                            .Concat(seedNodes)
+                            .Distinct();
+                    }
+                    // Add all of the remaining edges.
+                    edges.AddRange(list.SelectMany(item => item).Distinct());
+                }
+                else
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, "The provided algorithm is not yet implemented. Please select another algorithm.");
+                    // Redisplay the page.
+                    return Page();
+                }
                 // Check if there haven't been any edges found.
                 if (edges == null || !edges.Any())
                 {

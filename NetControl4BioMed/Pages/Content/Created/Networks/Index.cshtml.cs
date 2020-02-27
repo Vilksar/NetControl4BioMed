@@ -216,7 +216,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             query = query
                 .Include(item => item.NetworkDatabases)
                     .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType);
+                        .ThenInclude(item => item.DatabaseType)
+                .Include(item => item.NetworkNodes)
+                .Include(item => item.NetworkEdges);
             // Define the view.
             View = new ViewModel
             {
