@@ -33,6 +33,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
 
         public class ViewModel
         {
+            public IEnumerable<DatabaseType> DatabaseTypes { get; set; }
+
             public SearchViewModel<Analysis> Search { get; set; }
         }
 
@@ -250,6 +252,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             // Define the view.
             View = new ViewModel
             {
+                DatabaseTypes = _context.DatabaseTypes.AsEnumerable(),
                 Search = new SearchViewModel<Analysis>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.

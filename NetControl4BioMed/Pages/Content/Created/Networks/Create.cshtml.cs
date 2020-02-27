@@ -116,13 +116,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 NodeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.DatabaseNodeFields.Any(item1 => item1.IsSearchable))
+                    .Where(item => item.DatabaseType.Name == "Generic" || item.DatabaseNodeFields.Any(item1 => item1.IsSearchable))
                     .Include(item => item.DatabaseNodeFields)
                         .ThenInclude(item => item.DatabaseNodeFieldNodes),
                 EdgeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.DatabaseEdges.Any())
+                    .Where(item => item.DatabaseType.Name == "Generic" || item.DatabaseEdges.Any())
                     .Include(item => item.DatabaseEdges)
                         .ThenInclude(item => item.Edge)
                             .ThenInclude(item => item.EdgeNodes)
@@ -239,13 +239,15 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 NodeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.DatabaseNodeFields.Any(item1 => item1.IsSearchable))
+                    .Where(item => item.DatabaseType.Name == "Generic" || item.DatabaseNodeFields.Any(item1 => item1.IsSearchable))
                     .Include(item => item.DatabaseNodeFields)
                         .ThenInclude(item => item.DatabaseNodeFieldNodes),
                 EdgeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.DatabaseEdges.Any())
+                    .Where(item => item.DatabaseType.Name == "Generic" || item.DatabaseEdges.Any())
+                    .Include(item => item.DatabaseEdgeFields)
+                        .ThenInclude(item => item.DatabaseEdgeFieldEdges)
                     .Include(item => item.DatabaseEdges)
                         .ThenInclude(item => item.Edge)
                             .ThenInclude(item => item.EdgeNodes)

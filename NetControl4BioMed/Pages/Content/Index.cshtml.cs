@@ -54,10 +54,18 @@ namespace NetControl4BioMed.Pages.Content
             View = new ViewModel
             {
                 User = user,
-                NetworkCount = _context.Networks.Count(item => item.NetworkUsers.Any(item1 => item1.User == user)),
-                AnalysisCount = _context.Analyses.Count(item => item.AnalysisUsers.Any(item1 => item1.User == user)),
-                RecentNetworks = _context.Networks.Where(item => item.NetworkUsers.Any(item1 => item1.User == user)).OrderByDescending(item => item.DateTimeCreated).Take(5),
-                RecentAnalyses = _context.Analyses.Where(item => item.AnalysisUsers.Any(item1 => item1.User == user)).OrderByDescending(item => item.DateTimeStarted).Take(5)
+                NetworkCount = _context.Networks
+                    .Count(item => item.NetworkUsers.Any(item1 => item1.User == user)),
+                AnalysisCount = _context.Analyses
+                    .Count(item => item.AnalysisUsers.Any(item1 => item1.User == user)),
+                RecentNetworks = _context.Networks
+                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                    .OrderByDescending(item => item.DateTimeCreated)
+                    .Take(5),
+                RecentAnalyses = _context.Analyses
+                    .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
+                    .OrderByDescending(item => item.DateTimeStarted)
+                    .Take(5)
             };
             // Return the page.
             return Page();

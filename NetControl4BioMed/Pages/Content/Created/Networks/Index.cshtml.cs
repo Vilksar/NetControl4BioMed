@@ -222,7 +222,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             // Define the view.
             View = new ViewModel
             {
-                DatabaseTypes = _context.DatabaseTypes.AsQueryable(),
+                DatabaseTypes = _context.DatabaseTypes.AsEnumerable(),
                 Search = new SearchViewModel<Network>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.

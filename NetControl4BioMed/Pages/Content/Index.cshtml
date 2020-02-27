@@ -29,89 +29,129 @@
         </a>
     </div>
 </div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-share-alt"></i></span>
+@if (!Model.View.RecentNetworks.Any())
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-share-alt"></i></span>
+                </div>
+                <div>
+                    <span>Recent networks</span>
+                </div>
             </div>
-            <div>
-                <span>Recent networks</span>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no recent networks.</span>
             </div>
         </div>
     </div>
-    <div class="card-body p-0">
-        <table class="table mb-0">
-            <tbody>
-                @if (!Model.View.RecentNetworks.Any())
-                {
-                    <tr>
-                        <td>
-                            <span>There are no recent networks.</span>
-                        </td>
-                    </tr>
-                }
-                else
-                {
-                    @foreach (var network in Model.View.RecentNetworks)
-                    {
-                        <tr>
-                            <td>
-                                <span>@network.Name</span>
-                            </td>
-                            <td>
-                                <span>@network.DateTimeCreated.ToString()</span>
-                            </td>
-                            <td>
-                                <a asp-page="/Content/Created/Networks/Details" asp-route-id="@network.Id"><span>View</span></a>
-                            </td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-desktop"></i></span>
+}
+else
+{
+    <table class="table table-bordered mb-3">
+        <thead class="thead-light">
+            <tr>
+                <th class="text-center text-break">
+                    <span>#</span>
+                </th>
+                <th class="text-left text-break">
+                    <span>Recent network</span>
+                </th>
+                <th class="text-center text-break">
+                    <span>Date created</span>
+                </th>
+                <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                    <span>Links</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var (network, index) in Model.View.RecentNetworks.Select((item, index) => (item, index + 1)))
+            {
+                <tr>
+                    <td class="text-center text-break">
+                        <span>@index</span>
+                    </td>
+                    <td class="text-left text-break">
+                        <span title="@network.Name" class="font-weight-bold">@network.Name</span>
+                    </td>
+                    <td class="text-center text-break">
+                        <span title="@network.DateTimeCreated.ToString()">@network.DateTimeCreated.ToString()</span>
+                    </td>
+                    <td class="text-center text-break">
+                        <a asp-page="/Content/Created/Networks/Details" asp-route-id="@network.Id" title="Details">
+                            <span>Details</span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@if (!Model.View.RecentAnalyses.Any())
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-desktop"></i></span>
+                </div>
+                <div>
+                    <span>Recent analyses</span>
+                </div>
             </div>
-            <div>
-                <span>Recent analyses</span>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no recent analyses.</span>
             </div>
         </div>
     </div>
-    <div class="card-body p-0">
-        <table class="table mb-0">
-            <tbody>
-                @if (!Model.View.RecentAnalyses.Any())
-                {
-                    <tr>
-                        <td>
-                            <span>There are no recent analyses.</span>
-                        </td>
-                    </tr>
-                }
-                else
-                {
-                    @foreach (var analysis in Model.View.RecentAnalyses)
-                    {
-                        <tr>
-                            <td>
-                                <span>@analysis.Name</span>
-                            </td>
-                            <td>
-                                <span>@analysis.DateTimeStarted?.ToString()</span>
-                            </td>
-                            <td>
-                                <a asp-page="/Content/Created/Analyses/Details" asp-route-id="@analysis.Id"><span>View</span></a>
-                            </td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
+}
+else
+{
+    <table class="table table-bordered mb-3">
+        <thead class="thead-light">
+            <tr>
+                <th class="text-center text-break">
+                    <span>#</span>
+                </th>
+                <th class="text-left text-break">
+                    <span>Recent analysis</span>
+                </th>
+                <th class="text-center text-break">
+                    <span>Date started</span>
+                </th>
+                <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                    <span>Links</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var (analysis, index) in Model.View.RecentAnalyses.Select((item, index) => (item, index + 1)))
+            {
+                <tr>
+                    <td class="text-center text-break">
+                        <span>@index</span>
+                    </td>
+                    <td class="text-left text-break">
+                        <span title="@analysis.Name" class="font-weight-bold">@analysis.Name</span>
+                    </td>
+                    <td class="text-center text-break">
+                        <span title="@analysis.DateTimeStarted.ToString()">@analysis.DateTimeStarted.ToString()</span>
+                    </td>
+                    <td class="text-center text-break">
+                        <a asp-page="/Content/Created/Analyses/Details" asp-route-id="@analysis.Id" title="Details">
+                            <span>Details</span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

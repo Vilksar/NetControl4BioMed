@@ -73,9 +73,9 @@
                                 <span title="@item.Node.Id" class="small">@item.Node.Id</span>
                             </div>
                         </td>
-                        <th class="text-center text-break">
+                        <td class="text-center text-break">
                             <span title="@item.Type.ToString()">@item.Type.ToString()</span>
-                        </th>
+                        </td>
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Data/Edges/Update" asp-route-type="Edit" asp-route-ids="@item.Edge.Id" class="btn btn-warning m-1" title="Edit">
                                 <span><i class="fas fa-pencil-alt"></i></span>
