@@ -1,7 +1,7 @@
 ﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 // for details on configuring this project to bundle and minify static web assets.
 
-// Write your Javascript code.
+// Wait for the window to load.
 $(window).on('load', () => {
 
     // Check if there is a cookie notification alert on the page.
@@ -156,7 +156,7 @@ $(window).on('load', () => {
                 // Split the text into different lines.
                 const rows = $(groupElement).find('.file-group-text').first().val().split(new RegExp(lineSeparator)).filter((element) => {
                     // Split the row into its composing items.
-                    var row = element.split(new RegExp(inlineSeparator)).filter((el) => {
+                    const row = element.split(new RegExp(inlineSeparator)).filter((el) => {
                         // Select only the non-empty items.
                         return el !== '';
                     });
@@ -166,7 +166,7 @@ $(window).on('load', () => {
                 // Go over each row.
                 const items = $.map(rows, (element, index) => {
                     // Split the row into its composing items.
-                    var row = element.split(new RegExp(inlineSeparator));
+                    const row = element.split(new RegExp(inlineSeparator));
                     // Check if we don't have both source and target nodes.
                     if (!row[0] || !row[1]) {
                         // Don't return anything.
@@ -278,6 +278,119 @@ $(window).on('load', () => {
             });
         })();
 
+    }
+
+    // Check if there is a Cytoscape area on the page.
+    if ($('.cytoscape-area').length !== 0) {
+        // Get the corresponding colors.
+        const defaultColor = $('.cytoscape-color-default').first().css('color');
+        const seedColor = $('.cytoscape-color-seed').first().css('color');
+        const targetColor = $('.cytoscape-color-target').first().css('color');
+        const preferredColor = $('.cytoscape-color-preferred').first().css('color');
+        const controlColor = $('.cytoscape-color-control').first().css('color');
+        const targetPreferredColor = $('.cytoscape-color-target-preferred').first().css('color');
+        const targetControlColor = $('.cytoscape-color-target-control').first().css('color');
+        const preferredControlColor = $('.cytoscape-color-preferred-control').first().css('color');
+        const targetPreferredControlColor = $('.cytoscape-color-target-preferred-control').first().css('color');
+        // Define the Cytoscape variable.
+        const cy = cytoscape({
+            container: $('.cytoscape-container').first().get(0),
+            layout: {
+                name: "cose"
+            },
+            style: [
+                {
+                    selector: '.node',
+                    css: {
+                        'content': 'data(name)',
+                        'color': defaultColor,
+                        'background-color': defaultColor
+                    }
+                },
+                {
+                    selector: '.node.seed',
+                    css: {
+                        'color': seedColor,
+                        'background-color': seedColor
+                    }
+                },
+                {
+                    selector: 'node.target',
+                    css: {
+                        'color': targetColor,
+                        'background-color': targetColor
+                    }
+                },
+                {
+                    selector: 'node.preferred',
+                    css: {
+                        'color': preferredColor,
+                        'background-color': preferredColor
+                    }
+                },
+                {
+                    selector: 'node.control',
+                    css: {
+                        'color': controlColor,
+                        'background-color': controlColor
+                    }
+                },
+                {
+                    selector: 'node.target.preferred',
+                    css: {
+                        'color': targetPreferredColor,
+                        'background-color': targetPreferredColor
+                    }
+                },
+                {
+                    selector: 'node.target.control',
+                    css: {
+                        'color': targetControlColor,
+                        'background-color': targetControlColor
+                    }
+                },
+                {
+                    selector: 'node.preferred.control',
+                    css: {
+                        'color': preferredControlColor,
+                        'background-color': preferredControlColor
+                    }
+                },
+                {
+                    selector: 'node.target.preferred.control',
+                    css: {
+                        'color': targetPreferredControlColor,
+                        'background-color': targetPreferredControlColor
+                    }
+                },
+                {
+                    selector: 'edge',
+                    css: {
+                        'mid-target-arrow-shape': 'triangle',
+                        'color': defaultColor,
+                        'line-color': defaultColor
+                    }
+                },
+                {
+                    selector: 'edge.control',
+                    css: {
+                        'color': controlColor,
+                        'line-color': controlColor
+                    }
+                }
+            ],
+            elements: JSON.parse($('.cytoscape-configuration').first().text())
+        });
+        // Add listener for when a node is clicked.
+        cy.on('tap', 'node', (event) => {
+            // Check if there is a link.
+            if (event.target.data('href') && event.target.data('href').length !== 0) {
+                // Open a new link.
+                window.location.href = event.target.data('href');
+            }
+        });
+        // Hide the loading message.
+        $(".cytoscape-loading").prop("hidden", true);
     }
 
 });

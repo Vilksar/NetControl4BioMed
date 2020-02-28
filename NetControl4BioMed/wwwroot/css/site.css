@@ -24,3 +24,44 @@ body {
 th, td {
     vertical-align: middle !important;
 }
+
+/* Style for the Cytoscape elements. */
+.cytoscape-container {
+    min-height: 25rem !important;
+}
+
+.cytoscape-color-default {
+    color: lightgray;
+}
+
+.cytoscape-color-seed {
+    color: tomato;
+}
+
+.cytoscape-color-target {
+    color: cornflowerblue;
+}
+
+.cytoscape-color-preferred {
+    color: lightpink;
+}
+
+.cytoscape-color-control {
+    color: forestgreen;
+}
+
+.cytoscape-color-target-preferred {
+    color: mediumpurple;
+}
+
+.cytoscape-color-target-control {
+    color: aquamarine;
+}
+
+.cytoscape-color-preferred-control {
+    color: deeppink;
+}
+
+.cytoscape-color-target-preferred-control {
+    color: darkgoldenrod;
+}

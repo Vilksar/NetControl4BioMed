@@ -1,0 +1,38 @@
+﻿@page
+@model VisualizeModel
+@{
+    ViewData["Title"] = "Visualize network";
+    ViewData["ActiveGroup"] = "NetworkIndex";
+    ViewData["ActivePage"] = "NetworkIndex";
+}
+
+<div class="cytoscape-area d-flex flex-column">
+    <div class="cytoscape-configuration" hidden>
+        <span>@Model.View.CytoscapeJson</span>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body cytoscape-legend">
+            <div class="row align-items-center">
+                <div class="col-lg-6 text-center">
+                    <span class="cytoscape-color-default"><i class="fas fa-circle"></i></span>
+                    <span>None</span>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <span class="cytoscape-color-seed"><i class="fas fa-circle"></i></span>
+                    <span>Seed</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body cytoscape-container">
+            <div class="cytoscape-loading text-center">
+                <span class="font-italic">Loading network visualization...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/cytoscape/cytoscape.min.js"></script>
+}
