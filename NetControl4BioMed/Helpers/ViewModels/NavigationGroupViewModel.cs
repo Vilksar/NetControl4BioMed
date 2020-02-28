@@ -43,6 +43,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets or sets the navigation pages in the group.
         /// </summary>
-        public IEnumerable<NavigationPageViewModel> Pages { get; set; }
+        public IEnumerable<NavigationPageViewModel> NavigationPages { get; set; }
     }
 }

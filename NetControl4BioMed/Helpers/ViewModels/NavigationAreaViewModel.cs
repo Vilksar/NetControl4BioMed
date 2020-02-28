@@ -36,8 +36,13 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public string Color { get; set; }
 
         /// <summary>
+        /// Gets or sets the route ID of the area.
+        /// </summary>
+        public string RouteId { get; set; }
+
+        /// <summary>
         /// Gets or sets the navigation groups in the area.
         /// </summary>
-        public IEnumerable<NavigationGroupViewModel> Groups { get; set; }
+        public IEnumerable<NavigationGroupViewModel> NavigationGroups { get; set; }
     }
 }

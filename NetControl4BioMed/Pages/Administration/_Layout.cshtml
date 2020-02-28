@@ -1,13 +1,14 @@
 ﻿@using Helpers.ViewModels
 @{
     Layout = "/Pages/_Layout.cshtml";
-    var _color = "primary";
+    var _primaryColor = "primary";
+    var _secondaryColor = "light";
     var navigationBanner = new NavigationBannerViewModel
     {
         Id = "Administration",
         Title = "Administration",
         Icon = "fa-cog",
-        Color = _color
+        Color = _primaryColor
     };
     var navigationArea = new NavigationAreaViewModel
     {
@@ -15,16 +16,16 @@
         Title = "Administration",
         Description = string.Empty,
         Icon = "fa-cog",
-        Color = _color,
-        Groups = new List<NavigationGroupViewModel>
-        {
+        Color = _primaryColor,
+        NavigationGroups = new List<NavigationGroupViewModel>
+{
             new NavigationGroupViewModel
             {
                 Id = "Index",
                 Title = "Overview",
                 Description = string.Empty,
                 Icon = "fa-chart-bar",
-                Color = _color,
+                Color = _primaryColor,
                 Link = "/Administration/Index"
             },
             new NavigationGroupViewModel
@@ -33,17 +34,17 @@
                 Title = "Accounts",
                 Description = string.Empty,
                 Icon = "fa-users",
-                Color = _color,
+                Color = _primaryColor,
                 Link = "/Administration/Accounts/Index",
-                Pages = new List<NavigationPageViewModel>
-                {
+                NavigationPages = new List<NavigationPageViewModel>
+        {
                     new NavigationPageViewModel
                     {
                         Id = "Users",
                         Title = "Users",
                         Description = string.Empty,
                         Icon = "fa-user",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Accounts/Users/Index"
                     },
                     new NavigationPageViewModel
@@ -52,7 +53,7 @@
                         Title = "Roles",
                         Description = string.Empty,
                         Icon = "fa-tag",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Accounts/Roles/Index"
                     },
                     new NavigationPageViewModel
@@ -61,7 +62,7 @@
                         Title = "User roles",
                         Description = string.Empty,
                         Icon = "fa-user-tag",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Accounts/UserRoles/Index"
                     }
                 }
@@ -72,17 +73,17 @@
                 Title = "Permissions",
                 Description = string.Empty,
                 Icon = "fa-lock",
-                Color = _color,
+                Color = _primaryColor,
                 Link = "/Administration/Permissions/Index",
-                Pages = new List<NavigationPageViewModel>
-                {
+                NavigationPages = new List<NavigationPageViewModel>
+        {
                     new NavigationPageViewModel
                     {
                         Id = "DatabaseUsers",
                         Title = "Database users",
                         Description = string.Empty,
                         Icon = "fa-database",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Permissions/DatabaseUsers/Index"
                     },
                     new NavigationPageViewModel
@@ -91,7 +92,7 @@
                         Title = "Database user invitations",
                         Description = string.Empty,
                         Icon = "fa-envelope-open",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Permissions/DatabaseUserInvitations/Index"
                     }
                 }
@@ -102,17 +103,17 @@
                 Title = "Databases",
                 Description = string.Empty,
                 Icon = "fa-database",
-                Color = _color,
+                Color = _primaryColor,
                 Link = "/Administration/Databases/Index",
-                Pages = new List<NavigationPageViewModel>
-                {
+                NavigationPages = new List<NavigationPageViewModel>
+        {
                     new NavigationPageViewModel
                     {
                         Id = "DatabaseTypes",
                         Title = "Database types",
                         Description = string.Empty,
                         Icon = "fa-font",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Databases/DatabaseTypes/Index"
                     },
                     new NavigationPageViewModel
@@ -121,7 +122,7 @@
                         Title = "Databases",
                         Description = string.Empty,
                         Icon = "fa-database",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Databases/Databases/Index"
                     },
                     new NavigationPageViewModel
@@ -130,7 +131,7 @@
                         Title = "Database node fields",
                         Description = string.Empty,
                         Icon = "fa-circle",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Databases/DatabaseNodeFields/Index"
                     },
                     new NavigationPageViewModel
@@ -139,7 +140,7 @@
                         Title = "Database edge fields",
                         Description = string.Empty,
                         Icon = "fa-arrow-right",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Databases/DatabaseEdgeFields/Index"
                     }
                 }
@@ -150,17 +151,17 @@
                 Title = "Data",
                 Description = string.Empty,
                 Icon = "fa-table",
-                Color = _color,
+                Color = _primaryColor,
                 Link = "/Administration/Data/Index",
-                Pages = new List<NavigationPageViewModel>
-                {
+                NavigationPages = new List<NavigationPageViewModel>
+        {
                     new NavigationPageViewModel
                     {
                         Id = "Nodes",
                         Title = "Nodes",
                         Description = string.Empty,
                         Icon = "fa-circle",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Data/Nodes/Index"
                     },
                     new NavigationPageViewModel
@@ -169,7 +170,7 @@
                         Title = "Edges",
                         Description = string.Empty,
                         Icon = "fa-arrow-right",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Data/Edges/Index"
                     },
                     new NavigationPageViewModel
@@ -178,7 +179,7 @@
                         Title = "Node collections",
                         Description = string.Empty,
                         Icon = "fa-folder",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Data/NodeCollections/Index"
                     }
                 }
@@ -189,17 +190,17 @@
                 Title = "Relationships",
                 Description = string.Empty,
                 Icon = "fa-heart",
-                Color = _color,
+                Color = _primaryColor,
                 Link = "/Administration/Relationships/Index",
-                Pages = new List<NavigationPageViewModel>
-                {
+                NavigationPages = new List<NavigationPageViewModel>
+        {
                     new NavigationPageViewModel
                     {
                         Id = "DatabaseNodes",
                         Title = "Database nodes",
                         Description = string.Empty,
                         Icon = "fa-circle",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Relationships/DatabaseNodes/Index"
                     },
                     new NavigationPageViewModel
@@ -208,7 +209,7 @@
                         Title = "Database edges",
                         Description = string.Empty,
                         Icon = "fa-arrow-right",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Relationships/DatabaseEdges/Index"
                     },
                     new NavigationPageViewModel
@@ -217,7 +218,7 @@
                         Title = "Database node field nodes",
                         Description = string.Empty,
                         Icon = "fa-circle",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Relationships/DatabaseNodeFieldNodes/Index"
                     },
                     new NavigationPageViewModel
@@ -226,7 +227,7 @@
                         Title = "Database edge field edges",
                         Description = string.Empty,
                         Icon = "fa-arrow-right",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Relationships/DatabaseEdgeFieldEdges/Index"
                     },
                     new NavigationPageViewModel
@@ -235,7 +236,7 @@
                         Title = "Edge nodes",
                         Description = string.Empty,
                         Icon = "fa-arrow-circle-right",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Relationships/EdgeNodes/Index"
                     },
                     new NavigationPageViewModel
@@ -244,7 +245,7 @@
                         Title = "Node collection databases",
                         Description = string.Empty,
                         Icon = "fa-folder",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Relationships/NodeCollectionDatabases/Index"
                     },
                     new NavigationPageViewModel
@@ -253,7 +254,7 @@
                         Title = "Node collection nodes",
                         Description = string.Empty,
                         Icon = "fa-folder",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Relationships/NodeCollectionNodes/Index"
                     }
                 }
@@ -264,17 +265,17 @@
                 Title = "Created",
                 Description = string.Empty,
                 Icon = "fa-smile",
-                Color = _color,
+                Color = _primaryColor,
                 Link = "/Administration/Created/Index",
-                Pages = new List<NavigationPageViewModel>
-                {
+                NavigationPages = new List<NavigationPageViewModel>
+        {
                     new NavigationPageViewModel
                     {
                         Id = "Networks",
                         Title = "Networks",
                         Description = string.Empty,
                         Icon = "fa-share-alt",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Created/Networks/Index"
                     },
                     new NavigationPageViewModel
@@ -283,7 +284,7 @@
                         Title = "Analyses",
                         Description = string.Empty,
                         Icon = "fa-desktop",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Administration/Created/Analyses/Index"
                     }
                 }
@@ -303,6 +304,7 @@
 
 @section Navigation {
     <partial name="_NavigationAreaPartial" model="@navigationArea" />
+    @RenderSection("Navigation", required: false)
 }
 
 @RenderBody()

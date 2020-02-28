@@ -1,80 +1,76 @@
 ﻿@page
 @model IndexModel
+@using Helpers.ViewModels
 @{
     ViewData["Title"] = "Overview";
+    ViewData["ActiveGroup"] = "Index";
     ViewData["ActivePage"] = "Index";
+    var navigationQuickLinks = new List<NavigationQuickLinkViewModel>
+    {
+        new NavigationQuickLinkViewModel
+        {
+            Id = "Users",
+            Title = "User",
+            Color = "success",
+            Icon = "fa-user",
+            Width = 6,
+            ItemCount = Model.View.UserCount,
+            Link = "/Administration/Accounts/Users/Index",
+        },
+        new NavigationQuickLinkViewModel
+        {
+            Id = "Roles",
+            Title = "Role",
+            Color = "success",
+            Icon = "fa-tag",
+            Width = 6,
+            ItemCount = Model.View.RoleCount,
+            Link = "/Administration/Accounts/Roles/Index",
+        },
+        new NavigationQuickLinkViewModel
+        {
+            Id = "Databases",
+            Title = "Database",
+            Color = "info",
+            Icon = "fa-database",
+            Width = 6,
+            ItemCount = Model.View.DatabaseCount,
+            Link = "/Administration/Databases/Databases/Index",
+        },
+        new NavigationQuickLinkViewModel
+        {
+            Id = "NodeCollections",
+            Title = "Node collection",
+            Color = "info",
+            Icon = "fa-folder",
+            Width = 6,
+            ItemCount = Model.View.NodeCollectionCount,
+            Link = "/Administration/Data/NodeCollections/Index"
+        },
+        new NavigationQuickLinkViewModel
+        {
+            Id = "Nodes",
+            Title = "Node",
+            Color = "primary",
+            Icon = "fa-circle",
+            Width = 6,
+            ItemCount = Model.View.NodeCount,
+            Link = "/Administration/Data/Nodes/Index"
+        },
+        new NavigationQuickLinkViewModel
+        {
+            Id = "Edges",
+            Title = "Edge",
+            Color = "primary",
+            Icon = "fa-arrow-right",
+            Width = 6,
+            ItemCount = Model.View.EdgeCount,
+            Link = "/Administration/Data/Edges/Index"
+        }
+    };
 }
 
-<div class="row align-items-center">
-    <div class="col-lg-6 mb-3">
-        <a asp-page="/Administration/Accounts/Users/Index" class="btn btn-info btn-block text-white py-lg-3" title="Users">
-            <span class="d-flex flex-column flex-lg-row align-items-center justify-content-around">
-                <span class="my-1 my-lg-0"><i class="fas fa-user fa-2x"></i></span>
-                <span class="d-flex flex-column align-items-center align-items-lg-start my-1 my-lg-0">
-                    <span class="font-weight-bold">@Model.View.UserCount</span>
-                    <span class="small">User@(Model.View.UserCount != 1 ? "s" : string.Empty)</span>
-                </span>
-            </span>
-        </a>
-    </div>
-    <div class="col-lg-6 mb-3">
-        <a asp-page="/Administration/Accounts/Roles/Index" class="btn btn-info btn-block text-white py-lg-3" title="Roles">
-            <span class="d-flex flex-column flex-lg-row align-items-center justify-content-around">
-                <span class="my-1 my-lg-0"><i class="fas fa-tag fa-2x"></i></span>
-                <span class="d-flex flex-column align-items-center align-items-lg-start my-1 my-lg-0">
-                    <span class="font-weight-bold">@Model.View.RoleCount</span>
-                    <span class="small">Role@(Model.View.RoleCount != 1 ? "s" : string.Empty)</span>
-                </span>
-            </span>
-        </a>
-    </div>
-</div>
-<div class="row align-items-center">
-    <div class="col-lg-3 mb-3">
-        <a asp-page="/Administration/Databases/Databases/Index" class="btn btn-primary btn-block text-white py-lg-3" title="Databases">
-            <span class="d-flex flex-column flex-lg-row align-items-center justify-content-around">
-                <span class="my-1 my-lg-0"><i class="fas fa-database fa-2x"></i></span>
-                <span class="d-flex flex-column align-items-center align-items-lg-start my-1 my-lg-0">
-                    <span class="font-weight-bold">@Model.View.DatabaseCount</span>
-                    <span class="small">Database@(Model.View.DatabaseCount != 1 ? "s" : string.Empty)</span>
-                </span>
-            </span>
-        </a>
-    </div>
-    <div class="col-lg-3 mb-3">
-        <a asp-page="/Administration/Data/Nodes/Index" class="btn btn-success btn-block text-white py-lg-3" title="Nodes">
-            <span class="d-flex flex-column flex-lg-row align-items-center justify-content-around">
-                <span class="my-1 my-lg-0"><i class="fas fa-circle fa-2x"></i></span>
-                <span class="d-flex flex-column align-items-center align-items-lg-start my-1 my-lg-0">
-                    <span class="font-weight-bold">@Model.View.NodeCount</span>
-                    <span class="small">Node@(Model.View.NodeCount != 1 ? "s" : string.Empty)</span>
-                </span>
-            </span>
-        </a>
-    </div>
-    <div class="col-lg-3 mb-3">
-        <a asp-page="/Administration/Data/Edges/Index" class="btn btn-success btn-block text-white py-lg-3" title="Edges">
-            <span class="d-flex flex-column flex-lg-row align-items-center justify-content-around">
-                <span class="my-1 my-lg-0"><i class="fas fa-arrow-right fa-2x"></i></span>
-                <span class="d-flex flex-column align-items-center align-items-lg-start my-1 my-lg-0">
-                    <span class="font-weight-bold">@Model.View.EdgeCount</span>
-                    <span class="small">Edge@(Model.View.EdgeCount != 1 ? "s" : string.Empty)</span>
-                </span>
-            </span>
-        </a>
-    </div>
-    <div class="col-lg-3 mb-3">
-        <a asp-page="/Administration/Data/NodeCollections/Index" class="btn btn-primary btn-block text-white py-lg-3" title="Node collections">
-            <span class="d-flex flex-column flex-lg-row align-items-center justify-content-around">
-                <span class="my-1 my-lg-0"><i class="fas fa-folder fa-2x"></i></span>
-                <span class="d-flex flex-column align-items-center align-items-lg-start my-1 my-lg-0">
-                    <span class="font-weight-bold">@Model.View.NodeCollectionCount</span>
-                    <span class="small">Collection@(Model.View.NodeCollectionCount != 1 ? "s" : string.Empty)</span>
-                </span>
-            </span>
-        </a>
-    </div>
-</div>
+<partial name="_NavigationQuickLinksPartial" model="@navigationQuickLinks" />
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">

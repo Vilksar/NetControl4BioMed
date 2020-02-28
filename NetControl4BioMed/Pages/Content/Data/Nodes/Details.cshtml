@@ -2,25 +2,27 @@
 @model DetailsModel
 @{
     ViewData["Title"] = "Node details";
+    var navigationTitleCard = new Helpers.ViewModels.NavigationTitleCardViewModel
+    {
+        Id = "Node",
+        Title = Model.View.Node.Name,
+        Subtitle = Model.View.Node.Id,
+        Icon = "fa-circle"
+    };
 }
 
 @section Breadcrumbs {
     <a asp-page="/Content/Data/Nodes/Details" class="breadcrumb-item"><span>Details</span></a>
 }
 
-<div class="card mb-3">
-    <div class="card-body text-center">
-        <div class="my-2">
-            <span><i class="fas fa-circle fa-2x"></i></span>
-        </div>
-        <div class="font-weight-bold">
-            <span title="@Model.View.Node.Name">@Model.View.Node.Name</span>
-        </div>
-        <div class="small text-muted">
-            <span title="@Model.View.Node.Id">@Model.View.Node.Id</span>
-        </div>
-    </div>
-</div>
+<partial name="_NavigationTitleCardPartial" model="@navigationTitleCard" />
+@if (User.IsInRole("Administrator"))
+{
+    <a asp-page="/Administration/Data/Nodes/Details" asp-route-id="@Model.View.Node.Id" class="btn btn-info btn-block mb-3" title="Details">
+        <span><i class="fas fa-info-circle"></i></span>
+        <span>Details</span>
+    </a>
+}
 @if (!string.IsNullOrEmpty(Model.View.Node.Description))
 {
     <div class="card mb-3">
@@ -28,13 +30,6 @@
             <span title="Description">@Model.View.Node.Description</span>
         </div>
     </div>
-}
-@if (User.IsInRole("Administrator"))
-{
-    <a asp-page="/Administration/Data/Nodes/Details" asp-route-id="@Model.View.Node.Id" class="btn btn-info btn-block mb-3" title="Details">
-        <span><i class="fas fa-info-circle"></i></span>
-        <span>Details</span>
-    </a>
 }
 <div class="card mb-3">
     <div class="card-header font-weight-bold">

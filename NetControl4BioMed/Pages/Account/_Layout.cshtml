@@ -1,13 +1,14 @@
 ﻿@using Helpers.ViewModels
 @{
     Layout = "/Pages/_Layout.cshtml";
-    var _color = "info";
+    var _primaryColor = "info";
+    var _secondaryColor = "light";
     var navigationBanner = new NavigationBannerViewModel
     {
         Id = "Account",
         Title = "Account",
         Icon = "fa-user",
-        Color = _color
+        Color = _primaryColor
     };
     var navigationArea = new NavigationAreaViewModel
     {
@@ -15,16 +16,16 @@
         Title = "Account",
         Description = string.Empty,
         Icon = "fa-user",
-        Color = _color,
-        Groups = new List<NavigationGroupViewModel>
-        {
+        Color = _primaryColor,
+        NavigationGroups = new List<NavigationGroupViewModel>
+{
             new NavigationGroupViewModel
             {
                 Id = "Index",
                 Title = "Overview",
                 Description = string.Empty,
                 Icon = "fa-chart-bar",
-                Color = _color,
+                Color = _primaryColor,
                 Link = "/Account/Index"
             },
             new NavigationGroupViewModel
@@ -33,17 +34,17 @@
                 Title = "Manage",
                 Description = string.Empty,
                 Icon = "fa-cog",
-                Color = _color,
+                Color = _primaryColor,
                 Link = "/Account/Manage/Index",
-                Pages = new List<NavigationPageViewModel>
-                {
+                NavigationPages = new List<NavigationPageViewModel>
+        {
                     new NavigationPageViewModel
                     {
                         Id = "Profile",
                         Title = "Profile",
                         Description = string.Empty,
                         Icon = "fa-user-edit",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Account/Manage/Profile/Index"
                     },
                     new NavigationPageViewModel
@@ -52,7 +53,7 @@
                         Title = "Password",
                         Description = string.Empty,
                         Icon = "fa-user-lock",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Account/Manage/Password/Index"
                     },
                     new NavigationPageViewModel
@@ -61,7 +62,7 @@
                         Title = "External logins",
                         Description = string.Empty,
                         Icon = "fa-user-cog",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Account/Manage/ExternalLogins/Index"
                     },
                     new NavigationPageViewModel
@@ -70,7 +71,7 @@
                         Title = "Two-factor authentication",
                         Description = string.Empty,
                         Icon = "fa-user-shield",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Account/Manage/TwoFactorAuthentication/Index"
                     },
                     new NavigationPageViewModel
@@ -79,7 +80,7 @@
                         Title = "Personal data",
                         Description = string.Empty,
                         Icon = "fa-user-check",
-                        Color = "light",
+                        Color = _secondaryColor,
                         Link = "/Account/Manage/PersonalData/Index"
                     }
                 }
@@ -99,6 +100,7 @@
 
 @section Navigation {
     <partial name="_NavigationAreaPartial" model="@navigationArea" />
+    @RenderSection("Navigation", required: false)
 }
 
 @RenderBody()

@@ -2,25 +2,27 @@
 @model DetailsModel
 @{
     ViewData["Title"] = "Node collection details";
+    var navigationTitleCard = new Helpers.ViewModels.NavigationTitleCardViewModel
+    {
+        Id = "NodeCollection",
+        Title = Model.View.NodeCollection.Name,
+        Subtitle = Model.View.NodeCollection.Id,
+        Icon = "fa-folder"
+    };
 }
 
 @section Breadcrumbs {
     <a asp-page="/Content/Data/NodeCollections/Details" class="breadcrumb-item"><span>Details</span></a>
 }
 
-<div class="card mb-3">
-    <div class="card-body text-center">
-        <div class="my-2">
-            <span><i class="fas fa-folder fa-2x"></i></span>
-        </div>
-        <div class="font-weight-bold">
-            <span title="@Model.View.NodeCollection.Name">@Model.View.NodeCollection.Name</span>
-        </div>
-        <div class="small text-muted">
-            <span title="@Model.View.NodeCollection.Id">@Model.View.NodeCollection.Id</span>
-        </div>
-    </div>
-</div>
+<partial name="_NavigationTitleCardPartial" model="@navigationTitleCard" />
+@if (User.IsInRole("Administrator"))
+{
+    <a asp-page="/Administration/Data/NodeCollections/Details" asp-route-id="@Model.View.NodeCollection.Id" class="btn btn-info btn-block mb-3" title="Details">
+        <span><i class="fas fa-info-circle"></i></span>
+        <span>Details</span>
+    </a>
+}
 @if (!string.IsNullOrEmpty(Model.View.NodeCollection.Description))
 {
     <div class="card mb-3">
@@ -28,13 +30,6 @@
             <span title="Description">@Model.View.NodeCollection.Description</span>
         </div>
     </div>
-}
-@if (User.IsInRole("Administrator"))
-{
-    <a asp-page="/Administration/Data/NodeCollections/Details" asp-route-id="@Model.View.NodeCollection.Id" class="btn btn-info btn-block mb-3" title="Details">
-        <span><i class="fas fa-info-circle"></i></span>
-        <span>Details</span>
-    </a>
 }
 <div class="card mb-3">
     <div class="card-header font-weight-bold">

@@ -2,33 +2,20 @@
 @model DetailsModel
 @{
     ViewData["Title"] = "Database details";
+    var navigationTitleCard = new Helpers.ViewModels.NavigationTitleCardViewModel
+    {
+        Id = "Database",
+        Title = Model.View.Database.Name,
+        Subtitle = Model.View.Database.Id,
+        Icon = "fa-database"
+    };
 }
 
 @section Breadcrumbs {
     <a asp-page="/Content/Databases/Databases/Details" class="breadcrumb-item"><span>Details</span></a>
 }
 
-<div class="card mb-3">
-    <div class="card-body text-center">
-        <div class="my-2">
-            <span><i class="fas fa-database fa-2x"></i></span>
-        </div>
-        <div class="font-weight-bold">
-            <span title="@Model.View.Database.Name">@Model.View.Database.Name</span>
-        </div>
-        <div class="small text-muted">
-            <span title="@Model.View.Database.Id">@Model.View.Database.Id</span>
-        </div>
-    </div>
-</div>
-@if (!string.IsNullOrEmpty(Model.View.Database.Description))
-{
-    <div class="card mb-3">
-        <div class="card-body text-justify small">
-            <span title="Description">@Model.View.Database.Description</span>
-        </div>
-    </div>
-}
+<partial name="_NavigationTitleCardPartial" model="@navigationTitleCard" />
 @if (User.IsInRole("Administrator"))
 {
     <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@Model.View.Database.Id" class="btn btn-info btn-block mb-3" title="Details">
@@ -42,6 +29,14 @@
         <span><i class="fas fa-external-link-alt"></i></span>
         <span>Website</span>
     </a>
+}
+@if (!string.IsNullOrEmpty(Model.View.Database.Description))
+{
+    <div class="card mb-3">
+        <div class="card-body text-justify small">
+            <span title="Description">@Model.View.Database.Description</span>
+        </div>
+    </div>
 }
 <div class="card mb-3">
     <div class="card-header font-weight-bold">

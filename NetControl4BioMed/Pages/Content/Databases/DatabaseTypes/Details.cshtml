@@ -2,25 +2,27 @@
 @model DetailsModel
 @{
     ViewData["Title"] = "Database type details";
+    var navigationTitleCard = new Helpers.ViewModels.NavigationTitleCardViewModel
+    {
+        Id = "DatabaseType",
+        Title = Model.View.DatabaseType.Name,
+        Subtitle = Model.View.DatabaseType.Id,
+        Icon = "fa-font"
+    };
 }
 
 @section Breadcrumbs {
     <a asp-page="/Content/Databases/DatabaseTypes/Details" class="breadcrumb-item"><span>Details</span></a>
 }
 
-<div class="card mb-3">
-    <div class="card-body text-center">
-        <div class="my-2">
-            <span><i class="fas fa-font fa-2x"></i></span>
-        </div>
-        <div class="font-weight-bold">
-            <span title="@Model.View.DatabaseType.Name">@Model.View.DatabaseType.Name</span>
-        </div>
-        <div class="small text-muted">
-            <span title="@Model.View.DatabaseType.Id">@Model.View.DatabaseType.Id</span>
-        </div>
-    </div>
-</div>
+<partial name="_NavigationTitleCardPartial" model="@navigationTitleCard" />
+@if (User.IsInRole("Administrator"))
+{
+    <a asp-page="/Administration/Databases/DatabaseTypes/Details" asp-route-id="@Model.View.DatabaseType.Id" class="btn btn-info btn-block mt-0 mb-3" title="Details">
+        <span><i class="fas fa-info-circle"></i></span>
+        <span>Details</span>
+    </a>
+}
 @if (!string.IsNullOrEmpty(Model.View.DatabaseType.Description))
 {
     <div class="card mb-3">
@@ -28,13 +30,6 @@
             <span title="Description">@Model.View.DatabaseType.Description</span>
         </div>
     </div>
-}
-@if (User.IsInRole("Administrator"))
-{
-    <a asp-page="/Administration/Databases/DatabaseTypes/Details" asp-route-id="@Model.View.DatabaseType.Id" class="btn btn-info btn-block mt-0 mb-3" title="Details">
-        <span><i class="fas fa-info-circle"></i></span>
-        <span>Details</span>
-    </a>
 }
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
