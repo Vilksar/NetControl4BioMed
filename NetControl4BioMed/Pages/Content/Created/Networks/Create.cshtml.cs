@@ -587,7 +587,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                             Type = NetworkNodeType.Seed
                         })
                         .Concat(nodes
-                            .Except(seedNodes)
                             .Select(item => new NetworkNode
                             {
                                 Node = item,
