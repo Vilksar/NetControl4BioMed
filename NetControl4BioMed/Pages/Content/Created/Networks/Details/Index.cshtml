@@ -15,6 +15,7 @@
             Icon = "fa-circle",
             Width = 6,
             ItemCount = Model.View.NodeCount,
+            RouteId = Model.View.Network.Id,
             Link = "/Content/Created/Networks/Details/Nodes"
         },
         new NavigationQuickLinkViewModel
@@ -25,6 +26,7 @@
             Icon = "fa-arrow-right",
             Width = 6,
             ItemCount = Model.View.EdgeCount,
+            RouteId = Model.View.Network.Id,
             Link = "/Content/Created/Networks/Details/Edges"
         },
         new NavigationQuickLinkViewModel
@@ -35,6 +37,7 @@
             Icon = "fa-database",
             Width = Model.View.IsGeneric ? 0 : 6,
             ItemCount = Model.View.DatabaseCount,
+            RouteId = Model.View.Network.Id,
             Link = "/Content/Created/Networks/Details/Databases"
         },
         new NavigationQuickLinkViewModel
@@ -45,6 +48,7 @@
             Icon = "fa-folder",
             Width = Model.View.IsGeneric ? 0 : 6,
             ItemCount = Model.View.NodeCollectionCount,
+            RouteId = Model.View.Network.Id,
             Link = "/Content/Created/Networks/Details/NodeCollections"
         },
         new NavigationQuickLinkViewModel
@@ -53,19 +57,10 @@
             Title = "User",
             Color = "primary",
             Icon = "fa-user",
-            Width = 6,
+            Width = 12,
             ItemCount = Model.View.UserCount,
+            RouteId = Model.View.Network.Id,
             Link = "/Content/Created/Networks/Details/Users"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "UserInvitations",
-            Title = "User invitation",
-            Color = "primary",
-            Icon = "fa-envelope-open",
-            Width = 6,
-            ItemCount = Model.View.UserInvitationCount,
-            Link = "/Content/Created/Networks/Details/UserInvitations"
         }
     };
 }

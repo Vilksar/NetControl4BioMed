@@ -41,6 +41,11 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public int ItemCount { get; set; }
 
         /// <summary>
+        /// Gets or sets the route ID of the quick link.
+        /// </summary>
+        public string RouteId { get; set; }
+
+        /// <summary>
         /// Gets or sets the destination link of the quick link.
         /// </summary>
         public string Link { get; set; }
