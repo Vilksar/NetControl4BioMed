@@ -99,7 +99,7 @@
                             <span title="@item.NetworkDatabases.FirstOrDefault()?.Database?.DatabaseType?.Name">@item.NetworkDatabases.FirstOrDefault()?.Database?.DatabaseType?.Name</span>
                         </td>
                         <td class="d-none d-xl-table-cell text-center text-break">
-                            <span title="@item.NetworkNodes.Count()">@item.NetworkNodes.Count()</span>
+                            <span title="@item.NetworkNodes.Where(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NetworkNodeType.None).Count()">@item.NetworkNodes.Where(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NetworkNodeType.None).Count()</span>
                         </td>
                         <td class="d-none d-xl-table-cell text-center text-break">
                             <span title="@item.NetworkEdges.Count()">@item.NetworkEdges.Count()</span>

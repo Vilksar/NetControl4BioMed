@@ -186,10 +186,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     query = query.OrderByDescending(item => item.NetworkDatabases.Count());
                     break;
                 case var sort when sort == ("NetworkNodeCount", "Ascending"):
-                    query = query.OrderBy(item => item.NetworkNodes.Count());
+                    query = query.OrderBy(item => item.NetworkNodes.Where(item1 => item1.Type == NetworkNodeType.None).Count());
                     break;
                 case var sort when sort == ("NetworkNodeCount", "Descending"):
-                    query = query.OrderByDescending(item => item.NetworkNodes.Count());
+                    query = query.OrderByDescending(item => item.NetworkNodes.Where(item1 => item1.Type == NetworkNodeType.None).Count());
                     break;
                 case var sort when sort == ("NetworkEdgeCount", "Ascending"):
                     query = query.OrderBy(item => item.NetworkEdges.Count());

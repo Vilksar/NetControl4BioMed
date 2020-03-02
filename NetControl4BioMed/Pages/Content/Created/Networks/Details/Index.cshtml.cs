@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
+using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
@@ -93,7 +94,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 Network = item,
                 IsGeneric = item.NetworkDatabases
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                NodeCount = item.NetworkNodes.Count(),
+                NodeCount = item.NetworkNodes
+                    .Where(item => item.Type == NetworkNodeType.None)
+                    .Count(),
                 EdgeCount = item.NetworkEdges.Count(),
                 NodeCollectionCount = item.NetworkNodeCollections.Count(),
                 DatabaseCount = item.NetworkDatabases.Count(),

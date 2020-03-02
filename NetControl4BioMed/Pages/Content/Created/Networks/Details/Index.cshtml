@@ -57,8 +57,19 @@
             Title = "User",
             Color = "primary",
             Icon = "fa-user",
-            Width = 12,
+            Width = 6,
             ItemCount = Model.View.UserCount,
+            RouteId = Model.View.Network.Id,
+            Link = "/Content/Created/Networks/Details/Users"
+        },
+        new NavigationQuickLinkViewModel
+        {
+            Id = "UserInvitations",
+            Title = "User invitations",
+            Color = "primary",
+            Icon = "fa-envelope-open",
+            Width = 6,
+            ItemCount = Model.View.UserInvitationCount,
             RouteId = Model.View.Network.Id,
             Link = "/Content/Created/Networks/Details/Users"
         }
