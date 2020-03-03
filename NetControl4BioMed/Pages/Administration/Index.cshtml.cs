@@ -360,7 +360,6 @@ namespace NetControl4BioMed.Pages.Administration
             zipStream.Position = 0;
             // Return the archive file.
             return new FileStreamResult(zipStream, MediaTypeNames.Application.Zip) { FileDownloadName = "NetControl4BioMed-Data.zip" };
-            //return File(zipStream.ToArray(), MediaTypeNames.Application.Zip, "NetControl4BioMed-Data.zip");
         }
     }
 }
