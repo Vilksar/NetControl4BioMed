@@ -142,7 +142,7 @@ namespace NetControl4BioMed.Helpers.Services
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var to = new EmailAddress(viewModel.Email, viewModel.Email);
             var subject = "NetControl4BioMed - You shared a network";
-            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailAddedToGenericNetworkPartial", viewModel);
+            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailAddedToNetworkPartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail.
             await client.SendEmailAsync(msg);
@@ -160,7 +160,7 @@ namespace NetControl4BioMed.Helpers.Services
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var to = new EmailAddress(viewModel.Email, viewModel.Email);
             var subject = "NetControl4BioMed - A network was shared with you";
-            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailWasAddedToGenericNetworkPartial", viewModel);
+            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailWasAddedToNetworkPartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail.
             await client.SendEmailAsync(msg);
@@ -178,7 +178,7 @@ namespace NetControl4BioMed.Helpers.Services
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var to = new EmailAddress(viewModel.Email, viewModel.Email);
             var subject = "NetControl4BioMed - You shared an analysis";
-            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailAddedToGenericAnalysisPartial", viewModel);
+            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailAddedToAnalysisPartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail.
             await client.SendEmailAsync(msg);
@@ -196,7 +196,7 @@ namespace NetControl4BioMed.Helpers.Services
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var to = new EmailAddress(viewModel.Email, viewModel.Email);
             var subject = "NetControl4BioMed - An analysis was shared with you";
-            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailWasAddedToGenericAnalysisPartial", viewModel);
+            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailWasAddedToAnalysisPartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail.
             await client.SendEmailAsync(msg);

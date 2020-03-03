@@ -150,7 +150,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
             // Save the changes in the database.
             await _context.SaveChangesAsync();
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {userCount.ToString()} user{(userCount != 1 ? "s" : string.Empty)}  deleted successfully.";
+            TempData["StatusMessage"] = $"Success: {userCount.ToString()} user{(userCount != 1 ? "s" : string.Empty)} deleted successfully.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Accounts/Users/Index");
         }
