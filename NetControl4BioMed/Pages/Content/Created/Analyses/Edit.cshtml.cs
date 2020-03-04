@@ -80,7 +80,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             if (View.Analysis == null)
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No network could be found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No analysis could be found with the provided ID.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
