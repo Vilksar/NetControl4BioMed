@@ -384,7 +384,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                                 .Select(item1 => new DatabaseNodeFieldNode
                                 {
                                     DatabaseNodeField = item1,
-                                    Value = item1.Name
+                                    Value = item
                                 })
                                 .ToList()
                         },
@@ -411,7 +411,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                                 .Select(item1 => new DatabaseEdgeFieldEdge
                                 {
                                     DatabaseEdgeField = item1,
-                                    Value = item1.Name
+                                    Value = $"{item.SourceNode} - {item.TargetNode}"
                                 })
                                 .ToList(),
                             EdgeNodes = new List<EdgeNode>

@@ -138,6 +138,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                         .ThenInclude(item => item.Edge)
                             .ThenInclude(item => item.EdgeNodes)
                                 .ThenInclude(item => item.Node)
+                    .Include(item => item.AnalysisNetworks)
+                        .ThenInclude(item => item.Analysis)
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -155,12 +157,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 // Redisplay the page.
                 return Page();
             }
-            // Define the file options for each type of file.
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                IgnoreNullValues = true,
-                WriteIndented = true
-            };
             // Define the stream of the file to return.
             var zipStream = new MemoryStream();
             // Define a new ZIP archive.
@@ -172,32 +168,25 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     // Check which should be the format of the files within the archive.
                     if (Input.FileFormat == "Text")
                     {
-                        // Get the required data.
-                        var databaseType = network.NetworkDatabases
-                            .FirstOrDefault()?.Database.DatabaseType.Name.ToLower();
-                        var edges = network.NetworkEdges
-                            .Select(item => item.Edge);
                         // Create a new entry in the archive and open it.
                         using var stream = archive.CreateEntry($"{network.Name}-{network.Id}.txt", CompressionLevel.Fastest).Open();
                         // Define the stream writer for the file.
                         using var streamWriter = new StreamWriter(stream);
+                        // Get the default values.
+                        var interactionType = network.NetworkDatabases
+                            .FirstOrDefault()?.Database.DatabaseType.Name.ToLower();
                         // Define the data to be written to the file.
-                        var data = string.Join("\n", edges.Select(item =>
+                        var data = string.Join("\n", network.NetworkEdges.Select(item => item.Edge).Select(item =>
                         {
                             var sourceNode = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source)?.Node;
                             var targetNode = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)?.Node;
-                            return $"{sourceNode?.Name}\t{databaseType}\t{targetNode.Name}";
+                            return $"{sourceNode?.Name}\t{interactionType}\t{targetNode.Name}";
                         }));
                         // Write the data to the stream corresponding to the file.
                         await streamWriter.WriteAsync(data);
                     }
                     else if (Input.FileFormat == "Json")
                     {
-                        // Get the required data.
-                        var nodes = network.NetworkNodes
-                            .Select(item => item.Node);
-                        var edges = network.NetworkEdges
-                            .Select(item => item.Edge);
                         // Create a new entry in the archive and open it.
                         using var stream = archive.CreateEntry($"{network.Name}-{network.Id}.json", CompressionLevel.Fastest).Open();
                         // Define the data to be serialized to the file.
@@ -207,58 +196,57 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                             Name = network.Name,
                             Description = network.Description,
                             Algorithm = network.Algorithm.ToString(),
-                            Nodes = nodes.Select(item => new
-                            {
-                                Id = item.Id,
-                                Name = item.Name,
-                                Description = item.Description,
-                                Values = item.DatabaseNodeFieldNodes
-                                    .Select(item1 => new
-                                    {
-                                        DatabaseId = item1.DatabaseNodeField.Database.Id,
-                                        DatabaseName = item1.DatabaseNodeField.Database.Name,
-                                        DatabaseFieldId = item1.DatabaseNodeField.Id,
-                                        DatabaseFieldName = item1.DatabaseNodeField.Name,
-                                        Value = item1.Value
-                                    })
-                            }),
-                            Edges = nodes.Select(item => new
-                            {
-                                Id = item.Id,
-                                Description = item.Description,
-                                Nodes = item.EdgeNodes
-                                    .Select(item1 => new
-                                    {
-                                        NodeId = item1.Node.Id,
-                                        NodeName = item1.Node.Name,
-                                        Type = item1.Type.ToString()
-                                    }),
-                                Values = item.DatabaseNodeFieldNodes
-                                    .Select(item1 => new
-                                    {
-                                        DatabaseId = item1.DatabaseNodeField.Database.Id,
-                                        DatabaseName = item1.DatabaseNodeField.Database.Name,
-                                        DatabaseFieldId = item1.DatabaseNodeField.Id,
-                                        DatabaseFieldName = item1.DatabaseNodeField.Name,
-                                        Value = item1.Value
-                                    })
-                            })
+                            Nodes = network.NetworkNodes
+                                .Select(item => item.Node)
+                                .Select(item => new
+                                {
+                                    Id = item.Id,
+                                    Name = item.Name,
+                                    Description = item.Description,
+                                    Values = item.DatabaseNodeFieldNodes
+                                        .Select(item1 => new
+                                        {
+                                            DatabaseId = item1.DatabaseNodeField.Database.Id,
+                                            DatabaseName = item1.DatabaseNodeField.Database.Name,
+                                            DatabaseFieldId = item1.DatabaseNodeField.Id,
+                                            DatabaseFieldName = item1.DatabaseNodeField.Name,
+                                            Value = item1.Value
+                                        })
+                                }),
+                            Edges = network.NetworkEdges
+                                .Select(item => item.Edge)
+                                .Select(item => new
+                                {
+                                    Id = item.Id,
+                                    Description = item.Description,
+                                    Nodes = item.EdgeNodes
+                                        .Select(item1 => new
+                                        {
+                                            NodeId = item1.Node.Id,
+                                            NodeName = item1.Node.Name,
+                                            Type = item1.Type.ToString()
+                                        }),
+                                    Values = item.DatabaseEdgeFieldEdges
+                                        .Select(item1 => new
+                                        {
+                                            DatabaseId = item1.DatabaseEdgeField.Database.Id,
+                                            DatabaseName = item1.DatabaseEdgeField.Database.Name,
+                                            DatabaseFieldId = item1.DatabaseEdgeField.Id,
+                                            DatabaseFieldName = item1.DatabaseEdgeField.Name,
+                                            Value = item1.Value
+                                        })
+                                })
                         };
                         // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                        await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { WriteIndented = true });
                     }
                     else if (Input.FileFormat == "CytoscapeJson")
                     {
-                        // Get the required data.
-                        var databaseType = network.NetworkDatabases
-                            .FirstOrDefault()?.Database.DatabaseType.Name.ToLower();
-                        var nodes = network.NetworkNodes
-                            .Select(item => item.Node);
-                        var edges = network.NetworkEdges
-                            .Select(item => item.Edge);
                         // Create a new entry in the archive and open it.
                         using var stream = archive.CreateEntry($"{network.Name}-{network.Id}.json", CompressionLevel.Fastest).Open();
-                        // Get the default node and edge classes.
+                        // Get the default values.
+                        var interactionType = network.NetworkDatabases
+                            .FirstOrDefault()?.Database.DatabaseType.Name.ToLower();
                         var nodeClasses = new List<string> { "node" };
                         var edgeClasses = new List<string> { "edge" };
                         // Define the data to be serialized to the file.
@@ -268,31 +256,35 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                             {
                                 Elements = new CytoscapeViewModel.CytoscapeData.CytoscapeElements
                                 {
-                                    Nodes = nodes.Select(item => new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeNode
-                                    {
-                                        Data = new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeNode.CytoscapeNodeData
+                                    Nodes = network.NetworkNodes
+                                        .Select(item => item.Node)
+                                        .Select(item => new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeNode
                                         {
-                                            Id = item.Id,
-                                            Name = item.Name,
-                                            Href = null,
-                                            Alias = item.DatabaseNodeFieldNodes
-                                                .Where(item1 => item1.DatabaseNodeField.IsSearchable)
-                                                .Select(item1 => item1.Value)
-                                        },
-                                        Classes = nodeClasses.Concat(item.NetworkNodes.Select(item => item.Type.ToString().ToLower()))
-                                    }),
-                                    Edges = edges.Select(item => new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeEdge
-                                    {
-                                        Data = new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeEdge.CytoscapeEdgeData
+                                            Data = new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeNode.CytoscapeNodeData
+                                            {
+                                                Id = item.Id,
+                                                Name = item.Name,
+                                                Href = null,
+                                                Alias = item.DatabaseNodeFieldNodes
+                                                    .Where(item1 => item1.DatabaseNodeField.IsSearchable)
+                                                    .Select(item1 => item1.Value)
+                                            },
+                                            Classes = nodeClasses.Concat(item.NetworkNodes.Select(item => item.Type.ToString().ToLower()))
+                                        }),
+                                    Edges = network.NetworkEdges
+                                        .Select(item => item.Edge)
+                                        .Select(item => new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeEdge
                                         {
-                                            Id = item.Id,
-                                            Name = item.Name,
-                                            Source = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source)?.Node.Id,
-                                            Target = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)?.Node.Id,
-                                            Interaction = databaseType
-                                        },
-                                        Classes = edgeClasses
-                                    })
+                                            Data = new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeEdge.CytoscapeEdgeData
+                                            {
+                                                Id = item.Id,
+                                                Name = item.Name,
+                                                Source = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source)?.Node.Id,
+                                                Target = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)?.Node.Id,
+                                                Interaction = interactionType
+                                            },
+                                            Classes = edgeClasses
+                                        })
                                 },
                                 Layout = new CytoscapeViewModel.CytoscapeData.CytoscapeLayout
                                 {
@@ -301,13 +293,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                             }
                         };
                         // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                        await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { IgnoreNullValues = true });
                     }
                     else if (Input.FileFormat == "Excel")
                     {
                         // Get the required data.
                         var databases = network.NetworkDatabases
-                            .Select(item => item.Database);
+                            .Select(item => item.Database)
+                            .Where(item1 => item1.IsPublic || item1.DatabaseUsers.Any(item2 => item2.User == user));
                         var databaseNodeFields = databases
                             .Select(item => item.DatabaseNodeFields)
                             .SelectMany(item => item);
