@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
 {
@@ -89,34 +90,51 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 IsGeneric = item.NetworkDatabases
                     .Any(item => item.Database.DatabaseType.Name == "Generic")
             };
+            // Get the JSON serializer options.
+            var jsonSerializeOptions = new JsonSerializerOptions
+            {
+                IgnoreNullValues = true,
+                WriteIndented = true
+            };
+            // Get the default values.
+            var databaseType = View.Network.NetworkDatabases.FirstOrDefault().Database.DatabaseType.Name.ToLower();
+            var nodeClasses = new List<string> { "node" };
+            var edgeClasses = new List<string> { "edge" };
             // Get the required data.
-            var nodes = item.NetworkNodes
-                .Select(item => item.Node)
-                .Distinct()
-                .Select(item => new
-                {
-                    data = new
+            var elements = new CytoscapeViewModel.CytoscapeData.CytoscapeElements
+            {
+                Nodes = View.Network.NetworkNodes
+                    .Select(item => item.Node)
+                    .Select(item => new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeNode
                     {
-                        id = item.Id,
-                        name = item.Name,
-                        href = View.IsGeneric ? string.Empty : _linkGenerator.GetPathByPage(page: "/Content/Data/Nodes/Details", values: new { id = item.Id })
-                    },
-                    classes = string.Join(" ", item.NetworkNodes.Where(item1 => item1.Type != NetworkNodeType.None && item1.Node == item).Select(item1 => item1.Type.ToString().ToLower()).Append("node"))
-                });
-            var edges = item.NetworkEdges
-                .Select(item => item.Edge)
-                .Distinct()
-                .Select(item => new
-                {
-                    data = new
+                        Data = new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeNode.CytoscapeNodeData
+                        {
+                            Id = item.Id,
+                            Name = item.Name,
+                            Href = View.IsGeneric ? string.Empty : _linkGenerator.GetPathByPage(page: "/Content/Data/Nodes/Details", values: new { id = item.Id }),
+                            Alias = item.DatabaseNodeFieldNodes
+                                .Where(item1 => item1.DatabaseNodeField.IsSearchable)
+                                .Select(item1 => item1.Value)
+                        },
+                        Classes = nodeClasses.Concat(item.NetworkNodes.Select(item => item.Type.ToString().ToLower()))
+                    }),
+                Edges = View.Network.NetworkEdges
+                    .Select(item => item.Edge)
+                    .Select(item => new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeEdge
                     {
-                        source = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source)?.Node.Id,
-                        target = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)?.Node.Id
-                    },
-                    classes = "edge"
-                });
+                        Data = new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeEdge.CytoscapeEdgeData
+                        {
+                            Id = item.Id,
+                            Name = item.Name,
+                            Source = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source)?.Node.Id,
+                            Target = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)?.Node.Id,
+                            Interaction = databaseType
+                        },
+                        Classes = edgeClasses
+                    })
+            };
             // Define the view.
-            View.CytoscapeJson = JsonSerializer.Serialize(new { nodes, edges });
+            View.CytoscapeJson = JsonSerializer.Serialize(elements, jsonSerializeOptions);
             // Return the page.
             return Page();
         }
