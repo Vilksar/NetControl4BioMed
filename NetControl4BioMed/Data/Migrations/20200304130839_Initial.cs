@@ -14,7 +14,6 @@ namespace NetControl4BioMed.Data.Migrations
                     Id = table.Column<string>(nullable: false),
                     DateTimeStarted = table.Column<DateTime>(nullable: true),
                     DateTimeEnded = table.Column<DateTime>(nullable: true),
-                    DateTimeIntervals = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     Status = table.Column<int>(nullable: false),
@@ -648,8 +647,8 @@ namespace NetControl4BioMed.Data.Migrations
                     DatabaseId = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
-                    IsSearchable = table.Column<bool>(nullable: false),
-                    Url = table.Column<string>(nullable: true)
+                    Url = table.Column<string>(nullable: true),
+                    IsSearchable = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -695,8 +694,8 @@ namespace NetControl4BioMed.Data.Migrations
                     DatabaseId = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
-                    IsSearchable = table.Column<bool>(nullable: false),
-                    Url = table.Column<string>(nullable: true)
+                    Url = table.Column<string>(nullable: true),
+                    IsSearchable = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {

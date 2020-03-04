@@ -154,69 +154,13 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         }
 
         /// <summary>
-        /// Gets the fitness list of the population.
+        /// Gets the maximum fitness of the chromosomes in the population.
         /// </summary>
-        /// <returns>The fitness list.</returns>
-        public List<double> GetFitnessList()
+        /// <returns>The maximum fitness.</returns>
+        public double GetMaximumFitness()
         {
             // Return the fitness list.
-            return Chromosomes.Select(item => item.GetFitness()).ToList();
-        }
-
-        /// <summary>
-        /// Gets the combined fitness list of the population, for a Monte-Carlo style selection.
-        /// </summary>
-        /// <returns>The combined fitness list of the population.</returns>
-        public List<double> GetCombinedFitnessList()
-        {
-            // Get the fitness of each chromosome.
-            var fitness = GetFitnessList();
-            // Get the total fitness.
-            var totalFitness = fitness.Sum();
-            // Define a variable to store the temporary sum.
-            var sum = 0.0;
-            // Return the combined fitness.
-            return fitness.Select(item => sum += item).Select(item => item / totalFitness).ToList();
-        }
-
-        /// <summary>
-        /// Selects a chromosome based on its fitness (the better the fitness, the more chances to be selected).
-        /// </summary>
-        /// <param name="combinedFitnessList">The combined fitness list for the population.</param>
-        /// <param name="random">The random seed.</param>
-        /// <returns>A random chromosome, selected based on its fitness.</returns>
-        public Chromosome Select(List<double> combinedFitnessList, Random random)
-        {
-            // Generate a random value.
-            var randomValue = random.NextDouble();
-            // Find the index corresponding to the random value.
-            var index = combinedFitnessList.FindIndex(item => randomValue <= item);
-            // Return the chromosome at the specified index.
-            return Chromosomes[index];
-        }
-
-        /// <summary>
-        /// Returns all of the unique chromosomes with the highest fitness in the population (providing an unique combination of genes).
-        /// </summary>
-        /// <returns>The chromosomes that have the best fitness in the current population.</returns>
-        public IEnumerable<Chromosome> GetBestChromosomes()
-        {
-            // Get the best fitness of the population.
-            var bestFitness = GetFitnessList().Max();
-            // Define the variable to return.
-            var bestChromosomes = new List<Chromosome>();
-            // Go over all of the chromosomes with the best fitness.
-            foreach (var chromosome in Chromosomes.Where(item => item.GetFitness() == bestFitness))
-            {
-                // Check if the current combination already exists in the list of solutions.
-                if (!bestChromosomes.Any(item => item.IsEqual(chromosome)))
-                {
-                    // If not, then add it.
-                    bestChromosomes.Add(chromosome);
-                }
-            }
-            // Return the solutions.
-            return bestChromosomes;
+            return Chromosomes.Max(item => item.GetFitness());
         }
 
         /// <summary>
@@ -264,9 +208,165 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 }
             }
             // Get the arrays required for the Floyd-Warshall algorithm.
-            var (dist, next) = Algorithm.GetFloydWarshallMatrices(edges, nodes);
+            var (dist, next) = GetFloydWarshallMatrices(edges, nodes);
             // Get the chromosome control paths.
-            return solutionChromosomes.Select(item => item.Genes.ToDictionary(item1 => item1.Key, item1 => Algorithm.GetPath(dist, next, nodeIndex[item1.Value], nodeIndex[item1.Key], nodes).Reverse().ToList())).ToList();
+            return solutionChromosomes.Select(item => item.Genes.ToDictionary(item1 => item1.Key, item1 => GetPath(next, nodeIndex[item1.Value], nodeIndex[item1.Key], nodes).Reverse().ToList())).ToList();
+        }
+
+        /// <summary>
+        /// Gets the fitness list of the population.
+        /// </summary>
+        /// <returns>The fitness list.</returns>
+        private List<double> GetFitnessList()
+        {
+            // Return the fitness list.
+            return Chromosomes.Select(item => item.GetFitness()).ToList();
+        }
+
+        /// <summary>
+        /// Gets the combined fitness list of the population, for a Monte-Carlo style selection.
+        /// </summary>
+        /// <returns>The combined fitness list of the population.</returns>
+        private List<double> GetCombinedFitnessList()
+        {
+            // Get the fitness of each chromosome.
+            var fitness = GetFitnessList();
+            // Get the total fitness.
+            var totalFitness = fitness.Sum();
+            // Define a variable to store the temporary sum.
+            var sum = 0.0;
+            // Return the combined fitness.
+            return fitness.Select(item => sum += item).Select(item => item / totalFitness).ToList();
+        }
+
+        /// <summary>
+        /// Selects a chromosome based on its fitness (the better the fitness, the more chances to be selected).
+        /// </summary>
+        /// <param name="combinedFitnessList">The combined fitness list for the population.</param>
+        /// <param name="random">The random seed.</param>
+        /// <returns>A random chromosome, selected based on its fitness.</returns>
+        private Chromosome Select(List<double> combinedFitnessList, Random random)
+        {
+            // Generate a random value.
+            var randomValue = random.NextDouble();
+            // Find the index corresponding to the random value.
+            var index = combinedFitnessList.FindIndex(item => randomValue <= item);
+            // Return the chromosome at the specified index.
+            return Chromosomes[index];
+        }
+
+        /// <summary>
+        /// Returns all of the unique chromosomes with the highest fitness in the population (providing an unique combination of genes).
+        /// </summary>
+        /// <returns>The chromosomes that have the best fitness in the current population.</returns>
+        private IEnumerable<Chromosome> GetBestChromosomes()
+        {
+            // Get the best fitness of the population.
+            var bestFitness = GetFitnessList().Max();
+            // Define the variable to return.
+            var bestChromosomes = new List<Chromosome>();
+            // Go over all of the chromosomes with the best fitness.
+            foreach (var chromosome in Chromosomes.Where(item => item.GetFitness() == bestFitness))
+            {
+                // Check if the current combination already exists in the list of solutions.
+                if (!bestChromosomes.Any(item => item.IsEqual(chromosome)))
+                {
+                    // If not, then add it.
+                    bestChromosomes.Add(chromosome);
+                }
+            }
+            // Return the solutions.
+            return bestChromosomes;
+        }
+
+        /// <summary>
+        /// Represents the Floyd-Warshall algorithm for finding the shortest path between two nodes in a graph.
+        /// The implementation is the Wikipedia version found on https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm.
+        /// </summary>
+        /// <param name="edges">The edges of the graph.</param>
+        /// <param name="nodes">The nodes of the graph.</param>
+        /// <returns>Returns a tuple of two-dimensional arrays that contain the data required to build the shortest path between any two nodes.</returns>
+        private static (int[,], int[,]) GetFloydWarshallMatrices(List<(string, string)> edges, List<string> nodes)
+        {
+            // Define the variables to be used.
+            var numberOfNodes = nodes.Count();
+            // Transpose the list of edges into a list of node indices.
+            var edgesIndex = edges.Select(item => (nodes.IndexOf(item.Item1), nodes.IndexOf(item.Item2)));
+            // Define the matrices to return.
+            var dist = new int[numberOfNodes, numberOfNodes];
+            var next = new int[numberOfNodes, numberOfNodes];
+            // Initialize the matrices to return.
+            for (int index1 = 0; index1 < numberOfNodes; index1++)
+            {
+                for (int index2 = 0; index2 < numberOfNodes; index2++)
+                {
+                    dist[index1, index2] = int.MaxValue;
+                    next[index1, index2] = -1;
+                }
+            }
+            // Go over each edge and update the corresponding entry in matrices.
+            foreach (var edge in edgesIndex)
+            {
+                dist[edge.Item1, edge.Item2] = 1;
+                next[edge.Item1, edge.Item2] = edge.Item2;
+            }
+            // Go over each node and mark the distance from itself to itself as 0.
+            for (int index = 0; index < numberOfNodes; index++)
+            {
+                dist[index, index] = 0;
+                next[index, index] = index;
+            }
+            // Actual Floyd-Warshall implementation.
+            for (int k = 0; k < numberOfNodes; k++)
+            {
+                for (int i = 0; i < numberOfNodes; i++)
+                {
+                    for (int j = 0; j < numberOfNodes; j++)
+                    {
+                        // Try to simulate the behavior of adding "inifinity".
+                        var sum = int.MaxValue;
+                        if (dist[i, k] != int.MaxValue && dist[k, j] != int.MaxValue)
+                        {
+                            sum = dist[i, k] + dist[k, j];
+                        }
+                        // Compare it with the current minimum value.
+                        if (dist[i, j] > sum)
+                        {
+                            dist[i, j] = sum;
+                            next[i, j] = next[i, k];
+                        }
+                    }
+                }
+            }
+            // And return the two matrices.
+            return (dist, next);
+        }
+
+        /// <summary>
+        /// Returns the shortest path between two points.
+        /// </summary>
+        /// <param name="next">The array containing the next node in a path, required by the algorithm.</param>
+        /// <param name="nodes">The nodes of the graph.</param>
+        /// <param name="sourceIndex">The index of source node of the path.</param>
+        /// <param name="targetIndex">The index of the target node of the path.</param>
+        /// <returns>Returns an ordered list of the nodes in the path, from source to target.</returns>
+        private static IEnumerable<string> GetPath(int[,] next, int sourceIndex, int targetIndex, List<string> nodes)
+        {
+            // Check if there is a path from the source to the target.
+            if (next[sourceIndex, targetIndex] == -1)
+            {
+                return Enumerable.Empty<string>();
+            }
+            // Add the source to the path.
+            var path = new List<string>() { nodes[sourceIndex] };
+            // Recreate the path.
+            while (sourceIndex != targetIndex)
+            {
+                sourceIndex = next[sourceIndex, targetIndex];
+                path.Add(nodes[sourceIndex]);
+            }
+            // And return it.
+            return path;
         }
     }
 }

@@ -126,9 +126,6 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<DateTime?>("DateTimeEnded")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DateTimeIntervals")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("DateTimeStarted")
                         .HasColumnType("datetime2");
 

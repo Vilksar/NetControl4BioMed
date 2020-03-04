@@ -2,7 +2,6 @@
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Data.ViewModels;
 using NetControl4BioMed.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
@@ -22,8 +21,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         /// </summary>
         /// <param name="context">The database context of the analysis.</param>
         /// <param name="analysis">The analysis which to run using the algorithm.</param>
-        /// <returns>True if the run was completed successfully, false oterwise.</returns>
-        public static async Task Run(ApplicationDbContext context, Analysis analysis)
+        public static async Task RunAsync(ApplicationDbContext context, Analysis analysis)
         {
             // Mark the analysis for updating.
             context.Update(analysis);
@@ -31,7 +29,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             analysis.ControlPaths = new List<ControlPath>();
             analysis.Status = AnalysisStatus.Initializing;
             analysis.DateTimeStarted = DateTime.Now;
-            analysis.DateTimeIntervals = analysis.AppendToDateTimeIntervals(analysis.DateTimeStarted, null);
             // Save the changes in the database.
             await context.SaveChangesAsync();
             // Reload it for a fresh start.
@@ -135,7 +132,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 // Move on to the next population.
                 population = new Population(population, nodeIndex, targets, targetAncestors, powersMatrixCA, nodeIsPreferred, parameters, random);
                 // Get the best fitness of the current solution.
-                var currentSolutionSize = population.GetFitnessList().Max();
+                var currentSolutionSize = population.GetMaximumFitness();
                 // Check if the current solution is better than the previously obtained best solutions.
                 if (bestSolutionSize < currentSolutionSize)
                 {
@@ -182,7 +179,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             analysis.ControlPaths = controlPaths;
             analysis.Status = currentIteration < parameters.MaximumIterations && currentIterationWithoutImprovement < parameters.MaximumIterationsWithoutImprovement ? AnalysisStatus.Stopped : AnalysisStatus.Completed;
             analysis.DateTimeEnded = DateTime.Now;
-            analysis.DateTimeIntervals = analysis.AppendToDateTimeIntervalsSkipLast(analysis.DateTimeStarted, analysis.DateTimeEnded);
             // Save the changes in the database.
             await context.SaveChangesAsync();
             // End the function.
@@ -195,7 +191,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         /// <param name="nodeIndices">The dictionary containing, for each node, its index in the node list.</param>
         /// <param name="edges">The edges of the graph.</param>
         /// <returns>The A matrix (corresponding to the adjacency matrix).</returns>
-        public static Matrix<double> GetMatrixA(Dictionary<string, int> nodeIndices, List<(string, string)> edges)
+        private static Matrix<double> GetMatrixA(Dictionary<string, int> nodeIndices, List<(string, string)> edges)
         {
             // Initialize the adjacency matrix with zero.
             var matrixA = Matrix<double>.Build.DenseDiagonal(nodeIndices.Count(), nodeIndices.Count(), 0.0);
@@ -215,7 +211,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         /// <param name="nodeIndex">The dictionary containing, for each node, its index in the node list.</param>
         /// <param name="targets">The target nodes for the algorithm.</param>
         /// <returns>The C matrix (corresponding to the target nodes).</returns>
-        public static Matrix<double> GetMatrixC(Dictionary<string, int> nodeIndex, List<string> targets)
+        private static Matrix<double> GetMatrixC(Dictionary<string, int> nodeIndex, List<string> targets)
         {
             // Initialize the C matrix with zero.
             var matrixC = Matrix<double>.Build.Dense(targets.Count(), nodeIndex.Count());
@@ -235,7 +231,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         /// <param name="matrixA">The adjacency matrix of the graph.</param>
         /// <param name="maximumPathLength">The maximum path length for control in the graph.</param>
         /// <returns>The powers of the adjacency matrix A, up to a given maximum power.</returns>
-        public static List<Matrix<double>> GetPowersMatrixA(Matrix<double> matrixA, int maximumPathLength)
+        private static List<Matrix<double>> GetPowersMatrixA(Matrix<double> matrixA, int maximumPathLength)
         {
             // Initialize a matrix list with the identity matrix.
             var powers = new List<Matrix<double>>(maximumPathLength + 1)
@@ -258,7 +254,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         /// <param name="matrixC">The matrix corresponding to the target nodes in the graph.</param>
         /// <param name="powersMatrixA">The list of powers of the adjacency matrix A.</param>
         /// <returns>The powers of the combination between the target matrix C and the adjacency matrix A.</returns>
-        public static List<Matrix<double>> GetPowersMatrixCA(Matrix<double> matrixC, List<Matrix<double>> powersMatrixA)
+        private static List<Matrix<double>> GetPowersMatrixCA(Matrix<double> matrixC, List<Matrix<double>> powersMatrixA)
         {
             // Initialize a new empty list.
             var powers = new List<Matrix<double>>(powersMatrixA.Count());
@@ -279,7 +275,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         /// <param name="targets">The target nodes for the algorithm.</param>
         /// <param name="nodeIndex">The dictionary containing, for each node, its index in the node list.</param>
         /// <returns>The list of nodes from which every target node can be reached.</returns>
-        public static Dictionary<string, List<string>> GetTargetAncestors(List<Matrix<double>> powersMatrixA, List<string> targets, Dictionary<string, int> nodeIndex)
+        private static Dictionary<string, List<string>> GetTargetAncestors(List<Matrix<double>> powersMatrixA, List<string> targets, Dictionary<string, int> nodeIndex)
         {
             // Initialize the path dictionary with an empty list for each target node.
             var dictionary = targets.ToDictionary(item => item, item => new List<string>());
@@ -305,102 +301,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             }
             // Return the dictionary.
             return dictionary;
-        }
-
-        /// <summary>
-        /// Represents the Floyd-Warshall algorithm for finding the shortest path between two nodes in a graph.
-        /// The implementation is the Wikipedia version found on https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm.
-        /// </summary>
-        /// <param name="edges">The edges of the graph.</param>
-        /// <param name="nodes">The nodes of the graph.</param>
-        /// <returns>Returns a tuple of two-dimensional arrays that contain the data required to build the shortest path between any two nodes.</returns>
-        public static (int[,], int[,]) GetFloydWarshallMatrices(List<(string, string)> edges, List<string> nodes)
-        {
-            // Define the variables to be used.
-            var v = nodes.Count();
-            var e = edges.Count();
-            // Transpose the list of edges into a list of node indices.
-            var edgesIndex = new List<(int, int)>();
-            foreach (var edge in edges)
-            {
-                edgesIndex.Add((nodes.IndexOf(edge.Item1), nodes.IndexOf(edge.Item2)));
-            }
-            // Define the matrices to return.
-            var dist = new int[v, v];
-            var next = new int[v, v];
-            // Initialize the matrices to return.
-            for (int index1 = 0; index1 < v; index1++)
-            {
-                for (int index2 = 0; index2 < v; index2++)
-                {
-                    dist[index1, index2] = int.MaxValue;
-                    next[index1, index2] = -1;
-                }
-            }
-            // Go over each edge and update the corresponding entry in matrices.
-            foreach (var edge in edgesIndex)
-            {
-                dist[edge.Item1, edge.Item2] = 1;
-                next[edge.Item1, edge.Item2] = edge.Item2;
-            }
-            // Go over each node and mark the distance from itself to itself as 0.
-            for (int index = 0; index < v; index++)
-            {
-                dist[index, index] = 0;
-                next[index, index] = index;
-            }
-            // Actual Floyd-Warshall implementation.
-            for (int k = 0; k < v; k++)
-            {
-                for (int i = 0; i < v; i++)
-                {
-                    for (int j = 0; j < v; j++)
-                    {
-                        // Try to simulate the behavior of adding "inifinity".
-                        var sum = int.MaxValue;
-                        if (dist[i, k] != int.MaxValue && dist[k, j] != int.MaxValue)
-                        {
-                            sum = dist[i, k] + dist[k, j];
-                        }
-                        // Compare it with the current minimum value.
-                        if (dist[i, j] > sum)
-                        {
-                            dist[i, j] = sum;
-                            next[i, j] = next[i, k];
-                        }
-                    }
-                }
-            }
-            // And return the two matrices.
-            return (dist, next);
-        }
-
-        /// <summary>
-        /// Returns the shortest path between two points.
-        /// </summary>
-        /// <param name="dist">The array containing the distances between any two node, required by the algorithm.</param>
-        /// <param name="next">The array containing the next node in a path, required by the algorithm.</param>
-        /// <param name="nodes">The nodes of the graph.</param>
-        /// <param name="sourceIndex">The index of source node of the path.</param>
-        /// <param name="targetIndex">The index of the target node of the path.</param>
-        /// <returns>Returns an ordered list of the nodes in the path, from source to target.</returns>
-        public static IEnumerable<string> GetPath(int[,] dist, int[,] next, int sourceIndex, int targetIndex, List<string> nodes)
-        {
-            // Check if there is a path from the source to the target.
-            if (next[sourceIndex, targetIndex] == -1)
-            {
-                return Enumerable.Empty<string>();
-            }
-            // Add the source to the path.
-            var path = new List<string>() { nodes[sourceIndex] };
-            // Recreate the path.
-            while (sourceIndex != targetIndex)
-            {
-                sourceIndex = next[sourceIndex, targetIndex];
-                path.Add(nodes[sourceIndex]);
-            }
-            // And return it.
-            return path;
         }
     }
 }

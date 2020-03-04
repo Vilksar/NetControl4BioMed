@@ -27,11 +27,6 @@ namespace NetControl4BioMed.Data.Models
         public DateTime? DateTimeEnded { get; set; }
 
         /// <summary>
-        /// Gets or sets the intervals in which the analysis has been running, with an underlying format of List&lt;DateTimeInterval&gt;.
-        /// </summary>
-        public string DateTimeIntervals { get; set; }
-
-        /// <summary>
         /// Gets or sets the name of the analysis.
         /// </summary>
         public string Name { get; set; }
@@ -47,7 +42,7 @@ namespace NetControl4BioMed.Data.Models
         public AnalysisStatus Status { get; set; }
 
         /// <summary>
-        /// Gets or sets the message log of the analysis, with an underlying format of List&lt;LogEntry&gt;.
+        /// Gets or sets the message log of the analysis, with an underlying format of List&lt;string&gt;.
         /// </summary>
         public string Log { get; set; }
 
@@ -67,7 +62,7 @@ namespace NetControl4BioMed.Data.Models
         public AnalysisAlgorithm Algorithm { get; set; }
 
         /// <summary>
-        /// Gets or sets the parameters of the algorithm used by the analysis, with an underlying format of AlgorithmParameters.
+        /// Gets or sets the parameters of the algorithm used by the analysis, with an underlying format of Parameters.
         /// </summary>
         public string Parameters { get; set; }
 

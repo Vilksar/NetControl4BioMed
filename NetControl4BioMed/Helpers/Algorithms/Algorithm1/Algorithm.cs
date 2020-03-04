@@ -2,6 +2,7 @@
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,8 +21,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// </summary>
         /// <param name="context">The database context of the analysis.</param>
         /// <param name="analysis">The analysis which to run using the algorithm.</param>
-        /// <returns>True if the run was completed successfully, false oterwise.</returns>
-        public static async Task Run(ApplicationDbContext context, Analysis analysis)
+        public static async Task RunAsync(ApplicationDbContext context, Analysis analysis)
         {
             // Mark the analysis for updating.
             context.Update(analysis);
@@ -29,7 +29,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             analysis.ControlPaths = new List<ControlPath>();
             analysis.Status = AnalysisStatus.Initializing;
             analysis.DateTimeStarted = DateTime.Now;
-            analysis.DateTimeIntervals = analysis.AppendToDateTimeIntervals(analysis.DateTimeStarted, null);
             // Save the changes in the database.
             await context.SaveChangesAsync();
             // Reload it for a fresh start.
@@ -283,7 +282,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             analysis.ControlPaths = controlPaths;
             analysis.Status = currentIteration < parameters.MaximumIterations && currentIterationWithoutImprovement < parameters.MaximumIterationsWithoutImprovement ? AnalysisStatus.Stopped : AnalysisStatus.Completed;
             analysis.DateTimeEnded = DateTime.Now;
-            analysis.DateTimeIntervals = analysis.AppendToDateTimeIntervalsSkipLast(analysis.DateTimeStarted, analysis.DateTimeEnded);
             // Save the changes in the database.
             await context.SaveChangesAsync();
             // End the function.
@@ -295,7 +293,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// </summary>
         /// <param name="controlPath">The control path of the current iteration.</param>
         /// <returns>Returns the dictionary containing, for each control node, the target nodes that it controls.</returns>
-        public static Dictionary<string, IEnumerable<string>> GetControllingNodes(Dictionary<string, List<string>> controlPath)
+        private static Dictionary<string, IEnumerable<string>> GetControllingNodes(Dictionary<string, List<string>> controlPath)
         {
             // Get the pairs of corresponding control nodes and target nodes for each path in the control path.
             var pairs = controlPath.Select(item => (item.Key.ToString(), item.Value.Last()));
@@ -313,7 +311,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// <param name="controlPath">Represents the current control path.</param>
         /// <param name="sources">Represents the source (drug-target) nodes.</param>
         /// <returns></returns>
-        public static List<(string, string)> GetSingleHeuristicEdges(List<string> leftNodes, List<string> rightNodes, List<(string, string)> edges, List<string> heuristic, Dictionary<string, List<string>> controlPath, List<string> sources)
+        private static List<(string, string)> GetSingleHeuristicEdges(List<string> leftNodes, List<string> rightNodes, List<(string, string)> edges, List<string> heuristic, Dictionary<string, List<string>> controlPath, List<string> sources)
         {
             // Define the variable to return.
             var heuristicEdges = new List<(string, string)>();
@@ -455,7 +453,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// <param name="edges">Represents the edges of the bipartite graph.</param>
         /// <param name="rand">Represents the random variable for choosing randomly a maximum matching.</param>
         /// <returns>Returns the list of edges corresponding to a maximum matching for the bipartite graph.</returns>
-        public static List<(string, string)> GetMaximumMatching(List<string> leftNodes, List<string> rightNodes, List<(string, string)> edges, Random rand)
+        private static List<(string, string)> GetMaximumMatching(List<string> leftNodes, List<string> rightNodes, List<(string, string)> edges, Random rand)
         {
             // The Wikipedia algorithm uses considers the left nodes as U, and the right ones as V. But, as the unmatched nodes are considered, in order, from the left side of the bipartite graph, the obtained matching would not be truly random, especially on the first step. That is why I perform here a simple switch, by inter-changing the lists U and V (left and right side nodes), and using the opposite direction edges, in order to obtained a random maximum matching.
             var U = rightNodes;
