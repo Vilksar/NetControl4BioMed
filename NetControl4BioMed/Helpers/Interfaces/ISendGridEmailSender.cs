@@ -43,31 +43,31 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task SendContactEmailAsync(EmailContactViewModel viewModel);
 
         /// <summary>
-        /// Sends an e-mail with a notification that the user has given access to a generic network.
+        /// Sends an e-mail with a notification that the user has given access to a network.
         /// </summary>
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         Task SendAddedToNetworkEmailAsync(EmailAddedToNetworkViewModel viewModel);
 
         /// <summary>
-        /// Sends an e-mail with a notification that the user has been given access to a generic network.
+        /// Sends an e-mail with a notification that the user has been given access to a network.
         /// </summary>
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         Task SendWasAddedToNetworkEmailAsync(EmailWasAddedToNetworkViewModel viewModel);
 
         /// <summary>
-        /// Sends an e-mail with a notification that the user has given access to a generic analysis.
+        /// Sends an e-mail with a notification that the user has given access to an analysis.
         /// </summary>
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         Task SendAddedToAnalysisEmailAsync(EmailAddedToAnalysisViewModel viewModel);
 
         /// <summary>
-        /// Sends an e-mail with a notification that the user was given access to a generic analysis.
+        /// Sends an e-mail with a notification that the user was given access to an analysis.
         /// </summary>
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         Task SendWasAddedToAnalysisEmailAsync(EmailWasAddedToAnalysisViewModel viewModel);
 
         /// <summary>
-        /// Sends an e-mail with a notification that a generic analysis has ended.
+        /// Sends an e-mail with a notification that an analysis has ended.
         /// </summary>
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         Task SendAnalysisEndedEmailAsync(EmailAnalysisEndedViewModel viewModel);
