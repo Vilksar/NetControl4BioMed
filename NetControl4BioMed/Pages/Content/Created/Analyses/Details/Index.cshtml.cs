@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Extensions;
 
 namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
 {
@@ -44,6 +47,19 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
             public int UserCount { get; set; }
 
             public int UserInvitationCount { get; set; }
+
+            public List<ItemModel> Parameters { get; set; }
+        }
+
+        public class ItemModel
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
+
+            public string Value { get; set; }
+
+            public string Description { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -101,8 +117,48 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                 NodeCollectionCount = item.AnalysisNodeCollections.Count(),
                 DatabaseCount = item.AnalysisDatabases.Count(),
                 UserCount = item.AnalysisUsers.Count(),
-                UserInvitationCount = item.AnalysisUserInvitations.Count()
+                UserInvitationCount = item.AnalysisUserInvitations.Count(),
+                Parameters = new List<ItemModel>()
             };
+            // Check which algorithm is used and try to deserialize the parameters.
+            if (item.Algorithm == AnalysisAlgorithm.Algorithm1)
+            {
+                // Try to deserialize the parameters
+                if (item.Parameters.TryDeserializeJsonObject<Helpers.Algorithms.Algorithm1.Parameters>(out var parameters))
+                {
+                    // Iterate over the properties.
+                    foreach (var property in parameters.GetType().GetProperties())
+                    {
+                        // Add to the list the parameter details.
+                        View.Parameters.Add(new ItemModel
+                        {
+                            Id = property.Name.Replace(" ", string.Empty),
+                            Name = property.Name,
+                            Value = property.GetValue(parameters)?.ToString(),
+                            Description = Attribute.IsDefined(property, typeof(DescriptionAttribute)) ? ((DescriptionAttribute)Attribute.GetCustomAttribute(property, typeof(DescriptionAttribute))).Description : string.Empty
+                        });
+                    }
+                }
+            }
+            else if (item.Algorithm == AnalysisAlgorithm.Algorithm2)
+            {
+                // Try to deserialize the parameters
+                if (item.Parameters.TryDeserializeJsonObject<Helpers.Algorithms.Algorithm2.Parameters>(out var parameters))
+                {
+                    // Iterate over the properties.
+                    foreach (var property in parameters.GetType().GetProperties())
+                    {
+                        // Add to the list the parameter details.
+                        View.Parameters.Add(new ItemModel
+                        {
+                            Id = property.Name.Replace(" ", string.Empty),
+                            Name = property.Name,
+                            Value = property.GetValue(parameters)?.ToString(),
+                            Description = Attribute.IsDefined(property, typeof(DescriptionAttribute)) ? ((DescriptionAttribute)Attribute.GetCustomAttribute(property, typeof(DescriptionAttribute))).Description : string.Empty
+                        });
+                    }
+                }
+            }
             // Return the page.
             return Page();
         }

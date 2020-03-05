@@ -1,6 +1,7 @@
 ﻿@page
 @model IndexModel
 @using Helpers.ViewModels
+@using NetControl4BioMed.Data.Enumerations
 @{
     ViewData["Title"] = "Analysis details";
     ViewData["ActiveGroup"] = "AnalysisIndex";
@@ -76,6 +77,42 @@
     };
 }
 
+<div class="card mb-3">
+    <div class="card-body text-center">
+        <div class="text-uppercase">
+            @switch (Model.View.Analysis.Status)
+            {
+                case AnalysisStatus.Scheduled:
+                    <span title="@Model.View.Analysis.Status.ToString()" class="text-warning"><i class="fas fa-clock"></i></span>
+                    break;
+                case AnalysisStatus.Initializing:
+                    <span title="@Model.View.Analysis.Status.ToString()" class="text-primary"><i class="fas fa-play-circle"></i></span>
+                    break;
+                case AnalysisStatus.Ongoing:
+                    <span title="@Model.View.Analysis.Status.ToString()" class="text-primary"><i class="fas fa-sync-alt fa-spin"></i></span>
+                    break;
+                case AnalysisStatus.Stopping:
+                    <span title="@Model.View.Analysis.Status.ToString()" class="text-danger"><i class="fas fa-stopwatch"></i></span>
+                    break;
+                case AnalysisStatus.Stopped:
+                    <span title="@Model.View.Analysis.Status.ToString()" class="text-danger"><i class="fas fa-stop-circle"></i></span>
+                    break;
+                case AnalysisStatus.Completed:
+                    <span title="@Model.View.Analysis.Status.ToString()" class="text-success"><i class="fas fa-check-circle"></i></span>
+                    break;
+                case AnalysisStatus.Error:
+                    <span title="@Model.View.Analysis.Status.ToString()" class="text-danger"><i class="fas fa-times-circle"></i></span>
+                    break;
+                default:
+                    break;
+            }
+            <span title="Status">@Model.View.Analysis.Status.ToString()</span>
+        </div>
+        <div class="font-weight-bold">
+            <span title="Progress">@Math.Round((double)Model.View.Analysis.CurrentIteration * 100 / Model.View.Analysis.MaximumIterations, 2) / @Math.Round((double)Model.View.Analysis.CurrentIterationWithoutImprovement * 100 / Model.View.Analysis.MaximumIterationsWithoutImprovement, 2)</span>
+        </div>
+    </div>
+</div>
 <div class="row align-items-center">
     <div class="col-lg-4 mb-3">
         <a asp-page="/Content/Created/Analyses/Edit" asp-route-id="@Model.View.Analysis.Id" class="btn btn-warning btn-block" title="Edit">
@@ -142,5 +179,33 @@
             <span><i class="fas fa-info-circle"></i></span>
             <span>The parameters of used by the analysis algorithm are displayed below.</span>
         </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-code"></i></span>
+            </div>
+            <div>
+                <span>Parameters</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="form-group">
+            <label asp-for="View.Analysis.Algorithm" class="font-weight-bold">Algorithm</label>
+            <input asp-for="View.Analysis.Algorithm" class="form-control" value="@Model.View.Analysis.Algorithm.ToString()" readonly />
+            <span asp-description-for="View.Analysis.Algorithm" class="text-muted small">The algorithm used in running the analysis.</span>
+            <span asp-validation-for="View.Analysis.Algorithm" class="text-danger small"></span>
+        </div>
+        @foreach (var parameter in Model.View.Parameters)
+        {
+            <div class="form-group">
+                <label for="@parameter.Id" class="font-weight-bold">@parameter.Name</label>
+                <input id="@parameter.Id" name="@parameter.Id" class="form-control" value="@parameter.Value" readonly />
+                <span description-for="@parameter.Id" class="text-muted small">@parameter.Description</span>
+            </div>
+        }
     </div>
 </div>
