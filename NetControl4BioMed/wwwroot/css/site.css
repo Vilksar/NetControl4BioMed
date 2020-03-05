@@ -29,39 +29,3 @@ th, td {
 .cytoscape-container {
     min-height: 25rem !important;
 }
-
-.cytoscape-color-default {
-    color: lightgray;
-}
-
-.cytoscape-color-seed {
-    color: tomato;
-}
-
-.cytoscape-color-source {
-    color: lightpink;
-}
-
-.cytoscape-color-target {
-    color: cornflowerblue;
-}
-
-.cytoscape-color-control {
-    color: forestgreen;
-}
-
-.cytoscape-color-source-target {
-    color: mediumpurple;
-}
-
-.cytoscape-color-source-control {
-    color: deeppink;
-}
-
-.cytoscape-color-target-control {
-    color: aquamarine;
-}
-
-.cytoscape-color-source-target-control {
-    color: darkgoldenrod;
-}

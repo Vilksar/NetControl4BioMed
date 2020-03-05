@@ -282,104 +282,14 @@ $(window).on('load', () => {
 
     // Check if there is a Cytoscape area on the page.
     if ($('.cytoscape-area').length !== 0) {
-        // Get the corresponding colors.
-        const defaultColor = $('.cytoscape-color-default').first().css('color');
-        const seedColor = $('.cytoscape-color-seed').first().css('color');
-        const sourceColor = $('.cytoscape-color-source').first().css('color');
-        const targetColor = $('.cytoscape-color-target').first().css('color');
-        const controlColor = $('.cytoscape-color-control').first().css('color');
-        const sourceTargetColor = $('.cytoscape-color-source-target').first().css('color');
-        const sourceControlColor = $('.cytoscape-color-source-control').first().css('color');
-        const targetControlColor = $('.cytoscape-color-target-control').first().css('color');
-        const targetPreferredControlColor = $('.cytoscape-color-source-target-control').first().css('color');
+        // Get the Cytoscape configuration JSON.
+        const cytoscapeJson = JSON.parse($('.cytoscape-configuration').first().text());
         // Define the Cytoscape variable.
         const cy = cytoscape({
             container: $('.cytoscape-container').first().get(0),
-            layout: {
-                name: "cose"
-            },
-            style: [
-                {
-                    selector: 'node',
-                    css: {
-                        'content': 'data(name)',
-                        'color': defaultColor,
-                        'background-color': defaultColor
-                    }
-                },
-                {
-                    selector: 'node.seed',
-                    css: {
-                        'color': seedColor,
-                        'background-color': seedColor
-                    }
-                },
-                {
-                    selector: 'node.source',
-                    css: {
-                        'color': sourceColor,
-                        'background-color': sourceColor
-                    }
-                },
-                {
-                    selector: 'node.target',
-                    css: {
-                        'color': targetColor,
-                        'background-color': targetColor
-                    }
-                },
-                {
-                    selector: 'node.control',
-                    css: {
-                        'color': controlColor,
-                        'background-color': controlColor
-                    }
-                },
-                {
-                    selector: 'node.source.target',
-                    css: {
-                        'color': sourceTargetColor,
-                        'background-color': sourceTargetColor
-                    }
-                },
-                {
-                    selector: 'node.source.control',
-                    css: {
-                        'color': sourceControlColor,
-                        'background-color': sourceControlColor
-                    }
-                },
-                {
-                    selector: 'node.target.control',
-                    css: {
-                        'color': targetControlColor,
-                        'background-color': targetControlColor
-                    }
-                },
-                {
-                    selector: 'node.source.target.control',
-                    css: {
-                        'color': targetPreferredControlColor,
-                        'background-color': targetPreferredControlColor
-                    }
-                },
-                {
-                    selector: 'edge',
-                    css: {
-                        'mid-target-arrow-shape': 'triangle',
-                        'color': defaultColor,
-                        'line-color': defaultColor
-                    }
-                },
-                {
-                    selector: 'edge.control',
-                    css: {
-                        'color': controlColor,
-                        'line-color': controlColor
-                    }
-                }
-            ],
-            elements: JSON.parse($('.cytoscape-configuration').first().text())
+            elements: cytoscapeJson.elements,
+            layout: cytoscapeJson.layout,
+            style: cytoscapeJson.style
         });
         // Add listener for when a node is clicked.
         cy.on('tap', 'node', (event) => {

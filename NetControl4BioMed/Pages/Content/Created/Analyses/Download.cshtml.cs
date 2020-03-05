@@ -14,10 +14,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Content.Created.Analyses
@@ -27,11 +29,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly LinkGenerator _linkGenerator;
 
-        public DownloadModel(UserManager<User> userManager, ApplicationDbContext context)
+        public DownloadModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator)
         {
             _userManager = userManager;
             _context = context;
+            _linkGenerator = linkGenerator;
         }
 
         [BindProperty]
@@ -246,57 +250,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     {
                         // Create a new entry in the archive and open it.
                         using var stream = archive.CreateEntry($"{analysis.Name}-{analysis.Id}.json", CompressionLevel.Fastest).Open();
-                        // Get the default values.
-                        var interactionType = analysis.AnalysisDatabases
-                            .FirstOrDefault()?.Database.DatabaseType.Name.ToLower();
-                        var nodeClasses = new List<string> { "node" };
-                        var edgeClasses = new List<string> { "edge" };
-                        // Define the data to be serialized to the file.
-                        var data = new CytoscapeViewModel
-                        {
-                            Data = new CytoscapeViewModel.CytoscapeData
-                            {
-                                Elements = new CytoscapeViewModel.CytoscapeData.CytoscapeElements
-                                {
-                                    Nodes = analysis.AnalysisNodes
-                                        .Select(item => item.Node)
-                                        .Select(item => new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeNode
-                                        {
-                                            Data = new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeNode.CytoscapeNodeData
-                                            {
-                                                Id = item.Id,
-                                                Name = item.Name,
-                                                Href = null,
-                                                Alias = item.DatabaseNodeFieldNodes
-                                                    .Where(item1 => item1.DatabaseNodeField.Database.IsPublic || item1.DatabaseNodeField.Database.DatabaseUsers.Any(item2 => item2.User == user))
-                                                    .Where(item1 => item1.DatabaseNodeField.IsSearchable)
-                                                    .Select(item1 => item1.Value)
-                                            },
-                                            Classes = nodeClasses.Concat(item.NetworkNodes.Select(item => item.Type.ToString().ToLower()))
-                                        }),
-                                    Edges = analysis.AnalysisEdges
-                                        .Select(item => item.Edge)
-                                        .Select(item => new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeEdge
-                                        {
-                                            Data = new CytoscapeViewModel.CytoscapeData.CytoscapeElements.CytoscapeEdge.CytoscapeEdgeData
-                                            {
-                                                Id = item.Id,
-                                                Name = item.Name,
-                                                Source = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source)?.Node.Id,
-                                                Target = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)?.Node.Id,
-                                                Interaction = interactionType
-                                            },
-                                            Classes = edgeClasses
-                                        })
-                                },
-                                Layout = new CytoscapeViewModel.CytoscapeData.CytoscapeLayout
-                                {
-                                    Name = "cose"
-                                }
-                            }
-                        };
                         // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { IgnoreNullValues = true });
+                        await JsonSerializer.SerializeAsync(stream, analysis.GetCytoscapeViewModel(_linkGenerator), new JsonSerializerOptions { IgnoreNullValues = true });
                     }
                     else if (Input.FileFormat == "Excel")
                     {
