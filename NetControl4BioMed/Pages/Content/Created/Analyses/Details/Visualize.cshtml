@@ -1,0 +1,49 @@
+﻿@page
+@model VisualizeModel
+@{
+    ViewData["Title"] = "Visualize analysis";
+    ViewData["ActiveGroup"] = "AnalysisIndex";
+    ViewData["ActivePage"] = "AnalysisIndex";
+}
+
+<div class="cytoscape-area d-flex flex-column">
+    <div class="cytoscape-configuration" hidden>
+        <span>@Model.View.CytoscapeJson</span>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body cytoscape-legend">
+            <div class="row align-items-center">
+                <div class="col-lg-3 text-center">
+                    <span class="cytoscape-color-default"><i class="fas fa-circle"></i></span>
+                    <span>None</span>
+                </div>
+                <div class="col-lg-3 text-center">
+                    <span class="cytoscape-color-target"><i class="fas fa-circle"></i></span>
+                    <span>Target</span>
+                </div>
+                <div class="col-lg-3 text-center">
+                    <span class="cytoscape-color-source"><i class="fas fa-circle"></i></span>
+                    <span>Preferred</span>
+                </div>
+                <div class="col-lg-3 text-center">
+                    <span class="cytoscape-color-source-target"><i class="fas fa-circle"></i></span>
+                    <span><i class="fas fa-equals"></i></span>
+                    <span class="cytoscape-color-source"><i class="fas fa-circle"></i></span>
+                    <span><i class="fas fa-plus"></i></span>
+                    <span class="cytoscape-color-target"><i class="fas fa-circle"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body cytoscape-container">
+            <div class="cytoscape-loading text-center">
+                <span class="font-italic">Loading analysis visualization...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/cytoscape/cytoscape.min.js"></script>
+}
