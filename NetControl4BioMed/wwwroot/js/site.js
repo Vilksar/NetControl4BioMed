@@ -285,13 +285,13 @@ $(window).on('load', () => {
         // Get the corresponding colors.
         const defaultColor = $('.cytoscape-color-default').first().css('color');
         const seedColor = $('.cytoscape-color-seed').first().css('color');
+        const sourceColor = $('.cytoscape-color-source').first().css('color');
         const targetColor = $('.cytoscape-color-target').first().css('color');
-        const preferredColor = $('.cytoscape-color-preferred').first().css('color');
         const controlColor = $('.cytoscape-color-control').first().css('color');
-        const targetPreferredColor = $('.cytoscape-color-target-preferred').first().css('color');
+        const sourceTargetColor = $('.cytoscape-color-source-target').first().css('color');
+        const sourceControlColor = $('.cytoscape-color-source-control').first().css('color');
         const targetControlColor = $('.cytoscape-color-target-control').first().css('color');
-        const preferredControlColor = $('.cytoscape-color-preferred-control').first().css('color');
-        const targetPreferredControlColor = $('.cytoscape-color-target-preferred-control').first().css('color');
+        const targetPreferredControlColor = $('.cytoscape-color-source-target-control').first().css('color');
         // Define the Cytoscape variable.
         const cy = cytoscape({
             container: $('.cytoscape-container').first().get(0),
@@ -300,7 +300,7 @@ $(window).on('load', () => {
             },
             style: [
                 {
-                    selector: '.node',
+                    selector: 'node',
                     css: {
                         'content': 'data(name)',
                         'color': defaultColor,
@@ -308,10 +308,17 @@ $(window).on('load', () => {
                     }
                 },
                 {
-                    selector: '.node.seed',
+                    selector: 'node.seed',
                     css: {
                         'color': seedColor,
                         'background-color': seedColor
+                    }
+                },
+                {
+                    selector: 'node.source',
+                    css: {
+                        'color': sourceColor,
+                        'background-color': sourceColor
                     }
                 },
                 {
@@ -322,13 +329,6 @@ $(window).on('load', () => {
                     }
                 },
                 {
-                    selector: 'node.preferred',
-                    css: {
-                        'color': preferredColor,
-                        'background-color': preferredColor
-                    }
-                },
-                {
                     selector: 'node.control',
                     css: {
                         'color': controlColor,
@@ -336,10 +336,17 @@ $(window).on('load', () => {
                     }
                 },
                 {
-                    selector: 'node.target.preferred',
+                    selector: 'node.source.target',
                     css: {
-                        'color': targetPreferredColor,
-                        'background-color': targetPreferredColor
+                        'color': sourceTargetColor,
+                        'background-color': sourceTargetColor
+                    }
+                },
+                {
+                    selector: 'node.source.control',
+                    css: {
+                        'color': sourceControlColor,
+                        'background-color': sourceControlColor
                     }
                 },
                 {
@@ -350,14 +357,7 @@ $(window).on('load', () => {
                     }
                 },
                 {
-                    selector: 'node.preferred.control',
-                    css: {
-                        'color': preferredControlColor,
-                        'background-color': preferredControlColor
-                    }
-                },
-                {
-                    selector: 'node.target.preferred.control',
+                    selector: 'node.source.target.control',
                     css: {
                         'color': targetPreferredControlColor,
                         'background-color': targetPreferredControlColor

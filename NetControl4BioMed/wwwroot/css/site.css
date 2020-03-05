@@ -38,30 +38,30 @@ th, td {
     color: tomato;
 }
 
-.cytoscape-color-target {
-    color: cornflowerblue;
+.cytoscape-color-source {
+    color: lightpink;
 }
 
-.cytoscape-color-preferred {
-    color: lightpink;
+.cytoscape-color-target {
+    color: cornflowerblue;
 }
 
 .cytoscape-color-control {
     color: forestgreen;
 }
 
-.cytoscape-color-target-preferred {
+.cytoscape-color-source-target {
     color: mediumpurple;
+}
+
+.cytoscape-color-source-control {
+    color: deeppink;
 }
 
 .cytoscape-color-target-control {
     color: aquamarine;
 }
 
-.cytoscape-color-preferred-control {
-    color: deeppink;
-}
-
-.cytoscape-color-target-preferred-control {
+.cytoscape-color-source-target-control {
     color: darkgoldenrod;
 }

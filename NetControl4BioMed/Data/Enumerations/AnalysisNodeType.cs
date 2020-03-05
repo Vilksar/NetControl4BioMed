@@ -27,12 +27,6 @@ namespace NetControl4BioMed.Data.Enumerations
         /// Represents a target node.
         /// </summary>
         [Display(Name = "Target", Description = "The node is a target node in the analysis.")]
-        Target,
-
-        /// <summary>
-        /// Represents a control node.
-        /// </summary>
-        [Display(Name = "Target", Description = "The node is a control node in the analysis.")]
-        Control
+        Target
     }
 }

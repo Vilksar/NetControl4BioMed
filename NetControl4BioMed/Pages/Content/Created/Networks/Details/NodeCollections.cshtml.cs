@@ -93,7 +93,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
-                    { "Name", "Name" }
+                    { "Name", "Name" },
+                    { "Type", "Type" }
                 }
             };
             // Define the search input.
@@ -133,6 +134,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                     break;
                 case var sort when sort == ("Name", "Descending"):
                     query = query.OrderByDescending(item => item.NodeCollection.Name);
+                    break;
+                case var sort when sort == ("Type", "Ascending"):
+                    query = query.OrderBy(item => item.Type);
+                    break;
+                case var sort when sort == ("Type", "Descending"):
+                    query = query.OrderByDescending(item => item.Type);
                     break;
                 default:
                     break;
