@@ -10,7 +10,7 @@ using NetControl4BioMed.Data;
 namespace NetControl4BioMed.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200304130839_Initial")]
+    [Migration("20200305104755_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -136,6 +136,12 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.Property<string>("Log")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaximumIterations")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaximumIterationsWithoutImprovement")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");

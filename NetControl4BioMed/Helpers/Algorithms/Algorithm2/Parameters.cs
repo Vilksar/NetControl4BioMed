@@ -12,58 +12,57 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
     public class Parameters
     {
         /// <summary>
-        /// Represents the random seed to be used in the analysis.
+        /// Gets or sets the random seed to be used throughout the algorithm.
         /// </summary>
+        [Display(Name = "Random seed", Description = "The random seed to be used throughout the algorithm.")]
         public int RandomSeed { get; set; }
 
         /// <summary>
-        /// Represents the maximum number of iteration for which the analysis to run.
+        /// Gets or sets the maximum length of any path between a source node and a target node.
         /// </summary>
-        public int MaximumIterations { get; set; }
-
-        /// <summary>
-        /// Represents the maximum number of iterations without improvement for which the analysis to run.
-        /// </summary>
-        public int MaximumIterationsWithoutImprovement { get; set; }
-
-        /// <summary>
-        /// Represents the maximum path length to be used in the analysis.
-        /// </summary>
+        [Display(Name = "Maximum path length", Description = "The maximum length of any path between a source node and a target node.")]
         public int MaximumPathLength { get; set; }
 
         /// <summary>
-        /// Represents the number of chromosomes in each population.
+        /// Gets or sets the number of chromosomes in each population.
         /// </summary>
+        [Display(Name = "Population size", Description = "The number of chromosomes in each population.")]
         public int PopulationSize { get; set; }
 
         /// <summary>
-        /// Represents the maximum number of genes whose value can be simultaneously randomly generated.
+        /// Gets or sets the maximum number of genes whose value can be simultaneously randomly generated.
         /// </summary>
+        [Display(Name = "Random genes per chromosome", Description = "The maximum number of genes whose value can be simultaneously randomly generated.")]
         public int RandomGenesPerChromosome { get; set; }
 
         /// <summary>
-        /// Represents the percentage of a population which is composed of randomly generated chromosomes.
+        /// Gets or sets the percentage of a population which is composed of randomly generated chromosomes.
         /// </summary>
+        [Display(Name = "Percentage random", Description = "The percentage of a population which is composed of randomly generated chromosomes.")]
         public double PercentageRandom { get; set; }
 
         /// <summary>
-        /// Represents the percentage of a population which is composed of the elite chromosomes of the previous population.
+        /// Gets or sets the percentage of a population which is composed of the elite chromosomes of the previous population.
         /// </summary>
+        [Display(Name = "Percentage elite", Description = "The percentage of a population which is composed of the elite chromosomes of the previous population.")]
         public double PercentageElite { get; set; }
 
         /// <summary>
-        /// Represents the probability of mutation for each gene of a chromosome..
+        /// Gets or sets the probability of mutation for each gene of a chromosome.
         /// </summary>
+        [Display(Name = "Percentage elite", Description = "The probability of mutation for each gene of a chromosome.")]
         public double ProbabilityMutation { get; set; }
 
         /// <summary>
-        /// Represents the crossover algorithm to be used.
+        /// Gets or sets the crossover algorithm to be used.
         /// </summary>
+        [Display(Name = "Crossover type", Description = "The crossover algorithm to be used.")]
         public CrossoverType CrossoverType { get; set; }
 
         /// <summary>
-        /// Represents the mutation algorithm to be used.
+        /// Gets or sets the mutation algorithm to be used.
         /// </summary>
+        [Display(Name = "Mutation type", Description = "The mutation algorithm to be used.")]
         public MutationType MutationType { get; set; }
 
         /// <summary>
@@ -71,129 +70,84 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         /// </summary>
         public Parameters()
         {
-            // Assign the default value for each parameter.
-            RandomSeed = DefaultValues.RandomSeed;
-            MaximumIterations = DefaultValues.MaximumIterations;
-            MaximumIterationsWithoutImprovement = DefaultValues.MaximumIterationsWithoutImprovement;
-            MaximumPathLength = DefaultValues.MaximumPathLength;
-            PopulationSize = DefaultValues.PopulationSize;
-            RandomGenesPerChromosome = DefaultValues.RandomGenesPerChromosome;
-            PercentageRandom = DefaultValues.PercentageRandom;
-            PercentageElite = DefaultValues.PercentageElite;
-            ProbabilityMutation = DefaultValues.ProbabilityMutation;
-            CrossoverType = DefaultValues.CrossoverType;
-            MutationType = DefaultValues.MutationType;
+            // Define a new parameters model.
+            var model = new ViewModel();
+            // Assign the default value for each property.
+            RandomSeed = model.RandomSeed;
+            MaximumPathLength = model.MaximumPathLength;
+            PopulationSize = model.PopulationSize;
+            RandomGenesPerChromosome = model.RandomGenesPerChromosome;
+            PercentageRandom = model.PercentageRandom;
+            PercentageElite = model.PercentageElite;
+            ProbabilityMutation = model.ProbabilityMutation;
+            CrossoverType = model.CrossoverType;
+            MutationType = model.MutationType;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the class.
-        /// </summary>
-        /// <param name="randomSeed">The random seed.</param>
-        /// <param name="maximumIterations">The maximum number of iterations.</param>
-        /// <param name="maximumIterationsWithoutImprovement">The maximum number of iterations without improvement.</param>
-        /// <param name="maximumPathLength">The maximum path length.</param>
-        /// <param name="populationSize">The population size.</param>
-        /// <param name="randomGenesPerChromosome">The maximum number of genes whose value can be simultaneously randomly generated.</param>
-        /// <param name="percentageRandom">The percentage of a population which is composed of randomly generated chromosomes.</param>
-        /// <param name="percentageElite">The percentage of a population which is composed of the elite chromosomes of the previous population.</param>
-        /// <param name="probabilityMutation">The probability of mutation for each gene of a chromosome.</param>
-        /// <param name="crossoverType">The crossover algorithm to be used.</param>
-        /// <param name="mutationType">The mutation algorithm to be used.</param>
-        public Parameters(int randomSeed, int maximumIterations, int maximumIterationsWithoutImprovement, int maximumPathLength, int populationSize, int randomGenesPerChromosome, double percentageRandom, double percentageElite, double probabilityMutation, CrossoverType crossoverType, MutationType mutationType)
-        {
-            // Assign the value for each parameter.
-            RandomSeed = randomSeed;
-            MaximumIterations = maximumIterations;
-            MaximumIterationsWithoutImprovement = maximumIterationsWithoutImprovement;
-            MaximumPathLength = maximumPathLength;
-            PopulationSize = populationSize;
-            RandomGenesPerChromosome = randomGenesPerChromosome;
-            PercentageRandom = percentageRandom;
-            PercentageElite = percentageElite;
-            ProbabilityMutation = probabilityMutation;
-            CrossoverType = crossoverType;
-            MutationType = mutationType;
-        }
-
-        /// <summary>
-        /// Check if the parameters in the current instance are valid.
-        /// </summary>
-        /// <returns>True if all of the parameters are valid, false otherwise.</returns>
-        public bool IsValid()
-        {
-            // Check if the given parameters are valid.
-            return 0 <= RandomSeed &&
-                1 <= MaximumIterations &&
-                1 <= MaximumIterationsWithoutImprovement &&
-                1 <= MaximumPathLength &&
-                2 <= PopulationSize &&
-                1 <= RandomGenesPerChromosome &&
-                0.0 <= PercentageRandom && PercentageRandom <= 1.0 &&
-                0.0 <= PercentageElite && PercentageElite <= 1.0 &&
-                0.0 <= ProbabilityMutation && ProbabilityMutation <= 1.0 &&
-                Enum.IsDefined(typeof(CrossoverType), CrossoverType) &&
-                Enum.IsDefined(typeof(MutationType), MutationType);
-        }
-
-        /// <summary>
-        /// Represents the default values for the parameters.
-        /// </summary>
-        public static class DefaultValues
+        public class ViewModel : IValidatableObject
         {
             /// <summary>
-            /// Represents the default value for the random seed to be used in the algorithm.
+            /// Gets or sets the random seed to be used throughout the algorithm.
             /// </summary>
-            public static int RandomSeed { get; } = (new Random()).Next();
+            [Range(0, int.MaxValue, ErrorMessage = "The value must be a positive integer.")]
+            public int RandomSeed { get; set; } = (new Random()).Next();
 
             /// <summary>
-            /// Represents the default value for the maximum number of iteration for which the algorithm to run.
+            /// Gets or sets the maximum length of any path between a source node and a target node.
             /// </summary>
-            public static int MaximumIterations { get; } = 10000;
+            [Range(0, 25, ErrorMessage = "The value must be between {1} and {2}.")]
+            public int MaximumPathLength { get; set; } = 15;
 
             /// <summary>
-            /// Represents the default value for the maximum number of iterations without improvement for which the algorithm to run.
+            /// Gets or sets the number of chromosomes in each population.
             /// </summary>
-            public static int MaximumIterationsWithoutImprovement { get; } = 1000;
+            [Range(2, 150, ErrorMessage = "The value must be between {1} and {2}.")]
+            public int PopulationSize { get; set; } = 80;
 
             /// <summary>
-            /// Represents the default value for the maximum path length to be used in the algorithm.
+            /// Gets or sets the maximum number of genes whose value can be simultaneously randomly generated.
             /// </summary>
-            public static int MaximumPathLength { get; } = 15;
+            [Range(0, 30, ErrorMessage = "The value must be between {1} and {2}.")]
+            public int RandomGenesPerChromosome { get; set; } = 25;
 
             /// <summary>
-            /// Represents the default value for the number of chromosomes in each population.
+            /// Gets or sets the percentage of a population which is composed of randomly generated chromosomes.
             /// </summary>
-            public static int PopulationSize { get; } = 80;
+            [Range(0.0, 1.0, ErrorMessage = "The value must be between {1} and {2}.")]
+            public double PercentageRandom { get; set; } = 0.25;
 
             /// <summary>
-            /// Represents the default value for the maximum number of genes whose value can be simultaneously randomly generated.
+            /// Gets or sets the percentage of a population which is composed of the elite chromosomes of the previous population.
             /// </summary>
-            public static int RandomGenesPerChromosome { get; } = 25;
+            [Range(0.0, 1.0, ErrorMessage = "The value must be between {1} and {2}.")]
+            public double PercentageElite { get; set; } = 0.25;
 
             /// <summary>
-            /// Represents the default value for the percentage of a population which is composed of randomly generated chromosomes.
+            /// Gets or sets the probability of mutation for each gene of a chromosome.
             /// </summary>
-            public static double PercentageRandom { get; } = 0.25;
+            [Range(0.0, 1.0, ErrorMessage = "The value must be between {1} and {2}.")]
+            public double ProbabilityMutation { get; set; } = 0.01;
 
             /// <summary>
-            /// Represents the default value for the percentage of a population which is composed of the elite chromosomes of the previous population.
+            /// Gets or sets the crossover algorithm to be used.
             /// </summary>
-            public static double PercentageElite { get; } = 0.25;
+            public CrossoverType CrossoverType { get; set; } = CrossoverType.WeightedRandom;
 
             /// <summary>
-            /// Represents the default value for the probability of mutation for each chromosome.
+            /// Gets or sets the mutation algorithm to be used.
             /// </summary>
-            public static double ProbabilityMutation { get; } = 0.01;
+            public MutationType MutationType { get; set; } = MutationType.WeightedRandomAncestor;
 
             /// <summary>
-            /// Represents the default value for the crossover algorithm to be used.
+            /// Checks if the parameters are valid.
             /// </summary>
-            public static CrossoverType CrossoverType { get; } = CrossoverType.WeightedRandom;
-
-            /// <summary>
-            /// Represents the default value for the mutation algorithm to be used.
-            /// </summary>
-            public static MutationType MutationType { get; } = MutationType.WeightedRandomAncestor;
+            /// <param name="validationContext">Represents the validation context.</param>
+            /// <returns>Returns a list with the validation errors.</returns>
+            public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+            {
+                // Return an empty list of validation results.
+                return Enumerable.Empty<ValidationResult>();
+            }
         }
     }
 }

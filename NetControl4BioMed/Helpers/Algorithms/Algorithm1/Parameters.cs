@@ -15,33 +15,27 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
     public class Parameters
     {
         /// <summary>
-        /// Gets or sets the random seed.
+        /// Gets or sets the random seed to be used throughout the algorithm.
         /// </summary>
+        [Display(Name = "Random seed", Description = "The random seed to be used throughout the algorithm.")]
         public int RandomSeed { get; set; }
 
         /// <summary>
-        /// Gets or sets the maximum number of iterations.
+        /// Gets or sets the maximum length of any path between a source node and a target node.
         /// </summary>
-        public int MaximumIterations { get; set; }
-
-        /// <summary>
-        /// Gets or sets the maximum number of iterations without improvement.
-        /// </summary>
-        public int MaximumIterationsWithoutImprovement { get; set; }
-
-        /// <summary>
-        /// Gets or sets the maximum path length.
-        /// </summary>
+        [Display(Name = "Maximum path length", Description = "The maximum length of any path between a source node and a target node.")]
         public int MaximumPathLength { get; set; }
 
         /// <summary>
-        /// Gets or sets the number of repeats.
+        /// Gets or sets the number of times that each heuristic will be repeated in one iteration..
         /// </summary>
+        [Display(Name = "Repeats", Description = "The number of times that each heuristic will be repeated in one iteration.")]
         public int Repeats { get; set; }
 
         /// <summary>
-        /// Gets or sets the heuristics.
+        /// Gets or sets the search heuristics.
         /// </summary>
+        [Display(Name = "Heuristics", Description = "The search heuristics.")]
         public List<List<string>> Heuristics { get; set; }
 
         /// <summary>
@@ -52,11 +46,9 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             // Define a new parameters model.
             var model = new ViewModel();
             // Assign the default value for each property.
-            RandomSeed = model.RandomSeed.Value;
-            MaximumIterations = model.MaximumIterations.Value;
-            MaximumIterationsWithoutImprovement = model.MaximumIterationsWithoutImprovement.Value;
-            MaximumPathLength = model.MaximumPathLength.Value;
-            Repeats = model.Repeats.Value;
+            RandomSeed = model.RandomSeed;
+            MaximumPathLength = model.MaximumPathLength;
+            Repeats = model.Repeats;
             Heuristics = JsonSerializer.Deserialize<List<List<string>>>(model.Heuristics);
         }
 
@@ -66,31 +58,19 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             /// Gets or sets the random seed.
             /// </summary>
             [Range(0, int.MaxValue, ErrorMessage = "The value must be a positive integer.")]
-            public int? RandomSeed { get; set; } = new Random().Next();
-
-            /// <summary>
-            /// Gets or sets the maximum number of iterations.
-            /// </summary>
-            [Range(1, 20000, ErrorMessage = "The value must be between {1} and {2}.")]
-            public int? MaximumIterations { get; set; } = 10000;
-
-            /// <summary>
-            /// Gets or sets the maximum number of iterations without improvement.
-            /// </summary>
-            [Range(1, 2000, ErrorMessage = "The value must be between {1} and {2}.")]
-            public int? MaximumIterationsWithoutImprovement { get; set; } = 1000;
+            public int RandomSeed { get; set; } = new Random().Next();
 
             /// <summary>
             /// Gets or sets the maximum path length.
             /// </summary>
             [Range(0, 25, ErrorMessage = "The value must be between {1} and {2}.")]
-            public int? MaximumPathLength { get; set; } = 0;
+            public int MaximumPathLength { get; set; } = 0;
 
             /// <summary>
             /// Gets or sets the number of repeats.
             /// </summary>
             [Range(1, 3, ErrorMessage = "The value must be between {1} and {2}.")]
-            public int? Repeats { get; set; } = 1;
+            public int Repeats { get; set; } = 1;
 
             /// <summary>
             /// Gets or sets the heuristics.

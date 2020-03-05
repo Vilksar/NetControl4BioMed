@@ -115,11 +115,13 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             var random = new Random(parameters.RandomSeed);
             var currentIteration = analysis.CurrentIteration;
             var currentIterationWithoutImprovement = analysis.CurrentIterationWithoutImprovement;
+            var maximumIterations = analysis.MaximumIterations;
+            var maximumIterationsWithoutImprovement = analysis.MaximumIterationsWithoutImprovement;
             var bestSolutionSize = 0.0;
             // Initialize a new population.
             var population = new Population(nodeIndex, targets, targetAncestors, powersMatrixCA, nodeIsPreferred, parameters, random);
             // Run as long as the analysis exists and the final iteration hasn't been reached.
-            while (analysis != null && analysis.Status == AnalysisStatus.Ongoing && currentIteration < parameters.MaximumIterations && currentIterationWithoutImprovement < parameters.MaximumIterationsWithoutImprovement)
+            while (analysis != null && analysis.Status == AnalysisStatus.Ongoing && currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement)
             {
                 // Move on to the next iterations.
                 currentIteration += 1;
@@ -177,7 +179,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             }).ToList();
             // Update the analysis.
             analysis.ControlPaths = controlPaths;
-            analysis.Status = currentIteration < parameters.MaximumIterations && currentIterationWithoutImprovement < parameters.MaximumIterationsWithoutImprovement ? AnalysisStatus.Stopped : AnalysisStatus.Completed;
+            analysis.Status = currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement ? AnalysisStatus.Stopped : AnalysisStatus.Completed;
             analysis.DateTimeEnded = DateTime.Now;
             // Save the changes in the database.
             await context.SaveChangesAsync();

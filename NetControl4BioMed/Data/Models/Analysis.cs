@@ -57,12 +57,22 @@ namespace NetControl4BioMed.Data.Models
         public int CurrentIterationWithoutImprovement { get; set; }
 
         /// <summary>
+        /// Gets or sets the maximum number of iterations.
+        /// </summary>
+        public int MaximumIterations { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of iterations without improvement.
+        /// </summary>
+        public int MaximumIterationsWithoutImprovement { get; set; }
+
+        /// <summary>
         /// Gets or sets the algorithm used by the analysis.
         /// </summary>
         public AnalysisAlgorithm Algorithm { get; set; }
 
         /// <summary>
-        /// Gets or sets the parameters of the algorithm used by the analysis, with an underlying format of Parameters.
+        /// Gets or sets the parameters of the algorithm used by the analysis, with an underlying format of Parameter.
         /// </summary>
         public string Parameters { get; set; }
 

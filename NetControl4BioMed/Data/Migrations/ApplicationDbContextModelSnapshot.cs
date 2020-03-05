@@ -135,6 +135,12 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("Log")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("MaximumIterations")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaximumIterationsWithoutImprovement")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
