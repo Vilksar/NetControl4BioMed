@@ -29,5 +29,38 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// Gets or sets the color of the banner.
         /// </summary>
         public string Color { get; set; }
+
+        /// <summary>
+        /// Gets the navigation banner for the account pages.
+        /// </summary>
+        public static NavigationBannerViewModel AccountNavigationBanner { get; } = new NavigationBannerViewModel
+        {
+            Id = "Account",
+            Title = "Account",
+            Icon = "fa-user",
+            Color = "info"
+        };
+
+        /// <summary>
+        /// Gets the navigation banner for the administration pages.
+        /// </summary>
+        public static NavigationBannerViewModel AdministrationNavigationBanner { get; } = new NavigationBannerViewModel
+        {
+            Id = "Administration",
+            Title = "Administration",
+            Icon = "fa-cog",
+            Color = "primary"
+        };
+
+        /// <summary>
+        /// Gets the navigation banner for the content pages.
+        /// </summary>
+        public static NavigationBannerViewModel ContentNavigationBanner { get; } = new NavigationBannerViewModel
+        {
+            Id = "Content",
+            Title = "Content",
+            Icon = "fa-box-open",
+            Color = "success"
+        };
     }
 }
