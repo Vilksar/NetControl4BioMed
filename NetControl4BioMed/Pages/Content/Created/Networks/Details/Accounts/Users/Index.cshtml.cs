@@ -9,20 +9,19 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
 
-namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
+namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.Users
 {
     [Authorize]
-    public class NodeCollectionsModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly LinkGenerator _linkGenerator;
 
-        public NodeCollectionsModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator)
+        public IndexModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator)
         {
             _userManager = userManager;
             _context = context;
@@ -37,7 +36,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
 
             public bool IsGeneric { get; set; }
 
-            public SearchViewModel<NetworkNodeCollection> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
+        }
+
+        public class ItemModel
+        {
+            public string Email { get; set; }
+
+            public DateTime DateTimeCreated { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -81,20 +87,15 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
             {
                 SearchIn = new Dictionary<string, string>
                 {
-                    { "Id", "ID" },
-                    { "Name", "Name" },
-                    { "Description", "Description" }
+                    { "Email", "E-mail" }
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "IsSeed", "Is of type \"Seed\"" },
-                    { "IsNotSeed", "Is not of type \"Seed\"" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
-                    { "Id", "ID" },
-                    { "Name", "Name" },
-                    { "Type", "Type" }
+                    { "DateTimeCreated", "Date created" },
+                    { "Email", "E-mail" }
                 }
             };
             // Define the search input.
@@ -106,54 +107,56 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 return RedirectToPage(new { id = input.Id, searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
             // Start with all of the items of the network.
-            var query = items
-                .Select(item => item.NetworkNodeCollections)
+            var query1 = items
+                .Select(item => item.NetworkUsers)
                 .SelectMany(item => item)
+                .Select(item => new ItemModel
+                {
+                    Email = item.User.Email,
+                    DateTimeCreated = item.DateTimeCreated
+                })
+                .AsEnumerable();
+            var query2 = items
+                .Select(item => item.NetworkUserInvitations)
+                .SelectMany(item => item)
+                .Select(item => new ItemModel
+                {
+                    Email = item.Email,
+                    DateTimeCreated = item.DateTimeCreated
+                })
+                .AsEnumerable();
+            var query = query1
+                .Concat(query2)
                 .AsQueryable();
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
-                    input.SearchIn.Contains("Id") && item.NodeCollection.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Name") && item.NodeCollection.Name.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Description") && item.NodeCollection.Description.Contains(input.SearchString));
-            // Select the results matching the filter parameter.
-            query = query
-                .Where(item => input.Filter.Contains("IsSeed") ? item.Type == NetworkNodeCollectionType.Seed : true)
-                .Where(item => input.Filter.Contains("IsNotSeed") ? item.Type != NetworkNodeCollectionType.Seed : true);
+                    input.SearchIn.Contains("Email") && item.Email.Contains(input.SearchString));
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
-                case var sort when sort == ("Id", "Ascending"):
-                    query = query.OrderBy(item => item.NodeCollection.Id);
+                case var sort when sort == ("DateTimeCreated", "Ascending"):
+                    query = query.OrderBy(item => item.DateTimeCreated);
                     break;
-                case var sort when sort == ("Id", "Descending"):
-                    query = query.OrderByDescending(item => item.NodeCollection.Id);
+                case var sort when sort == ("DateTimeCreated", "Descending"):
+                    query = query.OrderByDescending(item => item.DateTimeCreated);
                     break;
-                case var sort when sort == ("Name", "Ascending"):
-                    query = query.OrderBy(item => item.NodeCollection.Name);
+                case var sort when sort == ("Email", "Ascending"):
+                    query = query.OrderBy(item => item.Email);
                     break;
-                case var sort when sort == ("Name", "Descending"):
-                    query = query.OrderByDescending(item => item.NodeCollection.Name);
-                    break;
-                case var sort when sort == ("Type", "Ascending"):
-                    query = query.OrderBy(item => item.Type);
-                    break;
-                case var sort when sort == ("Type", "Descending"):
-                    query = query.OrderByDescending(item => item.Type);
+                case var sort when sort == ("Email", "Descending"):
+                    query = query.OrderByDescending(item => item.Email);
                     break;
                 default:
                     break;
             }
-            // Include the related entities.
-            query = query
-                .Include(item => item.NodeCollection);
             // Define the view.
             View = new ViewModel
             {
                 Network = items.First(),
                 IsGeneric = items.First().NetworkDatabases
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                Search = new SearchViewModel<NetworkNodeCollection>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.
             return Page();

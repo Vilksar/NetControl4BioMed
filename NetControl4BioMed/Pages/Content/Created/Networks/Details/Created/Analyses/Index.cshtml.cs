@@ -12,16 +12,16 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
 
-namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
+namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Created.Analyses
 {
     [Authorize]
-    public class UsersModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly LinkGenerator _linkGenerator;
 
-        public UsersModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator)
+        public IndexModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator)
         {
             _userManager = userManager;
             _context = context;
@@ -36,14 +36,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
 
             public bool IsGeneric { get; set; }
 
-            public SearchViewModel<ItemModel> Search { get; set; }
-        }
-
-        public class ItemModel
-        {
-            public string Email { get; set; }
-
-            public DateTime DateTimeCreated { get; set; }
+            public SearchViewModel<AnalysisNetwork> Search { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -87,15 +80,17 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
             {
                 SearchIn = new Dictionary<string, string>
                 {
-                    { "Email", "E-mail" }
+                    { "Id", "ID" },
+                    { "Name", "Name" },
+                    { "Description", "Description" }
                 },
                 Filter = new Dictionary<string, string>
                 {
                 },
                 SortBy = new Dictionary<string, string>
                 {
-                    { "DateTimeCreated", "Date created" },
-                    { "Email", "E-mail" }
+                    { "Id", "ID" },
+                    { "Name", "Name" }
                 }
             };
             // Define the search input.
@@ -107,56 +102,44 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 return RedirectToPage(new { id = input.Id, searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
             // Start with all of the items of the network.
-            var query1 = items
-                .Select(item => item.NetworkUsers)
+            var query = items
+                .Select(item => item.AnalysisNetworks)
                 .SelectMany(item => item)
-                .Select(item => new ItemModel
-                {
-                    Email = item.User.Email,
-                    DateTimeCreated = item.DateTimeCreated
-                })
-                .AsEnumerable();
-            var query2 = items
-                .Select(item => item.NetworkUserInvitations)
-                .SelectMany(item => item)
-                .Select(item => new ItemModel
-                {
-                    Email = item.Email,
-                    DateTimeCreated = item.DateTimeCreated
-                })
-                .AsEnumerable();
-            var query = query1
-                .Concat(query2)
                 .AsQueryable();
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
-                    input.SearchIn.Contains("Email") && item.Email.Contains(input.SearchString));
+                    input.SearchIn.Contains("Id") && item.Analysis.Id.Contains(input.SearchString) ||
+                    input.SearchIn.Contains("Name") && item.Analysis.Name.Contains(input.SearchString) ||
+                    input.SearchIn.Contains("Description") && item.Analysis.Description.Contains(input.SearchString));
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
-                case var sort when sort == ("DateTimeCreated", "Ascending"):
-                    query = query.OrderBy(item => item.DateTimeCreated);
+                case var sort when sort == ("Id", "Ascending"):
+                    query = query.OrderBy(item => item.Analysis.Id);
                     break;
-                case var sort when sort == ("DateTimeCreated", "Descending"):
-                    query = query.OrderByDescending(item => item.DateTimeCreated);
+                case var sort when sort == ("Id", "Descending"):
+                    query = query.OrderByDescending(item => item.Analysis.Id);
                     break;
-                case var sort when sort == ("Email", "Ascending"):
-                    query = query.OrderBy(item => item.Email);
+                case var sort when sort == ("Name", "Ascending"):
+                    query = query.OrderBy(item => item.Analysis.Name);
                     break;
-                case var sort when sort == ("Email", "Descending"):
-                    query = query.OrderByDescending(item => item.Email);
+                case var sort when sort == ("Name", "Descending"):
+                    query = query.OrderByDescending(item => item.Analysis.Name);
                     break;
                 default:
                     break;
             }
+            // Include the related entities.
+            query = query
+                .Include(item => item.Analysis);
             // Define the view.
             View = new ViewModel
             {
                 Network = items.First(),
                 IsGeneric = items.First().NetworkDatabases
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<AnalysisNetwork>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.
             return Page();

@@ -14,10 +14,10 @@ using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.ViewModels;
 
-namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
+namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.Users
 {
     [Authorize]
-    public class AddUsersModel : PageModel
+    public class AddModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
@@ -25,7 +25,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
         private readonly LinkGenerator _linkGenerator;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public AddUsersModel(UserManager<User> userManager, ApplicationDbContext context, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public AddModel(UserManager<User> userManager, ApplicationDbContext context, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
             _userManager = userManager;
             _context = context;
@@ -242,7 +242,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
             // Display a message to the user.
             TempData["StatusMessage"] = "Success: 1 user added successfully to the network.";
             // Redirect to the users page.
-            return RedirectToPage("/Content/Created/Networks/Details/Users", new { id = View.Network.Id });
+            return RedirectToPage("/Content/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
         }
     }
 }

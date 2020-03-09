@@ -12,16 +12,16 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
 
-namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
+namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Databases.Databases
 {
     [Authorize]
-    public class DatabasesModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly LinkGenerator _linkGenerator;
 
-        public DatabasesModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator)
+        public IndexModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator)
         {
             _userManager = userManager;
             _context = context;

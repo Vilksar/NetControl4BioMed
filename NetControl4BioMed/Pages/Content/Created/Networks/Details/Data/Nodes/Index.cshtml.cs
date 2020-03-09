@@ -13,16 +13,16 @@ using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
 
-namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
+namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.Nodes
 {
     [Authorize]
-    public class EdgesModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly LinkGenerator _linkGenerator;
 
-        public EdgesModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator)
+        public IndexModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator)
         {
             _userManager = userManager;
             _context = context;
@@ -37,7 +37,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
 
             public bool IsGeneric { get; set; }
 
-            public SearchViewModel<NetworkEdge> Search { get; set; }
+            public SearchViewModel<NetworkNode> Search { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -84,21 +84,20 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                     { "Id", "ID" },
                     { "Name", "Name" },
                     { "Description", "Description" },
-                    { "SourceNode", "Source node" },
-                    { "TargetNode", "Target node" },
                     { "Values", "Values" }
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsNone", "Is of type \"None\"" },
+                    { "IsNotNone", "Is not of type \"None\"" },
+                    { "IsSeed", "Is of type \"Seed\"" },
+                    { "IsNotSeed", "Is not of type \"Seed\"" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
                     { "Name", "Name" },
-                    { "SourceNodeId", "Source node ID" },
-                    { "SourceNodeName", "Source node name" },
-                    { "TargetNodeId", "Target node ID" },
-                    { "TargetNodeName", "Target node name" }
+                    { "Type", "Type" }
                 }
             };
             // Define the search input.
@@ -111,70 +110,56 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
             }
             // Start with all of the items of the network.
             var query = items
-                .Select(item => item.NetworkEdges)
+                .Select(item => item.NetworkNodes)
                 .SelectMany(item => item)
                 .AsQueryable();
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
-                    input.SearchIn.Contains("Id") && item.Edge.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Name") && item.Edge.Name.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Description") && item.Edge.Description.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("SourceNode") && item.Edge.EdgeNodes.Any(item1 => item1.Type == EdgeNodeType.Source && (item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Any(item2 => item2.DatabaseNodeField.IsSearchable && item2.Value.Contains(input.SearchString)))) ||
-                    input.SearchIn.Contains("TargetNode") && item.Edge.EdgeNodes.Any(item1 => item1.Type == EdgeNodeType.Target && (item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Any(item2 => item2.DatabaseNodeField.IsSearchable && item2.Value.Contains(input.SearchString)))) ||
-                    input.SearchIn.Contains("Values") && item.Edge.DatabaseEdgeFieldEdges.Where(item1 => item1.DatabaseEdgeField.Database.IsPublic || item1.DatabaseEdgeField.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.DatabaseEdgeField.IsSearchable && item1.Value.Contains(input.SearchString)));
+                    input.SearchIn.Contains("Id") && item.Node.Id.Contains(input.SearchString) ||
+                    input.SearchIn.Contains("Name") && item.Node.Name.Contains(input.SearchString) ||
+                    input.SearchIn.Contains("Description") && item.Node.Description.Contains(input.SearchString) ||
+                    input.SearchIn.Contains("Values") && item.Node.DatabaseNodeFieldNodes.Where(item1 => item1.DatabaseNodeField.Database.IsPublic || item1.DatabaseNodeField.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.DatabaseNodeField.IsSearchable && item1.Value.Contains(input.SearchString)));
+            // Select the results matching the filter parameter.
+            query = query
+                .Where(item => input.Filter.Contains("IsNone") ? item.Type == NetworkNodeType.None : true)
+                .Where(item => input.Filter.Contains("IsNotNone") ? item.Type != NetworkNodeType.None : true)
+                .Where(item => input.Filter.Contains("IsSeed") ? item.Type == NetworkNodeType.Seed : true)
+                .Where(item => input.Filter.Contains("IsNotSeed") ? item.Type != NetworkNodeType.Seed : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
                 case var sort when sort == ("Id", "Ascending"):
-                    query = query.OrderBy(item => item.Edge.Id);
+                    query = query.OrderBy(item => item.Node.Id);
                     break;
                 case var sort when sort == ("Id", "Descending"):
-                    query = query.OrderByDescending(item => item.Edge.Id);
+                    query = query.OrderByDescending(item => item.Node.Id);
                     break;
                 case var sort when sort == ("Name", "Ascending"):
-                    query = query.OrderBy(item => item.Edge.Name);
+                    query = query.OrderBy(item => item.Node.Name);
                     break;
                 case var sort when sort == ("Name", "Descending"):
-                    query = query.OrderByDescending(item => item.Edge.Name);
+                    query = query.OrderByDescending(item => item.Node.Name);
                     break;
-                case var sort when sort == ("SourceNodeId", "Ascending"):
-                    query = query.OrderBy(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Id);
+                case var sort when sort == ("Type", "Ascending"):
+                    query = query.OrderBy(item => item.Type);
                     break;
-                case var sort when sort == ("SourceNodeId", "Descending"):
-                    query = query.OrderByDescending(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Id);
-                    break;
-                case var sort when sort == ("SourceNodeName", "Ascending"):
-                    query = query.OrderBy(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Name);
-                    break;
-                case var sort when sort == ("SourceNodeName", "Descending"):
-                    query = query.OrderByDescending(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Name);
-                    break;
-                case var sort when sort == ("TargetNodeId", "Ascending"):
-                    query = query.OrderBy(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Id);
-                    break;
-                case var sort when sort == ("TargetNodeId", "Descending"):
-                    query = query.OrderByDescending(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Id);
-                    break;
-                case var sort when sort == ("TargetNodeName", "Ascending"):
-                    query = query.OrderBy(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name);
-                    break;
-                case var sort when sort == ("TargetNodeName", "Descending"):
-                    query = query.OrderByDescending(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name);
+                case var sort when sort == ("Type", "Descending"):
+                    query = query.OrderByDescending(item => item.Type);
                     break;
                 default:
                     break;
             }
             // Include the related entities.
             query = query
-                .Include(item => item.Edge);
+                .Include(item => item.Node);
             // Define the view.
             View = new ViewModel
             {
                 Network = items.First(),
                 IsGeneric = items.First().NetworkDatabases
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                Search = new SearchViewModel<NetworkEdge>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<NetworkNode>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.
             return Page();

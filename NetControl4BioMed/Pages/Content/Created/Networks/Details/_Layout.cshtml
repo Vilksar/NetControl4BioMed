@@ -2,13 +2,19 @@
     Layout = "/Pages/Content/Created/Networks/_Layout.cshtml";
 }
 
+@section Banner {
+    @*<partial name="_NavigationBannerPartial" model="@Helpers.ViewModels.NavigationBannerViewModel.NetworkNavigationBanner" />*@
+    @RenderSection("Banner", required: false)
+}
+
 @section Breadcrumbs {
-    <a asp-page="/Content/Created/Networks/Details/Index" class="breadcrumb-item"><span>Details</span></a>
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.NetworkDetailsNavigationBreadcrumb" />
     @RenderSection("Breadcrumbs", required: false)
 }
 
 @section Navigation {
     <partial name="_NavigationAreaPartial" model="@Helpers.ViewModels.NavigationAreaViewModel.GetNetworkNavigationArea(Model.View.Network)" />
+    @RenderSection("Navigation", required: false)
 }
 
 @RenderBody()

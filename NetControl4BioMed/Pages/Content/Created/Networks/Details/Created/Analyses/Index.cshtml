@@ -1,9 +1,7 @@
 ﻿@page
-@model NodesModel
+@model IndexModel
 @{
-    ViewData["Title"] = "Network nodes";
-    ViewData["ActiveGroup"] = "NetworkData";
-    ViewData["ActivePage"] = "NetworkNodes";
+    ViewData["Title"] = "Network analyses";
 }
 
 <partial name="_SearchInputPartial" model="Model.View.Search.Input" />
@@ -12,7 +10,7 @@
 {
     <div class="alert alert-info text-justify text-wrap">
         <span><i class="fas fa-info-circle"></i></span>
-        <span>No nodes have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
+        <span>No analyses have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
     </div>
 }
 else
@@ -29,9 +27,6 @@ else
                 <th class="text-left text-break">
                     <span>ID</span>
                 </th>
-                <th class="text-center text-break">
-                    <span>Type</span>
-                </th>
                 <th class="text-center text-break" data-orderable="false" data-searchable="false">
                     <span>Links</span>
                 </th>
@@ -45,16 +40,13 @@ else
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
                     </td>
                     <td class="text-left text-break">
-                        <span title="@item.Node.Name" class="font-weight-bold">@item.Node.Name</span>
+                        <span title="@item.Analysis.Name" class="font-weight-bold">@item.Analysis.Name</span>
                     </td>
                     <td class="text-left text-break">
-                        <span title="@item.Node.Id" class="small text-muted">@item.Node.Id</span>
-                    </td>
-                    <td class="text-left text-break">
-                        <span title="@item.Type.ToString()">@item.Type.ToString()</span>
+                        <span title="@item.Analysis.Id" class="small text-muted">@item.Analysis.Id</span>
                     </td>
                     <td class="text-center text-break">
-                        <a asp-page="/Content/Data/Nodes/Details" asp-route-id="@item.Node.Id" title="Details">
+                        <a asp-page="/Content/Created/Analyses/Details/Index" asp-route-id="@item.Analysis.Id" title="Details">
                             <span>Details</span>
                         </a>
                     </td>

@@ -10,15 +10,15 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 
-namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
+namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.Users
 {
     [Authorize]
-    public class RemoveUsersModel : PageModel
+    public class RemoveModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public RemoveUsersModel(UserManager<User> userManager, ApplicationDbContext context)
+        public RemoveModel(UserManager<User> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _context = context;
@@ -126,7 +126,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No users have been found with the provided e-mails.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/Created/Networks/Details/Index", new { id = View.Network.Id });
+                return RedirectToPage("/Content/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
             }
             // Define the view status of the selected items.
             View.IsCurrentUserSelected = View.Items.Any(item => item.Email == user.Email);
@@ -137,7 +137,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid emails have been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/Created/Networks/Details/Index", new { id = View.Network.Id });
+                return RedirectToPage("/Content/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
             }
             // Define the input.
             Input = new InputModel
@@ -224,7 +224,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No users have been found with the provided e-mails.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/Created/Networks/Details/Index", new { id = View.Network.Id });
+                return RedirectToPage("/Content/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
             }
             // Define the status of the selected items.
             View.IsCurrentUserSelected = View.Items.Any(item => item.Email == user.Email);
@@ -235,7 +235,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid emails have been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/Created/Networks/Details/Index", new { id = View.Network.Id });
+                return RedirectToPage("/Content/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
             }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
@@ -292,7 +292,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
             // Redirect to the index page.
-            return RedirectToPage("/Content/Created/Networks/Details/Users", new { id = View.Network.Id });
+            return RedirectToPage("/Content/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
         }
     }
 }
