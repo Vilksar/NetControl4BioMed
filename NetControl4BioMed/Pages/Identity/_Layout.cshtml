@@ -2,6 +2,18 @@
     Layout = "/Pages/_Layout.cshtml";
 }
 
+@section Banner {
+    @RenderSection("Banner", required: false)
+}
+
+@section Breadcrumbs {
+    @RenderSection("Breadcrumbs", required: false)
+}
+
+@section Navigation {
+    @RenderSection("Navigation", required: false)
+}
+
 @RenderBody()
 
 @section Scripts {

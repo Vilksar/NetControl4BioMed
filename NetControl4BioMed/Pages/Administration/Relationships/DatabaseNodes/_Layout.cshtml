@@ -2,9 +2,17 @@
     Layout = "/Pages/Administration/Relationships/_Layout.cshtml";
 }
 
+@section Banner {
+    @RenderSection("Banner", required: false)
+}
+
 @section Breadcrumbs {
     <a asp-page="/Administration/Relationships/DatabaseNodes/Index" class="breadcrumb-item"><span>Database nodes</span></a>
     @RenderSection("Breadcrumbs", required: false)
+}
+
+@section Navigation {
+    @RenderSection("Navigation", required: false)
 }
 
 @RenderBody()

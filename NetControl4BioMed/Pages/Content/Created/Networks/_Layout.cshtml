@@ -2,6 +2,10 @@
     Layout = "/Pages/Content/Created/_Layout.cshtml";
 }
 
+@section Banner {
+    @RenderSection("Banner", required: false)
+}
+
 @section Breadcrumbs {
     <a asp-page="/Content/Created/Networks/Index" class="breadcrumb-item"><span>Networks</span></a>
     @RenderSection("Breadcrumbs", required: false)

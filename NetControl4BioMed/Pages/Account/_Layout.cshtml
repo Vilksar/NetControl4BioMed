@@ -1,96 +1,10 @@
-﻿@using Helpers.ViewModels
-@{
+﻿@{
     Layout = "/Pages/_Layout.cshtml";
-    var _primaryColor = "info";
-    var _secondaryColor = "light";
-    var navigationBanner = new NavigationBannerViewModel
-    {
-        Id = "Account",
-        Title = "Account",
-        Icon = "fa-user",
-        Color = _primaryColor
-    };
-    var navigationArea = new NavigationAreaViewModel
-    {
-        Id = "Account",
-        Title = "Account",
-        Description = string.Empty,
-        Icon = "fa-user",
-        Color = _primaryColor,
-        NavigationGroups = new List<NavigationGroupViewModel>
-{
-            new NavigationGroupViewModel
-            {
-                Id = "Index",
-                Title = "Overview",
-                Description = string.Empty,
-                Icon = "fa-chart-bar",
-                Color = _primaryColor,
-                Link = "/Account/Index"
-            },
-            new NavigationGroupViewModel
-            {
-                Id = "Manage",
-                Title = "Manage",
-                Description = string.Empty,
-                Icon = "fa-cog",
-                Color = _primaryColor,
-                Link = "/Account/Manage/Index",
-                NavigationPages = new List<NavigationPageViewModel>
-        {
-                    new NavigationPageViewModel
-                    {
-                        Id = "Profile",
-                        Title = "Profile",
-                        Description = string.Empty,
-                        Icon = "fa-user-edit",
-                        Color = _secondaryColor,
-                        Link = "/Account/Manage/Profile/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "Password",
-                        Title = "Password",
-                        Description = string.Empty,
-                        Icon = "fa-user-lock",
-                        Color = _secondaryColor,
-                        Link = "/Account/Manage/Password/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "ExternalLogins",
-                        Title = "External logins",
-                        Description = string.Empty,
-                        Icon = "fa-user-cog",
-                        Color = _secondaryColor,
-                        Link = "/Account/Manage/ExternalLogins/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "TwoFactorAuthentication",
-                        Title = "Two-factor authentication",
-                        Description = string.Empty,
-                        Icon = "fa-user-shield",
-                        Color = _secondaryColor,
-                        Link = "/Account/Manage/TwoFactorAuthentication/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "PersonalData",
-                        Title = "Personal data",
-                        Description = string.Empty,
-                        Icon = "fa-user-check",
-                        Color = _secondaryColor,
-                        Link = "/Account/Manage/PersonalData/Index"
-                    }
-                }
-            }
-        }
-    };
 }
 
 @section Banner {
-    <partial name="_NavigationBannerPartial" model="@navigationBanner" />
+    <partial name="_NavigationBannerPartial" model="@Helpers.ViewModels.NavigationBannerViewModel.AccountNavigationBanner" />
+    @RenderSection("Banner", required: false)
 }
 
 @section Breadcrumbs {
@@ -99,7 +13,7 @@
 }
 
 @section Navigation {
-    <partial name="_NavigationAreaPartial" model="@navigationArea" />
+    <partial name="_NavigationAreaPartial" model="@Helpers.ViewModels.NavigationAreaViewModel.AccountNavigationArea" />
     @RenderSection("Navigation", required: false)
 }
 

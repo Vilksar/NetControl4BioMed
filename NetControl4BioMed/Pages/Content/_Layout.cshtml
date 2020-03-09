@@ -1,156 +1,10 @@
-﻿@using Helpers.ViewModels
-@{
+﻿@{
     Layout = "/Pages/_Layout.cshtml";
-    var _primaryColor = "success";
-    var _secondaryColor = "light";
-    var navigationBanner = new NavigationBannerViewModel
-    {
-        Id = "Content",
-        Title = "Content",
-        Icon = "fa-box-open",
-        Color = _primaryColor
-    };
-    var navigationArea = new NavigationAreaViewModel
-    {
-        Id = "Content",
-        Title = "Content",
-        Description = string.Empty,
-        Icon = "fa-box-open",
-        Color = _primaryColor,
-        NavigationGroups = new List<NavigationGroupViewModel>
-        {
-            new NavigationGroupViewModel
-            {
-                Id = "Index",
-                Title = "Overview",
-                Description = string.Empty,
-                Icon = "fa-chart-bar",
-                Color = _primaryColor,
-                Link = "/Content/Index"
-            },
-            new NavigationGroupViewModel
-            {
-                Id = "Databases",
-                Title = "Databases",
-                Description = string.Empty,
-                Icon = "fa-database",
-                Color = _primaryColor,
-                Link = "/Content/Databases/Index",
-                NavigationPages = new List<NavigationPageViewModel>
-                {
-                    new NavigationPageViewModel
-                    {
-                        Id = "DatabaseTypes",
-                        Title = "Database types",
-                        Description = string.Empty,
-                        Icon = "fa-font",
-                        Color = _secondaryColor,
-                        Link = "/Content/Databases/DatabaseTypes/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "Databases",
-                        Title = "Databases",
-                        Description = string.Empty,
-                        Icon = "fa-database",
-                        Color = _secondaryColor,
-                        Link = "/Content/Databases/Databases/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "DatabaseNodeFields",
-                        Title = "Database node fields",
-                        Description = string.Empty,
-                        Icon = "fa-circle",
-                        Color = _secondaryColor,
-                        Link = "/Content/Databases/DatabaseNodeFields/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "DatabaseEdgeFields",
-                        Title = "Database edge fields",
-                        Description = string.Empty,
-                        Icon = "fa-arrow-right",
-                        Color = _secondaryColor,
-                        Link = "/Content/Databases/DatabaseEdgeFields/Index"
-                    }
-                }
-            },
-            new NavigationGroupViewModel
-            {
-                Id = "Data",
-                Title = "Data",
-                Description = string.Empty,
-                Icon = "fa-table",
-                Color = _primaryColor,
-                Link = "/Content/Data/Index",
-                NavigationPages = new List<NavigationPageViewModel>
-                {
-                    new NavigationPageViewModel
-                    {
-                        Id = "Nodes",
-                        Title = "Nodes",
-                        Description = string.Empty,
-                        Icon = "fa-circle",
-                        Color = _secondaryColor,
-                        Link = "/Content/Data/Nodes/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "Edges",
-                        Title = "Edges",
-                        Description = string.Empty,
-                        Icon = "fa-arrow-right",
-                        Color = _secondaryColor,
-                        Link = "/Content/Data/Edges/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "NodeCollections",
-                        Title = "Node collections",
-                        Description = string.Empty,
-                        Icon = "fa-folder",
-                        Color = _secondaryColor,
-                        Link = "/Content/Data/NodeCollections/Index"
-                    }
-                }
-            },
-            new NavigationGroupViewModel
-            {
-                Id = "Created",
-                Title = "Created",
-                Description = string.Empty,
-                Icon = "fa-smile",
-                Color = _primaryColor,
-                Link = "/Content/Created/Index",
-                NavigationPages = new List<NavigationPageViewModel>
-                {
-                    new NavigationPageViewModel
-                    {
-                        Id = "Networks",
-                        Title = "Networks",
-                        Description = string.Empty,
-                        Icon = "fa-share-alt",
-                        Color = _secondaryColor,
-                        Link = "/Content/Created/Networks/Index"
-                    },
-                    new NavigationPageViewModel
-                    {
-                        Id = "Analyses",
-                        Title = "Analyses",
-                        Description = string.Empty,
-                        Icon = "fa-desktop",
-                        Color = _secondaryColor,
-                        Link = "/Content/Created/Analyses/Index"
-                    }
-                }
-            }
-        }
-    };
 }
 
 @section Banner {
-    <partial name="_NavigationBannerPartial" model="@navigationBanner" />
+    <partial name="_NavigationBannerPartial" model="@Helpers.ViewModels.NavigationBannerViewModel.ContentNavigationBanner" />
+    @RenderSection("Banner", required: false)
 }
 
 @section Breadcrumbs {
@@ -159,7 +13,7 @@
 }
 
 @section Navigation {
-    <partial name="_NavigationAreaPartial" model="@navigationArea" />
+    <partial name="_NavigationAreaPartial" model="@Helpers.ViewModels.NavigationAreaViewModel.ContentNavigationArea" />
     @RenderSection("Navigation", required: false)
 }
 

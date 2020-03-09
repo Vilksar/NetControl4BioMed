@@ -4,16 +4,9 @@
     ViewData["Title"] = "Overview";
     ViewData["ActiveGroup"] = "Index";
     ViewData["ActivePage"] = "Index";
-    var navigationTitleCard = new Helpers.ViewModels.NavigationTitleCardViewModel
-    {
-        Id = "User",
-        Title = Model.View.User.Email,
-        Subtitle = Model.View.User.Id,
-        Icon = "fa-user"
-    };
 }
 
-<partial name="_NavigationTitleCardPartial" model="@navigationTitleCard" />
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetUserNavigationTitleCard(Model.View.User)" />
 <div class="card mb-3">
     <div class="card-body text-center small">
         @if (Model.View.User.EmailConfirmed)
