@@ -1,106 +1,36 @@
 ﻿@page
 @model IndexModel
-@using Helpers.ViewModels
-@using NetControl4BioMed.Data.Enumerations
 @{
     ViewData["Title"] = "Analysis details";
     ViewData["ActiveGroup"] = "AnalysisIndex";
     ViewData["ActivePage"] = "AnalysisIndex";
-    var navigationQuickLinks = new List<NavigationQuickLinkViewModel>
-{
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Nodes",
-            Title = "Node",
-            Color = "success",
-            Icon = "fa-circle",
-            Width = 6,
-            ItemCount = Model.View.NodeCount,
-            RouteId = Model.View.Analysis.Id,
-            Link = "/Content/Created/Analyses/Details/Nodes"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Edges",
-            Title = "Edge",
-            Color = "success",
-            Icon = "fa-arrow-right",
-            Width = 6,
-            ItemCount = Model.View.EdgeCount,
-            RouteId = Model.View.Analysis.Id,
-            Link = "/Content/Created/Analyses/Details/Edges"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Databases",
-            Title = "Database",
-            Color = "info",
-            Icon = "fa-database",
-            Width = Model.View.IsGeneric ? 0 : 6,
-            ItemCount = Model.View.DatabaseCount,
-            RouteId = Model.View.Analysis.Id,
-            Link = "/Content/Created/Analyses/Details/Databases"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "NodeCollections",
-            Title = "Node collection",
-            Color = "info",
-            Icon = "fa-folder",
-            Width = Model.View.IsGeneric ? 0 : 6,
-            ItemCount = Model.View.NodeCollectionCount,
-            RouteId = Model.View.Analysis.Id,
-            Link = "/Content/Created/Analyses/Details/NodeCollections"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Users",
-            Title = "User",
-            Color = "primary",
-            Icon = "fa-user",
-            Width = 6,
-            ItemCount = Model.View.UserCount,
-            RouteId = Model.View.Analysis.Id,
-            Link = "/Content/Created/Analyses/Details/Users"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "UserInvitations",
-            Title = "User invitations",
-            Color = "primary",
-            Icon = "fa-envelope-open",
-            Width = 6,
-            ItemCount = Model.View.UserInvitationCount,
-            RouteId = Model.View.Analysis.Id,
-            Link = "/Content/Created/Analyses/Details/Users"
-        }
-    };
 }
 
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetAnalysisNavigationTitleCard(Model.View.Analysis)" />
 <div class="card mb-3">
     <div class="card-body text-center">
         <div class="text-uppercase">
             @switch (Model.View.Analysis.Status)
             {
-                case AnalysisStatus.Scheduled:
+                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Scheduled:
                     <span title="@Model.View.Analysis.Status.ToString()" class="text-warning"><i class="fas fa-clock"></i></span>
                     break;
-                case AnalysisStatus.Initializing:
+                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Initializing:
                     <span title="@Model.View.Analysis.Status.ToString()" class="text-primary"><i class="fas fa-play-circle"></i></span>
                     break;
-                case AnalysisStatus.Ongoing:
+                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Ongoing:
                     <span title="@Model.View.Analysis.Status.ToString()" class="text-primary"><i class="fas fa-sync-alt fa-spin"></i></span>
                     break;
-                case AnalysisStatus.Stopping:
+                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Stopping:
                     <span title="@Model.View.Analysis.Status.ToString()" class="text-danger"><i class="fas fa-stopwatch"></i></span>
                     break;
-                case AnalysisStatus.Stopped:
+                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Stopped:
                     <span title="@Model.View.Analysis.Status.ToString()" class="text-danger"><i class="fas fa-stop-circle"></i></span>
                     break;
-                case AnalysisStatus.Completed:
+                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Completed:
                     <span title="@Model.View.Analysis.Status.ToString()" class="text-success"><i class="fas fa-check-circle"></i></span>
                     break;
-                case AnalysisStatus.Error:
+                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Error:
                     <span title="@Model.View.Analysis.Status.ToString()" class="text-danger"><i class="fas fa-times-circle"></i></span>
                     break;
                 default:
@@ -141,7 +71,7 @@
         </div>
     </div>
 }
-<partial name="_NavigationQuickLinksPartial" model="@navigationQuickLinks" />
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAnalysisNavigationQuickLinks(Model.View.Analysis)" />
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
@@ -158,7 +88,7 @@
             <span><i class="fas fa-info-circle"></i></span>
             <span>If the analysis is relatively small you can visualize it in-browser by clicking on the button below.</span>
         </div>
-        <a asp-page="/Content/Created/Analyses/Details/Visualize" asp-route-id="@Model.View.Analysis.Id" class="btn btn-primary btn-block @(300 < Model.View.NodeCount ? "disabled" : string.Empty)">
+        <a asp-page="/Content/Created/Analyses/Details/Visualize" asp-route-id="@Model.View.Analysis.Id" class="btn btn-primary btn-block @(Model.View.ShowVisualization ? "disabled" : string.Empty)">
             <span>Visualize</span>
         </a>
     </div>

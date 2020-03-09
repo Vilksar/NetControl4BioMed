@@ -2,20 +2,13 @@
 @model DetailsModel
 @{
     ViewData["Title"] = "Edge details";
-    var navigationTitleCard = new Helpers.ViewModels.NavigationTitleCardViewModel
-    {
-        Id = "Edge",
-        Title = Model.View.Edge.Name,
-        Subtitle = Model.View.Edge.Id,
-        Icon = "fa-arrow-right"
-    };
 }
 
 @section Breadcrumbs {
     <a asp-page="/Content/Data/Edges/Details" class="breadcrumb-item"><span>Details</span></a>
 }
 
-<partial name="_NavigationTitleCardPartial" model="@navigationTitleCard" />
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetEdgeNavigationTitleCard(Model.View.Edge)" />
 @if (User.IsInRole("Administrator"))
 {
     <a asp-page="/Administration/Data/Edges/Details" asp-route-id="@Model.View.Edge.Id" class="btn btn-info btn-block mb-3" title="Details">

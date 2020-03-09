@@ -33,17 +33,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
 
             public bool IsGeneric { get; set; }
 
-            public int NodeCount { get; set; }
-
-            public int EdgeCount { get; set; }
-
-            public int NodeCollectionCount { get; set; }
-
-            public int DatabaseCount { get; set; }
-
-            public int UserCount { get; set; }
-
-            public int UserInvitationCount { get; set; }
+            public bool ShowVisualization { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -94,14 +84,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 Network = item,
                 IsGeneric = item.NetworkDatabases
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                NodeCount = item.NetworkNodes
-                    .Where(item => item.Type == NetworkNodeType.None)
-                    .Count(),
-                EdgeCount = item.NetworkEdges.Count(),
-                NodeCollectionCount = item.NetworkNodeCollections.Count(),
-                DatabaseCount = item.NetworkDatabases.Count(),
-                UserCount = item.NetworkUsers.Count(),
-                UserInvitationCount = item.NetworkUserInvitations.Count()
+                ShowVisualization = item.NetworkNodes.Count(item => item.Type == NetworkNodeType.None) < 500
             };
             // Return the page.
             return Page();

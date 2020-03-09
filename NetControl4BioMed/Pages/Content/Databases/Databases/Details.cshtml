@@ -2,20 +2,13 @@
 @model DetailsModel
 @{
     ViewData["Title"] = "Database details";
-    var navigationTitleCard = new Helpers.ViewModels.NavigationTitleCardViewModel
-    {
-        Id = "Database",
-        Title = Model.View.Database.Name,
-        Subtitle = Model.View.Database.Id,
-        Icon = "fa-database"
-    };
 }
 
 @section Breadcrumbs {
     <a asp-page="/Content/Databases/Databases/Details" class="breadcrumb-item"><span>Details</span></a>
 }
 
-<partial name="_NavigationTitleCardPartial" model="@navigationTitleCard" />
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetDatabaseNavigationTitleCard(Model.View.Database)" />
 @if (User.IsInRole("Administrator"))
 {
     <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@Model.View.Database.Id" class="btn btn-info btn-block mb-3" title="Details">

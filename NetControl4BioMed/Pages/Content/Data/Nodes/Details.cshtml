@@ -2,20 +2,13 @@
 @model DetailsModel
 @{
     ViewData["Title"] = "Node details";
-    var navigationTitleCard = new Helpers.ViewModels.NavigationTitleCardViewModel
-    {
-        Id = "Node",
-        Title = Model.View.Node.Name,
-        Subtitle = Model.View.Node.Id,
-        Icon = "fa-circle"
-    };
 }
 
 @section Breadcrumbs {
     <a asp-page="/Content/Data/Nodes/Details" class="breadcrumb-item"><span>Details</span></a>
 }
 
-<partial name="_NavigationTitleCardPartial" model="@navigationTitleCard" />
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetNodeNavigationTitleCard(Model.View.Node)" />
 @if (User.IsInRole("Administrator"))
 {
     <a asp-page="/Administration/Data/Nodes/Details" asp-route-id="@Model.View.Node.Id" class="btn btn-info btn-block mb-3" title="Details">

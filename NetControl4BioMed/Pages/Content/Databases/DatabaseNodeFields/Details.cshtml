@@ -2,20 +2,13 @@
 @model DetailsModel
 @{
     ViewData["Title"] = "Node field details";
-    var navigationTitleCard = new Helpers.ViewModels.NavigationTitleCardViewModel
-    {
-        Id = "DatabaseNodeField",
-        Title = Model.View.DatabaseNodeField.Name,
-        Subtitle = Model.View.DatabaseNodeField.Id,
-        Icon = "fa-table"
-    };
 }
 
 @section Breadcrumbs {
     <a asp-page="/Content/Databases/DatabaseNodeFields/Details" class="breadcrumb-item"><span>Details</span></a>
 }
 
-<partial name="_NavigationTitleCardPartial" model="@navigationTitleCard" />
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetDatabaseNodeFieldNavigationTitleCard(Model.View.DatabaseNodeField)" />
 @if (User.IsInRole("Administrator"))
 {
     <a asp-page="/Administration/Databases/DatabaseNodeFields/Details" asp-route-id="@Model.View.DatabaseNodeField.Id" class="btn btn-primary btn-block mb-3" title="Details">

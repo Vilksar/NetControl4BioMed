@@ -1,38 +1,12 @@
 ﻿@page
 @model IndexModel
-@using Helpers.ViewModels
 @{
     ViewData["Title"] = "Overview";
     ViewData["ActiveGroup"] = "Index";
     ViewData["ActivePage"] = "Index";
-    var navigationQuickLinks = new List<NavigationQuickLinkViewModel>
-    {
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Networks",
-            Title = "Network",
-            Color = "success",
-            Icon = "fa-share-alt",
-            Width = 6,
-            ItemCount = Model.View.NetworkCount,
-            RouteId = null,
-            Link = "/Content/Created/Networks/Index",
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Analyses",
-            Title = "Analysis",
-            Color = "success",
-            Icon = "fa-desktop",
-            Width = 6,
-            ItemCount = Model.View.AnalysisCount,
-            RouteId = null,
-            Link = "/Content/Created/Analyses/Index",
-        },
-    };
 }
 
-<partial name="_NavigationQuickLinksPartial" model="@navigationQuickLinks" />
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetContentNavigationQuickLinks(Model.View.NetworkCount, Model.View.AnalysisCount)" />
 @if (!Model.View.RecentNetworks.Any())
 {
     <div class="card mb-3">

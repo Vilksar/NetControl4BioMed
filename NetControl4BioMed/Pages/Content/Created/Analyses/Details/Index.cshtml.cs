@@ -36,17 +36,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
 
             public bool IsGeneric { get; set; }
 
-            public int NodeCount { get; set; }
-
-            public int EdgeCount { get; set; }
-
-            public int NodeCollectionCount { get; set; }
-
-            public int DatabaseCount { get; set; }
-
-            public int UserCount { get; set; }
-
-            public int UserInvitationCount { get; set; }
+            public bool ShowVisualization { get; set; }
 
             public List<ItemModel> Parameters { get; set; }
         }
@@ -110,14 +100,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                 Analysis = item,
                 IsGeneric = item.AnalysisDatabases
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                NodeCount = item.AnalysisNodes
-                    .Where(item => item.Type == AnalysisNodeType.None)
-                    .Count(),
-                EdgeCount = item.AnalysisEdges.Count(),
-                NodeCollectionCount = item.AnalysisNodeCollections.Count(),
-                DatabaseCount = item.AnalysisDatabases.Count(),
-                UserCount = item.AnalysisUsers.Count(),
-                UserInvitationCount = item.AnalysisUserInvitations.Count(),
+                ShowVisualization = item.AnalysisNodes.Count(item => item.Type == AnalysisNodeType.None) < 500,
                 Parameters = new List<ItemModel>()
             };
             // Check which algorithm is used and try to deserialize the parameters.

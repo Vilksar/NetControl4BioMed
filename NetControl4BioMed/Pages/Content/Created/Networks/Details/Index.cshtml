@@ -1,81 +1,12 @@
 ﻿@page
 @model IndexModel
-@using Helpers.ViewModels
 @{
     ViewData["Title"] = "Network details";
     ViewData["ActiveGroup"] = "NetworkIndex";
     ViewData["ActivePage"] = "NetworkIndex";
-    var navigationQuickLinks = new List<NavigationQuickLinkViewModel>
-{
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Nodes",
-            Title = "Node",
-            Color = "success",
-            Icon = "fa-circle",
-            Width = 6,
-            ItemCount = Model.View.NodeCount,
-            RouteId = Model.View.Network.Id,
-            Link = "/Content/Created/Networks/Details/Nodes"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Edges",
-            Title = "Edge",
-            Color = "success",
-            Icon = "fa-arrow-right",
-            Width = 6,
-            ItemCount = Model.View.EdgeCount,
-            RouteId = Model.View.Network.Id,
-            Link = "/Content/Created/Networks/Details/Edges"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Databases",
-            Title = "Database",
-            Color = "info",
-            Icon = "fa-database",
-            Width = Model.View.IsGeneric ? 0 : 6,
-            ItemCount = Model.View.DatabaseCount,
-            RouteId = Model.View.Network.Id,
-            Link = "/Content/Created/Networks/Details/Databases"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "NodeCollections",
-            Title = "Node collection",
-            Color = "info",
-            Icon = "fa-folder",
-            Width = Model.View.IsGeneric ? 0 : 6,
-            ItemCount = Model.View.NodeCollectionCount,
-            RouteId = Model.View.Network.Id,
-            Link = "/Content/Created/Networks/Details/NodeCollections"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Users",
-            Title = "User",
-            Color = "primary",
-            Icon = "fa-user",
-            Width = 6,
-            ItemCount = Model.View.UserCount,
-            RouteId = Model.View.Network.Id,
-            Link = "/Content/Created/Networks/Details/Users"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "UserInvitations",
-            Title = "User invitations",
-            Color = "primary",
-            Icon = "fa-envelope-open",
-            Width = 6,
-            ItemCount = Model.View.UserInvitationCount,
-            RouteId = Model.View.Network.Id,
-            Link = "/Content/Created/Networks/Details/Users"
-        }
-    };
 }
 
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetNetworkNavigationTitleCard(Model.View.Network)" />
 <div class="row align-items-center">
     <div class="col-lg-4 mb-3">
         <a asp-page="/Content/Created/Networks/Edit" asp-route-id="@Model.View.Network.Id" class="btn btn-warning btn-block" title="Edit">
@@ -104,7 +35,7 @@
         </div>
     </div>
 }
-<partial name="_NavigationQuickLinksPartial" model="@navigationQuickLinks" />
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetNetworkNavigationQuickLinks(Model.View.Network)" />
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
@@ -121,7 +52,7 @@
             <span><i class="fas fa-info-circle"></i></span>
             <span>If the network is relatively small you can visualize it in-browser by clicking on the button below.</span>
         </div>
-        <a asp-page="/Content/Created/Networks/Details/Visualize" asp-route-id="@Model.View.Network.Id" class="btn btn-primary btn-block @(300 < Model.View.NodeCount ? "disabled" : string.Empty)">
+        <a asp-page="/Content/Created/Networks/Details/Visualize" asp-route-id="@Model.View.Network.Id" class="btn btn-primary btn-block @(Model.View.ShowVisualization ? "disabled" : string.Empty)">
             <span>Visualize</span>
         </a>
     </div>
