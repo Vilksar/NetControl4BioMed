@@ -3,10 +3,12 @@
 }
 
 @section Banner {
+    @*<partial name="_NavigationBannerPartial" model="@Helpers.ViewModels.NavigationBannerViewModel.AnalysisNavigationBanner" />*@
     @RenderSection("Banner", required: false)
 }
 
 @section Breadcrumbs {
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.AnalysisDetailsNavigationBreadcrumb" />
     @RenderSection("Breadcrumbs", required: false)
 }
 
