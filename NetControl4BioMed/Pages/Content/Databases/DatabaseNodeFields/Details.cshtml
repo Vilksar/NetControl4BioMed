@@ -4,10 +4,6 @@
     ViewData["Title"] = "Node field details";
 }
 
-@section Breadcrumbs {
-    <a asp-page="/Content/Databases/DatabaseNodeFields/Details" class="breadcrumb-item"><span>Details</span></a>
-}
-
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetDatabaseNodeFieldNavigationTitleCard(Model.View.DatabaseNodeField)" />
 @if (User.IsInRole("Administrator"))
 {

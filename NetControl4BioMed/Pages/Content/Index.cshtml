@@ -2,8 +2,6 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Overview";
-    ViewData["ActiveGroup"] = "Index";
-    ViewData["ActivePage"] = "Index";
 }
 
 <partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetContentNavigationQuickLinks(Model.View.NetworkCount, Model.View.AnalysisCount)" />

@@ -1,82 +1,10 @@
 ﻿@page
 @model IndexModel
-@using Helpers.ViewModels
 @{
     ViewData["Title"] = "Overview";
-    ViewData["ActiveGroup"] = "Index";
-    ViewData["ActivePage"] = "Index";
-    var navigationQuickLinks = new List<NavigationQuickLinkViewModel>
-    {
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Users",
-            Title = "User",
-            Color = "success",
-            Icon = "fa-user",
-            Width = 6,
-            ItemCount = Model.View.UserCount,
-            RouteId = null,
-            Link = "/Administration/Accounts/Users/Index",
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Roles",
-            Title = "Role",
-            Color = "success",
-            Icon = "fa-tag",
-            Width = 6,
-            ItemCount = Model.View.RoleCount,
-            RouteId = null,
-            Link = "/Administration/Accounts/Roles/Index",
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Databases",
-            Title = "Database",
-            Color = "info",
-            Icon = "fa-database",
-            Width = 6,
-            ItemCount = Model.View.DatabaseCount,
-            RouteId = null,
-            Link = "/Administration/Databases/Databases/Index",
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "NodeCollections",
-            Title = "Node collection",
-            Color = "info",
-            Icon = "fa-folder",
-            Width = 6,
-            ItemCount = Model.View.NodeCollectionCount,
-            RouteId = null,
-            Link = "/Administration/Data/NodeCollections/Index"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Nodes",
-            Title = "Node",
-            Color = "primary",
-            Icon = "fa-circle",
-            Width = 6,
-            ItemCount = Model.View.NodeCount,
-            RouteId = null,
-            Link = "/Administration/Data/Nodes/Index"
-        },
-        new NavigationQuickLinkViewModel
-        {
-            Id = "Edges",
-            Title = "Edge",
-            Color = "primary",
-            Icon = "fa-arrow-right",
-            Width = 6,
-            ItemCount = Model.View.EdgeCount,
-            RouteId = null,
-            Link = "/Administration/Data/Edges/Index"
-        }
-    };
 }
 
-<partial name="_NavigationQuickLinksPartial" model="@navigationQuickLinks" />
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAdministrationNavigationQuickLinks(Model.View.UserCount, Model.View.RoleCount, Model.View.DatabaseCount, Model.View.NodeCollectionCount, Model.View.NodeCount, Model.View.EdgeCount)" />
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">

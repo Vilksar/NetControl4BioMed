@@ -4,10 +4,6 @@
     ViewData["Title"] = "Delete users";
 }
 
-@section Breadcrumbs {
-    <a asp-page="/Administration/Accounts/Users/Delete" class="breadcrumb-item"><span>Delete</span></a>
-}
-
 <div class="alert alert-danger text-justify text-wrap">
     <span><i class="fas fa-exclamation-circle"></i></span>
     <span>The following @Model.View.Items.Count() item@(Model.View.Items.Count() != 1 ? "s" : string.Empty) will be deleted, together with all of the associated data. <span class="font-weight-bold">This action can't be reversed!</span></span>

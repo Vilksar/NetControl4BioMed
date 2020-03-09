@@ -4,10 +4,6 @@
     ViewData["Title"] = "Network details";
 }
 
-@section Breadcrumbs {
-    <a asp-page="/Administration/Created/Networks/Details" class="breadcrumb-item"><span>Details</span></a>
-}
-
 <div class="row align-items-center">
     <div class="col-lg-12 mb-3">
         <a asp-page="/Administration/Created/Networks/Delete" asp-route-ids="@Model.View.Network.Id" class="btn btn-danger btn-block" title="Delete">

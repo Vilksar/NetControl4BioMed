@@ -4,10 +4,6 @@
     ViewData["Title"] = "Download analyses";
 }
 
-@section Breadcrumbs {
-    <a asp-page="/Content/Created/Analyses/Download" class="breadcrumb-item"><span>Download</span></a>
-}
-
 <div class="alert alert-primary text-justify text-wrap">
     <span><i class="fas fa-info-circle"></i></span>
     <span>The following @Model.View.Items.Count() analys@(Model.View.Items.Count() != 1 ? "e" : "i")s will be downloaded in a <a href="https://en.wikipedia.org/wiki/Zip_(file_format)" class="alert-link">ZIP archive</a>.</span>

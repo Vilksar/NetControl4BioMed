@@ -4,10 +4,6 @@
     ViewData["Title"] = "Delete user roles";
 }
 
-@section Breadcrumbs {
-    <a asp-page="/Administration/Accounts/UserRoles/Delete" class="breadcrumb-item"><span>Delete</span></a>
-}
-
 <div class="alert alert-danger text-justify text-wrap">
     <span><i class="fas fa-exclamation-circle"></i></span>
     @if (Model.View.IsCurrentUserSelected)

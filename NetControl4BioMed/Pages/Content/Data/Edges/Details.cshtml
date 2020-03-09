@@ -4,10 +4,6 @@
     ViewData["Title"] = "Edge details";
 }
 
-@section Breadcrumbs {
-    <a asp-page="/Content/Data/Edges/Details" class="breadcrumb-item"><span>Details</span></a>
-}
-
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetEdgeNavigationTitleCard(Model.View.Edge)" />
 @if (User.IsInRole("Administrator"))
 {

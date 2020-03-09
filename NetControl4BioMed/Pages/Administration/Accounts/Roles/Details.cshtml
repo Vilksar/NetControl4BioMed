@@ -4,10 +4,6 @@
     ViewData["Title"] = "Role details";
 }
 
-@section Breadcrumbs {
-    <a asp-page="/Administration/Accounts/Roles/Details" class="breadcrumb-item"><span>Details</span></a>
-}
-
 <div class="row align-items-center">
     <div class="col-lg-6 mb-3">
         <a asp-page="/Administration/Accounts/Roles/Edit" asp-route-id="@Model.View.Role.Id" class="btn btn-warning btn-block" title="Edit">

@@ -4,10 +4,6 @@
     ViewData["Title"] = "Node details";
 }
 
-@section Breadcrumbs {
-    <a asp-page="/Administration/Data/Nodes/Details" class="breadcrumb-item"><span>Details</span></a>
-}
-
 <div class="row align-items-center">
     <div class="col-lg-6 mb-3">
         <a asp-page="/Administration/Data/Nodes/Update" asp-route-type="Edit" asp-route-ids="@Model.View.Node.Id" class="btn btn-warning btn-block" title="Edit">
