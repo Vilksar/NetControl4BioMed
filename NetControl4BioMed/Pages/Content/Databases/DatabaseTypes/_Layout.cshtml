@@ -7,7 +7,7 @@
 }
 
 @section Breadcrumbs {
-    <a asp-page="/Content/Databases/DatabaseTypes/Index" class="breadcrumb-item"><span>Database types</span></a>
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.ContentDatabasesDatabaseTypesNavigationBreadcrumb" />
     @RenderSection("Breadcrumbs", required: false)
 }
 

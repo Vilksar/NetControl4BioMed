@@ -7,7 +7,7 @@
 }
 
 @section Breadcrumbs {
-    <a asp-page="/Account/Manage/ExternalLogins/Index" class="breadcrumb-item"><span>External logins</span></a>
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.AccountManageExternalLoginsNavigationBreadcrumb" />
     @RenderSection("Breadcrumbs", required: false)
 }
 

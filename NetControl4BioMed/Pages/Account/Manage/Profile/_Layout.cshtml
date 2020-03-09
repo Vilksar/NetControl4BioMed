@@ -7,7 +7,7 @@
 }
 
 @section Breadcrumbs {
-    <a asp-page="/Account/Manage/Profile/Index" class="breadcrumb-item"><span>Profile</span></a>
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.AccountManageProfileNavigationBreadcrumb" />
     @RenderSection("Breadcrumbs", required: false)
 }
 

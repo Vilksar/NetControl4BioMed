@@ -7,7 +7,7 @@
 }
 
 @section Breadcrumbs {
-    <a asp-page="/Content/Databases/DatabaseEdgeFields/Index" class="breadcrumb-item"><span>Database edge fields</span></a>
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.ContentDatabasesDatabaseEdgeFieldsNavigationBreadcrumb" />
     @RenderSection("Breadcrumbs", required: false)
 }
 

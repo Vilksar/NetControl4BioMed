@@ -7,7 +7,7 @@
 }
 
 @section Breadcrumbs {
-    <a asp-page="/Account/Manage/TwoFactorAuthentication/Index" class="breadcrumb-item"><span>Two-factor authentication</span></a>
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.AccountManageTwoFactorAuthenticationNavigationBreadcrumb" />
     @RenderSection("Breadcrumbs", required: false)
 }
 

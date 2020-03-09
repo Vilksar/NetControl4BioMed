@@ -64,7 +64,7 @@
             @if (IsSectionDefined("Breadcrumbs"))
             {
                 <nav class="breadcrumb my-2">
-                    <a asp-page="/Index" class="breadcrumb-item"><span>Home</span></a>
+                    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.NavigationBreadcrumb" />
                     @RenderSection("Breadcrumbs", required: false)
                 </nav>
             }

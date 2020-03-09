@@ -7,7 +7,7 @@
 }
 
 @section Breadcrumbs {
-    <a asp-page="/Administration/Permissions/Index" class="breadcrumb-item"><span>Permissions</span></a>
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.AdministrationPermissionsNavigationBreadcrumb" />
     @RenderSection("Breadcrumbs", required: false)
 }
 
