@@ -37,6 +37,22 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
             public bool IsGeneric { get; set; }
 
             public SearchViewModel<ItemModel> Search { get; set; }
+
+            public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
+            {
+                SearchIn = new Dictionary<string, string>
+                {
+                    { "Email", "E-mail" }
+                },
+                Filter = new Dictionary<string, string>
+                {
+                },
+                SortBy = new Dictionary<string, string>
+                {
+                    { "DateTimeCreated", "Date created" },
+                    { "Email", "E-mail" }
+                }
+            };
         }
 
         public class ItemModel
@@ -82,24 +98,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
-            // Define the search options.
-            var options = new SearchOptionsViewModel
-            {
-                SearchIn = new Dictionary<string, string>
-                {
-                    { "Email", "E-mail" }
-                },
-                Filter = new Dictionary<string, string>
-                {
-                },
-                SortBy = new Dictionary<string, string>
-                {
-                    { "DateTimeCreated", "Date created" },
-                    { "Email", "E-mail" }
-                }
-            };
             // Define the search input.
-            var input = new SearchInputViewModel(options, id, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
+            var input = new SearchInputViewModel(ViewModel.SearchOptions, id, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
             // Check if any of the provided variables was null before the reassignment.
             if (input.NeedsRedirect)
             {

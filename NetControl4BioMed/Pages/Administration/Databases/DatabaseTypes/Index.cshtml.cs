@@ -30,12 +30,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
         public class ViewModel
         {
             public SearchViewModel<DatabaseType> Search { get; set; }
-        }
 
-        public IActionResult OnGet(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
-        {
-            // Define the search options.
-            var options = new SearchOptionsViewModel
+            public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
                 SearchIn = new Dictionary<string, string>
                 {
@@ -56,8 +52,12 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                     { "DatabaseCount", "Number of databases" }
                 }
             };
+        }
+
+        public IActionResult OnGet(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
+        {
             // Define the search input.
-            var input = new SearchInputViewModel(options, null, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
+            var input = new SearchInputViewModel(ViewModel.SearchOptions, null, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
             // Check if any of the provided variables was null before the reassignment.
             if (input.NeedsRedirect)
             {

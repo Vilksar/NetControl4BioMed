@@ -38,6 +38,30 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
             public bool IsGeneric { get; set; }
 
             public SearchViewModel<ControlPath> Search { get; set; }
+
+            public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
+            {
+                SearchIn = new Dictionary<string, string>
+                {
+                    { "Id", "ID" },
+                    { "NodeId", "Node ID" },
+                    { "NodeName", "Node name" },
+                    { "SourceNodeId", "Source node ID" },
+                    { "SourceNodeName", "Source node name" },
+                    { "TargetNodeId", "Target node ID" },
+                    { "TargetNodeName", "Target node name" },
+                    { "EdgeId", "Edge ID" },
+                    { "EdgeName", "Edge name" }
+                },
+                Filter = new Dictionary<string, string>
+                {
+                },
+                SortBy = new Dictionary<string, string>
+                {
+                    { "Id", "ID" },
+                    { "ControlNodeCount", "Number of control nodes" }
+                }
+            };
         }
 
         public async Task<IActionResult> OnGetAsync(string id, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -76,32 +100,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
-            // Define the search options.
-            var options = new SearchOptionsViewModel
-            {
-                SearchIn = new Dictionary<string, string>
-                {
-                    { "Id", "ID" },
-                    { "NodeId", "Node ID" },
-                    { "NodeName", "Node name" },
-                    { "SourceNodeId", "Source node ID" },
-                    { "SourceNodeName", "Source node name" },
-                    { "TargetNodeId", "Target node ID" },
-                    { "TargetNodeName", "Target node name" },
-                    { "EdgeId", "Edge ID" },
-                    { "EdgeName", "Edge name" }
-                },
-                Filter = new Dictionary<string, string>
-                {
-                },
-                SortBy = new Dictionary<string, string>
-                {
-                    { "Id", "ID" },
-                    { "ControlNodeCount", "Number of control nodes" }
-                }
-            };
             // Define the search input.
-            var input = new SearchInputViewModel(options, id, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
+            var input = new SearchInputViewModel(ViewModel.SearchOptions, id, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
             // Check if any of the provided variables was null before the reassignment.
             if (input.NeedsRedirect)
             {

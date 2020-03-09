@@ -38,6 +38,29 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Data.NodeColl
             public bool IsGeneric { get; set; }
 
             public SearchViewModel<AnalysisNodeCollection> Search { get; set; }
+
+            public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
+            {
+                SearchIn = new Dictionary<string, string>
+                {
+                    { "Id", "ID" },
+                    { "Name", "Name" },
+                    { "Description", "Description" }
+                },
+                Filter = new Dictionary<string, string>
+                {
+                    { "IsSource", "Is of type \"Source\"" },
+                    { "IsNotSource", "Is not of type \"Source\"" },
+                    { "IsTarget", "Is of type \"Target\"" },
+                    { "IsNotTarget", "Is not of type \"Target\"" }
+                },
+                SortBy = new Dictionary<string, string>
+                {
+                    { "Id", "ID" },
+                    { "Name", "Name" },
+                    { "Type", "Type" }
+                }
+            };
         }
 
         public async Task<IActionResult> OnGetAsync(string id, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -76,31 +99,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Data.NodeColl
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
-            // Define the search options.
-            var options = new SearchOptionsViewModel
-            {
-                SearchIn = new Dictionary<string, string>
-                {
-                    { "Id", "ID" },
-                    { "Name", "Name" },
-                    { "Description", "Description" }
-                },
-                Filter = new Dictionary<string, string>
-                {
-                    { "IsSource", "Is of type \"Source\"" },
-                    { "IsNotSource", "Is not of type \"Source\"" },
-                    { "IsTarget", "Is of type \"Target\"" },
-                    { "IsNotTarget", "Is not of type \"Target\"" }
-                },
-                SortBy = new Dictionary<string, string>
-                {
-                    { "Id", "ID" },
-                    { "Name", "Name" },
-                    { "Type", "Type" }
-                }
-            };
             // Define the search input.
-            var input = new SearchInputViewModel(options, id, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
+            var input = new SearchInputViewModel(ViewModel.SearchOptions, id, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
             // Check if any of the provided variables was null before the reassignment.
             if (input.NeedsRedirect)
             {

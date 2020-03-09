@@ -36,12 +36,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             public IEnumerable<DatabaseType> DatabaseTypes { get; set; }
 
             public SearchViewModel<Analysis> Search { get; set; }
-        }
 
-        public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
-        {
-            // Define the search options.
-            var options = new SearchOptionsViewModel
+            public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
                 SearchIn = new Dictionary<string, string>
                 {
@@ -97,14 +93,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     { "AnalysisNetworkCount", "Number of networks" }
                 }
             };
-            // Define the search input.
-            var input = new SearchInputViewModel(options, null, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
-            // Check if any of the provided variables was null before the reassignment.
-            if (input.NeedsRedirect)
-            {
-                // Redirect to the page where they are all explicitly defined.
-                return RedirectToPage(new { searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
-            }
+        }
+
+        public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
+        {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
             // Check if the user does not exist.
@@ -114,6 +106,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
+            }
+            // Define the search input.
+            var input = new SearchInputViewModel(ViewModel.SearchOptions, null, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
+            // Check if any of the provided variables was null before the reassignment.
+            if (input.NeedsRedirect)
+            {
+                // Redirect to the page where they are all explicitly defined.
+                return RedirectToPage(new { searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
             // Start with all of the items to which the user has access.
             var query = _context.Analyses
