@@ -52,6 +52,84 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public string Link { get; set; }
 
         /// <summary>
+        /// Gets the users navigation quick link for the administration index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel AdministrationUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Users",
+            Title = "User",
+            Color = "success",
+            Icon = "fa-user",
+            Width = 6,
+            Link = "/Administration/Accounts/Users/Index"
+        };
+
+        /// <summary>
+        /// Gets the roles navigation quick link for the administration index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel AdministrationRolesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Roles",
+            Title = "Roles",
+            Color = "success",
+            Icon = "fa-tag",
+            Width = 6,
+            Link = "/Administration/Accounts/Roles/Index"
+        };
+
+        /// <summary>
+        /// Gets the databases navigation quick link for the administration index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel AdministrationDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Databases",
+            Title = "Database",
+            Color = "info",
+            Icon = "fa-database",
+            Width = 6,
+            Link = "/Administration/Databases/Databases/Index"
+        };
+
+        /// <summary>
+        /// Gets the node collections navigation quick link for the administration index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel AdministrationNodeCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "NodeCollections",
+            Title = "Node collection",
+            Color = "info",
+            Icon = "fa-folder",
+            Width = 6,
+            Link = "/Administration/Data/NodeCollections/Index"
+        };
+
+        /// <summary>
+        /// Gets the nodes navigation quick link for the administration index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel AdministrationNodesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Nodes",
+            Title = "Node",
+            Color = "primary",
+            Icon = "fa-circle",
+            Width = 6,
+            Link = "/Administration/Data/Nodes/Index"
+        };
+
+        /// <summary>
+        /// Gets the edges navigation quick link for the administration index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel AdministrationEdgesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Edges",
+            Title = "Edge",
+            Color = "primary",
+            Icon = "fa-arrow-right",
+            Width = 6,
+            Link = "/Administration/Data/Edges/Index"
+        };
+
+        /// <summary>
         /// Gets the networks navigation quick link for the content index page.
         /// </summary>
         public static NavigationQuickLinkViewModel ContentNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
@@ -78,7 +156,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the nodes navigation quick link for the analysis index page.
+        /// Gets the nodes navigation quick link for the networks index page.
         /// </summary>
         public static NavigationQuickLinkViewModel NetworkNodesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
@@ -91,7 +169,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the edges navigation quick link for the analysis index page.
+        /// Gets the edges navigation quick link for the networks index page.
         /// </summary>
         public static NavigationQuickLinkViewModel NetworkEdgesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
@@ -104,7 +182,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the databases navigation quick link for the analysis index page.
+        /// Gets the databases navigation quick link for the networks index page.
         /// </summary>
         public static NavigationQuickLinkViewModel NetworkDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
@@ -117,7 +195,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the node collections navigation quick link for the analysis index page.
+        /// Gets the node collections navigation quick link for the networks index page.
         /// </summary>
         public static NavigationQuickLinkViewModel NetworkNodeCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
@@ -130,7 +208,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the users navigation quick link for the analysis index page.
+        /// Gets the users navigation quick link for the networks index page.
         /// </summary>
         public static NavigationQuickLinkViewModel NetworkUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
@@ -143,7 +221,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the user invitations navigation quick link for the analysis index page.
+        /// Gets the user invitations navigation quick link for the networks index page.
         /// </summary>
         public static NavigationQuickLinkViewModel NetworkUserInvitationsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
@@ -232,6 +310,44 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Width = 6,
             Link = "/Content/Created/Analyses/Details/Users"
         };
+
+        /// <summary>
+        /// Gets the navigation quick links for the administration index page.
+        /// </summary>
+        /// <param name="userCount">Represents the current number of users.</param>
+        /// <param name="roleCount">Represents the current number of roles.</param>
+        /// <param name="databaseCount">Represents the current number of databases.</param>
+        /// <param name="nodeCollectionCount">Represents the current number of node collections.</param>
+        /// <param name="nodeCount">Represents the current number of nodes.</param>
+        /// <param name="edgeCount">Represents the current number of edges.</param>
+        /// <returns>The navigation quick links for the content index page.</returns>
+        public static IEnumerable<NavigationQuickLinkViewModel> GetAdministrationNavigationQuickLinks(int userCount = 0, int roleCount = 0, int databaseCount = 0, int nodeCollectionCount = 0, int nodeCount = 0, int edgeCount = 0)
+        {
+            // Get the corresponding navigation quick links.
+            var administrationUsersNavigationQuickLink = AdministrationUsersNavigationQuickLink;
+            var administrationRolesNavigationQuickLink = AdministrationRolesNavigationQuickLink;
+            var administrationDatabasesNavigationQuickLink = AdministrationDatabasesNavigationQuickLink;
+            var administrationNodeCollectionsNavigationQuickLink = AdministrationNodeCollectionsNavigationQuickLink;
+            var administrationNodesNavigationQuickLink = AdministrationNodesNavigationQuickLink;
+            var administrationEdgesNavigationQuickLink = AdministrationEdgesNavigationQuickLink;
+            // Update the count and the route ID.
+            administrationUsersNavigationQuickLink.ItemCount = userCount;
+            administrationRolesNavigationQuickLink.ItemCount = roleCount;
+            administrationDatabasesNavigationQuickLink.ItemCount = databaseCount;
+            administrationNodeCollectionsNavigationQuickLink.ItemCount = nodeCollectionCount;
+            administrationNodesNavigationQuickLink.ItemCount = nodeCount;
+            administrationEdgesNavigationQuickLink.ItemCount = edgeCount;
+            // Return the navigation quick links.
+            return new List<NavigationQuickLinkViewModel>
+            {
+                administrationUsersNavigationQuickLink,
+                administrationRolesNavigationQuickLink,
+                administrationDatabasesNavigationQuickLink,
+                administrationNodeCollectionsNavigationQuickLink,
+                administrationNodesNavigationQuickLink,
+                administrationEdgesNavigationQuickLink
+            };
+        }
 
         /// <summary>
         /// Gets the navigation quick links for the content index page.
