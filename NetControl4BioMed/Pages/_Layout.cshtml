@@ -59,24 +59,29 @@
     </header>
     <main class="flex-grow-1 d-flex flex-column">
         <partial name="_ScriptsCookieConsentPartial" />
-        @RenderSection("Banner", required: false)
+        @if (IsSectionDefined("Banner"))
+        {
+            <div class="mb-3">
+                @RenderSection("Banner", required: false)
+            </div>
+        }
         <div class="flex-grow-1 container d-flex flex-column">
             @if (IsSectionDefined("Breadcrumbs"))
             {
-                <nav class="breadcrumb my-2">
+                <nav class="breadcrumb mb-3">
                     <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.NavigationBreadcrumb" />
                     @RenderSection("Breadcrumbs", required: false)
                 </nav>
             }
             <partial name="_StatusMessagePartial" model="@TempData["StatusMessage"]" />
-            <div class="flex-grow-1 d-flex flex-column flex-lg-row my-0 my-lg-2">
+            <div class="flex-grow-1 d-flex flex-column flex-lg-row mb-3">
                 @if (IsSectionDefined("Navigation"))
                 {
-                    <div class="col-lg-4 col-xl-3 my-2 my-lg-0 d-flex flex-column">
+                    <div class="col-lg-4 col-xl-3 d-flex flex-column">
                         @RenderSection("Navigation", required: false)
                     </div>
                 }
-                <div class="col-lg my-2 my-lg-0 d-flex flex-column flex-grow-1">
+                <div class="col-lg d-flex flex-column flex-grow-1">
                     @RenderBody()
                 </div>
             </div>

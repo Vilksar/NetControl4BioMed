@@ -515,5 +515,25 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Title = "Database types",
             Link = "/Content/Databases/DatabaseTypes/Index"
         };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the network details index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel NetworkDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Details",
+            Title = "Details",
+            Link = "/Content/Created/Networks/Details/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the analysis details index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AnalysisDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Details",
+            Title = "Details",
+            Link = "/Content/Created/Analyses/Details/Index"
+        };
     }
 }

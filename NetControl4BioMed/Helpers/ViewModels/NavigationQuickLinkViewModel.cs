@@ -165,7 +165,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "success",
             Icon = "fa-circle",
             Width = 6,
-            Link = "/Content/Created/Networks/Details/Nodes"
+            Link = "/Content/Created/Networks/Details/Data/Nodes/Index"
         };
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "success",
             Icon = "fa-arrow-right",
             Width = 6,
-            Link = "/Content/Created/Networks/Details/Edges"
+            Link = "/Content/Created/Networks/Details/Data/Edges/Index"
         };
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "info",
             Icon = "fa-database",
             Width = 6,
-            Link = "/Content/Created/Networks/Details/Databases"
+            Link = "/Content/Created/Networks/Details/Databases/Databases/Index"
         };
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "info",
             Icon = "fa-folder",
             Width = 6,
-            Link = "/Content/Created/Networks/Details/NodeCollections"
+            Link = "/Content/Created/Networks/Details/Data/NodeCollections/Index"
         };
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "primary",
             Icon = "fa-user",
             Width = 6,
-            Link = "/Content/Created/Networks/Details/Users"
+            Link = "/Content/Created/Networks/Details/Accounts/Users/Index"
         };
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "primary",
             Icon = "fa-envelope-open",
             Width = 6,
-            Link = "/Content/Created/Networks/Details/Users"
+            Link = "/Content/Created/Networks/Details/Accounts/Users/Index"
         };
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "success",
             Icon = "fa-circle",
             Width = 6,
-            Link = "/Content/Created/Analyses/Details/Nodes"
+            Link = "/Content/Created/Analyses/Details/Data/Nodes/Index"
         };
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "success",
             Icon = "fa-arrow-right",
             Width = 6,
-            Link = "/Content/Created/Analyses/Details/Edges"
+            Link = "/Content/Created/Analyses/Details/Data/Edges/Index"
         };
 
         /// <summary>
@@ -269,7 +269,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "info",
             Icon = "fa-database",
             Width = 6,
-            Link = "/Content/Created/Analyses/Details/Databases"
+            Link = "/Content/Created/Analyses/Details/Databases/Databases/Index"
         };
 
         /// <summary>
@@ -282,7 +282,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "info",
             Icon = "fa-folder",
             Width = 6,
-            Link = "/Content/Created/Analyses/Details/NodeCollections"
+            Link = "/Content/Created/Analyses/Details/Data/NodeCollections/Index"
         };
 
         /// <summary>
@@ -295,7 +295,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "primary",
             Icon = "fa-user",
             Width = 6,
-            Link = "/Content/Created/Analyses/Details/Users"
+            Link = "/Content/Created/Analyses/Details/Accounts/Users/Index"
         };
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "primary",
             Icon = "fa-envelope-open",
             Width = 6,
-            Link = "/Content/Created/Analyses/Details/Users"
+            Link = "/Content/Created/Analyses/Details/Accounts/Users/Index"
         };
 
         /// <summary>

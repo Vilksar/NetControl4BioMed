@@ -6,7 +6,7 @@
     var text = Model.Substring(Model.IndexOf(": ") + 1);
     var color = type == "Error" ? "danger" : type == "Success" ? "success" : "info";
     var icon = type == "Error" ? "exclamation-circle" : type == "Success" ? "check-circle" : "info-circle";
-    <div class="alert alert-@color alert-dismissible text-wrap my-2">
+    <div class="alert alert-@color alert-dismissible text-wrap mb-3">
         <div>
             <span><i class="fas fa-@icon"></i></span>
             <span class="sr-only">@type!</span>

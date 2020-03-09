@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetControl4BioMed.Data.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -61,6 +62,28 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Title = "Content",
             Icon = "fa-box-open",
             Color = "success"
+        };
+
+        /// <summary>
+        /// Gets the navigation banner for the network pages.
+        /// </summary>
+        public static NavigationBannerViewModel NetworkNavigationBanner { get; } = new NavigationBannerViewModel
+        {
+            Id = "Network",
+            Title = "Network",
+            Icon = "fa-share-alt",
+            Color = "dark"
+        };
+
+        /// <summary>
+        /// Gets the navigation banner for the network pages.
+        /// </summary>
+        public static NavigationBannerViewModel AnalysisNavigationBanner { get; } = new NavigationBannerViewModel
+        {
+            Id = "Analysis",
+            Title = "Analysis",
+            Icon = "fa-desktop",
+            Color = "dark"
         };
     }
 }

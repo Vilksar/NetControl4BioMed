@@ -1,5 +1,6 @@
 ﻿@model Helpers.ViewModels.NavigationAreaViewModel
 @{
+    var activeArea = (string)ViewData["ActiveArea"] ?? string.Empty;
     var activeGroup = (string)ViewData["ActiveGroup"] ?? string.Empty;
     var activePage = (string)ViewData["ActivePage"] ?? string.Empty;
 }
@@ -9,7 +10,7 @@
     {
         @if (navigationGroup.NavigationPages == null || !navigationGroup.NavigationPages.Any())
         {
-            <a asp-page="@navigationGroup.Link" asp-route-id="@Model.RouteId" class="list-group-item list-group-item-action list-group-item-@navigationGroup.Color @(activeGroup == navigationGroup.Id && activePage == navigationGroup.Id ? "active" : string.Empty)" title="@navigationGroup.Description">
+            <a asp-page="@navigationGroup.Link" asp-route-id="@Model.RouteId" class="list-group-item list-group-item-action list-group-item-@navigationGroup.Color @(activeArea == Model.Id && activeGroup == navigationGroup.Id && activePage == navigationGroup.Id ? "active" : string.Empty)" title="@navigationGroup.Description">
                 <div class="row">
                     <span class="col-2 text-center"><i class="fas @navigationGroup.Icon"></i></span>
                     <span class="col-8 text-left text-wrap">@navigationGroup.Title</span>
@@ -18,17 +19,17 @@
         }
         else
         {
-            <a asp-page="@navigationGroup.Link" class="list-group-item list-group-item-action list-group-item-@navigationGroup.Color @(activeGroup == navigationGroup.Id ? "active" : string.Empty)" data-toggle="collapse" data-target="#navigation-area-@Model.Id.ToLower()-@navigationGroup.Id.ToLower()" title="@navigationGroup.Description">
+            <a asp-page="@navigationGroup.Link" class="list-group-item list-group-item-action list-group-item-@navigationGroup.Color @(activeArea == Model.Id && activeGroup == navigationGroup.Id ? "active" : string.Empty)" data-toggle="collapse" data-target="#navigation-area-@Model.Id.ToLower()-@navigationGroup.Id.ToLower()" title="@navigationGroup.Description">
                 <div class="row">
                     <span class="col-2 text-center"><i class="fas @navigationGroup.Icon"></i></span>
                     <span class="col-8 text-left text-wrap">@navigationGroup.Title</span>
                     <span class="col-2 text-center"><i class="fas fa-angle-down"></i></span>
                 </div>
             </a>
-            <div id="navigation-area-@Model.Id.ToLower()-@navigationGroup.Id.ToLower()" class="list-group list-group-flush collapse @(activeGroup == navigationGroup.Id ? "show" : string.Empty)" data-parent="#navigation-area-@Model.Id.ToLower()">
+            <div id="navigation-area-@Model.Id.ToLower()-@navigationGroup.Id.ToLower()" class="list-group list-group-flush collapse @(activeArea == Model.Id && activeGroup == navigationGroup.Id ? "show" : string.Empty)" data-parent="#navigation-area-@Model.Id.ToLower()">
                 @foreach (var navigationPage in navigationGroup.NavigationPages)
                 {
-                    <a asp-page="@navigationPage.Link" asp-route-id="@Model.RouteId" class="list-group-item list-group-item-action list-group-item-@navigationPage.Color @(activeGroup == navigationGroup.Id && activePage == navigationPage.Id ? "active" : string.Empty)" title="@navigationPage.Description">
+                    <a asp-page="@navigationPage.Link" asp-route-id="@Model.RouteId" class="list-group-item list-group-item-action list-group-item-@navigationPage.Color @(activeArea == Model.Id && activeGroup == navigationGroup.Id && activePage == navigationPage.Id ? "active" : string.Empty)" title="@navigationPage.Description">
                         <div class="row small align-items-center">
                             <span class="col-9 text-left text-wrap">@navigationPage.Title</span>
                             <span class="col-3 text-center"><i class="fas @navigationPage.Icon"></i></span>

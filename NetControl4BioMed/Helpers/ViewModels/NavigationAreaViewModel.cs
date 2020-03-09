@@ -567,7 +567,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             {
                 new NavigationGroupViewModel
                 {
-                    Id = "NetworkIndex",
+                    Id = "Index",
                     Title = "Overview",
                     Description = string.Empty,
                     Icon = "fa-chart-bar",
@@ -576,103 +576,103 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "NetworkAccounts",
+                    Id = "Accounts",
                     Title = "Accounts",
                     Description = string.Empty,
                     Icon = "fa-user",
                     Color = "dark",
-                    Link = "/Content/Created/Networks/Details/Index",
+                    Link = "/Content/Created/Networks/Details/Accounts/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "NetworkUsers",
+                            Id = "Users",
                             Title = "Users",
                             Description = string.Empty,
                             Icon = "fa-user",
                             Color = "light",
-                            Link = "/Content/Created/Networks/Details/Users"
+                            Link = "/Content/Created/Networks/Details/Accounts/Users/Index"
                         }
                     }
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "NetworkDatabases",
+                    Id = "Databases",
                     Title = "Databases",
                     Description = string.Empty,
                     Icon = "fa-database",
                     Color = "dark",
-                    Link = "/Content/Created/Networks/Details/Index",
+                    Link = "/Content/Created/Networks/Details/Databases/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "NetworkDatabases",
+                            Id = "Databases",
                             Title = "Databases",
                             Description = string.Empty,
                             Icon = "fa-database",
                             Color = "light",
-                            Link = "/Content/Created/Networks/Details/Databases"
+                            Link = "/Content/Created/Networks/Details/Databases/Databases/Index"
                         }
                     }
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "NetworkData",
+                    Id = "Data",
                     Title = "Data",
                     Description = string.Empty,
                     Icon = "fa-table",
                     Color = "dark",
-                    Link = "/Content/Created/Networks/Details/Index",
+                    Link = "/Content/Created/Networks/Details/Data/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "NetworkNodes",
+                            Id = "Nodes",
                             Title = "Nodes",
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
-                            Link = "/Content/Created/Networks/Details/Nodes"
+                            Link = "/Content/Created/Networks/Details/Data/Nodes/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "NetworkEdges",
+                            Id = "Edges",
                             Title = "Edges",
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
-                            Link = "/Content/Created/Networks/Details/Edges"
+                            Link = "/Content/Created/Networks/Details/Data/Edges/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "NetworkNodeCollections",
+                            Id = "NodeCollections",
                             Title = "Node collections",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
-                            Link = "/Content/Created/Networks/Details/NodeCollections"
+                            Link = "/Content/Created/Networks/Details/Data/NodeCollections/Index"
                         }
                     }
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "NetworkCreated",
+                    Id = "Created",
                     Title = "Created",
                     Description = string.Empty,
                     Icon = "fa-smile",
                     Color = "dark",
-                    Link = "/Content/Created/Networks/Details/Index",
+                    Link = "/Content/Created/Networks/Details/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "NetworkAnalyses",
+                            Id = "Analyses",
                             Title = "Analyses",
                             Description = string.Empty,
                             Icon = "fa-desktop",
                             Color = "light",
-                            Link = "/Content/Created/Networks/Details/Analyses"
+                            Link = "/Content/Created/Networks/Details/Created/Analyses/Index"
                         }
                     }
                 }
