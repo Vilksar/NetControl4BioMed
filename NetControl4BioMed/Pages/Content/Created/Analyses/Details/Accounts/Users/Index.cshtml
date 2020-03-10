@@ -15,13 +15,13 @@
     </div>
     <div class="row align-items-center">
         <div class="col-lg-6 mb-3">
-            <a asp-page="/Content/Created/Analyses/Details/AddUsers" asp-route-id="@Model.View.Analysis.Id" class="btn btn-success btn-block" title="Add">
+            <a asp-page="/Content/Created/Analyses/Details/Accounts/Users/Add" asp-route-id="@Model.View.Analysis.Id" class="btn btn-success btn-block" title="Add">
                 <span><i class="fas fa-plus"></i></span>
                 <span>Add a new user</span>
             </a>
         </div>
         <div class="col-lg-6 mb-3">
-            <button type="submit" asp-page="/Content/Created/Analyses/Details/RemoveUsers" asp-route-id="@Model.View.Analysis.Id" class="btn btn-danger btn-block item-group-button" title="Remove" disabled>
+            <button type="submit" asp-page="/Content/Created/Analyses/Details/Accounts/Users/Remove" asp-route-id="@Model.View.Analysis.Id" class="btn btn-danger btn-block item-group-button" title="Remove" disabled>
                 <span><i class="fas fa-trash"></i></span>
                 <span>Remove selected users</span>
             </button>
@@ -78,7 +78,7 @@
                             </div>
                         </td>
                         <td class="text-center text-break">
-                            <a asp-page="/Content/Created/Analyses/Details/RemoveUsers" asp-route-id="@Model.View.Analysis.Id" asp-route-emails="@item.Email" class="btn btn-danger m-1" title="Delete">
+                            <a asp-page="/Content/Created/Analyses/Details/Accounts/Users/Remove" asp-route-id="@Model.View.Analysis.Id" asp-route-emails="@item.Email" class="btn btn-danger m-1" title="Delete">
                                 <span><i class="fas fa-trash"></i></span>
                             </a>
                         </td>

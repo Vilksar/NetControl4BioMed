@@ -72,27 +72,30 @@
     </div>
 }
 <partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAnalysisNavigationQuickLinks(Model.View.Analysis)" />
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-eye"></i></span>
+@if (Model.View.ShowVisualization)
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-eye"></i></span>
+                </div>
+                <div>
+                    <span>Visualize</span>
+                </div>
             </div>
-            <div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-primary text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>As the network corresponding to the analysis is relatively small, you can click the button below to visualize it in browser.</span>
+            </div>
+            <a asp-page="/Content/Created/Analyses/Details/Visualize" asp-route-id="@Model.View.Analysis.Id" class="btn btn-primary btn-block">
                 <span>Visualize</span>
-            </div>
+            </a>
         </div>
     </div>
-    <div class="card-body">
-        <div class="alert alert-primary text-justify text-wrap">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>If the analysis is relatively small you can visualize it in-browser by clicking on the button below.</span>
-        </div>
-        <a asp-page="/Content/Created/Analyses/Details/Visualize" asp-route-id="@Model.View.Analysis.Id" class="btn btn-primary btn-block @(Model.View.ShowVisualization ? "disabled" : string.Empty)">
-            <span>Visualize</span>
-        </a>
-    </div>
-</div>
+}
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">

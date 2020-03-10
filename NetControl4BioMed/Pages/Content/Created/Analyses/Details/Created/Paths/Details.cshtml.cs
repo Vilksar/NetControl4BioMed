@@ -70,6 +70,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
                     .ThenInclude(item => item.Edge)
                 .Include(item => item.ControlPath)
                     .ThenInclude(item => item.Analysis)
+                        .ThenInclude(item => item.AnalysisDatabases)
+                            .ThenInclude(item => item.Database)
+                                .ThenInclude(item => item.DatabaseType)
                 .FirstOrDefault();
             // Check if there was no item found.
             if (item == null)

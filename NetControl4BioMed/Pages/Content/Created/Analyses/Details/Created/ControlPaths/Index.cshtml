@@ -46,7 +46,7 @@ else
                         <span>@item.Paths.Select(item1 => item1.PathNodes.First()).Distinct().Count()</span>
                     </td>
                     <td class="text-center text-break">
-                        <a asp-page="/Content/Created/Analyses/Details/Paths" asp-route-id="@item.Id" title="Details">
+                        <a asp-page="/Content/Created/Analyses/Details/Created/ControlPaths/Details" asp-route-id="@item.Id" title="Details">
                             <span>Details</span>
                         </a>
                     </td>
