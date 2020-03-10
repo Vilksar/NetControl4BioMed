@@ -28,7 +28,4 @@ th, td {
 /* Style for the Cytoscape elements. */
 .cytoscape-container {
     min-height: 25rem !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
