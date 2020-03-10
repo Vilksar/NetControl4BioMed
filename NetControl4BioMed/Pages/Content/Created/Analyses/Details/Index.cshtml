@@ -2,8 +2,6 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Analysis details";
-    ViewData["ActiveGroup"] = "AnalysisIndex";
-    ViewData["ActivePage"] = "AnalysisIndex";
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetAnalysisNavigationTitleCard(Model.View.Analysis)" />

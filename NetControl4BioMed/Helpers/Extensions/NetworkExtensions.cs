@@ -43,7 +43,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                                     .Where(item1 => item1.DatabaseNodeField.IsSearchable)
                                     .Select(item1 => item1.Value)
                             },
-                            Classes = item.NetworkNodes.Select(item => item.Type.ToString().ToLower())
+                            Classes = item.NetworkNodes
+                                .Where(item1 => item1.Network == network)
+                                .Select(item => item.Type.ToString().ToLower())
                         }),
                     Edges = network.NetworkEdges
                         .Select(item => item.Edge)
