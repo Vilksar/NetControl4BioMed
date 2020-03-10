@@ -135,10 +135,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                     query = query.OrderByDescending(item => item.Id);
                     break;
                 case var sort when sort == ("ControlNodeCount", "Ascending"):
-                    query = query.OrderBy(item => item.Paths.Select(item => item.PathNodes).SelectMany(item => item).Where(item => item.Type == PathNodeType.Source).Select(item => item.Node).Distinct().Count());
+                    query = query.OrderBy(item => item.Paths.Select(item1 => item1.PathNodes).SelectMany(item1 => item1).Where(item1 => item1.Type == PathNodeType.Source).Select(item1 => item1.Node).Distinct().Count());
                     break;
                 case var sort when sort == ("ControlNodeCount", "Descending"):
-                    query = query.OrderByDescending(item => item.Paths.Select(item => item.PathNodes).SelectMany(item => item).Where(item => item.Type == PathNodeType.Source).Select(item => item.Node).Distinct().Count());
+                    query = query.OrderByDescending(item => item.Paths.Select(item1 => item1.PathNodes).SelectMany(item1 => item1).Where(item1 => item1.Type == PathNodeType.Source).Select(item1 => item1.Node).Distinct().Count());
                     break;
                 default:
                     break;
