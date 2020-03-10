@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Services;
 
 namespace NetControl4BioMed.Pages.Account.Manage.PersonalData
 {
@@ -78,22 +79,23 @@ namespace NetControl4BioMed.Pages.Account.Manage.PersonalData
                 // Return the page.
                 return Page();
             }
-            // Define the personal data dictionary and include all of the defined properties.
-            var personalData = new Dictionary<string, string>();
-            // Iterate over the personal data properties.
-            foreach (var property in user.GetType().GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute))))
+            // Return the streamed file.
+            return new FileCallbackResult(MediaTypeNames.Application.Json, async (stream, _) =>
             {
-                // Add to the personal data dictionary the name and value (if it exists).
-                personalData.Add(property.Name, property.GetValue(user)?.ToString());
-            }
-            // Define a new memory stream.
-            var stream = new MemoryStream();
-            // Serialize the personal data to the stream.
-            await JsonSerializer.SerializeAsync(stream, personalData, new JsonSerializerOptions { WriteIndented = true });
-            // Reset the stream position.
-            stream.Position = 0;
-            // Return a new JSON file.
-            return new FileStreamResult(stream, MediaTypeNames.Application.Json) { FileDownloadName = $"PersonalData.json" };
+                // Define the personal data dictionary and include all of the defined properties.
+                var personalData = new Dictionary<string, string>();
+                // Iterate over the personal data properties.
+                foreach (var property in user.GetType().GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute))))
+                {
+                    // Add to the personal data dictionary the name and value (if it exists).
+                    personalData.Add(property.Name, property.GetValue(user)?.ToString());
+                }
+                // Serialize the personal data to the stream.
+                await JsonSerializer.SerializeAsync(stream, personalData, new JsonSerializerOptions { WriteIndented = true });
+            })
+            {
+                FileDownloadName = $"PersonalData.json"
+            };
         }
     }
 }

@@ -21,6 +21,7 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.Services;
 using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks
@@ -162,16 +163,16 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 // Redisplay the page.
                 return Page();
             }
-            // Define the stream of the file to return.
-            var zipStream = new MemoryStream();
-            // Define a new ZIP archive.
-            using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+            // Return the streamed file.
+            return new FileCallbackResult(MediaTypeNames.Application.Zip, async (zipStream, _) =>
             {
-                // Go over each of the networks to download.
-                foreach (var network in View.Items)
+                // Define a new ZIP archive.
+                using var archive = new ZipArchive(zipStream, ZipArchiveMode.Create);
+                // Check which should be the format of the files within the archive.
+                if (Input.FileFormat == "Text")
                 {
-                    // Check which should be the format of the files within the archive.
-                    if (Input.FileFormat == "Text")
+                    // Go over each of the networks to download.
+                    foreach (var network in View.Items)
                     {
                         // Create a new entry in the archive and open it.
                         using var stream = archive.CreateEntry($"{network.Name}-{network.Id}.txt", CompressionLevel.Fastest).Open();
@@ -180,21 +181,30 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                         // Get the default values.
                         var interactionType = network.NetworkDatabases
                             .FirstOrDefault()?.Database.DatabaseType.Name.ToLower();
-                        // Define the data to be written to the file.
+                        // Get the required data.
                         var data = string.Join("\n", network.NetworkEdges.Select(item => item.Edge).Select(item =>
                         {
                             var sourceNode = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source)?.Node;
                             var targetNode = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)?.Node;
                             return $"{sourceNode?.Name}\t{interactionType}\t{targetNode.Name}";
                         }));
-                        // Write the data to the stream corresponding to the file.
+                        // Write the corresponding to the file.
                         await streamWriter.WriteAsync(data);
                     }
-                    else if (Input.FileFormat == "Json")
+                }
+                else if (Input.FileFormat == "Json")
+                {
+                    // Define the JSON serializer options.
+                    var jsonSerializerOptions = new JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    };
+                    // Go over each of the networks to download.
+                    foreach (var network in View.Items)
                     {
                         // Create a new entry in the archive and open it.
                         using var stream = archive.CreateEntry($"{network.Name}-{network.Id}.json", CompressionLevel.Fastest).Open();
-                        // Define the data to be serialized to the file.
+                        // Get the required data.
                         var data = new
                         {
                             Id = network.Id,
@@ -242,18 +252,33 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                                         })
                                 })
                         };
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { WriteIndented = true });
+                        // Write the data corresponding to the file.
+                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
                     }
-                    else if (Input.FileFormat == "CytoscapeJson")
+                }
+                else if (Input.FileFormat == "CytoscapeJson")
+                {
+                    // Define the JSON serializer options for all of the returned files.
+                    var jsonSerializerOptions = new JsonSerializerOptions
+                    {
+                        IgnoreNullValues = true
+                    };
+                    // Go over each of the networks to download.
+                    foreach (var network in View.Items)
                     {
                         // Create a new entry in the archive and open it.
                         using var stream = archive.CreateEntry($"{network.Name}-{network.Id}.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, network.GetCytoscapeViewModel(_linkGenerator), new JsonSerializerOptions { IgnoreNullValues = true });
+                        // Write the data corresponding to the file.
+                        await JsonSerializer.SerializeAsync(stream, network.GetCytoscapeViewModel(_linkGenerator), jsonSerializerOptions);
                     }
-                    else if (Input.FileFormat == "Excel")
+                }
+                else if (Input.FileFormat == "Excel")
+                {
+                    // Go over each of the networks to download.
+                    foreach (var network in View.Items)
                     {
+                        // Create a new entry in the archive and open it.
+                        using var stream = archive.CreateEntry($"{network.Name}-{network.Id}.xlsx", CompressionLevel.Fastest).Open();
                         // Get the required data.
                         var databases = network.NetworkDatabases
                             .Select(item => item.Database)
@@ -264,8 +289,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                         var databaseEdgeFields = databases
                             .Select(item => item.DatabaseEdgeFields)
                             .SelectMany(item => item);
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"{network.Name}-{network.Id}.xlsx", CompressionLevel.Fastest).Open();
                         // Define the rows in the first sheet.
                         var worksheet1Rows = new List<List<string>>
                         {
@@ -342,19 +365,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                         // Copy it to the archive stream.
                         await fileStream.CopyToAsync(stream);
                     }
-                    else
-                    {
-                        // Add an error to the model.
-                        ModelState.AddModelError(string.Empty, "The provided file format is not valid or is not yet implemented.");
-                        // Redisplay the page.
-                        return Page();
-                    }
                 }
-            }
-            // Reset the stream position.
-            zipStream.Position = 0;
-            // Return the archive file.
-            return new FileStreamResult(zipStream, MediaTypeNames.Application.Zip) { FileDownloadName = "NetControl4BioMed-Networks.zip" };
+            })
+            {
+                FileDownloadName = $"NetControl4BioMed-Networks.zip"
+            };
         }
     }
 }

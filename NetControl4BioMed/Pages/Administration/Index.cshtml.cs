@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Services;
 
 namespace NetControl4BioMed.Pages.Administration
 {
@@ -188,178 +189,228 @@ namespace NetControl4BioMed.Pages.Administration
             return LocalRedirect("/Hangfire");
         }
 
-        public async Task<IActionResult> OnPostDownloadAsync()
+        public IActionResult OnPostDownload()
         {
-            // Get the data to be written to the archive.
-            var data = new
+            // Return the streamed file.
+            return new FileCallbackResult(MediaTypeNames.Application.Zip, async (zipStream, _) =>
             {
-                DatabaseTypes = _context.DatabaseTypes.Select(item => new
+                // Define the JSON serializer options for all of the returned files.
+                var jsonSerializerOptions = new JsonSerializerOptions
                 {
-                    Id = item.Id,
-                    DateTimeCreated = item.DateTimeCreated,
-                    Name = item.Name,
-                    Description = item.Description,
-                    Databases = item.Databases.Select(item1 => new
-                    {
-                        Id = item1.Id,
-                        Name = item1.Name
-                    })
-                }),
-                Databases = _context.Databases.Select(item => new
+                    WriteIndented = true
+                };
+                // Define a new ZIP archive.
+                using var archive = new ZipArchive(zipStream, ZipArchiveMode.Create);
+                // Create an entry for the database types.
+                if (true)
                 {
-                    Id = item.Id,
-                    DateTimeCreated = item.DateTimeCreated,
-                    Name = item.Name,
-                    Description = item.Description,
-                    DatabaseType = new
+                    // Get the required data.
+                    var data = _context.DatabaseTypes.Select(item => new
                     {
-                        Id = item.DatabaseType.Id,
-                        Name = item.DatabaseType.Name
-                    },
-                    DatabaseNodeFields = item.DatabaseNodeFields.Select(item1 => new
-                    {
-                        Id = item1.Id,
-                        Name = item1.Name
-                    }),
-                    DatabaseEdgeFields = item.DatabaseEdgeFields.Select(item1 => new
-                    {
-                        Id = item1.Id,
-                        Name = item1.Name
-                    }),
-                    DatabaseNodes = item.DatabaseNodes.Select(item1 => new
-                    {
-                        Id = item1.Node.Id,
-                        Name = item1.Node.Name
-                    }),
-                    DatabaseEdges = item.DatabaseEdges.Select(item1 => new
-                    {
-                        Id = item1.Edge.Id,
-                        Name = item1.Edge.Name
-                    })
-                }),
-                DatabaseNodeFields = _context.DatabaseNodeFields.Select(item => new
-                {
-                    Id = item.Id,
-                    DateTimeCreated = item.DateTimeCreated,
-                    Name = item.Name,
-                    Description = item.Description,
-                    IsSearchable = item.IsSearchable,
-                    Url = item.Url,
-                    Database = new
-                    {
-                        Id = item.Database.Id,
-                        Name = item.Database.Name
-                    },
-                    DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes.Select(item1 => new
-                    {
-                        Id = item1.Node.Id,
-                        Name = item1.Node.Name,
-                        Value = item1.Value
-                    })
-                }),
-                DatabaseEdgeFields = _context.DatabaseEdgeFields.Select(item => new
-                {
-                    Id = item.Id,
-                    DateTimeCreated = item.DateTimeCreated,
-                    Name = item.Name,
-                    Description = item.Description,
-                    Url = item.Url,
-                    Database = new
-                    {
-                        Id = item.Database.Id,
-                        Name = item.Database.Name
-                    },
-                    DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges.Select(item1 => new
-                    {
-                        Id = item1.Edge.Id,
-                        Name = item1.Edge.Name,
-                        Value = item1.Value
-                    })
-                }),
-                Nodes = _context.Nodes.Select(item => new
-                {
-                    Id = item.Id,
-                    DateTimeCreated = item.DateTimeCreated,
-                    Name = item.Name,
-                    Description = item.Description,
-                    Databases = item.DatabaseNodes.Select(item1 => new
-                    {
-                        Id = item1.Database.Id,
-                        Name = item1.Database.Name
-                    }),
-                    DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes.Select(item1 => new
-                    {
-                        Id = item1.DatabaseNodeField.Id,
-                        Name = item1.DatabaseNodeField.Name,
-                        Value = item1.Value
-                    }),
-                    EdgeNodes = item.EdgeNodes.Select(item1 => new
-                    {
-                        Id = item1.Edge.Id,
-                        Name = item1.Edge.Name,
-                        Type = item1.Type.ToString()
-                    })
-                }),
-                Edges = _context.Edges.Select(item => new
-                {
-                    Id = item.Id,
-                    DateTimeCreated = item.DateTimeCreated,
-                    Name = item.Name,
-                    Description = item.Description,
-                    Databases = item.DatabaseEdges.Select(item1 => new
-                    {
-                        Id = item1.Database.Id,
-                        Name = item1.Database.Name
-                    }),
-                    DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges.Select(item1 => new
-                    {
-                        Id = item1.DatabaseEdgeField.Id,
-                        Name = item1.DatabaseEdgeField.Name,
-                        Value = item1.Value
-                    }),
-                    EdgeNodes = item.EdgeNodes.Select(item1 => new
-                    {
-                        Id = item1.Node.Id,
-                        Name = item1.Node.Name,
-                        Type = item1.Type.ToString()
-                    })
-                }),
-                NodeCollections = _context.NodeCollections.Select(item => new
-                {
-                    Id = item.Id,
-                    DateTimeCreated = item.DateTimeCreated,
-                    Name = item.Name,
-                    Description = item.Description,
-                    NodeCollectionNodes = item.NodeCollectionNodes.Select(item1 => new
-                    {
-                        Id = item1.Node.Id,
-                        Name = item1.Node.Name
-                    })
-                })
-            };
-            // Define the JSON serializer options for all of the returned files.
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-            // Define the stream of the file to return.
-            var zipStream = new MemoryStream();
-            // Define a new ZIP archive.
-            using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
-            {
-                // Go over each of the items in the data to download.
-                foreach (var property in data.GetType().GetProperties())
-                {
+                        Id = item.Id,
+                        DateTimeCreated = item.DateTimeCreated,
+                        Name = item.Name,
+                        Description = item.Description,
+                        Databases = item.Databases.Select(item1 => new
+                        {
+                            Id = item1.Id,
+                            Name = item1.Name
+                        })
+                    });
                     // Create a new entry in the archive and open it.
-                    using var stream = archive.CreateEntry($"NetControl4BioMed-{property.Name}.json", CompressionLevel.Fastest).Open();
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-DatabaseTypes.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
-                    await JsonSerializer.SerializeAsync(stream, property.GetValue(data), jsonSerializerOptions);
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
                 }
-            }
-            // Reset the stream position.
-            zipStream.Position = 0;
-            // Return the archive file.
-            return new FileStreamResult(zipStream, MediaTypeNames.Application.Zip) { FileDownloadName = "NetControl4BioMed-Data.zip" };
+                // Create an entry for the databases.
+                if (true)
+                {
+                    // Get the required data.
+                    var data = _context.Databases.Select(item => new
+                    {
+                        Id = item.Id,
+                        DateTimeCreated = item.DateTimeCreated,
+                        Name = item.Name,
+                        Description = item.Description,
+                        DatabaseType = new
+                        {
+                            Id = item.DatabaseType.Id,
+                            Name = item.DatabaseType.Name
+                        },
+                        DatabaseNodeFields = item.DatabaseNodeFields.Select(item1 => new
+                        {
+                            Id = item1.Id,
+                            Name = item1.Name
+                        }),
+                        DatabaseEdgeFields = item.DatabaseEdgeFields.Select(item1 => new
+                        {
+                            Id = item1.Id,
+                            Name = item1.Name
+                        }),
+                        DatabaseNodes = item.DatabaseNodes.Select(item1 => new
+                        {
+                            Id = item1.Node.Id,
+                            Name = item1.Node.Name
+                        }),
+                        DatabaseEdges = item.DatabaseEdges.Select(item1 => new
+                        {
+                            Id = item1.Edge.Id,
+                            Name = item1.Edge.Name
+                        })
+                    });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Databases.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Create an entry for the database node fields.
+                if (true)
+                {
+                    // Get the required data.
+                    var data = _context.DatabaseNodeFields.Select(item => new
+                    {
+                        Id = item.Id,
+                        DateTimeCreated = item.DateTimeCreated,
+                        Name = item.Name,
+                        Description = item.Description,
+                        IsSearchable = item.IsSearchable,
+                        Url = item.Url,
+                        Database = new
+                        {
+                            Id = item.Database.Id,
+                            Name = item.Database.Name
+                        },
+                        DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes.Select(item1 => new
+                        {
+                            Id = item1.Node.Id,
+                            Name = item1.Node.Name,
+                            Value = item1.Value
+                        })
+                    });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-DatabaseNodeFields.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Create an entry for the database edge fields.
+                if (true)
+                {
+                    // Get the required data.
+                    var data = _context.DatabaseEdgeFields.Select(item => new
+                    {
+                        Id = item.Id,
+                        DateTimeCreated = item.DateTimeCreated,
+                        Name = item.Name,
+                        Description = item.Description,
+                        Url = item.Url,
+                        Database = new
+                        {
+                            Id = item.Database.Id,
+                            Name = item.Database.Name
+                        },
+                        DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges.Select(item1 => new
+                        {
+                            Id = item1.Edge.Id,
+                            Name = item1.Edge.Name,
+                            Value = item1.Value
+                        })
+                    });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-DatabaseEdgeFields.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Create an entry for the nodes.
+                if (true)
+                {
+                    // Get the required data.
+                    var data = _context.Nodes.Select(item => new
+                    {
+                        Id = item.Id,
+                        DateTimeCreated = item.DateTimeCreated,
+                        Name = item.Name,
+                        Description = item.Description,
+                        Databases = item.DatabaseNodes.Select(item1 => new
+                        {
+                            Id = item1.Database.Id,
+                            Name = item1.Database.Name
+                        }),
+                        DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes.Select(item1 => new
+                        {
+                            Id = item1.DatabaseNodeField.Id,
+                            Name = item1.DatabaseNodeField.Name,
+                            Value = item1.Value
+                        }),
+                        EdgeNodes = item.EdgeNodes.Select(item1 => new
+                        {
+                            Id = item1.Edge.Id,
+                            Name = item1.Edge.Name,
+                            Type = item1.Type.ToString()
+                        })
+                    });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Nodes.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Create an entry for the edges.
+                if (true)
+                {
+                    // Get the required data.
+                    var data = _context.Edges.Select(item => new
+                    {
+                        Id = item.Id,
+                        DateTimeCreated = item.DateTimeCreated,
+                        Name = item.Name,
+                        Description = item.Description,
+                        Databases = item.DatabaseEdges.Select(item1 => new
+                        {
+                            Id = item1.Database.Id,
+                            Name = item1.Database.Name
+                        }),
+                        DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges.Select(item1 => new
+                        {
+                            Id = item1.DatabaseEdgeField.Id,
+                            Name = item1.DatabaseEdgeField.Name,
+                            Value = item1.Value
+                        }),
+                        EdgeNodes = item.EdgeNodes.Select(item1 => new
+                        {
+                            Id = item1.Node.Id,
+                            Name = item1.Node.Name,
+                            Type = item1.Type.ToString()
+                        })
+                    });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Edges.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Create an entry for the node collections.
+                if (true)
+                {
+                    // Get the required data.
+                    var data = _context.NodeCollections.Select(item => new
+                    {
+                        Id = item.Id,
+                        DateTimeCreated = item.DateTimeCreated,
+                        Name = item.Name,
+                        Description = item.Description,
+                        NodeCollectionNodes = item.NodeCollectionNodes.Select(item1 => new
+                        {
+                            Id = item1.Node.Id,
+                            Name = item1.Node.Name
+                        })
+                    });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-NodeCollections.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+            })
+            {
+                FileDownloadName = $"NetControl4BioMed-Data.zip"
+            };
         }
     }
 }
