@@ -1,0 +1,78 @@
+﻿@page
+@model DetailsModel
+@{
+    ViewData["Title"] = "Analysis control path details";
+}
+
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-long-arrow-alt-right"></i></span>
+            </div>
+            <div>
+                <span>Paths</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-primary text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>Click the button below to see the list of paths forming the current control path.</span>
+        </div>
+        <a asp-page="/Content/Created/Networks/Details/Created/Paths/Index" asp-route-id="@Model.View.ControlPath.Id" class="btn btn-primary btn-block">
+            <span>View paths</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-circle"></i></span>
+            </div>
+            <div>
+                <span>Unique control nodes</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>This section contains the unique control nodes in the control path.</span>
+        </div>
+        <table class="table table-hover table-bordered table-datatable item-group" data-order="[[0]]">
+            <thead class="thead-light">
+                <tr>
+                    <th class="text-center text-break" data-name="index">
+                        <span>#</span>
+                    </th>
+                    <th class="text-left text-break">
+                        <span>Node</span>
+                    </th>
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <span>Links</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var uniqueControlNode in Model.View.UniqueControlNodes)
+                {
+                    <tr class="item-group-item">
+                        <td class="text-center text-break">
+                            <span></span>
+                        </td>
+                        <td class="text-left text-break">
+                            <span title="@uniqueControlNode.Name" class="font-weight-bold">@uniqueControlNode.Name</span>
+                        </td>
+                        <td class="text-center text-break">
+                            <a asp-page="/Content/Data/Nodes/Details" asp-route-id="@uniqueControlNode.Id" title="Details" target="_blank" rel="nofollow noopener noreferrer">
+                                <span>Details</span>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
