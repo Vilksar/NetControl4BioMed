@@ -1,0 +1,477 @@
+﻿@page
+@model CreateModel
+@using Helpers.Extensions
+@{
+    ViewData["Title"] = "Create analysis";
+}
+
+<form method="post" class="text-justify">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-info"></i></span>
+                </div>
+                <div>
+                    <span>Details</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the general details of the new analysis.</span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="Input.DatabaseTypeId" class="font-weight-bold">ID</label>
+                <input asp-for="Input.DatabaseTypeId" class="form-control" readonly />
+                <span asp-description-for="Input.DatabaseTypeId" class="text-muted small">The database type ID of the new analysis.</span>
+                <span asp-validation-for="Input.DatabaseTypeId" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Name" class="font-weight-bold">Name</label>
+                <input asp-for="Input.Name" class="form-control" />
+                <span asp-description-for="Input.Name" class="text-muted small">The name of the new analysis.</span>
+                <span asp-validation-for="Input.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="Input.Description" class="form-control"></textarea>
+                <span asp-description-for="Input.Description" class="text-muted small">The description of the new analysis.</span>
+                <span asp-validation-for="Input.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="Input.Algorithm" class="font-weight-bold">Algorithm</label>
+                <select asp-for="Input.Algorithm" class="custom-select">
+                    @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
+                    {
+                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                    }
+                </select>
+                <span asp-description-for="Input.Algorithm" class="text-muted small">The algorithm to be used by the new analysis.</span>
+                <span asp-validation-for="Input.Algorithm" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-share-alt"></i></span>
+                </div>
+                <div>
+                    <span>Networks</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the networks to be used by the new analysis.</span>
+            </div>
+            <table class="table table-hover table-bordered table-datatable item-group" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" id="checkbox-network-select" class="custom-control-input item-group-select" title="Select" />
+                                <label for="checkbox-network-select" class="custom-control-label"></label>
+                            </div>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Network</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var network in Model.View.Networks)
+                    {
+                        <tr class="item-group-item">
+                            <td class="text-center text-break">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" id="checkbox-network-@network.Id" name="Input.NetworkIds" value="@network.Id" class="custom-control-input item-group-item-checkbox" title="Select" checked="@(Model.Input.NetworkIds != null && Model.Input.NetworkIds.Contains(network.Id) ? "checked" : null)" />
+                                    <label for="checkbox-network-@network.Id" class="custom-control-label"></label>
+                                </div>
+                            </td>
+                            <td class="text-left text-break">
+                                <span title="@network.Name" class="font-weight-bold">@network.Name</span>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Content/Created/Networks/Details/Index" asp-route-id="@network.Id" title="Details" target="_blank" rel="nofollow noopener noreferrer">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-syringe"></i></span>
+                </div>
+                <div>
+                    <span>Source data</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the source data to be used by the new analysis. Namely, the source (preferred) nodes used by the new analysis should be defined here.</span>
+            </div>
+            <div class="file-group" data-type="nodes">
+                <div class="form-group" hidden>
+                    <label asp-for="Input.SourceData" class="font-weight-bold">Source nodes</label>
+                    <textarea asp-for="Input.SourceData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.SourceData" class="text-muted small">The nodes to be used as source nodes by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.SourceData" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <div class="row align-items-center mb-2">
+                        <div class="col-lg-4">
+                            <label for="data-textarea" class="font-weight-bold mb-0">Data</label>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row align-items-center">
+                                <div class="col-6 col-form-label-sm text-right">
+                                    <label for="data-line-separator" class="font-weight-normal mb-0">Line separator:</label>
+                                </div>
+                                <div class="col-6 text-left">
+                                    <select id="data-line-separator" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                        <option value=",">comma (",")</option>
+                                        <option value=";">semicolon (";")</option>
+                                        <option value="\t">tab ("\t")</option>
+                                        <option value="\s">space (" ")</option>
+                                        <option value="\n" selected>new line ("\n")</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="data-textarea" class="form-control file-group-text mb-2"></textarea>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input file-group-file-upload" />
+                        <label class="custom-file-label file-group-file-label">Choose file</label>
+                    </div>
+                    <span class="text-muted small">The source nodes of the new analysis. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (Model.View.SourceNodeCollections.Any())
+    {
+        <div class="card mb-3">
+            <div class="card-header font-weight-bold">
+                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                    <div>
+                        <span><i class="fas fa-folder"></i></span>
+                    </div>
+                    <div>
+                        <span>Source node collections</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info text-justify text-wrap">
+                    <span><i class="fas fa-info-circle"></i></span>
+                    <span>This section contains the node collections which can be used as additional source nodes by the new analysis.</span>
+                </div>
+                <table class="table table-hover table-bordered table-datatable item-group" data-order="[[1]]">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" id="checkbox-source-node-collection-select" class="custom-control-input item-group-select" title="Select" />
+                                    <label for="checkbox-source-node-collection-select" class="custom-control-label"></label>
+                                </div>
+                            </th>
+                            <th class="text-left text-break">
+                                <span>Node collection</span>
+                            </th>
+                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                <span>Links</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var nodeCollection in Model.View.SourceNodeCollections)
+                        {
+                            <tr class="item-group-item">
+                                <td class="text-center text-break">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" id="checkbox-source-node-collection-@nodeCollection.Id" name="Input.SourceNodeCollectionIds" value="@nodeCollection.Id" class="custom-control-input item-group-item-checkbox" title="Select" checked="@(Model.Input.SourceNodeCollectionIds != null && Model.Input.SourceNodeCollectionIds.Contains(nodeCollection.Id) ? "checked" : null)" />
+                                        <label for="checkbox-source-node-collection-@nodeCollection.Id" class="custom-control-label"></label>
+                                    </div>
+                                </td>
+                                <td class="text-left text-break">
+                                    <span title="@nodeCollection.Name" class="font-weight-bold">@nodeCollection.Name</span>
+                                </td>
+                                <td class="text-center text-break">
+                                    <a asp-page="/Content/Data/NodeCollections/Details" asp-route-id="@nodeCollection.Id" title="Details" target="_blank" rel="nofollow noopener noreferrer">
+                                        <span>Details</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-bullseye"></i></span>
+                </div>
+                <div>
+                    <span>Target data</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the target data to be used by the new analysis. Namely, the target nodes used by the new analysis should be defined here.</span>
+            </div>
+            <div class="file-group" data-type="nodes">
+                <div class="form-group" hidden>
+                    <label asp-for="Input.TargetData" class="font-weight-bold">Source nodes</label>
+                    <textarea asp-for="Input.TargetData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.TargetData" class="text-muted small">The nodes to be used as target nodes by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.TargetData" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <div class="row align-items-center mb-2">
+                        <div class="col-lg-4">
+                            <label for="data-textarea" class="font-weight-bold mb-0">Data</label>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row align-items-center">
+                                <div class="col-6 col-form-label-sm text-right">
+                                    <label for="data-line-separator" class="font-weight-normal mb-0">Line separator:</label>
+                                </div>
+                                <div class="col-6 text-left">
+                                    <select id="data-line-separator" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                        <option value=",">comma (",")</option>
+                                        <option value=";">semicolon (";")</option>
+                                        <option value="\t">tab ("\t")</option>
+                                        <option value="\s">space (" ")</option>
+                                        <option value="\n" selected>new line ("\n")</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="data-textarea" class="form-control file-group-text mb-2"></textarea>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input file-group-file-upload" />
+                        <label class="custom-file-label file-group-file-label">Choose file</label>
+                    </div>
+                    <span class="text-muted small">The target nodes of the new analysis. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (Model.View.TargetNodeCollections.Any())
+    {
+        <div class="card mb-3">
+            <div class="card-header font-weight-bold">
+                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                    <div>
+                        <span><i class="fas fa-folder"></i></span>
+                    </div>
+                    <div>
+                        <span>Target node collections</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info text-justify text-wrap">
+                    <span><i class="fas fa-info-circle"></i></span>
+                    <span>This section contains the node collections which can be used as additional target nodes by the new analysis.</span>
+                </div>
+                <table class="table table-hover table-bordered table-datatable item-group" data-order="[[1]]">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" id="checkbox-target-node-collection-select" class="custom-control-input item-group-select" title="Select" />
+                                    <label for="checkbox-target-node-collection-select" class="custom-control-label"></label>
+                                </div>
+                            </th>
+                            <th class="text-left text-break">
+                                <span>Node collection</span>
+                            </th>
+                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                <span>Links</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var nodeCollection in Model.View.TargetNodeCollections)
+                        {
+                            <tr class="item-group-item">
+                                <td class="text-center text-break">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" id="checkbox-target-node-collection-@nodeCollection.Id" name="Input.TargetNodeCollectionIds" value="@nodeCollection.Id" class="custom-control-input item-group-item-checkbox" title="Select" checked="@(Model.Input.TargetNodeCollectionIds != null && Model.Input.TargetNodeCollectionIds.Contains(nodeCollection.Id) ? "checked" : null)" />
+                                        <label for="checkbox-target-node-collection-@nodeCollection.Id" class="custom-control-label"></label>
+                                    </div>
+                                </td>
+                                <td class="text-left text-break">
+                                    <span title="@nodeCollection.Name" class="font-weight-bold">@nodeCollection.Name</span>
+                                </td>
+                                <td class="text-center text-break">
+                                    <a asp-page="/Content/Data/NodeCollections/Details" asp-route-id="@nodeCollection.Id" title="Details" target="_blank" rel="nofollow noopener noreferrer">
+                                        <span>Details</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-code"></i></span>
+                </div>
+                <div>
+                    <span>Parameters</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the parameters of the algorithm used by the new analysis.</span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.MaximumIterations" class="font-weight-bold">Maximum iterations</label>
+                <input asp-for="Input.MaximumIterations" class="form-control" />
+                <span asp-description-for="Input.MaximumIterations" class="text-muted small">The maximum number of iterations for which the analysis to run.</span>
+                <span asp-validation-for="Input.MaximumIterations" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.MaximumIterationsWithoutImprovement" class="font-weight-bold">Maximum iterations without improvement</label>
+                <input asp-for="Input.MaximumIterationsWithoutImprovement" class="form-control" />
+                <span asp-description-for="Input.MaximumIterationsWithoutImprovement" class="text-muted small">The maximum number of iterations without improvement in the size of the best solution for which the analysis to run.</span>
+                <span asp-validation-for="Input.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
+            </div>
+            @if (Model.View.Algorithm == NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm.Algorithm1)
+            {
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm1Parameters.RandomSeed" class="font-weight-bold">Random seed</label>
+                    <input asp-for="Input.Algorithm1Parameters.RandomSeed" class="form-control" />
+                    <span asp-description-for="Input.Algorithm1Parameters.RandomSeed" class="text-muted small">The random seed to be used throughout the algorithm.</span>
+                    <span asp-validation-for="Input.Algorithm1Parameters.RandomSeed" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm1Parameters.MaximumPathLength" class="font-weight-bold">Maximum path length</label>
+                    <input asp-for="Input.Algorithm1Parameters.MaximumPathLength" class="form-control" />
+                    <span asp-description-for="Input.Algorithm1Parameters.MaximumPathLength" class="text-muted small">The maximum length of any path between a source node and a target node.</span>
+                    <span asp-validation-for="Input.Algorithm1Parameters.MaximumPathLength" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm1Parameters.Repeats" class="font-weight-bold">Repeats</label>
+                    <input asp-for="Input.Algorithm1Parameters.Repeats" class="form-control" />
+                    <span asp-description-for="Input.Algorithm1Parameters.Repeats" class="text-muted small">The number of times that each heuristic will be repeated in one iteration.</span>
+                    <span asp-validation-for="Input.Algorithm1Parameters.Repeats" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm1Parameters.Heuristics" class="font-weight-bold">Heuristics</label>
+                    <textarea asp-for="Input.Algorithm1Parameters.Heuristics" class="form-control"></textarea>
+                    <span asp-description-for="Input.Algorithm1Parameters.Heuristics" class="text-muted small">The search heuristics.</span>
+                    <span asp-validation-for="Input.Algorithm1Parameters.Heuristics" class="text-danger small"></span>
+                </div>
+            }
+            else if (Model.View.Algorithm == NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm.Algorithm2)
+            {
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm2Parameters.RandomSeed" class="font-weight-bold">Random seed</label>
+                    <input asp-for="Input.Algorithm2Parameters.RandomSeed" class="form-control" />
+                    <span asp-description-for="Input.Algorithm2Parameters.RandomSeed" class="text-muted small">The random seed to be used throughout the algorithm.</span>
+                    <span asp-validation-for="Input.Algorithm2Parameters.RandomSeed" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm1Parameters.MaximumPathLength" class="font-weight-bold">Maximum path length</label>
+                    <input asp-for="Input.Algorithm1Parameters.MaximumPathLength" class="form-control" />
+                    <span asp-description-for="Input.Algorithm1Parameters.MaximumPathLength" class="text-muted small">The maximum length of any path between a source node and a target node.</span>
+                    <span asp-validation-for="Input.Algorithm1Parameters.MaximumPathLength" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm2Parameters.PopulationSize" class="font-weight-bold">Population size</label>
+                    <input asp-for="Input.Algorithm2Parameters.PopulationSize" class="form-control" />
+                    <span asp-description-for="Input.Algorithm2Parameters.PopulationSize" class="text-muted small">The number of chromosomes in each population.</span>
+                    <span asp-validation-for="Input.Algorithm2Parameters.PopulationSize" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm2Parameters.RandomGenesPerChromosome" class="font-weight-bold">Random genes per chromosome</label>
+                    <input asp-for="Input.Algorithm2Parameters.RandomGenesPerChromosome" class="form-control" />
+                    <span asp-description-for="Input.Algorithm2Parameters.RandomGenesPerChromosome" class="text-muted small">The maximum number of genes whose value can be simultaneously randomly generated.</span>
+                    <span asp-validation-for="Input.Algorithm2Parameters.RandomGenesPerChromosome" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm2Parameters.PercentageRandom" class="font-weight-bold">Percentage random</label>
+                    <input asp-for="Input.Algorithm2Parameters.PercentageRandom" class="form-control" />
+                    <span asp-description-for="Input.Algorithm2Parameters.PercentageRandom" class="text-muted small">The percentage of a population which is composed of randomly generated chromosomes.</span>
+                    <span asp-validation-for="Input.Algorithm2Parameters.PercentageRandom" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm2Parameters.PercentageElite" class="font-weight-bold">Percentage elite</label>
+                    <input asp-for="Input.Algorithm2Parameters.PercentageElite" class="form-control" />
+                    <span asp-description-for="Input.Algorithm2Parameters.PercentageElite" class="text-muted small">The percentage of a population which is composed of the elite chromosomes of the previous population.</span>
+                    <span asp-validation-for="Input.Algorithm2Parameters.PercentageElite" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm2Parameters.ProbabilityMutation" class="font-weight-bold">Probability of mutation</label>
+                    <input asp-for="Input.Algorithm2Parameters.ProbabilityMutation" class="form-control" />
+                    <span asp-description-for="Input.Algorithm2Parameters.ProbabilityMutation" class="text-muted small">The probability of mutation for each gene of a chromosome.</span>
+                    <span asp-validation-for="Input.Algorithm2Parameters.ProbabilityMutation" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm2Parameters.CrossoverType" class="font-weight-bold">Crossover algorithm</label>
+                    <select asp-for="Input.Algorithm2Parameters.CrossoverType" class="custom-select">
+                        @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Algorithm2.CrossoverType)).Cast<Helpers.Algorithms.Algorithm2.CrossoverType>())
+                        {
+                            <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                        }
+                    </select>
+                    <span asp-description-for="Input.Algorithm2Parameters.CrossoverType" class="text-muted small">The crossover algorithm to be used.</span>
+                    <span asp-validation-for="Input.Algorithm2Parameters.CrossoverType" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Algorithm2Parameters.MutationType" class="font-weight-bold">Mutation algorithm</label>
+                    <select asp-for="Input.Algorithm2Parameters.MutationType" class="custom-select">
+                        @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Algorithm2.MutationType)).Cast<Helpers.Algorithms.Algorithm2.MutationType>())
+                        {
+                            <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                        }
+                    </select>
+                    <span asp-description-for="Input.Algorithm2Parameters.MutationType" class="text-muted small">The mutation algorithm to be used.</span>
+                    <span asp-validation-for="Input.Algorithm2Parameters.MutationType" class="text-danger small"></span>
+                </div>
+            }
+        </div>
+    </div>
+    <button type="submit" class="btn btn-block btn-success" title="Create">
+        <span>Create</span>
+    </button>
+</form>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+}
