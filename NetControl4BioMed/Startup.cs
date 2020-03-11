@@ -101,6 +101,7 @@ namespace NetControl4BioMed
             services.AddTransient<IPartialViewRenderer, PartialViewRenderer>();
             services.AddTransient<IReCaptchaChecker, ReCaptchaChecker>();
             services.AddTransient<ISendGridEmailSender, SendGridEmailSender>();
+            services.AddTransient<IAnalysisRunner, AnalysisRunner>();
             // Add Razor pages.
             services.AddRazorPages();
         }

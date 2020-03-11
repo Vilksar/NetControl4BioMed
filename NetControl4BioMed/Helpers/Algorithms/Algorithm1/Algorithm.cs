@@ -107,6 +107,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             var maximumIterationsWithoutImprovement = analysis.MaximumIterationsWithoutImprovement;
             var bestSolutionSize = targets.Count() + 1;
             var bestControlPaths = new List<Dictionary<string, List<string>>>();
+            var heuristics = JsonSerializer.Deserialize<List<List<string>>>(parameters.Heuristics);
             // Update the analysis status.
             analysis.Status = AnalysisStatus.Ongoing;
             // Save the changes in the database.
@@ -169,7 +170,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                         }
                         // We determine a maximal matching by computing several maximum matchings, in steps, for each heuristic.
                         var matchedEdges = new List<(string, string)>();
-                        foreach (var heuristic in parameters.Heuristics)
+                        foreach (var heuristic in heuristics)
                         {
                             // The left nodes, right nodes, and edges of the current matching.
                             var left = new List<string>(); left.AddRange(free);
