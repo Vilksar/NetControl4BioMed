@@ -1,5 +1,6 @@
 ﻿@page
 @model IndexModel
+@using Helpers.Extensions
 @{
     ViewData["Title"] = "Analysis details";
 }
@@ -7,37 +8,37 @@
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetAnalysisNavigationTitleCard(Model.View.Analysis)" />
 <div class="card mb-3">
     <div class="card-body text-center">
-        <div class="text-uppercase">
+        <div class="text-uppercase" title="Status">
             @switch (Model.View.Analysis.Status)
             {
                 case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Scheduled:
-                    <span title="@Model.View.Analysis.Status.ToString()" class="text-warning"><i class="fas fa-clock"></i></span>
+                    <span class="text-warning"><i class="fas fa-clock"></i></span>
                     break;
                 case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Initializing:
-                    <span title="@Model.View.Analysis.Status.ToString()" class="text-primary"><i class="fas fa-play-circle"></i></span>
+                    <span class="text-primary"><i class="fas fa-play-circle"></i></span>
                     break;
                 case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Ongoing:
-                    <span title="@Model.View.Analysis.Status.ToString()" class="text-primary"><i class="fas fa-sync-alt fa-spin"></i></span>
+                    <span class="text-primary"><i class="fas fa-sync-alt fa-spin"></i></span>
                     break;
                 case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Stopping:
-                    <span title="@Model.View.Analysis.Status.ToString()" class="text-danger"><i class="fas fa-stopwatch"></i></span>
+                    <span class="text-danger"><i class="fas fa-stopwatch"></i></span>
                     break;
                 case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Stopped:
-                    <span title="@Model.View.Analysis.Status.ToString()" class="text-danger"><i class="fas fa-stop-circle"></i></span>
+                    <span class="text-danger"><i class="fas fa-stop-circle"></i></span>
                     break;
                 case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Completed:
-                    <span title="@Model.View.Analysis.Status.ToString()" class="text-success"><i class="fas fa-check-circle"></i></span>
+                    <span class="text-success"><i class="fas fa-check-circle"></i></span>
                     break;
                 case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Error:
-                    <span title="@Model.View.Analysis.Status.ToString()" class="text-danger"><i class="fas fa-times-circle"></i></span>
+                    <span class="text-danger"><i class="fas fa-times-circle"></i></span>
                     break;
                 default:
                     break;
             }
-            <span title="Status">@Model.View.Analysis.Status.ToString()</span>
+            <span title="@Model.View.Analysis.Status.GetDisplayDescription()">@Model.View.Analysis.Status.GetDisplayName()</span>
         </div>
         <div class="font-weight-bold">
-            <span title="Progress">@Math.Round((double)Model.View.Analysis.CurrentIteration * 100 / Model.View.Analysis.MaximumIterations, 2) / @Math.Round((double)Model.View.Analysis.CurrentIterationWithoutImprovement * 100 / Model.View.Analysis.MaximumIterationsWithoutImprovement, 2)</span>
+            <span title="Progress">@(Math.Round((double)Model.View.Analysis.CurrentIteration * 100 / Model.View.Analysis.MaximumIterations, 2).ToString("0.00"))% / @(Math.Round((double)Model.View.Analysis.CurrentIterationWithoutImprovement * 100 / Model.View.Analysis.MaximumIterationsWithoutImprovement, 2).ToString("0.00"))%</span>
         </div>
     </div>
 </div>
@@ -98,17 +99,52 @@
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
-                <span><i class="fas fa-code"></i></span>
+                <span><i class="fas fa-spinner"></i></span>
             </div>
             <div>
-                <span>Parameters</span>
+                <span>Progress</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="alert alert-primary text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The parameters of used by the analysis algorithm are displayed below.</span>
+            <span>The status and the current progress of the analysis are displayed below.</span>
+        </div>
+        <div class="form-group">
+            <label asp-for="View.Analysis.Status" class="font-weight-bold">Status</label>
+            <select asp-for="View.Analysis.Status" class="custom-select" disabled="disabled">
+                @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisStatus)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisStatus>())
+                {
+                    <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                }
+            </select>
+            <span asp-description-for="View.Analysis.Status" class="text-muted small">The current status of the analysis.</span>
+            <span asp-validation-for="View.Analysis.Status" class="text-danger small"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="View.Analysis.CurrentIteration" class="font-weight-bold">Current iteration</label>
+            <input asp-for="View.Analysis.CurrentIteration" class="form-control" disabled="disabled" />
+            <span asp-description-for="View.Analysis.CurrentIteration" class="text-muted small">The number of iterations for which the analysis has ran so far.</span>
+            <span asp-validation-for="View.Analysis.CurrentIteration" class="text-danger small"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="View.Analysis.CurrentIterationWithoutImprovement" class="font-weight-bold">Current iteration without improvement</label>
+            <input asp-for="View.Analysis.CurrentIterationWithoutImprovement" class="form-control" disabled="disabled" />
+            <span asp-description-for="View.Analysis.CurrentIterationWithoutImprovement" class="text-muted small">The number of iterations without improvement for which the analysis has ran so far.</span>
+            <span asp-validation-for="View.Analysis.CurrentIterationWithoutImprovement" class="text-danger small"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="View.Analysis.MaximumIterations" class="font-weight-bold">Maximum iterations</label>
+            <input asp-for="View.Analysis.MaximumIterations" class="form-control" disabled="disabled" />
+            <span asp-description-for="View.Analysis.MaximumIterations" class="text-muted small">The maximum number of iterations for which the analysis to run.</span>
+            <span asp-validation-for="View.Analysis.MaximumIterations" class="text-danger small"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="View.Analysis.MaximumIterationsWithoutImprovement" class="font-weight-bold">Maximum iterations without improvement</label>
+            <input asp-for="View.Analysis.MaximumIterationsWithoutImprovement" class="form-control" disabled="disabled" />
+            <span asp-description-for="View.Analysis.MaximumIterationsWithoutImprovement" class="text-muted small">The maximum number of iterations without improvement in the size of the best solution for which the analysis to run.</span>
+            <span asp-validation-for="View.Analysis.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
         </div>
     </div>
 </div>
@@ -124,18 +160,113 @@
         </div>
     </div>
     <div class="card-body">
+        <div class="alert alert-primary text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The parameters used by the algorithm corresponding to the analysis are displayed below.</span>
+        </div>
         <div class="form-group">
             <label asp-for="View.Analysis.Algorithm" class="font-weight-bold">Algorithm</label>
-            <input asp-for="View.Analysis.Algorithm" class="form-control" value="@Model.View.Analysis.Algorithm.ToString()" readonly />
-            <span asp-description-for="View.Analysis.Algorithm" class="text-muted small">The algorithm used in running the analysis.</span>
+            <select asp-for="View.Analysis.Algorithm" class="custom-select" disabled="disabled">
+                @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
+                {
+                    <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                }
+            </select>
+            <span asp-description-for="View.Analysis.Algorithm" class="text-muted small">The algorithm used by the analysis.</span>
             <span asp-validation-for="View.Analysis.Algorithm" class="text-danger small"></span>
         </div>
-        @foreach (var parameter in Model.View.Parameters)
+        @if (Model.View.Algorithm1Parameters != null)
         {
             <div class="form-group">
-                <label for="@parameter.Id" class="font-weight-bold">@parameter.Name</label>
-                <input id="@parameter.Id" name="@parameter.Id" class="form-control" value="@parameter.Value" readonly />
-                <span description-for="@parameter.Id" class="text-muted small">@parameter.Description</span>
+                <label asp-for="View.Algorithm1Parameters.RandomSeed" class="font-weight-bold">Random seed</label>
+                <input asp-for="View.Algorithm1Parameters.RandomSeed" class="form-control" disabled="disabled" />
+                <span asp-description-for="View.Algorithm1Parameters.RandomSeed" class="text-muted small">The random seed used throughout the algorithm.</span>
+                <span asp-validation-for="View.Algorithm1Parameters.RandomSeed" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Algorithm1Parameters.MaximumPathLength" class="font-weight-bold">Maximum path length</label>
+                <input asp-for="View.Algorithm1Parameters.MaximumPathLength" class="form-control" disabled="disabled" />
+                <span asp-description-for="View.Algorithm1Parameters.MaximumPathLength" class="text-muted small">The maximum length of any path between a source node and a target node.</span>
+                <span asp-validation-for="View.Algorithm1Parameters.MaximumPathLength" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Algorithm1Parameters.Repeats" class="font-weight-bold">Repeats</label>
+                <input asp-for="View.Algorithm1Parameters.Repeats" class="form-control" disabled="disabled" />
+                <span asp-description-for="View.Algorithm1Parameters.Repeats" class="text-muted small">The number of times that each heuristic will be repeated in one iteration.</span>
+                <span asp-validation-for="View.Algorithm1Parameters.Repeats" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Algorithm1Parameters.Heuristics" class="font-weight-bold">Heuristics</label>
+                <textarea asp-for="View.Algorithm1Parameters.Heuristics" class="form-control" disabled="disabled"></textarea>
+                <span asp-description-for="View.Algorithm1Parameters.Heuristics" class="text-muted small">The search heuristics.</span>
+                <span asp-validation-for="View.Algorithm1Parameters.Heuristics" class="text-danger small"></span>
+            </div>
+        }
+        else if (Model.View.Algorithm2Parameters != null)
+        {
+            <div class="form-group">
+                <label asp-for="View.Algorithm2Parameters.RandomSeed" class="font-weight-bold">Random seed</label>
+                <input asp-for="View.Algorithm2Parameters.RandomSeed" class="form-control" disabled="disabled" />
+                <span asp-description-for="View.Algorithm2Parameters.RandomSeed" class="text-muted small">The random seed to be used throughout the algorithm.</span>
+                <span asp-validation-for="View.Algorithm2Parameters.RandomSeed" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Algorithm1Parameters.MaximumPathLength" class="font-weight-bold">Maximum path length</label>
+                <input asp-for="View.Algorithm1Parameters.MaximumPathLength" class="form-control" disabled="disabled" />
+                <span asp-description-for="View.Algorithm1Parameters.MaximumPathLength" class="text-muted small">The maximum length of any path between a source node and a target node.</span>
+                <span asp-validation-for="View.Algorithm1Parameters.MaximumPathLength" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Algorithm2Parameters.PopulationSize" class="font-weight-bold">Population size</label>
+                <input asp-for="View.Algorithm2Parameters.PopulationSize" class="form-control" disabled="disabled" />
+                <span asp-description-for="View.Algorithm2Parameters.PopulationSize" class="text-muted small">The number of chromosomes in each population.</span>
+                <span asp-validation-for="View.Algorithm2Parameters.PopulationSize" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Algorithm2Parameters.RandomGenesPerChromosome" class="font-weight-bold">Random genes per chromosome</label>
+                <input asp-for="View.Algorithm2Parameters.RandomGenesPerChromosome" class="form-control" disabled="disabled" />
+                <span asp-description-for="View.Algorithm2Parameters.RandomGenesPerChromosome" class="text-muted small">The maximum number of genes whose value can be simultaneously randomly generated.</span>
+                <span asp-validation-for="View.Algorithm2Parameters.RandomGenesPerChromosome" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Algorithm2Parameters.PercentageRandom" class="font-weight-bold">Percentage random</label>
+                <input asp-for="View.Algorithm2Parameters.PercentageRandom" class="form-control" disabled="disabled" />
+                <span asp-description-for="View.Algorithm2Parameters.PercentageRandom" class="text-muted small">The percentage of a population which is composed of randomly generated chromosomes.</span>
+                <span asp-validation-for="View.Algorithm2Parameters.PercentageRandom" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Algorithm2Parameters.PercentageElite" class="font-weight-bold">Percentage elite</label>
+                <input asp-for="View.Algorithm2Parameters.PercentageElite" class="form-control" disabled="disabled" />
+                <span asp-description-for="View.Algorithm2Parameters.PercentageElite" class="text-muted small">The percentage of a population which is composed of the elite chromosomes of the previous population.</span>
+                <span asp-validation-for="View.Algorithm2Parameters.PercentageElite" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Algorithm2Parameters.ProbabilityMutation" class="font-weight-bold">Probability of mutation</label>
+                <input asp-for="View.Algorithm2Parameters.ProbabilityMutation" class="form-control" disabled="disabled" />
+                <span asp-description-for="View.Algorithm2Parameters.ProbabilityMutation" class="text-muted small">The probability of mutation for each gene of a chromosome.</span>
+                <span asp-validation-for="View.Algorithm2Parameters.ProbabilityMutation" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Algorithm2Parameters.CrossoverType" class="font-weight-bold">Crossover algorithm</label>
+                <select asp-for="View.Algorithm2Parameters.CrossoverType" class="custom-select" disabled="disabled">
+                    @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Algorithm2.CrossoverType)).Cast<Helpers.Algorithms.Algorithm2.CrossoverType>())
+                    {
+                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                    }
+                </select>
+                <span asp-description-for="View.Algorithm2Parameters.CrossoverType" class="text-muted small">The crossover algorithm to be used.</span>
+                <span asp-validation-for="View.Algorithm2Parameters.CrossoverType" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Algorithm2Parameters.MutationType" class="font-weight-bold">Mutation algorithm</label>
+                <select asp-for="View.Algorithm2Parameters.MutationType" class="custom-select" disabled="disabled">
+                    @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Algorithm2.MutationType)).Cast<Helpers.Algorithms.Algorithm2.MutationType>())
+                    {
+                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                    }
+                </select>
+                <span asp-description-for="View.Algorithm2Parameters.MutationType" class="text-muted small">The mutation algorithm to be used.</span>
+                <span asp-validation-for="View.Algorithm2Parameters.MutationType" class="text-danger small"></span>
             </div>
         }
     </div>

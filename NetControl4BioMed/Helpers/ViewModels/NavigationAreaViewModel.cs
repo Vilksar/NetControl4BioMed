@@ -693,7 +693,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             {
                 new NavigationGroupViewModel
                 {
-                    Id = "AnalysisIndex",
+                    Id = "Index",
                     Title = "Overview",
                     Description = string.Empty,
                     Icon = "fa-chart-bar",
@@ -702,93 +702,93 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "AnalysisAccounts",
+                    Id = "Accounts",
                     Title = "Accounts",
                     Description = string.Empty,
                     Icon = "fa-user",
                     Color = "dark",
-                    Link = "/Content/Created/Analyses/Details/Index",
+                    Link = "/Content/Created/Analyses/Details/Accounts/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "AnalysisUsers",
+                            Id = "Users",
                             Title = "Users",
                             Description = string.Empty,
                             Icon = "fa-user",
                             Color = "light",
-                            Link = "/Content/Created/Analyses/Details/Users"
+                            Link = "/Content/Created/Analyses/Details/Accounts/Users/Index"
                         }
                     }
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "AnalysisDatabases",
+                    Id = "Databases",
                     Title = "Databases",
                     Description = string.Empty,
                     Icon = "fa-database",
                     Color = "dark",
-                    Link = "/Content/Created/Analyses/Details/Index",
+                    Link = "/Content/Created/Analyses/Details/Databases/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "AnalysisDatabases",
+                            Id = "Databases",
                             Title = "Databases",
                             Description = string.Empty,
                             Icon = "fa-database",
                             Color = "light",
-                            Link = "/Content/Created/Analyses/Details/Databases"
+                            Link = "/Content/Created/Analyses/Details/Databases/Databases/Index"
                         }
                     }
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "AnalysisData",
+                    Id = "Data",
                     Title = "Data",
                     Description = string.Empty,
                     Icon = "fa-table",
                     Color = "dark",
-                    Link = "/Content/Created/Analyses/Details/Index",
+                    Link = "/Content/Created/Analyses/Details/Data/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "AnalysisNodes",
+                            Id = "Nodes",
                             Title = "Nodes",
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
-                            Link = "/Content/Created/Analyses/Details/Nodes"
+                            Link = "/Content/Created/Analyses/Details/Data/Nodes/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "AnalysisEdges",
+                            Id = "Edges",
                             Title = "Edges",
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
-                            Link = "/Content/Created/Analyses/Details/Edges"
+                            Link = "/Content/Created/Analyses/Details/Data/Edges/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "AnalysisNodeCollections",
+                            Id = "NodeCollections",
                             Title = "Node collections",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
-                            Link = "/Content/Created/Analyses/Details/NodeCollections"
+                            Link = "/Content/Created/Analyses/Details/Data/NodeCollections/Index"
                         }
                     }
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "AnalysisCreated",
+                    Id = "Created",
                     Title = "Created",
                     Description = string.Empty,
                     Icon = "fa-smile",
                     Color = "dark",
-                    Link = "/Content/Created/Analyses/Details/Index",
+                    Link = "/Content/Created/Analyses/Details/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
@@ -798,7 +798,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-desktop",
                             Color = "light",
-                            Link = "/Content/Created/Analyses/Details/Networks"
+                            Link = "/Content/Created/Analyses/Details/Created/Networks/Index"
                         }
                     }
                 }

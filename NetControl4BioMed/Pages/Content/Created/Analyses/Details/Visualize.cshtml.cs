@@ -68,6 +68,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                 .Where(item => item.Id == id)
                 .Include(item => item.AnalysisNodes)
                     .ThenInclude(item => item.Node)
+                        .ThenInclude(item => item.DatabaseNodeFieldNodes)
+                            .ThenInclude(item => item.DatabaseNodeField)
                 .Include(item => item.AnalysisEdges)
                     .ThenInclude(item => item.Edge)
                         .ThenInclude(item => item.EdgeNodes)

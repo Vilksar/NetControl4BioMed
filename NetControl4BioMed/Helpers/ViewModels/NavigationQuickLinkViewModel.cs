@@ -304,7 +304,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AnalysisUserInvitationsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "UserInvitations",
-            Title = "User invitations",
+            Title = "User invitation",
             Color = "primary",
             Icon = "fa-envelope-open",
             Width = 6,

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
@@ -17,7 +18,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// <summary>
         /// Gets or sets the random seed to be used throughout the algorithm.
         /// </summary>
-        [Display(Name = "Random seed", Description = "The random seed to be used throughout the algorithm.")]
         [Range(0, int.MaxValue, ErrorMessage = "The value must be a positive integer.")]
         [Required(ErrorMessage = "This field is required.")]
         public int RandomSeed { get; set; } = new Random().Next();
@@ -25,7 +25,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// <summary>
         /// Gets or sets the maximum length of any path between a source node and a target node.
         /// </summary>
-        [Display(Name = "Maximum path length", Description = "The maximum length of any path between a source node and a target node.")]
         [Range(0, 25, ErrorMessage = "The value must be between {1} and {2}.")]
         [Required(ErrorMessage = "This field is required.")]
         public int MaximumPathLength { get; set; } = 0;
@@ -33,7 +32,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// <summary>
         /// Gets or sets the number of times that each heuristic will be repeated in one iteration..
         /// </summary>
-        [Display(Name = "Repeats", Description = "The number of times that each heuristic will be repeated in one iteration.")]
         [Range(1, 3, ErrorMessage = "The value must be between {1} and {2}.")]
         [Required(ErrorMessage = "This field is required.")]
         public int Repeats { get; set; } = 1;
@@ -42,7 +40,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// Gets or sets the search heuristics.
         /// </summary>
         [DataType(DataType.MultilineText)]
-        [Display(Name = "Heuristics", Description = "The search heuristics.")]
         [Required(ErrorMessage = "This field is required.")]
         public string Heuristics { get; set; } = JsonSerializer.Serialize(new List<List<string>>
         {
@@ -80,7 +77,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// <summary>
         /// Gets the possible heuristics.
         /// </summary>
-        public static Dictionary<string, string> PossibleHeuristics { get; } = new Dictionary<string, string>()
+        [JsonIgnore]
+        private static Dictionary<string, string> PossibleHeuristics { get; } = new Dictionary<string, string>()
         {
             { "A", "Previously seen edges coming from drug-target nodes" },
             { "B", "Edges to any drug target node" },

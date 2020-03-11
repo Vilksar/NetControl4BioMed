@@ -1,5 +1,6 @@
 ﻿@page
 @model IndexModel
+@using Helpers.Extensions
 @{
     ViewData["Title"] = "Analyses";
 }
@@ -8,12 +9,18 @@
 <partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
 <form method="get" class="text-justify">
     <div class="row align-items-center">
-        <div class="col-lg-4 mb-3">
+        <div class="col-lg-12 mb-3">
             <div class="input-group">
                 <select name="databaseTypeId" class="custom-select">
                     @foreach (var item in Model.View.DatabaseTypes)
                     {
-                        <option value="@item.Id">@item.Name</option>
+                        <option value="@item.Id" title="@item.Description">@item.Name</option>
+                    }
+                </select>
+                <select name="algorithm" class="custom-select">
+                    @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
+                    {
+                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
                     }
                 </select>
                 <div class="input-group-append">
@@ -24,13 +31,15 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 mb-3">
+    </div>
+    <div class="row align-items-center">
+        <div class="col-lg-6 mb-3">
             <button type="submit" asp-page="/Content/Created/Analyses/Download" class="btn btn-primary btn-block item-group-button" title="Download" disabled>
                 <span><i class="fas fa-download"></i></span>
                 <span>Download</span>
             </button>
         </div>
-        <div class="col-lg-4 mb-3">
+        <div class="col-lg-6 mb-3">
             <button type="submit" asp-page="/Content/Created/Analyses/Delete" class="btn btn-danger btn-block item-group-button" title="Delete" disabled>
                 <span><i class="fas fa-trash"></i></span>
                 <span>Delete</span>
