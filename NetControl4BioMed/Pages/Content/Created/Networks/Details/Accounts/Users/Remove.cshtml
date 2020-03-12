@@ -88,12 +88,7 @@
                                     <span title="@item.Email" class="font-weight-bold">@item.Email</span>
                                 </td>
                                 <td class="d-none d-lg-table-cell text-center text-break">
-                                    <div>
-                                        <span title="@item.DateTimeCreated.ToShortDateString()">@item.DateTimeCreated.ToShortDateString()</span>
-                                    </div>
-                                    <div>
-                                        <span title="@item.DateTimeCreated.ToShortTimeString()">@item.DateTimeCreated.ToShortTimeString()</span>
-                                    </div>
+                                    <span title="@item.DateTimeCreated.ToString()">@item.DateTimeCreated.ToString()</span>
                                 </td>
                             </tr>
                         }

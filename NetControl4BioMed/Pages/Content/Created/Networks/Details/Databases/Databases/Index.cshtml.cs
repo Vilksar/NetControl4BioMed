@@ -34,8 +34,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Databases.Dat
         {
             public Network Network { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public SearchViewModel<NetworkDatabase> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
@@ -80,16 +78,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Databases.Dat
             // Get the items with the provided ID.
             var items = _context.Networks
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.NetworkDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .AsQueryable();
+                .Where(item => item.Id == id);
             // Check if there were no items found.
-            if (items == null || items.Count() != 1)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
@@ -136,9 +130,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Databases.Dat
             // Define the view.
             View = new ViewModel
             {
-                Network = items.First(),
-                IsGeneric = items.First().NetworkDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
+                Network = items
+                    .First(),
                 Search = new SearchViewModel<NetworkDatabase>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.

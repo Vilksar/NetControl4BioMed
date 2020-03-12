@@ -27,9 +27,12 @@ else
                 <th class="text-left text-break">
                     <span>ID</span>
                 </th>
-                <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                    <span>Links</span>
-                </th>
+                @if (!Model.View.IsGeneric)
+                {
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <span>Links</span>
+                    </th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -45,11 +48,14 @@ else
                     <td class="text-left text-break">
                         <span title="@item.Edge.Id" class="small text-muted">@item.Edge.Id</span>
                     </td>
-                    <td class="text-center text-break">
-                        <a asp-page="/Content/Data/Edges/Details" asp-route-id="@item.Edge.Id" title="Details">
-                            <span>Details</span>
-                        </a>
-                    </td>
+                    @if (!Model.View.IsGeneric)
+                    {
+                        <td class="text-center text-break">
+                            <a asp-page="/Content/Data/Edges/Details" asp-route-id="@item.Edge.Id" title="Details">
+                                <span>Details</span>
+                            </a>
+                        </td>
+                    }
                 </tr>
             }
         </tbody>

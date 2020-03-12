@@ -33,9 +33,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.Edges
 
         public class ViewModel
         {
-            public Network Network { get; set; }
-
             public bool IsGeneric { get; set; }
+
+            public Network Network { get; set; }
 
             public SearchViewModel<NetworkEdge> Search { get; set; }
 
@@ -94,10 +94,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.Edges
                         .ThenInclude(item => item.DatabaseType)
                 .AsQueryable();
             // Check if there were no items found.
-            if (items == null || items.Count() != 1)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
@@ -171,9 +171,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.Edges
             // Define the view.
             View = new ViewModel
             {
+                IsGeneric = items
+                    .Any(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic")),
                 Network = items.First(),
-                IsGeneric = items.First().NetworkDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 Search = new SearchViewModel<NetworkEdge>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.

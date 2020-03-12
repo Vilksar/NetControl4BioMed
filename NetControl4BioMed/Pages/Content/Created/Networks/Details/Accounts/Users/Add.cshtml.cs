@@ -55,8 +55,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
         public class ViewModel
         {
             public Network Network { get; set; }
-
-            public bool IsGeneric { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -83,27 +81,20 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
             var items = _context.Networks
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id)
-                .Include(item => item.NetworkDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .Include(item => item.NetworkUsers)
-                    .ThenInclude(item => item.User)
-                .Include(item => item.NetworkUserInvitations)
                 .AsQueryable();
             // Check if there were no items found.
-            if (items == null || items.Count() != 1)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Network = items.First(),
-                IsGeneric = items.First().NetworkDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic")
+                Network = items
+                    .First()
             };
             // Define the input.
             Input = new InputModel
@@ -138,27 +129,23 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
             var items = _context.Networks
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id)
-                .Include(item => item.NetworkDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .Include(item => item.NetworkUsers)
-                    .ThenInclude(item => item.User)
-                .Include(item => item.NetworkUserInvitations)
                 .AsQueryable();
             // Check if there were no items found.
-            if (items == null || items.Count() != 1)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Network = items.First(),
-                IsGeneric = items.First().NetworkDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic")
+                Network = items
+                    .Include(item => item.NetworkUsers)
+                        .ThenInclude(item => item.User)
+                    .Include(item => item.NetworkUserInvitations)
+                    .First()
             };
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
