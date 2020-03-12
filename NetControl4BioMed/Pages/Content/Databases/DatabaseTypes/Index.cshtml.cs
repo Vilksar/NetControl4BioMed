@@ -78,7 +78,6 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseTypes
             }
             // Start with all of the items to which the user has access.
             var query = _context.DatabaseTypes
-                .Where(item => item.Name != "Generic")
                 .AsQueryable();
             // Select the results matching the search string.
             query = query

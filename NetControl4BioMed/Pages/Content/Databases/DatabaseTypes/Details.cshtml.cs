@@ -28,9 +28,11 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseTypes
 
         public class ViewModel
         {
+            public bool IsGeneric { get; set; }
+
             public DatabaseType DatabaseType { get; set; }
 
-            public IEnumerable<Database> Databases { get; set; }
+            public IQueryable<Database> Databases { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -54,26 +56,27 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseTypes
                 return RedirectToPage("/Content/Databases/DatabaseTypes/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.DatabaseTypes
-                .Where(item => item.Name != "Generic")
-                .Where(item => item.Id == id)
-                .Include(item => item.Databases)
-                    .ThenInclude(item => item.DatabaseUsers)
-                .FirstOrDefault();
+            var items = _context.DatabaseTypes
+                .Where(item => item.Id == id);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Databases/DatabaseTypes/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                DatabaseType = item,
-                Databases = item.Databases
-                    .Where(item1 => item1.IsPublic || item1.DatabaseUsers.Any(item2 => item2.User == user))
+                IsGeneric = items
+                    .Any(item => item.Name == "Generic"),
+                DatabaseType = items
+                    .First(),
+                Databases = items
+                    .Select(item => item.Databases)
+                    .SelectMany(item => item)
+                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
             };
             // Return the page.
             return Page();

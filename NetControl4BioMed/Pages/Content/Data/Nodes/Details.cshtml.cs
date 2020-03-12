@@ -30,13 +30,13 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
         {
             public Node Node { get; set; }
 
-            public IEnumerable<DatabaseNode> DatabaseNodes { get; set; }
+            public IQueryable<DatabaseNode> DatabaseNodes { get; set; }
 
-            public IEnumerable<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }
+            public IQueryable<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }
 
-            public IEnumerable<EdgeNode> EdgeNodes { get; set; }
+            public IQueryable<EdgeNode> EdgeNodes { get; set; }
 
-            public IEnumerable<NodeCollectionNode> NodeCollectionNodes { get; set; }
+            public IQueryable<NodeCollectionNode> NodeCollectionNodes { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -60,58 +60,45 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
                 return RedirectToPage("/Content/Data/Nodes/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.Nodes
+            var items = _context.Nodes
                 .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                 .Where(item => item.DatabaseNodes.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                .Where(item => item.Id == id)
-                .Include(item => item.DatabaseNodes)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseUsers)
-                .Include(item => item.DatabaseNodeFieldNodes)
-                    .ThenInclude(item => item.DatabaseNodeField)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseUsers)
-                                    .ThenInclude(item => item.User)
-                .Include(item => item.EdgeNodes)
-                    .ThenInclude(item => item.Edge)
-                        .ThenInclude(item => item.DatabaseEdges)
-                            .ThenInclude(item => item.Database)
-                                .ThenInclude(item => item.DatabaseType)
-                .Include(item => item.EdgeNodes)
-                    .ThenInclude(item => item.Edge)
-                        .ThenInclude(item => item.DatabaseEdges)
-                            .ThenInclude(item => item.Database)
-                                .ThenInclude(item => item.DatabaseUsers)
-                                    .ThenInclude(item => item.User)
-                .Include(item => item.NodeCollectionNodes)
-                    .ThenInclude(item => item.NodeCollection)
-                        .ThenInclude(item => item.NodeCollectionDatabases)
-                            .ThenInclude(item => item.Database)
-                                .ThenInclude(item => item.DatabaseUsers)
-                                    .ThenInclude(item => item.User)
-                .FirstOrDefault();
+                .Where(item => item.Id == id);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Data/Nodes/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Node = item,
-                DatabaseNodes = item.DatabaseNodes
-                    .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user)),
-                DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes
-                    .Where(item => item.DatabaseNodeField.Database.IsPublic || item.DatabaseNodeField.Database.DatabaseUsers.Any(item1 => item1.User == user)),
-                EdgeNodes = item.EdgeNodes
+                Node = items
+                    .First(),
+                DatabaseNodes = items
+                    .Select(item => item.DatabaseNodes)
+                    .SelectMany(item => item)
+                    .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user))
+                    .Include(item => item.Database),
+                DatabaseNodeFieldNodes = items
+                    .Select(item => item.DatabaseNodeFieldNodes)
+                    .SelectMany(item => item)
+                    .Where(item => item.DatabaseNodeField.Database.IsPublic || item.DatabaseNodeField.Database.DatabaseUsers.Any(item1 => item1.User == user))
+                    .Include(item => item.DatabaseNodeField),
+                EdgeNodes = items
+                    .Select(item => item.EdgeNodes)
+                    .SelectMany(item => item)
                     .Where(item => !item.Edge.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => item.Edge.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                    .Where(item => item.Edge.EdgeNodes.All(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user)))),
-                NodeCollectionNodes = item.NodeCollectionNodes
+                    .Where(item => item.Edge.EdgeNodes.All(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
+                    .Include(item => item.Edge),
+                NodeCollectionNodes = items
+                    .Select(item => item.NodeCollectionNodes)
+                    .SelectMany(item => item)
                     .Where(item => item.NodeCollection.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                    .Include(item => item.NodeCollection)
             };
             // Return the page.
             return Page();

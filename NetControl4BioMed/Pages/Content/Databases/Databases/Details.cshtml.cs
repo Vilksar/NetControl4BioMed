@@ -28,13 +28,15 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
 
         public class ViewModel
         {
+            public bool IsGeneric { get; set; }
+
             public Database Database { get; set; }
 
-            public IEnumerable<DatabaseNodeField> DatabaseNodeFields { get; set; }
+            public IQueryable<DatabaseNodeField> DatabaseNodeFields { get; set; }
 
-            public IEnumerable<DatabaseEdgeField> DatabaseEdgeFields { get; set; }
+            public IQueryable<DatabaseEdgeField> DatabaseEdgeFields { get; set; }
 
-            public IEnumerable<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }
+            public IQueryable<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -58,37 +60,34 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
                 return RedirectToPage("/Content/Databases/Databases/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.Databases
-                .Where(item => item.Name != "Generic")
+            var items = _context.Databases
                 .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.DatabaseType)
-                .Include(item => item.DatabaseNodeFields)
-                    .ThenInclude(item => item.DatabaseNodeFieldNodes)
-                .Include(item => item.DatabaseEdgeFields)
-                    .ThenInclude(item => item.DatabaseEdgeFieldEdges)
-                .Include(item => item.DatabaseNodes)
-                    .ThenInclude(item => item.Node)
-                .Include(item => item.DatabaseEdges)
-                    .ThenInclude(item => item.Edge)
-                .Include(item => item.NodeCollectionDatabases)
-                    .ThenInclude(item => item.NodeCollection)
-                .FirstOrDefault();
+                .Where(item => item.Id == id);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Databases/Databases/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Database = item,
-                DatabaseNodeFields = item.DatabaseNodeFields,
-                DatabaseEdgeFields = item.DatabaseEdgeFields,
-                NodeCollectionDatabases = item.NodeCollectionDatabases
+                IsGeneric = items
+                    .Any(item => item.DatabaseType.Name == "Generic"),
+                Database = items
+                    .Include(item => item.DatabaseType)
+                    .First(),
+                DatabaseNodeFields = items
+                    .Select(item => item.DatabaseNodeFields)
+                    .SelectMany(item => item),
+                DatabaseEdgeFields = items
+                    .Select(item => item.DatabaseEdgeFields)
+                    .SelectMany(item => item),
+                NodeCollectionDatabases = items
+                    .Select(item => item.NodeCollectionDatabases)
+                    .SelectMany(item => item)
             };
             // Return the page.
             return Page();

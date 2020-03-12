@@ -7,7 +7,7 @@
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetDatabaseEdgeFieldNavigationTitleCard(Model.View.DatabaseEdgeField)" />
 @if (User.IsInRole("Administrator"))
 {
-    <a asp-page="/Administration/Databases/DatabaseEdgeFields/Details" asp-route-id="@Model.View.DatabaseEdgeField.Id" class="btn btn-primary btn-block mb-3" title="Details">
+    <a asp-page="/Administration/Databases/DatabaseEdgeFields/Details" asp-route-id="@Model.View.DatabaseEdgeField.Id" class="btn btn-info btn-block mb-3" title="Details">
         <span><i class="fas fa-info-circle"></i></span>
         <span>Details</span>
     </a>
@@ -64,24 +64,27 @@
         </table>
     </div>
 </div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-arrow-right"></i></span>
+@if (!Model.View.IsGeneric)
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-arrow-right"></i></span>
+                </div>
+                <div>
+                    <span>Edges</span>
+                </div>
             </div>
-            <div>
-                <span>Edges</span>
+        </div>
+        <div class="card-body">
+            <a asp-page="/Content/Data/Edges/Index" asp-route-searchString="@Model.View.DatabaseEdgeField.Id" asp-route-searchIn="DatabaseEdgeFields" class="btn btn-info btn-block mb-3">
+                <span>View all</span>
+            </a>
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>The edge field currently contains @Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Count() edge@(Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Count() != 1 ? "s" : string.Empty).</span>
             </div>
         </div>
     </div>
-    <div class="card-body">
-        <a asp-page="/Content/Data/Edges/Index" asp-route-searchString="@Model.View.DatabaseEdgeField.Id" asp-route-searchIn="DatabaseEdgeFields" class="btn btn-info btn-block mb-3">
-            <span>View all</span>
-        </a>
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The edge field currently contains @Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Count() edge@(Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Count() != 1 ? "s" : string.Empty).</span>
-        </div>
-    </div>
-</div>
+}

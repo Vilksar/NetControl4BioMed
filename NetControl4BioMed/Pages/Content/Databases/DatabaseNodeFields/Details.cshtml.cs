@@ -28,9 +28,11 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
 
         public class ViewModel
         {
+            public bool IsGeneric { get; set; }
+
             public DatabaseNodeField DatabaseNodeField { get; set; }
 
-            public IEnumerable<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }
+            public IQueryable<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -54,27 +56,28 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
                 return RedirectToPage("/Content/Databases/DatabaseNodeFields/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.DatabaseNodeFields
-                .Where(item => item.Database.DatabaseType.Name != "Generic")
+            var items = _context.DatabaseNodeFields
                 .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.Database)
-                    .ThenInclude(item => item.DatabaseType)
-                .Include(item => item.DatabaseNodeFieldNodes)
-                .FirstOrDefault();
+                .Where(item => item.Id == id);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Databases/DatabaseNodeFields/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                DatabaseNodeField = item,
-                DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes
+                IsGeneric = items
+                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
+                DatabaseNodeField = items
+                    .Include(item => item.Database)
+                    .First(),
+                DatabaseNodeFieldNodes = items
+                    .Select(item => item.DatabaseNodeFieldNodes)
+                    .SelectMany(item => item)
             };
             // Return the page.
             return Page();

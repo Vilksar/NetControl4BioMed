@@ -30,11 +30,11 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
         {
             public Edge Edge { get; set; }
 
-            public IEnumerable<DatabaseEdge> DatabaseEdges { get; set; }
+            public IQueryable<DatabaseEdge> DatabaseEdges { get; set; }
 
-            public IEnumerable<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }
+            public IQueryable<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }
 
-            public IEnumerable<EdgeNode> EdgeNodes { get; set; }
+            public IQueryable<EdgeNode> EdgeNodes { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -58,46 +58,38 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
                 return RedirectToPage("/Content/Data/Edges/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.Edges
+            var items = _context.Edges
                 .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                 .Where(item => item.EdgeNodes.All(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
-                .Where(item => item.Id == id)
-                .Include(item => item.DatabaseEdges)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseUsers)
-                .Include(item => item.DatabaseEdgeFieldEdges)
-                    .ThenInclude(item => item.DatabaseEdgeField)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseUsers)
-                .Include(item => item.EdgeNodes)
-                    .ThenInclude(item => item.Node)
-                        .ThenInclude(item => item.DatabaseNodes)
-                            .ThenInclude(item => item.Database)
-                                .ThenInclude(item => item.DatabaseType)
-                .Include(item => item.EdgeNodes)
-                    .ThenInclude(item => item.Node)
-                        .ThenInclude(item => item.DatabaseNodes)
-                            .ThenInclude(item => item.Database)
-                                .ThenInclude(item => item.DatabaseUsers)
-                .FirstOrDefault();
+                .Where(item => item.Id == id);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Data/Edges/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Edge = item,
-                DatabaseEdges = item.DatabaseEdges
-                    .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user)),
-                DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges
-                    .Where(item => item.DatabaseEdgeField.Database.IsPublic || item.DatabaseEdgeField.Database.DatabaseUsers.Any(item1 => item1.User == user)),
-                EdgeNodes = item.EdgeNodes
+                Edge = items
+                    .First(),
+                DatabaseEdges = items
+                    .Select(item => item.DatabaseEdges)
+                    .SelectMany(item => item)
+                    .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user))
+                    .Include(item => item.Database),
+                DatabaseEdgeFieldEdges = items
+                    .Select(item => item.DatabaseEdgeFieldEdges)
+                    .SelectMany(item => item)
+                    .Where(item => item.DatabaseEdgeField.Database.IsPublic || item.DatabaseEdgeField.Database.DatabaseUsers.Any(item1 => item1.User == user))
+                    .Include(item => item.DatabaseEdgeField),
+                EdgeNodes = items
+                    .Select(item => item.EdgeNodes)
+                    .SelectMany(item => item)
+                    .Include(item => item.Node)
             };
             // Return the page.
             return Page();

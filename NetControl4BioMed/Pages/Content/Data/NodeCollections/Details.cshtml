@@ -50,9 +50,6 @@
                         <th class="text-left text-break">
                             <span>Database</span>
                         </th>
-                        <th class="text-center text-break">
-                            <span>Type</span>
-                        </th>
                         <th class="text-center text-break" data-orderable="false" data-searchable="false">
                             <span>Internal</span>
                         </th>
@@ -70,9 +67,6 @@
                             </td>
                             <td class="text-left text-break">
                                 <span title="@nodeCollectionDatabase.Database.Name">@nodeCollectionDatabase.Database.Name</span>
-                            </td>
-                            <td class="text-center text-break">
-                                <span title="@nodeCollectionDatabase.Database.DatabaseType.Name">@nodeCollectionDatabase.Database.DatabaseType.Name</span>
                             </td>
                             <td class="text-center text-break">
                                 <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@nodeCollectionDatabase.Database.Id" title="Details">

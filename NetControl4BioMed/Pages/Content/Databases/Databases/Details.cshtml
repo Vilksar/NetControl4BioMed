@@ -185,66 +185,69 @@
         }
     </div>
 </div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-circle"></i></span>
-            </div>
-            <div>
-                <span>Nodes</span>
+@if (!Model.View.IsGeneric)
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-circle"></i></span>
+                </div>
+                <div>
+                    <span>Nodes</span>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="card-body">
-        <a asp-page="/Content/Data/Nodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="btn btn-info btn-block mb-3">
-            <span>View all</span>
-        </a>
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.Database.DatabaseNodes.Count() node@(Model.View.Database.DatabaseNodes.Count() != 1 ? "s" : string.Empty).</span>
-        </div>
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-arrow-right"></i></span>
-            </div>
-            <div>
-                <span>Edges</span>
+        <div class="card-body">
+            <a asp-page="/Content/Data/Nodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="btn btn-info btn-block mb-3">
+                <span>View all</span>
+            </a>
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>The database currently contains @Model.View.Database.DatabaseNodes.Count() node@(Model.View.Database.DatabaseNodes.Count() != 1 ? "s" : string.Empty).</span>
             </div>
         </div>
     </div>
-    <div class="card-body">
-        <a asp-page="/Content/Data/Edges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="btn btn-info btn-block mb-3">
-            <span>View all</span>
-        </a>
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.Database.DatabaseEdges.Count() edge@(Model.View.Database.DatabaseEdges.Count() != 1 ? "s" : string.Empty).</span>
-        </div>
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-folder"></i></span>
-            </div>
-            <div>
-                <span>Node collections</span>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-arrow-right"></i></span>
+                </div>
+                <div>
+                    <span>Edges</span>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="card-body">
-        <a asp-page="/Content/Data/NodeCollections/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="btn btn-info btn-block mb-3">
-            <span>View all</span>
-        </a>
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.Database.NodeCollectionDatabases.Count() node collection@(Model.View.Database.NodeCollectionDatabases.Count() != 1 ? "s" : string.Empty).</span>
+        <div class="card-body">
+            <a asp-page="/Content/Data/Edges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="btn btn-info btn-block mb-3">
+                <span>View all</span>
+            </a>
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>The database currently contains @Model.View.Database.DatabaseEdges.Count() edge@(Model.View.Database.DatabaseEdges.Count() != 1 ? "s" : string.Empty).</span>
+            </div>
         </div>
     </div>
-</div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-folder"></i></span>
+                </div>
+                <div>
+                    <span>Node collections</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <a asp-page="/Content/Data/NodeCollections/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="btn btn-info btn-block mb-3">
+                <span>View all</span>
+            </a>
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>The database currently contains @Model.View.Database.NodeCollectionDatabases.Count() node collection@(Model.View.Database.NodeCollectionDatabases.Count() != 1 ? "s" : string.Empty).</span>
+            </div>
+        </div>
+    </div>
+}

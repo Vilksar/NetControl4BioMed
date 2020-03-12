@@ -28,9 +28,11 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseEdgeFields
 
         public class ViewModel
         {
+            public bool IsGeneric { get; set; }
+
             public DatabaseEdgeField DatabaseEdgeField { get; set; }
 
-            public IEnumerable<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }
+            public IQueryable<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -54,27 +56,28 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseEdgeFields
                 return RedirectToPage("/Content/Databases/DatabaseEdgeFields/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.DatabaseEdgeFields
-                .Where(item => item.Database.DatabaseType.Name != "Generic")
+            var items = _context.DatabaseEdgeFields
                 .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.Database)
-                    .ThenInclude(item => item.DatabaseType)
-                .Include(item => item.DatabaseEdgeFieldEdges)
-                .FirstOrDefault();
+                .Where(item => item.Id == id);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Databases/DatabaseEdgeFields/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                DatabaseEdgeField = item,
-                DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges
+                IsGeneric = items
+                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
+                DatabaseEdgeField = items
+                    .Include(item => item.Database)
+                    .First(),
+                DatabaseEdgeFieldEdges = items
+                    .Select(item => item.DatabaseEdgeFieldEdges)
+                    .SelectMany(item => item)
             };
             // Return the page.
             return Page();
