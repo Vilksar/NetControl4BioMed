@@ -1,5 +1,6 @@
 ﻿@page
 @model IndexModel
+@using Helpers.Extensions
 @{
     ViewData["Title"] = "Network details";
 }
@@ -58,26 +59,28 @@
         </div>
     </div>
 }
-@if (!Model.View.IsGeneric)
-{
-    <div class="card mb-3">
-        <div class="card-header font-weight-bold">
-            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                <div>
-                    <span><i class="fas fa-code"></i></span>
-                </div>
-                <div>
-                    <span>Parameters</span>
-                </div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-code"></i></span>
             </div>
-        </div>
-        <div class="card-body">
-            <div class="form-group mb-0">
-                <label asp-for="View.Network.Algorithm" class="font-weight-bold">Algorithm</label>
-                <input asp-for="View.Network.Algorithm" class="form-control" value="@Model.View.Network.Algorithm.ToString()" readonly />
-                <span asp-description-for="View.Network.Algorithm" class="text-muted small">The algorithm used in generating the network.</span>
-                <span asp-validation-for="View.Network.Algorithm" class="text-danger small"></span>
+            <div>
+                <span>Parameters</span>
             </div>
         </div>
     </div>
-}
+    <div class="card-body">
+        <div class="form-group">
+            <label asp-for="View.Network.Algorithm" class="font-weight-bold">Algorithm</label>
+            <select asp-for="View.Network.Algorithm" class="custom-select" title="@Model.View.Network.Algorithm.GetDisplayDescription()" disabled>
+                @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.NetworkAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.NetworkAlgorithm>())
+                {
+                    <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                }
+            </select>
+            <span asp-description-for="View.Network.Algorithm" class="text-muted small">The algorithm used in generating the network.</span>
+            <span asp-validation-for="View.Network.Algorithm" class="text-danger small"></span>
+        </div>
+    </div>
+</div>

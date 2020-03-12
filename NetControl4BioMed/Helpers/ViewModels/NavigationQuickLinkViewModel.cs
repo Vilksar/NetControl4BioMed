@@ -1,4 +1,5 @@
-﻿using NetControl4BioMed.Data.Models;
+﻿using NetControl4BioMed.Data.Enumerations;
+using NetControl4BioMed.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -386,7 +387,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             var networkUsersNavigationQuickLink = NetworkUsersNavigationQuickLink;
             var networkUserInvitationsNavigationQuickLink = NetworkUserInvitationsNavigationQuickLink;
             // Update the count and the route ID.
-            networkNodesNavigationQuickLink.ItemCount = network.NetworkNodes.Count();
+            networkNodesNavigationQuickLink.ItemCount = network.NetworkNodes.Count(item => item.Type == NetworkNodeType.None);
             networkNodesNavigationQuickLink.RouteId = network.Id;
             networkEdgesNavigationQuickLink.ItemCount = network.NetworkEdges.Count();
             networkEdgesNavigationQuickLink.RouteId = network.Id;
@@ -425,7 +426,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             var analysisUsersNavigationQuickLink = AnalysisUsersNavigationQuickLink;
             var analysisUserInvitationsNavigationQuickLink = AnalysisUserInvitationsNavigationQuickLink;
             // Update the count and the route ID.
-            analysisNodesNavigationQuickLink.ItemCount = analysis.AnalysisNodes.Count();
+            analysisNodesNavigationQuickLink.ItemCount = analysis.AnalysisNodes.Count(item => item.Type == NetworkNodeType.None);
             analysisNodesNavigationQuickLink.RouteId = analysis.Id;
             analysisEdgesNavigationQuickLink.ItemCount = analysis.AnalysisEdges.Count();
             analysisEdgesNavigationQuickLink.RouteId = analysis.Id;

@@ -1,5 +1,6 @@
 ﻿@page
 @model CreateModel
+@using Helpers.Extensions
 @{
     ViewData["Title"] = "Create network";
 }
@@ -37,27 +38,21 @@
             <div class="form-group">
                 <label asp-for="Input.Description" class="font-weight-bold">Description</label>
                 <textarea asp-for="Input.Description" class="form-control"></textarea>
-                <span asp-description-for="Input.Description" class="text-muted small">The description of the network.</span>
+                <span asp-description-for="Input.Description" class="text-muted small">The description of the new network.</span>
                 <span asp-validation-for="Input.Description" class="text-danger small"></span>
             </div>
             <div class="form-group" hidden="@(Model.View.IsGeneric ? "hidden" : null)">
                 <label asp-for="Input.Algorithm" class="font-weight-bold">Algorithm</label>
-                <select asp-for="Input.Algorithm" class="custom-select form-control">
+                <select asp-for="Input.Algorithm" class="custom-select">
                     @if (Model.View.IsGeneric)
                     {
-                        <option value="0">None</option>
-                    }
-                    else
-                    {
-                        <option value="1">Neighbors</option>
-                        <option value="2">Gap 0</option>
-                        <option value="3">Gap 1</option>
-                        <option value="4">Gap 2</option>
-                        <option value="5">Gap 3</option>
-                        <option value="6">Gap 4</option>
+                        @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.NetworkAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.NetworkAlgorithm>().Where(item => Model.View.IsGeneric ^ item != NetControl4BioMed.Data.Enumerations.NetworkAlgorithm.None))
+                        {
+                            <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                        }
                     }
                 </select>
-                <span asp-description-for="Input.Algorithm" class="text-muted small">The algorithm to be used in generating the network.</span>
+                <span asp-description-for="Input.Algorithm" class="text-muted small">The algorithm to be used in generating the new network.</span>
                 <span asp-validation-for="Input.Algorithm" class="text-danger small"></span>
             </div>
         </div>
@@ -76,7 +71,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the databases to be used when searching for the nodes of the network.</span>
+                <span>This section contains the databases to be used when searching for the nodes of the new network.</span>
             </div>
             <table class="table table-hover table-bordered table-datatable item-group" data-order="[[1]]">
                 <thead class="thead-light">
@@ -133,7 +128,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the databases to be used when searching for the edges of the network.</span>
+                <span>This section contains the databases to be used when searching for the edges of the new network.</span>
             </div>
             <table class="table table-hover table-bordered table-datatable item-group" data-order="[[1]]">
                 <thead class="thead-light">
@@ -192,14 +187,14 @@
             <div class="card-body">
                 <div class="alert alert-info text-justify text-wrap">
                     <span><i class="fas fa-info-circle"></i></span>
-                    <span>This section contains the data to be used in generating the network. Namely, the edges of the network should be defined here.</span>
+                    <span>This section contains the data to be used in generating the new network. Namely, the edges of the new network should be defined here.</span>
                 </div>
                 <div class="file-group" data-type="edges">
                     <div class="form-group" hidden>
-                        <label asp-for="Input.Data" class="font-weight-bold">Edges</label>
-                        <textarea asp-for="Input.Data" class="form-control file-group-input"></textarea>
-                        <span asp-description-for="Input.Data" class="text-muted small">The edges of the network, formatted as a JSON object. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                        <span asp-validation-for="Input.Data" class="text-danger small"></span>
+                        <label asp-for="Input.SeedData" class="font-weight-bold">Edges</label>
+                        <textarea asp-for="Input.SeedData" class="form-control file-group-input"></textarea>
+                        <span asp-description-for="Input.SeedData" class="text-muted small">The edges of the new network, formatted as a JSON object. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                        <span asp-validation-for="Input.SeedData" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <div class="row align-items-center mb-2">
@@ -243,7 +238,7 @@
                             <input type="file" class="custom-file-input file-group-file-upload" />
                             <label class="custom-file-label file-group-file-label">Choose file</label>
                         </div>
-                        <span class="text-muted small">The edges of the network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                        <span class="text-muted small">The edges of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
                     </div>
                 </div>
             </div>
@@ -265,14 +260,14 @@
             <div class="card-body">
                 <div class="alert alert-info text-justify text-wrap">
                     <span><i class="fas fa-info-circle"></i></span>
-                    <span>This section contains the data to be used in generating the network. Namely, the seed nodes used to generate the network should be defined here.</span>
+                    <span>This section contains the data to be used in generating the new network. Namely, the seed nodes used to generate the new network should be defined here.</span>
                 </div>
                 <div class="file-group" data-type="nodes">
                     <div class="form-group" hidden>
-                        <label asp-for="Input.Data" class="font-weight-bold">Seed nodes</label>
-                        <textarea asp-for="Input.Data" class="form-control file-group-input"></textarea>
-                        <span asp-description-for="Input.Data" class="text-muted small">The nodes to be used as seed nodes when generating the network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                        <span asp-validation-for="Input.Data" class="text-danger small"></span>
+                        <label asp-for="Input.SeedData" class="font-weight-bold">Seed nodes</label>
+                        <textarea asp-for="Input.SeedData" class="form-control file-group-input"></textarea>
+                        <span asp-description-for="Input.SeedData" class="text-muted small">The nodes to be used as seed nodes when generating the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                        <span asp-validation-for="Input.SeedData" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <div class="row align-items-center mb-2">
@@ -302,7 +297,7 @@
                             <input type="file" class="custom-file-input file-group-file-upload" />
                             <label class="custom-file-label file-group-file-label">Choose file</label>
                         </div>
-                        <span class="text-muted small">The seed nodes of the network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                        <span class="text-muted small">The seed nodes of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
                     </div>
                 </div>
             </div>
@@ -321,7 +316,7 @@
             <div class="card-body">
                 <div class="alert alert-info text-justify text-wrap">
                     <span><i class="fas fa-info-circle"></i></span>
-                    <span>This section contains the node collections which can be used as additional seed nodes when generating the network.</span>
+                    <span>This section contains the node collections which can be used as additional seed nodes when generating the new network.</span>
                 </div>
                 <table class="table table-hover table-bordered table-datatable item-group" data-order="[[1]]">
                     <thead class="thead-light">

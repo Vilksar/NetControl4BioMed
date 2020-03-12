@@ -1,5 +1,6 @@
 ﻿@page
 @model IndexModel
+@using Helpers.Extensions
 @{
     ViewData["Title"] = "Overview";
 }
@@ -37,8 +38,8 @@ else
                 <th class="text-left text-break">
                     <span>Recent network</span>
                 </th>
-                <th class="text-center text-break">
-                    <span>Date created</span>
+                <th class="text-left text-break">
+                    <span>ID</span>
                 </th>
                 <th class="text-center text-break" data-orderable="false" data-searchable="false">
                     <span>Links</span>
@@ -46,20 +47,20 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var (network, index) in Model.View.RecentNetworks.Select((item, index) => (item, index + 1)))
+            @foreach (var (item, index) in Model.View.RecentNetworks.Select((item, index) => (item, index + 1)))
             {
                 <tr>
                     <td class="text-center text-break">
                         <span>@index</span>
                     </td>
                     <td class="text-left text-break">
-                        <span title="@network.Name" class="font-weight-bold">@network.Name</span>
+                        <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                    </td>
+                    <td class="text-left text-break">
+                        <span title="@item.Id" class="small text-muted">@item.Id</span>
                     </td>
                     <td class="text-center text-break">
-                        <span title="@network.DateTimeCreated.ToString()">@network.DateTimeCreated.ToString()</span>
-                    </td>
-                    <td class="text-center text-break">
-                        <a asp-page="/Content/Created/Networks/Details/Index" asp-route-id="@network.Id" title="Details">
+                        <a asp-page="/Content/Created/Networks/Details/Index" asp-route-id="@item.Id" title="Details">
                             <span>Details</span>
                         </a>
                     </td>
@@ -100,8 +101,8 @@ else
                 <th class="text-left text-break">
                     <span>Recent analysis</span>
                 </th>
-                <th class="text-center text-break">
-                    <span>Date started</span>
+                <th class="text-left text-break">
+                    <span>ID</span>
                 </th>
                 <th class="text-center text-break" data-orderable="false" data-searchable="false">
                     <span>Links</span>
@@ -109,20 +110,20 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var (analysis, index) in Model.View.RecentAnalyses.Select((item, index) => (item, index + 1)))
+            @foreach (var (item, index) in Model.View.RecentAnalyses.Select((item, index) => (item, index + 1)))
             {
                 <tr>
                     <td class="text-center text-break">
                         <span>@index</span>
                     </td>
                     <td class="text-left text-break">
-                        <span title="@analysis.Name" class="font-weight-bold">@analysis.Name</span>
+                        <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                    </td>
+                    <td class="text-left text-break">
+                        <span title="@item.Id" class="small text-muted">@item.Id</span>
                     </td>
                     <td class="text-center text-break">
-                        <span title="@analysis.DateTimeStarted.ToString()">@analysis.DateTimeStarted.ToString()</span>
-                    </td>
-                    <td class="text-center text-break">
-                        <a asp-page="/Content/Created/Analyses/Details/Index" asp-route-id="@analysis.Id" title="Details">
+                        <a asp-page="/Content/Created/Analyses/Details/Index" asp-route-id="@item.Id" title="Details">
                             <span>Details</span>
                         </a>
                     </td>

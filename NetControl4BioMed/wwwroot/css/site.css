@@ -25,6 +25,11 @@ th, td {
     vertical-align: middle !important;
 }
 
+/* Style for the forms. */
+label {
+    text-align: left;
+}
+
 /* Style for the Cytoscape elements. */
 .cytoscape-container {
     min-height: 25rem !important;

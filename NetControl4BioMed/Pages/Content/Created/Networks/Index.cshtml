@@ -60,16 +60,10 @@
                     <th class="text-left text-break">
                         <span>Name</span>
                     </th>
-                    <th class="d-none d-xl-table-cell text-center text-break">
-                        <span>Date</span>
-                    </th>
-                    <th class="d-none d-xl-table-cell text-center text-break">
-                        <span>Type</span>
-                    </th>
-                    <th class="d-none d-xl-table-cell text-center text-break">
+                    <th class="d-none d-lg-table-cell text-center text-break">
                         <span>Nodes</span>
                     </th>
-                    <th class="d-none d-xl-table-cell text-center text-break">
+                    <th class="d-none d-lg-table-cell text-center text-break">
                         <span>Edges</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -88,28 +82,12 @@
                             </div>
                         </td>
                         <td class="text-left text-break">
-                            <div>
-                                <span title="@item.Name" class="font-weight-bold">@item.Name</span>
-                            </div>
-                            <div>
-                                <span title="@item.Id" class="small">@item.Id</span>
-                            </div>
+                            <span title="@item.Name" class="font-weight-bold">@item.Name</span>
                         </td>
-                        <td class="d-none d-xl-table-cell text-center text-break">
-                            <div>
-                                <span title="@item.DateTimeCreated.ToShortDateString()">@item.DateTimeCreated.ToShortDateString()</span>
-                            </div>
-                            <div>
-                                <span title="@item.DateTimeCreated.ToShortTimeString()">@item.DateTimeCreated.ToShortTimeString()</span>
-                            </div>
+                        <td class="d-none d-lg-table-cell text-center text-break">
+                            <span title="@item.NetworkNodes.Count(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NetworkNodeType.None)">@item.NetworkNodes.Count(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NetworkNodeType.None)</span>
                         </td>
-                        <td class="d-none d-xl-table-cell text-center text-break">
-                            <span title="@item.NetworkDatabases.FirstOrDefault()?.Database?.DatabaseType?.Name">@item.NetworkDatabases.FirstOrDefault()?.Database?.DatabaseType?.Name</span>
-                        </td>
-                        <td class="d-none d-xl-table-cell text-center text-break">
-                            <span title="@item.NetworkNodes.Where(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NetworkNodeType.None).Count()">@item.NetworkNodes.Where(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NetworkNodeType.None).Count()</span>
-                        </td>
-                        <td class="d-none d-xl-table-cell text-center text-break">
+                        <td class="d-none d-lg-table-cell text-center text-break">
                             <span title="@item.NetworkEdges.Count()">@item.NetworkEdges.Count()</span>
                         </td>
                         <td class="text-center text-break">

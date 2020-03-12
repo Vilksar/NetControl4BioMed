@@ -83,11 +83,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
 
             public IEnumerable<string> TargetNodeCollectionIds { get; set; }
 
-            /// <summary>
-            /// Checks if the parameters are valid.
-            /// </summary>
-            /// <param name="validationContext">Represents the validation context.</param>
-            /// <returns>Returns a list with the validation errors.</returns>
             public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
             {
                 // Check if there isn't any algorithm
@@ -310,9 +305,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 return Page();
             }
             // Get the provided network IDs.
-           Input.NetworkIds = Input.NetworkIds ?? Enumerable.Empty<string>();
+           var networkIds = Input.NetworkIds ?? Enumerable.Empty<string>();
             // Check if there weren't any network IDs provided.
-            if (!Input.NetworkIds.Any())
+            if (!networkIds.Any())
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "At least one network must be selected.");
@@ -320,7 +315,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 return Page();
             }
             // Try to get the networks with the provided IDs.
-            var networks = View.Networks.Where(item => Input.NetworkIds.Contains(item.Id));
+            var networks = View.Networks
+                .Where(item => networkIds.Contains(item.Id));
             // Check if there weren't any networks found.
             if (!networks.Any())
             {
@@ -347,7 +343,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             var sourceNodeCollections = View.SourceNodeCollections
                 .Where(item => sourceNodeCollectionIds.Contains(item.Id));
             // Get all of the source nodes that match the given data.
-            var sourceNodes = View.Networks
+            var sourceNodes = networks
                 .Select(item => item.NetworkNodes)
                 .SelectMany(item => item)
                 .Select(item => item.Node)
@@ -371,7 +367,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             var targetNodeCollections = View.TargetNodeCollections
                 .Where(item => targetNodeCollectionIds.Contains(item.Id));
             // Get all of the target nodes that match the given data.
-            var targetNodes = View.Networks
+            var targetNodes = networks
                 .Select(item => item.NetworkNodes)
                 .SelectMany(item => item)
                 .Select(item => item.Node)
@@ -385,7 +381,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             if (targetNodes == null || !targetNodes.Any())
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No target nodes could be found with the provided data.");
+                ModelState.AddModelError(string.Empty, "No target nodes could be found with the provided target data.");
                 // Redisplay the page.
                 return Page();
             }
