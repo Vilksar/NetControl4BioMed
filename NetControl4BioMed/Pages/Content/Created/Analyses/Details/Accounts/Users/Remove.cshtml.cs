@@ -40,8 +40,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
         {
             public Analysis Analysis { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public IEnumerable<ItemModel> Items { get; set; }
 
             public bool IsCurrentUserSelected { get; set; }
@@ -79,28 +77,23 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             // Get the items with the provided ID.
             var items = _context.Analyses
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.AnalysisDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .Include(item => item.AnalysisUsers)
-                    .ThenInclude(item => item.User)
-                .Include(item => item.AnalysisUserInvitations)
-                .AsQueryable();
+                .Where(item => item.Id == id);
             // Check if there were no items found.
-            if (items == null || items.Count() != 1)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Analysis = items.First(),
-                IsGeneric = items.First().AnalysisDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic")
+                Analysis = items
+                    .Include(item => item.AnalysisUsers)
+                        .ThenInclude(item => item.User)
+                    .Include(item => item.AnalysisUserInvitations)
+                    .First()
             };
             // Get the items for the view.
             var items1 = View.Analysis.AnalysisUsers
@@ -171,34 +164,23 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             // Get the items with the provided ID.
             var items = _context.Analyses
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == Input.Id)
-                .Include(item => item.AnalysisDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .Include(item => item.AnalysisNodes)
-                    .ThenInclude(item => item.Node)
-                .Include(item => item.AnalysisEdges)
-                    .ThenInclude(item => item.Edge)
-                .Include(item => item.AnalysisNetworks)
-                    .ThenInclude(item => item.Network)
-                .Include(item => item.AnalysisUsers)
-                    .ThenInclude(item => item.User)
-                .Include(item => item.AnalysisUserInvitations)
-                .AsQueryable();
+                .Where(item => item.Id == Input.Id);
             // Check if there were no items found.
-            if (items == null || items.Count() != 1)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Analysis = items.First(),
-                IsGeneric = items.First().AnalysisDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic")
+                Analysis = items
+                    .Include(item => item.AnalysisUsers)
+                        .ThenInclude(item => item.User)
+                    .Include(item => item.AnalysisUserInvitations)
+                    .First()
             };
             // Get the items for the view.
             var items1 = View.Analysis.AnalysisUsers

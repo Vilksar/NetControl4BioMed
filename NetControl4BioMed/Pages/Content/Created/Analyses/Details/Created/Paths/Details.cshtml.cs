@@ -29,15 +29,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
 
         public class ViewModel
         {
-            public Analysis Analysis { get; set; }
-
             public bool IsGeneric { get; set; }
 
+            public Analysis Analysis { get; set; }
+
             public Path Path { get; set; }
-
-            public int NodeCount { get; set; }
-
-            public int EdgeCount { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -61,7 +57,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.Paths
+            var items = _context.Paths
                 .Where(item => item.ControlPath.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id)
                 .Include(item => item.PathNodes)
@@ -72,25 +68,27 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
                     .ThenInclude(item => item.Analysis)
                         .ThenInclude(item => item.AnalysisDatabases)
                             .ThenInclude(item => item.Database)
-                                .ThenInclude(item => item.DatabaseType)
-                .FirstOrDefault();
+                                .ThenInclude(item => item.DatabaseType);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Analysis = item.ControlPath.Analysis,
-                IsGeneric = item.ControlPath.Analysis.AnalysisDatabases
+                IsGeneric = items
+                    .Select(item => item.ControlPath.Analysis.AnalysisDatabases)
+                    .SelectMany(item => item)
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                Path = item,
-                NodeCount = item.PathNodes.Count(),
-                EdgeCount = item.PathEdges.Count()
+                Analysis = items
+                    .Select(item => item.ControlPath.Analysis)
+                    .First(),
+                Path = items
+                    .First()
             };
             // Return the page.
             return Page();

@@ -35,8 +35,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
         {
             public Analysis Analysis { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public SearchViewModel<ControlPath> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
@@ -87,11 +85,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
             // Get the items with the provided ID.
             var items = _context.Analyses
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.AnalysisDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .AsQueryable();
+                .Where(item => item.Id == id);
             // Check if there were no items found.
             if (items == null || items.Count() != 1)
             {
@@ -108,11 +102,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                 // Redirect to the page where they are all explicitly defined.
                 return RedirectToPage(new { id = input.Id, searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
-            // Start with all of the items of the network.
+            // Start with all of the items.
             var query = items
                 .Select(item => item.ControlPaths)
-                .SelectMany(item => item)
-                .AsQueryable();
+                .SelectMany(item => item);
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
@@ -147,16 +140,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
             query = query
                 .Include(item => item.Paths)
                     .ThenInclude(item => item.PathNodes)
-                        .ThenInclude(item => item.Node)
-                .Include(item => item.Paths)
-                    .ThenInclude(item => item.PathEdges)
-                        .ThenInclude(item => item.Edge);
+                        .ThenInclude(item => item.Node);
             // Define the view.
             View = new ViewModel
             {
-                Analysis = items.First(),
-                IsGeneric = items.First().AnalysisDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
+                Analysis = items
+                    .First(),
                 Search = new SearchViewModel<ControlPath>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.

@@ -34,8 +34,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
         {
             public Analysis Analysis { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
@@ -85,16 +83,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             // Get the items with the provided ID.
             var items = _context.Analyses
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.AnalysisDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .AsQueryable();
+                .Where(item => item.Id == id);
             // Check if there were no items found.
-            if (items == null || items.Count() != 1)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
@@ -106,7 +100,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 // Redirect to the page where they are all explicitly defined.
                 return RedirectToPage(new { id = input.Id, searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
-            // Start with all of the items of the network.
+            // Start with all of the items.
             var query1 = items
                 .Select(item => item.AnalysisUsers)
                 .SelectMany(item => item)
@@ -126,8 +120,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 })
                 .AsEnumerable();
             var query = query1
-                .Concat(query2)
-                .AsQueryable();
+                .Concat(query2);
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
@@ -153,9 +146,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             // Define the view.
             View = new ViewModel
             {
-                Analysis = items.First(),
-                IsGeneric = items.First().AnalysisDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
+                Analysis = items
+                    .Include(item => item.AnalysisUsers)
+                        .ThenInclude(item => item.User)
+                    .Include(item => item.AnalysisUserInvitations)
+                    .First(),
                 Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.

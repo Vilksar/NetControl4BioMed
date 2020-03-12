@@ -55,8 +55,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
         public class ViewModel
         {
             public Analysis Analysis { get; set; }
-
-            public bool IsGeneric { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -82,28 +80,20 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             // Get the items with the provided ID.
             var items = _context.Analyses
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.AnalysisDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .Include(item => item.AnalysisUsers)
-                    .ThenInclude(item => item.User)
-                .Include(item => item.AnalysisUserInvitations)
-                .AsQueryable();
+                .Where(item => item.Id == id);
             // Check if there were no items found.
-            if (items == null || items.Count() != 1)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Analysis = items.First(),
-                IsGeneric = items.First().AnalysisDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic")
+                Analysis = items
+                    .First()
             };
             // Define the input.
             Input = new InputModel
@@ -137,28 +127,23 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             // Get the items with the provided ID.
             var items = _context.Analyses
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.AnalysisDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .Include(item => item.AnalysisUsers)
-                    .ThenInclude(item => item.User)
-                .Include(item => item.AnalysisUserInvitations)
-                .AsQueryable();
+                .Where(item => item.Id == id);
             // Check if there were no items found.
-            if (items == null || items.Count() != 1)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Analysis = items.First(),
-                IsGeneric = items.First().AnalysisDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic")
+                Analysis = items
+                    .Include(item => item.AnalysisUsers)
+                        .ThenInclude(item => item.User)
+                    .Include(item => item.AnalysisUserInvitations)
+                    .First()
             };
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))

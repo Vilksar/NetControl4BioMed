@@ -37,8 +37,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
         {
             public Analysis Analysis { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public string CytoscapeJson { get; set; }
         }
 
@@ -63,36 +61,33 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.Analyses
+            var items = _context.Analyses
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.AnalysisNodes)
-                    .ThenInclude(item => item.Node)
-                        .ThenInclude(item => item.DatabaseNodeFieldNodes)
-                            .ThenInclude(item => item.DatabaseNodeField)
-                .Include(item => item.AnalysisEdges)
-                    .ThenInclude(item => item.Edge)
-                        .ThenInclude(item => item.EdgeNodes)
-                            .ThenInclude(item => item.Node)
-                .Include(item => item.AnalysisDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .FirstOrDefault();
+                .Where(item => item.Id == id);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Analysis = item,
-                IsGeneric = item.AnalysisDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                CytoscapeJson = JsonSerializer.Serialize(item.GetCytoscapeViewModel(_linkGenerator), new JsonSerializerOptions { IgnoreNullValues = true })
+                Analysis = items
+                    .First(),
+                CytoscapeJson = JsonSerializer.Serialize(items
+                    .Include(item => item.AnalysisNodes)
+                        .ThenInclude(item => item.Node)
+                            .ThenInclude(item => item.DatabaseNodeFieldNodes)
+                                .ThenInclude(item => item.DatabaseNodeField)
+                    .Include(item => item.AnalysisEdges)
+                        .ThenInclude(item => item.Edge)
+                            .ThenInclude(item => item.EdgeNodes)
+                                .ThenInclude(item => item.Node)
+                    .First()
+                    .GetCytoscapeViewModel(_linkGenerator), new JsonSerializerOptions { IgnoreNullValues = true })
             };
             // Return the page.
             return Page();

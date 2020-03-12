@@ -32,9 +32,12 @@
                     <th class="d-none d-lg-table-cell text-center text-break">
                         <span>Type</span>
                     </th>
-                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                        <span>Links</span>
-                    </th>
+                    @if (!Model.View.IsGeneric)
+                    {
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    }
                 </tr>
             </thead>
             <tbody>
@@ -50,11 +53,14 @@
                         <td class="d-none d-lg-table-cell text-center text-break">
                             <span title="@pathNode.Type.ToString()">@pathNode.Type.ToString()</span>
                         </td>
-                        <td class="text-center text-break">
-                            <a asp-page="/Content/Data/Nodes/Details" asp-route-id="@pathNode.Node.Id" title="Details" target="_blank" rel="nofollow noopener noreferrer">
-                                <span>Details</span>
-                            </a>
-                        </td>
+                        @if (!Model.View.IsGeneric)
+                        {
+                            <td class="text-center text-break">
+                                <a asp-page="/Content/Data/Nodes/Details" asp-route-id="@pathNode.Node.Id" title="Details" target="_blank" rel="nofollow noopener noreferrer">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>
@@ -86,9 +92,12 @@
                     <th class="text-left text-break">
                         <span>Edge</span>
                     </th>
-                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                        <span>Links</span>
-                    </th>
+                    @if (!Model.View.IsGeneric)
+                    {
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    }
                 </tr>
             </thead>
             <tbody>
@@ -101,11 +110,14 @@
                         <td class="text-left text-break">
                             <span title="@pathEdge.Edge.Name" class="font-weight-bold">@pathEdge.Edge.Name</span>
                         </td>
-                        <td class="text-center text-break">
-                            <a asp-page="/Content/Data/Edges/Details" asp-route-id="@pathEdge.Edge.Id" title="Details" target="_blank" rel="nofollow noopener noreferrer">
-                                <span>Details</span>
-                            </a>
-                        </td>
+                        @if (!Model.View.IsGeneric)
+                        {
+                            <td class="text-center text-break">
+                                <a asp-page="/Content/Data/Edges/Details" asp-route-id="@pathEdge.Edge.Id" title="Details" target="_blank" rel="nofollow noopener noreferrer">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>

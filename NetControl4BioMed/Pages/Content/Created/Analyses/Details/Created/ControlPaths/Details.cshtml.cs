@@ -29,9 +29,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
 
         public class ViewModel
         {
-            public Analysis Analysis { get; set; }
-
             public bool IsGeneric { get; set; }
+
+            public Analysis Analysis { get; set; }
 
             public ControlPath ControlPath { get; set; }
 
@@ -59,38 +59,37 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.ControlPaths
+            var items = _context.ControlPaths
                 .Where(item => item.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.Paths)
-                    .ThenInclude(item => item.PathNodes)
-                        .ThenInclude(item => item.Node)
-                .Include(item => item.Paths)
-                    .ThenInclude(item => item.PathEdges)
-                        .ThenInclude(item => item.Edge)
-                            .ThenInclude(item => item.EdgeNodes)
-                                .ThenInclude(item => item.Node)
-                .Include(item => item.Analysis)
-                    .ThenInclude(item => item.AnalysisDatabases)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseType)
-                .FirstOrDefault();
+                .Where(item => item.Id == id);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Analysis = item.Analysis,
-                IsGeneric = item.Analysis.AnalysisDatabases
+                IsGeneric = items
+                    .Select(item => item.Analysis.AnalysisDatabases)
+                    .SelectMany(item => item)
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                ControlPath = item,
-                UniqueControlNodes = item.Paths.Select(item => item.PathNodes).SelectMany(item => item).Where(item => item.Type == PathNodeType.Source).Select(item => item.Node).Distinct()
+                Analysis = items
+                    .Select(item => item.Analysis)
+                    .First(),
+                ControlPath = items
+                    .First(),
+                UniqueControlNodes = items
+                    .Select(item => item.Paths)
+                    .SelectMany(item => item)
+                    .Select(item => item.PathNodes)
+                    .SelectMany(item => item)
+                    .Where(item => item.Type == PathNodeType.Source)
+                    .Select(item => item.Node)
+                    .Distinct()
             };
             // Return the page.
             return Page();

@@ -43,7 +43,7 @@ else
                         <span title="@item.Id" class="small text-muted">@item.Id</span>
                     </td>
                     <td class="d-none d-lg-table-cell text-center text-break">
-                        <span>@item.Paths.Select(item1 => item1.PathNodes.First()).Distinct().Count()</span>
+                        <span>@item.Paths.Select(item1 => item1.PathNodes).SelectMany(item => item).Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Source).Select(item => item.Node).Distinct().Count()</span>
                     </td>
                     <td class="text-center text-break">
                         <a asp-page="/Content/Created/Analyses/Details/Created/ControlPaths/Details" asp-route-id="@item.Id" title="Details">

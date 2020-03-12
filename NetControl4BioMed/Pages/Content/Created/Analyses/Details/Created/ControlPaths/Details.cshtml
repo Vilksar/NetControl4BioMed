@@ -50,9 +50,12 @@
                     <th class="text-left text-break">
                         <span>Node</span>
                     </th>
-                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                        <span>Links</span>
-                    </th>
+                    @if (!Model.View.IsGeneric)
+                    {
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    }
                 </tr>
             </thead>
             <tbody>
@@ -65,11 +68,14 @@
                         <td class="text-left text-break">
                             <span title="@uniqueControlNode.Name" class="font-weight-bold">@uniqueControlNode.Name</span>
                         </td>
-                        <td class="text-center text-break">
-                            <a asp-page="/Content/Data/Nodes/Details" asp-route-id="@uniqueControlNode.Id" title="Details" target="_blank" rel="nofollow noopener noreferrer">
-                                <span>Details</span>
-                            </a>
-                        </td>
+                        @if (!Model.View.IsGeneric)
+                        {
+                            <td class="text-center text-break">
+                                <a asp-page="/Content/Data/Nodes/Details" asp-route-id="@uniqueControlNode.Id" title="Details" target="_blank" rel="nofollow noopener noreferrer">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>

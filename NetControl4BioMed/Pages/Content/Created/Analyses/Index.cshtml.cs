@@ -117,8 +117,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             }
             // Start with all of the items to which the user has access.
             var query = _context.Analyses
-                .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                .AsQueryable();
+                .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user));
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||

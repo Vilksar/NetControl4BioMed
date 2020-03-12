@@ -34,8 +34,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
         {
             public Analysis Analysis { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public bool ShowVisualization { get; set; }
 
             public Helpers.Algorithms.Algorithm1.Parameters Algorithm1Parameters { get; set; }
@@ -64,21 +62,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.Analyses
+            var items = _context.Analyses
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.AnalysisNodes)
-                .Include(item => item.AnalysisEdges)
-                .Include(item => item.AnalysisDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .Include(item => item.AnalysisNodeCollections)
-                .Include(item => item.AnalysisUsers)
-                .Include(item => item.AnalysisUserInvitations)
-                .Include(item => item.AnalysisNetworks)
-                .FirstOrDefault();
+                .Where(item => item.Id == id);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
@@ -88,27 +76,36 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
             // Define the view.
             View = new ViewModel
             {
-                Analysis = item,
-                IsGeneric = item.AnalysisDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                ShowVisualization = item.AnalysisNodes.Count(item => item.Type == AnalysisNodeType.None) < 500,
+                Analysis = items
+                    .Include(item => item.AnalysisNodes)
+                    .Include(item => item.AnalysisEdges)
+                    .Include(item => item.AnalysisDatabases)
+                    .Include(item => item.AnalysisNodeCollections)
+                    .Include(item => item.AnalysisUsers)
+                    .Include(item => item.AnalysisUserInvitations)
+                    .Include(item => item.AnalysisNetworks)
+                    .First(),
+                ShowVisualization = items
+                    .Select(item => item.AnalysisNodes)
+                    .SelectMany(item => item)
+                    .Count(item => item.Type == AnalysisNodeType.None) < 500,
                 Algorithm1Parameters = null,
                 Algorithm2Parameters = null
             };
             // Check which algorithm is used and try to deserialize the parameters.
-            if (item.Algorithm == AnalysisAlgorithm.Algorithm1)
+            if (View.Analysis.Algorithm == AnalysisAlgorithm.Algorithm1)
             {
                 // Try to deserialize the parameters
-                if (item.Parameters.TryDeserializeJsonObject<Helpers.Algorithms.Algorithm1.Parameters>(out var parameters))
+                if (View.Analysis.Parameters.TryDeserializeJsonObject<Helpers.Algorithms.Algorithm1.Parameters>(out var parameters))
                 {
                     // Assign the parameters.
                     View.Algorithm1Parameters = parameters;
                 }
             }
-            else if (item.Algorithm == AnalysisAlgorithm.Algorithm2)
+            else if (View.Analysis.Algorithm == AnalysisAlgorithm.Algorithm2)
             {
                 // Try to deserialize the parameters
-                if (item.Parameters.TryDeserializeJsonObject<Helpers.Algorithms.Algorithm2.Parameters>(out var parameters))
+                if (View.Analysis.Parameters.TryDeserializeJsonObject<Helpers.Algorithms.Algorithm2.Parameters>(out var parameters))
                 {
                     // Assign the parameters.
                     View.Algorithm2Parameters = parameters;

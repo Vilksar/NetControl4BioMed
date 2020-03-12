@@ -33,9 +33,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
 
         public class ViewModel
         {
-            public Analysis Analysis { get; set; }
-
             public bool IsGeneric { get; set; }
+
+            public Analysis Analysis { get; set; }
 
             public SearchViewModel<Path> Search { get; set; }
 
@@ -89,19 +89,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Get the items with the provided ID.
-            var items = _context.ControlPaths
-                .Where(item => item.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.Analysis)
-                    .ThenInclude(item => item.AnalysisDatabases)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseType)
-                .AsQueryable();
+            var items = _context.Paths
+                .Where(item => item.ControlPath.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
+                .Where(item => item.Id == id);
             // Check if there were no items found.
-            if (items == null || items.Count() != 1)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
@@ -113,11 +108,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
                 // Redirect to the page where they are all explicitly defined.
                 return RedirectToPage(new { id = input.Id, searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
-            // Start with all of the items of the network.
+            // Start with all of the items.
             var query = items
-                .Select(item => item.Paths)
-                .SelectMany(item => item)
-                .AsQueryable();
+                .Where(item => true);
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
@@ -181,9 +174,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
             // Define the view.
             View = new ViewModel
             {
-                Analysis = items.First().Analysis,
-                IsGeneric = items.First().Analysis.AnalysisDatabases
+                IsGeneric = items
+                    .Select(item => item.ControlPath.Analysis.AnalysisDatabases)
+                    .SelectMany(item => item)
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
+                Analysis = items
+                    .Select(item => item.ControlPath.Analysis)
+                    .First(),
                 Search = new SearchViewModel<Path>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.
