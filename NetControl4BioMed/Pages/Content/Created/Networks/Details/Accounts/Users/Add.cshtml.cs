@@ -80,8 +80,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
             // Get the items with the provided ID.
             var items = _context.Networks
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .AsQueryable();
+                .Where(item => item.Id == id);
             // Check if there were no items found.
             if (items == null || !items.Any())
             {
@@ -128,8 +127,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
             // Get the items with the provided ID.
             var items = _context.Networks
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .AsQueryable();
+                .Where(item => item.Id == id);
             // Check if there were no items found.
             if (items == null || !items.Any())
             {

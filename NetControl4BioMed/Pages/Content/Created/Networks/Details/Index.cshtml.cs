@@ -57,34 +57,37 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.Networks
+            var items = _context.Networks
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.NetworkNodes)
-                .Include(item => item.NetworkEdges)
-                .Include(item => item.NetworkDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .Include(item => item.NetworkNodeCollections)
-                .Include(item => item.NetworkUsers)
-                .Include(item => item.NetworkUserInvitations)
-                .Include(item => item.AnalysisNetworks)
-                .FirstOrDefault();
+                .Where(item => item.Id == id);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Network = item,
-                IsGeneric = item.NetworkDatabases
+                IsGeneric = items
+                    .Select(item => item.NetworkDatabases)
+                    .SelectMany(item => item)
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                ShowVisualization = item.NetworkNodes.Count(item => item.Type == NetworkNodeType.None) < 500
+                Network = items
+                    .Include(item => item.NetworkNodes)
+                    .Include(item => item.NetworkEdges)
+                    .Include(item => item.NetworkDatabases)
+                    .Include(item => item.NetworkNodeCollections)
+                    .Include(item => item.NetworkUsers)
+                    .Include(item => item.NetworkUserInvitations)
+                    .Include(item => item.AnalysisNetworks)
+                    .First(),
+                ShowVisualization = items
+                    .Select(item => item.NetworkNodes)
+                    .SelectMany(item => item)
+                    .Count(item => item.Type == NetworkNodeType.None) < 500
             };
             // Return the page.
             return Page();

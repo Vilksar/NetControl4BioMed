@@ -151,7 +151,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                         .ThenInclude(item => item.User)
                     .Include(item => item.AnalysisUserInvitations)
                     .First(),
-                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.AsQueryable())
             };
             // Return the page.
             return Page();

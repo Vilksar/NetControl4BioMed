@@ -87,8 +87,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.Nodes
             // Get the items with the provided ID.
             var items = _context.Networks
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .AsQueryable();
+                .Where(item => item.Id == id);
             // Check if there were no items found.
             if (items == null || !items.Any())
             {
@@ -105,11 +104,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.Nodes
                 // Redirect to the page where they are all explicitly defined.
                 return RedirectToPage(new { id = input.Id, searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
-            // Start with all of the items of the network.
+            // Start with all of the items.
             var query = items
                 .Select(item => item.NetworkNodes)
-                .SelectMany(item => item)
-                .AsQueryable();
+                .SelectMany(item => item);
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
@@ -154,7 +152,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.Nodes
             View = new ViewModel
             {
                 IsGeneric = items
-                    .Any(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic")),
+                    .Select(item => item.NetworkDatabases)
+                    .SelectMany(item => item)
+                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 Network = items
                     .First(),
                 Search = new SearchViewModel<NetworkNode>(_linkGenerator, HttpContext, input, query)

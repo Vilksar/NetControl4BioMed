@@ -65,8 +65,7 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.NodeCollectionNod
             }
             // Start with all of the items in the non-generic databases.
             var query = _context.NodeCollectionNodes
-                .Where(item => !item.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                .AsQueryable();
+                .Where(item => !item.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||

@@ -74,7 +74,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
             }
             // Start with all of the items in the database.
             var query = _context.DatabaseNodeFields
-                .AsQueryable();
+                .Where(item => true);
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||

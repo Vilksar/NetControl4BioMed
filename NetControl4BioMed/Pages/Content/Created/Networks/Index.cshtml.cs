@@ -111,8 +111,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             }
             // Start with all of the items to which the user has access.
             var query = _context.Networks
-                .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                .AsQueryable();
+                .Where(item => item.NetworkUsers.Any(item1 => item1.User == user));
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||

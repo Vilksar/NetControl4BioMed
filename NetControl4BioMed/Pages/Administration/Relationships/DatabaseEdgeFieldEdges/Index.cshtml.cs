@@ -82,8 +82,7 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseEdgeField
             }
             // Start with all of the items in the database.
             var query = _context.DatabaseEdgeFieldEdges
-                .Where(item => !item.Edge.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                .AsQueryable();
+                .Where(item => !item.Edge.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||

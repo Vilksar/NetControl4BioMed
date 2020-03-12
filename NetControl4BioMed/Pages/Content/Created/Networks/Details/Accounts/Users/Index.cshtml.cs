@@ -83,11 +83,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
             // Get the items with the provided ID.
             var items = _context.Networks
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.NetworkUsers)
-                    .ThenInclude(item => item.User)
-                .Include(item => item.NetworkUserInvitations)
-                .AsQueryable();
+                .Where(item => item.Id == id);
             // Check if there were no items found.
             if (items == null || !items.Any())
             {
@@ -104,7 +100,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
                 // Redirect to the page where they are all explicitly defined.
                 return RedirectToPage(new { id = input.Id, searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
-            // Start with all of the items of the network.
+            // Start with all of the items.
             var query1 = items
                 .Select(item => item.NetworkUsers)
                 .SelectMany(item => item)
@@ -124,8 +120,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
                 })
                 .AsEnumerable();
             var query = query1
-                .Concat(query2)
-                .AsQueryable();
+                .Concat(query2);
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
@@ -152,8 +147,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
             View = new ViewModel
             {
                 Network = items
+                    .Include(item => item.NetworkUsers)
+                        .ThenInclude(item => item.User)
+                    .Include(item => item.NetworkUserInvitations)
                     .First(),
-                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.AsQueryable())
             };
             // Return the page.
             return Page();

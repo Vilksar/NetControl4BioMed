@@ -65,7 +65,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
             }
             // Start with all of the items in the database.
             var query = _context.UserRoles
-                .AsQueryable();
+                .Where(item => true);
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
