@@ -96,7 +96,7 @@
                         <tr class="item-group-item">
                             <td class="text-center text-break">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" id="checkbox-node-database-@database.Id" name="Input.NodeDatabaseIds" value="@database.Id" class="custom-control-input item-group-item-checkbox" title="Select" checked="@(Model.Input.NodeDatabaseIds.Contains(database.Id) ? "checked" : null)" />
+                                    <input type="checkbox" id="checkbox-node-database-@database.Id" name="Input.NodeDatabaseIds" value="@database.Id" class="custom-control-input item-group-item-checkbox" title="Select" checked="@(Model.Input.NodeDatabaseIds != null && Model.Input.NodeDatabaseIds.Contains(database.Id) ? "checked" : null)" />
                                     <label for="checkbox-node-database-@database.Id" class="custom-control-label"></label>
                                 </div>
                             </td>
@@ -153,7 +153,7 @@
                         <tr class="item-group-item">
                             <td class="text-center text-break">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" id="checkbox-edge-database-@database.Id" name="Input.EdgeDatabaseIds" value="@database.Id" class="custom-control-input item-group-item-checkbox" title="Select" checked="@(Model.Input.EdgeDatabaseIds.Contains(database.Id) ? "checked" : null)" />
+                                    <input type="checkbox" id="checkbox-edge-database-@database.Id" name="Input.EdgeDatabaseIds" value="@database.Id" class="custom-control-input item-group-item-checkbox" title="Select" checked="@(Model.Input.EdgeDatabaseIds != null && Model.Input.EdgeDatabaseIds.Contains(database.Id) ? "checked" : null)" />
                                     <label for="checkbox-edge-database-@database.Id" class="custom-control-label"></label>
                                 </div>
                             </td>
@@ -341,7 +341,7 @@
                             <tr class="item-group-item">
                                 <td class="text-center text-break">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="checkbox-seed-node-collection-@nodeCollection.Id" name="Input.SeedNodeCollectionIds" value="@nodeCollection.Id" class="custom-control-input item-group-item-checkbox" title="Select" checked="@(Model.Input.SeedNodeCollectionIds.Contains(nodeCollection.Id) ? "checked" : null)" />
+                                        <input type="checkbox" id="checkbox-seed-node-collection-@nodeCollection.Id" name="Input.SeedNodeCollectionIds" value="@nodeCollection.Id" class="custom-control-input item-group-item-checkbox" title="Select" checked="@(Model.Input.SeedNodeCollectionIds != null && Model.Input.SeedNodeCollectionIds.Contains(nodeCollection.Id) ? "checked" : null)" />
                                         <label for="checkbox-seed-node-collection-@nodeCollection.Id" class="custom-control-label"></label>
                                     </div>
                                 </td>

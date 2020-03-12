@@ -426,7 +426,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             var analysisUsersNavigationQuickLink = AnalysisUsersNavigationQuickLink;
             var analysisUserInvitationsNavigationQuickLink = AnalysisUserInvitationsNavigationQuickLink;
             // Update the count and the route ID.
-            analysisNodesNavigationQuickLink.ItemCount = analysis.AnalysisNodes.Count(item => item.Type == NetworkNodeType.None);
+            analysisNodesNavigationQuickLink.ItemCount = analysis.AnalysisNodes.Count(item => item.Type == AnalysisNodeType.None);
             analysisNodesNavigationQuickLink.RouteId = analysis.Id;
             analysisEdgesNavigationQuickLink.ItemCount = analysis.AnalysisEdges.Count();
             analysisEdgesNavigationQuickLink.RouteId = analysis.Id;
