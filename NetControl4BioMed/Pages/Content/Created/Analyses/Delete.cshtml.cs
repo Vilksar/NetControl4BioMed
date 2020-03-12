@@ -69,7 +69,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             if (View.Items == null || !View.Items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No analyses have been found with the provided IDs.";
+                TempData["StatusMessage"] = "Error: No analyses have been found with the provided IDs, or you don't have access to them.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
@@ -108,7 +108,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             if (View.Items == null || !View.Items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No analyses have been found with the provided IDs.";
+                TempData["StatusMessage"] = "Error: No analyses have been found with the provided IDs, or you don't have access to them.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }

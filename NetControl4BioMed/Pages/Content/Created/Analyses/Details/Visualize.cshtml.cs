@@ -68,7 +68,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
             if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
+                TempData["StatusMessage"] = "Error: No analysis has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }

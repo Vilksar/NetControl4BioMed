@@ -80,7 +80,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             if (View.Network == null)
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No network could be found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No network has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
@@ -127,7 +127,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             if (View.Network == null)
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No network could be found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No network has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }

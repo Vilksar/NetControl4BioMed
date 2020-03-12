@@ -1,0 +1,87 @@
+﻿@page
+@model StopModel
+@{
+    ViewData["Title"] = "Stop analyses";
+}
+
+<div class="alert alert-danger text-justify text-wrap">
+    <span><i class="fas fa-exclamation-circle"></i></span>
+    <span>The following @Model.View.Items.Count() analys@(Model.View.Items.Count() != 1 ? "e" : "i")s will be stopped. <span class="font-weight-bold">This action can't be reversed!</span></span>
+</div>
+<form method="post" class="text-justify">
+    <button type="submit" class="btn btn-danger btn-block item-group-button mb-3" title="Stop">
+        <span><i class="fas fa-stop"></i></span>
+        <span>Stop</span>
+    </button>
+    @if (!Model.View.Items.Any())
+    {
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>No analyses have been found with the provided IDs.</span>
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-header font-weight-bold">
+                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                    <div>
+                        <span><i class="fas fa-stop"></i></span>
+                    </div>
+                    <div>
+                        <span>Stop</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-bordered table-datatable" data-order="[[2]]">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="text-center text-break" data-orderable="false" data-searchable="false" hidden>
+                                <span></span>
+                            </th>
+                            <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                                <span>#</span>
+                            </th>
+                            <th class="text-left text-break">
+                                <span>Analysis</span>
+                            </th>
+                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                <span>Links</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.View.Items)
+                        {
+                            <tr>
+                                <td class="text-center text-break" hidden>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" id="checkbox-@item.Id" name="Input.Ids" value="@item.Id" class="custom-control-input" title="Select" checked="checked" />
+                                        <label for="checkbox-@item.Id" class="custom-control-label"></label>
+                                    </div>
+                                </td>
+                                <td class="text-center text-break">
+                                    <span></span>
+                                </td>
+                                <td class="text-left text-break">
+                                    <div>
+                                        <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                                    </div>
+                                    <div>
+                                        <span title="@item.Id" class="small">@item.Id</span>
+                                    </div>
+                                </td>
+                                <td class="text-center text-break">
+                                    <a asp-page="/Content/Created/Analyses/Details/Index" asp-route-id="@item.Id" title="Details">
+                                        <span>Details</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</form>
