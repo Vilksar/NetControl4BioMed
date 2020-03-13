@@ -33,6 +33,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
 
             public Analysis Analysis { get; set; }
 
+            public bool ShowVisualization { get; set; }
+
             public ControlPath ControlPath { get; set; }
 
             public IEnumerable<Node> UniqueControlNodes { get; set; }
@@ -80,6 +82,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                 Analysis = items
                     .Select(item => item.Analysis)
                     .First(),
+                ShowVisualization = items
+                    .Select(item => item.Analysis.AnalysisNodes)
+                    .SelectMany(item => item)
+                    .Count(item => item.Type == AnalysisNodeType.None) < 500,
                 ControlPath = items
                     .First(),
                 UniqueControlNodes = items

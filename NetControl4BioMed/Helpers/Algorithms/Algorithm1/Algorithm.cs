@@ -107,8 +107,11 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             var maximumIterationsWithoutImprovement = analysis.MaximumIterationsWithoutImprovement;
             var bestSolutionSize = targets.Count() + 1;
             var bestControlPaths = new List<Dictionary<string, List<string>>>();
-            var heuristics = JsonSerializer.Deserialize<List<List<string>>>(parameters.Heuristics);
-            // Update the analysis status.
+            // Update the parameters.
+            var heuristics = JsonSerializer.Deserialize<List<List<string>>>(parameters.Heuristics).TakeWhile(item => !item.Contains("Z")).Append(new List<string> { "Z" }).ToList();
+            parameters.Heuristics = JsonSerializer.Serialize(heuristics);
+            // Update the analysis status and parameters.
+            analysis.Parameters = JsonSerializer.Serialize(parameters);
             analysis.Status = AnalysisStatus.Ongoing;
             // Save the changes in the database.
             await context.SaveChangesAsync();
@@ -143,7 +146,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                     // Get the target nodes to keep.
                     var keptNodes = GetControllingNodes(controlPath).Where(item => item.Value.Count() > 1).Select(item => item.Value).SelectMany(item => item);
                     // Go over each of the paths corresponding to the target nodes to reset.
-                    foreach (var item in controlPath.Keys.Except(keptNodes))
+                    foreach (var item in controlPath.Keys.Except(keptNodes).ToList())
                     {
                         // Reset the control path.
                         controlPath[item] = new List<string>() { item };
@@ -247,7 +250,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                         bestControlPaths.Add(controlPath);
                     }
                 }
-                // And reload it for the next iteration.
+                // Reload it for the next iteration.
                 await context.Entry(analysis).ReloadAsync();
             }
             // Check if the analysis doesn't exist anymore (if it has been deleted).

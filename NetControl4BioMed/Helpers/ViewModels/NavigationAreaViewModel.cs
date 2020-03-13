@@ -799,6 +799,15 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Icon = "fa-desktop",
                             Color = "light",
                             Link = "/Content/Created/Analyses/Details/Created/Networks/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "ControlPaths",
+                            Title = "Control paths",
+                            Description = string.Empty,
+                            Icon = "fa-gamepad",
+                            Color = "light",
+                            Link = "/Content/Created/Analyses/Details/Created/ControlPaths/Index"
                         }
                     }
                 }

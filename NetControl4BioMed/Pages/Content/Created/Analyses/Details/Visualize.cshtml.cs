@@ -78,6 +78,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                 Analysis = items
                     .First(),
                 CytoscapeJson = JsonSerializer.Serialize(items
+                    .Include(item => item.AnalysisDatabases)
+                        .ThenInclude(item => item.Database)
+                            .ThenInclude(item => item.DatabaseType)
                     .Include(item => item.AnalysisNodes)
                         .ThenInclude(item => item.Node)
                             .ThenInclude(item => item.DatabaseNodeFieldNodes)

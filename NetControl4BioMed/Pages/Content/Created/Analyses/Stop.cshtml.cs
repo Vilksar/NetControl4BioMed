@@ -64,7 +64,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             {
                 Items = _context.Analyses
                     .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.Status == AnalysisStatus.Scheduled || item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing)
+                    .Where(item => item.Status == AnalysisStatus.Ongoing)
                     .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -104,7 +104,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             {
                 Items = _context.Analyses
                     .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.Status == AnalysisStatus.Scheduled || item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing)
+                    .Where(item => item.Status == AnalysisStatus.Ongoing)
                     .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.

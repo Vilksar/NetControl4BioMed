@@ -26,7 +26,7 @@ namespace NetControl4BioMed.Helpers.Extensions
             var controlNodes = path.PathNodes.Where(item => item.Type == PathNodeType.Source).Select(item => item.Node);
             var controlEdges = path.PathEdges.Select(item => item.Edge);
             // Get the default values.
-            var interactionType = path.ControlPath.Analysis.AnalysisDatabases.FirstOrDefault().Database.DatabaseType.Name.ToLower();
+            var interactionType = path.ControlPath.Analysis.AnalysisDatabases.FirstOrDefault()?.Database.DatabaseType.Name.ToLower();
             var isGeneric = interactionType == "generic";
             var controlClasses = new List<string> { "control" };
             // Return the view model.
@@ -35,6 +35,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 Elements = new CytoscapeViewModel.CytoscapeElements
                 {
                     Nodes = path.PathNodes
+                        .Where(item => item.Type == PathNodeType.None)
                         .Select(item => item.Node)
                         .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeNode
                         {
@@ -68,7 +69,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                         })
                 },
                 Layout = CytoscapeViewModel.DefaultLayout,
-                Styles = CytoscapeViewModel.DefaultStyles.Concat(CytoscapeViewModel.DefaultNetworkStyles)
+                Styles = CytoscapeViewModel.DefaultStyles.Concat(CytoscapeViewModel.DefaultAnalysisStyles).Concat(CytoscapeViewModel.DefaultControlPathStyles)
             };
         }
     }

@@ -52,8 +52,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Data.Nodes
                 {
                     { "IsNone", "Is of type \"None\"" },
                     { "IsNotNone", "Is not of type \"None\"" },
-                    { "IsSource", "Is of type \"Preferred\"" },
-                    { "IsNotSource", "Is not of type \"Preferred\"" },
+                    { "IsSource", "Is of type \"Source\"" },
+                    { "IsNotSource", "Is not of type \"Source\"" },
                     { "IsTarget", "Is of type \"Target\"" },
                     { "IsNotTarget", "Is not of type \"Target\"" }
                 },

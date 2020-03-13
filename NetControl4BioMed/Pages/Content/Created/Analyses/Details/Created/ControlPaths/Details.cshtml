@@ -20,11 +20,35 @@
             <span><i class="fas fa-info-circle"></i></span>
             <span>Click the button below to see the list of paths forming the current control path.</span>
         </div>
-        <a asp-page="/Content/Created/Networks/Details/Created/Paths/Index" asp-route-id="@Model.View.ControlPath.Id" class="btn btn-primary btn-block">
+        <a asp-page="/Content/Created/Analyses/Details/Created/Paths/Index" asp-route-id="@Model.View.ControlPath.Id" class="btn btn-primary btn-block">
             <span>View paths</span>
         </a>
     </div>
 </div>
+@if (Model.View.ShowVisualization)
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-eye"></i></span>
+                </div>
+                <div>
+                    <span>Visualize</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-primary text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>As the network corresponding to the analysis is relatively small, you can click the button below to visualize it in browser.</span>
+            </div>
+            <a asp-page="/Content/Created/Analyses/Details/Created/ControlPaths/Visualize" asp-route-id="@Model.View.ControlPath.Id" class="btn btn-primary btn-block">
+                <span>Visualize</span>
+            </a>
+        </div>
+    </div>
+}
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">

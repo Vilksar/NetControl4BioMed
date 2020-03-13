@@ -249,7 +249,7 @@
                         <label for="heuristics-group-current" class="font-weight-bold">Heuristics</label>
                     </div>
                     <div class="col-lg-12 order-1 order-lg-2">
-                        <select id="heuristics-group-current" class="custom-select heuristics-group-current" size="10" multiple title="Heuristics" disabled></select>
+                        <select id="heuristics-group-current" class="custom-select heuristics-group-current" multiple title="Heuristics" disabled></select>
                     </div>
                     <div class="col-lg-12 order-1 order-lg-3 mb-3">
                         <span description-for="heuristics-group-current" class="text-muted small">The search heuristics for the algorithm.</span>
@@ -341,7 +341,7 @@
                     <label asp-for="View.Algorithm2Parameters.CrossoverType" class="font-weight-bold">Crossover algorithm</label>
                 </div>
                 <div class="col-lg-6 order-1 order-lg-2">
-                    <select asp-for="View.Algorithm2Parameters.CrossoverType" class="custom-select" disabled>
+                    <select asp-for="View.Algorithm2Parameters.CrossoverType" class="custom-select" title="@Model.View.Algorithm2Parameters.CrossoverType.GetDisplayDescription()" disabled>
                         @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Algorithm2.CrossoverType)).Cast<Helpers.Algorithms.Algorithm2.CrossoverType>())
                         {
                             <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
@@ -356,7 +356,7 @@
                     <label asp-for="View.Algorithm2Parameters.MutationType" class="font-weight-bold">Mutation algorithm</label>
                 </div>
                 <div class="col-lg-6 order-2 order-lg-2">
-                    <select asp-for="View.Algorithm2Parameters.MutationType" class="custom-select" disabled>
+                    <select asp-for="View.Algorithm2Parameters.MutationType" class="custom-select" title="@Model.View.Algorithm2Parameters.MutationType.GetDisplayDescription()" disabled>
                         @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Algorithm2.MutationType)).Cast<Helpers.Algorithms.Algorithm2.MutationType>())
                         {
                             <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>

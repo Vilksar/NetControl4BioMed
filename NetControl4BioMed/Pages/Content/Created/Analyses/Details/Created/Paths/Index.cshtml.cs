@@ -91,7 +91,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
             // Get the items with the provided ID.
             var items = _context.Paths
                 .Where(item => item.ControlPath.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id);
+                .Where(item => item.ControlPath.Id == id);
             // Check if there were no items found.
             if (items == null || !items.Any())
             {

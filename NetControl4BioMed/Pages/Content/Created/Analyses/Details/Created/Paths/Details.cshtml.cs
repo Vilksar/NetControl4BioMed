@@ -33,6 +33,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
 
             public Analysis Analysis { get; set; }
 
+            public bool ShowVisualization { get; set; }
+
             public Path Path { get; set; }
         }
 
@@ -87,6 +89,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
                 Analysis = items
                     .Select(item => item.ControlPath.Analysis)
                     .First(),
+                ShowVisualization = items
+                    .Select(item => item.ControlPath.Analysis.AnalysisNodes)
+                    .SelectMany(item => item)
+                    .Count(item => item.Type == AnalysisNodeType.None) < 500,
                 Path = items
                     .First()
             };

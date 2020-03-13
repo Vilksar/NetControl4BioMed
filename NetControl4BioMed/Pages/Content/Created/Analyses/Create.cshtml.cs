@@ -485,11 +485,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             var viewModel = new AnalysisRunnerViewModel
             {
                 Id = analysis.Id,
-                Url = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null),
-                ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id })
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }),
+                ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Add a new Hangfire background task.
-            //BackgroundJob.Enqueue(() => _analysisRunner.Run(viewModel));
+            BackgroundJob.Enqueue(() => _analysisRunner.Run(viewModel));
             // Display a message.
             TempData["StatusMessage"] = $"Success: 1 analysis of type \"{databaseType.Name}\" using the algorithm \"{analysis.Algorithm.GetDisplayName()}\" created and scheduled successfully.";
             // Redirect to the index page.

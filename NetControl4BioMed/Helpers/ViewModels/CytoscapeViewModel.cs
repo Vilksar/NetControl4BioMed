@@ -298,7 +298,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 Selector = "node.control",
                 Css = new CytoscapeStyle.CytoscapeCSS
                 {
-                    BackgroundColor = "forrestgreen"
+                    BackgroundColor = "forestgreen"
                 }
             },
             new CytoscapeStyle

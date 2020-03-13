@@ -31,6 +31,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 Elements = new CytoscapeViewModel.CytoscapeElements
                 {
                     Nodes = network.NetworkNodes
+                        .Where(item => item.Type == NetworkNodeType.None)
                         .Select(item => item.Node)
                         .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeNode
                         {
