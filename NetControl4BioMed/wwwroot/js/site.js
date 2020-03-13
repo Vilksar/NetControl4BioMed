@@ -47,7 +47,7 @@ $(window).on('load', () => {
         });
     }
 
-    // Check if there is a list group of items on the page.
+    // Check if there is an item group on the page.
     if ($('.item-group').length !== 0) {
         // Define a function which gets all of the selected items and creates a JSON string array with their IDs.
         const updateSelectedItems = (groupElement) => {
@@ -277,7 +277,55 @@ $(window).on('load', () => {
                 updateText(groupElement);
             });
         })();
+    }
 
+    // Check if there is a heuristics group on the page.
+    if ($('.heuristics-group').length !== 0) {
+        // Define a function which updates the data to be submitted.
+        const updateText = (groupElement) => {
+            //// Parse and clean the current heuristics and update the input text area.
+        };
+        // Add a listener for if the add button was clicked.
+        $('.heuristics-group-add').on('click', (event) => {
+            // Get the actual group which was clicked.
+            const groupElement = $(event.target).closest('.heuristics-group');
+            //// Update the current heuristics with the additions.
+            // Update the selected items.
+            updateText(groupElement);
+        });
+        // Add a listener for if the remove button was clicked.
+        $('.heuristics-group-add').on('click', (event) => {
+            // Get the actual group which was clicked.
+            const groupElement = $(event.target).closest('.heuristics-group');
+            //// Update the current heuristics with the removals.
+            // Update the selected items.
+            updateText(groupElement);
+        });
+        // Execute the function on page load.
+        (() => {
+            // Go over all of the groups.
+            $('.heuristics-group').each((index, groupElement) => {
+                // Define a variable for the input data.
+                let data = undefined;
+                // Try to parse the input data.
+                try {
+                    // Get the input data.
+                    data = JSON.parse($(groupElement).find('.heuristics-group-input').first().val());
+                }
+                catch (error) {
+                    // Return from the function.
+                    return;
+                }
+                // Check if there isn't any data.
+                if (typeof data === 'undefined') {
+                    // Return from the function.
+                    return;
+                }
+                //// Update the current heuristics with the input data.
+                // Update the selected items.
+                updateText(groupElement);
+            });
+        })();
     }
 
     // Check if there is a Cytoscape area on the page.
