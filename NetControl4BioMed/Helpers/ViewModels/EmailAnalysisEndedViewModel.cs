@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace NetControl4BioMed.Helpers.ViewModels
 {
     /// <summary>
-    /// Represents the variables for a generic analysis end e-mail.
+    /// Represents the variables for an analysis end e-mail.
     /// </summary>
     public class EmailAnalysisEndedViewModel
     {

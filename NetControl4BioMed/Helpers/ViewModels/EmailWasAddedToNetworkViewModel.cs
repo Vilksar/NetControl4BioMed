@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace NetControl4BioMed.Helpers.ViewModels
 {
     /// <summary>
-    /// Represents the variables needed for an e-mail sent to a user after they were added to a generic network.
+    /// Represents the variables needed for an e-mail sent to a user after they were added to a network.
     /// </summary>
     public class EmailWasAddedToNetworkViewModel
     {
