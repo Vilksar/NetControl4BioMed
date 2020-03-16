@@ -38,10 +38,8 @@ else
         <tbody>
             @foreach (var (item, index) in Model.View.Search.Items.Select((item, index) => (item, index)))
             {
-                @{
-                    var sourceNode = item.PathNodes.Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Source).Select(item => item.Node.Name).First();
-                    var targetNode = item.PathNodes.Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Target).Select(item => item.Node.Name).First();
-                }
+                var sourceNode = item.PathNodes.Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Source).Select(item => item.Node.Name).First();
+                var targetNode = item.PathNodes.Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Target).Select(item => item.Node.Name).First();
                 <tr>
                     <td class="text-center text-break">
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
