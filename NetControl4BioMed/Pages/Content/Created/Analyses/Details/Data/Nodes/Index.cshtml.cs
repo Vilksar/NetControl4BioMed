@@ -33,9 +33,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Data.Nodes
 
         public class ViewModel
         {
-            public bool IsGeneric { get; set; }
-
             public Analysis Analysis { get; set; }
+
+            public bool IsGeneric { get; set; }
 
             public SearchViewModel<AnalysisNode> Search { get; set; }
 
@@ -155,12 +155,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Data.Nodes
             // Define the view.
             View = new ViewModel
             {
+                Analysis = items
+                    .First(),
                 IsGeneric = items
                     .Select(item => item.AnalysisDatabases)
                     .SelectMany(item => item)
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                Analysis = items
-                    .First(),
                 Search = new SearchViewModel<AnalysisNode>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.

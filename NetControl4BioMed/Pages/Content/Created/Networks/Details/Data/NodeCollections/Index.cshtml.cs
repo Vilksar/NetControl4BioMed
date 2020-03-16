@@ -33,9 +33,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.NodeColl
 
         public class ViewModel
         {
-            public bool IsGeneric { get; set; }
-
             public Network Network { get; set; }
+
+            public bool IsGeneric { get; set; }
 
             public SearchViewModel<NetworkNodeCollection> Search { get; set; }
 

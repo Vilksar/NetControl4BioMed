@@ -29,8 +29,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Created
         public class ViewModel
         {
             public Network Network { get; set; }
-
-            public bool IsGeneric { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -54,15 +52,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Created
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.Networks
+            var items = _context.Networks
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.NetworkDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .FirstOrDefault();
+                .Where(item => item.Id == id);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
@@ -72,9 +66,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Created
             // Define the view.
             View = new ViewModel
             {
-                Network = item,
-                IsGeneric = item.NetworkDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic")
+                Network = items
+                    .First()
             };
             // Redirect to the index page.
             return RedirectToPage("/Content/Created/Networks/Details/Index", new { id = View.Network.Id });

@@ -33,9 +33,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.Edges
 
         public class ViewModel
         {
-            public bool IsGeneric { get; set; }
-
             public Network Network { get; set; }
+
+            public bool IsGeneric { get; set; }
 
             public SearchViewModel<NetworkEdge> Search { get; set; }
 
@@ -166,12 +166,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.Edges
             // Define the view.
             View = new ViewModel
             {
+                Network = items
+                    .First(),
                 IsGeneric = items
                     .Select(item => item.NetworkDatabases)
                     .SelectMany(item => item)
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                Network = items
-                    .First(),
                 Search = new SearchViewModel<NetworkEdge>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.

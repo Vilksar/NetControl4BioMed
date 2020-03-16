@@ -29,8 +29,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Databases
         public class ViewModel
         {
             public Analysis Analysis { get; set; }
-
-            public bool IsGeneric { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -54,15 +52,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Databases
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Get the item with the provided ID.
-            var item = _context.Analyses
+            var items = _context.Analyses
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == id)
-                .Include(item => item.AnalysisDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                .FirstOrDefault();
+                .Where(item => item.Id == id);
             // Check if there was no item found.
-            if (item == null)
+            if (items == null || !items.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
@@ -72,9 +66,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Databases
             // Define the view.
             View = new ViewModel
             {
-                Analysis = item,
-                IsGeneric = item.AnalysisDatabases
-                    .Any(item => item.Database.DatabaseType.Name == "Generic")
+                Analysis = items
+                    .First()
             };
             // Redirect to the index page.
             return RedirectToPage("/Content/Created/Analyses/Details/Index", new { id = View.Analysis.Id });

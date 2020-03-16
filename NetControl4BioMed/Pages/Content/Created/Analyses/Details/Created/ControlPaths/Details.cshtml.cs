@@ -29,9 +29,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
 
         public class ViewModel
         {
-            public bool IsGeneric { get; set; }
-
             public Analysis Analysis { get; set; }
+
+            public bool IsGeneric { get; set; }
 
             public bool ShowVisualization { get; set; }
 
@@ -75,13 +75,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
             // Define the view.
             View = new ViewModel
             {
+                Analysis = items
+                    .Select(item => item.Analysis)
+                    .First(),
                 IsGeneric = items
                     .Select(item => item.Analysis.AnalysisDatabases)
                     .SelectMany(item => item)
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                Analysis = items
-                    .Select(item => item.Analysis)
-                    .First(),
                 ShowVisualization = items
                     .Select(item => item.Analysis.AnalysisNodes)
                     .SelectMany(item => item)

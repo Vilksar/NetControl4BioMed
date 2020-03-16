@@ -28,9 +28,9 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseTypes
 
         public class ViewModel
         {
-            public bool IsGeneric { get; set; }
-
             public DatabaseType DatabaseType { get; set; }
+
+            public bool IsGeneric { get; set; }
 
             public IQueryable<Database> Databases { get; set; }
         }
@@ -69,10 +69,10 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseTypes
             // Define the view.
             View = new ViewModel
             {
-                IsGeneric = items
-                    .Any(item => item.Name == "Generic"),
                 DatabaseType = items
                     .First(),
+                IsGeneric = items
+                    .Any(item => item.Name == "Generic"),
                 Databases = items
                     .Select(item => item.Databases)
                     .SelectMany(item => item)

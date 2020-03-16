@@ -28,9 +28,9 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseEdgeFields
 
         public class ViewModel
         {
-            public bool IsGeneric { get; set; }
-
             public DatabaseEdgeField DatabaseEdgeField { get; set; }
+
+            public bool IsGeneric { get; set; }
 
             public IQueryable<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }
         }
@@ -70,11 +70,11 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseEdgeFields
             // Define the view.
             View = new ViewModel
             {
-                IsGeneric = items
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 DatabaseEdgeField = items
                     .Include(item => item.Database)
                     .First(),
+                IsGeneric = items
+                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 DatabaseEdgeFieldEdges = items
                     .Select(item => item.DatabaseEdgeFieldEdges)
                     .SelectMany(item => item)

@@ -28,9 +28,9 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
 
         public class ViewModel
         {
-            public bool IsGeneric { get; set; }
-
             public DatabaseNodeField DatabaseNodeField { get; set; }
+
+            public bool IsGeneric { get; set; }
 
             public IQueryable<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }
         }
@@ -70,11 +70,11 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
             // Define the view.
             View = new ViewModel
             {
-                IsGeneric = items
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 DatabaseNodeField = items
                     .Include(item => item.Database)
                     .First(),
+                IsGeneric = items
+                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 DatabaseNodeFieldNodes = items
                     .Select(item => item.DatabaseNodeFieldNodes)
                     .SelectMany(item => item)
