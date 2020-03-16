@@ -4,6 +4,9 @@
 // Wait for the window to load.
 $(window).on('load', () => {
 
+    // Define the time interval in which refreshing takes place, in miliseconds.
+    const _refreshInterval = 2000;
+
     // Check if there is a cookie notification alert on the page.
     if ($('.cookie-consent-alert').length !== 0) {
         // Get the cookie acceptance button.
@@ -351,4 +354,46 @@ $(window).on('load', () => {
         $(".cytoscape-loading").prop("hidden", true);
     }
 
+    // Check if there is a refreshable item on the page.
+    if ($('.item-refresh').length !== 0) {
+        // Define a function to refresh the details.
+        const refresh = (element) => {
+            // Get the ID of the item.
+            const id = $(element).data("id");
+            // Get the status of the item.
+            const status = $(element).data("status");
+            // Get the data for the item with the provided ID.
+            const ajaxCall = $.ajax({
+                url: `${window.location.pathname}?handler=Refresh&id=${id}`,
+                dataType: 'json',
+                success: (data) => {
+                    // Check if the status has changed.
+                    if (status !== data.status) {
+                        // Reload the page.
+                        location.reload(true);
+                    }
+                    // Go over each JSON property.
+                    $.each(data, (key, value) => {
+                        // Update the corresponding fields.
+                        $(element).find(`.item-refresh-item[data-type=${key}]`).attr('title', value);
+                        $(element).find(`.item-refresh-item[data-type=${key}]`).text(value);
+                    });
+                },
+                error: () => { }
+            });
+        };
+        // Execute the function on page load.
+        (() => {
+            // Refresh all items once.
+            $('.item-refresh').each((index, element) => refresh(element));
+            // Check if the items need to be refreshed.
+            if ($('.item-refresh[data-refresh="True"]').length !== 0) {
+                // Repeat the function every few seconds.
+                setInterval(() => {
+                    // Go over all elements in the page.
+                    $('.item-refresh[data-refresh="True"]').each((index, element) => refresh(element));
+                }, _refreshInterval);
+            }
+        })();
+    }
 });

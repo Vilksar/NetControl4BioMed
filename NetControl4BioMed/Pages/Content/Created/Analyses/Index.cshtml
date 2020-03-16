@@ -41,7 +41,7 @@
             </button>
         </div>
         <div class="col-lg-4 mb-3">
-            <button type="submit" asp-page="/Content/Created/Analyses/Stop" class="btn btn-warning btn-block item-group-button" title="Stop" disabled>
+            <button type="submit" asp-page="/Content/Created/Analyses/Stop" class="btn btn-secondary btn-block item-group-button" title="Stop" disabled>
                 <span><i class="fas fa-stop"></i></span>
                 <span>Stop</span>
             </button>
@@ -88,7 +88,7 @@
             <tbody>
                 @foreach (var item in Model.View.Search.Items)
                 {
-                    <tr class="item-group-item">
+                    <tr class="item-group-item item-refresh" data-id="@item.Id" data-status="@item.Status.ToString()" data-refresh="@(item.Status == AnalysisStatus.Scheduled || item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing || item.Status == AnalysisStatus.Stopping)">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" id="checkbox-@item.Id" name="ids" value="@item.Id" class="custom-control-input item-group-item-checkbox" title="Select" />
@@ -128,18 +128,20 @@
                             <span title="@item.Status.GetDisplayDescription()">@item.Status.GetDisplayName()</span>
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break">
-                            <span title="Progress">@(Math.Round((double)item.CurrentIteration * 100 / item.MaximumIterations, 2).ToString("0.00"))% / @(Math.Round((double)item.CurrentIterationWithoutImprovement * 100 / item.MaximumIterationsWithoutImprovement, 2).ToString("0.00"))%</span>
+                            <span class="item-refresh-item" data-type="progress"></span>
+                            <span>/</span>
+                            <span class="item-refresh-item" data-type="progressWithoutImprovement"></span>
                         </td>
                         <td class="text-center text-break">
                             <a asp-page="/Content/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="btn btn-info my-1 mr-1" title="Details">
                                 <span><i class="fas fa-info-circle"></i></span>
                             </a>
-                            <a asp-page="/Content/Created/Networks/Download" asp-route-ids="@item.Id" class="btn btn-primary my-1 mr-1" title="Download">
+                            <a asp-page="/Content/Created/Analyses/Download" asp-route-ids="@item.Id" class="btn btn-primary my-1 mr-1" title="Download">
                                 <span><i class="fas fa-download"></i></span>
                             </a>
                             @if (item.Status == AnalysisStatus.Ongoing)
                             {
-                                <a asp-page="/Content/Created/Analyses/Stop" asp-route-ids="@item.Id" class="btn btn-warning my-1 mr-1" title="Stop">
+                                <a asp-page="/Content/Created/Analyses/Stop" asp-route-ids="@item.Id" class="btn btn-secondary my-1 mr-1" title="Stop">
                                     <span><i class="fas fa-stop"></i></span>
                                 </a>
                             }

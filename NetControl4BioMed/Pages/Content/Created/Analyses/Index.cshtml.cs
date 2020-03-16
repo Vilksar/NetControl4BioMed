@@ -257,5 +257,41 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             // Return the page.
             return Page();
         }
+
+        public async Task<IActionResult> OnGetRefreshAsync(string id)
+        {
+            // Get the current user.
+            var user = await _userManager.GetUserAsync(User);
+            // Check if the user does not exist.
+            if (user == null)
+            {
+                // Return an empty result.
+                return new JsonResult(new { });
+            }
+            // Check if there isn't any ID provided.
+            if (string.IsNullOrEmpty(id))
+            {
+                // Return an empty result.
+                return new JsonResult(new { });
+            }
+            // Get the item with the provided ID.
+            var item = _context.Analyses
+                .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
+                .Where(item => item.Id == id)
+                .FirstOrDefault();
+            // Check if there was no item found.
+            if (item == null)
+            {
+                // Return an empty result.
+                return new JsonResult(new { });
+            }
+            // Return the analysis data.
+            return new JsonResult(new
+            {
+                Status = item.Status.ToString(),
+                Progress = ((double)item.CurrentIteration * 100 / item.MaximumIterations).ToString("0.00"),
+                ProgressWithoutImprovement = ((double)item.CurrentIterationWithoutImprovement * 100 / item.MaximumIterationsWithoutImprovement).ToString("0.00")
+            });
+        }
     }
 }

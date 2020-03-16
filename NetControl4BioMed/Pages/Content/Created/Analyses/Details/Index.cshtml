@@ -1,35 +1,39 @@
 ﻿@page
 @model IndexModel
+@using NetControl4BioMed.Data.Enumerations
 @using Helpers.Extensions
 @{
     ViewData["Title"] = "Analysis details";
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetAnalysisNavigationTitleCard(Model.View.Analysis)" />
-<div class="card mb-3">
+@*<div class="analysis-details-partial" data-id="@Model.View.Analysis.Id" data-status="@Model.View.Analysis.Status.ToString()" data-refresh="@(Model.View.Analysis.Status == AnalysisStatus.Scheduled || Model.View.Analysis.Status == AnalysisStatus.Initializing || Model.View.Analysis.Status == AnalysisStatus.Ongoing || Model.View.Analysis.Status == AnalysisStatus.Stopping || Model.View.Analysis.Status == AnalysisStatus.Completed)">
+    <partial name="_AnalysisDetailsPartial" model="Model.View.Analysis" />
+</div>*@
+<div class="card mb-3" title="Status">
     <div class="card-body text-center">
-        <div class="text-uppercase" title="Status">
+        <div class="text-uppercase">
             @switch (Model.View.Analysis.Status)
             {
-                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Scheduled:
+                case AnalysisStatus.Scheduled:
                     <span class="text-warning"><i class="fas fa-clock"></i></span>
                     break;
-                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Initializing:
+                case AnalysisStatus.Initializing:
                     <span class="text-primary"><i class="fas fa-play-circle"></i></span>
                     break;
-                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Ongoing:
+                case AnalysisStatus.Ongoing:
                     <span class="text-primary"><i class="fas fa-sync-alt fa-spin"></i></span>
                     break;
-                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Stopping:
+                case AnalysisStatus.Stopping:
                     <span class="text-danger"><i class="fas fa-stopwatch"></i></span>
                     break;
-                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Stopped:
+                case AnalysisStatus.Stopped:
                     <span class="text-danger"><i class="fas fa-stop-circle"></i></span>
                     break;
-                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Completed:
+                case AnalysisStatus.Completed:
                     <span class="text-success"><i class="fas fa-check-circle"></i></span>
                     break;
-                case NetControl4BioMed.Data.Enumerations.AnalysisStatus.Error:
+                case AnalysisStatus.Error:
                     <span class="text-danger"><i class="fas fa-times-circle"></i></span>
                     break;
                 default:
@@ -37,25 +41,60 @@
             }
             <span title="@Model.View.Analysis.Status.GetDisplayDescription()">@Model.View.Analysis.Status.GetDisplayName()</span>
         </div>
-        <div class="font-weight-bold">
-            <span title="Progress">@(Math.Round((double)Model.View.Analysis.CurrentIteration * 100 / Model.View.Analysis.MaximumIterations, 2).ToString("0.00"))% / @(Math.Round((double)Model.View.Analysis.CurrentIterationWithoutImprovement * 100 / Model.View.Analysis.MaximumIterationsWithoutImprovement, 2).ToString("0.00"))%</span>
+    </div>
+</div>
+<div class="item-refresh" data-id="@Model.View.Analysis.Id" data-status="@Model.View.Analysis.Status.ToString()" data-refresh="@(Model.View.Analysis.Status == AnalysisStatus.Scheduled || Model.View.Analysis.Status == AnalysisStatus.Initializing || Model.View.Analysis.Status == AnalysisStatus.Ongoing || Model.View.Analysis.Status == AnalysisStatus.Stopping)">
+    <div class="card mb-3" title="Progress">
+        <div class="card-body text-center">
+            <div class="font-weight-bold">
+                <span class="item-refresh-item" data-type="progress"></span>
+                <span>/</span>
+                <span class="item-refresh-item" data-type="progressWithoutImprovement"></span>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body text-center">
+            <div class="row align-items-center">
+                <div class="col-lg-4" title="Date started">
+                    <span><i class="fas fa-calendar"></i></span>
+                    <span class="item-refresh-item" data-type="dateTimeStarted"></span>
+                </div>
+                <div class="col-lg-4 my-1 my-lg-0" title="Time elapsed">
+                    <span><i class="fas fa-clock"></i></span>
+                    <span class="item-refresh-item" data-type="dateTimeElapsed"></span>
+                </div>
+                <div class="col-lg-4" title="Date ended">
+                    <span><i class="fas fa-calendar"></i></span>
+                    <span class="item-refresh-item" data-type="dateTimeEnded"></span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 <div class="row align-items-center">
-    <div class="col-lg-4 mb-3">
+    <div class="col-lg mb-3">
         <a asp-page="/Content/Created/Analyses/Edit" asp-route-id="@Model.View.Analysis.Id" class="btn btn-warning btn-block" title="Edit">
             <span><i class="fas fa-pencil-alt"></i></span>
             <span>Edit</span>
         </a>
     </div>
-    <div class="col-lg-4 mb-3">
+    <div class="col-lg mb-3">
         <a asp-page="/Content/Created/Analyses/Download" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-primary btn-block" title="Download">
             <span><i class="fas fa-download"></i></span>
             <span>Download</span>
         </a>
     </div>
-    <div class="col-lg-4 mb-3">
+    @if (Model.View.Analysis.Status == AnalysisStatus.Ongoing)
+    {
+        <div class="col-lg mb-3">
+            <a asp-page="/Content/Created/Analyses/Stop" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-secondary btn-block" title="Stop">
+                <span><i class="fas fa-stop"></i></span>
+                <span>Stop</span>
+            </a>
+        </div>
+    }
+    <div class="col-lg mb-3">
         <a asp-page="/Content/Created/Analyses/Delete" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Delete">
             <span><i class="fas fa-trash"></i></span>
             <span>Delete</span>
