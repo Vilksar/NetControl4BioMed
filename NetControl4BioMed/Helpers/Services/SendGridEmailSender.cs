@@ -219,5 +219,23 @@ namespace NetControl4BioMed.Helpers.Services
             // Send the e-mail.
             await client.SendEmailAsync(msg);
         }
+
+        /// <summary>
+        /// Sends an e-mail with an alert that one or more analyses will be deleted.
+        /// </summary>
+        /// <param name="viewModel">Represents the view model of the e-mail.</param>
+        public async Task SendAlertDeleteAnalysesEmailAsync(EmailAlertDeleteAnalysesViewModel viewModel)
+        {
+            // Define the variables for the e-mail.
+            var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
+            var client = new SendGridClient(apiKey);
+            var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
+            var to = new EmailAddress(viewModel.Email, viewModel.Email);
+            var subject = "NetControl4BioMed - Analyses to be deleted";
+            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailAlertDeleteAnalysesPartial", viewModel);
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
+            // Send the e-mail.
+            await client.SendEmailAsync(msg);
+        }
     }
 }
