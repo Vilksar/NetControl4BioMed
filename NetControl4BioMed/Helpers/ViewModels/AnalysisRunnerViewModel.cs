@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,13 +17,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public string Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the URL to the analysis page.
+        /// Gets or sets the HTTP context.
         /// </summary>
-        public string Url { get; set; }
-
-        /// <summary>
-        /// Gets or sets the URL to the home page.
-        /// </summary>
-        public string ApplicationUrl { get; set; }
+        public HttpContext HttpContext { get; set; }
     }
 }

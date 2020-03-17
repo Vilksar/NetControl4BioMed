@@ -26,14 +26,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
-        private readonly LinkGenerator _linkGenerator;
         private readonly IAnalysisRunner _analysisRunner;
 
-        public CreateModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator, IAnalysisRunner analysisRunner)
+        public CreateModel(UserManager<User> userManager, ApplicationDbContext context, IAnalysisRunner analysisRunner)
         {
             _userManager = userManager;
             _context = context;
-            _linkGenerator = linkGenerator;
             _analysisRunner = analysisRunner;
         }
 
@@ -125,21 +123,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }
-            // Try to get the analysis with the provided ID.
-            var analysis = !string.IsNullOrEmpty(analysisId) ? _context.Analyses
-                .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                .FirstOrDefault(item => item.Id == analysisId) : null;
-            // Check if there was no analysis found.
-            if (!string.IsNullOrEmpty(analysisId) && analysis == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No analysis could be found with the provided ID.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/Created/Analyses/Index");
-            }
-            // Update the database type ID.
-            databaseTypeId = analysis == null ? databaseTypeId : analysis.AnalysisDatabases.FirstOrDefault()?.Database?.DatabaseType?.Id;
-            // Check if there isn't any database type ID provided or if the database type ID couldn't be inferred.
+            // Check if there wasn't any database type ID provided.
             if (string.IsNullOrEmpty(databaseTypeId))
             {
                 // Display a message.
@@ -148,22 +132,35 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Try to get the database type with the provided ID.
-            var databaseType = _context.DatabaseTypes.FirstOrDefault(item => item.Id == databaseTypeId);
+            var databaseType = _context.DatabaseTypes
+                .FirstOrDefault(item => item.Id == databaseTypeId);
             // Check if there wasn't any database type found.
             if (databaseType == null)
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No type could be found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No type could be found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
-            // Update the algorithm.
-            algorithm = analysis == null ? algorithm : analysis.Algorithm;
-            // Check if there isn't any algorithm provided.
+            // Check if there wasn't any algorithm provided.
             if (algorithm == null)
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: An algorithm is required for creating an analysis.";
+                // Redirect to the index page.
+                return RedirectToPage("/Content/Created/Analyses/Index");
+            }
+            // Try to get the analysis with the provided ID.
+            var analyses = _context.Analyses
+                .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
+                .Where(item => item.Id == analysisId);
+            // Check if there wasn't any analysis found.
+            var analysesFound = analyses.Any();
+            // Check if there was an ID provided, but there was no analysis found.
+            if (!string.IsNullOrEmpty(analysisId) && !analysesFound)
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: No analysis could be found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
@@ -190,7 +187,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Define the input.
-            Input = analysis == null ?
+            Input = !analyses.Any() ?
                 new InputModel
                 {
                     DatabaseTypeId = databaseType.Id,
@@ -208,25 +205,49 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 new InputModel
                 {
                     DatabaseTypeId = databaseType.Id,
-                    Name = analysis.Name,
-                    Description = analysis.Description,
-                    Algorithm = analysis.Algorithm,
-                    SourceData = JsonSerializer.Serialize(analysis.AnalysisNodes.Where(item => item.Type == AnalysisNodeType.Source).Select(item => item.Node.Name)),
-                    TargetData = JsonSerializer.Serialize(analysis.AnalysisNodes.Where(item => item.Type == AnalysisNodeType.Target).Select(item => item.Node.Name)),
-                    MaximumIterations = analysis.MaximumIterations,
-                    MaximumIterationsWithoutImprovement = analysis.MaximumIterationsWithoutImprovement,
-                    Algorithm1Parameters = analysis.Algorithm == AnalysisAlgorithm.Algorithm1 ? JsonSerializer.Deserialize<Helpers.Algorithms.Algorithm1.Parameters>(analysis.Parameters) : null,
-                    Algorithm2Parameters = analysis.Algorithm == AnalysisAlgorithm.Algorithm2 ? JsonSerializer.Deserialize<Helpers.Algorithms.Algorithm2.Parameters>(analysis.Parameters) : null,
-                    NetworkIds = analysis.AnalysisNetworks
+                    Name = analyses
+                        .Select(item => item.Name)
+                        .FirstOrDefault(),
+                    Description = analyses
+                        .Select(item => item.Description)
+                        .FirstOrDefault(),
+                    Algorithm = algorithm,
+                    SourceData = JsonSerializer.Serialize(analyses
+                        .Select(item => item.AnalysisNodes)
+                        .SelectMany(item => item)
+                        .Where(item => item.Type == AnalysisNodeType.Source)
+                        .Select(item => item.Node.Name)),
+                    TargetData = JsonSerializer.Serialize(analyses
+                        .Select(item => item.AnalysisNodes)
+                        .SelectMany(item => item)
+                        .Where(item => item.Type == AnalysisNodeType.Target)
+                        .Select(item => item.Node.Name)),
+                    MaximumIterations = analyses
+                        .Select(item => item.MaximumIterations)
+                        .FirstOrDefault(),
+                    MaximumIterationsWithoutImprovement = analyses
+                        .Select(item => item.MaximumIterationsWithoutImprovement)
+                        .FirstOrDefault(),
+                    Algorithm1Parameters = algorithm == AnalysisAlgorithm.Algorithm1 ?
+                        JsonSerializer.Deserialize<Helpers.Algorithms.Algorithm1.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : null,
+                    Algorithm2Parameters = algorithm == AnalysisAlgorithm.Algorithm2 ?
+                        JsonSerializer.Deserialize<Helpers.Algorithms.Algorithm2.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : null,
+                    NetworkIds = analyses
+                        .Select(item => item.AnalysisNetworks)
+                        .SelectMany(item => item)
                         .Select(item => item.Network)
                         .Intersect(View.Networks)
                         .Select(item => item.Id),
-                    SourceNodeCollectionIds = analysis.AnalysisNodeCollections
+                    SourceNodeCollectionIds = analyses
+                        .Select(item => item.AnalysisNodeCollections)
+                        .SelectMany(item => item)
                         .Where(item => item.Type == AnalysisNodeCollectionType.Source)
                         .Select(item => item.NodeCollection)
                         .Intersect(View.SourceNodeCollections)
                         .Select(item => item.Id),
-                    TargetNodeCollectionIds = analysis.AnalysisNodeCollections
+                    TargetNodeCollectionIds = analyses
+                        .Select(item => item.AnalysisNodeCollections)
+                        .SelectMany(item => item)
                         .Where(item => item.Type == AnalysisNodeCollectionType.Target)
                         .Select(item => item.NodeCollection)
                         .Intersect(View.TargetNodeCollections)
@@ -248,7 +269,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }
-            // Check if there isn't any ID provided.
+            // Check if there isn't any database type ID provided.
             if (string.IsNullOrEmpty(Input.DatabaseTypeId))
             {
                 // Display a message.
@@ -485,11 +506,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             var viewModel = new AnalysisRunnerViewModel
             {
                 Id = analysis.Id,
-                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }),
-                ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
+                HttpContext = HttpContext
             };
+            // Mark the data for updating.
+            _context.Analyses.Update(analysis);
             // Add a new Hangfire background task.
-            BackgroundJob.Enqueue(() => _analysisRunner.Run(viewModel));
+            analysis.JobId = BackgroundJob.Enqueue<IAnalysisRunner>(item => item.Run(viewModel));
+            // Save the changes to the database.
+            await _context.SaveChangesAsync();
             // Display a message.
             TempData["StatusMessage"] = $"Success: 1 analysis of type \"{databaseType.Name}\" using the algorithm \"{analysis.Algorithm.GetDisplayName()}\" created and scheduled successfully.";
             // Redirect to the index page.

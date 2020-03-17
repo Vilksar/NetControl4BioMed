@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.Interfaces;
@@ -26,14 +27,21 @@ namespace NetControl4BioMed.Helpers.Services
         private readonly ISendGridEmailSender _emailSender;
 
         /// <summary>
+        /// Represents the link generator
+        /// </summary>
+        private readonly LinkGenerator _linkGenerator;
+
+        /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
         /// <param name="context">The application database context.</param>
         /// <param name="emailSender">The e-mail sender.</param>
-        public AnalysisRunner(ApplicationDbContext context, ISendGridEmailSender emailSender)
+        /// <param name="linkGenerator">The link generator.</param>
+        public AnalysisRunner(ApplicationDbContext context, ISendGridEmailSender emailSender, LinkGenerator linkGenerator)
         {
             _context = context;
             _emailSender = emailSender;
+            _linkGenerator = linkGenerator;
         }
 
         /// <summary>
@@ -74,8 +82,8 @@ namespace NetControl4BioMed.Helpers.Services
                     Id = analysis.Id,
                     Name = analysis.Name,
                     Status = analysis.Status.GetDisplayName(),
-                    Url = model.Url,
-                    ApplicationUrl = model.ApplicationUrl
+                    Url = _linkGenerator.GetUriByPage(model.HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }),
+                    ApplicationUrl = _linkGenerator.GetUriByPage(model.HttpContext, "/Index", handler: null, values: null)
                 });
             }
         }
