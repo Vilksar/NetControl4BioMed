@@ -17,6 +17,7 @@ using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Services;
+using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed
 {
@@ -95,12 +96,14 @@ namespace NetControl4BioMed
                     facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
                     facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
                 });
-            // Add the HTTP client dependency.
+            // Add the HTTP context accessor and the HTTP client dependency.
+            services.AddHttpContextAccessor();
             services.AddHttpClient();
             // Add the dependency injection for the partial view renderer, reCaptcha checker and the e-mail sender.
             services.AddTransient<IPartialViewRenderer, PartialViewRenderer>();
             services.AddTransient<IReCaptchaChecker, ReCaptchaChecker>();
             services.AddTransient<ISendGridEmailSender, SendGridEmailSender>();
+            services.AddTransient<IHangfireRecurringCleaner, HangfireRecurringCleaner>();
             services.AddTransient<IAnalysisRunner, AnalysisRunner>();
             // Add Razor pages.
             services.AddRazorPages();
@@ -114,7 +117,8 @@ namespace NetControl4BioMed
         /// </remarks>
         /// <param name="app">Represents the application builder.</param>
         /// <param name="env">Represents the hosting environment of the application.</param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        /// <param name="http">Represents the HTTP context accessor.</param>
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHttpContextAccessor http)
         {
             // Check the environment in which it is running.
             if (env.IsDevelopment())
@@ -151,10 +155,19 @@ namespace NetControl4BioMed
             });
             app.UseHangfireServer(new BackgroundJobServerOptions
             {
-                WorkerCount = (Environment.ProcessorCount - 1) * 2 > 0 ? (Environment.ProcessorCount - 1) * 2 : 1
+                WorkerCount = Environment.ProcessorCount > 1 ? (Environment.ProcessorCount - 1) * 2 : 1
             });
             // Seed the database.
             app.SeedDatabaseAsync(Configuration).Wait();
+            // Define the view model for the recurring task of cleaning the database.
+            var viewModel = new HangfireRecurringCleanerViewModel
+            {
+                HttpContext = http.HttpContext
+            };
+            // Delete any existing recurring tasks of cleaning the database.
+            RecurringJob.RemoveIfExists(nameof(IHangfireRecurringCleaner));
+            // Create a daily recurring Hangfire task of cleaning the database.
+            RecurringJob.AddOrUpdate<IHangfireRecurringCleaner>(nameof(IHangfireRecurringCleaner), item => item.Run(viewModel), Cron.Daily());
         }
     }
 }
