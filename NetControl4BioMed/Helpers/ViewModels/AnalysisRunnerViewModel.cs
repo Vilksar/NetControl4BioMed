@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,13 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public string Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the HTTP context.
+        /// Gets or sets the HTTP context scheme.
         /// </summary>
-        public HttpContext HttpContext { get; set; }
+        public string Scheme { get; set; }
+
+        /// <summary>
+        /// Gets or sets the HTTP context host value.
+        /// </summary>
+        public string HostValue { get; set; }
     }
 }

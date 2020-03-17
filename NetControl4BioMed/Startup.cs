@@ -6,7 +6,6 @@ using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -96,8 +95,7 @@ namespace NetControl4BioMed
                     facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
                     facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
                 });
-            // Add the HTTP context accessor and the HTTP client dependency.
-            services.AddHttpContextAccessor();
+            // Add the HTTP client dependency.
             services.AddHttpClient();
             // Add the dependency injection for the partial view renderer, reCaptcha checker and the e-mail sender.
             services.AddTransient<IPartialViewRenderer, PartialViewRenderer>();
@@ -117,8 +115,7 @@ namespace NetControl4BioMed
         /// </remarks>
         /// <param name="app">Represents the application builder.</param>
         /// <param name="env">Represents the hosting environment of the application.</param>
-        /// <param name="http">Represents the HTTP context accessor.</param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHttpContextAccessor http)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // Check the environment in which it is running.
             if (env.IsDevelopment())
@@ -159,15 +156,6 @@ namespace NetControl4BioMed
             });
             // Seed the database.
             app.SeedDatabaseAsync(Configuration).Wait();
-            // Define the view model for the recurring task of cleaning the database.
-            var viewModel = new HangfireRecurringCleanerViewModel
-            {
-                HttpContext = http.HttpContext
-            };
-            // Delete any existing recurring tasks of cleaning the database.
-            RecurringJob.RemoveIfExists(nameof(IHangfireRecurringCleaner));
-            // Create a daily recurring Hangfire task of cleaning the database.
-            RecurringJob.AddOrUpdate<IHangfireRecurringCleaner>(nameof(IHangfireRecurringCleaner), item => item.Run(viewModel), Cron.Daily());
         }
     }
 }

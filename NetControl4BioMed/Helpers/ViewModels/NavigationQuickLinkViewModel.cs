@@ -137,7 +137,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Networks",
             Title = "Network",
-            Color = "success",
+            Color = "info",
             Icon = "fa-share-alt",
             Width = 6,
             Link = "/Content/Created/Networks/Index"
@@ -150,7 +150,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Analyses",
             Title = "Analysis",
-            Color = "success",
+            Color = "info",
             Icon = "fa-desktop",
             Width = 6,
             Link = "/Content/Created/Analyses/Index"

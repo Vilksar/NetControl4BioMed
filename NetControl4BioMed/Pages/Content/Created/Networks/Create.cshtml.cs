@@ -91,50 +91,53 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }
-            // Try to get the network with the provided ID.
-            var network = !string.IsNullOrEmpty(networkId) ? _context.Networks
-                .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                .FirstOrDefault(item => item.Id == networkId) : null;
-            // Check if there was no network found.
-            if (!string.IsNullOrEmpty(networkId) && network == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No network could be found with the provided ID.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/Created/Networks/Index");
-            }
-            // Update the database type ID.
-            databaseTypeId = network == null ? databaseTypeId : network.NetworkDatabases.FirstOrDefault()?.Database?.DatabaseType?.Id;
-            // Check if there isn't any database type ID provided or if the database type ID couldn't be inferred.
+            // Check if there wasn't any database type ID provided.
             if (string.IsNullOrEmpty(databaseTypeId))
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: A type is required for creating an analysis.";
+                TempData["StatusMessage"] = "Error: A type is required for creating a network.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
             // Try to get the database type with the provided ID.
-            var databaseType = _context.DatabaseTypes.FirstOrDefault(item => item.Id == databaseTypeId);
+            var databaseType = _context.DatabaseTypes
+                .FirstOrDefault(item => item.Id == databaseTypeId);
             // Check if there wasn't any database type found.
             if (databaseType == null)
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No type could be found with the provided ID.";
+                TempData["StatusMessage"] = "Error: No type could be found with the provided ID, or you don't have access to it.";
+                // Redirect to the index page.
+                return RedirectToPage("/Content/Created/Networks/Index");
+            }
+            // Check if the database type is generic.
+            var isGeneric = databaseType.Name == "Generic";
+            // Try to get the network with the provided ID.
+            var networks = _context.Networks
+                .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                .Where(item => item.Id == networkId);
+            // Check if there wasn't any network found.
+            var networksFound = networks != null && networks.Any();
+            // Check if there was an ID provided, but there was no network found.
+            if (!string.IsNullOrEmpty(networkId) && !networksFound)
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: No network could be found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                IsGeneric = databaseType.Name == "Generic",
+                IsGeneric = isGeneric,
                 NodeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.DatabaseNodeFields.Any(item1 => item1.IsSearchable)),
+                    .Where(item => !isGeneric ? item.DatabaseNodeFields.Any(item1 => item1.IsSearchable) : true),
                 EdgeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.DatabaseEdges.Any()),
+                    .Where(item => !isGeneric ? item.DatabaseEdges.Any() : true),
                 SeedNodeCollections = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
@@ -156,7 +159,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
             // Define the input.
-            Input = network == null ?
+            Input = !networksFound ?
                 new InputModel
                 {
                     DatabaseTypeId = databaseType.Id,
@@ -167,29 +170,45 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 new InputModel
                 {
                     DatabaseTypeId = databaseType.Id,
-                    Name = network.Name,
-                    Description = network.Description,
-                    Algorithm = network.Algorithm,
+                    Name = networks
+                        .Select(item => item.Name)
+                        .FirstOrDefault(),
+                    Description = networks
+                        .Select(item => item.Description)
+                        .FirstOrDefault(),
+                    Algorithm = networks
+                        .Select(item => item.Algorithm)
+                        .FirstOrDefault(),
                     SeedData = View.IsGeneric ?
-                        JsonSerializer.Serialize(network.NetworkEdges
+                        JsonSerializer.Serialize(networks
+                            .Select(item => item.NetworkEdges)
+                            .SelectMany(item => item)
                             .Select(item => new ItemModel
                             {
-                                SourceNode = item.Edge.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source)?.Node?.Name,
-                                TargetNode = item.Edge.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)?.Node?.Name
+                                SourceNode = item.Edge.EdgeNodes.Where(item1 => item1.Type == EdgeNodeType.Source).Select(item1 => item1.Node.Name).FirstOrDefault(),
+                                TargetNode = item.Edge.EdgeNodes.Where(item1 => item1.Type == EdgeNodeType.Target).Select(item1 => item1.Node.Name).FirstOrDefault()
                             })
                             .Where(item => !string.IsNullOrEmpty(item.SourceNode) && !string.IsNullOrEmpty(item.TargetNode))) :
-                        JsonSerializer.Serialize(network.NetworkNodes
+                        JsonSerializer.Serialize(networks
+                            .Select(item => item.NetworkNodes)
+                            .SelectMany(item => item)
                             .Where(item => item.Type == NetworkNodeType.Seed)
                             .Select(item => item.Node.Name)),
-                    NodeDatabaseIds = network.NetworkDatabases
+                    NodeDatabaseIds = networks
+                        .Select(item => item.NetworkDatabases)
+                        .SelectMany(item => item)
                         .Select(item => item.Database)
                         .Intersect(View.NodeDatabases)
                         .Select(item => item.Id),
-                    EdgeDatabaseIds = network.NetworkDatabases
+                    EdgeDatabaseIds = networks
+                        .Select(item => item.NetworkDatabases)
+                        .SelectMany(item => item)
                         .Select(item => item.Database)
                         .Intersect(View.EdgeDatabases)
                         .Select(item => item.Id),
-                    SeedNodeCollectionIds = network.NetworkNodeCollections
+                    SeedNodeCollectionIds = networks
+                        .Select(item => item.NetworkNodeCollections)
+                        .SelectMany(item => item)
                         .Select(item => item.NodeCollection)
                         .Intersect(View.SeedNodeCollections)
                         .Select(item => item.Id)
@@ -228,18 +247,20 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
+            // Check if the database type is generic.
+            var isGeneric = databaseType.Name == "Generic";
             // Define the view.
             View = new ViewModel
             {
-                IsGeneric = databaseType.Name == "Generic",
+                IsGeneric = isGeneric,
                 NodeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.DatabaseNodeFields.Any(item1 => item1.IsSearchable)),
+                    .Where(item => !isGeneric ? item.DatabaseNodeFields.Any(item1 => item1.IsSearchable) : true),
                 EdgeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.DatabaseEdges.Any()),
+                    .Where(item => !isGeneric ? item.DatabaseEdges.Any() : true),
                 SeedNodeCollections = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Helpers.Extensions;
@@ -47,9 +48,9 @@ namespace NetControl4BioMed.Helpers.Services
         /// <summary>
         /// Runs the analysis with the given ID.
         /// </summary>
-        /// <param name="model">The view model of the analysis to run.</param>
+        /// <param name="viewModel">The view model of the analysis to run.</param>
         /// <returns></returns>
-        public async Task Run(AnalysisRunnerViewModel model)
+        public async Task Run(AnalysisRunnerViewModel viewModel)
         {
             // Get the analysis with the given ID.
             var analysis = _context.Analyses
@@ -61,7 +62,7 @@ namespace NetControl4BioMed.Helpers.Services
                             .ThenInclude(item => item.Node)
                 .Include(item => item.AnalysisUsers)
                     .ThenInclude(item => item.User)
-                .FirstOrDefault(item => item.Id == model.Id);
+                .FirstOrDefault(item => item.Id == viewModel.Id);
             // Check if the analysis hasn't been found.
             if (analysis == null)
             {
@@ -72,6 +73,8 @@ namespace NetControl4BioMed.Helpers.Services
             await analysis.Run(_context);
             // Reload the analysis.
             await _context.Entry(analysis).ReloadAsync();
+            // Define the HTTP context host.
+            var host = new HostString(viewModel.HostValue);
             // Go over each registered user in the analysis.
             foreach (var user in analysis.AnalysisUsers.Where(item => item.User != null).Select(item => item.User))
             {
@@ -82,8 +85,8 @@ namespace NetControl4BioMed.Helpers.Services
                     Id = analysis.Id,
                     Name = analysis.Name,
                     Status = analysis.Status.GetDisplayName(),
-                    Url = _linkGenerator.GetUriByPage(model.HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }),
-                    ApplicationUrl = _linkGenerator.GetUriByPage(model.HttpContext, "/Index", handler: null, values: null)
+                    Url = _linkGenerator.GetUriByPage("/Content/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }, scheme: viewModel.Scheme, host: host),
+                    ApplicationUrl = _linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: viewModel.Scheme, host: host)
                 });
             }
         }

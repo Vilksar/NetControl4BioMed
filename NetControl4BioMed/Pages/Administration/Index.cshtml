@@ -386,6 +386,35 @@
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
+                <span><i class="fas fa-sync"></i></span>
+            </div>
+            <div>
+                <span>Recurring jobs</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-warning text-justify text-wrap">
+            <span><i class="fas fa-exclamation-circle"></i></span>
+            <span>You can (re)set all of the Hangfire recurrent jobs by clicking on the button below. The jobs are unset by default. The recurring jobs are:</span>
+            <ul class="mt-1 mb-0">
+                <li>
+                    <span><span class="font-weight-bold">Recurring Cleaner</span>, which runs every day at midnight to stop ongoing long-running analyses, forcefully stop long-stopping analyses, and delete the networks and analyses created over a month before the current date.</span>
+                </li>
+            </ul>
+        </div>
+        <form method="post" asp-page-handler="ResetHangfireRecurrentJobs" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <button type="submit" title="Reset Hangfire recurrent jobs" class="btn btn-warning btn-block">
+                <span class="text-white">Reset Hangfire recurrent jobs</span>
+            </button>
+        </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
                 <span><i class="fas fa-download"></i></span>
             </div>
             <div>
@@ -400,7 +429,7 @@
         </div>
         <form method="post" asp-page-handler="Download" class="text-justify">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-            <button type="submit" title="Open Hangfire dashboard" class="btn btn-primary btn-block">
+            <button type="submit" title="Download" class="btn btn-primary btn-block">
                 <span>Download</span>
             </button>
         </form>

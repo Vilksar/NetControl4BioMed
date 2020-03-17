@@ -59,7 +59,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Delete the ongoing long running analyses.
             await ForceStopAnalyses(numberOfDays: 7, numberOfDaysLeft: 1);
             // Alert about the items close to deletion.
-            await AlertDelete(httpContext: viewModel.HttpContext, numberOfDays: 31, numberOfDaysLeft: 7);
+            await AlertDelete(scheme: viewModel.Scheme, host: new HostString(viewModel.HostValue), numberOfDays: 31, numberOfDaysLeft: 7);
             // Delete the items.
             await DeleteNetworks(numberOfDays: 31);
             await DeleteAnalyses(numberOfDays: 31);
@@ -126,7 +126,7 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="numberOfDays">The number of days for which an analysis is stored in the database.</param>
         /// <param name="numberOfDaysLeft">The number of days until the deletion will take place.</param>
         /// <returns></returns>
-        private async Task AlertDelete(HttpContext httpContext, int numberOfDays = 31, int numberOfDaysLeft = 7)
+        private async Task AlertDelete(string scheme, HostString host, int numberOfDays = 31, int numberOfDaysLeft = 7)
         {
             // Get the grouping of users, and the networks that they have access to.
             var groupingUserNetworks = _context.NetworkUsers
@@ -160,7 +160,7 @@ namespace NetControl4BioMed.Helpers.Services
                         {
                             Id = item.Network.Id,
                             Name = item.Network.Name,
-                            Url = _linkGenerator.GetUriByPage(httpContext, "/Content/Created/Networks/Details/Index", handler: null, values: new { id = item.Network.Id })
+                            Url = _linkGenerator.GetUriByPage("/Content/Created/Networks/Details/Index", handler: null, values: new { id = item.Network.Id }, scheme: scheme, host: host)
                         }),
                     AnalysisItems = groupingUserAnalyses
                         .Where(item => item.Key == user)
@@ -170,9 +170,9 @@ namespace NetControl4BioMed.Helpers.Services
                         {
                             Id = item.Analysis.Id,
                             Name = item.Analysis.Name,
-                            Url = _linkGenerator.GetUriByPage(httpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = item.Analysis.Id })
+                            Url = _linkGenerator.GetUriByPage("/Content/Created/Analyses/Details/Index", handler: null, values: new { id = item.Analysis.Id }, scheme: scheme, host: host)
                         }),
-                    ApplicationUrl = _linkGenerator.GetUriByPage(httpContext, "/Index", handler: null, values: null)
+                    ApplicationUrl = _linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: scheme, host: host)
                 });
             }
         }

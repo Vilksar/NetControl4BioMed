@@ -5,7 +5,7 @@
 $(window).on('load', () => {
 
     // Define the time interval in which refreshing takes place, in miliseconds.
-    const _refreshInterval = 2000;
+    const _refreshInterval = 5000;
 
     // Check if there is a cookie notification alert on the page.
     if ($('.cookie-consent-alert').length !== 0) {

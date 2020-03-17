@@ -153,7 +153,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == analysisId);
             // Check if there wasn't any analysis found.
-            var analysesFound = analyses.Any();
+            var analysesFound = analyses != null && analyses.Any();
             // Check if there was an ID provided, but there was no analysis found.
             if (!string.IsNullOrEmpty(analysisId) && !analysesFound)
             {
@@ -185,7 +185,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Define the input.
-            Input = !analyses.Any() ?
+            Input = !analysesFound ?
                 new InputModel
                 {
                     DatabaseTypeId = databaseType.Id,
@@ -504,7 +504,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             var viewModel = new AnalysisRunnerViewModel
             {
                 Id = analysis.Id,
-                HttpContext = HttpContext
+                Scheme = HttpContext.Request.Scheme,
+                HostValue = HttpContext.Request.Host.Value
             };
             // Mark the data for updating.
             _context.Analyses.Update(analysis);

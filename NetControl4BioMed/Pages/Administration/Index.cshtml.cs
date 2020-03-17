@@ -7,12 +7,15 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Services;
+using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Administration
 {
@@ -187,6 +190,24 @@ namespace NetControl4BioMed.Pages.Administration
         {
             // Redirect to the Hangfire dashboard.
             return LocalRedirect("/Hangfire");
+        }
+
+        public IActionResult OnPostResetHangfireRecurrentJobs()
+        {
+            // Delete any existing recurring tasks of cleaning the database.
+            RecurringJob.RemoveIfExists(nameof(IHangfireRecurringCleaner));
+            // Define the view model for the recurring task of cleaning the database.
+            var viewModel = new HangfireRecurringCleanerViewModel
+            {
+                Scheme = HttpContext.Request.Scheme,
+                HostValue = HttpContext.Request.Host.Value
+            };
+            // Create a daily recurring Hangfire task of cleaning the database.
+            RecurringJob.AddOrUpdate<IHangfireRecurringCleaner>(nameof(IHangfireRecurringCleaner), item => item.Run(viewModel), Cron.Daily());
+            // Display a message.
+            TempData["StatusMessage"] = "Success: The Hangfire recurrent jobs have been successfully reset. You can view more details on the Hangfire dasboard.";
+            // Redirect to the page.
+            return RedirectToPage();
         }
 
         public IActionResult OnPostDownload()

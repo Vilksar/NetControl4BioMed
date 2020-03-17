@@ -12,8 +12,13 @@ namespace NetControl4BioMed.Helpers.ViewModels
     public class HangfireRecurringCleanerViewModel
     {
         /// <summary>
-        /// Gets or sets the HTTP context.
+        /// Gets or sets the HTTP context scheme.
         /// </summary>
-        public HttpContext HttpContext { get; set; }
+        public string Scheme { get; set; }
+
+        /// <summary>
+        /// Gets or sets the HTTP context host value.
+        /// </summary>
+        public string HostValue { get; set; }
     }
 }
