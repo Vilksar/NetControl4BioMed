@@ -1,0 +1,48 @@
+﻿@model Helpers.ViewModels.EmailAlertDeleteViewModel
+
+<div>
+    <div>
+        <span>Hello @Model.Email,</span>
+    </div>
+    <div>
+        <span>The following items will be deleted on @Model.DateTime.ToLongDateString(). All related information will be deleted, and this can't be recovered. Thus, it is recommended to download and save locally all of the corresponding data.</span>
+    </div>
+    @if (Model.NetworkItems.Any())
+    {
+        <div>
+            <div>
+                <span>Networks</span>
+            </div>
+            <ul>
+                @foreach (var item in Model.NetworkItems)
+                {
+                    <li>
+                        <span><a href="@item.Url">@item.Name</a> (@item.Id)</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    @if (Model.AnalysisItems.Any())
+    {
+        <div>
+            <div>
+                <span>Analyses</span>
+            </div>
+            <ul>
+                @foreach (var item in Model.AnalysisItems)
+                {
+                    <li>
+                        <span><a href="@item.Url">@item.Name</a> (@item.Id)</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    <div>
+        <span>Thank you for using our application!</span>
+    </div>
+    <div>
+        <span>This message was sent automatically by the <a href="@Model.ApplicationUrl">NetControl4BioMed</a> application from an unmonitored address. Please do not reply to this e-mail.</span>
+    </div>
+</div>

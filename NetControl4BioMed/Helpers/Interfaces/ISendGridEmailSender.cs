@@ -76,6 +76,6 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// Sends an e-mail with an alert that one or more analyses will be deleted.
         /// </summary>
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
-        Task SendAlertDeleteAnalysesEmailAsync(EmailAlertDeleteAnalysesViewModel viewModel);
+        Task SendAlertDeleteEmailAsync(EmailAlertDeleteViewModel viewModel);
     }
 }

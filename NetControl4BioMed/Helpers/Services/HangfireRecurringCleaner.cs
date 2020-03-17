@@ -58,48 +58,11 @@ namespace NetControl4BioMed.Helpers.Services
             await StopAnalyses(numberOfDays: 7);
             // Delete the ongoing long running analyses.
             await ForceStopAnalyses(numberOfDays: 7, numberOfDaysLeft: 1);
-            // Alert about the analyses close to deletion.
-            await AlertDeleteAnalyses(httpContext: viewModel.HttpContext, numberOfDays: 31, numberOfDaysLeft: 7);
-            // Delete the ended analyses.
+            // Alert about the items close to deletion.
+            await AlertDelete(httpContext: viewModel.HttpContext, numberOfDays: 31, numberOfDaysLeft: 7);
+            // Delete the items.
+            await DeleteNetworks(numberOfDays: 31);
             await DeleteAnalyses(numberOfDays: 31);
-        }
-
-        /// <summary>
-        /// Deletes all networks that ended more than 31 days prior to the current date.
-        /// </summary>
-        /// <param name="numberOfDays">The number of days for which an analysis is stored in the database.</param>
-        /// <returns></returns>
-        private async Task DeleteNetworks(int numberOfDays = 31)
-        {
-            // Get the networks.
-            var networks = _context.Networks
-                .Where(item => item.DateTimeCreated < DateTime.Now - TimeSpan.FromDays(numberOfDays));
-            // Get the corresponding analyses.
-            var analyses = networks
-                .Select(item => item.AnalysisNetworks)
-                .SelectMany(item => item)
-                .Select(item => item.Analysis)
-                .Distinct();
-            // Get the generic corresponding networks, nodes and edges.
-            var genericNetworks = networks
-                .Where(item => item.NetworkDatabases.Any(item => item.Database.DatabaseType.Name == "Generic"));
-            var genericNodes = genericNetworks
-                .Select(item => item.NetworkNodes)
-                .SelectMany(item => item)
-                .Select(item => item.Node)
-                .Distinct();
-            var genericEdges = genericNetworks
-                .Select(item => item.NetworkEdges)
-                .SelectMany(item => item)
-                .Select(items => items.Edge)
-                .Distinct();
-            // Mark all of the items for deletion.
-            _context.Analyses.RemoveRange(analyses);
-            _context.Networks.RemoveRange(networks);
-            _context.Edges.RemoveRange(genericEdges);
-            _context.Nodes.RemoveRange(genericNodes);
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
         }
 
         /// <summary>
@@ -148,6 +111,8 @@ namespace NetControl4BioMed.Helpers.Services
                 analysis.Log = analysis.AppendToLog($"The analysis could not be gracefully stopped within the alotted time of {numberOfDaysLeft} days, so it will now be forcefully stopped.");
                 // Update the status.
                 analysis.Status = AnalysisStatus.Error;
+                // Update the analysis end time.
+                analysis.DateTimeEnded = DateTime.Now;
                 // Stop and delete the Hangfire background job.
                 BackgroundJob.Delete(analysis.JobId);
             }
@@ -161,23 +126,47 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="numberOfDays">The number of days for which an analysis is stored in the database.</param>
         /// <param name="numberOfDaysLeft">The number of days until the deletion will take place.</param>
         /// <returns></returns>
-        private async Task AlertDeleteAnalyses(HttpContext httpContext, int numberOfDays = 31, int numberOfDaysLeft = 7)
+        private async Task AlertDelete(HttpContext httpContext, int numberOfDays = 31, int numberOfDaysLeft = 7)
         {
-            // Get the grouping of users, and the analyses that they have access to.
+            // Get the grouping of users, and the networks that they have access to.
+            var groupingUserNetworks = _context.NetworkUsers
+                .Where(item => item.Network.DateTimeCreated == DateTime.Today - TimeSpan.FromDays(numberOfDays - numberOfDaysLeft))
+                .GroupBy(item => item.User)
+                .Where(item => item.Any());
+            // Get the grouping of nodes, and the analyses that they have access to.
             var groupingUserAnalyses = _context.AnalysisUsers
                 .Where(item => item.Analysis.Status == AnalysisStatus.Stopped || item.Analysis.Status == AnalysisStatus.Completed || item.Analysis.Status == AnalysisStatus.Error)
                 .Where(item => item.Analysis.DateTimeEnded == DateTime.Today - TimeSpan.FromDays(numberOfDays - numberOfDaysLeft))
-                .GroupBy(item => item.User);
-            // Go over each of the user analyses.
-            foreach (var group in groupingUserAnalyses)
+                .GroupBy(item => item.User)
+                .Where(item => item.Any());
+            // Get the users that have access to the items.
+            var users = groupingUserNetworks
+                .Select(item => item.Key)
+                .Concat(groupingUserAnalyses.Select(item => item.Key))
+                .Distinct();
+            // Go over each of the users.
+            foreach (var user in users)
             {
                 // Send an alert delete analyses e-mail.
-                await _emailSender.SendAlertDeleteAnalysesEmailAsync(new EmailAlertDeleteAnalysesViewModel
+                await _emailSender.SendAlertDeleteEmailAsync(new EmailAlertDeleteViewModel
                 {
-                    Email = group.Key.Email,
+                    Email = user.Email,
                     DateTime = DateTime.Today + TimeSpan.FromDays(numberOfDaysLeft),
-                    Items = group
-                        .Select(item => new EmailAlertDeleteAnalysesViewModel.ItemModel
+                    NetworkItems = groupingUserNetworks
+                        .Where(item => item.Key == user)
+                        .SelectMany(item => item)
+                        .AsEnumerable()
+                        .Select(item => new EmailAlertDeleteViewModel.ItemModel
+                        {
+                            Id = item.Network.Id,
+                            Name = item.Network.Name,
+                            Url = _linkGenerator.GetUriByPage(httpContext, "/Content/Created/Networks/Details/Index", handler: null, values: new { id = item.Network.Id })
+                        }),
+                    AnalysisItems = groupingUserAnalyses
+                        .Where(item => item.Key == user)
+                        .SelectMany(item => item)
+                        .AsEnumerable()
+                        .Select(item => new EmailAlertDeleteViewModel.ItemModel
                         {
                             Id = item.Analysis.Id,
                             Name = item.Analysis.Name,
@@ -186,6 +175,44 @@ namespace NetControl4BioMed.Helpers.Services
                     ApplicationUrl = _linkGenerator.GetUriByPage(httpContext, "/Index", handler: null, values: null)
                 });
             }
+        }
+
+        /// <summary>
+        /// Deletes all networks that ended more than 31 days prior to the current date.
+        /// </summary>
+        /// <param name="numberOfDays">The number of days for which an analysis is stored in the database.</param>
+        /// <returns></returns>
+        private async Task DeleteNetworks(int numberOfDays = 31)
+        {
+            // Get the networks.
+            var networks = _context.Networks
+                .Where(item => item.DateTimeCreated < DateTime.Now - TimeSpan.FromDays(numberOfDays));
+            // Get the corresponding analyses.
+            var analyses = networks
+                .Select(item => item.AnalysisNetworks)
+                .SelectMany(item => item)
+                .Select(item => item.Analysis)
+                .Distinct();
+            // Get the generic corresponding networks, nodes and edges.
+            var genericNetworks = networks
+                .Where(item => item.NetworkDatabases.Any(item => item.Database.DatabaseType.Name == "Generic"));
+            var genericNodes = genericNetworks
+                .Select(item => item.NetworkNodes)
+                .SelectMany(item => item)
+                .Select(item => item.Node)
+                .Distinct();
+            var genericEdges = genericNetworks
+                .Select(item => item.NetworkEdges)
+                .SelectMany(item => item)
+                .Select(items => items.Edge)
+                .Distinct();
+            // Mark all of the items for deletion.
+            _context.Analyses.RemoveRange(analyses);
+            _context.Networks.RemoveRange(networks);
+            _context.Edges.RemoveRange(genericEdges);
+            _context.Nodes.RemoveRange(genericNodes);
+            // Save the changes to the database.
+            await _context.SaveChangesAsync();
         }
 
         /// <summary>

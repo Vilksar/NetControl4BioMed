@@ -8,7 +8,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
     /// <summary>
     /// Represents the variables for an analyses delete alert e-mail.
     /// </summary>
-    public class EmailAlertDeleteAnalysesViewModel
+    public class EmailAlertDeleteViewModel
     {
         /// <summary>
         /// Gets or sets the user e-mail.
@@ -21,9 +21,14 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public DateTime DateTime { get; set; }
 
         /// <summary>
-        /// Gets or sets the items.
+        /// Gets or sets the network items.
         /// </summary>
-        public IEnumerable<ItemModel> Items { get; set; }
+        public IEnumerable<ItemModel> NetworkItems { get; set; }
+
+        /// <summary>
+        /// Gets or sets the analysis items.
+        /// </summary>
+        public IEnumerable<ItemModel> AnalysisItems { get; set; }
 
         /// <summary>
         /// Gets or sets the URL to the home page of the application.
@@ -31,22 +36,22 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public string ApplicationUrl { get; set; }
 
         /// <summary>
-        /// Represents the model of an analysis item.
+        /// Represents the model of an item.
         /// </summary>
         public class ItemModel
         {
             /// <summary>
-            /// Gets or sets the analysis ID.
+            /// Gets or sets the item ID.
             /// </summary>
             public string Id { get; set; }
 
             /// <summary>
-            /// Gets or sets the analysis name.
+            /// Gets or sets the item name.
             /// </summary>
             public string Name { get; set; }
 
             /// <summary>
-            /// Gets or sets the analysis URL.
+            /// Gets or sets the item URL.
             /// </summary>
             public string Url { get; set; }
         }
