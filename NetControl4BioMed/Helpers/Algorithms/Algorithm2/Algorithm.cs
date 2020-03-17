@@ -58,6 +58,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 analysis.Log = analysis.AppendToLog("There are edges which contain unknown nodes.");
                 // Update the analysis status.
                 analysis.Status = AnalysisStatus.Error;
+                // Update the analysis end time.
+                analysis.DateTimeEnded = DateTime.Now;
                 // Save the changes in the database.
                 await context.SaveChangesAsync();
                 // End the function.
@@ -70,6 +72,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 analysis.Log = analysis.AppendToLog("There are unknown target nodes.");
                 // Update the analysis status.
                 analysis.Status = AnalysisStatus.Error;
+                // Update the analysis end time.
+                analysis.DateTimeEnded = DateTime.Now;
                 // Save the changes in the database.
                 await context.SaveChangesAsync();
                 // End the function.
@@ -82,6 +86,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 analysis.Log = analysis.AppendToLog("There are unknown source nodes.");
                 // Update the analysis status.
                 analysis.Status = AnalysisStatus.Error;
+                // Update the analysis end time.
+                analysis.DateTimeEnded = DateTime.Now;
                 // Save the changes in the database.
                 await context.SaveChangesAsync();
                 // End the function.
@@ -94,6 +100,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 analysis.Log = analysis.AppendToLog("The parameters are not valid for the algorithm.");
                 // Update the analysis status.
                 analysis.Status = AnalysisStatus.Error;
+                // Update the analysis end time.
+                analysis.DateTimeEnded = DateTime.Now;
                 // Save the changes in the database.
                 await context.SaveChangesAsync();
                 // End the function.

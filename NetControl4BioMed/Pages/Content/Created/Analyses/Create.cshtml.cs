@@ -26,13 +26,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
-        private readonly IAnalysisRunner _analysisRunner;
 
-        public CreateModel(UserManager<User> userManager, ApplicationDbContext context, IAnalysisRunner analysisRunner)
+        public CreateModel(UserManager<User> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _context = context;
-            _analysisRunner = analysisRunner;
         }
 
         [BindProperty]

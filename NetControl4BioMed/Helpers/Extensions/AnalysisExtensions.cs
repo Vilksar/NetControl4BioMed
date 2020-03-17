@@ -49,6 +49,10 @@ namespace NetControl4BioMed.Helpers.Extensions
                     analysis.Log = analysis.AppendToLog("The algorithm is not defined.");
                     // Update the analysis status.
                     analysis.Status = AnalysisStatus.Error;
+                    // Update the analysis start time.
+                    analysis.DateTimeStarted = DateTime.Now;
+                    // Update the analysis end time.
+                    analysis.DateTimeEnded = DateTime.Now;
                     // Save the changes in the database.
                     await context.SaveChangesAsync();
                     // End the switch.
@@ -81,8 +85,8 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <returns>Returns the updated log of the analysis.</returns>
         public static string AppendToLog(this Analysis analysis, string message)
         {
-            // Return the log entries.
-            return JsonSerializer.Serialize(analysis.GetLog().Append(message));
+            // Return the log entries with the message appended.
+            return JsonSerializer.Serialize(analysis.GetLog().Append($"{DateTime.Now.ToString()}: {message}"));
         }
 
         /// <summary>
