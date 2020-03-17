@@ -10,7 +10,7 @@ using NetControl4BioMed.Data;
 namespace NetControl4BioMed.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200305104755_Initial")]
+    [Migration("20200317073621_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -132,6 +132,9 @@ namespace NetControl4BioMed.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JobId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Log")

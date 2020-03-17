@@ -18,6 +18,7 @@ namespace NetControl4BioMed.Data.Migrations
                     Description = table.Column<string>(nullable: true),
                     Status = table.Column<int>(nullable: false),
                     Log = table.Column<string>(nullable: true),
+                    JobId = table.Column<string>(nullable: true),
                     CurrentIteration = table.Column<int>(nullable: false),
                     CurrentIterationWithoutImprovement = table.Column<int>(nullable: false),
                     MaximumIterations = table.Column<int>(nullable: false),

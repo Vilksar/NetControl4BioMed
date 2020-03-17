@@ -47,6 +47,11 @@ namespace NetControl4BioMed.Data.Models
         public string Log { get; set; }
 
         /// <summary>
+        /// Gets or sets the Hangfire job ID of the analysis.
+        /// </summary>
+        public string JobId { get; set; }
+
+        /// <summary>
         /// Gets or sets the current iteration of the algorithm that the analysis uses.
         /// </summary>
         public int CurrentIteration { get; set; }

@@ -132,6 +132,9 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("JobId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Log")
                         .HasColumnType("nvarchar(max)");
 
