@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace NetControl4BioMed.Helpers.Interfaces
 {
     /// <summary>
-    /// Provides an abstraction for the Hangfire recurring cleaner job.
+    /// Provides an abstraction for the Hangfire recurring job runner.
     /// </summary>
-    public interface IHangfireRecurringCleaner
+    public interface IHangfireRecurringJobRunner
     {
         /// <summary>
         /// Performs the daily cleaning of the database.

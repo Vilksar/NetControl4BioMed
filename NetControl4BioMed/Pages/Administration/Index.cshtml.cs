@@ -195,7 +195,7 @@ namespace NetControl4BioMed.Pages.Administration
         public IActionResult OnPostResetHangfireRecurrentJobs()
         {
             // Delete any existing recurring tasks of cleaning the database.
-            RecurringJob.RemoveIfExists(nameof(IHangfireRecurringCleaner));
+            RecurringJob.RemoveIfExists(nameof(IHangfireRecurringJobRunner));
             // Define the view model for the recurring task of cleaning the database.
             var viewModel = new HangfireRecurringCleanerViewModel
             {
@@ -203,7 +203,7 @@ namespace NetControl4BioMed.Pages.Administration
                 HostValue = HttpContext.Request.Host.Value
             };
             // Create a daily recurring Hangfire task of cleaning the database.
-            RecurringJob.AddOrUpdate<IHangfireRecurringCleaner>(nameof(IHangfireRecurringCleaner), item => item.Run(viewModel), Cron.Daily());
+            RecurringJob.AddOrUpdate<IHangfireRecurringJobRunner>(nameof(IHangfireRecurringJobRunner), item => item.Run(viewModel), Cron.Daily());
             // Display a message.
             TempData["StatusMessage"] = "Success: The Hangfire recurrent jobs have been successfully reset. You can view more details on the Hangfire dasboard.";
             // Redirect to the page.

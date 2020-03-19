@@ -16,7 +16,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public string Email { get; set; }
 
         /// <summary>
-        /// Gets or sets the URL to undo the changes.
+        /// Gets or sets the URL to the account page.
         /// </summary>
         public string Url { get; set; }
 

@@ -133,7 +133,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.Password
             var emailViewModel = new EmailPasswordChangedViewModel
             {
                 Email = user.Email,
-                Url = _linkGenerator.GetUriByPage(HttpContext, "/Account/Manage/Password/Index", handler: null, values: null),
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Account/Index", handler: null, values: null),
                 ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Send the e-mail changed e-mail to the user.

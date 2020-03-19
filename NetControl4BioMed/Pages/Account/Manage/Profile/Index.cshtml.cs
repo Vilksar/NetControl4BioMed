@@ -167,6 +167,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
                 {
                     OldEmail = oldEmail,
                     NewEmail = user.Email,
+                    Url = _linkGenerator.GetUriByPage(HttpContext, "/Account/Index", handler: null, values: null),
                     ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
                 };
                 // Send the e-mail changed e-mail to the user.

@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 namespace NetControl4BioMed.Helpers.Services
 {
     /// <summary>
-    /// Implements a Hangfire recurring cleaner.
+    /// Implements a Hangfire recurring job runner.
     /// </summary>
-    public class HangfireRecurringCleaner : IHangfireRecurringCleaner
+    public class HangfireRecurringJobRunner : IHangfireRecurringJobRunner
     {
         /// <summary>
         /// Represents the application database context.
@@ -40,8 +40,7 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="context">The application database context.</param>
         /// <param name="emailSender">The e-mail sender.</param>
-        /// <param name="logger">The application logger.</param>
-        public HangfireRecurringCleaner(ApplicationDbContext context, ISendGridEmailSender emailSender, LinkGenerator linkGenerator)
+        public HangfireRecurringJobRunner(ApplicationDbContext context, ISendGridEmailSender emailSender, LinkGenerator linkGenerator)
         {
             _context = context;
             _emailSender = emailSender;
@@ -72,10 +71,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <returns></returns>
         private async Task StopAnalyses(int numberOfDays = 7)
         {
+            // Get the limit date.
+            var limitDate = DateTime.Today - TimeSpan.FromDays(numberOfDays);
             // Get the analyses.
             var analyses = _context.Analyses
                 .Where(item => item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing)
-                .Where(item => item.DateTimeStarted < DateTime.Today - TimeSpan.FromDays(numberOfDays));
+                .Where(item => item.DateTimeStarted < limitDate);
             // Mark all of the items for updating.
             _context.Analyses.UpdateRange(analyses);
             // Go over each of the analyses.
@@ -98,10 +99,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <returns></returns>
         private async Task ForceStopAnalyses(int numberOfDays = 7, int numberOfDaysLeft = 1)
         {
+            // Get the limit date.
+            var limitDate = DateTime.Today - TimeSpan.FromDays(numberOfDays + numberOfDaysLeft);
             // Get the analyses.
             var analyses = _context.Analyses
                 .Where(item => item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing || item.Status == AnalysisStatus.Stopping)
-                .Where(item => item.DateTimeStarted < DateTime.Today - TimeSpan.FromDays(numberOfDays + numberOfDaysLeft));
+                .Where(item => item.DateTimeStarted < limitDate);
             // Mark all of the items for updating.
             _context.Analyses.UpdateRange(analyses);
             // Go over each of the analyses.
@@ -128,22 +131,31 @@ namespace NetControl4BioMed.Helpers.Services
         /// <returns></returns>
         private async Task AlertDelete(string scheme, HostString host, int numberOfDays = 31, int numberOfDaysLeft = 7)
         {
-            // Get the grouping of users, and the networks that they have access to.
-            var groupingUserNetworks = _context.NetworkUsers
-                .Where(item => item.Network.DateTimeCreated == DateTime.Today - TimeSpan.FromDays(numberOfDays - numberOfDaysLeft))
-                .GroupBy(item => item.User)
-                .Where(item => item.Any());
-            // Get the grouping of nodes, and the analyses that they have access to.
-            var groupingUserAnalyses = _context.AnalysisUsers
-                .Where(item => item.Analysis.Status == AnalysisStatus.Stopped || item.Analysis.Status == AnalysisStatus.Completed || item.Analysis.Status == AnalysisStatus.Error)
-                .Where(item => item.Analysis.DateTimeEnded == DateTime.Today - TimeSpan.FromDays(numberOfDays - numberOfDaysLeft))
-                .GroupBy(item => item.User)
-                .Where(item => item.Any());
-            // Get the users that have access to the items.
-            var users = groupingUserNetworks
-                .Select(item => item.Key)
-                .Concat(groupingUserAnalyses.Select(item => item.Key))
+            // Get the limit date.
+            var limitDate = DateTime.Today - TimeSpan.FromDays(numberOfDays - numberOfDaysLeft);
+            // Get the networks and analyses.
+            var networks = _context.Networks
+                .Where(item => item.DateTimeCreated < limitDate);
+            var analyses = _context.Analyses
+                .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
+                .Where(item => item.DateTimeEnded < limitDate)
+                .Concat(networks
+                    .Select(item => item.AnalysisNetworks)
+                    .SelectMany(item => item)
+                    .Select(item => item.Analysis))
                 .Distinct();
+            // Get the users.
+            var networkUsers = networks
+                .Select(item => item.NetworkUsers)
+                .SelectMany(item => item)
+                .Select(item => item.User);
+            var analysisUsers = analyses
+                .Select(item => item.AnalysisUsers)
+                .SelectMany(item => item)
+                .Select(item => item.User);
+            // Get the users that have access to the items.
+            var users = networkUsers
+                .Concat(analysisUsers);
             // Go over each of the users.
             foreach (var user in users)
             {
@@ -152,25 +164,23 @@ namespace NetControl4BioMed.Helpers.Services
                 {
                     Email = user.Email,
                     DateTime = DateTime.Today + TimeSpan.FromDays(numberOfDaysLeft),
-                    NetworkItems = groupingUserNetworks
-                        .Where(item => item.Key == user)
-                        .SelectMany(item => item)
-                        .AsEnumerable()
+                    NetworkItems = user.NetworkUsers
+                        .Select(item => item.Network)
+                        .Where(item => networks.Contains(item))
                         .Select(item => new EmailAlertDeleteViewModel.ItemModel
                         {
-                            Id = item.Network.Id,
-                            Name = item.Network.Name,
-                            Url = _linkGenerator.GetUriByPage("/Content/Created/Networks/Details/Index", handler: null, values: new { id = item.Network.Id }, scheme: scheme, host: host)
+                            Id = item.Id,
+                            Name = item.Name,
+                            Url = _linkGenerator.GetUriByPage("/Content/Created/Networks/Details/Index", handler: null, values: new { id = item.Id }, scheme: scheme, host: host)
                         }),
-                    AnalysisItems = groupingUserAnalyses
-                        .Where(item => item.Key == user)
-                        .SelectMany(item => item)
-                        .AsEnumerable()
+                    AnalysisItems = user.AnalysisUsers
+                        .Select(item => item.Analysis)
+                        .Where(item => analyses.Contains(item))
                         .Select(item => new EmailAlertDeleteViewModel.ItemModel
                         {
-                            Id = item.Analysis.Id,
-                            Name = item.Analysis.Name,
-                            Url = _linkGenerator.GetUriByPage("/Content/Created/Analyses/Details/Index", handler: null, values: new { id = item.Analysis.Id }, scheme: scheme, host: host)
+                            Id = item.Id,
+                            Name = item.Name,
+                            Url = _linkGenerator.GetUriByPage("/Content/Created/Analyses/Details/Index", handler: null, values: new { id = item.Id }, scheme: scheme, host: host)
                         }),
                     ApplicationUrl = _linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: scheme, host: host)
                 });
@@ -184,9 +194,11 @@ namespace NetControl4BioMed.Helpers.Services
         /// <returns></returns>
         private async Task DeleteNetworks(int numberOfDays = 31)
         {
+            // Get the limit date.
+            var limitDate = DateTime.Today - TimeSpan.FromDays(numberOfDays);
             // Get the networks.
             var networks = _context.Networks
-                .Where(item => item.DateTimeCreated < DateTime.Now - TimeSpan.FromDays(numberOfDays));
+                .Where(item => item.DateTimeCreated < limitDate);
             // Get the corresponding analyses.
             var analyses = networks
                 .Select(item => item.AnalysisNetworks)
@@ -222,10 +234,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <returns></returns>
         private async Task DeleteAnalyses(int numberOfDays = 31)
         {
+            // Get the limit date.
+            var limitDate = DateTime.Today - TimeSpan.FromDays(numberOfDays);
             // Get the analyses.
             var analyses = _context.Analyses
                 .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
-                .Where(item => item.DateTimeEnded < DateTime.Today - TimeSpan.FromDays(numberOfDays));
+                .Where(item => item.DateTimeEnded < limitDate);
             // Mark all of the items for deletion.
             _context.Analyses.RemoveRange(analyses);
             // Save the changes to the database.
