@@ -386,6 +386,36 @@
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
+                <span><i class="fas fa-bullhorn"></i></span>
+            </div>
+            <div>
+                <span>Announcements</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-primary text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>Write a message and click the button below to have it appear on each user's account overview page. This can be useful in making application-wide announcements. Submitting an empty message will clear the current announcement.</span>
+        </div>
+        <form method="post" asp-page-handler="UpdateAnnouncementMessage" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label for="announcementMessage" class="font-weight-bold">Announcement message</label>
+                <input id="announcementMessage" name="announcementMessage" value="@Model.View.AnnouncementMessage" class="form-control" />
+                <span description-for="announcementMessage" class="text-muted small">The message of the announcement.</span>
+                <span validation-for="announcementMessage" class="text-danger small"></span>
+            </div>
+            <button type="submit" title="Update" class="btn btn-primary btn-block">
+                <span>Update</span>
+            </button>
+        </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
                 <span><i class="fas fa-sync"></i></span>
             </div>
             <div>

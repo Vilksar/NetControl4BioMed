@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 
@@ -15,10 +16,12 @@ namespace NetControl4BioMed.Pages.Account
     public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
+        private readonly IConfiguration _configuration;
 
-        public IndexModel(UserManager<User> userManager)
+        public IndexModel(UserManager<User> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
+            _configuration = configuration;
         }
 
         public ViewModel View { get; set; }
@@ -48,7 +51,7 @@ namespace NetControl4BioMed.Pages.Account
                 User = user
             };
             // Check for any announcements.
-            View.AnnouncementMessage = null;
+            View.AnnouncementMessage = _configuration["AnnouncementMessage"];
             // Return the page.
             return Page();
         }

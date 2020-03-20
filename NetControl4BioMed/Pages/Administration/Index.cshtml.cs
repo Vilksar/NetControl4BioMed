@@ -11,6 +11,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Interfaces;
@@ -23,10 +24,12 @@ namespace NetControl4BioMed.Pages.Administration
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public IndexModel(ApplicationDbContext context)
+        public IndexModel(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         public ViewModel View { get; set; }
@@ -90,6 +93,8 @@ namespace NetControl4BioMed.Pages.Administration
             public IQueryable<Network> InconsistentNetworks { get; set; }
 
             public IQueryable<Analysis> InconsistentAnalyses { get; set; }
+
+            public string AnnouncementMessage { get; set; }
         }
 
         public IActionResult OnGet()
@@ -176,7 +181,8 @@ namespace NetControl4BioMed.Pages.Administration
                 InconsistentNetworks = _context.Networks
                     .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
                 InconsistentAnalyses = _context.Analyses
-                    .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                    .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1),
+                AnnouncementMessage = _configuration["AnnouncementMessage"]
             };
             // Check if there were any issues detected.
             View.DuplicateDetected = View.DuplicateDatabaseTypes.Any() || View.DuplicateDatabases.Any() || View.DuplicateDatabaseNodeFields.Any() || View.DuplicateDatabaseEdgeFields.Any() || View.DuplicateDatabaseNodeFieldNodes.Any() || View.DuplicateNodes.Any() || View.DuplicateEdges.Any() || View.DuplicateNodeCollections.Any();
@@ -190,6 +196,16 @@ namespace NetControl4BioMed.Pages.Administration
         {
             // Redirect to the Hangfire dashboard.
             return LocalRedirect("/Hangfire");
+        }
+
+        public IActionResult OnPostUpdateAnnouncementMessage(string announcementMessage)
+        {
+            // Update the announcement message.
+            _configuration["AnnouncementMessage"] = announcementMessage;
+            // Display a message.
+            TempData["StatusMessage"] = "Success: The announcement message has been successfully updated.";
+            // Redirect to the page.
+            return RedirectToPage();
         }
 
         public IActionResult OnPostResetHangfireRecurrentJobs()
