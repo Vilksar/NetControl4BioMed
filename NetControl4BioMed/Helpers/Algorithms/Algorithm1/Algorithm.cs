@@ -116,7 +116,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             var bestSolutionSize = targets.Count() + 1;
             var bestControlPaths = new List<Dictionary<string, List<string>>>();
             // Update the parameters.
-            var heuristics = JsonSerializer.Deserialize<List<List<string>>>(parameters.Heuristics).TakeWhile(item => !item.Contains("Z")).Append(new List<string> { "Z" }).ToList();
+            var heuristics = JsonSerializer.Deserialize<List<List<string>>>(parameters.Heuristics).TakeWhile(item => !item.Contains("Z")).Select(item => item.Distinct().ToList()).Append(new List<string> { "Z" }).ToList();
             parameters.Heuristics = JsonSerializer.Serialize(heuristics);
             // Update the analysis status and parameters.
             analysis.Parameters = JsonSerializer.Serialize(parameters);

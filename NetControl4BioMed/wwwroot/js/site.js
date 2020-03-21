@@ -284,78 +284,103 @@ $(window).on('load', () => {
 
     // Check if there is a heuristics group on the page.
     if ($('.heuristics-group').length !== 0) {
+        // Define the HTML of an optgroup.
+        const optgroupHTML = `<optgroup></optgroup>`;
         // Define a function which updates the data to be submitted.
-        const updateText = () => {
-            //// Parse and clean the current heuristics and update the input text area.
-            let inputArray = [];
-            
-            let currentHeuristics = $('#heuristics-group-current');
-            for (i = 0; i < currentHeuristics.children().length; i++){
-            	let heuristicGroup = $(currentHeuristics.children()[i]);
-            	let heuristicGroupString = '["';
-            	for (j = 0; j < heuristicGroup.children().length; j++){
-            		heuristicGroupString += $(heuristicGroup.children()[j]).val();
-            	}
-            	heuristicGroupString += '"]';
-            	inputArray.push(heuristicGroupString);
-            }
-            
-            let inputString = "[" + inputArray.join(",") + "]";
-            $("#inputHeuristicsTextarea").val(inputString);
+        const updateText = (groupElement) => {
+            // Parse the current heuristics into a JSON object and add it to the input data.
+            $(groupElement).find('.heuristics-group-input').val(JSON.stringify($.map($(groupElement).find('.heuristics-group-current').children(), (element1, index1) => [$.map($(element1).children(), (element2, index2) => $(element2).val())])))
         };
-        // Updates optgroup elements in current heuristics
-        const updateCurrentHeuristics = () => {
-        	// Remove empty outgroup
-        	let emptyOutgroupHeuristic = $.grep($('#heuristics-group-current').children(), function(obj){return $(obj).children().length === 0;});
-        	$(emptyOutgroupHeuristic).remove();
-        	
-        	// Update optgroup labels
-        	let outgroupHeuristic = $($('#heuristics-group-current').children());
-        	for (i = 0; i < outgroupHeuristic.length; i++){
-        		$(outgroupHeuristic[i]).attr("label", "Group " + (i+1).toString());
-        	}
-        }
-        // Adds a new optgroup at the end of the current heuristics and returns it
-        const addHeuristicOptgroup = () => {
-        	let heuristicOptgroupCount = $('#heuristics-group-current').children().length;
-        	$('#heuristics-group-current').append('<optgroup label="Group ' + (heuristicOptgroupCount + 1) +'"></optgroup>');
-        	return $($('#heuristics-group-current').children().last());
-        }
+        // Define a function which updates the current heuristics, by updating the group index numbers.
+        const updateCurrentHeuristics = (groupElement) => {
+            // Remove the empty optgroups.
+            $(groupElement).find('.heuristics-group-current').children().filter((index, element) => $(element).children().length === 0).remove();
+            // Go over each optgroup in the current heuristics of the group element.
+            $(groupElement).find('.heuristics-group-current').children().each((index1, element1) => {
+                // Get the new text of the element.
+                const text = `Group ${index1 + 1}`;
+                // Update the label of the element.
+                $(element1).prop('label', text);
+                // Update the title of the element.
+                $(element1).prop('title', text);
+                // Define an array to store the unique values.
+                let unique = [];
+                // Go over each option in the optgroup.
+                $(element1).children().each((index2, element2) => {
+                    // Get the value of the option.
+                    const value = $(element2).val();
+                    // Check if the value already appears in the array.
+                    if (unique.includes(value)) {
+                        // Remove the element.
+                        $(element2).remove();
+                    } else {
+                        // Add the value to the array.
+                        unique.push(value)
+                    }
+                });
+            });
+        };
         // Add a listener for if the add button was clicked.
         $('.heuristics-group-add').on('click', (event) => {
-            let currentHeuristicOptgroup;
-		let groupElement = $('#heuristics-group-possible option:selected').clone();
-		let newGroupOption = $.grep(groupElement, function(obj){return obj.title === "New group";})[0];
-		groupElement = groupElement.filter(function ()
-		{
-		    if (this.title === "New group") return false;
-		    return true;
-		});
-		
-		if (groupElement.length > 0){
-			if (newGroupOption === undefined && $('#heuristics-group-current option:selected').length > 0){
-				let currentSelectedHeuristics = $('#heuristics-group-current option:selected');
-				currentHeuristicOptgroup = $(currentSelectedHeuristics.parent());
-				let lastCurrentSelectedHeuristic = $(currentSelectedHeuristics.last());
-				groupElement.insertAfter(lastCurrentSelectedHeuristic);
-			}else{
-				if (newGroupOption !== undefined || $('#heuristics-group-current').children().length == 0){
-					currentHeuristicOptgroup = addHeuristicOptgroup()
-				}else{
-					currentHeuristicOptgroup = $($('#heuristics-group-current').children().last());
-				}
-				currentHeuristicOptgroup.append(groupElement);
-			}
-			updateText();
-		}
+            // Get the actual group which was clicked.
+            const groupElement = $(event.target).closest('.heuristics-group');
+            // Get the current heuristics element.
+            const currentHeuristicsElement = $(groupElement).find('.heuristics-group-current');
+            // Get a clone of the selected possible heuristics options.
+            const options = $(groupElement).find('.heuristics-group-possible').children('option:selected').clone();
+            // Check if the option to add a new group is selected.
+            if ($(options).filter((index, element) => $(element).val() === '').length !== 0) {
+                // Define the optgroups to be updated.
+                let optgroups;
+                // Check if there are any selected current heuristics optgroups.
+                if ($(currentHeuristicsElement).find('option:selected').length !== 0) {
+                    // Add a new optgroup after each selected current heuristics optgroup.
+                    $(currentHeuristicsElement).children().filter((index, element) => $(element).children('option:selected').length !== 0).after(optgroupHTML);
+                    // Update the selected optgroups.
+                    optgroups = $(currentHeuristicsElement).children().filter((index, element) => $(element).children().length === 0);
+                } else {
+                    // Add a new optgroup to the current heuristics.
+                    $(currentHeuristicsElement).append(optgroupHTML);
+                    // Update the selected optgroups.
+                    optgroups = $(currentHeuristicsElement).children().last();
+                }
+                // Append to them the clones of the selected possible heurstics options, except for the new group.
+                $(optgroups).append($(options).filter((index, element) => $(element).val() !== ''));
+
+            } else {
+                // Define the optgroups to be updated.
+                let optgroups;
+                // Check if there doesn't exist any optgroup.
+                if ($(currentHeuristicsElement).children().length === 0) {
+                    // Add a new optgroup to the current heuristics.
+                    $(currentHeuristicsElement).append(optgroupHTML);
+                }
+                // Check if there are any selected current heuristics optgroups.
+                if ($(currentHeuristicsElement).find('option:selected').length !== 0) {
+                    // Update the selected optgroups.
+                    optgroups = $(currentHeuristicsElement).children().filter((index, element) => $(element).children('option:selected').length !== 0);
+                } else {
+                    // Update the selected optgroups.
+                    optgroups = $(currentHeuristicsElement).children().last();
+                }
+                // Append to them the clones of the selected possible heurstics options.
+                $(optgroups).append(options);
+            }
+            // Update the current heuristics.
+            updateCurrentHeuristics(groupElement);
+            // Update the input text.
+            updateText(groupElement);
         });
         // Add a listener for if the remove button was clicked.
         $('.heuristics-group-remove').on('click', (event) => {
             // Get the actual group which was clicked.
-		let groupElement = $('#heuristics-group-current option:selected');
-		groupElement.remove();
-		updateCurrentHeuristics();
-		updateText();
+            const groupElement = $(event.target).closest('.heuristics-group');
+            // Remove the selected current heuristics options.
+            $(groupElement).find('.heuristics-group-current').find('option:selected').remove();
+            // Update the current heuristics.
+            updateCurrentHeuristics(groupElement);
+            // Update the input text.
+            updateText(groupElement);
         });
         // Execute the function on page load.
         (() => {
@@ -377,16 +402,24 @@ $(window).on('load', () => {
                     // Return from the function.
                     return;
                 }
-                
-                // Upload Current Heuristics with the input heuristics
-                let dataGroups = data.toString().split(",");
-                for (i = 0; i < dataGroups.length; i++){
-                	heuristicGroup = addHeuristicOptgroup();
-                	for (j = 0; j < dataGroups[i].length; j++){
-                		let heuristic = $('#heuristics-group-possible option[value="' + dataGroups[i][j] + '"]').clone();
-                		heuristicGroup.append(heuristic);
-                	}
-                }
+                // Get the possible heuristics element.
+                const possibleHeuristicsElement = $(groupElement).find('.heuristics-group-possible');
+                // Get the current heuristics element.
+                const currentHeuristicsElement = $(groupElement).find('.heuristics-group-current');
+                // Go over each optgroup in the input data.
+                jQuery.each(data, (index1, item1) => {
+                    // Add a new optgroup to the current heuristics.
+                    $(currentHeuristicsElement).append(optgroupHTML);
+                    // Go over each option within the optgroup.
+                    jQuery.each(item1, (index2, item2) => {
+                        // Append a clone of the corresponding possible option element to the current heuristics.
+                        $(currentHeuristicsElement).children().last().append($(possibleHeuristicsElement).children(`option[value="${item2}"]`).clone());
+                    });
+                });
+                // Update the current heuristics.
+                updateCurrentHeuristics(groupElement);
+                // Update the input text.
+                updateText(groupElement);
             });
         })();
     }

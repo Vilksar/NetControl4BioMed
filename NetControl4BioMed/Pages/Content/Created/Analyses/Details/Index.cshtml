@@ -7,9 +7,6 @@
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetAnalysisNavigationTitleCard(Model.View.Analysis)" />
-@*<div class="analysis-details-partial" data-id="@Model.View.Analysis.Id" data-status="@Model.View.Analysis.Status.ToString()" data-refresh="@(Model.View.Analysis.Status == AnalysisStatus.Scheduled || Model.View.Analysis.Status == AnalysisStatus.Initializing || Model.View.Analysis.Status == AnalysisStatus.Ongoing || Model.View.Analysis.Status == AnalysisStatus.Stopping || Model.View.Analysis.Status == AnalysisStatus.Completed)">
-    <partial name="_AnalysisDetailsPartial" model="Model.View.Analysis" />
-</div>*@
 <div class="card mb-3" title="Status">
     <div class="card-body text-center">
         <div class="text-uppercase">
@@ -276,7 +273,7 @@
                         <label asp-for="View.Algorithm1Parameters.Heuristics" class="font-weight-bold">Heuristics</label>
                     </div>
                     <div class="col-lg-12 order-1 order-lg-2">
-                        <textarea asp-for="View.Algorithm1Parameters.Heuristics" class="form-control heuristics-group-input" disabled></textarea>
+                        <textarea asp-for="View.Algorithm1Parameters.Heuristics" class="form-control heuristics-group-input"></textarea>
                     </div>
                     <div class="col-lg-12 order-1 order-lg-3 mb-3">
                         <span asp-description-for="View.Algorithm1Parameters.Heuristics" class="text-muted small">The search heuristics for the algorithm. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
@@ -284,13 +281,36 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-12 order-1 order-lg-1 align-self-center">
+                    <div class="d-none col-lg-12 order-1 order-lg-1 align-self-center">
+                        <label for="heuristics-group-possible" class="font-weight-bold">Possible heuristics</label>
+                    </div>
+                    <div class="d-none col-lg-12 order-1 order-lg-2">
+                        <select id="heuristics-group-possible" class="custom-select heuristics-group-possible" size="10" multiple title="Current heuristics">
+                            <option value="" title="New group">--- New group ---</option>
+                            @foreach (var item in Helpers.Algorithms.Algorithm1.Parameters.PossibleHeuristics)
+                            {
+                                <option value="@item.Key" title="@item.Value">@item.Value</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="d-none col-lg-12 order-2 order-lg-1 align-self-center"></div>
+                    <div class="d-none col-lg-12 order-2 order-lg-2 align-self-center">
+                        <button type="button" class="btn btn-dark btn-block heuristics-group-add my-2" title="Add heuristic">
+                            <span class="d-none d-lg-block"><i class="fas fa-angle-right"></i></span>
+                            <span class="d-block d-lg-none"><i class="fas fa-angle-down"></i></span>
+                        </button>
+                        <button type="button" class="btn btn-dark btn-block heuristics-group-remove my-2" title="Remove heuristic">
+                            <span class="d-none d-lg-block"><i class="fas fa-angle-left"></i></span>
+                            <span class="d-block d-lg-none"><i class="fas fa-angle-up"></i></span>
+                        </button>
+                    </div>
+                    <div class="col-lg-12 order-3 order-lg-1 align-self-center">
                         <label for="heuristics-group-current" class="font-weight-bold">Heuristics</label>
                     </div>
-                    <div class="col-lg-12 order-1 order-lg-2">
-                        <select id="heuristics-group-current" class="custom-select heuristics-group-current" multiple title="Heuristics" disabled></select>
+                    <div class="col-lg-12 order-3 order-lg-2">
+                        <select id="heuristics-group-current" class="custom-select heuristics-group-current" size="10" title="Heuristics" disabled></select>
                     </div>
-                    <div class="col-lg-12 order-1 order-lg-3 mb-3">
+                    <div class="col-lg-12 order-4 order-lg-3 mb-3">
                         <span description-for="heuristics-group-current" class="text-muted small">The search heuristics for the algorithm.</span>
                         <span validation-for="heuristics-group-current" class="text-danger small"></span>
                     </div>
