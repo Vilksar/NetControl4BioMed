@@ -285,24 +285,77 @@ $(window).on('load', () => {
     // Check if there is a heuristics group on the page.
     if ($('.heuristics-group').length !== 0) {
         // Define a function which updates the data to be submitted.
-        const updateText = (groupElement) => {
+        const updateText = () => {
             //// Parse and clean the current heuristics and update the input text area.
+            let inputArray = [];
+            
+            let currentHeuristics = $('#heuristics-group-current');
+            for (i = 0; i < currentHeuristics.children().length; i++){
+            	let heuristicGroup = $(currentHeuristics.children()[i]);
+            	let heuristicGroupString = '["';
+            	for (j = 0; j < heuristicGroup.children().length; j++){
+            		heuristicGroupString += $(heuristicGroup.children()[j]).val();
+            	}
+            	heuristicGroupString += '"]';
+            	inputArray.push(heuristicGroupString);
+            }
+            
+            let inputString = "[" + inputArray.join(",") + "]";
+            $("#inputHeuristicsTextarea").val(inputString);
         };
+        // Updates optgroup elements in current heuristics
+        const updateCurrentHeuristics = () => {
+        	// Remove empty outgroup
+        	let emptyOutgroupHeuristic = $.grep($('#heuristics-group-current').children(), function(obj){return $(obj).children().length === 0;});
+        	$(emptyOutgroupHeuristic).remove();
+        	
+        	// Update optgroup labels
+        	let outgroupHeuristic = $($('#heuristics-group-current').children());
+        	for (i = 0; i < outgroupHeuristic.length; i++){
+        		$(outgroupHeuristic[i]).attr("label", "Group " + (i+1).toString());
+        	}
+        }
+        // Adds a new optgroup at the end of the current heuristics and returns it
+        const addHeuristicOptgroup = () => {
+        	let heuristicOptgroupCount = $('#heuristics-group-current').children().length;
+        	$('#heuristics-group-current').append('<optgroup label="Group ' + (heuristicOptgroupCount + 1) +'"></optgroup>');
+        	return $($('#heuristics-group-current').children().last());
+        }
         // Add a listener for if the add button was clicked.
         $('.heuristics-group-add').on('click', (event) => {
-            // Get the actual group which was clicked.
-            const groupElement = $(event.target).closest('.heuristics-group');
-            //// Update the current heuristics with the additions.
-            // Update the selected items.
-            updateText(groupElement);
+            let currentHeuristicOptgroup;
+		let groupElement = $('#heuristics-group-possible option:selected').clone();
+		let newGroupOption = $.grep(groupElement, function(obj){return obj.title === "New group";})[0];
+		groupElement = groupElement.filter(function ()
+		{
+		    if (this.title === "New group") return false;
+		    return true;
+		});
+		
+		if (groupElement.length > 0){
+			if (newGroupOption === undefined && $('#heuristics-group-current option:selected').length > 0){
+				let currentSelectedHeuristics = $('#heuristics-group-current option:selected');
+				currentHeuristicOptgroup = $(currentSelectedHeuristics.parent());
+				let lastCurrentSelectedHeuristic = $(currentSelectedHeuristics.last());
+				groupElement.insertAfter(lastCurrentSelectedHeuristic);
+			}else{
+				if (newGroupOption !== undefined || $('#heuristics-group-current').children().length == 0){
+					currentHeuristicOptgroup = addHeuristicOptgroup()
+				}else{
+					currentHeuristicOptgroup = $($('#heuristics-group-current').children().last());
+				}
+				currentHeuristicOptgroup.append(groupElement);
+			}
+			updateText();
+		}
         });
         // Add a listener for if the remove button was clicked.
-        $('.heuristics-group-add').on('click', (event) => {
+        $('.heuristics-group-remove').on('click', (event) => {
             // Get the actual group which was clicked.
-            const groupElement = $(event.target).closest('.heuristics-group');
-            //// Update the current heuristics with the removals.
-            // Update the selected items.
-            updateText(groupElement);
+		let groupElement = $('#heuristics-group-current option:selected');
+		groupElement.remove();
+		updateCurrentHeuristics();
+		updateText();
         });
         // Execute the function on page load.
         (() => {
@@ -324,9 +377,16 @@ $(window).on('load', () => {
                     // Return from the function.
                     return;
                 }
-                //// Update the current heuristics with the input data.
-                // Update the selected items.
-                updateText(groupElement);
+                
+                // Upload Current Heuristics with the input heuristics
+                let dataGroups = data.toString().split(",");
+                for (i = 0; i < dataGroups.length; i++){
+                	heuristicGroup = addHeuristicOptgroup();
+                	for (j = 0; j < dataGroups[i].length; j++){
+                		let heuristic = $('#heuristics-group-possible option[value="' + dataGroups[i][j] + '"]').clone();
+                		heuristicGroup.append(heuristic);
+                	}
+                }
             });
         })();
     }
