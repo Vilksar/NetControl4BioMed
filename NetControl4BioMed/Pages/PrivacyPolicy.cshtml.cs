@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace NetControl4BioMed.Pages
 {
     [AllowAnonymous]
-    public class PrivacyModel : PageModel
+    public class PrivacyPolicyModel : PageModel
     {
         public IActionResult OnGet()
         {
