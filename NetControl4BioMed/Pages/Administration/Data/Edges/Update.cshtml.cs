@@ -269,9 +269,17 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                     .Select(item => item.Id);
                 // Save the edges to add.
                 var edges = new List<Edge>();
+                // Save the start time of the loop.
+                var startTime = DateTime.Now;
                 // Go over each of the items.
                 foreach (var item in items)
                 {
+                    // Check if the loop has been running for more than the allowed time.
+                    if ((DateTime.Now - startTime).TotalSeconds > 180)
+                    {
+                        // End the loop.
+                        break;
+                    }
                     // Check if the ID of the current item is valid.
                     if (!string.IsNullOrEmpty(item.Id) && !validItemEdgeIds.Contains(item.Id))
                     {
@@ -435,9 +443,17 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                     .Select(item => item.Id);
                 // Save the edges to update.
                 var edgesToUpdate = new List<Edge>();
+                // Save the start time of the loop.
+                var startTime = DateTime.Now;
                 // Go over each of the valid items.
                 foreach (var item in items)
                 {
+                    // Check if the loop has been running for more than the allowed time.
+                    if ((DateTime.Now - startTime).TotalSeconds > 180)
+                    {
+                        // End the loop.
+                        break;
+                    }
                     // Get the corresponding edge.
                     var edge = edges.FirstOrDefault(item1 => item.Id == item1.Id);
                     // Check if there was no edge found.

@@ -31,7 +31,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are several database types with the same name. The duplicate names are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.DuplicateDatabaseTypes)
                         {
                             <li>
@@ -48,7 +48,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are several databases with the same name. The duplicate names are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.DuplicateDatabases)
                         {
                             <li>
@@ -65,7 +65,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are several database node fields with the same name. The duplicate names are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.DuplicateDatabaseNodeFields)
                         {
                             <li>
@@ -82,7 +82,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are several database edge fields with the same name. The duplicate names are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.DuplicateDatabaseEdgeFields)
                         {
                             <li>
@@ -99,7 +99,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are several database node field nodes with the same value. The duplicate values are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.DuplicateDatabaseNodeFieldNodes)
                         {
                             <li>
@@ -116,7 +116,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are several nodes with the same name. The duplicate names are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.DuplicateNodes)
                         {
                             <li>
@@ -133,7 +133,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are several edges with the same name. The duplicate names are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.DuplicateEdges)
                         {
                             <li>
@@ -150,7 +150,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are several node collections with the same name. The duplicate names are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.DuplicateNodeCollections)
                         {
                             <li>
@@ -177,7 +177,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are orphaned nodes in the database. They are are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.OrphanedNodes)
                         {
                             <li>
@@ -194,7 +194,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are orphaned edges in the database. They are are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.OrphanedEdges)
                         {
                             <li>
@@ -211,7 +211,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are orphaned node collections in the database. They are are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.OrphanedNodeCollections)
                         {
                             <li>
@@ -228,7 +228,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are orphaned networks in the database. They are are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.OrphanedNetworks)
                         {
                             <li>
@@ -245,7 +245,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are orphaned analyses in the database. They are are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.OrphanedAnalyses)
                         {
                             <li>
@@ -272,7 +272,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are inconsistent nodes in the database. They are are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.InconsistentNodes)
                         {
                             <li>
@@ -289,7 +289,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are inconsistent edges in the database. They are are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.InconsistentEdges)
                         {
                             <li>
@@ -306,7 +306,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are inconsistent node collections in the database. They are are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.InconsistentNodeCollections)
                         {
                             <li>
@@ -323,7 +323,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are inconsistent networks in the database. They are are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.InconsistentNetworks)
                         {
                             <li>
@@ -340,7 +340,7 @@
                 <div class="alert alert-danger text-justify text-wrap">
                     <span><i class="fas fa-exclamation-circle"></i></span>
                     <span>There are inconsistent analyses in the database. They are are listed below.</span>
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var item in Model.View.InconsistentAnalyses)
                         {
                             <li>

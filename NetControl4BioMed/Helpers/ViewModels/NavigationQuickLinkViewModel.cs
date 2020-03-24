@@ -71,7 +71,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AdministrationRolesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Roles",
-            Title = "Roles",
+            Title = "Role",
             Color = "success",
             Icon = "fa-tag",
             Width = 6,
