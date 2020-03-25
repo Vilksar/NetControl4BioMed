@@ -53,7 +53,7 @@ namespace NetControl4BioMed.Pages.Identity
             // Display a message to the user.
             TempData["StatusMessage"] = "Success: Thank you for confirming your e-mail. You can now log in and use the application.";
             // Redirect to the login page.
-            return RedirectToPage("/Login");
+            return RedirectToPage("/Identity/Login");
         }
     }
 }

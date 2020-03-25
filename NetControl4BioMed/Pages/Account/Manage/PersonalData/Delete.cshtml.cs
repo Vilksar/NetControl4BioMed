@@ -148,6 +148,8 @@ namespace NetControl4BioMed.Pages.Account.Manage.PersonalData
             _context.Nodes.RemoveRange(genericNodes);
             // Save the changes in the database.
             await _context.SaveChangesAsync();
+            // Display a message to the user.
+            TempData["StatusMessage"] = "Success: Your account has been successfully deleted, together with all of the associated data.";
             // Redirect to the home page.
             return RedirectToPage("/Index");
         }

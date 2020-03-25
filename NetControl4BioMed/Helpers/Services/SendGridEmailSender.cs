@@ -43,7 +43,7 @@ namespace NetControl4BioMed.Helpers.Services
         /// <summary>
         /// Sends an e-mail confirmation e-mail to the specified user.
         /// </summary>
-        /// <param name="user">Represents the user to which to send the e-mail.</param>
+        /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendEmailConfirmationEmailAsync(EmailEmailConfirmationViewModel viewModel)
         {
             // Define the variables for the e-mail.

@@ -140,12 +140,11 @@ namespace NetControl4BioMed.Pages.Identity
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 // Create the callback URL to be encoded in the confirmation email.
                 var callbackUrl = _linkGenerator.GetUriByPage(HttpContext, "/Identity/ConfirmEmail", handler: null, values: new { userId = user.Id, code = code });
-                var encodedUrl = HtmlEncoder.Default.Encode(callbackUrl);
                 // Define a new view model for the e-mail.
                 var emailViewModel = new EmailEmailConfirmationViewModel
                 {
                     Email = user.Email,
-                    Url = encodedUrl,
+                    Url = callbackUrl,
                     ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
                 };
                 // Send the confirmation e-mail for the user.
