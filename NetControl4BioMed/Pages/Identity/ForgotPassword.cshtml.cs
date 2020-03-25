@@ -75,18 +75,17 @@ namespace NetControl4BioMed.Pages.Identity
                 // Display a message.
                 TempData["StatusMessage"] = "Error: The provided e-mail address is not associated with any user.";
                 // Redirect to the page.
-                return RedirectToPage("/Account/Index");
+                return RedirectToPage("/Index");
             }
             // Generate the password reset code for the user.
             var code = await _userManager.GeneratePasswordResetTokenAsync(user);
             // Get the callback URL to be encoded in the e-mail.
             var callbackUrl = _linkGenerator.GetUriByPage(HttpContext, "/Identity/ResetPassword", handler: null, values: new { code = code });
-            var encodedUrl = HtmlEncoder.Default.Encode(callbackUrl);
             // Define a new view model for the e-mail.
             var emailViewModel = new EmailPasswordResetViewModel
             {
                 Email = user.Email,
-                Url = encodedUrl,
+                Url = callbackUrl,
                 ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Send the password reset e-mail for the user.
