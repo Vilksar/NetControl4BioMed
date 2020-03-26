@@ -42,7 +42,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
             { 10, "10" },
             { 20, "20" },
             { 50, "50" },
-            { 100, "100" }
+            { 100, "100" },
+            { 200, "200" }
         };
     }
 }

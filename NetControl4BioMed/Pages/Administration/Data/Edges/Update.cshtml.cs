@@ -264,7 +264,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 // Get the valid database IDs.
                 var validItemDatabaseIds = databases
                     .Select(item => item.Id);
-                // Get the valid database node field IDs.
+                // Get the valid database edge field IDs.
                 var validItemEdgeFieldIds = edgeFields
                     .Select(item => item.Id);
                 // Save the edges to add.
