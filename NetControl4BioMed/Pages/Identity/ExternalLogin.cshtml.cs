@@ -57,7 +57,7 @@ namespace NetControl4BioMed.Pages.Identity
         public IActionResult OnGet()
         {
             // Redirect to the login page. All "get" requests for external login should come from the external providers.
-            return RedirectToPage("/Identity/Login");
+            return RedirectToPage("/Identity/LoginWithExternalAccount");
         }
 
         public IActionResult OnPost(string provider, string returnUrl = null)
@@ -66,15 +66,15 @@ namespace NetControl4BioMed.Pages.Identity
             View = new ViewModel
             {
                 LoginProvider = provider,
-                ReturnUrl = returnUrl ?? Url.Content("~/")
+                ReturnUrl = returnUrl ?? _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };
-            // Check if there is any external provider given.
+            // Check if there isn't any external provider given.
             if (string.IsNullOrEmpty(provider))
             {
                 // Display an error.
                 TempData["StatusMessage"] = "Error: A valid external provider is needed in order log in.";
                 // Redirect to the home page.
-                return RedirectToPage("/Identity/Login");
+                return RedirectToPage("/Identity/LoginWithExternalAccount");
             }
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Page("/Identity/ExternalLogin", "Callback", new { returnUrl = View.ReturnUrl });
@@ -92,7 +92,7 @@ namespace NetControl4BioMed.Pages.Identity
                 // Display an error.
                 TempData["StatusMessage"] = $"Error: There was an error with the external provider: {remoteError}.";
                 // Redirect to the login page.
-                return RedirectToPage("/Identity/Login");
+                return RedirectToPage("/Identity/LoginWithExternalAccount");
             }
             // Get the information provided by the external authentication for the current user.
             var info = await _signInManager.GetExternalLoginInfoAsync();
@@ -102,13 +102,13 @@ namespace NetControl4BioMed.Pages.Identity
                 // Display an error.
                 TempData["StatusMessage"] = "Error: There was an error loading information from the external provider.";
                 // Redirect to the login page.
-                return RedirectToPage("/Identity/Login");
+                return RedirectToPage("/Identity/LoginWithExternalAccount");
             }
             // Define the variables for the view.
             View = new ViewModel
             {
                 LoginProvider = info.LoginProvider,
-                ReturnUrl = returnUrl ?? Url.Content("~/")
+                ReturnUrl = returnUrl ?? _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Get the ID of the user trying to log in.
             var userId = info.Principal != null ? info.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value : string.Empty;
@@ -118,7 +118,7 @@ namespace NetControl4BioMed.Pages.Identity
                 // Display an error.
                 TempData["StatusMessage"] = "Error: There was an error loading information from the external provider.";
                 // Redirect to the login page.
-                return RedirectToPage("/Identity/Login");
+                return RedirectToPage("/Identity/LoginWithExternalAccount");
             }
             // Get the user trying to log in.
             var user = await _userManager.FindByIdAsync(userId);
@@ -128,7 +128,7 @@ namespace NetControl4BioMed.Pages.Identity
                 // Display an error.
                 TempData["StatusMessage"] = "Error: There was an error loading information from the external provider.";
                 // Redirect to the login page.
-                return RedirectToPage("/Identity/Login");
+                return RedirectToPage("/Identity/LoginWithExternalAccount");
             }
             // Try to sign in the user with the external login provider information. It will work only if the user already has a login.
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false, true);
@@ -144,7 +144,7 @@ namespace NetControl4BioMed.Pages.Identity
                 // Display an error.
                 TempData["StatusMessage"] = "Error: This account has been locked out. Please try again later.";
                 // Redirect to the home page.
-                return RedirectToPage("/Identity/Login");
+                return RedirectToPage("/Identity/LoginWithExternalAccount");
             }
             // Check if the user is not allowed to sign in because the e-mail is not confirmed.
             if (result.IsNotAllowed && !user.EmailConfirmed)
@@ -165,7 +165,7 @@ namespace NetControl4BioMed.Pages.Identity
                 // Display an error.
                 TempData["StatusMessage"] = "Error: You are not allowed to log in because your e-mail address is not yet confirmed. A new e-mail containing instructions on how to confirm it has been sent to the specified e-mail address.";
                 // Redirect to the login page.
-                return RedirectToPage("/Identity/Login");
+                return RedirectToPage("/Identity/LoginWithExternalAccount");
             }
             // If the user does not have an account, then ask to create one. Retrieve the e-mail from the external provider, if it exists.
             Input = new InputModel
@@ -186,13 +186,13 @@ namespace NetControl4BioMed.Pages.Identity
                 // Display an error.
                 TempData["StatusMessage"] = "Error: There was an error loading information from the external provider.";
                 // Redirect to the login page.
-                return RedirectToPage("/Identity/Login");
+                return RedirectToPage("/Identity/LoginWithExternalAccount");
             }
             // Define the variables for the view.
             View = new ViewModel
             {
                 LoginProvider = info.LoginProvider,
-                ReturnUrl = returnUrl ?? Url.Content("~/")
+                ReturnUrl = returnUrl ?? _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Check if the provided model is not valid.
             if (!ModelState.IsValid)

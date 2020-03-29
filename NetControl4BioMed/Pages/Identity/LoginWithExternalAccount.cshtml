@@ -21,13 +21,13 @@
                 <div class="card-body">
                     @if (Model.View.ExternalLogins.Any())
                     {
-                        <form method="post" asp-page="/ExternalLogin" asp-route-returnUrl="@Model.View.ReturnUrl" class="text-justify">
+                        <form method="post" class="text-justify">
                             <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
                             <div class="form-group">
                                 <label class="font-weight-bold">External login</label>
                                 @foreach (var provider in Model.View.ExternalLogins)
                                 {
-                                    <button asp-route-provider="@provider.Name" type="submit" title="Log in using your @provider.DisplayName account" class="btn btn-dark btn-block">
+                                    <button asp-page="/Identity/ExternalLogin" asp-route-provider="@provider.Name" asp-route-returnUrl="@Model.View.ReturnUrl" type="submit" title="Log in using your @provider.DisplayName account" class="btn btn-dark btn-block">
                                         <span><i class="fab fa-@provider.DisplayName.ToLower()"></i></span>
                                         <span>@provider.DisplayName</span>
                                     </button>

@@ -41,7 +41,7 @@ namespace NetControl4BioMed.Pages.Identity
             View = new ViewModel
             {
                 ExternalLogins = await _signInManager.GetExternalAuthenticationSchemesAsync(),
-                ReturnUrl = returnUrl ?? _linkGenerator.GetPathByPage(HttpContext, "/Index", handler: null, values: null)
+                ReturnUrl = returnUrl ?? _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
