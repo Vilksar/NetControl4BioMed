@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -51,9 +52,9 @@ namespace NetControl4BioMed
             // Configure the cookie options.
             services.Configure<CookiePolicyOptions>(options =>
             {
-                // Determine whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.MinimumSameSitePolicy = SameSiteMode.Strict;
+                options.Secure = CookieSecurePolicy.SameAsRequest;
             });
             // Add the database context and connection.
             services.AddDbContext<ApplicationDbContext>(options =>
