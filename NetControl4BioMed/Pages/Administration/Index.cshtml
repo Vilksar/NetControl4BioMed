@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="card-body">
-        @if (!Model.View.DuplicateDetected)
+        @if (Model.View.DuplicateItemCount == 0)
         {
             <div class="alert alert-success text-justify text-wrap">
                 <span><i class="fas fa-check-circle"></i></span>
@@ -26,144 +26,64 @@
         }
         else
         {
-            @if (Model.View.DuplicateDatabaseTypes.Any())
+            @if (0 < Model.View.DuplicateDatabaseTypeCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are several database types with the same name. The duplicate names are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.DuplicateDatabaseTypes)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Databases/DatabaseTypes/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
-                                    <span>@item</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.DuplicateDatabaseTypeCount != 1 ? "are" : "is") @Model.View.DuplicateDatabaseTypeCount duplicate database type value@(Model.View.DuplicateDatabaseTypeCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.DuplicateDatabases.Any())
+            @if (0 < Model.View.DuplicateDatabaseCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are several databases with the same name. The duplicate names are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.DuplicateDatabases)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Databases/Databases/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
-                                    <span>@item</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.DuplicateDatabaseCount != 1 ? "are" : "is") @Model.View.DuplicateDatabaseCount duplicate database value@(Model.View.DuplicateDatabaseCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.DuplicateDatabaseNodeFields.Any())
+            @if (0 < Model.View.DuplicateDatabaseNodeFieldCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are several database node fields with the same name. The duplicate names are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.DuplicateDatabaseNodeFields)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Databases/DatabaseNodeFields/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
-                                    <span>@item</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.DuplicateDatabaseNodeFieldCount != 1 ? "are" : "is") @Model.View.DuplicateDatabaseNodeFieldCount duplicate database node field value@(Model.View.DuplicateDatabaseNodeFieldCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.DuplicateDatabaseEdgeFields.Any())
+            @if (0 < Model.View.DuplicateDatabaseEdgeFieldCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are several database edge fields with the same name. The duplicate names are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.DuplicateDatabaseEdgeFields)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Databases/DatabaseEdgeFields/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
-                                    <span>@item</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.DuplicateDatabaseEdgeFieldCount != 1 ? "are" : "is") @Model.View.DuplicateDatabaseEdgeFieldCount duplicate database edge field value@(Model.View.DuplicateDatabaseEdgeFieldCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.DuplicateDatabaseNodeFieldNodes.Any())
+            @if (0 < Model.View.DuplicateDatabaseNodeFieldNodeCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are several database node field nodes with the same value. The duplicate values are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.DuplicateDatabaseNodeFieldNodes)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Relationships/DatabaseNodeFieldNodes/Index" asp-route-searchString="@item" asp-route-searchIn="Value" class="alert-link">
-                                    <span>@item</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.DuplicateDatabaseNodeFieldNodeCount != 1 ? "are" : "is") @Model.View.DuplicateDatabaseNodeFieldNodeCount duplicate database node field node value@(Model.View.DuplicateDatabaseNodeFieldNodeCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.DuplicateNodes.Any())
+            @if (0 < Model.View.DuplicateNodeCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are several nodes with the same name. The duplicate names are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.DuplicateNodes)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Data/Nodes/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
-                                    <span>@item</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.DuplicateNodeCount != 1 ? "are" : "is") @Model.View.DuplicateNodeCount duplicate node value@(Model.View.DuplicateNodeCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.DuplicateEdges.Any())
+            @if (0 < Model.View.DuplicateEdgeCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are several edges with the same name. The duplicate names are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.DuplicateEdges)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Data/Edges/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
-                                    <span>@item</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.DuplicateEdgeCount != 1 ? "are" : "is") @Model.View.DuplicateEdgeCount duplicate edge value@(Model.View.DuplicateEdgeCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.DuplicateNodeCollections.Any())
+            @if (0 < Model.View.DuplicateNodeCollectionCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are several node collections with the same name. The duplicate names are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.DuplicateNodeCollections)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Data/NodeCollections/Index" asp-route-searchString="@item" asp-route-searchIn="Name" class="alert-link">
-                                    <span>@item</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.DuplicateNodeCollectionCount != 1 ? "are" : "is") @Model.View.DuplicateNodeCollectionCount duplicate node collection value@(Model.View.DuplicateNodeCollectionCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
         }
-        @if (!Model.View.OrphanDetected)
+        @if (Model.View.OrphanedItemCount == 0)
         {
             <div class="alert alert-success text-justify text-wrap">
                 <span><i class="fas fa-check-circle"></i></span>
@@ -172,93 +92,43 @@
         }
         else
         {
-            @if (Model.View.OrphanedNodes.Any())
+            @if (0 < Model.View.OrphanedNodeCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are orphaned nodes in the database. They are are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.OrphanedNodes)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Data/Nodes/Details" asp-route-id="@item" class="alert-link">
-                                    <span>@item.Name</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.OrphanedNodeCount != 1 ? "are" : "is") @Model.View.OrphanedNodeCount orphaned node@(Model.View.OrphanedNodeCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.OrphanedEdges.Any())
+            @if (0 < Model.View.OrphanedEdgeCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are orphaned edges in the database. They are are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.OrphanedEdges)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Data/Edges/Details" asp-route-id="@item" class="alert-link">
-                                    <span>@item.Name</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.OrphanedEdgeCount != 1 ? "are" : "is") @Model.View.OrphanedEdgeCount orphaned edge@(Model.View.OrphanedEdgeCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.OrphanedNodeCollections.Any())
+            @if (0 < Model.View.OrphanedNodeCollectionCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are orphaned node collections in the database. They are are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.OrphanedNodeCollections)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Data/NodeCollections/Details" asp-route-id="@item" class="alert-link">
-                                    <span>@item.Name</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.OrphanedNodeCollectionCount != 1 ? "are" : "is") @Model.View.OrphanedNodeCollectionCount orphaned node collection@(Model.View.OrphanedNodeCollectionCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.OrphanedNetworks.Any())
+            @if (0 < Model.View.OrphanedNetworkCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are orphaned networks in the database. They are are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.OrphanedNetworks)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Created/Networks/Details" asp-route-id="@item" class="alert-link">
-                                    <span>@item.Name</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.OrphanedNetworkCount != 1 ? "are" : "is") @Model.View.OrphanedNetworkCount orphaned network@(Model.View.OrphanedNetworkCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.OrphanedAnalyses.Any())
+            @if (0 < Model.View.OrphanedAnalysisCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are orphaned analyses in the database. They are are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.OrphanedAnalyses)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Created/Analysis/Details" asp-route-id="@item" class="alert-link">
-                                    <span>@item.Name</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.OrphanedAnalysisCount != 1 ? "are" : "is") @Model.View.OrphanedAnalysisCount orphaned analys@(Model.View.OrphanedAnalysisCount != 1 ? "e" : "i").</span>
                 </div>
             }
         }
-        @if (!Model.View.InconsistencyDetected)
+        @if (Model.View.InconsistentItemCount == 0)
         {
             <div class="alert alert-success text-justify text-wrap">
                 <span><i class="fas fa-check-circle"></i></span>
@@ -267,95 +137,47 @@
         }
         else
         {
-            @if (Model.View.InconsistentNodes.Any())
+            @if (0 < Model.View.InconsistentNodeCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are inconsistent nodes in the database. They are are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.InconsistentNodes)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Data/Nodes/Details" asp-route-id="@item" class="alert-link">
-                                    <span>@item.Name</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.InconsistentNodeCount != 1 ? "are" : "is") @Model.View.InconsistentNodeCount inconsistent node@(Model.View.InconsistentNodeCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.InconsistentEdges.Any())
+            @if (0 < Model.View.InconsistentEdgeCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are inconsistent edges in the database. They are are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.InconsistentEdges)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Data/Edges/Details" asp-route-id="@item" class="alert-link">
-                                    <span>@item.Name</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.InconsistentEdgeCount != 1 ? "are" : "is") @Model.View.InconsistentEdgeCount inconsistent edge@(Model.View.InconsistentEdgeCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.InconsistentNodeCollections.Any())
+            @if (0 < Model.View.InconsistentNodeCollectionCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are inconsistent node collections in the database. They are are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.InconsistentNodeCollections)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Data/NodeCollections/Details" asp-route-id="@item" class="alert-link">
-                                    <span>@item.Name</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.InconsistentNodeCollectionCount != 1 ? "are" : "is") @Model.View.InconsistentNodeCollectionCount inconsistent node collection@(Model.View.InconsistentNodeCollectionCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.InconsistentNetworks.Any())
+            @if (0 < Model.View.InconsistentNetworkCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are inconsistent networks in the database. They are are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.InconsistentNetworks)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Created/Networks/Details" asp-route-id="@item" class="alert-link">
-                                    <span>@item.Name</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.InconsistentNetworkCount != 1 ? "are" : "is") @Model.View.InconsistentNetworkCount inconsistent network@(Model.View.InconsistentNetworkCount != 1 ? "s" : string.Empty).</span>
                 </div>
             }
-            @if (Model.View.InconsistentAnalyses.Any())
+            @if (0 < Model.View.InconsistentAnalysisCount)
             {
-                <div class="alert alert-danger text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>There are inconsistent analyses in the database. They are are listed below.</span>
-                    <ul class="mb-0">
-                        @foreach (var item in Model.View.InconsistentAnalyses)
-                        {
-                            <li>
-                                <a asp-page="/Administration/Created/Analysis/Details" asp-route-id="@item" class="alert-link">
-                                    <span>@item.Name</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>There @(Model.View.InconsistentAnalysisCount != 1 ? "are" : "is") @Model.View.InconsistentAnalysisCount inconsistent analys@(Model.View.InconsistentAnalysisCount != 1 ? "e" : "i")s.</span>
                 </div>
             }
         }
-        <a asp-page="/Administration/Index" class="btn btn-success btn-block" title="Refresh">
-            <span>Refresh the page</span>
-        </a>
+        <form method="post" asp-page-handler="UpdateItemCount" class="text-justify">
+            <button type="submit" title="Update" class="btn btn-success btn-block">
+                <span>Update</span>
+            </button>
+        </form>
     </div>
 </div>
 <div class="card mb-3">
@@ -375,7 +197,6 @@
             <span>This application uses Hangfire to manage the background tasks. You can access the corresponding dashboard by clicking on the button below.</span>
         </div>
         <form method="post" asp-page-handler="Hangfire" class="text-justify">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
             <button type="submit" title="Open Hangfire dashboard" class="btn btn-info btn-block">
                 <span>Open Hangfire dashboard</span>
             </button>
@@ -399,7 +220,6 @@
             <span>Write a message and click the button below to have it appear on each user's account overview page. This can be useful in making application-wide announcements. Submitting an empty message will clear the current announcement.</span>
         </div>
         <form method="post" asp-page-handler="UpdateAnnouncementMessage" class="text-justify">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
             <div class="form-group">
                 <label for="announcementMessage" class="font-weight-bold">Announcement message</label>
                 <input id="announcementMessage" name="announcementMessage" value="@Model.View.AnnouncementMessage" class="form-control" />
@@ -425,7 +245,7 @@
     </div>
     <div class="card-body">
         <div class="alert alert-warning text-justify text-wrap">
-            <span><i class="fas fa-exclamation-circle"></i></span>
+            <span><i class="fas fa-exclamation-triangle"></i></span>
             <span>You can (re)set all of the Hangfire recurrent jobs by clicking on the button below. The jobs are unset by default. The recurring jobs are:</span>
             <ul class="mt-1 mb-0">
                 <li>
@@ -434,7 +254,6 @@
             </ul>
         </div>
         <form method="post" asp-page-handler="ResetHangfireRecurrentJobs" class="text-justify">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
             <button type="submit" title="Reset Hangfire recurrent jobs" class="btn btn-warning btn-block">
                 <span class="text-white">Reset Hangfire recurrent jobs</span>
             </button>
@@ -458,7 +277,33 @@
             <span>You can download all of the data used by the application (namely the database types, databases, database fields, nodes and edges) by clicking on the button below.</span>
         </div>
         <form method="post" asp-page-handler="Download" class="text-justify">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label for="type" class="font-weight-bold">Type</label>
+                <select for="type" name="type" class="form-control">
+                    <option value="All" title="All">All</option>
+                    <option value="Duplicate" title="Duplicate">Duplicate</option>
+                    <option value="Orphaned" title="Orphaned">Orphaned</option>
+                    <option value="Inconsistent" title="Inconsistent">Inconsistent</option>
+                </select>
+                <span description-for="type" class="text-muted small">The type of the items to download.</span>
+                <span validation-for="type" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label for="items" class="font-weight-bold">Items</label>
+                <select for="items" name="items" class="form-control" multiple="multiple">
+                    <option value="DatabaseTypes" title="Database types">Database types</option>
+                    <option value="Databases" title="Databases">Databases</option>
+                    <option value="DatabaseNodeFields" title="Database node fields">Database node fields</option>
+                    <option value="DatabaseEdgeFields" title="Database edge fields">Database edge fields</option>
+                    <option value="Nodes" title="Nodes">Nodes</option>
+                    <option value="Edges" title="Edges">Edges</option>
+                    <option value="NodeCollections" title="Node collections">Node collections</option>
+                    <option value="Networks" title="Networks">Networks</option>
+                    <option value="Analyses" title="Analyses">Analyses</option>
+                </select>
+                <span description-for="items" class="text-muted small">The items to download.</span>
+                <span validation-for="items" class="text-danger small"></span>
+            </div>
             <button type="submit" title="Download" class="btn btn-primary btn-block">
                 <span>Download</span>
             </button>
