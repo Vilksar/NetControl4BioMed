@@ -48,10 +48,9 @@ namespace NetControl4BioMed.Pages.Account
             // Define the view.
             View = new ViewModel
             {
-                User = user
+                User = user,
+                AnnouncementMessage = _configuration["Data:AnnouncementMessage"]
             };
-            // Check for any announcements.
-            View.AnnouncementMessage = _configuration["AnnouncementMessage"];
             // Return the page.
             return Page();
         }

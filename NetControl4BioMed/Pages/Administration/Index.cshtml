@@ -17,165 +17,32 @@
         </div>
     </div>
     <div class="card-body">
-        @if (Model.View.DuplicateItemCount == 0)
+        @foreach (var item in Model.View.IssueCount)
         {
-            <div class="alert alert-success text-justify text-wrap">
-                <span><i class="fas fa-check-circle"></i></span>
-                <span>There were no duplicate items found in the data.</span>
-            </div>
-        }
-        else
-        {
-            @if (0 < Model.View.DuplicateDatabaseTypeCount)
+            @if (!item.Value.Any(item1 => item1.Value != 0))
             {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.DuplicateDatabaseTypeCount != 1 ? "are" : "is") @Model.View.DuplicateDatabaseTypeCount duplicate database type value@(Model.View.DuplicateDatabaseTypeCount != 1 ? "s" : string.Empty).</span>
+                <div class="alert alert-success text-justify text-wrap">
+                    <span><i class="fas fa-check-circle"></i></span>
+                    <span>There were no @item.Key.ToLower() items found in the data.</span>
                 </div>
             }
-            @if (0 < Model.View.DuplicateDatabaseCount)
+            else
             {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.DuplicateDatabaseCount != 1 ? "are" : "is") @Model.View.DuplicateDatabaseCount duplicate database value@(Model.View.DuplicateDatabaseCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.DuplicateDatabaseNodeFieldCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.DuplicateDatabaseNodeFieldCount != 1 ? "are" : "is") @Model.View.DuplicateDatabaseNodeFieldCount duplicate database node field value@(Model.View.DuplicateDatabaseNodeFieldCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.DuplicateDatabaseEdgeFieldCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.DuplicateDatabaseEdgeFieldCount != 1 ? "are" : "is") @Model.View.DuplicateDatabaseEdgeFieldCount duplicate database edge field value@(Model.View.DuplicateDatabaseEdgeFieldCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.DuplicateDatabaseNodeFieldNodeCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.DuplicateDatabaseNodeFieldNodeCount != 1 ? "are" : "is") @Model.View.DuplicateDatabaseNodeFieldNodeCount duplicate database node field node value@(Model.View.DuplicateDatabaseNodeFieldNodeCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.DuplicateNodeCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.DuplicateNodeCount != 1 ? "are" : "is") @Model.View.DuplicateNodeCount duplicate node value@(Model.View.DuplicateNodeCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.DuplicateEdgeCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.DuplicateEdgeCount != 1 ? "are" : "is") @Model.View.DuplicateEdgeCount duplicate edge value@(Model.View.DuplicateEdgeCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.DuplicateNodeCollectionCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.DuplicateNodeCollectionCount != 1 ? "are" : "is") @Model.View.DuplicateNodeCollectionCount duplicate node collection value@(Model.View.DuplicateNodeCollectionCount != 1 ? "s" : string.Empty).</span>
-                </div>
+                @foreach (var item1 in item.Value)
+                {
+                    @if (item1.Value != 0)
+                    {
+                        <div class="alert alert-warning text-justify text-wrap">
+                            <span><i class="fas fa-exclamation-triangle"></i></span>
+                            <span>There @(item1.Value != 1 ? "are" : "is") @item1.Value @item.Key.ToLower() value@(item1.Value != 1 ? "s" : string.Empty) of type "@item1.Key".</span>
+                        </div>
+                    }
+                }
             }
         }
-        @if (Model.View.OrphanedItemCount == 0)
-        {
-            <div class="alert alert-success text-justify text-wrap">
-                <span><i class="fas fa-check-circle"></i></span>
-                <span>There were no orphaned items found in the data.</span>
-            </div>
-        }
-        else
-        {
-            @if (0 < Model.View.OrphanedNodeCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.OrphanedNodeCount != 1 ? "are" : "is") @Model.View.OrphanedNodeCount orphaned node@(Model.View.OrphanedNodeCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.OrphanedEdgeCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.OrphanedEdgeCount != 1 ? "are" : "is") @Model.View.OrphanedEdgeCount orphaned edge@(Model.View.OrphanedEdgeCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.OrphanedNodeCollectionCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.OrphanedNodeCollectionCount != 1 ? "are" : "is") @Model.View.OrphanedNodeCollectionCount orphaned node collection@(Model.View.OrphanedNodeCollectionCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.OrphanedNetworkCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.OrphanedNetworkCount != 1 ? "are" : "is") @Model.View.OrphanedNetworkCount orphaned network@(Model.View.OrphanedNetworkCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.OrphanedAnalysisCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.OrphanedAnalysisCount != 1 ? "are" : "is") @Model.View.OrphanedAnalysisCount orphaned analys@(Model.View.OrphanedAnalysisCount != 1 ? "e" : "i").</span>
-                </div>
-            }
-        }
-        @if (Model.View.InconsistentItemCount == 0)
-        {
-            <div class="alert alert-success text-justify text-wrap">
-                <span><i class="fas fa-check-circle"></i></span>
-                <span>There were no inconsistent items found in the data.</span>
-            </div>
-        }
-        else
-        {
-            @if (0 < Model.View.InconsistentNodeCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.InconsistentNodeCount != 1 ? "are" : "is") @Model.View.InconsistentNodeCount inconsistent node@(Model.View.InconsistentNodeCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.InconsistentEdgeCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.InconsistentEdgeCount != 1 ? "are" : "is") @Model.View.InconsistentEdgeCount inconsistent edge@(Model.View.InconsistentEdgeCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.InconsistentNodeCollectionCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.InconsistentNodeCollectionCount != 1 ? "are" : "is") @Model.View.InconsistentNodeCollectionCount inconsistent node collection@(Model.View.InconsistentNodeCollectionCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.InconsistentNetworkCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.InconsistentNetworkCount != 1 ? "are" : "is") @Model.View.InconsistentNetworkCount inconsistent network@(Model.View.InconsistentNetworkCount != 1 ? "s" : string.Empty).</span>
-                </div>
-            }
-            @if (0 < Model.View.InconsistentAnalysisCount)
-            {
-                <div class="alert alert-warning text-justify text-wrap">
-                    <span><i class="fas fa-exclamation-triangle"></i></span>
-                    <span>There @(Model.View.InconsistentAnalysisCount != 1 ? "are" : "is") @Model.View.InconsistentAnalysisCount inconsistent analys@(Model.View.InconsistentAnalysisCount != 1 ? "e" : "i")s.</span>
-                </div>
-            }
-        }
-        <form method="post" asp-page-handler="UpdateItemCount" class="text-justify">
-            <button type="submit" title="Update" class="btn btn-success btn-block">
-                <span>Update</span>
+        <form method="post" asp-page-handler="ResetIssueCount" class="text-justify">
+            <button type="submit" title="Reset" class="btn btn-success btn-block">
+                <span>Reset</span>
             </button>
         </form>
     </div>

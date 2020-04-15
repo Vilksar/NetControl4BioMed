@@ -40,6 +40,12 @@ namespace NetControl4BioMed.Pages.Administration
 
         public class ViewModel
         {
+            public bool AnyDuplicate { get; set; }
+
+            public bool AnyOrphaned { get; set; }
+
+            public bool AnyInconsistent { get; set; }
+
             public int UserCount { get; set; }
 
             public int RoleCount { get; set; }
@@ -52,53 +58,116 @@ namespace NetControl4BioMed.Pages.Administration
 
             public int NodeCollectionCount { get; set; }
 
-            public int DuplicateItemCount { get; set; }
-
-            public int DuplicateDatabaseTypeCount { get; set; }
-
-            public int DuplicateDatabaseCount { get; set; }
-
-            public int DuplicateDatabaseNodeFieldCount { get; set; }
-
-            public int DuplicateDatabaseEdgeFieldCount { get; set; }
-
-            public int DuplicateDatabaseNodeFieldNodeCount { get; set; }
-
-            public int DuplicateNodeCount { get; set; }
-
-            public int DuplicateEdgeCount { get; set; }
-
-            public int DuplicateNodeCollectionCount { get; set; }
-
-            public int OrphanedItemCount { get; set; }
-
-            public int OrphanedNodeCount { get; set; }
-
-            public int OrphanedEdgeCount { get; set; }
-
-            public int OrphanedNodeCollectionCount { get; set; }
-
-            public int OrphanedNetworkCount { get; set; }
-
-            public int OrphanedAnalysisCount { get; set; }
-
-            public int InconsistentItemCount { get; set; }
-
-            public int InconsistentNodeCount { get; set; }
-
-            public int InconsistentEdgeCount { get; set; }
-
-            public int InconsistentNodeCollectionCount { get; set; }
-
-            public int InconsistentNetworkCount { get; set; }
-
-            public int InconsistentAnalysisCount { get; set; }
+            public Dictionary<string, Dictionary<string, int>> IssueCount { get; set; }
 
             public string AnnouncementMessage { get; set; }
         }
 
         public IActionResult OnGet()
         {
+            // Check if corresponding configuration section doesn't exist.
+            if (!_configuration.GetSection("Data").GetSection("IssueCount").Exists())
+            {
+                // Update the duplicate counts.
+                _configuration["Data:IssueCount:Duplicate:DatabaseTypes"] = _context.DatabaseTypes
+                    .Where(item => item.Name != "Generic")
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Duplicate:Databases"] = _context.Databases
+                    .Where(item => item.DatabaseType.Name != "Generic")
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Duplicate:DatabaseNodeFields"] = _context.DatabaseNodeFields
+                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Duplicate:DatabaseEdgeFields"] = _context.DatabaseEdgeFields
+                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Duplicate:DatabaseNodeFieldNodes"] = _context.DatabaseNodeFieldNodes
+                    .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
+                    .Where(item => item.DatabaseNodeField.IsSearchable)
+                    .GroupBy(item => item.Value)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Duplicate:Nodes"] = _context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Duplicate:Edges"] = _context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Duplicate:NodeCollections"] = _context.NodeCollections
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .Count()
+                    .ToString();
+                // Update the orphaned counts.
+                _configuration["Data:IssueCount:Orphaned:Nodes"] = _context.Nodes
+                    .Where(item => !item.DatabaseNodeFieldNodes.Any())
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Orphaned:Edges"] = _context.Edges
+                    .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Orphaned:NodeCollections"] = _context.NodeCollections
+                    .Where(item => !item.NodeCollectionNodes.Any())
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Orphaned:Networks"] = _context.Networks
+                    .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any())
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Orphaned:Analyses"] = _context.Analyses
+                    .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any())
+                    .Count()
+                    .ToString();
+                // Update the inconsistent counts.
+                _configuration["Data:IssueCount:Inconsistent:Nodes"] = _context.Nodes
+                    .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Inconsistent:Edges"] = _context.Edges
+                    .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Inconsistent:NodeCollections"] = _context.NodeCollections
+                    .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Inconsistent:Networks"] = _context.Networks
+                    .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                    .Count()
+                    .ToString();
+                _configuration["Data:IssueCount:Inconsistent:Analyses"] = _context.Analyses
+                    .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                    .Count()
+                    .ToString();
+            }
             // Define the view.
             View = new ViewModel
             {
@@ -116,96 +185,21 @@ namespace NetControl4BioMed.Pages.Administration
                     .Count(),
                 NodeCollectionCount = _context.NodeCollections
                     .Count(),
-                DuplicateDatabaseTypeCount = _context.DatabaseTypes
-                    .Where(item => item.Name != "Generic")
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count(),
-                DuplicateDatabaseCount = _context.Databases
-                    .Where(item => item.DatabaseType.Name != "Generic")
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count(),
-                DuplicateDatabaseNodeFieldCount = _context.DatabaseNodeFields
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count(),
-                DuplicateDatabaseEdgeFieldCount = _context.DatabaseEdgeFields
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count(),
-                DuplicateDatabaseNodeFieldNodeCount = _context.DatabaseNodeFieldNodes
-                    .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
-                    .Where(item => item.DatabaseNodeField.IsSearchable)
-                    .GroupBy(item => item.Value)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count(),
-                DuplicateNodeCount = _context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count(),
-                DuplicateEdgeCount = _context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count(),
-                DuplicateNodeCollectionCount = _context.NodeCollections
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count(),
-                OrphanedNodeCount = _context.Nodes
-                    .Where(item => !item.DatabaseNodeFieldNodes.Any())
-                    .Count(),
-                OrphanedEdgeCount = _context.Edges
-                    .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
-                    .Count(),
-                OrphanedNodeCollectionCount = _context.NodeCollections
-                    .Where(item => !item.NodeCollectionNodes.Any())
-                    .Count(),
-                OrphanedNetworkCount = _context.Networks
-                    .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any())
-                    .Count(),
-                OrphanedAnalysisCount = _context.Analyses
-                    .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any())
-                    .Count(),
-                InconsistentNodeCount = _context.Nodes
-                    .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .Count(),
-                InconsistentEdgeCount = _context.Edges
-                    .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .Count(),
-                InconsistentNodeCollectionCount = _context.NodeCollections
-                    .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .Count(),
-                InconsistentNetworkCount = _context.Networks
-                    .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .Count(),
-                InconsistentAnalysisCount = _context.Analyses
-                    .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .Count(),
-                AnnouncementMessage = _configuration["AnnouncementMessage"]
+                IssueCount = _configuration
+                    .GetSection("Data")
+                    .GetSection("IssueCount")
+                    .GetChildren()
+                    .ToDictionary(item => item.Key, item => item.GetChildren().ToDictionary(item1 => item1.Key, item1 => int.TryParse(item1.Value, out var result) ? result : -1)),
+                AnnouncementMessage = _configuration["Data:AnnouncementMessage"]
             };
-            // Check if there were any issues detected.
-            View.DuplicateItemCount = View.DuplicateDatabaseTypeCount + View.DuplicateDatabaseCount + View.DuplicateDatabaseNodeFieldCount + View.DuplicateDatabaseEdgeFieldCount + View.DuplicateDatabaseNodeFieldNodeCount + View.DuplicateNodeCount + View.DuplicateEdgeCount + View.DuplicateNodeCollectionCount;
-            View.OrphanedItemCount = View.OrphanedNodeCount + View.OrphanedEdgeCount + View.OrphanedNodeCollectionCount + View.OrphanedNetworkCount + View.OrphanedAnalysisCount;
-            View.InconsistentItemCount = View.InconsistentNodeCount + View.InconsistentEdgeCount + View.InconsistentNodeCollectionCount + View.InconsistentNetworkCount + View.InconsistentAnalysisCount;
             // Return the page.
             return Page();
         }
 
-        public IActionResult OnPostUpdateItemCount()
+        public IActionResult OnPostResetIssueCount()
         {
+            // Reset the configuration data.
+            _configuration["Data:IssueCount"] = null;
             // Redirect to the page.
             return RedirectToPage();
         }
@@ -219,7 +213,7 @@ namespace NetControl4BioMed.Pages.Administration
         public IActionResult OnPostUpdateAnnouncementMessage(string announcementMessage)
         {
             // Update the announcement message.
-            _configuration["AnnouncementMessage"] = announcementMessage;
+            _configuration["Data:AnnouncementMessage"] = announcementMessage;
             // Display a message.
             TempData["StatusMessage"] = "Success: The announcement message has been successfully updated.";
             // Redirect to the page.
