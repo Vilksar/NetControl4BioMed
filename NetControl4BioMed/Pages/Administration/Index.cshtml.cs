@@ -27,11 +27,13 @@ namespace NetControl4BioMed.Pages.Administration
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public IndexModel(ApplicationDbContext context, IConfiguration configuration)
+        public IndexModel(ApplicationDbContext context, IConfiguration configuration, IReCaptchaChecker reCaptchaChecker)
         {
             _context = context;
             _configuration = configuration;
+            _reCaptchaChecker = reCaptchaChecker;
         }
 
         public ViewModel View { get; set; }
@@ -982,6 +984,154 @@ namespace NetControl4BioMed.Pages.Administration
             }
             // Display a message.
             TempData["StatusMessage"] = "Error: The provided download type is not valid.";
+            // Redirect to the page.
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(string items, string confirmation, string reCaptchaToken)
+        {
+            // Check if there is any missing parameter.
+            if (string.IsNullOrEmpty(items))
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: There were no provided items to delete.";
+                // Redirect to the page.
+                return RedirectToPage();
+            }
+            // Check if the confirmation is not valid.
+            if (confirmation != $"I confirm that I want to delete the {items}!")
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: The confirmation message was not valid for the selected items.";
+                // Redirect to the page.
+                return RedirectToPage();
+            }
+            // Check if the reCaptcha is valid.
+            if (!await _reCaptchaChecker.IsValid(reCaptchaToken))
+            {
+                // Add an error to the model.
+                TempData["StatusMessage"] = "The reCaptcha verification failed.";
+                // Redirect to the page.
+                return RedirectToPage();
+            }
+            // Check the items to delete.
+            if (items == "Nodes")
+            {
+                // Get the items to delete.
+                var nodes = _context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
+                // Save the number of items found.
+                var nodeCount = nodes.Count();
+                // Get the related entities that use the items.
+                var edges = _context.Edges
+                    .Where(item => item.EdgeNodes.Any(item1 => nodes.Contains(item1.Node)));
+                var networks = _context.Networks
+                    .Where(item => item.NetworkNodes.Any(item1 => nodes.Contains(item1.Node)));
+                var analyses = _context.Analyses
+                    .Where(item => item.AnalysisNodes.Any(item1 => nodes.Contains(item1.Node)));
+                // Mark the items for deletion.
+                _context.Analyses.RemoveRange(analyses);
+                _context.Networks.RemoveRange(networks);
+                _context.Edges.RemoveRange(edges);
+                _context.Nodes.RemoveRange(nodes);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Display a message.
+                TempData["StatusMessage"] = $"Success: {nodeCount.ToString()} node{(nodeCount != 1 ? "s" : string.Empty)} deleted successfully.";
+                // Redirect to the page.
+                return RedirectToPage();
+            }
+            // Check the items to delete.
+            if (items == "Edges")
+            {
+                // Get the items to delete.
+                var edges = _context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
+                // Save the number of items found.
+                var edgeCount = edges.Count();
+                // Get the related entities that use the items.
+                var networks = _context.Networks
+                    .Where(item => item.NetworkEdges.Any(item1 => edges.Contains(item1.Edge)));
+                var analyses = _context.Analyses
+                    .Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
+                // Mark the items for deletion.
+                _context.Analyses.RemoveRange(analyses);
+                _context.Networks.RemoveRange(networks);
+                _context.Edges.RemoveRange(edges);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Display a message.
+                TempData["StatusMessage"] = $"Success: {edgeCount.ToString()} edge{(edgeCount != 1 ? "s" : string.Empty)} deleted successfully.";
+                // Redirect to the page.
+                return RedirectToPage();
+            }
+            // Check the items to delete.
+            if (items == "NodeCollections")
+            {
+                // Get the items to delete.
+                var nodeCollections = _context.NodeCollections
+                    .AsQueryable();
+                // Save the number of items found.
+                var nodeCollectionCount = nodeCollections.Count();
+                // Get the related entities that use the items.
+                var networks = _context.Networks.Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)));
+                var analyses = _context.Analyses.Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)) || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
+                // Mark the items for deletion.
+                _context.Analyses.RemoveRange(analyses);
+                _context.Networks.RemoveRange(networks);
+                _context.NodeCollections.RemoveRange(nodeCollections);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Display a message.
+                TempData["StatusMessage"] = $"Success: {nodeCollectionCount.ToString()} node collection{(nodeCollectionCount != 1 ? "s" : string.Empty)} deleted successfully.";
+                // Redirect to the page.
+                return RedirectToPage();
+            }
+            // Check the items to delete.
+            if (items == "Networks")
+            {
+                // Get the items to delete.
+                var networks = _context.Networks
+                    .AsQueryable();
+                // Save the number of items found.
+                var networkCount = networks.Count();
+                // Get the related entities that use the items.
+                var analyses = _context.Analyses.Where(item => item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
+                // Get the generic entities among them.
+                var genericNetworks = networks.Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
+                var genericNodes = _context.Nodes.Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
+                var genericEdges = _context.Edges.Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
+                // Mark the items for deletion.
+                _context.Analyses.RemoveRange(analyses);
+                _context.Networks.RemoveRange(networks);
+                _context.Edges.RemoveRange(genericEdges);
+                _context.Nodes.RemoveRange(genericNodes);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Display a message.
+                TempData["StatusMessage"] = $"Success: {networkCount.ToString()} network{(networkCount != 1 ? "s" : string.Empty)} deleted successfully.";
+                // Redirect to the page.
+                return RedirectToPage();
+            }
+            // Check the items to delete.
+            if (items == "Analyses")
+            {
+                // Get the items to delete.
+                var analyses = _context.Analyses
+                    .AsQueryable();
+                // Save the number of items found.
+                var analysisCount = analyses.Count();
+                // Mark the items for deletion.
+                _context.Analyses.RemoveRange(analyses);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Display a message.
+                TempData["StatusMessage"] = $"Success: {analysisCount.ToString()} analys{(analysisCount != 1 ? "e" : "i")}s deleted successfully.";
+                // Redirect to the page.
+                return RedirectToPage();
+            }
+            // Display a message.
+            TempData["StatusMessage"] = "Error: There were no items to delete.";
             // Redirect to the page.
             return RedirectToPage();
         }
