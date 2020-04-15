@@ -155,7 +155,11 @@ namespace NetControl4BioMed.Helpers.Services
                 .Select(item => item.User);
             // Get the users that have access to the items.
             var users = networkUsers
-                .Concat(analysisUsers);
+                .Concat(analysisUsers)
+                .Include(item => item.NetworkUsers)
+                    .ThenInclude(item => item.Network)
+                .Include(item => item.AnalysisUsers)
+                    .ThenInclude(item => item.Analysis);
             // Go over each of the users.
             foreach (var user in users)
             {

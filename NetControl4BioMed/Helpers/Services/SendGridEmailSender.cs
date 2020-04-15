@@ -231,7 +231,7 @@ namespace NetControl4BioMed.Helpers.Services
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var to = new EmailAddress(viewModel.Email, viewModel.Email);
-            var subject = "NetControl4BioMed - Analyses to be deleted";
+            var subject = "NetControl4BioMed - Items to be deleted";
             var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailAlertDeletePartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail.
