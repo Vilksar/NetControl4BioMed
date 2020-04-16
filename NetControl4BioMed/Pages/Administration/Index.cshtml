@@ -89,7 +89,7 @@
         <form method="post" asp-page-handler="UpdateAnnouncementMessage" class="text-justify">
             <div class="form-group">
                 <label for="announcementMessage" class="font-weight-bold">Announcement message</label>
-                <input id="announcementMessage" name="announcementMessage" value="@Model.View.AnnouncementMessage" class="form-control" />
+                <input for="announcementMessage" id="announcementMessage" name="announcementMessage" value="@Model.View.AnnouncementMessage" class="form-control" />
                 <span description-for="announcementMessage" class="text-muted small">The message of the announcement.</span>
                 <span validation-for="announcementMessage" class="text-danger small"></span>
             </div>
@@ -145,31 +145,46 @@
         </div>
         <form method="post" asp-page-handler="Download" class="text-justify">
             <div class="form-group">
-                <label for="type" class="font-weight-bold">Type</label>
-                <select for="type" name="type" class="form-control">
-                    <option value="All" title="All">All</option>
-                    <option value="Duplicate" title="Duplicate">Duplicate</option>
-                    <option value="Orphaned" title="Orphaned">Orphaned</option>
-                    <option value="Inconsistent" title="Inconsistent">Inconsistent</option>
+                <label for="downloadItems" class="font-weight-bold">Items</label>
+                <select for="downloadItems" id="downloadItems" name="downloadItems" class="form-control" multiple="multiple">
+                    <optgroup title="All" label="All">
+                        <option value="AllDatabaseTypes" title="Database types">Database types</option>
+                        <option value="AllDatabases" title="Databases">Databases</option>
+                        <option value="AllDatabaseNodeFields" title="Database node fields">Database node fields</option>
+                        <option value="AllDatabaseEdgeFields" title="Database edge fields">Database edge fields</option>
+                        <option value="AllNodes" title="Nodes">Nodes</option>
+                        <option value="AllEdges" title="Edges">Edges</option>
+                        <option value="AllNodeCollections" title="Node collections">Node collections</option>
+                        <option value="AllNetworks" title="Networks">Networks</option>
+                        <option value="AllAnalyses" title="Analyses">Analyses</option>
+                    </optgroup>
+                    <optgroup title="Duplicate" label="Duplicate">
+                        <option value="DuplicateDatabaseTypes" title="Database types">Database types</option>
+                        <option value="DuplicateDatabases" title="Databases">Databases</option>
+                        <option value="DuplicateDatabaseNodeFields" title="Database node fields">Database node fields</option>
+                        <option value="DuplicateDatabaseEdgeFields" title="Database edge fields">Database edge fields</option>
+                        <option value="DuplicateDatabaseNodeFieldNodes" title="Database node field nodes">Database node field nodes</option>
+                        <option value="DuplicateNodes" title="Nodes">Nodes</option>
+                        <option value="DuplicateEdges" title="Edges">Edges</option>
+                        <option value="DuplicateNodeCollections" title="Node collections">Node collections</option>
+                    </optgroup>
+                    <optgroup title="Orphaned" label="Orphaned">
+                        <option value="OrphanedNodes" title="Nodes">Nodes</option>
+                        <option value="OrphanedEdges" title="Edges">Edges</option>
+                        <option value="OrphanedNodeCollections" title="Node collections">Node collections</option>
+                        <option value="OrphanedNetworks" title="Networks">Networks</option>
+                        <option value="OrphanedAnalyses" title="Analyses">Analyses</option>
+                    </optgroup>
+                    <optgroup title="Inconsistent" label="Inconsistent">
+                        <option value="InconsistentNodes" title="Nodes">Nodes</option>
+                        <option value="InconsistentEdges" title="Edges">Edges</option>
+                        <option value="InconsistentNodeCollections" title="Node collections">Node collections</option>
+                        <option value="InconsistentNetworks" title="Networks">Networks</option>
+                        <option value="InconsistentAnalyses" title="Analyses">Analyses</option>
+                    </optgroup>
                 </select>
-                <span description-for="type" class="text-muted small">The type of the items to download.</span>
-                <span validation-for="type" class="text-danger small"></span>
-            </div>
-            <div class="form-group">
-                <label for="items" class="font-weight-bold">Items</label>
-                <select for="items" name="items" class="form-control" multiple="multiple">
-                    <option value="DatabaseTypes" title="Database types">Database types</option>
-                    <option value="Databases" title="Databases">Databases</option>
-                    <option value="DatabaseNodeFields" title="Database node fields">Database node fields</option>
-                    <option value="DatabaseEdgeFields" title="Database edge fields">Database edge fields</option>
-                    <option value="Nodes" title="Nodes">Nodes</option>
-                    <option value="Edges" title="Edges">Edges</option>
-                    <option value="NodeCollections" title="Node collections">Node collections</option>
-                    <option value="Networks" title="Networks">Networks</option>
-                    <option value="Analyses" title="Analyses">Analyses</option>
-                </select>
-                <span description-for="items" class="text-muted small">The items to download.</span>
-                <span validation-for="items" class="text-danger small"></span>
+                <span description-for="downloadItems" class="text-muted small">The items to download.</span>
+                <span validation-for="downloadItems" class="text-danger small"></span>
             </div>
             <button type="submit" title="Download" class="btn btn-primary btn-block">
                 <span>Download</span>
@@ -195,23 +210,22 @@
         </div>
         <form method="post" asp-page-handler="Delete" class="text-justify">
             <div class="form-group">
-                <label for="items" class="font-weight-bold">Items</label>
-                <select for="items" name="items" class="form-control">
-                    <option value="" title="">Please select an option...</option>
+                <label for="deleteItems" class="font-weight-bold">Items</label>
+                <select for="deleteItems" id="deleteItems" name="deleteItems" class="form-control" multiple="multiple">
                     <option value="Nodes" title="Nodes">Nodes</option>
                     <option value="Edges" title="Edges">Edges</option>
                     <option value="NodeCollections" title="Node collections">Node collections</option>
                     <option value="Networks" title="Networks">Networks</option>
                     <option value="Analyses" title="Analyses">Analyses</option>
                 </select>
-                <span description-for="items" class="text-muted small">The items to delete.</span>
-                <span validation-for="items" class="text-danger small"></span>
+                <span description-for="deleteItems" class="text-muted small">The items to delete.</span>
+                <span validation-for="deleteItems" class="text-danger small"></span>
             </div>
             <div class="form-group">
-                <label for="confirmation" class="font-weight-bold">Confirmation</label>
-                <input for="confirmation" name="confirmation" class="form-control" autocomplete="off" required="required" />
-                <span description-for="confirmation" class="text-muted small">The confirmation for the deletion. You need to type "I confirm that I want to delete the <span class="">Items</span>!" (including the exclamation mark), replacing the word "items" with the case-sensitive name of the actual items that you would like to delete ("Nodes", "Edges", "NodeCollections", "Networks", or "Analyses").</span>
-                <span validation-for="confirmation" class="text-danger small"></span>
+                <label for="deleteConfirmation" class="font-weight-bold">Confirmation</label>
+                <input for="deleteConfirmation" id="deleteConfirmation" name="deleteConfirmation" class="form-control" autocomplete="off" required="required" />
+                <span description-for="deleteConfirmation" class="text-muted small">The confirmation for the deletion. You need to type "I confirm that I want to delete the <span class="">Items</span>!" (including the exclamation mark), replacing the word "items" with the case-sensitive name of the actual items that you would like to delete ("Nodes", "Edges", "NodeCollections", "Networks", or "Analyses"). If more than one set of items is to be deleted at a time, then they should be separated by the word "and" ("Nodes and Edges and NodeCollections").</span>
+                <span validation-for="deleteConfirmation" class="text-danger small"></span>
             </div>
             <div class="form-group" hidden>
                 <label for="reCaptchaToken" class="font-weight-bold">reCaptcha token</label>
@@ -227,6 +241,5 @@
 </div>
 
 @section Scripts {
-    <partial name="_ScriptsValidationPartial" />
     <partial name="_ScriptsReCaptchaPartial" />
 }

@@ -40,12 +40,6 @@ namespace NetControl4BioMed.Pages.Administration
 
         public class ViewModel
         {
-            public bool AnyDuplicate { get; set; }
-
-            public bool AnyOrphaned { get; set; }
-
-            public bool AnyInconsistent { get; set; }
-
             public int UserCount { get; set; }
 
             public int RoleCount { get; set; }
@@ -65,9 +59,11 @@ namespace NetControl4BioMed.Pages.Administration
 
         public IActionResult OnGet()
         {
-            // Check if corresponding configuration section doesn't exist.
-            if (!_configuration.GetSection("Data").GetSection("IssueCount").Exists())
+            // Check if the issue count needs to be reset.
+            if (!bool.TryParse(_configuration["Data:IssueCount:Reset"], out var reset) || reset)
             {
+                // Update the reset status.
+                _configuration["Data:IssueCount:Reset"] = false.ToString();
                 // Update the duplicate counts.
                 _configuration["Data:IssueCount:Duplicate:DatabaseTypes"] = _context.DatabaseTypes
                     .Where(item => item.Name != "Generic")
@@ -167,6 +163,8 @@ namespace NetControl4BioMed.Pages.Administration
                     .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
                     .Count()
                     .ToString();
+                // Display a message.
+                TempData["StatusMessage"] = "Success: The issue count has been successfully updated.";
             }
             // Define the view.
             View = new ViewModel
@@ -198,8 +196,8 @@ namespace NetControl4BioMed.Pages.Administration
 
         public IActionResult OnPostResetIssueCount()
         {
-            // Reset the configuration data.
-            _configuration["Data:IssueCount"] = null;
+            // Update the reset status.
+            _configuration["Data:IssueCount:Reset"] = true.ToString();
             // Redirect to the page.
             return RedirectToPage();
         }
@@ -238,754 +236,699 @@ namespace NetControl4BioMed.Pages.Administration
             return RedirectToPage();
         }
 
-        public IActionResult OnPostDownload(string type, IEnumerable<string> items)
+        public IActionResult OnPostDownload(IEnumerable<string> downloadItems)
         {
-            // Define the JSON serializer options for all of the returned files.
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-            // Check if there is no type provided.
-            if (string.IsNullOrEmpty(type))
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: There was no provided download type.";
-                // Redirect to the page.
-                return RedirectToPage();
-            }
             // Check if there are no items provided.
-            if (items == null || !items.Any())
+            if (downloadItems == null || !downloadItems.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: There were no provided items to download.";
                 // Redirect to the page.
                 return RedirectToPage();
             }
-            // Check the type of the download.
-            if (type == "All")
+            // Define the JSON serializer options for all of the returned files.
+            var jsonSerializerOptions = new JsonSerializerOptions
             {
-                // Return the streamed file.
-                return new FileCallbackResult(MediaTypeNames.Application.Zip, async (zipStream, _) =>
-                {
-                    // Define a new ZIP archive.
-                    using var archive = new ZipArchive(zipStream, ZipArchiveMode.Create);
-                    // Create an entry for the database types.
-                    if (items.Contains("DatabaseTypes"))
-                    {
-                        // Get the required data.
-                        var data = _context.DatabaseTypes
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description,
-                                Databases = item.Databases
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.Id,
-                                        Name = item1.Name
-                                    })
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-DatabaseTypes.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the databases.
-                    if (items.Contains("Databases"))
-                    {
-                        // Get the required data.
-                        var data = _context.Databases
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description,
-                                DatabaseType = new
-                                {
-                                    Id = item.DatabaseType.Id,
-                                    Name = item.DatabaseType.Name
-                                },
-                                DatabaseNodeFields = item.DatabaseNodeFields
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.Id,
-                                        Name = item1.Name
-                                    }),
-                                DatabaseEdgeFields = item.DatabaseEdgeFields
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.Id,
-                                        Name = item1.Name
-                                    }),
-                                DatabaseNodes = item.DatabaseNodes
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.Node.Id,
-                                        Name = item1.Node.Name
-                                    }),
-                                DatabaseEdges = item.DatabaseEdges
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.Edge.Id,
-                                        Name = item1.Edge.Name
-                                    })
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Databases.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the database node fields.
-                    if (items.Contains("DatabaseNodeFields"))
-                    {
-                        // Get the required data.
-                        var data = _context.DatabaseNodeFields
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description,
-                                IsSearchable = item.IsSearchable,
-                                Url = item.Url,
-                                Database = new
-                                {
-                                    Id = item.Database.Id,
-                                    Name = item.Database.Name
-                                },
-                                DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.Node.Id,
-                                        Name = item1.Node.Name,
-                                        Value = item1.Value
-                                    })
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-DatabaseNodeFields.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the database edge fields.
-                    if (items.Contains("DatabaseEdgeFields"))
-                    {
-                        // Get the required data.
-                        var data = _context.DatabaseEdgeFields
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description,
-                                Url = item.Url,
-                                Database = new
-                                {
-                                    Id = item.Database.Id,
-                                    Name = item.Database.Name
-                                },
-                                DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.Edge.Id,
-                                        Name = item1.Edge.Name,
-                                        Value = item1.Value
-                                    })
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-DatabaseEdgeFields.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the nodes.
-                    if (items.Contains("Nodes"))
-                    {
-                        // Get the required data.
-                        var data = _context.Nodes
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description,
-                                Databases = item.DatabaseNodes
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.Database.Id,
-                                        Name = item1.Database.Name
-                                    }),
-                                DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.DatabaseNodeField.Id,
-                                        Name = item1.DatabaseNodeField.Name,
-                                        Value = item1.Value
-                                    }),
-                                EdgeNodes = item.EdgeNodes
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.Edge.Id,
-                                        Name = item1.Edge.Name,
-                                        Type = item1.Type.ToString()
-                                    })
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Nodes.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the edges.
-                    if (items.Contains("Edges"))
-                    {
-                        // Get the required data.
-                        var data = _context.Edges
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description,
-                                Databases = item.DatabaseEdges
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.Database.Id,
-                                        Name = item1.Database.Name
-                                    }),
-                                DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.DatabaseEdgeField.Id,
-                                        Name = item1.DatabaseEdgeField.Name,
-                                        Value = item1.Value
-                                    }),
-                                EdgeNodes = item.EdgeNodes
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.Node.Id,
-                                        Name = item1.Node.Name,
-                                        Type = item1.Type.ToString()
-                                    })
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Edges.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the node collections.
-                    if (items.Contains("NodeCollections"))
-                    {
-                        // Get the required data.
-                        var data = _context.NodeCollections
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description,
-                                NodeCollectionNodes = item.NodeCollectionNodes
-                                    .Select(item1 => new
-                                    {
-                                        Id = item1.Node.Id,
-                                        Name = item1.Node.Name
-                                    })
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-NodeCollections.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the networks.
-                    if (items.Contains("Networks"))
-                    {
-                        // Get the required data.
-                        var data = _context.Networks
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Algorithm = item.Algorithm.GetDisplayName()
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Networks.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the analyses.
-                    if (items.Contains("Analyses"))
-                    {
-                        // Get the required data.
-                        var data = _context.Analyses
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeStarted = item.DateTimeStarted,
-                                DateTimeEnded = item.DateTimeEnded,
-                                Status = item.Status,
-                                CurrentIteration = item.CurrentIteration,
-                                CurrentIterationWithoutImprovement = item.CurrentIterationWithoutImprovement,
-                                Algorithm = item.Algorithm.GetDisplayName(),
-                                Parameters = item.Parameters
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Analyses.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                })
-                {
-                    FileDownloadName = $"NetControl4BioMed-AllData.zip"
-                };
-            }
-            // Check the type of the download.
-            if (type == "Duplicate")
+                WriteIndented = true
+            };
+            // Return the streamed file.
+            return new FileCallbackResult(MediaTypeNames.Application.Zip, async (zipStream, _) =>
             {
-                // Return the streamed file.
-                return new FileCallbackResult(MediaTypeNames.Application.Zip, async (zipStream, _) =>
+                // Define a new ZIP archive.
+                using var archive = new ZipArchive(zipStream, ZipArchiveMode.Create);
+                // Check the items to download.
+                if (downloadItems.Contains("AllDatabaseTypes"))
                 {
-                    // Define a new ZIP archive.
-                    using var archive = new ZipArchive(zipStream, ZipArchiveMode.Create);
-                    // Create an entry for the database types.
-                    if (items.Contains("DatabaseTypes"))
-                    {
-                        // Get the duplicate values.
-                        var values = _context.DatabaseTypes
-                            .Where(item => item.Name != "Generic")
-                            .GroupBy(item => item.Name)
-                            .Where(item => item.Count() > 1)
-                            .Select(item => item.Key);
-                        // Get the required data.
-                        var data = _context.DatabaseTypes
-                            .Where(item => item.Name != "Generic")
-                            .Where(item => values.Contains(item.Name))
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description
-                            })
-                            .AsEnumerable()
-                            .GroupBy(item => item.Name)
-                            .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-DatabaseTypes.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the databases.
-                    if (items.Contains("Databases"))
-                    {
-                        // Get the duplicate values.
-                        var values = _context.Databases
-                            .Where(item => item.DatabaseType.Name != "Generic")
-                            .GroupBy(item => item.Name)
-                            .Where(item => item.Count() > 1)
-                            .Select(item => item.Key);
-                        // Get the required data.
-                        var data = _context.Databases
-                            .Where(item => item.DatabaseType.Name != "Generic")
-                            .Where(item => values.Contains(item.Name))
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description,
-                                DatabaseType = new
+                    // Get the required data.
+                    var data = _context.DatabaseTypes
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description,
+                            Databases = item.Databases
+                                .Select(item1 => new
                                 {
-                                    Id = item.DatabaseType.Id,
-                                    Name = item.DatabaseType.Name
-                                }
-                            })
-                            .AsEnumerable()
-                            .GroupBy(item => item.Name)
-                            .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Databases.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the database node fields.
-                    if (items.Contains("DatabaseNodeFields"))
-                    {
-                        // Get the duplicate values.
-                        var values = _context.DatabaseNodeFields
-                            .Where(item => item.Database.DatabaseType.Name != "Generic")
-                            .GroupBy(item => item.Name)
-                            .Where(item => item.Count() > 1)
-                            .Select(item => item.Key);
-                        // Get the required data.
-                        var data = _context.DatabaseNodeFields
-                            .Where(item => item.Database.DatabaseType.Name != "Generic")
-                            .Where(item => values.Contains(item.Name))
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description,
-                                IsSearchable = item.IsSearchable,
-                                Url = item.Url,
-                                Database = new
-                                {
-                                    Id = item.Database.Id,
-                                    Name = item.Database.Name
-                                }
-                            })
-                            .AsEnumerable()
-                            .GroupBy(item => item.Name)
-                            .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-DatabaseNodeFields.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the database edge fields.
-                    if (items.Contains("DatabaseEdgeFields"))
-                    {
-                        // Get the duplicate values.
-                        var values = _context.DatabaseEdgeFields
-                            .Where(item => item.Database.DatabaseType.Name != "Generic")
-                            .GroupBy(item => item.Name)
-                            .Where(item => item.Count() > 1)
-                            .Select(item => item.Key);
-                        // Get the required data.
-                        var data = _context.DatabaseEdgeFields
-                            .Where(item => item.Database.DatabaseType.Name != "Generic")
-                            .Where(item => values.Contains(item.Name))
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description,
-                                Url = item.Url,
-                                Database = new
-                                {
-                                    Id = item.Database.Id,
-                                    Name = item.Database.Name
-                                }
-                            })
-                            .AsEnumerable()
-                            .GroupBy(item => item.Name)
-                            .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-DatabaseEdgeFields.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the nodes.
-                    if (items.Contains("Nodes"))
-                    {
-                        // Get the duplicate values.
-                        var values = _context.Nodes
-                            .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                            .GroupBy(item => item.Name)
-                            .Where(item => item.Count() > 1)
-                            .Select(item => item.Key);
-                        // Get the required data.
-                        var data = _context.Nodes
-                            .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                            .Where(item => values.Contains(item.Name))
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description
-                            })
-                            .AsEnumerable()
-                            .GroupBy(item => item.Name)
-                            .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Nodes.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the nodes (matching on database node field node values).
-                    if (items.Contains("Nodes"))
-                    {
-                        // Get the duplicate values.
-                        var values = _context.DatabaseNodeFieldNodes
-                            .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
-                            .Where(item => item.DatabaseNodeField.IsSearchable)
-                            .GroupBy(item => item.Value)
-                            .Where(item => item.Count() > 1)
-                            .Select(item => item.Key);
-                        // Get the required data.
-                        var data = _context.DatabaseNodeFieldNodes
-                            .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
-                            .Where(item => item.DatabaseNodeField.IsSearchable)
-                            .Where(item => values.Contains(item.Value))
-                            .Select(item => new
-                            {
-                                DatabaseNodeField = new
-                                {
-                                    Id = item.DatabaseNodeField.Id,
-                                    Name = item.DatabaseNodeField.Name
-                                },
-                                Node = new
-                                {
-                                    Id = item.Node.Id,
-                                    Name = item.Node.Name
-                                },
-                                Value = item.Value
-                            })
-                            .AsEnumerable()
-                            .GroupBy(item => item.Value)
-                            .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-DatabaseNodeFieldNodes.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the edges.
-                    if (items.Contains("Edges"))
-                    {
-                        // Get the duplicate values.
-                        var values = _context.Edges
-                            .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                            .GroupBy(item => item.Name)
-                            .Where(item => item.Count() > 1)
-                            .Select(item => item.Key);
-                        // Get the required data.
-                        var data = _context.Edges
-                            .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                            .Where(item => values.Contains(item.Name))
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description
-                            })
-                            .AsEnumerable()
-                            .GroupBy(item => item.Name)
-                            .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Edges.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the node collections.
-                    if (items.Contains("NodeCollections"))
-                    {
-                        // Get the duplicate values.
-                        var values = _context.NodeCollections
-                            .GroupBy(item => item.Name)
-                            .Where(item => item.Count() > 1)
-                            .Select(item => item.Key);
-                        // Get the required data.
-                        var data = _context.NodeCollections
-                            .Where(item => values.Contains(item.Name))
-                            .Select(item => new
-                            {
-                                Id = item.Id,
-                                DateTimeCreated = item.DateTimeCreated,
-                                Name = item.Name,
-                                Description = item.Description
-                            })
-                            .AsEnumerable()
-                            .GroupBy(item => item.Name)
-                            .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-NodeCollections.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                })
+                                    Id = item1.Id,
+                                    Name = item1.Name
+                                })
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-All-DatabaseTypes.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("AllDatabases"))
                 {
-                    FileDownloadName = $"NetControl4BioMed-DuplicateData.zip"
-                };
-            }
-            // Check the type of the download.
-            if (type == "Orphaned")
+                    // Get the required data.
+                    var data = _context.Databases
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description,
+                            DatabaseType = new
+                            {
+                                Id = item.DatabaseType.Id,
+                                Name = item.DatabaseType.Name
+                            },
+                            DatabaseNodeFields = item.DatabaseNodeFields
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Id,
+                                    Name = item1.Name
+                                }),
+                            DatabaseEdgeFields = item.DatabaseEdgeFields
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Id,
+                                    Name = item1.Name
+                                }),
+                            DatabaseNodes = item.DatabaseNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Node.Id,
+                                    Name = item1.Node.Name
+                                }),
+                            DatabaseEdges = item.DatabaseEdges
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Edge.Id,
+                                    Name = item1.Edge.Name
+                                })
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-All-Databases.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("AllDatabaseNodeFields"))
+                {
+                    // Get the required data.
+                    var data = _context.DatabaseNodeFields
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description,
+                            IsSearchable = item.IsSearchable,
+                            Url = item.Url,
+                            Database = new
+                            {
+                                Id = item.Database.Id,
+                                Name = item.Database.Name
+                            },
+                            DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Node.Id,
+                                    Name = item1.Node.Name,
+                                    Value = item1.Value
+                                })
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-All-DatabaseNodeFields.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("AllDatabaseEdgeFields"))
+                {
+                    // Get the required data.
+                    var data = _context.DatabaseEdgeFields
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description,
+                            Url = item.Url,
+                            Database = new
+                            {
+                                Id = item.Database.Id,
+                                Name = item.Database.Name
+                            },
+                            DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Edge.Id,
+                                    Name = item1.Edge.Name,
+                                    Value = item1.Value
+                                })
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-All-DatabaseEdgeFields.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("AllNodes"))
+                {
+                    // Get the required data.
+                    var data = _context.Nodes
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description,
+                            Databases = item.DatabaseNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Database.Id,
+                                    Name = item1.Database.Name
+                                }),
+                            DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.DatabaseNodeField.Id,
+                                    Name = item1.DatabaseNodeField.Name,
+                                    Value = item1.Value
+                                }),
+                            EdgeNodes = item.EdgeNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Edge.Id,
+                                    Name = item1.Edge.Name,
+                                    Type = item1.Type.ToString()
+                                })
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-All-Nodes.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("AllEdges"))
+                {
+                    // Get the required data.
+                    var data = _context.Edges
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description,
+                            Databases = item.DatabaseEdges
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Database.Id,
+                                    Name = item1.Database.Name
+                                }),
+                            DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges
+                                .Select(item1 => new
+                                {
+                                    Id = item1.DatabaseEdgeField.Id,
+                                    Name = item1.DatabaseEdgeField.Name,
+                                    Value = item1.Value
+                                }),
+                            EdgeNodes = item.EdgeNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Node.Id,
+                                    Name = item1.Node.Name,
+                                    Type = item1.Type.ToString()
+                                })
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-All-Edges.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("AllNodeCollections"))
+                {
+                    // Get the required data.
+                    var data = _context.NodeCollections
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description,
+                            NodeCollectionNodes = item.NodeCollectionNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Node.Id,
+                                    Name = item1.Node.Name
+                                })
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-All-NodeCollections.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("AllNetworks"))
+                {
+                    // Get the required data.
+                    var data = _context.Networks
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Algorithm = item.Algorithm.GetDisplayName()
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-All-Networks.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("AllAnalyses"))
+                {
+                    // Get the required data.
+                    var data = _context.Analyses
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeStarted = item.DateTimeStarted,
+                            DateTimeEnded = item.DateTimeEnded,
+                            Status = item.Status,
+                            CurrentIteration = item.CurrentIteration,
+                            CurrentIterationWithoutImprovement = item.CurrentIterationWithoutImprovement,
+                            Algorithm = item.Algorithm.GetDisplayName(),
+                            Parameters = item.Parameters
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-All-Analyses.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("DuplicateDatabaseTypes"))
+                {
+                    // Get the duplicate values.
+                    var values = _context.DatabaseTypes
+                        .Where(item => item.Name != "Generic")
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key);
+                    // Get the required data.
+                    var data = _context.DatabaseTypes
+                        .Where(item => item.Name != "Generic")
+                        .Where(item => values.Contains(item.Name))
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description
+                        })
+                        .AsEnumerable()
+                        .GroupBy(item => item.Name)
+                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-DatabaseTypes.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("DuplicateDatabases"))
+                {
+                    // Get the duplicate values.
+                    var values = _context.Databases
+                        .Where(item => item.DatabaseType.Name != "Generic")
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key);
+                    // Get the required data.
+                    var data = _context.Databases
+                        .Where(item => item.DatabaseType.Name != "Generic")
+                        .Where(item => values.Contains(item.Name))
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description,
+                            DatabaseType = new
+                            {
+                                Id = item.DatabaseType.Id,
+                                Name = item.DatabaseType.Name
+                            }
+                        })
+                        .AsEnumerable()
+                        .GroupBy(item => item.Name)
+                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-Databases.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("DuplicateDatabaseNodeFields"))
+                {
+                    // Get the duplicate values.
+                    var values = _context.DatabaseNodeFields
+                        .Where(item => item.Database.DatabaseType.Name != "Generic")
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key);
+                    // Get the required data.
+                    var data = _context.DatabaseNodeFields
+                        .Where(item => item.Database.DatabaseType.Name != "Generic")
+                        .Where(item => values.Contains(item.Name))
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description,
+                            IsSearchable = item.IsSearchable,
+                            Url = item.Url,
+                            Database = new
+                            {
+                                Id = item.Database.Id,
+                                Name = item.Database.Name
+                            }
+                        })
+                        .AsEnumerable()
+                        .GroupBy(item => item.Name)
+                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-DatabaseNodeFields.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("DuplicateDatabaseEdgeFields"))
+                {
+                    // Get the duplicate values.
+                    var values = _context.DatabaseEdgeFields
+                        .Where(item => item.Database.DatabaseType.Name != "Generic")
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key);
+                    // Get the required data.
+                    var data = _context.DatabaseEdgeFields
+                        .Where(item => item.Database.DatabaseType.Name != "Generic")
+                        .Where(item => values.Contains(item.Name))
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description,
+                            Url = item.Url,
+                            Database = new
+                            {
+                                Id = item.Database.Id,
+                                Name = item.Database.Name
+                            }
+                        })
+                        .AsEnumerable()
+                        .GroupBy(item => item.Name)
+                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-DatabaseEdgeFields.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("DuplicateDatabaseNodeFieldNodes"))
+                {
+                    // Get the duplicate values.
+                    var values = _context.DatabaseNodeFieldNodes
+                        .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
+                        .Where(item => item.DatabaseNodeField.IsSearchable)
+                        .GroupBy(item => item.Value)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key);
+                    // Get the required data.
+                    var data = _context.DatabaseNodeFieldNodes
+                        .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
+                        .Where(item => item.DatabaseNodeField.IsSearchable)
+                        .Where(item => values.Contains(item.Value))
+                        .Select(item => new
+                        {
+                            DatabaseNodeField = new
+                            {
+                                Id = item.DatabaseNodeField.Id,
+                                Name = item.DatabaseNodeField.Name
+                            },
+                            Node = new
+                            {
+                                Id = item.Node.Id,
+                                Name = item.Node.Name
+                            },
+                            Value = item.Value
+                        })
+                        .AsEnumerable()
+                        .GroupBy(item => item.Value)
+                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-DatabaseNodeFieldNodes.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("DuplicateNodes"))
+                {
+                    // Get the duplicate values.
+                    var values = _context.Nodes
+                        .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key);
+                    // Get the required data.
+                    var data = _context.Nodes
+                        .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .Where(item => values.Contains(item.Name))
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description
+                        })
+                        .AsEnumerable()
+                        .GroupBy(item => item.Name)
+                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-Nodes.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("DuplicateEdges"))
+                {
+                    // Get the duplicate values.
+                    var values = _context.Edges
+                        .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key);
+                    // Get the required data.
+                    var data = _context.Edges
+                        .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .Where(item => values.Contains(item.Name))
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description
+                        })
+                        .AsEnumerable()
+                        .GroupBy(item => item.Name)
+                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-Edges.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("DuplicateNodeCollections"))
+                {
+                    // Get the duplicate values.
+                    var values = _context.NodeCollections
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key);
+                    // Get the required data.
+                    var data = _context.NodeCollections
+                        .Where(item => values.Contains(item.Name))
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description
+                        })
+                        .AsEnumerable()
+                        .GroupBy(item => item.Name)
+                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-NodeCollections.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("OrphanedNodes"))
+                {
+                    // Get the required data.
+                    var data = _context.Nodes
+                        .Where(item => !item.DatabaseNodeFieldNodes.Any())
+                        .Select(item => new
+                        {
+                            Id = item.Id
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Nodes.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("OrphanedEdges"))
+                {
+                    // Get the required data.
+                    var data = _context.Edges
+                        .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
+                        .Select(item => new
+                        {
+                            Id = item.Id
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Edges.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("OrphanedNodeCollections"))
+                {
+                    // Get the required data.
+                    var data = _context.NodeCollections
+                        .Where(item => !item.NodeCollectionNodes.Any())
+                        .Select(item => new
+                        {
+                            Id = item.Id
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-NodeCollections.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("OrphanedNetworks"))
+                {
+                    // Get the required data.
+                    var data = _context.Networks
+                        .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any())
+                        .Select(item => new
+                        {
+                            Id = item.Id
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Networks.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("OrphanedAnalyses"))
+                {
+                    // Get the required data.
+                    var data = _context.Analyses
+                        .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any())
+                        .Select(item => new
+                        {
+                            Id = item.Id
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Analyses.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("InconsistentNodes"))
+                {
+                    // Get the required data.
+                    var data = _context.Nodes
+                        .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                        .Select(item => new
+                        {
+                            Id = item.Id
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Nodes.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("InconsistentEdges"))
+                {
+                    // Get the required data.
+                    var data = _context.Edges
+                        .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                        .Select(item => new
+                        {
+                            Id = item.Id
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Edges.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("InconsistentNodeCollections"))
+                {
+                    // Get the required data.
+                    var data = _context.NodeCollections
+                        .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                        .Select(item => new
+                        {
+                            Id = item.Id
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-NodeCollections.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("InconsistentNetworks"))
+                {
+                    // Get the required data.
+                    var data = _context.Networks
+                        .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                        .Select(item => new
+                        {
+                            Id = item.Id
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Networks.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("InconsistentAnalyses"))
+                {
+                    // Get the required data.
+                    var data = _context.Analyses
+                        .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                        .Select(item => new
+                        {
+                            Id = item.Id
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Analyses.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+            })
             {
-                // Return the streamed file.
-                return new FileCallbackResult(MediaTypeNames.Application.Zip, async (zipStream, _) =>
-                {
-                    // Define a new ZIP archive.
-                    using var archive = new ZipArchive(zipStream, ZipArchiveMode.Create);
-                    // Create an entry for the nodes.
-                    if (items.Contains("Nodes"))
-                    {
-                        // Get the required data.
-                        var data = _context.Nodes
-                            .Where(item => !item.DatabaseNodeFieldNodes.Any())
-                            .Select(item => new
-                            {
-                                Id = item.Id
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Nodes.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the edges.
-                    if (items.Contains("Edges"))
-                    {
-                        // Get the required data.
-                        var data = _context.Edges
-                            .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
-                            .Select(item => new
-                            {
-                                Id = item.Id
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Edges.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the node collections.
-                    if (items.Contains("NodeCollections"))
-                    {
-                        // Get the required data.
-                        var data = _context.NodeCollections
-                            .Where(item => !item.NodeCollectionNodes.Any())
-                            .Select(item => new
-                            {
-                                Id = item.Id
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-NodeCollections.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the networks.
-                    if (items.Contains("Networks"))
-                    {
-                        // Get the required data.
-                        var data = _context.Networks
-                            .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any())
-                            .Select(item => new
-                            {
-                                Id = item.Id
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Networks.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the analyses.
-                    if (items.Contains("Analyses"))
-                    {
-                        // Get the required data.
-                        var data = _context.Analyses
-                            .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any())
-                            .Select(item => new
-                            {
-                                Id = item.Id
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Analyses.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                })
-                {
-                    FileDownloadName = $"NetControl4BioMed-OrphanedData.zip"
-                };
-            }
-            // Check the type of the download.
-            if (type == "Inconsistent")
-            {
-                // Return the streamed file.
-                return new FileCallbackResult(MediaTypeNames.Application.Zip, async (zipStream, _) =>
-                {
-                    // Define a new ZIP archive.
-                    using var archive = new ZipArchive(zipStream, ZipArchiveMode.Create);
-                    // Create an entry for the nodes.
-                    if (items.Contains("Nodes"))
-                    {
-                        // Get the required data.
-                        var data = _context.Nodes
-                            .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                            .Select(item => new
-                            {
-                                Id = item.Id
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Nodes.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the edges.
-                    if (items.Contains("Edges"))
-                    {
-                        // Get the required data.
-                        var data = _context.Edges
-                            .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                            .Select(item => new
-                            {
-                                Id = item.Id
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Edges.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the node collections.
-                    if (items.Contains("NodeCollections"))
-                    {
-                        // Get the required data.
-                        var data = _context.NodeCollections
-                            .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                            .Select(item => new
-                            {
-                                Id = item.Id
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-NodeCollections.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the networks
-                    if (items.Contains("Networks"))
-                    {
-                        // Get the required data.
-                        var data = _context.Networks
-                            .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                            .Select(item => new
-                            {
-                                Id = item.Id
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Networks.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                    // Create an entry for the analyses.
-                    if (items.Contains("Analyses"))
-                    {
-                        // Get the required data.
-                        var data = _context.Analyses
-                            .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                            .Select(item => new
-                            {
-                                Id = item.Id
-                            });
-                        // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"NetControl4BioMed-Analyses.json", CompressionLevel.Fastest).Open();
-                        // Write the data to the stream corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                    }
-                })
-                {
-                    FileDownloadName = $"NetControl4BioMed-InconsistentData.zip"
-                };
-            }
-            // Display a message.
-            TempData["StatusMessage"] = "Error: The provided download type is not valid.";
-            // Redirect to the page.
-            return RedirectToPage();
+                FileDownloadName = $"NetControl4BioMed-Data-{DateTime.Now:yyyyMMdd}.zip"
+            };
         }
 
-        public async Task<IActionResult> OnPostDeleteAsync(string items, string confirmation, string reCaptchaToken)
+        public async Task<IActionResult> OnPostDeleteAsync(IEnumerable<string> deleteItems, string deleteConfirmation, string reCaptchaToken)
         {
-            // Check if there is any missing parameter.
-            if (string.IsNullOrEmpty(items))
+            // Check if there are no items provided.
+            if (deleteItems == null || !deleteItems.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: There were no provided items to delete.";
@@ -993,7 +936,7 @@ namespace NetControl4BioMed.Pages.Administration
                 return RedirectToPage();
             }
             // Check if the confirmation is not valid.
-            if (confirmation != $"I confirm that I want to delete the {items}!")
+            if (deleteConfirmation != $"I confirm that I want to delete the {string.Join(" and ", deleteItems)}!")
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: The confirmation message was not valid for the selected items.";
@@ -1008,8 +951,10 @@ namespace NetControl4BioMed.Pages.Administration
                 // Redirect to the page.
                 return RedirectToPage();
             }
+            // Define a list to store the number of items found.
+            var itemList = new List<string>();
             // Check the items to delete.
-            if (items == "Nodes")
+            if (deleteItems.Contains("Nodes"))
             {
                 // Get the items to delete.
                 var nodes = _context.Nodes
@@ -1030,13 +975,11 @@ namespace NetControl4BioMed.Pages.Administration
                 _context.Nodes.RemoveRange(nodes);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
-                // Display a message.
-                TempData["StatusMessage"] = $"Success: {nodeCount.ToString()} node{(nodeCount != 1 ? "s" : string.Empty)} deleted successfully.";
-                // Redirect to the page.
-                return RedirectToPage();
+                // Save a message.
+                itemList.Add($"{nodeCount.ToString()} node{(nodeCount != 1 ? "s" : string.Empty)}");
             }
             // Check the items to delete.
-            if (items == "Edges")
+            if (deleteItems.Contains("Edges"))
             {
                 // Get the items to delete.
                 var edges = _context.Edges
@@ -1054,13 +997,11 @@ namespace NetControl4BioMed.Pages.Administration
                 _context.Edges.RemoveRange(edges);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
-                // Display a message.
-                TempData["StatusMessage"] = $"Success: {edgeCount.ToString()} edge{(edgeCount != 1 ? "s" : string.Empty)} deleted successfully.";
-                // Redirect to the page.
-                return RedirectToPage();
+                // Save a message.
+                itemList.Add($"{edgeCount.ToString()} edge{(edgeCount != 1 ? "s" : string.Empty)}");
             }
             // Check the items to delete.
-            if (items == "NodeCollections")
+            if (deleteItems.Contains("NodeCollections"))
             {
                 // Get the items to delete.
                 var nodeCollections = _context.NodeCollections
@@ -1076,13 +1017,11 @@ namespace NetControl4BioMed.Pages.Administration
                 _context.NodeCollections.RemoveRange(nodeCollections);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
-                // Display a message.
-                TempData["StatusMessage"] = $"Success: {nodeCollectionCount.ToString()} node collection{(nodeCollectionCount != 1 ? "s" : string.Empty)} deleted successfully.";
-                // Redirect to the page.
-                return RedirectToPage();
+                // Save a message.
+                itemList.Add($"{nodeCollectionCount.ToString()} node collection{(nodeCollectionCount != 1 ? "s" : string.Empty)}");
             }
             // Check the items to delete.
-            if (items == "Networks")
+            if (deleteItems.Contains("Networks"))
             {
                 // Get the items to delete.
                 var networks = _context.Networks
@@ -1102,13 +1041,11 @@ namespace NetControl4BioMed.Pages.Administration
                 _context.Nodes.RemoveRange(genericNodes);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
-                // Display a message.
-                TempData["StatusMessage"] = $"Success: {networkCount.ToString()} network{(networkCount != 1 ? "s" : string.Empty)} deleted successfully.";
-                // Redirect to the page.
-                return RedirectToPage();
+                // Save a message.
+                itemList.Add($"{networkCount.ToString()} network{(networkCount != 1 ? "s" : string.Empty)}");
             }
             // Check the items to delete.
-            if (items == "Analyses")
+            if (deleteItems.Contains("Analyses"))
             {
                 // Get the items to delete.
                 var analyses = _context.Analyses
@@ -1119,13 +1056,18 @@ namespace NetControl4BioMed.Pages.Administration
                 _context.Analyses.RemoveRange(analyses);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
+                itemList.Add($"{analysisCount.ToString()} analys{(analysisCount != 1 ? "e" : "i")}s");
+            }
+            // Check if there weren't any items found.
+            if (!itemList.Any())
+            {
                 // Display a message.
-                TempData["StatusMessage"] = $"Success: {analysisCount.ToString()} analys{(analysisCount != 1 ? "e" : "i")}s deleted successfully.";
+                TempData["StatusMessage"] = "Error: There were no items to delete.";
                 // Redirect to the page.
                 return RedirectToPage();
             }
             // Display a message.
-            TempData["StatusMessage"] = "Error: There were no items to delete.";
+            TempData["StatusMessage"] = $"Success: {string.Join(" and ", itemList)} deleted successfully.";
             // Redirect to the page.
             return RedirectToPage();
         }
