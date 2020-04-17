@@ -65,7 +65,7 @@ namespace NetControl4BioMed.Data.Seed
             {
                 Id = "9284c1a3-1baa-43e9-920e-9decddcb42f0",
                 DateTimeCreated = DateTime.Now,
-                Name = "KEGG Is Directed",
+                Name = "OmniPath Is Directed",
                 Description = "Is the interaction directed in the Omnipath database?",
                 IsSearchable = false,
                 Url = null,
