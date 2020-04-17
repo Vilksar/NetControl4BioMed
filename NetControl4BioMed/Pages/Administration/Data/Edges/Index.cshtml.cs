@@ -163,9 +163,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 default:
                     break;
             }
-            // Include the related entitites.
-            query = query
-                .Include(item => item.DatabaseEdgeFieldEdges);
             // Define the view.
             View = new ViewModel
             {

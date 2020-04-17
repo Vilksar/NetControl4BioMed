@@ -60,12 +60,12 @@ namespace NetControl4BioMed.Data.Seed
                 Url = null,
                 DatabaseId = "8364ed3b-cf03-40d8-a28d-1405c365cdee"
             },
-            // The edge fields in the OmniPath database.
+            // The edge fields in the Omnipath database.
             new DatabaseEdgeField
             {
                 Id = "9284c1a3-1baa-43e9-920e-9decddcb42f0",
                 DateTimeCreated = DateTime.Now,
-                Name = "OmniPath Is Directed",
+                Name = "Omnipath Is Directed",
                 Description = "Is the interaction directed in the Omnipath database?",
                 IsSearchable = false,
                 Url = null,

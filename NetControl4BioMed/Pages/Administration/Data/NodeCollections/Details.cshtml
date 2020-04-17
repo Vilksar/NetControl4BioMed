@@ -111,7 +111,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The node collection is currently assigned to @Model.View.NetworkCount network@(Model.View.NetworkCount != 1 ? "s" : string.Empty).</span>
+            <span>The node collection is currently assigned to @Model.View.NetworkCount network@(Model.View.NetworkCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Created/Networks/Index" asp-route-searchString="@Model.View.NodeCollection.Id" asp-route-searchIn="NodeCollectionId" class="alert-link">view the networks</a>.</span>
         </div>
     </div>
 </div>
@@ -129,7 +129,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The node collection is currently assigned to @Model.View.AnalysisCount analys@(Model.View.AnalysisCount != 1 ? "e" : "i")s.</span>
+            <span>The node collection is currently assigned to @Model.View.AnalysisCount analys@(Model.View.AnalysisCount != 1 ? "e" : "i")s. You can <a asp-page="/Administration/Created/Analyses/Index" asp-route-searchString="@Model.View.NodeCollection.Id" asp-route-searchIn="NodeCollectionId" class="alert-link">view the analyses</a>.</span>
         </div>
     </div>
 </div>

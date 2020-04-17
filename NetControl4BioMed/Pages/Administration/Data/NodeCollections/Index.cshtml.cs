@@ -149,9 +149,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 default:
                     break;
             }
-            // Include the related entitites.
-            query = query
-                .Include(item => item.NodeCollectionNodes);
             // Define the view.
             View = new ViewModel
             {

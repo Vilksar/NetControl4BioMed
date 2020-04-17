@@ -452,7 +452,7 @@ namespace NetControl4BioMed.Pages.Administration
                                 {
                                     Id = item1.Node.Id,
                                     Name = item1.Node.Name,
-                                    Type = item1.Type.ToString()
+                                    Type = item1.Type.GetDisplayName()
                                 })
                         });
                     // Create a new entry in the archive and open it.
@@ -528,7 +528,8 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => item.Name != "Generic")
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
-                        .Select(item => item.Key);
+                        .Select(item => item.Key)
+                        .ToList();
                     // Get the required data.
                     var data = _context.DatabaseTypes
                         .Where(item => item.Name != "Generic")
@@ -556,7 +557,8 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => item.DatabaseType.Name != "Generic")
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
-                        .Select(item => item.Key);
+                        .Select(item => item.Key)
+                        .ToList();
                     // Get the required data.
                     var data = _context.Databases
                         .Where(item => item.DatabaseType.Name != "Generic")
@@ -589,7 +591,8 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => item.Database.DatabaseType.Name != "Generic")
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
-                        .Select(item => item.Key);
+                        .Select(item => item.Key)
+                        .ToList();
                     // Get the required data.
                     var data = _context.DatabaseNodeFields
                         .Where(item => item.Database.DatabaseType.Name != "Generic")
@@ -624,7 +627,8 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => item.Database.DatabaseType.Name != "Generic")
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
-                        .Select(item => item.Key);
+                        .Select(item => item.Key)
+                        .ToList();
                     // Get the required data.
                     var data = _context.DatabaseEdgeFields
                         .Where(item => item.Database.DatabaseType.Name != "Generic")
@@ -659,7 +663,8 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => item.DatabaseNodeField.IsSearchable)
                         .GroupBy(item => item.Value)
                         .Where(item => item.Count() > 1)
-                        .Select(item => item.Key);
+                        .Select(item => item.Key)
+                        .ToList();
                     // Get the required data.
                     var data = _context.DatabaseNodeFieldNodes
                         .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
@@ -695,7 +700,8 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
-                        .Select(item => item.Key);
+                        .Select(item => item.Key)
+                        .ToList();
                     // Get the required data.
                     var data = _context.Nodes
                         .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
@@ -723,7 +729,8 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
-                        .Select(item => item.Key);
+                        .Select(item => item.Key)
+                        .ToList();
                     // Get the required data.
                     var data = _context.Edges
                         .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
@@ -750,7 +757,8 @@ namespace NetControl4BioMed.Pages.Administration
                     var values = _context.NodeCollections
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
-                        .Select(item => item.Key);
+                        .Select(item => item.Key)
+                        .ToList();
                     // Get the required data.
                     var data = _context.NodeCollections
                         .Where(item => values.Contains(item.Name))

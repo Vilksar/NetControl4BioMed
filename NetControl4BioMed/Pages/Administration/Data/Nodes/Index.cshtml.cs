@@ -174,9 +174,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 default:
                     break;
             }
-            // Include the related entitites.
-            query = query
-                .Include(item => item.DatabaseNodeFieldNodes);
             // Define the view.
             View = new ViewModel
             {
