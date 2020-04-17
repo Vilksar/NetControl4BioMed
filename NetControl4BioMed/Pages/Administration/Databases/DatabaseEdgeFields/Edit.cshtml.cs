@@ -68,15 +68,15 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseEdgeFields/Index");
             }
+            // Define the query.
+            var query = _context.DatabaseEdgeFields
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                DatabaseEdgeField = _context.DatabaseEdgeFields
-                    .Where(item => item.Id == id)
+                DatabaseEdgeField = query
                     .Include(item => item.Database)
                         .ThenInclude(item => item.DatabaseType)
-                    .Include(item => item.DatabaseEdgeFieldEdges)
-                        .ThenInclude(item => item.Edge)
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.
@@ -119,15 +119,15 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseEdgeFields/Index");
             }
+            // Define the query.
+            var query = _context.DatabaseEdgeFields
+                .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel
             {
-                DatabaseEdgeField = _context.DatabaseEdgeFields
-                    .Where(item => item.Id == Input.Id)
+                DatabaseEdgeField = query
                     .Include(item => item.Database)
                         .ThenInclude(item => item.DatabaseType)
-                    .Include(item => item.DatabaseEdgeFieldEdges)
-                        .ThenInclude(item => item.Edge)
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.

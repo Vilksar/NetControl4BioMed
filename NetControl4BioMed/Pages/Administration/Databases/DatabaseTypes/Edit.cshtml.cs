@@ -57,12 +57,13 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseTypes/Index");
             }
+            // Define the query.
+            var query = _context.DatabaseTypes
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                DatabaseType = _context.DatabaseTypes
-                    .Where(item => item.Id == id)
-                    .Include(item => item.Databases)
+                DatabaseType = query
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.
@@ -102,12 +103,13 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseTypes/Index");
             }
+            // Define the query.
+            var query = _context.DatabaseTypes
+                .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel
             {
-                DatabaseType = _context.DatabaseTypes
-                    .Where(item => item.Id == Input.Id)
-                    .Include(item => item.Databases)
+                DatabaseType = query
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.

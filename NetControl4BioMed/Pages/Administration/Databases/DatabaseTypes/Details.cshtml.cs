@@ -26,6 +26,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
         public class ViewModel
         {
             public DatabaseType DatabaseType { get; set; }
+
+            public int DatabaseCount { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -38,13 +40,20 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseTypes/Index");
             }
+            // Define the query.
+            var query = _context.DatabaseTypes
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                DatabaseType = _context.DatabaseTypes
-                    .Where(item => item.Id == id)
+                DatabaseType = query
                     .Include(item => item.Databases)
-                    .FirstOrDefault()
+                    .FirstOrDefault(),
+                DatabaseCount = query
+                    .Select(item => item.Databases)
+                    .SelectMany(item => item)
+                    .Distinct()
+                    .Count()
             };
             // Check if there was no item found.
             if (View.DatabaseType == null)

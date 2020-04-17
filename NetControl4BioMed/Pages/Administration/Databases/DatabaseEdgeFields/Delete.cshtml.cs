@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
 
         public class ViewModel
         {
-            public IEnumerable<DatabaseEdgeField> Items { get; set; }
+            public IQueryable<DatabaseEdgeField> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)
@@ -48,7 +48,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.DatabaseEdgeFields.Where(item => ids.Contains(item.Id))
+                Items = _context.DatabaseEdgeFields
+                    .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -83,7 +84,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.DatabaseEdgeFields.Where(item => Input.Ids.Contains(item.Id))
+                Items = _context.DatabaseEdgeFields
+                    .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -112,9 +114,12 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
             // Save the number of items found.
             var databaseEdgeFieldCount = View.Items.Count();
             // Get the related entities that use the items.
-            var edges = _context.Edges.Where(item => item.DatabaseEdgeFieldEdges.Any(item1 => View.Items.Contains(item1.DatabaseEdgeField)));
-            var networks = _context.Networks.Where(item => item.NetworkEdges.Any(item1 => edges.Contains(item1.Edge)));
-            var analyses = _context.Analyses.Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
+            var edges = _context.Edges
+                .Where(item => item.DatabaseEdgeFieldEdges.Any(item1 => View.Items.Contains(item1.DatabaseEdgeField)));
+            var networks = _context.Networks
+                .Where(item => item.NetworkEdges.Any(item1 => edges.Contains(item1.Edge)));
+            var analyses = _context.Analyses
+                .Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
             // Mark the items for deletion.
             _context.Analyses.RemoveRange(analyses);
             _context.Networks.RemoveRange(networks);

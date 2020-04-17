@@ -28,15 +28,23 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
         {
             public Database Database { get; set; }
 
-            public int DatabaseNodeCount { get; set; }
+            public int UserCount { get; set; }
 
-            public int DatabaseEdgeCount { get; set; }
+            public int UserInvitationCount { get; set; }
 
-            public int NodeCollectionDatabaseCount { get; set; }
+            public int DatabaseNodeFieldCount { get; set; }
 
-            public int NetworkDatabaseCount { get; set; }
+            public int DatabaseEdgeFieldCount { get; set; }
 
-            public int AnalysisDatabaseCount { get; set; }
+            public int NodeCount { get; set; }
+
+            public int EdgeCount { get; set; }
+
+            public int NodeCollectionCount { get; set; }
+
+            public int NetworkCount { get; set; }
+
+            public int AnalysisCount { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -57,32 +65,59 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             {
                 Database = query
                     .Include(item => item.DatabaseType)
-                    .Include(item => item.DatabaseUsers)
-                        .ThenInclude(item => item.User)
-                    .Include(item => item.DatabaseUserInvitations)
-                    .Include(item => item.DatabaseNodeFields)
-                    .Include(item => item.DatabaseEdgeFields)
                     .FirstOrDefault(),
-                DatabaseNodeCount = query
+                UserCount = query
+                    .Select(item => item.DatabaseUsers)
+                    .SelectMany(item => item)
+                    .Select(item => item.User)
+                    .Distinct()
+                    .Count(),
+                UserInvitationCount = query
+                    .Select(item => item.DatabaseUserInvitations)
+                    .SelectMany(item => item)
+                    .Select(item => item.Email)
+                    .Distinct()
+                    .Count(),
+                DatabaseNodeFieldCount = query
+                    .Select(item => item.DatabaseNodeFields)
+                    .SelectMany(item => item)
+                    .Distinct()
+                    .Count(),
+                DatabaseEdgeFieldCount = query
+                    .Select(item => item.DatabaseEdgeFields)
+                    .SelectMany(item => item)
+                    .Distinct()
+                    .Count(),
+                NodeCount = query
                     .Select(item => item.DatabaseNodes)
                     .SelectMany(item => item)
+                    .Select(item => item.Node)
+                    .Distinct()
                     .Count(),
-                DatabaseEdgeCount = query
+                EdgeCount = query
                     .Select(item => item.DatabaseEdges)
                     .SelectMany(item => item)
+                    .Select(item => item.Edge)
+                    .Distinct()
                     .Count(),
-                NodeCollectionDatabaseCount = query
+                NodeCollectionCount = query
                     .Select(item => item.NodeCollectionDatabases)
                     .SelectMany(item => item)
+                    .Select(item => item.NodeCollection)
+                    .Distinct()
                     .Count(),
-                NetworkDatabaseCount = query
+                NetworkCount = query
                     .Select(item => item.NetworkDatabases)
                     .SelectMany(item => item)
+                    .Select(item => item.Network)
+                    .Distinct()
                     .Count(),
-                AnalysisDatabaseCount = query
+                AnalysisCount = query
                     .Select(item => item.AnalysisDatabases)
                     .SelectMany(item => item)
-                    .Count(),
+                    .Select(item => item.Analysis)
+                    .Distinct()
+                    .Count()
             };
             // Check if there was no item found.
             if (View.Database == null)

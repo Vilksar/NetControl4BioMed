@@ -26,6 +26,10 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
         public class ViewModel
         {
             public DatabaseNodeField DatabaseNodeField { get; set; }
+
+            public int DatabaseNodeFieldNodeCount { get; set; }
+
+            public int NodeCount { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -38,16 +42,26 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
+            // Define the query.
+            var query = _context.DatabaseNodeFields
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                DatabaseNodeField = _context.DatabaseNodeFields
-                    .Where(item => item.Id == id)
+                DatabaseNodeField = query
                     .Include(item => item.Database)
                         .ThenInclude(item => item.DatabaseType)
-                    .Include(item => item.DatabaseNodeFieldNodes)
-                        .ThenInclude(item => item.Node)
-                    .FirstOrDefault()
+                    .FirstOrDefault(),
+                DatabaseNodeFieldNodeCount = query
+                    .Select(item => item.DatabaseNodeFieldNodes)
+                    .SelectMany(item => item)
+                    .Count(),
+                NodeCount = query
+                    .Select(item => item.DatabaseNodeFieldNodes)
+                    .SelectMany(item => item)
+                    .Select(item => item.Node)
+                    .Distinct()
+                    .Count()
             };
             // Check if there was no item found.
             if (View.DatabaseNodeField == null)

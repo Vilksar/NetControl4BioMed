@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
 
         public class ViewModel
         {
-            public IEnumerable<DatabaseType> Items { get; set; }
+            public IQueryable<DatabaseType> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)
@@ -48,7 +48,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.DatabaseTypes.Where(item => ids.Contains(item.Id))
+                Items = _context.DatabaseTypes
+                    .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -83,7 +84,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.DatabaseTypes.Where(item => Input.Ids.Contains(item.Id))
+                Items = _context.DatabaseTypes
+                    .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -112,10 +114,14 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             // Save the number of items found.
             var databaseTypeCount = View.Items.Count();
             // Get the related entities that use the items.
-            var nodes = _context.Nodes.Where(item => item.DatabaseNodes.Any(item1 => View.Items.Contains(item1.Database.DatabaseType)));
-            var edges = _context.Edges.Where(item => item.DatabaseEdges.Any(item1 => View.Items.Contains(item1.Database.DatabaseType)));
-            var networks = _context.Networks.Where(item => item.NetworkDatabases.Any(item1 => View.Items.Contains(item1.Database.DatabaseType)));
-            var analyses = _context.Analyses.Where(item => item.AnalysisDatabases.Any(item1 => View.Items.Contains(item1.Database.DatabaseType)));
+            var nodes = _context.Nodes
+                .Where(item => item.DatabaseNodes.Any(item1 => View.Items.Contains(item1.Database.DatabaseType)));
+            var edges = _context.Edges
+                .Where(item => item.DatabaseEdges.Any(item1 => View.Items.Contains(item1.Database.DatabaseType)));
+            var networks = _context.Networks
+                .Where(item => item.NetworkDatabases.Any(item1 => View.Items.Contains(item1.Database.DatabaseType)));
+            var analyses = _context.Analyses
+                .Where(item => item.AnalysisDatabases.Any(item1 => View.Items.Contains(item1.Database.DatabaseType)));
             // Mark the items for deletion.
             _context.Analyses.RemoveRange(analyses);
             _context.Networks.RemoveRange(networks);

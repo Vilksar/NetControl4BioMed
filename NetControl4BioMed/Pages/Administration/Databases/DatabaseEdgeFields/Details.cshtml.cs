@@ -26,6 +26,10 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
         public class ViewModel
         {
             public DatabaseEdgeField DatabaseEdgeField { get; set; }
+
+            public int DatabaseEdgeFieldEdgeCount { get; set; }
+
+            public int EdgeCount { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -38,15 +42,26 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseEdgeFields/Index");
             }
+            // Define the query.
+            var query = _context.DatabaseEdgeFields
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                DatabaseEdgeField = _context.DatabaseEdgeFields
-                    .Where(item => item.Id == id)
+                DatabaseEdgeField = query
                     .Include(item => item.Database)
                         .ThenInclude(item => item.DatabaseType)
-                    .Include(item => item.DatabaseEdgeFieldEdges)
-                    .FirstOrDefault()
+                    .FirstOrDefault(),
+                DatabaseEdgeFieldEdgeCount = query
+                    .Select(item => item.DatabaseEdgeFieldEdges)
+                    .SelectMany(item => item)
+                    .Count(),
+                EdgeCount = query
+                    .Select(item => item.DatabaseEdgeFieldEdges)
+                    .SelectMany(item => item)
+                    .Select(item => item.Edge)
+                    .Distinct()
+                    .Count()
             };
             // Check if there was no item found.
             if (View.DatabaseEdgeField == null)

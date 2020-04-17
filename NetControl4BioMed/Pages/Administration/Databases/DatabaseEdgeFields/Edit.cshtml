@@ -77,24 +77,6 @@
         </form>
     </div>
 </div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-arrow-right"></i></span>
-            </div>
-            <div>
-                <span>Edges</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The database edge field currently contains @Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Select(item => item.Edge).Distinct().Count() distinct edge@(Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Select(item => item.Edge).Distinct().Count() != 1 ? "s" : string.Empty) with @Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Count() value@(Model.View.DatabaseEdgeField.DatabaseEdgeFieldEdges.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseEdgeFieldEdges/Index" asp-route-searchString="@Model.View.DatabaseEdgeField.Id" asp-route-searchIn="DatabaseEdgeFieldId" class="alert-link">view the current edge values</a>.</span>
-        </div>
-    </div>
-</div>
 
 @section Scripts {
     <partial name="_ScriptsValidationPartial" />

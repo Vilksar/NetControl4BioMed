@@ -33,7 +33,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
 
         public class ViewModel
         {
-            public IEnumerable<DatabaseNodeField> Items { get; set; }
+            public IQueryable<DatabaseNodeField> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)
@@ -117,10 +117,14 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
             // Save the number of items found.
             var databaseNodeFieldCount = View.Items.Count();
             // Get the related entities that use the items.
-            var nodes = _context.Nodes.Where(item => item.DatabaseNodeFieldNodes.Any(item1 => View.Items.Contains(item1.DatabaseNodeField)));
-            var edges = _context.Edges.Where(item => item.EdgeNodes.Any(item1 => nodes.Contains(item1.Node)));
-            var networks = _context.Networks.Where(item => item.NetworkNodes.Any(item1 => nodes.Contains(item1.Node)));
-            var analyses = _context.Analyses.Where(item => item.AnalysisNodes.Any(item1 => nodes.Contains(item1.Node)));
+            var nodes = _context.Nodes
+                .Where(item => item.DatabaseNodeFieldNodes.Any(item1 => View.Items.Contains(item1.DatabaseNodeField)));
+            var edges = _context.Edges
+                .Where(item => item.EdgeNodes.Any(item1 => nodes.Contains(item1.Node)));
+            var networks = _context.Networks
+                .Where(item => item.NetworkNodes.Any(item1 => nodes.Contains(item1.Node)));
+            var analyses = _context.Analyses
+                .Where(item => item.AnalysisNodes.Any(item1 => nodes.Contains(item1.Node)));
             // Mark the items for deletion.
             _context.Analyses.RemoveRange(analyses);
             _context.Networks.RemoveRange(networks);

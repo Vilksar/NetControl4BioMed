@@ -77,24 +77,6 @@
         </form>
     </div>
 </div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-circle"></i></span>
-            </div>
-            <div>
-                <span>Nodes</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The database node field currently contains @Model.View.DatabaseNodeField.DatabaseNodeFieldNodes.Select(item => item.Node).Distinct().Count() distinct node@(Model.View.DatabaseNodeField.DatabaseNodeFieldNodes.Select(item => item.Node).Distinct().Count() != 1 ? "s" : string.Empty) with @Model.View.DatabaseNodeField.DatabaseNodeFieldNodes.Count() value@(Model.View.DatabaseNodeField.DatabaseNodeFieldNodes.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseNodeFieldNodes/Index" asp-route-searchString="@Model.View.DatabaseNodeField.Id" asp-route-searchIn="DatabaseNodeFieldId" class="alert-link">view the current node values</a>.</span>
-        </div>
-    </div>
-</div>
 
 @section Scripts {
     <partial name="_ScriptsValidationPartial" />

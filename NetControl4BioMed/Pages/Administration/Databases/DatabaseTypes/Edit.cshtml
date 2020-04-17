@@ -56,24 +56,6 @@
         </form>
     </div>
 </div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-database"></i></span>
-            </div>
-            <div>
-                <span>Databases</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The database type is currently assigned to @Model.View.DatabaseType.Databases.Count() database@(Model.View.DatabaseType.Databases.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/Databases/Index" asp-route-searchString="@Model.View.DatabaseType.Id" asp-route-searchIn="DatabaseTypeId" class="alert-link">view the current databases</a>, or <a asp-page="/Administration/Databases/Databases/Create" asp-route-databaseTypeId="@Model.View.DatabaseType.Id" class="alert-link">add a new one</a>.</span>
-        </div>
-    </div>
-</div>
 
 @section Scripts {
     <partial name="_ScriptsValidationPartial" />
