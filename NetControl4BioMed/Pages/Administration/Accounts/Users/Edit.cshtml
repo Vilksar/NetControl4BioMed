@@ -59,42 +59,6 @@
         </form>
     </div>
 </div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-user-tag"></i></span>
-            </div>
-            <div>
-                <span>Roles</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The user is currently assigned to @Model.View.User.UserRoles.Count() role@(Model.View.User.UserRoles.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Accounts/UserRoles/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="alert-link">view the current roles</a>, or <a asp-page="/Administration/Accounts/UserRoles/Create" asp-route-userString="@Model.View.User.Email" class="alert-link">add a new one</a>.</span>
-        </div>
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-user-shield"></i></span>
-            </div>
-            <div>
-                <span>Databases</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The user currently has access to @Model.View.User.DatabaseUsers.Count() database@(Model.View.User.DatabaseUsers.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="alert-link">view the current databases</a>, or <a asp-page="/Administration/Permissions/DatabaseUsers/Create" asp-route-userString="@Model.View.User.Email" class="alert-link">add a new one</a>.</span>
-        </div>
-    </div>
-</div>
 
 @section Scripts {
     <partial name="_ScriptsValidationPartial" />

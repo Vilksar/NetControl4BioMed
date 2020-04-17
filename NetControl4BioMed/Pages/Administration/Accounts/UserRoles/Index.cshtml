@@ -69,20 +69,10 @@
                             </div>
                         </td>
                         <td class="text-left text-break">
-                            <div>
-                                <span title="@item.User.Email" class="font-weight-bold">@item.User.Email</span>
-                            </div>
-                            <div>
-                                <span title="@item.User.Id" class="small">@item.User.Id</span>
-                            </div>
+                            <a asp-page="/Administration/Accounts/Users/Details" asp-route-id="@item.User.Id" title="@item.User.Email">@item.User.Email</a>
                         </td>
                         <td class="text-left text-break">
-                            <div>
-                                <span title="@item.Role.Name" class="font-weight-bold">@item.Role.Name</span>
-                            </div>
-                            <div>
-                                <span title="@item.Role.Id" class="small">@item.Role.Id</span>
-                            </div>
+                            <a asp-page="/Administration/Accounts/Roles/Details" asp-route-id="@item.Role.Id" title="@item.Role.Name">@item.Role.Name</a>
                         </td>
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Accounts/UserRoles/Delete" asp-route-userIds="@item.User.Id" asp-route-roleIds="@item.Role.Id" class="btn btn-danger m-1" title="Delete">

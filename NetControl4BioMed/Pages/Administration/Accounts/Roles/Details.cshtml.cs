@@ -26,6 +26,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
         public class ViewModel
         {
             public Role Role { get; set; }
+
+            public int UserCount { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -38,14 +40,20 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Roles/Index");
             }
+            // Define the query.
+            var query = _context.Roles
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                Role = _context.Roles
-                    .Where(item => item.Id == id)
-                    .Include(item => item.UserRoles)
-                        .ThenInclude(item => item.User)
-                    .FirstOrDefault()
+                Role = query
+                    .FirstOrDefault(),
+                UserCount = query
+                    .Select(item => item.UserRoles)
+                    .SelectMany(item => item)
+                    .Select(item => item.User)
+                    .Distinct()
+                    .Count()
             };
             // Check if there was no item found.
             if (View.Role == null)

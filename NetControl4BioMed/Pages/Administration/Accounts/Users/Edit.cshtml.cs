@@ -59,15 +59,13 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Users/Index");
             }
+            // Define the query.
+            var query = _context.Users
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                User = _context.Users
-                    .Where(item => item.Id == id)
-                    .Include(item => item.UserRoles)
-                        .ThenInclude(item => item.Role)
-                    .Include(item => item.DatabaseUsers)
-                        .ThenInclude(item => item.Database)
+                User = query
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.
@@ -99,17 +97,13 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Users/Index");
             }
+            // Define the query.
+            var query = _context.Users
+                .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel
             {
-                User = _context.Users
-                    .Where(item => item.Id == Input.Id)
-                    .Include(item => item.UserRoles)
-                        .ThenInclude(item => item.Role)
-                    .Include(item => item.DatabaseUsers)
-                        .ThenInclude(item => item.Database)
-                    .Include(item => item.NetworkUsers)
-                    .Include(item => item.AnalysisUsers)
+                User = query
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.

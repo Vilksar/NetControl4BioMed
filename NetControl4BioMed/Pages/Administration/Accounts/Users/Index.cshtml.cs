@@ -114,10 +114,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 default:
                     break;
             }
-            // Include the related entitites.
-            query = query
-                .Include(item => item.UserRoles)
-                    .ThenInclude(item => item.Role);
             // Define the view.
             View = new ViewModel
             {

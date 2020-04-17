@@ -35,7 +35,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
 
         public class ViewModel
         {
-            public IEnumerable<User> Items { get; set; }
+            public IQueryable<User> Items { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(IEnumerable<string> ids)
@@ -51,7 +51,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.Users.Where(item => ids.Contains(item.Id))
+                Items = _context.Users
+                    .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -88,7 +89,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.Users.Where(item => Input.Ids.Contains(item.Id))
+                Items = _context.Users
+                    .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -136,12 +138,17 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 }
             }
             // Go over all of the networks and analyses and get the ones without any users.
-            var networks = _context.Networks.Where(item => !item.NetworkUsers.Any());
-            var analyses = _context.Analyses.Where(item => !item.AnalysisUsers.Any() || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
+            var networks = _context.Networks
+                .Where(item => !item.NetworkUsers.Any());
+            var analyses = _context.Analyses
+                .Where(item => !item.AnalysisUsers.Any() || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
             // Get the generic entities among them.
-            var genericNetworks = networks.Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
-            var genericNodes = _context.Nodes.Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
-            var genericEdges = _context.Edges.Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
+            var genericNetworks = networks
+                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
+            var genericNodes = _context.Nodes
+                .Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
+            var genericEdges = _context.Edges
+                .Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
             // Mark the items for deletion.
             _context.Analyses.RemoveRange(analyses);
             _context.Networks.RemoveRange(networks);

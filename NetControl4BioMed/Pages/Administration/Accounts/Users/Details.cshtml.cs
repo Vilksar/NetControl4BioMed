@@ -26,6 +26,10 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
         public class ViewModel
         {
             public User User { get; set; }
+
+            public int RoleCount { get; set; }
+
+            public int DatabaseCount { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -38,16 +42,26 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Users/Index");
             }
+            // Define the query.
+            var query = _context.Users
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                User = _context.Users
-                    .Where(item => item.Id == id)
-                    .Include(item => item.UserRoles)
-                        .ThenInclude(item => item.Role)
-                    .Include(item => item.DatabaseUsers)
-                        .ThenInclude(item => item.Database)
-                    .FirstOrDefault()
+                User = query
+                    .FirstOrDefault(),
+                RoleCount = query
+                    .Select(item => item.UserRoles)
+                    .SelectMany(item => item)
+                    .Select(item => item.Role)
+                    .Distinct()
+                    .Count(),
+                DatabaseCount = query
+                    .Select(item => item.DatabaseUsers)
+                    .SelectMany(item => item)
+                    .Select(item => item.Database)
+                    .Distinct()
+                    .Count()
             };
             // Check if there was no item found.
             if (View.User == null)

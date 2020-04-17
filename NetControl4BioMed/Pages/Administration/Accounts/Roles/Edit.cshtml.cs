@@ -56,13 +56,13 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Roles/Index");
             }
+            // Define the query.
+            var query = _context.Roles
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                Role = _context.Roles
-                    .Where(item => item.Id == id)
-                    .Include(item => item.UserRoles)
-                        .ThenInclude(item => item.User)
+                Role = query
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.
@@ -101,13 +101,13 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Roles/Index");
             }
+            // Define the query.
+            var query = _context.Roles
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                Role = _context.Roles
-                    .Where(item => item.Id == Input.Id)
-                    .Include(item => item.UserRoles)
-                        .ThenInclude(item => item.User)
+                Role = query
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.
