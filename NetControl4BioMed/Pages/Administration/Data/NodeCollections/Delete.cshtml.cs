@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
 
         public class ViewModel
         {
-            public IEnumerable<NodeCollection> Items { get; set; }
+            public IQueryable<NodeCollection> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)
@@ -48,7 +48,8 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.NodeCollections.Where(item => ids.Contains(item.Id))
+                Items = _context.NodeCollections
+                    .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -75,7 +76,8 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.NodeCollections.Where(item => Input.Ids.Contains(item.Id))
+                Items = _context.NodeCollections
+                    .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -96,8 +98,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             // Save the number of items found.
             var nodeCollectionCount = View.Items.Count();
             // Get the related entities that use the items.
-            var networks = _context.Networks.Where(item => item.NetworkNodeCollections.Any(item1 => View.Items.Contains(item1.NodeCollection)));
-            var analyses = _context.Analyses.Where(item => item.AnalysisNodeCollections.Any(item1 => View.Items.Contains(item1.NodeCollection)) || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
+            var networks = _context.Networks
+                .Where(item => item.NetworkNodeCollections.Any(item1 => View.Items.Contains(item1.NodeCollection)));
+            var analyses = _context.Analyses
+                .Where(item => item.AnalysisNodeCollections.Any(item1 => View.Items.Contains(item1.NodeCollection)) || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
             // Mark the items for deletion.
             _context.Analyses.RemoveRange(analyses);
             _context.Networks.RemoveRange(networks);

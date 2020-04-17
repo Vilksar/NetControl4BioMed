@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Office.CustomUI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -26,6 +27,18 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
         public class ViewModel
         {
             public Edge Edge { get; set; }
+
+            public int DatabaseCount { get; set; }
+
+            public int DatabaseEdgeFieldCount { get; set; }
+
+            public int NodeCount { get; set; }
+
+            public int NetworkCount { get; set; }
+
+            public int AnalysisCount { get; set; }
+
+            public int PathCount { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -38,22 +51,51 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Data/Edges/Index");
             }
+            // Define the query.
+            var query = _context.Edges
+                .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                Edge = _context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => item.Id == id)
-                    .Include(item => item.DatabaseEdges)
-                        .ThenInclude(item => item.Database)
-                    .Include(item => item.DatabaseEdgeFieldEdges)
-                        .ThenInclude(item => item.DatabaseEdgeField)
-                    .Include(item => item.EdgeNodes)
-                        .ThenInclude(item => item.Node)
-                    .Include(item => item.NetworkEdges)
-                    .Include(item => item.AnalysisEdges)
-                    .Include(item => item.PathEdges)
-                    .FirstOrDefault()
+                Edge = query
+                    .FirstOrDefault(),
+                DatabaseCount = query
+                    .Select(item => item.DatabaseEdges)
+                    .SelectMany(item => item)
+                    .Select(item => item.Database)
+                    .Distinct()
+                    .Count(),
+                DatabaseEdgeFieldCount = query
+                    .Select(item => item.DatabaseEdgeFieldEdges)
+                    .SelectMany(item => item)
+                    .Select(item => item.DatabaseEdgeField)
+                    .Distinct()
+                    .Count(),
+                NodeCount = query
+                    .Select(item => item.EdgeNodes)
+                    .SelectMany(item => item)
+                    .Select(item => item.Node)
+                    .Distinct()
+                    .Count(),
+                NetworkCount = query
+                    .Select(item => item.NetworkEdges)
+                    .SelectMany(item => item)
+                    .Select(item => item.Network)
+                    .Distinct()
+                    .Count(),
+                AnalysisCount = query
+                    .Select(item => item.AnalysisEdges)
+                    .SelectMany(item => item)
+                    .Select(item => item.Analysis)
+                    .Distinct()
+                    .Count(),
+                PathCount = query
+                    .Select(item => item.PathEdges)
+                    .SelectMany(item => item)
+                    .Select(item => item.Path)
+                    .Distinct()
+                    .Count()
             };
             // Check if there was no item found.
             if (View.Edge == null)

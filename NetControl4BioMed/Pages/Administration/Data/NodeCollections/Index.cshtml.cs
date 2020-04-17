@@ -151,10 +151,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             }
             // Include the related entitites.
             query = query
-                .Include(item => item.NodeCollectionDatabases)
-                .Include(item => item.NodeCollectionNodes)
-                .Include(item => item.NetworkNodeCollections)
-                .Include(item => item.AnalysisNodeCollections);
+                .Include(item => item.NodeCollectionNodes);
             // Define the view.
             View = new ViewModel
             {

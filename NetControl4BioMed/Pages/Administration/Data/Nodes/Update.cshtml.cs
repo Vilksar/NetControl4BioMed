@@ -364,8 +364,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 // Mark the nodes for updating.
                 _context.Nodes.UpdateRange(nodesToUpdate);
                 // Get the networks and analyses that contain the nodes.
-                var networks = _context.Networks.Where(item => item.NetworkNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
-                var analyses = _context.Analyses.Where(item => item.AnalysisNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
+                var networks = _context.Networks
+                    .Where(item => item.NetworkNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
+                var analyses = _context.Analyses
+                    .Where(item => item.AnalysisNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
                 // Mark the items for deletion.
                 _context.Analyses.RemoveRange(analyses);
                 _context.Networks.RemoveRange(networks);
@@ -403,9 +405,12 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 // Save the number of nodes found.
                 itemCount = nodes.Count();
                 // Get the edges, networks and analyses that contain the nodes.
-                var edges = _context.Edges.Where(item => item.EdgeNodes.Any(item1 => nodes.Contains(item1.Node)));
-                var networks = _context.Networks.Where(item => item.NetworkNodes.Any(item1 => nodes.Contains(item1.Node)));
-                var analyses = _context.Analyses.Where(item => item.AnalysisNodes.Any(item1 => nodes.Contains(item1.Node)));
+                var edges = _context.Edges
+                    .Where(item => item.EdgeNodes.Any(item1 => nodes.Contains(item1.Node)));
+                var networks = _context.Networks
+                    .Where(item => item.NetworkNodes.Any(item1 => nodes.Contains(item1.Node)));
+                var analyses = _context.Analyses
+                    .Where(item => item.AnalysisNodes.Any(item1 => nodes.Contains(item1.Node)));
                 // Mark the items for deletion.
                 _context.Analyses.RemoveRange(analyses);
                 _context.Networks.RemoveRange(networks);

@@ -387,8 +387,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 // Mark the node collections for updating.
                 _context.NodeCollections.UpdateRange(nodeCollectionsToUpdate);
                 // Get the networks and analyses that use the node collections.
-                var networks = _context.Networks.Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollectionsToUpdate.Contains(item1.NodeCollection)));
-                var analyses = _context.Analyses.Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollectionsToUpdate.Contains(item1.NodeCollection)));
+                var networks = _context.Networks
+                    .Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollectionsToUpdate.Contains(item1.NodeCollection)));
+                var analyses = _context.Analyses
+                    .Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollectionsToUpdate.Contains(item1.NodeCollection)));
                 // Mark the items for deletion.
                 _context.Analyses.RemoveRange(analyses);
                 _context.Networks.RemoveRange(networks);
@@ -409,8 +411,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 // Save the number of node collections found.
                 itemCount = nodeCollections.Count();
                 // Get the networks and analyses that use the node collections.
-                var networks = _context.Networks.Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)));
-                var analyses = _context.Analyses.Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)));
+                var networks = _context.Networks
+                    .Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)));
+                var analyses = _context.Analyses
+                    .Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)));
                 // Mark the items for deletion.
                 _context.Analyses.RemoveRange(analyses);
                 _context.Networks.RemoveRange(networks);

@@ -509,8 +509,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 // Mark the edges for updating.
                 _context.Edges.UpdateRange(edgesToUpdate);
                 // Get the networks and analyses that contain the edges.
-                var networks = _context.Networks.Where(item => item.NetworkEdges.Any(item1 => edgesToUpdate.Contains(item1.Edge)));
-                var analyses = _context.Analyses.Where(item => item.AnalysisEdges.Any(item1 => edgesToUpdate.Contains(item1.Edge)));
+                var networks = _context.Networks
+                    .Where(item => item.NetworkEdges.Any(item1 => edgesToUpdate.Contains(item1.Edge)));
+                var analyses = _context.Analyses
+                    .Where(item => item.AnalysisEdges.Any(item1 => edgesToUpdate.Contains(item1.Edge)));
                 // Mark the items for deletion.
                 _context.Analyses.RemoveRange(analyses);
                 _context.Networks.RemoveRange(networks);
@@ -532,8 +534,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 // Save the number of edges found.
                 itemCount = edges.Count();
                 // Get the networks and analyses that contain the edges.
-                var networks = _context.Networks.Where(item => item.NetworkEdges.Any(item1 => edges.Contains(item1.Edge)));
-                var analyses = _context.Analyses.Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
+                var networks = _context.Networks
+                    .Where(item => item.NetworkEdges.Any(item1 => edges.Contains(item1.Edge)));
+                var analyses = _context.Analyses
+                    .Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
                 // Mark the items for deletion.
                 _context.Analyses.RemoveRange(analyses);
                 _context.Networks.RemoveRange(networks);

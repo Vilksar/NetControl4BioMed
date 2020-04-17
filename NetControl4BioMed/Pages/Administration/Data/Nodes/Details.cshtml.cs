@@ -26,6 +26,20 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
         public class ViewModel
         {
             public Node Node { get; set; }
+
+            public int DatabaseCount { get; set; }
+
+            public int DatabaseNodeFieldCount { get; set; }
+
+            public int EdgeCount { get; set; }
+
+            public int NodeCollectionCount { get; set; }
+
+            public int NetworkCount { get; set; }
+
+            public int AnalysisCount { get; set; }
+
+            public int PathCount { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -38,24 +52,57 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Data/Nodes/Index");
             }
+            // Define the query.
+            var query = _context.Nodes
+                .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                Node = _context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => item.Id == id)
-                    .Include(item => item.DatabaseNodes)
-                        .ThenInclude(item => item.Database)
-                    .Include(item => item.DatabaseNodeFieldNodes)
-                        .ThenInclude(item => item.DatabaseNodeField)
-                    .Include(item => item.EdgeNodes)
-                        .ThenInclude(item => item.Edge)
-                    .Include(item => item.NetworkNodes)
-                    .Include(item => item.AnalysisNodes)
-                    .Include(item => item.PathNodes)
-                    .Include(item => item.NodeCollectionNodes)
-                        .ThenInclude(item => item.NodeCollection)
-                    .FirstOrDefault()
+                Node = query
+                    .FirstOrDefault(),
+                DatabaseCount = query
+                    .Select(item => item.DatabaseNodes)
+                    .SelectMany(item => item)
+                    .Select(item => item.Database)
+                    .Distinct()
+                    .Count(),
+                DatabaseNodeFieldCount = query
+                    .Select(item => item.DatabaseNodeFieldNodes)
+                    .SelectMany(item => item)
+                    .Select(item => item.DatabaseNodeField)
+                    .Distinct()
+                    .Count(),
+                EdgeCount = query
+                    .Select(item => item.EdgeNodes)
+                    .SelectMany(item => item)
+                    .Select(item => item.Edge)
+                    .Distinct()
+                    .Count(),
+                NodeCollectionCount = query
+                    .Select(item => item.NodeCollectionNodes)
+                    .SelectMany(item => item)
+                    .Select(item => item.NodeCollection)
+                    .Distinct()
+                    .Count(),
+                NetworkCount = query
+                    .Select(item => item.NetworkNodes)
+                    .SelectMany(item => item)
+                    .Select(item => item.Network)
+                    .Distinct()
+                    .Count(),
+                AnalysisCount = query
+                    .Select(item => item.AnalysisNodes)
+                    .SelectMany(item => item)
+                    .Select(item => item.Analysis)
+                    .Distinct()
+                    .Count(),
+                PathCount = query
+                    .Select(item => item.PathNodes)
+                    .SelectMany(item => item)
+                    .Select(item => item.Path)
+                    .Distinct()
+                    .Count()
             };
             // Check if there was no item found.
             if (View.Node == null)

@@ -26,6 +26,14 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
         public class ViewModel
         {
             public NodeCollection NodeCollection { get; set; }
+
+            public int DatabaseCount { get; set; }
+
+            public int NodeCount { get; set; }
+
+            public int NetworkCount { get; set; }
+
+            public int AnalysisCount { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -38,20 +46,38 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Data/NodeCollections/Index");
             }
+            // Define the query.
+            var query = _context.NodeCollections
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                NodeCollection = _context.NodeCollections
-                    .Where(item => item.Id == id)
-                    .Include(item => item.NodeCollectionDatabases)
-                        .ThenInclude(item => item.Database)
-                    .Include(item => item.NodeCollectionNodes)
-                        .ThenInclude(item => item.Node)
-                    .Include(item => item.NetworkNodeCollections)
-                        .ThenInclude(item => item.Network)
-                    .Include(item => item.AnalysisNodeCollections)
-                        .ThenInclude(item => item.Analysis)
-                    .FirstOrDefault()
+                NodeCollection = query
+                    .FirstOrDefault(),
+                DatabaseCount = query
+                    .Select(item => item.NodeCollectionDatabases)
+                    .SelectMany(item => item)
+                    .Select(item => item.Database)
+                    .Distinct()
+                    .Count(),
+                NodeCount = query
+                    .Select(item => item.NodeCollectionNodes)
+                    .SelectMany(item => item)
+                    .Select(item => item.Node)
+                    .Distinct()
+                    .Count(),
+                NetworkCount = query
+                    .Select(item => item.NetworkNodeCollections)
+                    .SelectMany(item => item)
+                    .Select(item => item.Network)
+                    .Distinct()
+                    .Count(),
+                AnalysisCount = query
+                    .Select(item => item.AnalysisNodeCollections)
+                    .SelectMany(item => item)
+                    .Select(item => item.Analysis)
+                    .Distinct()
+                    .Count()
             };
             // Check if there was no item found.
             if (View.NodeCollection == null)

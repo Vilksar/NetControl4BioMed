@@ -71,128 +71,28 @@
         </div>
     </div>
     <div class="card-body">
-        <a asp-page="/Administration/Relationships/DatabaseEdges/Index" asp-route-searchString="@Model.View.Edge.Id" asp-route-searchIn="EdgeId" class="btn btn-info btn-block mb-3">
-            <span>View all</span>
-        </a>
-        @if (!Model.View.Edge.DatabaseEdges.Any())
-        {
-            <div class="alert alert-info text-justify text-wrap mb-0">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no databases currently assigned.</span>
-            </div>
-        }
-        else
-        {
-            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
-                <thead class="thead-light">
-                    <tr>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
-                            <span>#</span>
-                        </th>
-                        <th class="text-left text-break">
-                            <span>Database</span>
-                        </th>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>Links</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var databaseEdge in Model.View.Edge.DatabaseEdges)
-                    {
-                        <tr>
-                            <td class="text-center text-break">
-                                <span></span>
-                            </td>
-                            <td class="text-left text-break">
-                                <div>
-                                    <span title="@databaseEdge.Database.Name" class="font-weight-bold">@databaseEdge.Database.Name</span>
-                                </div>
-                                <div>
-                                    <span title="@databaseEdge.Database.Id" class="small">@databaseEdge.Database.Id</span>
-                                </div>
-                            </td>
-                            <td class="text-center text-break">
-                                <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@databaseEdge.Database.Id" title="Details">
-                                    <span>Details</span>
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The edge is currently assigned to @Model.View.DatabaseCount database@(Model.View.DatabaseCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseEdges/Index" asp-route-searchString="@Model.View.Edge.Id" asp-route-searchIn="EdgeId" class="alert-link">view the databases</a>.</span>
+        </div>
     </div>
 </div>
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
-                <span><i class="fas fa-circle"></i></span>
+                <span><i class="fas fa-arrow-right"></i></span>
             </div>
             <div>
-                <span>Edge fields</span>
+                <span>Database edge fields</span>
             </div>
         </div>
     </div>
     <div class="card-body">
-        <a asp-page="/Administration/Relationships/DatabaseEdgeFieldEdges/Index" asp-route-searchString="@Model.View.Edge.Id" asp-route-searchIn="EdgeId" class="btn btn-info btn-block mb-3">
-            <span>View all</span>
-        </a>
-        @if (!Model.View.Edge.DatabaseEdgeFieldEdges.Any())
-        {
-            <div class="alert alert-info text-justify text-wrap mb-0">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no edge fields currently assigned.</span>
-            </div>
-        }
-        else
-        {
-            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
-                <thead class="thead-light">
-                    <tr>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
-                            <span>#</span>
-                        </th>
-                        <th class="text-left text-break">
-                            <span>Edge field</span>
-                        </th>
-                        <th class="text-center text-break">
-                            <span>Value</span>
-                        </th>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>Links</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var databaseEdgeFieldEdge in Model.View.Edge.DatabaseEdgeFieldEdges)
-                    {
-                        <tr>
-                            <td class="text-center text-break">
-                                <span></span>
-                            </td>
-                            <td class="text-left text-break">
-                                <div>
-                                    <span title="@databaseEdgeFieldEdge.DatabaseEdgeField.Name" class="font-weight-bold">@databaseEdgeFieldEdge.DatabaseEdgeField.Name</span>
-                                </div>
-                                <div>
-                                    <span title="@databaseEdgeFieldEdge.DatabaseEdgeField.Id" class="small">@databaseEdgeFieldEdge.DatabaseEdgeField.Id</span>
-                                </div>
-                            </td>
-                            <td class="text-center text-break">
-                                <span title="@databaseEdgeFieldEdge.Value">@databaseEdgeFieldEdge.Value</span>
-                            </td>
-                            <td class="text-center text-break">
-                                <a asp-page="/Administration/Databases/DatabaseEdgeFields/Details" asp-route-id="@databaseEdgeFieldEdge.DatabaseEdgeField.Id" title="Details">
-                                    <span>Details</span>
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The edge is currently assigned to @Model.View.DatabaseEdgeFieldCount database edge field@(Model.View.DatabaseEdgeFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseEdgeFieldEdges/Index" asp-route-searchString="@Model.View.Edge.Id" asp-route-searchIn="EdgeId" class="alert-link">view the database edge fields</a>.</span>
+        </div>
     </div>
 </div>
 <div class="card mb-3">
@@ -207,57 +107,10 @@
         </div>
     </div>
     <div class="card-body">
-        <a asp-page="/Administration/Relationships/EdgeNodes/Index" asp-route-searchString="@Model.View.Edge.Id" asp-route-searchIn="EdgeId" class="btn btn-info btn-block mb-3">
-            <span>View all</span>
-        </a>
-        @if (!Model.View.Edge.EdgeNodes.Any())
-        {
-            <div class="alert alert-info text-justify text-wrap mb-0">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no nodes currently assigned.</span>
-            </div>
-        }
-        else
-        {
-            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
-                <thead class="thead-light">
-                    <tr>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
-                            <span>#</span>
-                        </th>
-                        <th class="text-left text-break">
-                            <span>Node</span>
-                        </th>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>Links</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var edgeNode in Model.View.Edge.EdgeNodes)
-                    {
-                        <tr>
-                            <td class="text-center text-break">
-                                <span></span>
-                            </td>
-                            <td class="text-left text-break">
-                                <div>
-                                    <span title="@edgeNode.Node.Name" class="font-weight-bold">@edgeNode.Node.Name</span>
-                                </div>
-                                <div>
-                                    <span title="@edgeNode.Node.Id" class="small">@edgeNode.Node.Id</span>
-                                </div>
-                            </td>
-                            <td class="text-center text-break">
-                                <a asp-page="/Administration/Data/Nodes/Details" asp-route-id="@edgeNode.Node.Id" title="Details">
-                                    <span>Details</span>
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The edge currently contains @Model.View.NodeCount node@(Model.View.NodeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/EdgeNodes/Index" asp-route-searchString="@Model.View.Edge.Id" asp-route-searchIn="EdgeId" class="alert-link">view the nodes</a>.</span>
+        </div>
     </div>
 </div>
 <div class="card mb-3">
@@ -274,7 +127,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The edge is currently assigned to @Model.View.Edge.NetworkEdges.Count() network@(Model.View.Edge.NetworkEdges.Count() != 1 ? "s" : string.Empty).</span>
+            <span>The edge is currently assigned to @Model.View.NetworkCount network@(Model.View.NetworkCount != 1 ? "s" : string.Empty).</span>
         </div>
     </div>
 </div>
@@ -292,7 +145,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The edge is currently assigned to @Model.View.Edge.AnalysisEdges.Count() analys@(Model.View.Edge.AnalysisEdges.Count() != 1 ? "e" : "i")s.</span>
+            <span>The edge is currently assigned to @Model.View.AnalysisCount analys@(Model.View.AnalysisCount != 1 ? "e" : "i")s.</span>
         </div>
     </div>
 </div>
@@ -310,7 +163,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The edge is currently assigned to @Model.View.Edge.PathEdges.Count() path@(Model.View.Edge.PathEdges.Count() != 1 ? "s" : string.Empty).</span>
+            <span>The edge is currently assigned to @Model.View.PathCount path@(Model.View.PathCount != 1 ? "s" : string.Empty).</span>
         </div>
     </div>
 </div>

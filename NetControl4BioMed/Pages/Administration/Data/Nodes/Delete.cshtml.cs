@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
 
         public class ViewModel
         {
-            public IEnumerable<Node> Items { get; set; }
+            public IQueryable<Node> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)
@@ -100,9 +100,12 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
             // Save the number of items found.
             var nodeCount = View.Items.Count();
             // Get the related entities that use the items.
-            var edges = _context.Edges.Where(item => item.EdgeNodes.Any(item1 => View.Items.Contains(item1.Node)));
-            var networks = _context.Networks.Where(item => item.NetworkNodes.Any(item1 => View.Items.Contains(item1.Node)));
-            var analyses = _context.Analyses.Where(item => item.AnalysisNodes.Any(item1 => View.Items.Contains(item1.Node)));
+            var edges = _context.Edges
+                .Where(item => item.EdgeNodes.Any(item1 => View.Items.Contains(item1.Node)));
+            var networks = _context.Networks
+                .Where(item => item.NetworkNodes.Any(item1 => View.Items.Contains(item1.Node)));
+            var analyses = _context.Analyses
+                .Where(item => item.AnalysisNodes.Any(item1 => View.Items.Contains(item1.Node)));
             // Mark the items for deletion.
             _context.Analyses.RemoveRange(analyses);
             _context.Networks.RemoveRange(networks);
