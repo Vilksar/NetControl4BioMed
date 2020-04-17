@@ -91,7 +91,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database is currently assigned to @Model.View.Database.DatabaseUsers.Count() registered user@(Model.View.Database.DatabaseUsers.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current users</a>, or <a asp-page="/Administration/Permissions/DatabaseUsers/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
+            <span>The database is currently assigned to @Model.View.DatabaseUserCount registered user@(Model.View.DatabaseUserCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current users</a>, or <a asp-page="/Administration/Permissions/DatabaseUsers/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>
@@ -109,7 +109,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database is currently assigned to @Model.View.Database.DatabaseUserInvitations.Count() unregistered user@(Model.View.Database.DatabaseUserInvitations.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current users</a>, or <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
+            <span>The database is currently assigned to @Model.View.DatabaseUserInvitationCount unregistered user@(Model.View.DatabaseUserInvitationCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current users</a>, or <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>
@@ -127,7 +127,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.Database.DatabaseNodeFields.Count() node field@(Model.View.Database.DatabaseNodeFields.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseNodeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current node fields</a>, or <a asp-page="/Administration/Databases/DatabaseNodeFields/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
+            <span>The database currently contains @Model.View.DatabaseNodeFieldCount node field@(Model.View.DatabaseNodeFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseNodeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current node fields</a>, or <a asp-page="/Administration/Databases/DatabaseNodeFields/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>
@@ -145,7 +145,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.Database.DatabaseEdgeFields.Count() edge field@(Model.View.Database.DatabaseEdgeFields.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseEdgeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current edge fields</a>, or <a asp-page="/Administration/Databases/DatabaseEdgeFields/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
+            <span>The database currently contains @Model.View.DatabaseEdgeFieldCount edge field@(Model.View.DatabaseEdgeFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseEdgeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current edge fields</a>, or <a asp-page="/Administration/Databases/DatabaseEdgeFields/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>
@@ -163,7 +163,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.Database.DatabaseNodes.Count() node@(Model.View.Database.DatabaseNodes.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseNodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current nodes</a>.</span>
+            <span>The database currently contains @Model.View.DatabaseNodeCount node@(Model.View.DatabaseNodeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseNodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current nodes</a>.</span>
         </div>
     </div>
 </div>
@@ -181,7 +181,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.Database.DatabaseEdges.Count() edge@(Model.View.Database.DatabaseNodes.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseEdges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current edges</a>.</span>
+            <span>The database currently contains @Model.View.DatabaseEdgeCount edge@(Model.View.DatabaseEdgeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseEdges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current edges</a>.</span>
         </div>
     </div>
 </div>
@@ -199,7 +199,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.Database.NodeCollectionDatabases.Count() node collection@(Model.View.Database.NodeCollectionDatabases.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/NodeCollectionDatabases/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current node collections</a>.</span>
+            <span>The database is currently used by @Model.View.NodeCollectionDatabaseCount node collection@(Model.View.NodeCollectionDatabaseCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/NodeCollectionDatabases/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current node collections</a>.</span>
         </div>
     </div>
 </div>
@@ -217,7 +217,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database is currently used by @Model.View.Database.NetworkDatabases.Count() network@(Model.View.Database.NetworkDatabases.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Created/Networks/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current networks</a>.</span>
+            <span>The database is currently used by @Model.View.NetworkDatabaseCount network@(Model.View.NetworkDatabaseCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Created/Networks/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current networks</a>.</span>
         </div>
     </div>
 </div>
@@ -235,7 +235,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database is currently used by @Model.View.Database.AnalysisDatabases.Count() analys@(Model.View.Database.AnalysisDatabases.Count() != 1 ? "e" : "i")s. You can <a asp-page="/Administration/Created/Analyses/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current analyses</a>.</span>
+            <span>The database is currently used by @Model.View.AnalysisDatabaseCount analys@(Model.View.AnalysisDatabaseCount != 1 ? "e" : "i")s. You can <a asp-page="/Administration/Created/Analyses/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the current analyses</a>.</span>
         </div>
     </div>
 </div>

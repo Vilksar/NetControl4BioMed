@@ -231,9 +231,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             query = query
                 .Include(item => item.DatabaseType)
                 .Include(item => item.DatabaseNodeFields)
-                .Include(item => item.DatabaseEdgeFields)
-                .Include(item => item.DatabaseNodes)
-                .Include(item => item.DatabaseEdges);
+                .Include(item => item.DatabaseEdgeFields);
             // Define the view.
             View = new ViewModel
             {

@@ -55,6 +55,24 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
         public class ViewModel
         {
             public Database Database { get; set; }
+
+            public int DatabaseUserCount { get; set; }
+
+            public int DatabaseUserInvitationCount { get; set; }
+
+            public int DatabaseNodeFieldCount { get; set; }
+
+            public int DatabaseEdgeFieldCount { get; set; }
+
+            public int DatabaseNodeCount { get; set; }
+
+            public int DatabaseEdgeCount { get; set; }
+
+            public int NodeCollectionDatabaseCount { get; set; }
+
+            public int NetworkDatabaseCount { get; set; }
+
+            public int AnalysisDatabaseCount { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -67,22 +85,51 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/Databases/Index");
             }
+            // Define the query.
+            var query = _context.Databases
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                Database = _context.Databases
-                    .Where(item => item.Id == id)
+                Database = query
                     .Include(item => item.DatabaseType)
-                    .Include(item => item.DatabaseUsers)
-                    .Include(item => item.DatabaseUserInvitations)
-                    .Include(item => item.DatabaseNodeFields)
-                    .Include(item => item.DatabaseEdgeFields)
-                    .Include(item => item.DatabaseNodes)
-                    .Include(item => item.DatabaseEdges)
-                    .Include(item => item.NodeCollectionDatabases)
-                    .Include(item => item.NetworkDatabases)
-                    .Include(item => item.AnalysisDatabases)
-                    .FirstOrDefault()
+                    .FirstOrDefault(),
+                DatabaseUserCount = query
+                    .Select(item => item.DatabaseUsers)
+                    .SelectMany(item => item)
+                    .Count(),
+                DatabaseUserInvitationCount = query
+                    .Select(item => item.DatabaseUserInvitations)
+                    .SelectMany(item => item)
+                    .Count(),
+                DatabaseNodeFieldCount = query
+                    .Select(item => item.DatabaseNodeFields)
+                    .SelectMany(item => item)
+                    .Count(),
+                DatabaseEdgeFieldCount = query
+                    .Select(item => item.DatabaseEdgeFields)
+                    .SelectMany(item => item)
+                    .Count(),
+                DatabaseNodeCount = query
+                    .Select(item => item.DatabaseNodes)
+                    .SelectMany(item => item)
+                    .Count(),
+                DatabaseEdgeCount = query
+                    .Select(item => item.DatabaseEdges)
+                    .SelectMany(item => item)
+                    .Count(),
+                NodeCollectionDatabaseCount = query
+                    .Select(item => item.NodeCollectionDatabases)
+                    .SelectMany(item => item)
+                    .Count(),
+                NetworkDatabaseCount = query
+                    .Select(item => item.NetworkDatabases)
+                    .SelectMany(item => item)
+                    .Count(),
+                AnalysisDatabaseCount = query
+                    .Select(item => item.AnalysisDatabases)
+                    .SelectMany(item => item)
+                    .Count(),
             };
             // Check if the item hasn't been found.
             if (View.Database == null)
@@ -124,22 +171,51 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/Databases/Index");
             }
+            // Define the query.
+            var query = _context.Databases
+                .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel
             {
-                Database = _context.Databases
-                    .Where(item => item.Id == Input.Id)
+                Database = query
                     .Include(item => item.DatabaseType)
-                    .Include(item => item.DatabaseUsers)
-                    .Include(item => item.DatabaseUserInvitations)
-                    .Include(item => item.DatabaseNodeFields)
-                    .Include(item => item.DatabaseEdgeFields)
-                    .Include(item => item.DatabaseNodes)
-                    .Include(item => item.DatabaseEdges)
-                    .Include(item => item.NodeCollectionDatabases)
-                    .Include(item => item.NetworkDatabases)
-                    .Include(item => item.AnalysisDatabases)
-                    .FirstOrDefault()
+                    .FirstOrDefault(),
+                DatabaseUserCount = query
+                    .Select(item => item.DatabaseUsers)
+                    .SelectMany(item => item)
+                    .Count(),
+                DatabaseUserInvitationCount = query
+                    .Select(item => item.DatabaseUserInvitations)
+                    .SelectMany(item => item)
+                    .Count(),
+                DatabaseNodeFieldCount = query
+                    .Select(item => item.DatabaseNodeFields)
+                    .SelectMany(item => item)
+                    .Count(),
+                DatabaseEdgeFieldCount = query
+                    .Select(item => item.DatabaseEdgeFields)
+                    .SelectMany(item => item)
+                    .Count(),
+                DatabaseNodeCount = query
+                    .Select(item => item.DatabaseNodes)
+                    .SelectMany(item => item)
+                    .Count(),
+                DatabaseEdgeCount = query
+                    .Select(item => item.DatabaseEdges)
+                    .SelectMany(item => item)
+                    .Count(),
+                NodeCollectionDatabaseCount = query
+                    .Select(item => item.NodeCollectionDatabases)
+                    .SelectMany(item => item)
+                    .Count(),
+                NetworkDatabaseCount = query
+                    .Select(item => item.NetworkDatabases)
+                    .SelectMany(item => item)
+                    .Count(),
+                AnalysisDatabaseCount = query
+                    .Select(item => item.AnalysisDatabases)
+                    .SelectMany(item => item)
+                    .Count(),
             };
             // Check if the item hasn't been found.
             if (View.Database == null)

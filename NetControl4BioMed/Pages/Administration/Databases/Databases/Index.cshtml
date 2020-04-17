@@ -80,12 +80,7 @@
                             </div>
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break">
-                            <div>
-                                <span title="@item.DatabaseNodeFields.Count() node field(s) / @item.DatabaseEdgeFields.Count() edge field(s)">@item.DatabaseNodeFields.Count() / @item.DatabaseEdgeFields.Count()</span>
-                            </div>
-                            <div>
-                                <span title="@item.DatabaseNodes.Count() node(s) / @item.DatabaseEdges.Count() edge(s)">@item.DatabaseNodes.Count() / @item.DatabaseEdges.Count()</span>
-                            </div>
+                            <span title="@item.DatabaseNodeFields.Count() node field(s) / @item.DatabaseEdgeFields.Count() edge field(s)">@item.DatabaseNodeFields.Count() / @item.DatabaseEdgeFields.Count()</span>
                         </td>
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
