@@ -240,16 +240,6 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 default:
                     break;
             }
-            // Include the related entitites.
-            query = query
-                .Include(item => item.AnalysisUsers)
-                .Include(item => item.AnalysisUserInvitations)
-                .Include(item => item.AnalysisNodes)
-                .Include(item => item.AnalysisEdges)
-                .Include(item => item.AnalysisNetworks)
-                .Include(item => item.AnalysisDatabases)
-                .Include(item => item.AnalysisNodeCollections)
-                .Include(item => item.ControlPaths);
             // Define the view.
             View = new ViewModel
             {

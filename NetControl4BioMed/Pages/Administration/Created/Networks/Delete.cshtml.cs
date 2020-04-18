@@ -33,7 +33,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
 
         public class ViewModel
         {
-            public IEnumerable<Network> Items { get; set; }
+            public IQueryable<Network> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)
@@ -107,9 +107,12 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
             // Get the related entities that use the items.
             var analyses = _context.Analyses.Where(item => item.AnalysisNetworks.Any(item1 => View.Items.Contains(item1.Network)));
             // Get the generic entities among them.
-            var genericNetworks = View.Items.Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
-            var genericNodes = _context.Nodes.Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
-            var genericEdges = _context.Edges.Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
+            var genericNetworks = View.Items
+                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
+            var genericNodes = _context.Nodes
+                .Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
+            var genericEdges = _context.Edges
+                .Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
             // Mark the items for deletion.
             _context.Analyses.RemoveRange(analyses);
             _context.Networks.RemoveRange(View.Items);

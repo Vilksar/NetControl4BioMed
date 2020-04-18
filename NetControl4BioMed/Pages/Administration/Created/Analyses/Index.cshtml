@@ -74,7 +74,7 @@
                             </div>
                         </td>
                         <td class="text-center text-break">
-                            <span title="@item.Status">@item.Status</span>
+                            <span title="@item.Status.ToString()">@item.Status.ToString()</span>
                         </td>
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Created/Analyses/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">

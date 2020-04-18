@@ -214,15 +214,6 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                 default:
                     break;
             }
-            // Include the related entitites.
-            query = query
-                .Include(item => item.NetworkUsers)
-                .Include(item => item.NetworkUserInvitations)
-                .Include(item => item.NetworkNodes)
-                .Include(item => item.NetworkEdges)
-                .Include(item => item.AnalysisNetworks)
-                .Include(item => item.NetworkDatabases)
-                .Include(item => item.NetworkNodeCollections);
             // Define the view.
             View = new ViewModel
             {

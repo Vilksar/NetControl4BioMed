@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
 
         public class ViewModel
         {
-            public IEnumerable<Analysis> Items { get; set; }
+            public IQueryable<Analysis> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)
@@ -48,7 +48,8 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.Analyses.Where(item => ids.Contains(item.Id))
+                Items = _context.Analyses
+                    .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -75,7 +76,8 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.Analyses.Where(item => Input.Ids.Contains(item.Id))
+                Items = _context.Analyses
+                    .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())

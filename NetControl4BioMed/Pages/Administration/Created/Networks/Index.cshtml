@@ -39,12 +39,6 @@
                     <th class="d-none d-lg-table-cell text-center text-break">
                         <span>Date</span>
                     </th>
-                    <th class="d-none d-lg-table-cell text-center text-break">
-                        <span>Nodes</span>
-                    </th>
-                    <th class="d-none d-lg-table-cell text-center text-break">
-                        <span>Edges</span>
-                    </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
                         <span>Actions</span>
                     </th>
@@ -75,12 +69,6 @@
                             <div>
                                 <span title="@item.DateTimeCreated.ToShortTimeString()">@item.DateTimeCreated.ToShortTimeString()</span>
                             </div>
-                        </td>
-                        <td class="d-none d-lg-table-cell text-center text-break">
-                            <span title="@item.NetworkNodes.Count()">@item.NetworkNodes.Count()</span>
-                        </td>
-                        <td class="d-none d-lg-table-cell text-center text-break">
-                            <span title="@item.NetworkEdges.Count()">@item.NetworkEdges.Count()</span>
                         </td>
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Created/Networks/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">

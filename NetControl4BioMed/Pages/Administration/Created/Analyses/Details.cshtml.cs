@@ -26,6 +26,20 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
         public class ViewModel
         {
             public Analysis Analysis { get; set; }
+
+            public int UserCount { get; set; }
+
+            public int UserInvitationCount { get; set; }
+
+            public int DatabaseCount { get; set; }
+
+            public int NodeCount { get; set; }
+
+            public int EdgeCount { get; set; }
+
+            public int NodeCollectionCount { get; set; }
+
+            public int NetworkCount { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -38,22 +52,56 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Created/Analyses/Index");
             }
+            // Define the query.
+            var query = _context.Analyses
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                Analysis = _context.Analyses
-                    .Where(item => item.Id == id)
-                    .Include(item => item.AnalysisUsers)
-                    .Include(item => item.AnalysisUserInvitations)
-                    .Include(item => item.AnalysisNodes)
-                    .Include(item => item.AnalysisEdges)
-                    .Include(item => item.AnalysisNetworks)
-                        .ThenInclude(item => item.Network)
-                    .Include(item => item.AnalysisDatabases)
-                        .ThenInclude(item => item.Database)
-                    .Include(item => item.AnalysisNodeCollections)
-                        .ThenInclude(item => item.NodeCollection)
-                    .FirstOrDefault()
+                Analysis = query
+                    .FirstOrDefault(),
+                UserCount = query
+                    .Select(item => item.AnalysisUsers)
+                    .SelectMany(item => item)
+                    .Select(item => item.User)
+                    .Distinct()
+                    .Count(),
+                UserInvitationCount = query
+                    .Select(item => item.AnalysisUserInvitations)
+                    .SelectMany(item => item)
+                    .Select(item => item.Email)
+                    .Distinct()
+                    .Count(),
+                DatabaseCount = query
+                    .Select(item => item.AnalysisDatabases)
+                    .SelectMany(item => item)
+                    .Select(item => item.Database)
+                    .Distinct()
+                    .Count(),
+                NodeCount = query
+                    .Select(item => item.AnalysisNodes)
+                    .SelectMany(item => item)
+                    .Select(item => item.Node)
+                    .Distinct()
+                    .Count(),
+                EdgeCount = query
+                    .Select(item => item.AnalysisEdges)
+                    .SelectMany(item => item)
+                    .Select(item => item.Edge)
+                    .Distinct()
+                    .Count(),
+                NodeCollectionCount = query
+                    .Select(item => item.AnalysisNodeCollections)
+                    .SelectMany(item => item)
+                    .Select(item => item.NodeCollection)
+                    .Distinct()
+                    .Count(),
+                NetworkCount = query
+                    .Select(item => item.AnalysisNetworks)
+                    .SelectMany(item => item)
+                    .Select(item => item.Network)
+                    .Distinct()
+                    .Count()
             };
             // Check if there was no item found.
             if (View.Analysis == null)
