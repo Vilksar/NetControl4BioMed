@@ -11,6 +11,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
@@ -19,6 +20,7 @@ using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Services;
 using NetControl4BioMed.Helpers.ViewModels;
+using Z.EntityFramework.Plus;
 
 namespace NetControl4BioMed.Pages.Administration
 {
@@ -273,7 +275,8 @@ namespace NetControl4BioMed.Pages.Administration
                                     Id = item1.Id,
                                     Name = item1.Name
                                 })
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-All-DatabaseTypes.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -319,7 +322,8 @@ namespace NetControl4BioMed.Pages.Administration
                                     Id = item1.Edge.Id,
                                     Name = item1.Edge.Name
                                 })
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-All-Databases.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -350,7 +354,8 @@ namespace NetControl4BioMed.Pages.Administration
                                     Name = item1.Node.Name,
                                     Value = item1.Value
                                 })
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-All-DatabaseNodeFields.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -380,7 +385,8 @@ namespace NetControl4BioMed.Pages.Administration
                                     Name = item1.Edge.Name,
                                     Value = item1.Value
                                 })
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-All-DatabaseEdgeFields.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -417,7 +423,8 @@ namespace NetControl4BioMed.Pages.Administration
                                     Name = item1.Edge.Name,
                                     Type = item1.Type.ToString()
                                 })
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-All-Nodes.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -454,7 +461,8 @@ namespace NetControl4BioMed.Pages.Administration
                                     Name = item1.Node.Name,
                                     Type = item1.Type.GetDisplayName()
                                 })
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-All-Edges.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -477,7 +485,8 @@ namespace NetControl4BioMed.Pages.Administration
                                     Id = item1.Node.Id,
                                     Name = item1.Node.Name
                                 })
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-All-NodeCollections.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -493,7 +502,8 @@ namespace NetControl4BioMed.Pages.Administration
                             Id = item.Id,
                             DateTimeCreated = item.DateTimeCreated,
                             Algorithm = item.Algorithm.GetDisplayName()
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-All-Networks.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -514,7 +524,8 @@ namespace NetControl4BioMed.Pages.Administration
                             CurrentIterationWithoutImprovement = item.CurrentIterationWithoutImprovement,
                             Algorithm = item.Algorithm.GetDisplayName(),
                             Parameters = item.Parameters
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-All-Analyses.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -541,6 +552,7 @@ namespace NetControl4BioMed.Pages.Administration
                             Name = item.Name,
                             Description = item.Description
                         })
+                        .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
                         .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
@@ -575,6 +587,7 @@ namespace NetControl4BioMed.Pages.Administration
                                 Name = item.DatabaseType.Name
                             }
                         })
+                        .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
                         .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
@@ -611,6 +624,7 @@ namespace NetControl4BioMed.Pages.Administration
                                 Name = item.Database.Name
                             }
                         })
+                        .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
                         .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
@@ -646,6 +660,7 @@ namespace NetControl4BioMed.Pages.Administration
                                 Name = item.Database.Name
                             }
                         })
+                        .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
                         .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
@@ -684,6 +699,7 @@ namespace NetControl4BioMed.Pages.Administration
                             },
                             Value = item.Value
                         })
+                        .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Value)
                         .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
@@ -711,8 +727,10 @@ namespace NetControl4BioMed.Pages.Administration
                             Id = item.Id,
                             DateTimeCreated = item.DateTimeCreated,
                             Name = item.Name,
-                            Description = item.Description
+                            Description = item.Description,
+                            Fields = Enumerable.Empty<object>()
                         })
+                        .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
                         .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
@@ -740,8 +758,12 @@ namespace NetControl4BioMed.Pages.Administration
                             Id = item.Id,
                             DateTimeCreated = item.DateTimeCreated,
                             Name = item.Name,
-                            Description = item.Description
+                            Description = item.Description,
+                            DatabaseIds = Enumerable.Empty<string>(),
+                            Nodes = Enumerable.Empty<object>(),
+                            Fields = Enumerable.Empty<object>()
                         })
+                        .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
                         .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
@@ -767,8 +789,11 @@ namespace NetControl4BioMed.Pages.Administration
                             Id = item.Id,
                             DateTimeCreated = item.DateTimeCreated,
                             Name = item.Name,
-                            Description = item.Description
+                            Description = item.Description,
+                            DatabaseIds = Enumerable.Empty<string>(),
+                            NodeIds = Enumerable.Empty<string>(),
                         })
+                        .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
                         .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
@@ -785,8 +810,11 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => !item.DatabaseNodeFieldNodes.Any())
                         .Select(item => new
                         {
-                            Id = item.Id
-                        });
+                            Id = item.Id,
+                            Description = string.Empty,
+                            Fields = Enumerable.Empty<object>()
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Nodes.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -800,8 +828,13 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
                         .Select(item => new
                         {
-                            Id = item.Id
-                        });
+                            Id = item.Id,
+                            Description = string.Empty,
+                            DatabaseIds = Enumerable.Empty<string>(),
+                            Nodes = Enumerable.Empty<object>(),
+                            Fields = Enumerable.Empty<object>()
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Edges.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -815,8 +848,12 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => !item.NodeCollectionNodes.Any())
                         .Select(item => new
                         {
-                            Id = item.Id
-                        });
+                            Id = item.Id,
+                            Description = string.Empty,
+                            DatabaseIds = Enumerable.Empty<string>(),
+                            NodeIds = Enumerable.Empty<string>()
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-NodeCollections.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -831,7 +868,8 @@ namespace NetControl4BioMed.Pages.Administration
                         .Select(item => new
                         {
                             Id = item.Id
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Networks.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -846,7 +884,8 @@ namespace NetControl4BioMed.Pages.Administration
                         .Select(item => new
                         {
                             Id = item.Id
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Analyses.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -860,8 +899,11 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
                         .Select(item => new
                         {
-                            Id = item.Id
-                        });
+                            Id = item.Id,
+                            Description = string.Empty,
+                            Fields = Enumerable.Empty<object>()
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Nodes.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -875,8 +917,13 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
                         .Select(item => new
                         {
-                            Id = item.Id
-                        });
+                            Id = item.Id,
+                            Description = string.Empty,
+                            DatabaseIds = Enumerable.Empty<string>(),
+                            Nodes = Enumerable.Empty<object>(),
+                            Fields = Enumerable.Empty<object>()
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Edges.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -890,8 +937,12 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
                         .Select(item => new
                         {
-                            Id = item.Id
-                        });
+                            Id = item.Id,
+                            Description = string.Empty,
+                            DatabaseIds = Enumerable.Empty<string>(),
+                            NodeIds = Enumerable.Empty<string>()
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-NodeCollections.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -906,7 +957,8 @@ namespace NetControl4BioMed.Pages.Administration
                         .Select(item => new
                         {
                             Id = item.Id
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Networks.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -921,7 +973,8 @@ namespace NetControl4BioMed.Pages.Administration
                         .Select(item => new
                         {
                             Id = item.Id
-                        });
+                        })
+                        .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Analyses.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -976,11 +1029,16 @@ namespace NetControl4BioMed.Pages.Administration
                     .Where(item => item.NetworkNodes.Any(item1 => nodes.Contains(item1.Node)));
                 var analyses = _context.Analyses
                     .Where(item => item.AnalysisNodes.Any(item1 => nodes.Contains(item1.Node)));
-                // Mark the items for deletion.
-                _context.Analyses.RemoveRange(analyses);
-                _context.Networks.RemoveRange(networks);
-                _context.Edges.RemoveRange(edges);
-                _context.Nodes.RemoveRange(nodes);
+                //// Mark the items for deletion.
+                //_context.Analyses.RemoveRange(analyses);
+                //_context.Networks.RemoveRange(networks);
+                //_context.Edges.RemoveRange(edges);
+                //_context.Nodes.RemoveRange(nodes);
+                // Mark the items for batch deletion.
+                await analyses.DeleteAsync();
+                await networks.DeleteAsync();
+                await edges.DeleteAsync();
+                await nodes.DeleteAsync();
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Save a message.
@@ -999,10 +1057,14 @@ namespace NetControl4BioMed.Pages.Administration
                     .Where(item => item.NetworkEdges.Any(item1 => edges.Contains(item1.Edge)));
                 var analyses = _context.Analyses
                     .Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
-                // Mark the items for deletion.
-                _context.Analyses.RemoveRange(analyses);
-                _context.Networks.RemoveRange(networks);
-                _context.Edges.RemoveRange(edges);
+                //// Mark the items for deletion.
+                //_context.Analyses.RemoveRange(analyses);
+                //_context.Networks.RemoveRange(networks);
+                //_context.Edges.RemoveRange(edges);
+                // Mark the items for batch deletion.
+                await analyses.DeleteAsync();
+                await networks.DeleteAsync();
+                await edges.DeleteAsync();
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Save a message.
@@ -1019,10 +1081,14 @@ namespace NetControl4BioMed.Pages.Administration
                 // Get the related entities that use the items.
                 var networks = _context.Networks.Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)));
                 var analyses = _context.Analyses.Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)) || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
-                // Mark the items for deletion.
-                _context.Analyses.RemoveRange(analyses);
-                _context.Networks.RemoveRange(networks);
-                _context.NodeCollections.RemoveRange(nodeCollections);
+                //// Mark the items for deletion.
+                //_context.Analyses.RemoveRange(analyses);
+                //_context.Networks.RemoveRange(networks);
+                //_context.NodeCollections.RemoveRange(nodeCollections);
+                // Mark the items for batch deletion.
+                await analyses.DeleteAsync();
+                await networks.DeleteAsync();
+                await nodeCollections.DeleteAsync();
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Save a message.
@@ -1037,16 +1103,22 @@ namespace NetControl4BioMed.Pages.Administration
                 // Save the number of items found.
                 var networkCount = networks.Count();
                 // Get the related entities that use the items.
-                var analyses = _context.Analyses.Where(item => item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
+                var analyses = _context.Analyses
+                    .Where(item => item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
                 // Get the generic entities among them.
                 var genericNetworks = networks.Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
                 var genericNodes = _context.Nodes.Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
                 var genericEdges = _context.Edges.Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
-                // Mark the items for deletion.
-                _context.Analyses.RemoveRange(analyses);
-                _context.Networks.RemoveRange(networks);
-                _context.Edges.RemoveRange(genericEdges);
-                _context.Nodes.RemoveRange(genericNodes);
+                //// Mark the items for deletion.
+                //_context.Analyses.RemoveRange(analyses);
+                //_context.Networks.RemoveRange(networks);
+                //_context.Edges.RemoveRange(genericEdges);
+                //_context.Nodes.RemoveRange(genericNodes);
+                // Mark the items for batch deletion.
+                await analyses.DeleteAsync();
+                await networks.DeleteAsync();
+                await genericEdges.DeleteAsync();
+                await genericNodes.DeleteAsync();
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Save a message.
@@ -1060,8 +1132,10 @@ namespace NetControl4BioMed.Pages.Administration
                     .AsQueryable();
                 // Save the number of items found.
                 var analysisCount = analyses.Count();
-                // Mark the items for deletion.
-                _context.Analyses.RemoveRange(analyses);
+                //// Mark the items for deletion.
+                //_context.Analyses.RemoveRange(analyses);
+                // Mark the items for batch deletion.
+                await analyses.DeleteAsync();
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Save a message.
@@ -1075,8 +1149,6 @@ namespace NetControl4BioMed.Pages.Administration
                 // Redirect to the page.
                 return RedirectToPage();
             }
-            // Update the reset status.
-            _configuration["Data:IssueCount:Reset"] = true.ToString();
             // Display a message.
             TempData["StatusMessage"] = $"Success: {string.Join(" and ", itemList)} deleted successfully.";
             // Redirect to the page.
