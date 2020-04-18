@@ -159,14 +159,8 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseEdges
             }
             // Include the related entitites.
             query = query
-                .Include(item => item.Edge)
-                    .ThenInclude(item => item.DatabaseEdgeFieldEdges)
-                        .ThenInclude(item => item.DatabaseEdgeField)
-                            .ThenInclude(item => item.Database)
-                .Include(item => item.Edge)
-                    .ThenInclude(item => item.EdgeNodes)
-                        .ThenInclude(item => item.Node)
-                .Include(item => item.Database);
+                .Include(item => item.Database)
+                .Include(item => item.Edge);
             // Define the view.
             View = new ViewModel
             {

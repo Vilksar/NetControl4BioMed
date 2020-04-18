@@ -123,10 +123,6 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.NodeCollectionDat
             // Include the related entitites.
             query = query
                 .Include(item => item.NodeCollection)
-                    .ThenInclude(item => item.NodeCollectionNodes)
-                        .ThenInclude(item => item.Node)
-                            .ThenInclude(item => item.DatabaseNodes)
-                                .ThenInclude(item => item.Database)
                 .Include(item => item.Database);
             // Define the view.
             View = new ViewModel

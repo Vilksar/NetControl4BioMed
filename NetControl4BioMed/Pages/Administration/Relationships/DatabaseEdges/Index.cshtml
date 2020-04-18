@@ -39,9 +39,6 @@
                     <th class="text-left text-break">
                         <span>Edge</span>
                     </th>
-                    <th class="d-none d-lg-table-cell text-center text-break">
-                        <span>Fields</span>
-                    </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
                         <span>Actions</span>
                     </th>
@@ -58,23 +55,10 @@
                             </div>
                         </td>
                         <td class="text-left text-break">
-                            <div>
-                                <span title="@item.Database.Name" class="font-weight-bold">@item.Database.Name</span>
-                            </div>
-                            <div>
-                                <span title="@item.Database.Id" class="small">@item.Database.Id</span>
-                            </div>
+                            <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@item.Database.Id" class="btn btn-outline-dark" title="@item.Database.Name">@item.Database.Name</a>
                         </td>
                         <td class="text-left text-break">
-                            <div>
-                                <span title="@item.Edge.Name" class="font-weight-bold">@item.Edge.Name</span>
-                            </div>
-                            <div>
-                                <span title="@item.Edge.Id" class="small">@item.Edge.Id</span>
-                            </div>
-                        </td>
-                        <td class="d-none d-lg-table-cell text-left text-break">
-                            <span title="@item.Edge.DatabaseEdgeFieldEdges.Count(item1 => item1.DatabaseEdgeField.Database == item.Database)">@item.Edge.DatabaseEdgeFieldEdges.Count(item1 => item1.DatabaseEdgeField.Database == item.Database)</span>
+                            <a asp-page="/Administration/Data/Edges/Details" asp-route-id="@item.Edge.Id" class="btn btn-outline-dark" title="@item.Edge.Name">@item.Edge.Name</a>
                         </td>
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Data/Edges/Update" asp-route-type="Edit" asp-route-ids="@item.Edge.Id" class="btn btn-warning m-1" title="Edit">

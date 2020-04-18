@@ -58,20 +58,10 @@
                             </div>
                         </td>
                         <td class="text-left text-break">
-                            <div>
-                                <span title="@item.Edge.Name" class="font-weight-bold">@item.Edge.Name</span>
-                            </div>
-                            <div>
-                                <span title="@item.Edge.Id" class="small">@item.Edge.Id</span>
-                            </div>
+                            <a asp-page="/Administration/Data/Edges/Details" asp-route-id="@item.Edge.Id" class="btn btn-outline-dark" title="@item.Edge.Name">@item.Edge.Name</a>
                         </td>
                         <td class="text-left text-break">
-                            <div>
-                                <span title="@item.Node.Name" class="font-weight-bold">@item.Node.Name</span>
-                            </div>
-                            <div>
-                                <span title="@item.Node.Id" class="small">@item.Node.Id</span>
-                            </div>
+                            <a asp-page="/Administration/Data/Nodes/Details" asp-route-id="@item.Node.Id" class="btn btn-outline-dark" title="@item.Node.Name">@item.Node.Name</a>
                         </td>
                         <td class="text-center text-break">
                             <span title="@item.Type.ToString()">@item.Type.ToString()</span>
