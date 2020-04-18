@@ -32,11 +32,11 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
 
             public bool IsGeneric { get; set; }
 
-            public IQueryable<DatabaseNodeField> DatabaseNodeFields { get; set; }
+            public int NodeCount { get; set; }
 
-            public IQueryable<DatabaseEdgeField> DatabaseEdgeFields { get; set; }
+            public int EdgeCount { get; set; }
 
-            public IQueryable<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }
+            public int NodeCollectionCount { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -76,18 +76,29 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
             {
                 Database = items
                     .Include(item => item.DatabaseType)
+                    .Include(item => item.DatabaseNodeFields)
+                    .Include(item => item.DatabaseEdgeFields)
                     .First(),
                 IsGeneric = items
                     .Any(item => item.DatabaseType.Name == "Generic"),
-                DatabaseNodeFields = items
-                    .Select(item => item.DatabaseNodeFields)
-                    .SelectMany(item => item),
-                DatabaseEdgeFields = items
-                    .Select(item => item.DatabaseEdgeFields)
-                    .SelectMany(item => item),
-                NodeCollectionDatabases = items
+                NodeCount = items
+                    .Select(item => item.DatabaseNodes)
+                    .SelectMany(item => item)
+                    .Select(item => item.Node)
+                    .Distinct()
+                    .Count(),
+                EdgeCount = items
+                    .Select(item => item.DatabaseEdges)
+                    .SelectMany(item => item)
+                    .Select(item => item.Edge)
+                    .Distinct()
+                    .Count(),
+                NodeCollectionCount = items
                     .Select(item => item.NodeCollectionDatabases)
                     .SelectMany(item => item)
+                    .Select(item => item.NodeCollection)
+                    .Distinct()
+                    .Count(),
             };
             // Return the page.
             return Page();

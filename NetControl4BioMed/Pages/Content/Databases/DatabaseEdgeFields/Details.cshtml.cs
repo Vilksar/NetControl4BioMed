@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseEdgeFields
 
             public bool IsGeneric { get; set; }
 
-            public IQueryable<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }
+            public int EdgeCount { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -75,9 +75,12 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseEdgeFields
                     .First(),
                 IsGeneric = items
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                DatabaseEdgeFieldEdges = items
+                EdgeCount = items
                     .Select(item => item.DatabaseEdgeFieldEdges)
                     .SelectMany(item => item)
+                    .Select(item => item.Edge)
+                    .Distinct()
+                    .Count()
             };
             // Return the page.
             return Page();

@@ -83,7 +83,7 @@
         </div>
     </div>
     <div class="card-body">
-        @if (!Model.View.DatabaseNodeFields.Any())
+        @if (!Model.View.Database.DatabaseNodeFields.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
@@ -107,7 +107,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var databaseNodeField in Model.View.DatabaseNodeFields)
+                    @foreach (var databaseNodeField in Model.View.Database.DatabaseNodeFields)
                     {
                         <tr>
                             <td class="text-center text-break">
@@ -140,7 +140,7 @@
         </div>
     </div>
     <div class="card-body">
-        @if (!Model.View.DatabaseEdgeFields.Any())
+        @if (!Model.View.Database.DatabaseEdgeFields.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
@@ -164,7 +164,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var databaseEdgeField in Model.View.DatabaseEdgeFields)
+                    @foreach (var databaseEdgeField in Model.View.Database.DatabaseEdgeFields)
                     {
                         <tr>
                             <td class="text-center text-break">
@@ -199,12 +199,9 @@
             </div>
         </div>
         <div class="card-body">
-            <a asp-page="/Content/Data/Nodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="btn btn-info btn-block mb-3">
-                <span>View all</span>
-            </a>
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The database currently contains @Model.View.Database.DatabaseNodes.Count() node@(Model.View.Database.DatabaseNodes.Count() != 1 ? "s" : string.Empty).</span>
+                <span>The database currently contains @Model.View.NodeCount node@(Model.View.NodeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Data/Nodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="btn btn-info btn-block mb-3">view the nodes</a>.</span>
             </div>
         </div>
     </div>
@@ -220,12 +217,9 @@
             </div>
         </div>
         <div class="card-body">
-            <a asp-page="/Content/Data/Edges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="btn btn-info btn-block mb-3">
-                <span>View all</span>
-            </a>
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The database currently contains @Model.View.Database.DatabaseEdges.Count() edge@(Model.View.Database.DatabaseEdges.Count() != 1 ? "s" : string.Empty).</span>
+                <span>The database currently contains @Model.View.EdgeCount edge@(Model.View.EdgeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Data/Edges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="btn btn-info btn-block mb-3">view the edges</a>.</span>
             </div>
         </div>
     </div>
@@ -241,12 +235,9 @@
             </div>
         </div>
         <div class="card-body">
-            <a asp-page="/Content/Data/NodeCollections/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="btn btn-info btn-block mb-3">
-                <span>View all</span>
-            </a>
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The database currently contains @Model.View.Database.NodeCollectionDatabases.Count() node collection@(Model.View.Database.NodeCollectionDatabases.Count() != 1 ? "s" : string.Empty).</span>
+                <span>The database currently contains @Model.View.NodeCollectionCount node collection@(Model.View.NodeCollectionCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Data/NodeCollections/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="btn btn-info btn-block mb-3">view the node collections</a>.</span>
             </div>
         </div>
     </div>

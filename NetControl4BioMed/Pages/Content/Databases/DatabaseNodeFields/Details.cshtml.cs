@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
 
             public bool IsGeneric { get; set; }
 
-            public IQueryable<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }
+            public int NodeCount { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -75,9 +75,12 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
                     .First(),
                 IsGeneric = items
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                DatabaseNodeFieldNodes = items
+                NodeCount = items
                     .Select(item => item.DatabaseNodeFieldNodes)
                     .SelectMany(item => item)
+                    .Select(item => item.Node)
+                    .Distinct()
+                    .Count()
             };
             // Return the page.
             return Page();

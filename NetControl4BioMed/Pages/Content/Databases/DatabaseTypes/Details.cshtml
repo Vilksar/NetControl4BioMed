@@ -32,7 +32,7 @@
         </div>
     </div>
     <div class="card-body">
-        @if (!Model.View.Databases.Any())
+        @if (!Model.View.DatabaseType.Databases.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
@@ -59,7 +59,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var database in Model.View.Databases)
+                    @foreach (var database in Model.View.DatabaseType.Databases)
                     {
                         <tr>
                             <td class="text-center text-break">

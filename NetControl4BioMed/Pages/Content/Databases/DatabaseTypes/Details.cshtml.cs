@@ -31,8 +31,6 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseTypes
             public DatabaseType DatabaseType { get; set; }
 
             public bool IsGeneric { get; set; }
-
-            public IQueryable<Database> Databases { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -70,13 +68,10 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseTypes
             View = new ViewModel
             {
                 DatabaseType = items
+                    .Include(item => item.Databases)
                     .First(),
                 IsGeneric = items
-                    .Any(item => item.Name == "Generic"),
-                Databases = items
-                    .Select(item => item.Databases)
-                    .SelectMany(item => item)
-                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
+                    .Any(item => item.Name == "Generic")
             };
             // Return the page.
             return Page();
