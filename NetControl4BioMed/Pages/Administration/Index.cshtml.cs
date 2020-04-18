@@ -1034,13 +1034,13 @@ namespace NetControl4BioMed.Pages.Administration
                 //_context.Networks.RemoveRange(networks);
                 //_context.Edges.RemoveRange(edges);
                 //_context.Nodes.RemoveRange(nodes);
+                //// Save the changes to the database.
+                //await _context.SaveChangesAsync();
                 // Mark the items for batch deletion.
                 await analyses.DeleteAsync();
                 await networks.DeleteAsync();
                 await edges.DeleteAsync();
                 await nodes.DeleteAsync();
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
                 // Save a message.
                 itemList.Add($"{nodeCount.ToString()} node{(nodeCount != 1 ? "s" : string.Empty)}");
             }
@@ -1061,12 +1061,12 @@ namespace NetControl4BioMed.Pages.Administration
                 //_context.Analyses.RemoveRange(analyses);
                 //_context.Networks.RemoveRange(networks);
                 //_context.Edges.RemoveRange(edges);
+                //// Save the changes to the database.
+                //await _context.SaveChangesAsync();
                 // Mark the items for batch deletion.
                 await analyses.DeleteAsync();
                 await networks.DeleteAsync();
                 await edges.DeleteAsync();
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
                 // Save a message.
                 itemList.Add($"{edgeCount.ToString()} edge{(edgeCount != 1 ? "s" : string.Empty)}");
             }
@@ -1085,12 +1085,12 @@ namespace NetControl4BioMed.Pages.Administration
                 //_context.Analyses.RemoveRange(analyses);
                 //_context.Networks.RemoveRange(networks);
                 //_context.NodeCollections.RemoveRange(nodeCollections);
+                //// Save the changes to the database.
+                //await _context.SaveChangesAsync();
                 // Mark the items for batch deletion.
                 await analyses.DeleteAsync();
                 await networks.DeleteAsync();
                 await nodeCollections.DeleteAsync();
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
                 // Save a message.
                 itemList.Add($"{nodeCollectionCount.ToString()} node collection{(nodeCollectionCount != 1 ? "s" : string.Empty)}");
             }
@@ -1114,13 +1114,13 @@ namespace NetControl4BioMed.Pages.Administration
                 //_context.Networks.RemoveRange(networks);
                 //_context.Edges.RemoveRange(genericEdges);
                 //_context.Nodes.RemoveRange(genericNodes);
+                //// Save the changes to the database.
+                //await _context.SaveChangesAsync();
                 // Mark the items for batch deletion.
                 await analyses.DeleteAsync();
                 await networks.DeleteAsync();
                 await genericEdges.DeleteAsync();
                 await genericNodes.DeleteAsync();
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
                 // Save a message.
                 itemList.Add($"{networkCount.ToString()} network{(networkCount != 1 ? "s" : string.Empty)}");
             }
@@ -1134,10 +1134,10 @@ namespace NetControl4BioMed.Pages.Administration
                 var analysisCount = analyses.Count();
                 //// Mark the items for deletion.
                 //_context.Analyses.RemoveRange(analyses);
+                //// Save the changes to the database.
+                //await _context.SaveChangesAsync();
                 // Mark the items for batch deletion.
                 await analyses.DeleteAsync();
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
                 // Save a message.
                 itemList.Add($"{analysisCount.ToString()} analys{(analysisCount != 1 ? "e" : "i")}s");
             }
