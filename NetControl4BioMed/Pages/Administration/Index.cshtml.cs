@@ -1064,6 +1064,7 @@ namespace NetControl4BioMed.Pages.Administration
                 _context.Analyses.RemoveRange(analyses);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
+                // Save a message.
                 itemList.Add($"{analysisCount.ToString()} analys{(analysisCount != 1 ? "e" : "i")}s");
             }
             // Check if there weren't any items found.
@@ -1074,6 +1075,8 @@ namespace NetControl4BioMed.Pages.Administration
                 // Redirect to the page.
                 return RedirectToPage();
             }
+            // Update the reset status.
+            _configuration["Data:IssueCount:Reset"] = true.ToString();
             // Display a message.
             TempData["StatusMessage"] = $"Success: {string.Join(" and ", itemList)} deleted successfully.";
             // Redirect to the page.

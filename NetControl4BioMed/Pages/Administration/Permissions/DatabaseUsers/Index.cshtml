@@ -69,20 +69,10 @@
                             </div>
                         </td>
                         <td class="text-left text-break">
-                            <div>
-                                <span title="@item.User.Email" class="font-weight-bold">@item.User.Email</span>
-                            </div>
-                            <div>
-                                <span title="@item.User.Id" class="small">@item.User.Id</span>
-                            </div>
+                            <a asp-page="/Administration/Accounts/Users/Details" asp-route-id="@item.User.Id" class="btn btn-outline-dark" title="@item.User.Email">@item.User.Email</a>
                         </td>
                         <td class="text-left text-break">
-                            <div>
-                                <span title="@item.Database.Name" class="font-weight-bold">@item.Database.Name</span>
-                            </div>
-                            <div>
-                                <span title="@item.Database.Id" class="small">@item.Database.Id</span>
-                            </div>
+                            <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@item.Database.Id" class="btn btn-outline-dark" title="@item.Database.Name">@item.Database.Name</a>
                         </td>
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Permissions/DatabaseUsers/Delete" asp-route-userIds="@item.User.Id" asp-route-databaseIds="@item.Database.Id" class="btn btn-danger m-1" title="Delete">

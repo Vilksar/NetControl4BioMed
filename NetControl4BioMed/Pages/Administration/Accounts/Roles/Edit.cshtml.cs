@@ -103,7 +103,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             }
             // Define the query.
             var query = _context.Roles
-                .Where(item => item.Id == id);
+                .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel
             {

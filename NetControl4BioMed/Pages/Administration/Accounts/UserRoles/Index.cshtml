@@ -69,10 +69,10 @@
                             </div>
                         </td>
                         <td class="text-left text-break">
-                            <a asp-page="/Administration/Accounts/Users/Details" asp-route-id="@item.User.Id" title="@item.User.Email">@item.User.Email</a>
+                            <a asp-page="/Administration/Accounts/Users/Details" asp-route-id="@item.User.Id" class="btn btn-outline-dark" title="@item.User.Email">@item.User.Email</a>
                         </td>
                         <td class="text-left text-break">
-                            <a asp-page="/Administration/Accounts/Roles/Details" asp-route-id="@item.Role.Id" title="@item.Role.Name">@item.Role.Name</a>
+                            <a asp-page="/Administration/Accounts/Roles/Details" asp-route-id="@item.Role.Id" class="btn btn-outline-dark" title="@item.Role.Name">@item.Role.Name</a>
                         </td>
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Accounts/UserRoles/Delete" asp-route-userIds="@item.User.Id" asp-route-roleIds="@item.Role.Id" class="btn btn-danger m-1" title="Delete">

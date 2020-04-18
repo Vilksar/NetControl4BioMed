@@ -206,7 +206,24 @@
     <div class="card-body">
         <div class="alert alert-danger text-justify text-wrap">
             <span><i class="fas fa-exclamation-circle"></i></span>
-            <span>You can quickly delete all of the corresponding data by using the form below. <span class="font-weight-bold">This action can't be reversed, so continue only if you are sure!</span></span>
+            <span>You can quickly delete all of the corresponding data by using the form below. <span class="font-weight-bold">This action can't be reversed, so continue only if you are sure!</span> Several things should be kept in mind.</span>
+            <ul class="mt-1 mb-0">
+                <li class="">
+                    <span><span class="font-weight-bold">Deleting all nodes</span> will also delete all edges and networks and analyses.</span>
+                </li>
+                <li class="">
+                    <span><span class="font-weight-bold">Deleting all edges</span> will also delete all networks and analyses.</span>
+                </li>
+                <li class="">
+                    <span><span class="font-weight-bold">Deleting all node collections</span> will also delete all networks and analyses that use them.</span>
+                </li>
+                <li class="">
+                    <span><span class="font-weight-bold">Deleting all networks</span> will also delete all analyses and generic nodes and generic edges.</span>
+                </li>
+                <li class="">
+                    <span><span class="font-weight-bold">Deleting all analyses</span> will not delete anything else.</span>
+                </li>
+            </ul>
         </div>
         <form method="post" asp-page-handler="Delete" class="text-justify">
             <div class="form-group">
