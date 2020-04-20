@@ -98,11 +98,12 @@ namespace NetControl4BioMed
                 });
             // Add the HTTP client dependency.
             services.AddHttpClient();
-            // Add the dependency injection for the partial view renderer, reCaptcha checker and the e-mail sender.
+            // Add the dependency injections.
             services.AddTransient<IPartialViewRenderer, PartialViewRenderer>();
             services.AddTransient<IReCaptchaChecker, ReCaptchaChecker>();
             services.AddTransient<ISendGridEmailSender, SendGridEmailSender>();
             services.AddTransient<IHangfireRecurringJobRunner, HangfireRecurringJobRunner>();
+            services.AddTransient<IDataDeleter, DataDeleter>();
             services.AddTransient<IAnalysisRunner, AnalysisRunner>();
             // Add Razor pages.
             services.AddRazorPages();
