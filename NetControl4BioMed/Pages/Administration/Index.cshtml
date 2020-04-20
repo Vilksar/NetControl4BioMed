@@ -9,6 +9,29 @@
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
+                <span><i class="fas fa-list"></i></span>
+            </div>
+            <div>
+                <span>Items</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-success text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>You can reset the item count by clicking on the button below.</span>
+        </div>
+        <form method="post" asp-page-handler="ResetItemCount" class="text-justify">
+            <button type="submit" title="Reset" class="btn btn-success btn-block">
+                <span>Reset</span>
+            </button>
+        </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
                 <span><i class="fas fa-exclamation-circle"></i></span>
             </div>
             <div>
@@ -41,29 +64,6 @@
             }
         }
         <form method="post" asp-page-handler="ResetIssueCount" class="text-justify">
-            <button type="submit" title="Reset" class="btn btn-success btn-block">
-                <span>Reset</span>
-            </button>
-        </form>
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-hashtag"></i></span>
-            </div>
-            <div>
-                <span>Count</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-success text-justify text-wrap">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>You can reset the item count by clicking on the button below.</span>
-        </div>
-        <form method="post" asp-page-handler="ResetItemCount" class="text-justify">
             <button type="submit" title="Reset" class="btn btn-success btn-block">
                 <span>Reset</span>
             </button>

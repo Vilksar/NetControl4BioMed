@@ -75,8 +75,6 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the items to delete.
             var nodes = _context.Nodes
                 .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
-            // Save the number of items found.
-            var nodeCount = nodes.Count();
             // Get the related entities that use the items.
             var edges = _context.Edges
                 .Where(item => item.EdgeNodes.Any(item1 => nodes.Contains(item1.Node)));
@@ -102,8 +100,6 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the items to delete.
             var edges = _context.Edges
                 .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
-            // Save the number of items found.
-            var edgeCount = edges.Count();
             // Get the related entities that use the items.
             var networks = _context.Networks
                 .Where(item => item.NetworkEdges.Any(item1 => edges.Contains(item1.Edge)));
@@ -126,8 +122,6 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the items to delete.
             var nodeCollections = _context.NodeCollections
                 .AsQueryable();
-            // Save the number of items found.
-            var nodeCollectionCount = nodeCollections.Count();
             // Get the related entities that use the items.
             var networks = _context.Networks.Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)));
             var analyses = _context.Analyses.Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)) || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
@@ -148,8 +142,6 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the items to delete.
             var networks = _context.Networks
                 .AsQueryable();
-            // Save the number of items found.
-            var networkCount = networks.Count();
             // Get the related entities that use the items.
             var analyses = _context.Analyses
                 .Where(item => item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
@@ -175,8 +167,6 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the items to delete.
             var analyses = _context.Analyses
                 .AsQueryable();
-            // Save the number of items found.
-            var analysisCount = analyses.Count();
             // Mark the items for deletion.
             _context.Analyses.RemoveRange(analyses);
             // Save the changes to the database.
