@@ -20,7 +20,6 @@ using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Services;
 using NetControl4BioMed.Helpers.ViewModels;
-using Z.EntityFramework.Plus;
 
 namespace NetControl4BioMed.Pages.Administration
 {
@@ -309,18 +308,6 @@ namespace NetControl4BioMed.Pages.Administration
                                 {
                                     Id = item1.Id,
                                     Name = item1.Name
-                                }),
-                            DatabaseNodes = item.DatabaseNodes
-                                .Select(item1 => new
-                                {
-                                    Id = item1.Node.Id,
-                                    Name = item1.Node.Name
-                                }),
-                            DatabaseEdges = item.DatabaseEdges
-                                .Select(item1 => new
-                                {
-                                    Id = item1.Edge.Id,
-                                    Name = item1.Edge.Name
                                 })
                         })
                         .AsNoTracking();
@@ -1012,145 +999,23 @@ namespace NetControl4BioMed.Pages.Administration
                 // Redirect to the page.
                 return RedirectToPage();
             }
-            // Define a list to store the number of items found.
-            var itemList = new List<string>();
-            // Check the items to delete.
-            if (deleteItems.Contains("Nodes"))
+            // Delete any existing recurring tasks of cleaning the database.
+            RecurringJob.RemoveIfExists(nameof(IDataDeleter));
+            // Define the view model for the data deleter.
+            var viewModel = new DataDeleterViewModel
             {
-                // Get the items to delete.
-                var nodes = _context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
-                // Save the number of items found.
-                var nodeCount = nodes.Count();
-                // Get the related entities that use the items.
-                var edges = _context.Edges
-                    .Where(item => item.EdgeNodes.Any(item1 => nodes.Contains(item1.Node)));
-                var networks = _context.Networks
-                    .Where(item => item.NetworkNodes.Any(item1 => nodes.Contains(item1.Node)));
-                var analyses = _context.Analyses
-                    .Where(item => item.AnalysisNodes.Any(item1 => nodes.Contains(item1.Node)));
-                //// Mark the items for deletion.
-                //_context.Analyses.RemoveRange(analyses);
-                //_context.Networks.RemoveRange(networks);
-                //_context.Edges.RemoveRange(edges);
-                //_context.Nodes.RemoveRange(nodes);
-                //// Save the changes to the database.
-                //await _context.SaveChangesAsync();
-                // Mark the items for batch deletion.
-                await analyses.DeleteAsync();
-                await networks.DeleteAsync();
-                await edges.DeleteAsync();
-                await nodes.DeleteAsync();
-                // Save a message.
-                itemList.Add($"{nodeCount.ToString()} node{(nodeCount != 1 ? "s" : string.Empty)}");
-            }
-            // Check the items to delete.
-            if (deleteItems.Contains("Edges"))
-            {
-                // Get the items to delete.
-                var edges = _context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
-                // Save the number of items found.
-                var edgeCount = edges.Count();
-                // Get the related entities that use the items.
-                var networks = _context.Networks
-                    .Where(item => item.NetworkEdges.Any(item1 => edges.Contains(item1.Edge)));
-                var analyses = _context.Analyses
-                    .Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
-                //// Mark the items for deletion.
-                //_context.Analyses.RemoveRange(analyses);
-                //_context.Networks.RemoveRange(networks);
-                //_context.Edges.RemoveRange(edges);
-                //// Save the changes to the database.
-                //await _context.SaveChangesAsync();
-                // Mark the items for batch deletion.
-                await analyses.DeleteAsync();
-                await networks.DeleteAsync();
-                await edges.DeleteAsync();
-                // Save a message.
-                itemList.Add($"{edgeCount.ToString()} edge{(edgeCount != 1 ? "s" : string.Empty)}");
-            }
-            // Check the items to delete.
-            if (deleteItems.Contains("NodeCollections"))
-            {
-                // Get the items to delete.
-                var nodeCollections = _context.NodeCollections
-                    .AsQueryable();
-                // Save the number of items found.
-                var nodeCollectionCount = nodeCollections.Count();
-                // Get the related entities that use the items.
-                var networks = _context.Networks.Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)));
-                var analyses = _context.Analyses.Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)) || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
-                //// Mark the items for deletion.
-                //_context.Analyses.RemoveRange(analyses);
-                //_context.Networks.RemoveRange(networks);
-                //_context.NodeCollections.RemoveRange(nodeCollections);
-                //// Save the changes to the database.
-                //await _context.SaveChangesAsync();
-                // Mark the items for batch deletion.
-                await analyses.DeleteAsync();
-                await networks.DeleteAsync();
-                await nodeCollections.DeleteAsync();
-                // Save a message.
-                itemList.Add($"{nodeCollectionCount.ToString()} node collection{(nodeCollectionCount != 1 ? "s" : string.Empty)}");
-            }
-            // Check the items to delete.
-            if (deleteItems.Contains("Networks"))
-            {
-                // Get the items to delete.
-                var networks = _context.Networks
-                    .AsQueryable();
-                // Save the number of items found.
-                var networkCount = networks.Count();
-                // Get the related entities that use the items.
-                var analyses = _context.Analyses
-                    .Where(item => item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
-                // Get the generic entities among them.
-                var genericNetworks = networks.Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
-                var genericNodes = _context.Nodes.Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
-                var genericEdges = _context.Edges.Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
-                //// Mark the items for deletion.
-                //_context.Analyses.RemoveRange(analyses);
-                //_context.Networks.RemoveRange(networks);
-                //_context.Edges.RemoveRange(genericEdges);
-                //_context.Nodes.RemoveRange(genericNodes);
-                //// Save the changes to the database.
-                //await _context.SaveChangesAsync();
-                // Mark the items for batch deletion.
-                await analyses.DeleteAsync();
-                await networks.DeleteAsync();
-                await genericEdges.DeleteAsync();
-                await genericNodes.DeleteAsync();
-                // Save a message.
-                itemList.Add($"{networkCount.ToString()} network{(networkCount != 1 ? "s" : string.Empty)}");
-            }
-            // Check the items to delete.
-            if (deleteItems.Contains("Analyses"))
-            {
-                // Get the items to delete.
-                var analyses = _context.Analyses
-                    .AsQueryable();
-                // Save the number of items found.
-                var analysisCount = analyses.Count();
-                //// Mark the items for deletion.
-                //_context.Analyses.RemoveRange(analyses);
-                //// Save the changes to the database.
-                //await _context.SaveChangesAsync();
-                // Mark the items for batch deletion.
-                await analyses.DeleteAsync();
-                // Save a message.
-                itemList.Add($"{analysisCount.ToString()} analys{(analysisCount != 1 ? "e" : "i")}s");
-            }
-            // Check if there weren't any items found.
-            if (!itemList.Any())
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: There were no items to delete.";
-                // Redirect to the page.
-                return RedirectToPage();
-            }
+                DeleteNodes = deleteItems.Contains("Nodes"),
+                DeleteEdges = deleteItems.Contains("Edges"),
+                DeleteNodeCollections = deleteItems.Contains("NodeCollections"),
+                DeleteNetworks = deleteItems.Contains("Networks"),
+                DeleteAnalyses = deleteItems.Contains("Analyses")
+            };
+            // Create a never recurring Hangfire task of deleting the data.
+            RecurringJob.AddOrUpdate<IDataDeleter>(nameof(IDataDeleter), item => item.Run(viewModel), Cron.Never());
+            // Trigger the task.
+            RecurringJob.Trigger(nameof(IDataDeleter));
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {string.Join(" and ", itemList)} deleted successfully.";
+            TempData["StatusMessage"] = $"Success: The data deletion task has been created and started successfully. You can view its progress on the Hangfire dasboard. It is recommended to not perform any other operations on the database until it will complete.";
             // Redirect to the page.
             return RedirectToPage();
         }

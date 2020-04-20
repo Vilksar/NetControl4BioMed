@@ -46,7 +46,7 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
-        /// Runs the analysis with the given ID.
+        /// Runs the analysis specified by the model.
         /// </summary>
         /// <param name="viewModel">The view model of the analysis to run.</param>
         /// <returns></returns>
