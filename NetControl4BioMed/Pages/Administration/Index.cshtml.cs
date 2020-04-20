@@ -60,8 +60,54 @@ namespace NetControl4BioMed.Pages.Administration
 
         public IActionResult OnGet()
         {
+            // Check if the count needs to be reset.
+            if (!bool.TryParse(_configuration["Data:ItemCount:Reset"], out var resetItemCount) || resetItemCount)
+            {
+                // Update the reset status.
+                _configuration["Data:ItemCount:Reset"] = false.ToString();
+                // Update the counts.
+                _configuration["Data:ItemCount:Users"] = _context.Users
+                    .Count()
+                    .ToString();
+                _configuration["Data:ItemCount:Roles"] = _context.Roles
+                    .Count()
+                    .ToString();
+                _configuration["Data:ItemCount:DatabaseTypes"] = _context.DatabaseTypes
+                    .Count()
+                    .ToString();
+                _configuration["Data:ItemCount:Databases"] = _context.Databases
+                    .Count()
+                    .ToString();
+                _configuration["Data:ItemCount:DatabaseNodeFields"] = _context.DatabaseNodeFields
+                    .Count()
+                    .ToString();
+                _configuration["Data:ItemCount:DatabaseEdgeFields"] = _context.DatabaseEdgeFields
+                    .Count()
+                    .ToString();
+                _configuration["Data:ItemCount:Nodes"] = _context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Count()
+                    .ToString();
+                _configuration["Data:ItemCount:Edges"] = _context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Count()
+                    .ToString();
+                _configuration["Data:ItemCount:NodeCollections"] = _context.NodeCollections
+                    .Count()
+                    .ToString();
+                _configuration["Data:ItemCount:Networks"] = _context.Networks
+                    .Count()
+                    .ToString();
+                _configuration["Data:ItemCount:Analyses"] = _context.Analyses
+                    .Count()
+                    .ToString();
+                // Get the current status message.
+                var statusMessage = (string)TempData["StatusMessage"];
+                // Display a message.
+                TempData["StatusMessage"] = $"{(!string.IsNullOrEmpty(statusMessage) ? statusMessage : "Success: ")} The item count has been successfully updated.";
+            }
             // Check if the issue count needs to be reset.
-            if (!bool.TryParse(_configuration["Data:IssueCount:Reset"], out var reset) || reset)
+            if (!bool.TryParse(_configuration["Data:IssueCount:Reset"], out var resetIssueCount) || resetIssueCount)
             {
                 // Update the reset status.
                 _configuration["Data:IssueCount:Reset"] = false.ToString();
@@ -164,32 +210,35 @@ namespace NetControl4BioMed.Pages.Administration
                     .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
                     .Count()
                     .ToString();
+                // Get the current status message.
+                var statusMessage = (string)TempData["StatusMessage"];
                 // Display a message.
-                TempData["StatusMessage"] = "Success: The issue count has been successfully updated.";
+                TempData["StatusMessage"] = $"{(!string.IsNullOrEmpty(statusMessage) ? statusMessage : "Success: ")} The issue count has been successfully updated.";
             }
+            // Get the data from configuration.
+            var count = _configuration
+                .GetSection("Data")
+                .GetSection("ItemCount")
+                .GetChildren()
+                .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? result : -1);
+            var issueCount = _configuration
+                .GetSection("Data")
+                .GetSection("IssueCount")
+                .GetChildren()
+                .Where(item => item.GetChildren().Any())
+                .ToDictionary(item => item.Key, item => item.GetChildren().ToDictionary(item1 => item1.Key, item1 => int.TryParse(item1.Value, out var result) ? result : -1));
+            var announcementMessage = _configuration["Data:AnnouncementMessage"];
             // Define the view.
             View = new ViewModel
             {
-                UserCount = _context.Users
-                    .Count(),
-                RoleCount = _context.Roles
-                    .Count(),
-                DatabaseCount = _context.Databases
-                    .Count(),
-                NodeCount = _context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Count(),
-                EdgeCount = _context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Count(),
-                NodeCollectionCount = _context.NodeCollections
-                    .Count(),
-                IssueCount = _configuration
-                    .GetSection("Data")
-                    .GetSection("IssueCount")
-                    .GetChildren()
-                    .ToDictionary(item => item.Key, item => item.GetChildren().ToDictionary(item1 => item1.Key, item1 => int.TryParse(item1.Value, out var result) ? result : -1)),
-                AnnouncementMessage = _configuration["Data:AnnouncementMessage"]
+                UserCount = count.GetValueOrDefault("Users", -1),
+                RoleCount = count.GetValueOrDefault("Roles", -1),
+                DatabaseCount = count.GetValueOrDefault("Databases", -1),
+                NodeCount = count.GetValueOrDefault("Nodes", -1),
+                EdgeCount = count.GetValueOrDefault("Edges", -1),
+                NodeCollectionCount = count.GetValueOrDefault("NodeCollections", -1),
+                IssueCount = issueCount,
+                AnnouncementMessage = announcementMessage
             };
             // Return the page.
             return Page();
@@ -199,6 +248,14 @@ namespace NetControl4BioMed.Pages.Administration
         {
             // Update the reset status.
             _configuration["Data:IssueCount:Reset"] = true.ToString();
+            // Redirect to the page.
+            return RedirectToPage();
+        }
+
+        public IActionResult OnPostResetItemCount()
+        {
+            // Update the reset status.
+            _configuration["Data:ItemCount:Reset"] = true.ToString();
             // Redirect to the page.
             return RedirectToPage();
         }
