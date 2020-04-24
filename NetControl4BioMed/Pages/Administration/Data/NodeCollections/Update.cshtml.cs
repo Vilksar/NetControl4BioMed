@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
 {
@@ -46,34 +49,12 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             public string JsonModel { get; set; }
         }
 
-        public class ItemModel
-        {
-            public string Id { get; set; }
-
-            public string Name { get; set; }
-
-            public string Description { get; set; }
-
-            public IEnumerable<string> DatabaseIds { get; set; }
-
-            public IEnumerable<string> NodeIds { get; set; }
-
-            public static ItemModel Default = new ItemModel
-            {
-                Id = "Node collection ID",
-                Name = "Node collection name",
-                Description = "Node collection description",
-                DatabaseIds = new List<string> { "Database ID" },
-                NodeIds = new List<string> { "Node ID" }
-            };
-        }
-
         public IActionResult OnGet(string type = null, IEnumerable<string> ids = null)
         {
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(new List<ItemModel> { ItemModel.Default }, new JsonSerializerOptions { WriteIndented = true })
+                JsonModel = JsonSerializer.Serialize(new List<DataUpdateNodeCollectionViewModel> { DataUpdateNodeCollectionViewModel.Default }, new JsonSerializerOptions { WriteIndented = true })
             };
             // Check if there are any IDs provided.
             ids ??= Enumerable.Empty<string>();
@@ -82,7 +63,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 .Where(item => ids.Contains(item.Id));
             // Get the items for the view.
             var items = nodeCollections.Select(item =>
-                new ItemModel
+                new DataUpdateNodeCollectionViewModel
                 {
                     Id = item.Id,
                     Name = item.Name,
@@ -105,7 +86,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(new List<ItemModel> { ItemModel.Default }, new JsonSerializerOptions { WriteIndented = true })
+                JsonModel = JsonSerializer.Serialize(new List<DataUpdateNodeCollectionViewModel> { DataUpdateNodeCollectionViewModel.Default }, new JsonSerializerOptions { WriteIndented = true })
             };
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
@@ -116,7 +97,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 return Page();
             }
             // Try to deserialize the data.
-            if (!Input.Data.TryDeserializeJsonObject<IEnumerable<ItemModel>>(out var items))
+            if (!Input.Data.TryDeserializeJsonObject<IEnumerable<DataUpdateNodeCollectionViewModel>>(out var items))
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The provided data is not a valid JSON object.");
@@ -156,112 +137,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                     // Redisplay the page.
                     return Page();
                 }
-                // Get the valid manually provided IDs, that do not appear in the database.
-                var validItemNodeCollectionIds = itemNodeCollectionIds
-                    .Except(_context.NodeCollections
-                        .Where(item => itemNodeCollectionIds.Contains(item.Id))
-                        .Select(item => item.Id));
-                // Get the IDs of all of the databases that are to be used by the collections.
-                var itemDatabaseIds = items
-                    .Select(item => item.DatabaseIds)
-                    .SelectMany(item => item)
-                    .Where(item => !string.IsNullOrEmpty(item))
-                    .Distinct();
-                // Get the databases that are to be used by the collections.
-                var databases = _context.Databases
-                    .Where(item => item.DatabaseType.Name != "Generic")
-                    .Where(item => itemDatabaseIds.Contains(item.Id))
-                    .Include(item => item.DatabaseNodes)
-                        .ThenInclude(item => item.Node)
-                    .AsEnumerable();
-                // Get the IDs of all of the nodes that are to be added to the collections.
-                var itemNodeIds = items
-                    .Select(item => item.NodeIds)
-                    .SelectMany(item => item)
-                    .Where(item => !string.IsNullOrEmpty(item))
-                    .Distinct();
-                // Get the nodes that are to be added to the collections.
-                var nodes = _context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => itemNodeIds.Contains(item.Id))
-                    .Include(item => item.DatabaseNodes)
-                        .ThenInclude(item => item.Database)
-                    .AsEnumerable();
-                // Get the valid database IDs.
-                var validItemDatabaseIds = databases
-                    .Select(item => item.Id);
-                // Get the valid node IDs.
-                var validItemNodeIds = nodes
-                    .Select(item => item.Id);
-                // Save the node collections to add.
-                var nodeCollections = new List<NodeCollection>();
-                // Save the start time of the loop.
-                var startTime = DateTime.Now;
-                // Go over each of the items.
-                foreach (var item in items)
-                {
-                    // Check if the loop has been running for more than the allowed time.
-                    if ((DateTime.Now - startTime).TotalSeconds > 180)
-                    {
-                        // End the loop.
-                        break;
-                    }
-                    // Check if the ID of the current item is valid.
-                    if (!string.IsNullOrEmpty(item.Id) && !validItemNodeCollectionIds.Contains(item.Id))
-                    {
-                        // Continue.
-                        continue;
-                    }
-                    // Get the valid databases and the node collection databases to add.
-                    var nodeCollectionDatabases = item.DatabaseIds
-                        .Where(item1 => validItemDatabaseIds.Contains(item1))
-                        .Distinct()
-                        .Select(item1 =>
-                            new NodeCollectionDatabase
-                            {
-                                DatabaseId = item1,
-                                Database = databases.FirstOrDefault(item2 => item1 == item2.Id)
-                            })
-                        .Where(item1 => item1.Database != null);
-                    // Get the valid nodes and the node collection nodes to add.
-                    var nodeCollectionNodes = item.NodeIds
-                        .Where(item1 => validItemNodeIds.Contains(item1))
-                        .Distinct()
-                        .Select(item1 =>
-                            new NodeCollectionNode
-                            {
-                                NodeId = item1,
-                                Node = nodes.FirstOrDefault(item2 => item1 == item2.Id)
-                            })
-                        .Where(item1 => item1.Node != null);
-                    // Define the new node collection.
-                    var nodeCollection = new NodeCollection
-                    {
-                        Name = item.Name,
-                        Description = item.Description,
-                        DateTimeCreated = DateTime.Now,
-                        NodeCollectionDatabases = nodeCollectionDatabases
-                            .Where(item1 => item1.Database.DatabaseNodes.Any(item2 => validItemNodeIds.Contains(item2.Node.Id)))
-                            .ToList(),
-                        NodeCollectionNodes = nodeCollectionNodes
-                            .Where(item1 => item1.Node.DatabaseNodes.Any(item1 => validItemDatabaseIds.Contains(item1.Database.Id)))
-                            .ToList()
-                    };
-                    // Check if there is any ID provided.
-                    if (!string.IsNullOrEmpty(item.Id))
-                    {
-                        // Assign it to the node.
-                        nodeCollection.Id = item.Id;
-                    }
-                    // Add the new node to the list.
-                    nodeCollections.Add(nodeCollection);
-                }
-                // Save the number of node collections.
-                itemCount = nodeCollections.Count();
-                // Mark the nodes for addition.
-                _context.NodeCollections.AddRange(nodeCollections);
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
+                // Save the number of items.
+                itemCount = items.Count();
+                // Create a new Hangfire background task.
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.CreateNodeCollectionsAsync(items));
             }
             // Check if the items should be edited.
             else if (Input.Type == "Edit")
@@ -405,22 +284,14 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                     .Where(item => !string.IsNullOrEmpty(item.Id));
                 // Get the list of IDs from the provided items.
                 var itemIds = items.Select(item => item.Id);
-                // Get the node collections that have the given IDs.
-                var nodeCollections = _context.NodeCollections
-                    .Where(item => itemIds.Contains(item.Id));
-                // Save the number of node collections found.
-                itemCount = nodeCollections.Count();
-                // Get the networks and analyses that use the node collections.
-                var networks = _context.Networks
-                    .Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)));
-                var analyses = _context.Analyses
-                    .Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)));
-                // Mark the items for deletion.
-                _context.Analyses.RemoveRange(analyses);
-                _context.Networks.RemoveRange(networks);
-                _context.NodeCollections.RemoveRange(nodeCollections);
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
+                // Get the IDs of the node collections that have the given IDs.
+                var ids = _context.NodeCollections
+                    .Where(item => itemIds.Contains(item.Id))
+                    .Select(item => item.Id);
+                // Save the number of nodes found.
+                itemCount = items.Count();
+                // Create a new Hangfire background task.
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodeCollectionsAsync(ids));
             }
             // Check if the type is not valid.
             else
@@ -431,7 +302,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 return Page();
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {itemCount.ToString()} item{(itemCount != 1 ? "s" : string.Empty)} of type \"{Input.Type}\" updated successfully.";
+            TempData["StatusMessage"] = $"Success: The background task for updating the data ({itemCount.ToString()} item{(itemCount != 1 ? "s" : string.Empty)} of type \"{Input.Type}\") has been created and scheduled successfully. You can view the progress on the Hangfire dasboard.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Data/NodeCollections/Index");
         }

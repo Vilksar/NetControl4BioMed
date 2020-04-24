@@ -103,7 +103,7 @@ namespace NetControl4BioMed
             services.AddTransient<IReCaptchaChecker, ReCaptchaChecker>();
             services.AddTransient<ISendGridEmailSender, SendGridEmailSender>();
             services.AddTransient<IHangfireRecurringJobRunner, HangfireRecurringJobRunner>();
-            services.AddTransient<IDataDeleter, DataDeleter>();
+            services.AddTransient<IDatabaseDataManager, DatabaseDataManager>();
             services.AddTransient<IAnalysisRunner, AnalysisRunner>();
             // Add Razor pages.
             services.AddRazorPages();

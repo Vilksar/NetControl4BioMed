@@ -1056,23 +1056,55 @@ namespace NetControl4BioMed.Pages.Administration
                 // Redirect to the page.
                 return RedirectToPage();
             }
-            // Delete any existing recurring tasks of cleaning the database.
-            RecurringJob.RemoveIfExists(nameof(IDataDeleter));
-            // Define the view model for the data deleter.
-            var viewModel = new DataDeleterViewModel
+            // Check the items to delete.
+            if (deleteItems.Contains("Nodes"))
             {
-                DeleteNodes = deleteItems.Contains("Nodes"),
-                DeleteEdges = deleteItems.Contains("Edges"),
-                DeleteNodeCollections = deleteItems.Contains("NodeCollections"),
-                DeleteNetworks = deleteItems.Contains("Networks"),
-                DeleteAnalyses = deleteItems.Contains("Analyses")
-            };
-            // Create a never recurring Hangfire task of deleting the data.
-            RecurringJob.AddOrUpdate<IDataDeleter>(nameof(IDataDeleter), item => item.Run(viewModel), Cron.Never());
-            // Trigger the task.
-            RecurringJob.Trigger(nameof(IDataDeleter));
+                // Get the items.
+                var items = _context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Select(item => item.Id);
+                // Create a new Hangfire background task.
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodesAsync(items));
+            }
+            // Check the items to delete.
+            if (deleteItems.Contains("Edges"))
+            {
+                // Get the items.
+                var ids = _context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Select(item => item.Id);
+                // Create a new Hangfire background task.
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteEdgesAsync(ids));
+            }
+            // Check the items to delete.
+            if (deleteItems.Contains("NodeCollections"))
+            {
+                // Get the items.
+                var ids = _context.NodeCollections
+                    .Select(item => item.Id);
+                // Create a new Hangfire background task.
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodeCollectionsAsync(ids));
+            }
+            // Check the items to delete.
+            if (deleteItems.Contains("Networks"))
+            {
+                // Get the items.
+                var ids = _context.Networks
+                    .Select(item => item.Id);
+                // Create a new Hangfire background task.
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNetworksAsync(ids));
+            }
+            // Check the items to delete.
+            if (deleteItems.Contains("Analyses"))
+            {
+                // Get the items.
+                var ids = _context.Analyses
+                    .Select(item => item.Id);
+                // Create a new Hangfire background task.
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteAnalysesAsync(ids));
+            }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: The data deletion task has been created and started successfully. You can view its progress on the Hangfire dasboard. It is recommended to not perform any other operations on the database until it will complete.";
+            TempData["StatusMessage"] = $"Success: The background tasks for deleting the data have been created and started successfully. You can view the progress on the Hangfire dasboard. It is recommended to not perform any other operations on the database until everything will complete.";
             // Redirect to the page.
             return RedirectToPage();
         }
