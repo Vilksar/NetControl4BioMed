@@ -594,7 +594,13 @@ namespace NetControl4BioMed.Pages.Administration
                             Id = item.Id,
                             DateTimeCreated = item.DateTimeCreated,
                             Name = item.Name,
-                            Description = item.Description
+                            Description = item.Description,
+                            Databases = item.Databases
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Id,
+                                    Name = item1.Name
+                                })
                         })
                         .AsNoTracking()
                         .AsEnumerable()
@@ -629,7 +635,19 @@ namespace NetControl4BioMed.Pages.Administration
                             {
                                 Id = item.DatabaseType.Id,
                                 Name = item.DatabaseType.Name
-                            }
+                            },
+                            DatabaseNodeFields = item.DatabaseNodeFields
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Id,
+                                    Name = item1.Name
+                                }),
+                            DatabaseEdgeFields = item.DatabaseEdgeFields
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Id,
+                                    Name = item1.Name
+                                })
                         })
                         .AsNoTracking()
                         .AsEnumerable()
@@ -666,7 +684,14 @@ namespace NetControl4BioMed.Pages.Administration
                             {
                                 Id = item.Database.Id,
                                 Name = item.Database.Name
-                            }
+                            },
+                            DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Node.Id,
+                                    Name = item1.Node.Name,
+                                    Value = item1.Value
+                                })
                         })
                         .AsNoTracking()
                         .AsEnumerable()
@@ -702,7 +727,14 @@ namespace NetControl4BioMed.Pages.Administration
                             {
                                 Id = item.Database.Id,
                                 Name = item.Database.Name
-                            }
+                            },
+                            DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Edge.Id,
+                                    Name = item1.Edge.Name,
+                                    Value = item1.Value
+                                })
                         })
                         .AsNoTracking()
                         .AsEnumerable()
@@ -772,7 +804,26 @@ namespace NetControl4BioMed.Pages.Administration
                             DateTimeCreated = item.DateTimeCreated,
                             Name = item.Name,
                             Description = item.Description,
-                            Fields = Enumerable.Empty<object>()
+                            Databases = item.DatabaseNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Database.Id,
+                                    Name = item1.Database.Name
+                                }),
+                            DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.DatabaseNodeField.Id,
+                                    Name = item1.DatabaseNodeField.Name,
+                                    Value = item1.Value
+                                }),
+                            EdgeNodes = item.EdgeNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Edge.Id,
+                                    Name = item1.Edge.Name,
+                                    Type = item1.Type.ToString()
+                                })
                         })
                         .AsNoTracking()
                         .AsEnumerable()
@@ -803,9 +854,26 @@ namespace NetControl4BioMed.Pages.Administration
                             DateTimeCreated = item.DateTimeCreated,
                             Name = item.Name,
                             Description = item.Description,
-                            DatabaseIds = Enumerable.Empty<string>(),
-                            Nodes = Enumerable.Empty<object>(),
-                            Fields = Enumerable.Empty<object>()
+                            Databases = item.DatabaseEdges
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Database.Id,
+                                    Name = item1.Database.Name
+                                }),
+                            DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges
+                                .Select(item1 => new
+                                {
+                                    Id = item1.DatabaseEdgeField.Id,
+                                    Name = item1.DatabaseEdgeField.Name,
+                                    Value = item1.Value
+                                }),
+                            EdgeNodes = item.EdgeNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Node.Id,
+                                    Name = item1.Node.Name,
+                                    Type = item1.Type.GetDisplayName()
+                                })
                         })
                         .AsNoTracking()
                         .AsEnumerable()
@@ -834,8 +902,12 @@ namespace NetControl4BioMed.Pages.Administration
                             DateTimeCreated = item.DateTimeCreated,
                             Name = item.Name,
                             Description = item.Description,
-                            DatabaseIds = Enumerable.Empty<string>(),
-                            NodeIds = Enumerable.Empty<string>(),
+                            NodeCollectionNodes = item.NodeCollectionNodes
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Node.Id,
+                                    Name = item1.Node.Name
+                                })
                         })
                         .AsNoTracking()
                         .AsEnumerable()
@@ -854,9 +926,7 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => !item.DatabaseNodeFieldNodes.Any())
                         .Select(item => new
                         {
-                            Id = item.Id,
-                            Description = string.Empty,
-                            Fields = Enumerable.Empty<object>()
+                            Id = item.Id
                         })
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
@@ -872,11 +942,7 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
                         .Select(item => new
                         {
-                            Id = item.Id,
-                            Description = string.Empty,
-                            DatabaseIds = Enumerable.Empty<string>(),
-                            Nodes = Enumerable.Empty<object>(),
-                            Fields = Enumerable.Empty<object>()
+                            Id = item.Id
                         })
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
@@ -892,10 +958,7 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => !item.NodeCollectionNodes.Any())
                         .Select(item => new
                         {
-                            Id = item.Id,
-                            Description = string.Empty,
-                            DatabaseIds = Enumerable.Empty<string>(),
-                            NodeIds = Enumerable.Empty<string>()
+                            Id = item.Id
                         })
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
@@ -943,9 +1006,7 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
                         .Select(item => new
                         {
-                            Id = item.Id,
-                            Description = string.Empty,
-                            Fields = Enumerable.Empty<object>()
+                            Id = item.Id
                         })
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
@@ -961,11 +1022,7 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
                         .Select(item => new
                         {
-                            Id = item.Id,
-                            Description = string.Empty,
-                            DatabaseIds = Enumerable.Empty<string>(),
-                            Nodes = Enumerable.Empty<object>(),
-                            Fields = Enumerable.Empty<object>()
+                            Id = item.Id
                         })
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
@@ -981,10 +1038,7 @@ namespace NetControl4BioMed.Pages.Administration
                         .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
                         .Select(item => new
                         {
-                            Id = item.Id,
-                            Description = string.Empty,
-                            DatabaseIds = Enumerable.Empty<string>(),
-                            NodeIds = Enumerable.Empty<string>()
+                            Id = item.Id
                         })
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
