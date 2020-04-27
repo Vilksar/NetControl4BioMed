@@ -18,14 +18,9 @@ namespace NetControl4BioMed.Helpers.Services
     public class DatabaseDataManager : IDatabaseDataManager
     {
         /// <summary>
-        /// Represents the batch size for an IQueryable.
+        /// Represents the batch size for a database operation.
         /// </summary>
-        private readonly int _queryableBatchSize = 200;
-
-        /// <summary>
-        /// Represents the batch size for an IEnumerable.
-        /// </summary>
-        private readonly int _enumerableBatchSize = 2000;
+        private readonly int _batchSize = 200;
 
         /// <summary>
         /// Represents the application service provider.
@@ -55,12 +50,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)items.Count() / _enumerableBatchSize);
+            var count = Math.Ceiling((double)items.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchItems = items.Skip(index * _enumerableBatchSize).Take(_enumerableBatchSize);
+                var batchItems = items.Skip(index * _batchSize).Take(_batchSize);
                 // Create a new scope.
                 using var scope = _serviceProvider.CreateScope();
                 // Use a new context instance.
@@ -153,7 +148,7 @@ namespace NetControl4BioMed.Helpers.Services
                 try
                 {
                     // Create the items.
-                    await CreateAsync(nodes);
+                    await CreateAsync(nodes, context);
                 }
                 catch (Exception exception)
                 {
@@ -176,12 +171,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)items.Count() / _enumerableBatchSize);
+            var count = Math.Ceiling((double)items.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchItems = items.Skip(index * _enumerableBatchSize).Take(_enumerableBatchSize);
+                var batchItems = items.Skip(index * _batchSize).Take(_batchSize);
                 // Create a new scope.
                 using var scope = _serviceProvider.CreateScope();
                 // Use a new context instance.
@@ -327,7 +322,7 @@ namespace NetControl4BioMed.Helpers.Services
                 try
                 {
                     // Create the items.
-                    await CreateAsync(edges);
+                    await CreateAsync(edges, context);
                 }
                 catch (Exception exception)
                 {
@@ -351,12 +346,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)items.Count() / _enumerableBatchSize);
+            var count = Math.Ceiling((double)items.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchItems = items.Skip(index * _enumerableBatchSize).Take(_enumerableBatchSize);
+                var batchItems = items.Skip(index * _batchSize).Take(_batchSize);
                 // Create a new scope.
                 using var scope = _serviceProvider.CreateScope();
                 // Use a new context instance.
@@ -467,7 +462,7 @@ namespace NetControl4BioMed.Helpers.Services
                 try
                 {
                     // Create the items.
-                    await CreateAsync(nodeCollections);
+                    await CreateAsync(nodeCollections, context);
                 }
                 catch (Exception exception)
                 {
@@ -491,12 +486,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)items.Count() / _enumerableBatchSize);
+            var count = Math.Ceiling((double)items.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchItems = items.Skip(index * _enumerableBatchSize).Take(_enumerableBatchSize);
+                var batchItems = items.Skip(index * _batchSize).Take(_batchSize);
                 // Create a new scope.
                 using var scope = _serviceProvider.CreateScope();
                 // Use a new context instance.
@@ -581,14 +576,14 @@ namespace NetControl4BioMed.Helpers.Services
                     .Where(item => item.NetworkNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
-                // Delete the items.
-                await DeleteAsync(analyses);
-                await DeleteAsync(networks);
                 // Try to update the items.
                 try
                 {
+                    // Delete the items.
+                    await DeleteAsync(analyses, context);
+                    await DeleteAsync(networks, context);
                     // Update the items.
-                    await UpdateAsync(nodesToUpdate);
+                    await UpdateAsync(nodesToUpdate, context);
                 }
                 catch (Exception exception)
                 {
@@ -611,7 +606,7 @@ namespace NetControl4BioMed.Helpers.Services
                 try
                 {
                     // Update the items.
-                    await UpdateAsync(edges);
+                    await UpdateAsync(edges, context);
                 }
                 catch (Exception exception)
                 {
@@ -635,12 +630,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)items.Count() / _enumerableBatchSize);
+            var count = Math.Ceiling((double)items.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchItems = items.Skip(index * _enumerableBatchSize).Take(_enumerableBatchSize);
+                var batchItems = items.Skip(index * _batchSize).Take(_batchSize);
                 // Create a new scope.
                 using var scope = _serviceProvider.CreateScope();
                 // Use a new context instance.
@@ -781,14 +776,14 @@ namespace NetControl4BioMed.Helpers.Services
                     .Where(item => item.NetworkEdges.Any(item1 => edgesToUpdate.Contains(item1.Edge)));
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisEdges.Any(item1 => edgesToUpdate.Contains(item1.Edge)));
-                // Delete the items.
-                await DeleteAsync(analyses);
-                await DeleteAsync(networks);
                 // Try to update the items.
                 try
                 {
+                    // Delete the items.
+                    await DeleteAsync(analyses, context);
+                    await DeleteAsync(networks, context);
                     // Update the items.
-                    await UpdateAsync(edgesToUpdate);
+                    await UpdateAsync(edgesToUpdate, context);
                 }
                 catch (Exception exception)
                 {
@@ -812,12 +807,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)items.Count() / _enumerableBatchSize);
+            var count = Math.Ceiling((double)items.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchItems = items.Skip(index * _enumerableBatchSize).Take(_enumerableBatchSize);
+                var batchItems = items.Skip(index * _batchSize).Take(_batchSize);
                 // Create a new scope.
                 using var scope = _serviceProvider.CreateScope();
                 // Use a new context instance.
@@ -922,14 +917,14 @@ namespace NetControl4BioMed.Helpers.Services
                     .Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollectionsToUpdate.Contains(item1.NodeCollection)));
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollectionsToUpdate.Contains(item1.NodeCollection)));
-                // Delete the items.
-                await DeleteAsync(analyses);
-                await DeleteAsync(networks);
                 // Try to update the items.
                 try
                 {
+                    // Delete the items.
+                    await DeleteAsync(analyses, context);
+                    await DeleteAsync(networks, context);
                     // Update the items.
-                    await UpdateAsync(nodeCollectionsToUpdate);
+                    await UpdateAsync(nodeCollectionsToUpdate, context);
                 }
                 catch (Exception exception)
                 {
@@ -953,12 +948,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentNullException(nameof(ids));
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)ids.Count() / _enumerableBatchSize);
+            var count = Math.Ceiling((double)ids.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchIds = ids.Skip(index * _enumerableBatchSize).Take(_enumerableBatchSize);
+                var batchIds = ids.Skip(index * _batchSize).Take(_batchSize);
                 // Create a new scope.
                 using var scope = _serviceProvider.CreateScope();
                 // Use a new context instance.
@@ -977,10 +972,10 @@ namespace NetControl4BioMed.Helpers.Services
                 try
                 {
                     // Delete the items.
-                    await DeleteAsync(analyses);
-                    await DeleteAsync(networks);
-                    await DeleteAsync(edges);
-                    await DeleteAsync(nodes);
+                    await DeleteAsync(analyses, context);
+                    await DeleteAsync(networks, context);
+                    await DeleteAsync(edges, context);
+                    await DeleteAsync(nodes, context);
                 }
                 catch (Exception exception)
                 {
@@ -1004,12 +999,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentNullException(nameof(ids));
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)ids.Count() / _enumerableBatchSize);
+            var count = Math.Ceiling((double)ids.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchIds = ids.Skip(index * _enumerableBatchSize).Take(_enumerableBatchSize);
+                var batchIds = ids.Skip(index * _batchSize).Take(_batchSize);
                 // Create a new scope.
                 using var scope = _serviceProvider.CreateScope();
                 // Use a new context instance.
@@ -1026,9 +1021,9 @@ namespace NetControl4BioMed.Helpers.Services
                 try
                 {
                     // Delete the items.
-                    await DeleteAsync(analyses);
-                    await DeleteAsync(networks);
-                    await DeleteAsync(edges);
+                    await DeleteAsync(analyses, context);
+                    await DeleteAsync(networks, context);
+                    await DeleteAsync(edges, context);
                 }
                 catch (Exception exception)
                 {
@@ -1052,12 +1047,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentNullException(nameof(ids));
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)ids.Count() / _enumerableBatchSize);
+            var count = Math.Ceiling((double)ids.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchIds = ids.Skip(index * _enumerableBatchSize).Take(_enumerableBatchSize);
+                var batchIds = ids.Skip(index * _batchSize).Take(_batchSize);
                 // Create a new scope.
                 using var scope = _serviceProvider.CreateScope();
                 // Use a new context instance.
@@ -1072,9 +1067,9 @@ namespace NetControl4BioMed.Helpers.Services
                 try
                 {
                     // Delete the items.
-                    await DeleteAsync(analyses);
-                    await DeleteAsync(networks);
-                    await DeleteAsync(nodeCollections);
+                    await DeleteAsync(analyses, context);
+                    await DeleteAsync(networks, context);
+                    await DeleteAsync(nodeCollections, context);
                 }
                 catch (Exception exception)
                 {
@@ -1098,12 +1093,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentNullException(nameof(ids));
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)ids.Count() / _enumerableBatchSize);
+            var count = Math.Ceiling((double)ids.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchIds = ids.Skip(index * _enumerableBatchSize).Take(_enumerableBatchSize);
+                var batchIds = ids.Skip(index * _batchSize).Take(_batchSize);
                 // Create a new scope.
                 using var scope = _serviceProvider.CreateScope();
                 // Use a new context instance.
@@ -1122,10 +1117,10 @@ namespace NetControl4BioMed.Helpers.Services
                 try
                 {
                     // Delete the items.
-                    await DeleteAsync(analyses);
-                    await DeleteAsync(networks);
-                    await DeleteAsync(genericEdges);
-                    await DeleteAsync(genericNodes);
+                    await DeleteAsync(analyses, context);
+                    await DeleteAsync(networks, context);
+                    await DeleteAsync(genericEdges, context);
+                    await DeleteAsync(genericNodes, context);
                 }
                 catch (Exception exception)
                 {
@@ -1149,12 +1144,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentNullException(nameof(ids));
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)ids.Count() / _enumerableBatchSize);
+            var count = Math.Ceiling((double)ids.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchIds = ids.Skip(index * _enumerableBatchSize).Take(_enumerableBatchSize);
+                var batchIds = ids.Skip(index * _batchSize).Take(_batchSize);
                 // Create a new scope.
                 using var scope = _serviceProvider.CreateScope();
                 // Use a new context instance.
@@ -1166,7 +1161,7 @@ namespace NetControl4BioMed.Helpers.Services
                 try
                 {
                     // Delete the items.
-                    await DeleteAsync(analyses);
+                    await DeleteAsync(analyses, context);
                 }
                 catch (Exception exception)
                 {
@@ -1182,7 +1177,7 @@ namespace NetControl4BioMed.Helpers.Services
         /// <typeparam name="T">The type of the items.</typeparam>
         /// <param name="items">The items to be created.</param>
         /// <returns></returns>
-        private async Task CreateAsync<T>(IEnumerable<T> items) where T : class
+        private async Task CreateAsync<T>(IEnumerable<T> items, ApplicationDbContext context) where T : class
         {
             // Get the current type of the items.
             var type = typeof(T);
@@ -1199,16 +1194,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentNullException(nameof(items));
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)items.Count() / _queryableBatchSize);
+            var count = Math.Ceiling((double)items.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchItems = items.Skip(index * _queryableBatchSize).Take(_queryableBatchSize);
-                // Create a new scope.
-                using var scope = _serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var batchItems = items.Skip(index * _batchSize).Take(_batchSize);
                 // Mark the items for addition.
                 context.Set<T>().AddRange(batchItems);
                 // Save the changes to the database.
@@ -1222,7 +1213,7 @@ namespace NetControl4BioMed.Helpers.Services
         /// <typeparam name="T">The type of the items.</typeparam>
         /// <param name="items">The items to be updated.</param>
         /// <returns></returns>
-        private async Task UpdateAsync<T>(IEnumerable<T> items) where T : class
+        private async Task UpdateAsync<T>(IEnumerable<T> items, ApplicationDbContext context) where T : class
         {
             // Get the current type of the items.
             var type = typeof(T);
@@ -1239,16 +1230,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentNullException(nameof(items));
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)items.Count() / _queryableBatchSize);
+            var count = Math.Ceiling((double)items.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchItems = items.Skip(index * _queryableBatchSize).Take(_queryableBatchSize);
-                // Create a new scope.
-                using var scope = _serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var batchItems = items.Skip(index * _batchSize).Take(_batchSize);
                 // Mark the items for update.
                 context.Set<T>().UpdateRange(batchItems);
                 // Save the changes to the database.
@@ -1262,7 +1249,7 @@ namespace NetControl4BioMed.Helpers.Services
         /// <typeparam name="T">The type of the items.</typeparam>
         /// <param name="items">The items to be deleted.</param>
         /// <returns></returns>
-        private async Task DeleteAsync<T>(IQueryable<T> items) where T : class
+        private async Task DeleteAsync<T>(IQueryable<T> items, ApplicationDbContext context) where T : class
         {
             // Get the current type of the items.
             var type = typeof(T);
@@ -1279,16 +1266,12 @@ namespace NetControl4BioMed.Helpers.Services
                 throw new ArgumentNullException(nameof(items));
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)items.Count() / _queryableBatchSize);
+            var count = Math.Ceiling((double)items.Count() / _batchSize);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
                 // Get the items in the current batch.
-                var batchItems = items.Take(_queryableBatchSize);
-                // Create a new scope.
-                using var scope = _serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var batchItems = items.Take(_batchSize);
                 // Mark the items for deletion.
                 context.Set<T>().RemoveRange(batchItems);
                 // Save the changes to the database.

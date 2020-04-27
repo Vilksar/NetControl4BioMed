@@ -2,8 +2,9 @@
 
 @if (!string.IsNullOrEmpty(Model))
 {
-    var type = Model.Substring(0, Model.IndexOf(": "));
-    var text = Model.Substring(Model.IndexOf(": ") + 1);
+    var index = Model.IndexOf(": ");
+    var type = index < 0 ? string.Empty : Model.Substring(0, index);
+    var text = Model.Substring(index + 1);
     var color = type == "Error" ? "danger" : type == "Success" ? "success" : "info";
     var icon = type == "Error" ? "exclamation-circle" : type == "Success" ? "check-circle" : "info-circle";
     <div class="alert alert-@color alert-dismissible text-wrap mb-3">

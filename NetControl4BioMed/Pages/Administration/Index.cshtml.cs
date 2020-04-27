@@ -1106,7 +1106,7 @@ namespace NetControl4BioMed.Pages.Administration
             if (!await _reCaptchaChecker.IsValid(reCaptchaToken))
             {
                 // Add an error to the model.
-                TempData["StatusMessage"] = "The reCaptcha verification failed.";
+                TempData["StatusMessage"] = "Error: The reCaptcha verification failed.";
                 // Redirect to the page.
                 return RedirectToPage();
             }
