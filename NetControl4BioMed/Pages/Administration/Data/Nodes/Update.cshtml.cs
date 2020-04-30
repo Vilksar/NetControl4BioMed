@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
@@ -143,7 +144,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 // Save the number of items.
                 itemCount = items.Count();
                 // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.CreateNodesAsync(items));
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.CreateNodes(items, CancellationToken.None));
             }
             // Check if the items should be edited.
             else if (Input.Type == "Edit")
@@ -162,7 +163,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 // Save the number of items.
                 itemCount = items.Count();
                 // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.UpdateNodesAsync(items));
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.UpdateNodes(items, CancellationToken.None));
             }
             // Check if the items should be deleted.
             else if (Input.Type == "Delete")
@@ -180,7 +181,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 // Save the number of nodes found.
                 itemCount = items.Count();
                 // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodesAsync(ids));
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodes(ids, CancellationToken.None));
             }
             // Check if the type is not valid.
             else

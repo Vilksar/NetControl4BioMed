@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
@@ -1114,11 +1115,11 @@ namespace NetControl4BioMed.Pages.Administration
             if (deleteItems.Contains("Nodes"))
             {
                 // Get the items.
-                var items = _context.Nodes
+                var ids = _context.Nodes
                     .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Select(item => item.Id);
                 // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodesAsync(items));
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodes(ids, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Edges"))
@@ -1128,7 +1129,7 @@ namespace NetControl4BioMed.Pages.Administration
                     .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Select(item => item.Id);
                 // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteEdgesAsync(ids));
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteEdges(ids, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("NodeCollections"))
@@ -1137,7 +1138,7 @@ namespace NetControl4BioMed.Pages.Administration
                 var ids = _context.NodeCollections
                     .Select(item => item.Id);
                 // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodeCollectionsAsync(ids));
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodeCollections(ids, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Networks"))
@@ -1146,7 +1147,7 @@ namespace NetControl4BioMed.Pages.Administration
                 var ids = _context.Networks
                     .Select(item => item.Id);
                 // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNetworksAsync(ids));
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNetworks(ids, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Analyses"))
@@ -1155,7 +1156,7 @@ namespace NetControl4BioMed.Pages.Administration
                 var ids = _context.Analyses
                     .Select(item => item.Id);
                 // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteAnalysesAsync(ids));
+                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteAnalyses(ids, CancellationToken.None));
             }
             // Display a message.
             TempData["StatusMessage"] = $"Success: The background tasks for deleting the data have been created and started successfully. You can view the progress on the Hangfire dasboard. It is recommended to not perform any other operations on the database until everything will complete.";
