@@ -290,7 +290,7 @@ namespace NetControl4BioMed.Pages.Administration
             // Create a daily recurring Hangfire task of cleaning the database.
             RecurringJob.AddOrUpdate<IHangfireRecurringJobRunner>(nameof(IHangfireRecurringJobRunner), item => item.Run(viewModel), Cron.Daily());
             // Display a message.
-            TempData["StatusMessage"] = "Success: The Hangfire recurrent jobs have been successfully reset. You can view more details on the Hangfire dasboard.";
+            TempData["StatusMessage"] = "Success: The Hangfire recurrent jobs have been successfully reset. You can view more details on the Hangfire dashboard.";
             // Redirect to the page.
             return RedirectToPage();
         }
@@ -1159,7 +1159,7 @@ namespace NetControl4BioMed.Pages.Administration
                 var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteAnalyses(ids, CancellationToken.None));
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: The background tasks for deleting the data have been created and started successfully. You can view the progress on the Hangfire dasboard. It is recommended to not perform any other operations on the database until everything will complete.";
+            TempData["StatusMessage"] = $"Success: The background tasks for deleting the data have been created and started successfully. You can view the progress on the Hangfire dashboard. It is recommended to not perform any other operations on the database until everything will complete.";
             // Redirect to the page.
             return RedirectToPage();
         }
