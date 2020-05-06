@@ -163,7 +163,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.DatabaseEdgeFieldCount dataase edge field@(Model.View.DatabaseEdgeFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseEdgeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the database edge fields</a>, or <a asp-page="/Administration/Databases/DatabaseEdgeFields/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
+            <span>The database currently contains @Model.View.DatabaseEdgeFieldCount database edge field@(Model.View.DatabaseEdgeFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseEdgeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the database edge fields</a>, or <a asp-page="/Administration/Databases/DatabaseEdgeFields/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>

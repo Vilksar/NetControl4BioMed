@@ -61,6 +61,7 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
             }
             // Get the item with the provided ID.
             var items = _context.Databases
+                .Where(item => item.DatabaseType.Name != "Generic")
                 .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there was no item found.

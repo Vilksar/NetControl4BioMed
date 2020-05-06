@@ -57,6 +57,7 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseEdgeFields
             }
             // Get the item with the provided ID.
             var items = _context.DatabaseEdgeFields
+                .Where(item => item.Database.DatabaseType.Name != "Generic")
                 .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there was no item found.

@@ -80,7 +80,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The node field currently contains @Model.View.NodeCount node@(Model.View.NodeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Data/Nodes/Index" asp-route-searchString="@Model.View.DatabaseNodeField.Id" asp-route-searchIn="DatabaseNodeFields" class="btn btn-info btn-block mb-3">view the nodes</a>.</span>
+                <span>The node field currently contains @Model.View.NodeCount node@(Model.View.NodeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Data/Nodes/Index" asp-route-searchString="@Model.View.DatabaseNodeField.Id" asp-route-searchIn="DatabaseNodeFields" class="alert-link">view the nodes</a>.</span>
             </div>
         </div>
     </div>

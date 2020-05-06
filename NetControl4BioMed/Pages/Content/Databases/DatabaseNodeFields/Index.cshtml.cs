@@ -82,6 +82,7 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
             }
             // Start with all of the items to which the user has access.
             var query = _context.DatabaseNodeFields
+                .Where(item => item.Database.DatabaseType.Name != "Generic")
                 .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user));
             // Select the results matching the search string.
             query = query
