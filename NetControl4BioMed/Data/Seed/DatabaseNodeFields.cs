@@ -113,6 +113,27 @@ namespace NetControl4BioMed.Data.Seed
                 IsSearchable = true,
                 Url = "https://www.uniprot.org/uniprot/",
                 DatabaseId = "458258dd-794f-4eec-9fe4-bc865b04f585"
+            },
+            // The node fields in the DrugBank database.
+            new DatabaseNodeField
+            {
+                Id = "9984fd37-b616-433d-99a8-1b349643a151",
+                DateTimeCreated = DateTime.Now,
+                Name = "DrugBank Drug ID",
+                Description = "The ID of a drug in the DrugBank database which targets the protein.",
+                IsSearchable = false,
+                Url = "https://www.drugbank.ca/drugs/",
+                DatabaseId = "3f88bfd7-14a4-425b-bcea-66c70950728a"
+            },
+            new DatabaseNodeField
+            {
+                Id = "6329043e-c2c7-4a19-ae9a-122d28d6a270",
+                DateTimeCreated = DateTime.Now,
+                Name = "DrugBank Drug Name",
+                Description = "The name of a drug in the DrugBank database which targets the protein.",
+                IsSearchable = false,
+                Url = null,
+                DatabaseId = "3f88bfd7-14a4-425b-bcea-66c70950728a"
             }
         };
     }

@@ -117,6 +117,16 @@ namespace NetControl4BioMed.Data.Seed
                 IsPublic = false,
                 Url = "https://www.uniprot.org/",
                 DatabaseTypeId = "9c87fcad-4395-406a-80e4-faadbf6e4d14"
+            },
+            new Database
+            {
+                Id = "3f88bfd7-14a4-425b-bcea-66c70950728a",
+                DateTimeCreated = DateTime.Now,
+                Name = "DrugBank",
+                Description = "The DrugBank database is a comprehensive, freely accessible, online database containing information on drugs and drug targets.",
+                IsPublic = false,
+                Url = "https://www.drugbank.ca/",
+                DatabaseTypeId = "9c87fcad-4395-406a-80e4-faadbf6e4d14"
             }
         };
     }
