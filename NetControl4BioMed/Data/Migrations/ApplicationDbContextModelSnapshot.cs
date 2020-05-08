@@ -285,6 +285,9 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsRecurring")
+                        .HasColumnType("bit");
+
                     b.Property<string>("JobId")
                         .HasColumnType("nvarchar(max)");
 

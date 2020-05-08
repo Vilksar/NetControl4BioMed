@@ -79,6 +79,7 @@ namespace NetControl4BioMed.Data.Migrations
                     Id = table.Column<string>(nullable: false),
                     DateTimeCreated = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(nullable: true),
+                    IsRecurring = table.Column<bool>(nullable: false),
                     Data = table.Column<string>(nullable: true),
                     JobId = table.Column<string>(nullable: true)
                 },

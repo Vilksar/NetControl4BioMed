@@ -27,6 +27,11 @@ namespace NetControl4BioMed.Data.Models
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets the recurring status of the background task.
+        /// </summary>
+        public bool IsRecurring { get; set; }
+
+        /// <summary>
         /// Gets or sets the data of the background task.
         /// </summary>
         public string Data { get; set; }
