@@ -10,14 +10,14 @@ using NetControl4BioMed.Data;
 namespace NetControl4BioMed.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200317073621_Initial")]
+    [Migration("20200508071042_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.1")
+                .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -273,6 +273,29 @@ namespace NetControl4BioMed.Data.Migrations
                     b.HasKey("AnalysisId", "Email");
 
                     b.ToTable("AnalysisUserInvitations");
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.BackgroundTask", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Data")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("JobId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BackgroundTasks");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.ControlPath", b =>

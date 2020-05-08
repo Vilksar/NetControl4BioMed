@@ -50,6 +50,11 @@ namespace NetControl4BioMed.Data
         public DbSet<AnalysisUserInvitation> AnalysisUserInvitations { get; set; }
 
         /// <summary>
+        /// Gets or sets the database table containing the background tasks.
+        /// </summary>
+        public DbSet<BackgroundTask> BackgroundTasks { get; set; }
+
+        /// <summary>
         /// Gets or sets the database table containing the control paths for analyses.
         /// </summary>
         public DbSet<ControlPath> ControlPaths { get; set; }
@@ -283,6 +288,11 @@ namespace NetControl4BioMed.Data
                     .WithMany(item => item.AnalysisUserInvitations)
                     .HasForeignKey(item => item.AnalysisId)
                     .IsRequired();
+            });
+            modelBuilder.Entity<BackgroundTask>(entity =>
+            {
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
             });
             modelBuilder.Entity<ControlPath>(entity =>
             {

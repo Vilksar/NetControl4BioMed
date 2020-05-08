@@ -73,6 +73,21 @@ namespace NetControl4BioMed.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BackgroundTasks",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    DateTimeCreated = table.Column<DateTime>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Data = table.Column<string>(nullable: true),
+                    JobId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BackgroundTasks", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DatabaseTypes",
                 columns: table => new
                 {
@@ -1133,6 +1148,9 @@ namespace NetControl4BioMed.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "BackgroundTasks");
 
             migrationBuilder.DropTable(
                 name: "DatabaseEdgeFieldEdges");
