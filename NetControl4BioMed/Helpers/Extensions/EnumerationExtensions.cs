@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.Extensions
@@ -40,6 +41,30 @@ namespace NetControl4BioMed.Helpers.Extensions
                 .First()
                 .GetCustomAttribute<DisplayAttribute>()
                 .Description;
+        }
+
+        /// <summary>
+        /// Returns the enumeration value for the provided string.
+        /// </summary>
+        /// <typeparam name="T">The type of the enumeration.</typeparam>
+        /// <param name="stringValue">The string which represents an enumeration value.</param>
+        /// <returns></returns>
+        public static T GetEnumerationValue<T>(string stringValue) where T : struct, IConvertible
+        {
+            // Check if the type is invalid.
+            if (!typeof(T).IsEnum)
+            {
+                // Throw an exception.
+                throw new ArgumentException("The provided type is not an enumeration.");
+            }
+            // Try to parse the string.
+            if (!Enum.TryParse(stringValue, out T value))
+            {
+                // Throw an exception.
+                throw new ArgumentException("The provided string is not valid for the enumeration.");
+            }
+            // Return the value.
+            return value;
         }
     }
 }
