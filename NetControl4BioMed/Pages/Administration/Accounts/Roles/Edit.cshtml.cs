@@ -97,7 +97,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(Input.Id))

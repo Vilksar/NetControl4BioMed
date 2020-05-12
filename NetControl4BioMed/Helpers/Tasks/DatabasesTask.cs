@@ -69,17 +69,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     DatabaseTypeId = item.DatabaseTypeId,
                     DatabaseType = databaseTypes.FirstOrDefault(item1 => item1.Id == item.DatabaseTypeId)
                 }).Where(item => item.DatabaseType != null);
-                // Try to create the items.
-                try
-                {
-                    // Create the items.
-                    IEnumerableExtensions.Create(databases, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Create the items.
+                IEnumerableExtensions.Create(databases, context, token);
             }
         }
 
@@ -122,11 +113,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the items corresponding to the current batch.
                 var databases = context.Databases
                     .Where(item => batchIds.Contains(item.Id));
-                // Go over each item.
-                foreach (var database in databases)
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
                 {
-                    // Get the corresponding batch item.
-                    var batchItem = batchItems.First(item => item.Id == database.Id);
+                    // Get the corresponding item.
+                    var database = databases.First(item => item.Id == batchItem.Id);
                     // Get the related entities.
                     var databaseType = databaseTypes.First(item1 => item1.Id == batchItem.DatabaseTypeId);
                     // Update the item.
@@ -137,17 +128,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     database.DatabaseTypeId = databaseType.Id;
                     database.DatabaseType = databaseType;
                 }
-                // Try to create the items.
-                try
-                {
-                    // Edit the items.
-                    IEnumerableExtensions.Edit(databases, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Edit the items.
+                IEnumerableExtensions.Edit(databases, context, token);
             }
         }
 
@@ -199,24 +181,15 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => item.NetworkDatabases.Any(item1 => databases.Contains(item1.Database)));
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisDatabases.Any(item1 => databases.Contains(item1.Database)));
-                // Try to delete the items.
-                try
-                {
-                    // Delete the items.
-                    IQueryableExtensions.Delete(analyses, context, token);
-                    IQueryableExtensions.Delete(networks, context, token);
-                    IQueryableExtensions.Delete(nodeCollections, context, token);
-                    IQueryableExtensions.Delete(edges, context, token);
-                    IQueryableExtensions.Delete(nodes, context, token);
-                    IQueryableExtensions.Delete(databaseEdgeFields, context, token);
-                    IQueryableExtensions.Delete(databaseNodeFields, context, token);
-                    IQueryableExtensions.Delete(databases, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Delete the items.
+                IQueryableExtensions.Delete(analyses, context, token);
+                IQueryableExtensions.Delete(networks, context, token);
+                IQueryableExtensions.Delete(nodeCollections, context, token);
+                IQueryableExtensions.Delete(edges, context, token);
+                IQueryableExtensions.Delete(nodes, context, token);
+                IQueryableExtensions.Delete(databaseEdgeFields, context, token);
+                IQueryableExtensions.Delete(databaseNodeFields, context, token);
+                IQueryableExtensions.Delete(databases, context, token);
             }
         }
     }

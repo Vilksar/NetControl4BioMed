@@ -85,7 +85,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())

@@ -157,17 +157,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Add the new node collection to the list.
                     nodeCollections.Add(nodeCollection);
                 }
-                // Try to create the items.
-                try
-                {
-                    // Create the items.
-                    IEnumerableExtensions.Create(nodeCollections, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Create the items.
+                IEnumerableExtensions.Create(nodeCollections, context, token);
             }
         }
 
@@ -303,20 +294,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollectionsToUpdate.Contains(item1.NodeCollection)));
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollectionsToUpdate.Contains(item1.NodeCollection)));
-                // Try to update the items.
-                try
-                {
-                    // Delete the items.
-                    IQueryableExtensions.Delete(analyses, context, token);
-                    IQueryableExtensions.Delete(networks, context, token);
-                    // Update the items.
-                    IEnumerableExtensions.Edit(nodeCollectionsToUpdate, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Delete the items.
+                IQueryableExtensions.Delete(analyses, context, token);
+                IQueryableExtensions.Delete(networks, context, token);
+                // Update the items.
+                IEnumerableExtensions.Edit(nodeCollectionsToUpdate, context, token);
             }
         }
 
@@ -358,19 +340,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the related entities that use the items.
                 var networks = context.Networks.Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)));
                 var analyses = context.Analyses.Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollections.Contains(item1.NodeCollection)) || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
-                // Try to delete the items.
-                try
-                {
-                    // Delete the items.
-                    IQueryableExtensions.Delete(analyses, context, token);
-                    IQueryableExtensions.Delete(networks, context, token);
-                    IQueryableExtensions.Delete(nodeCollections, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Delete the items.
+                IQueryableExtensions.Delete(analyses, context, token);
+                IQueryableExtensions.Delete(networks, context, token);
+                IQueryableExtensions.Delete(nodeCollections, context, token);
             }
         }
     }

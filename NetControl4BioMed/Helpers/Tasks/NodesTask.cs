@@ -146,17 +146,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Add the new node to the list.
                     nodes.Add(node);
                 }
-                // Try to create the items.
-                try
-                {
-                    // Create the items.
-                    IEnumerableExtensions.Create(nodes, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Create the items.
+                IEnumerableExtensions.Create(nodes, context, token);
             }
         }
 
@@ -283,20 +274,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => item.NetworkNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
-                // Try to update the items.
-                try
-                {
-                    // Delete the items.
-                    IQueryableExtensions.Delete(analyses, context, token);
-                    IQueryableExtensions.Delete(networks, context, token);
-                    // Update the items.
-                    IEnumerableExtensions.Edit(nodesToUpdate, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Delete the items.
+                IQueryableExtensions.Delete(analyses, context, token);
+                IQueryableExtensions.Delete(networks, context, token);
+                // Update the items.
+                IEnumerableExtensions.Edit(nodesToUpdate, context, token);
                 // Get the edges that contain the nodes.
                 var edges = context.Edges
                     .Where(item => item.EdgeNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)))
@@ -309,17 +291,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Update its name.
                     edge.Name = string.Concat(edge.EdgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " -> ", edge.EdgeNodes.First(item => item.Type == EdgeNodeType.Target).Node.Name);
                 }
-                // Try to update the items.
-                try
-                {
-                    // Update the items.
-                    IEnumerableExtensions.Edit(edges, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Update the items.
+                IEnumerableExtensions.Edit(edges, context, token);
             }
         }
 
@@ -365,20 +338,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => item.NetworkNodes.Any(item1 => nodes.Contains(item1.Node)));
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisNodes.Any(item1 => nodes.Contains(item1.Node)));
-                // Try to delete the items.
-                try
-                {
-                    // Delete the items.
-                    IQueryableExtensions.Delete(analyses, context, token);
-                    IQueryableExtensions.Delete(networks, context, token);
-                    IQueryableExtensions.Delete(edges, context, token);
-                    IQueryableExtensions.Delete(nodes, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Delete the items.
+                IQueryableExtensions.Delete(analyses, context, token);
+                IQueryableExtensions.Delete(networks, context, token);
+                IQueryableExtensions.Delete(edges, context, token);
+                IQueryableExtensions.Delete(nodes, context, token);
             }
         }
     }

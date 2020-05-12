@@ -68,17 +68,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     DatabaseId = item.DatabaseId,
                     Database = databases.FirstOrDefault(item1 => item1.Id == item.DatabaseId)
                 }).Where(item => item.Database != null);
-                // Try to create the items.
-                try
-                {
-                    // Create the items.
-                    IEnumerableExtensions.Create(databaseEdgeFields, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Create the items.
+                IEnumerableExtensions.Create(databaseEdgeFields, context, token);
             }
         }
 
@@ -121,11 +112,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the items corresponding to the current batch.
                 var databaseEdgeFields = context.DatabaseEdgeFields
                     .Where(item => batchIds.Contains(item.Id));
-                // Go over each item.
-                foreach (var databaseEdgeField in databaseEdgeFields)
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
                 {
-                    // Get the corresponding batch item.
-                    var batchItem = batchItems.First(item => item.Id == databaseEdgeField.Id);
+                    // Get the corresponding item.
+                    var databaseEdgeField = databaseEdgeFields.First(item => item.Id == batchItem.Id);
                     // Get the related entities.
                     var database = databases.First(item1 => item1.Id == batchItem.DatabaseId);
                     // Update the item.
@@ -136,17 +127,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseEdgeField.DatabaseId = database.Id;
                     databaseEdgeField.Database = database;
                 }
-                // Try to create the items.
-                try
-                {
-                    // Edit the items.
-                    IEnumerableExtensions.Edit(databaseEdgeFields, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Edit the items.
+                IEnumerableExtensions.Edit(databaseEdgeFields, context, token);
             }
         }
 
@@ -190,20 +172,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => item.NetworkEdges.Any(item1 => edges.Contains(item1.Edge)));
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
-                // Try to delete the items.
-                try
-                {
-                    // Delete the items.
-                    IQueryableExtensions.Delete(analyses, context, token);
-                    IQueryableExtensions.Delete(networks, context, token);
-                    IQueryableExtensions.Delete(edges, context, token);
-                    IQueryableExtensions.Delete(databaseEdgeFields, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Delete the items.
+                IQueryableExtensions.Delete(analyses, context, token);
+                IQueryableExtensions.Delete(networks, context, token);
+                IQueryableExtensions.Delete(edges, context, token);
+                IQueryableExtensions.Delete(databaseEdgeFields, context, token);
             }
         }
     }

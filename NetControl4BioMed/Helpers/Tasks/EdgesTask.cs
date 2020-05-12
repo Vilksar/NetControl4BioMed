@@ -140,7 +140,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Get the valid item nodes and the edge nodes to add.
-                    var x = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>("");
                     var edgeNodes = batchItem.EdgeNodes
                         .Where(item => item.Type == "Source" || item.Type == "Target")
                         .Select(item => (item.NodeId, item.Type))
@@ -211,17 +210,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Add the new node to the list.
                     edges.Add(edge);
                 }
-                // Try to create the items.
-                try
-                {
-                    // Create the items.
-                    IEnumerableExtensions.Create(edges, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Create the items.
+                IEnumerableExtensions.Create(edges, context, token);
             }
         }
 
@@ -414,20 +404,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => item.NetworkEdges.Any(item1 => edgesToUpdate.Contains(item1.Edge)));
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisEdges.Any(item1 => edgesToUpdate.Contains(item1.Edge)));
-                // Try to update the items.
-                try
-                {
-                    // Delete the items.
-                    IQueryableExtensions.Delete(analyses, context, token);
-                    IQueryableExtensions.Delete(networks, context, token);
-                    // Update the items.
-                    IEnumerableExtensions.Edit(edgesToUpdate, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Delete the items.
+                IQueryableExtensions.Delete(analyses, context, token);
+                IQueryableExtensions.Delete(networks, context, token);
+                // Update the items.
+                IEnumerableExtensions.Edit(edgesToUpdate, context, token);
             }
         }
 
@@ -471,19 +452,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => item.NetworkEdges.Any(item1 => edges.Contains(item1.Edge)));
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
-                // Try to delete the items.
-                try
-                {
-                    // Delete the items.
-                    IQueryableExtensions.Delete(analyses, context, token);
-                    IQueryableExtensions.Delete(networks, context, token);
-                    IQueryableExtensions.Delete(edges, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Delete the items.
+                IQueryableExtensions.Delete(analyses, context, token);
+                IQueryableExtensions.Delete(networks, context, token);
+                IQueryableExtensions.Delete(edges, context, token);
             }
         }
     }
