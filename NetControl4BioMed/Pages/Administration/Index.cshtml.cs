@@ -18,8 +18,10 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Services;
+using NetControl4BioMed.Helpers.Tasks;
 using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Administration
@@ -277,20 +279,42 @@ namespace NetControl4BioMed.Pages.Administration
             return RedirectToPage();
         }
 
-        public IActionResult OnPostResetHangfireRecurrentJobs()
+        public async Task<IActionResult> OnPostResetHangfireRecurrentJobsAsync()
         {
-            // Delete any existing recurring tasks of cleaning the database.
-            RecurringJob.RemoveIfExists(nameof(IHangfireRecurringJobRunner));
-            // Define the view model for the recurring task of cleaning the database.
-            var viewModel = new HangfireRecurringCleanerViewModel
+            // Get the name of the task and job for cleaning the database.
+            var name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.Clean)}";
+            // Get the existing tasks.
+            var tasks = _context.BackgroundTasks
+                .Where(item => item.Name == name);
+            // Delete any existing jobs.
+            RecurringJob.RemoveIfExists(name);
+            // Mark the existing tasks for deletion.
+            _context.BackgroundTasks.RemoveRange(tasks);
+            // Save the changes to the database.
+            await _context.SaveChangesAsync();
+            // Define a new background task.
+            var task = new BackgroundTask
             {
-                Scheme = HttpContext.Request.Scheme,
-                HostValue = HttpContext.Request.Host.Value
+                DateTimeCreated = DateTime.Now,
+                Name = name,
+                IsRecurring = true,
+                Data = JsonSerializer.Serialize(new CleaningTask
+                {
+                    Scheme = HttpContext.Request.Scheme,
+                    HostValue = HttpContext.Request.Host.Value,
+                    DaysBeforeStop = 7,
+                    DaysBeforeAlert = 24,
+                    DaysBeforeDelete = 31
+                })
             };
-            // Create a daily recurring Hangfire task of cleaning the database.
-            RecurringJob.AddOrUpdate<IHangfireRecurringJobRunner>(nameof(IHangfireRecurringJobRunner), item => item.Run(viewModel), Cron.Daily());
+            // Mark the background task for addition.
+            _context.BackgroundTasks.Add(task);
+            // Save the changes to the database.
+            await _context.SaveChangesAsync();
+            // Create a new Hangfire daily recurring job.
+            RecurringJob.AddOrUpdate<IAdministrationTaskManager>(name, item => item.Clean(task.Id, CancellationToken.None), Cron.Daily());
             // Display a message.
-            TempData["StatusMessage"] = "Success: The Hangfire recurrent jobs have been successfully reset. You can view more details on the Hangfire dashboard.";
+            TempData["StatusMessage"] = "Success: The database cleaning job has been successfully reset. You can view more details on the Hangfire dashboard.";
             // Redirect to the page.
             return RedirectToPage();
         }
@@ -1115,51 +1139,139 @@ namespace NetControl4BioMed.Pages.Administration
             if (deleteItems.Contains("Nodes"))
             {
                 // Get the items.
-                var ids = _context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Select(item => item.Id);
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodes(ids, CancellationToken.None));
+                var items = _context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNodes)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new NodesTask
+                    {
+                        Items = items.Select(item => new NodeInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNodes(task.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Edges"))
             {
                 // Get the items.
-                var ids = _context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Select(item => item.Id);
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteEdges(ids, CancellationToken.None));
+                var items = _context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteEdges)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new EdgesTask
+                    {
+                        Items = items.Select(item => new EdgeInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteEdges(task.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("NodeCollections"))
             {
                 // Get the items.
-                var ids = _context.NodeCollections
-                    .Select(item => item.Id);
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodeCollections(ids, CancellationToken.None));
+                var items = _context.NodeCollections
+                    .AsQueryable();
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNodeCollections)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new NodeCollectionsTask
+                    {
+                        Items = items.Select(item => new NodeCollectionInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNodeCollections(task.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Networks"))
             {
                 // Get the items.
-                var ids = _context.Networks
-                    .Select(item => item.Id);
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNetworks(ids, CancellationToken.None));
+                var items = _context.Networks
+                    .AsQueryable();
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNetworks)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new NetworksTask
+                    {
+                        Items = items.Select(item => new NetworkInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNetworks(task.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Analyses"))
             {
                 // Get the items.
-                var ids = _context.Analyses
-                    .Select(item => item.Id);
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteAnalyses(ids, CancellationToken.None));
+                var items = _context.Analyses
+                    .AsQueryable();
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAnalyses)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new AnalysesTask
+                    {
+                        Items = items.Select(item => new AnalysisInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAnalyses(task.Id, CancellationToken.None));
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: The background tasks for deleting the data have been created and started successfully. You can view the progress on the Hangfire dashboard. It is recommended to not perform any other operations on the database until everything will complete.";
+            TempData["StatusMessage"] = $"Success: The background tasks for deleting the data have been created and scheduled successfully. You can view the progress on the Hangfire dashboard. It is recommended to not perform any other operations on the database until everything will complete.";
             // Redirect to the page.
             return RedirectToPage();
         }

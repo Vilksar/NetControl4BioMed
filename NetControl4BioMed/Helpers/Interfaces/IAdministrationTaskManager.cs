@@ -106,26 +106,6 @@ namespace NetControl4BioMed.Helpers.Interfaces
         void DeleteUserRoles(string id, CancellationToken token);
 
         /// <summary>
-        /// Deletes database users from the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
-        [AutomaticRetry(Attempts = 0)]
-        [DisableConcurrentExecution(86400)]
-        void DeleteDatabaseUsers(string id, CancellationToken token);
-
-        /// <summary>
-        /// Deletes database user invitations from the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
-        [AutomaticRetry(Attempts = 0)]
-        [DisableConcurrentExecution(86400)]
-        void DeleteDatabaseUserInvitations(string id, CancellationToken token);
-
-        /// <summary>
         /// Deletes database types from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
@@ -144,6 +124,26 @@ namespace NetControl4BioMed.Helpers.Interfaces
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
         void DeleteDatabases(string id, CancellationToken token);
+
+        /// <summary>
+        /// Deletes database users from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        /// <returns></returns>
+        [AutomaticRetry(Attempts = 0)]
+        [DisableConcurrentExecution(86400)]
+        void DeleteDatabaseUsers(string id, CancellationToken token);
+
+        /// <summary>
+        /// Deletes database user invitations from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        /// <returns></returns>
+        [AutomaticRetry(Attempts = 0)]
+        [DisableConcurrentExecution(86400)]
+        void DeleteDatabaseUserInvitations(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes database node fields from the database.
