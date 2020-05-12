@@ -459,6 +459,14 @@ namespace NetControl4BioMed.Helpers.Services
             using var scope = _serviceProvider.CreateScope();
             // Use a new context instance.
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Reload the background task.
+            context.Entry(backgroundTask).Reload();
+            // Check if the background task doesn't exist anymore.
+            if (backgroundTask == null)
+            {
+                // End the function.
+                return;
+            }
             // Check if the background task is recurring.
             if (backgroundTask.IsRecurring)
             {

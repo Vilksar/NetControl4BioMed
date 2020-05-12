@@ -67,8 +67,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     Url = item.Url,
                     IsPublic = item.IsPublic,
                     DatabaseTypeId = item.DatabaseTypeId,
-                    DatabaseType = databaseTypes.FirstOrDefault(item1 => item1.Id == item.DatabaseTypeId)
-                }).Where(item => item.DatabaseType != null);
+                    DatabaseType = databaseTypes.First(item1 => item1.Id == item.DatabaseTypeId)
+                });
                 // Create the items.
                 IEnumerableExtensions.Create(databases, context, token);
             }

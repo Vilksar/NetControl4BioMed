@@ -66,8 +66,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     Url = item.Url,
                     IsSearchable = item.IsSearchable,
                     DatabaseId = item.DatabaseId,
-                    Database = databases.FirstOrDefault(item1 => item1.Id == item.DatabaseId)
-                }).Where(item => item.Database != null);
+                    Database = databases.First(item1 => item1.Id == item.DatabaseId)
+                });
                 // Create the items.
                 IEnumerableExtensions.Create(databaseNodeFields, context, token);
             }

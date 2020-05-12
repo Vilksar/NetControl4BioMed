@@ -55,25 +55,18 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 // Get the items in the current batch.
                 var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the related entities that appear in the current batch.
+                var userIds = batchItems.Select(item => item.UserId);
+                var roleIds = batchItems.Select(item => item.RoleId);
+                // Get the related entities that appear in the current batch.
+                var users = context.Users.Where(item => userIds.Contains(item.Id));
+                var roles = context.Roles.Where(item => roleIds.Contains(item.Id));
                 // Go over each item in the current batch.
                 foreach (var batchItem in batchItems)
                 {
-                    // Get the corresponding related entities.
-                    var user = context.Users.FirstOrDefault(item => item.Id == batchItem.UserId);
-                    // Check if there was no user found.
-                    if (user == null)
-                    {
-                        // Throw an exception.
-                        throw new ArgumentException("No user could be found matching the provided ID.");
-                    }
-                    // Get the corresponding related entities.
-                    var role = context.Roles.FirstOrDefault(item => item.Id == batchItem.RoleId);
-                    // Check if there was no role found.
-                    if (role == null)
-                    {
-                        // Throw an exception.
-                        throw new ArgumentException("No role could be found matching the provided ID.");
-                    }
+                    // Get the related entities.
+                    var user = users.First(item => item.Id == batchItem.UserId);
+                    var role = roles.First(item => item.Id == batchItem.RoleId);
                     // Try to add the user to the role.
                     var result = Task.Run(() => userManager.AddToRoleAsync(user, role.Name)).Result;
                     // Check if any of the operations has failed.
@@ -131,20 +124,25 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the items with the provided IDs.
                 var userRoles = context.UserRoles
                     .Where(item => batchIds.Any(item1 => item1.UserId == item.User.Id && item1.RoleId == item.Role.Id));
-                // Try to delete the items.
-                try
+                // Go over each item.
+                foreach (var userRole in userRoles.ToList())
                 {
-                    // Go over each of the item.
-                    foreach (var userRole in userRoles.ToList())
+                    // Delete it.
+                    var result = Task.Run(() => userManager.RemoveFromRoleAsync(userRole.User, userRole.Role.Name)).Result;
+                    // Check if the operation has failed.
+                    if (!result.Succeeded)
                     {
-                        // Delete it.
-                        Task.Run(() => userManager.RemoveFromRoleAsync(userRole.User, userRole.Role.Name)).Wait();
+                        // Define the exception message.
+                        var message = string.Empty;
+                        // Go over each of the encountered errors.
+                        foreach (var error in result.Errors)
+                        {
+                            // Add the error to the message.
+                            message += error.Description;
+                        }
+                        // Throw an exception.
+                        throw new DbUpdateException(message);
                     }
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
                 }
             }
         }
