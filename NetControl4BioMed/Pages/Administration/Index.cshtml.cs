@@ -1271,7 +1271,7 @@ namespace NetControl4BioMed.Pages.Administration
                 var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAnalyses(task.Id, CancellationToken.None));
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: The background tasks for deleting the data have been created and scheduled successfully. You can view the progress on the Hangfire dashboard. It is recommended to not perform any other operations on the database until everything will complete.";
+            TempData["StatusMessage"] = $"Success: A new background task was created to delete {string.Join("and ", deleteItems.Select(item => $"all {item.ToLower()}"))}.";
             // Redirect to the page.
             return RedirectToPage();
         }

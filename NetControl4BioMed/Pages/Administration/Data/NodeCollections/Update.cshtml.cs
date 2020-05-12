@@ -266,7 +266,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 return Page();
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: The background task for updating the data ({itemCount.ToString()} item{(itemCount != 1 ? "s" : string.Empty)} of type \"{Input.Type}\") has been created and scheduled successfully. You can view the progress on the Hangfire dashboard.";
+            TempData["StatusMessage"] = $"Success: A new background task was created to {Input.Type.ToLower()} ({itemCount} node collection{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Data/NodeCollections/Index");
         }
