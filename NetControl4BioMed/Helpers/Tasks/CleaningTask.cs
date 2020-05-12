@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.ViewModels;
 using System;
@@ -13,12 +14,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NetControl4BioMed.Helpers.BackgroundJobs
+namespace NetControl4BioMed.Helpers.Tasks
 {
     /// <summary>
-    /// Implements a background job to clean the database.
+    /// Implements a task to clean the database.
     /// </summary>
-    public class CleanBackgroundJob : BaseBackgroundJob
+    public class CleaningTask
     {
         /// <summary>
         /// Gets or sets the HTTP context scheme.
@@ -46,11 +47,11 @@ namespace NetControl4BioMed.Helpers.BackgroundJobs
         public int DaysBeforeDelete { get; set; }
 
         /// <summary>
-        /// Runs the current job.
+        /// Cleans the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public override void Run(IServiceProvider serviceProvider, CancellationToken token)
+        public void Clean(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Stop the long running analyses.
             StopAnalyses(serviceProvider, token);
@@ -79,14 +80,17 @@ namespace NetControl4BioMed.Helpers.BackgroundJobs
             var items = context.Analyses
                 .Where(item => item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing)
                 .Where(item => item.DateTimeStarted < limitDate);
-            // Define a new job.
-            var job = new StopAnalysesBackgroundJob
+            // Define a new task.
+            var task = new AnalysesTask
             {
-                Ids = items
-                    .Select(item => item.Id)
+                Items = items
+                    .Select(item => new AnalysisInputModel
+                    {
+                        Id = item.Id
+                    })
             };
-            // Run the job.
-            job.Run(serviceProvider, token);
+            // Run the task.
+            task.Stop(serviceProvider, token);
         }
 
         /// <summary>
@@ -183,14 +187,17 @@ namespace NetControl4BioMed.Helpers.BackgroundJobs
             // Get the items to stop.
             var items = context.Networks
                 .Where(item => item.DateTimeCreated < limitDate);
-            // Define a new job.
-            var job = new DeleteNetworksBackgroundJob
+            // Define a new task.
+            var task = new NetworksTask
             {
-                Ids = items
-                    .Select(item => item.Id)
+                Items = items
+                    .Select(item => new NetworkInputModel
+                    {
+                        Id = item.Id
+                    })
             };
-            // Run the job.
-            job.Run(serviceProvider, token);
+            // Run the task.
+            task.Delete(serviceProvider, token);
         }
 
         /// <summary>
@@ -210,14 +217,17 @@ namespace NetControl4BioMed.Helpers.BackgroundJobs
             var items = context.Analyses
                 .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
                 .Where(item => item.DateTimeEnded < limitDate);
-            // Define a new job.
-            var job = new DeleteAnalysesBackgroundJob
+            // Define a new task.
+            var task = new AnalysesTask
             {
-                Ids = items
-                    .Select(item => item.Id)
+                Items = items
+                    .Select(item => new AnalysisInputModel
+                    {
+                        Id = item.Id
+                    })
             };
-            // Run the job.
-            job.Run(serviceProvider, token);
+            // Run the task.
+            task.Delete(serviceProvider, token);
         }
     }
 }

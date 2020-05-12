@@ -151,10 +151,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if there is any ID provided.
                     if (!string.IsNullOrEmpty(batchItem.Id))
                     {
-                        // Assign it to the node.
+                        // Assign it to the node collection.
                         nodeCollection.Id = batchItem.Id;
                     }
-                    // Add the new node to the list.
+                    // Add the new node collection to the list.
                     nodeCollections.Add(nodeCollection);
                 }
                 // Try to create the items.

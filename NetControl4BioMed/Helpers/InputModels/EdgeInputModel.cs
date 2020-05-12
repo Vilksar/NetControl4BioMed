@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace NetControl4BioMed.Helpers.InputModels
 {
@@ -14,14 +10,11 @@ namespace NetControl4BioMed.Helpers.InputModels
         /// <summary>
         /// Represents the ID of the edge.
         /// </summary>
-        [DataType(DataType.Text)]
-        [Required(ErrorMessage = "This field is required.")]
         public string Id { get; set; }
 
         /// <summary>
         /// Represents the description of the edge.
         /// </summary>
-        [DataType(DataType.MultilineText)]
         public string Description { get; set; }
 
         /// <summary>
