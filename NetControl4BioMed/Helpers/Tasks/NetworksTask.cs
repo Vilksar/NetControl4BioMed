@@ -69,15 +69,17 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Get the IDs of the items in the current batch.
-                var batchIds = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize).Select(item => item.Id);
                 // Create a new scope.
                 using var scope = serviceProvider.CreateScope();
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
                 var networks = context.Networks
-                .Where(item => batchIds.Contains(item.Id));
+                    .Where(item => batchIds.Contains(item.Id));
                 // Get the related entities that use the items.
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
@@ -85,20 +87,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var genericNetworks = networks.Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
                 var genericNodes = context.Nodes.Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
                 var genericEdges = context.Edges.Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
-                // Try to delete the items.
-                try
-                {
-                    // Delete the items.
-                    IQueryableExtensions.Delete(analyses, context, token);
-                    IQueryableExtensions.Delete(networks, context, token);
-                    IQueryableExtensions.Delete(genericEdges, context, token);
-                    IQueryableExtensions.Delete(genericNodes, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Delete the items.
+                IQueryableExtensions.Delete(analyses, context, token);
+                IQueryableExtensions.Delete(networks, context, token);
+                IQueryableExtensions.Delete(genericEdges, context, token);
+                IQueryableExtensions.Delete(genericNodes, context, token);
             }
         }
 

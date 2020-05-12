@@ -69,26 +69,19 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Get the IDs of the items in the current batch.
-                var batchIds = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize).Select(item => item.Id);
                 // Create a new scope.
                 using var scope = serviceProvider.CreateScope();
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
                 var analyses = context.Analyses
                     .Where(item => batchIds.Contains(item.Id));
-                // Try to delete the items.
-                try
-                {
-                    // Delete the items.
-                    IQueryableExtensions.Delete(analyses, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Delete the items.
+                IQueryableExtensions.Delete(analyses, context, token);
             }
         }
 
@@ -138,18 +131,20 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Get the IDs of the items in the current batch.
-                var batchIds = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize).Select(item => item.Id);
                 // Create a new scope.
                 using var scope = serviceProvider.CreateScope();
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
                 var analyses = context.Analyses
                     .Where(item => batchIds.Contains(item.Id));
                 // Mark the items for updating.
                 context.Analyses.UpdateRange(analyses);
-                // Go over each of item.
+                // Go over each item.
                 foreach (var analysis in analyses)
                 {
                     // Update the log.
@@ -157,17 +152,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Update the status.
                     analysis.Status = AnalysisStatus.Stopping;
                 }
-                // Try to update the items.
-                try
-                {
-                    // Update the items.
-                    IEnumerableExtensions.Edit(analyses, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Update the items.
+                IEnumerableExtensions.Edit(analyses, context, token);
             }
         }
     }
