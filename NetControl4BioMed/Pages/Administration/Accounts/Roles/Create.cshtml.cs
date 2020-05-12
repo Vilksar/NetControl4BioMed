@@ -2,24 +2,28 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
 {
     [Authorize(Roles = "Administrator")]
     public class CreateModel : PageModel
     {
-        private readonly RoleManager<Role> _roleManager;
+        private readonly IServiceProvider _serviceProvider;
 
-        public CreateModel(RoleManager<Role> roleManager)
+        public CreateModel(IServiceProvider serviceProvider)
         {
-            _roleManager = roleManager;
+            _serviceProvider = serviceProvider;
         }
 
         [BindProperty]
@@ -38,8 +42,14 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Use a new role manager instance.
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
             {
@@ -48,23 +58,27 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                 // Redisplay the page.
                 return Page();
             }
-            // Define the new role.
-            var role = new Role
+            // Define a new task.
+            var task = new RolesTask
             {
-                Name = Input.Name,
-                DateTimeCreated = DateTime.Now
-            };
-            // Try to create the new role.
-            var result = await _roleManager.CreateAsync(role);
-            // Check if any of the operations has failed.
-            if (!result.Succeeded)
-            {
-                // Go over each of the encountered errors.
-                foreach (var error in result.Errors)
+                Items = new List<RoleInputModel>
                 {
-                    // Add the error to the model.
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    new RoleInputModel
+                    {
+                        Name = Input.Name
+                    }
                 }
+            };
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Create(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
                 // Redisplay the page.
                 return Page();
             }

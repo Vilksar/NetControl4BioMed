@@ -2,28 +2,28 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
 {
     [Authorize(Roles = "Administrator")]
     public class CreateModel : PageModel
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly ApplicationDbContext _context;
+        private readonly IServiceProvider _serviceProvider;
 
-        public CreateModel(UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
+        public CreateModel(IServiceProvider serviceProvider)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _context = context;
+            _serviceProvider = serviceProvider;
         }
 
         [BindProperty]
@@ -54,6 +54,14 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Use a new user manager instance.
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            // Use a new sign in manager instance.
+            var signInManager = scope.ServiceProvider.GetRequiredService<SignInManager<User>>();
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
             {
@@ -63,7 +71,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return Page();
             }
             // Get the user based on the provided string.
-            var user = _context.Users.FirstOrDefault(item => item.Id == Input.UserString || item.Email == Input.UserString);
+            var user = context.Users.FirstOrDefault(item => item.Id == Input.UserString || item.Email == Input.UserString);
             // Check if there was no user found.
             if (user == null)
             {
@@ -73,7 +81,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return Page();
             }
             // Get the role based on the provided string.
-            var role = _context.Roles.FirstOrDefault(item => item.Id == Input.RoleString || item.Name == Input.RoleString);
+            var role = context.Roles.FirstOrDefault(item => item.Id == Input.RoleString || item.Name == Input.RoleString);
             // Check if there was no role found.
             if (role == null)
             {
@@ -82,25 +90,36 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 // Redisplay the page.
                 return Page();
             }
-            // Try to add the user to the role.
-            var result = await _userManager.AddToRoleAsync(user, role.Name);
-            // Check if the operations has failed.
-            if (!result.Succeeded)
+            // Define a new task.
+            var task = new UserRolesTask
             {
-                // Go over each of the encountered errors.
-                foreach (var error in result.Errors)
+                Items = new List<UserRoleInputModel>
                 {
-                    // Add the error to the model.
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    new UserRoleInputModel
+                    {
+                        UserId = user.Id,
+                        RoleId = role.Id
+                    }
                 }
+            };
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Create(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
                 // Redisplay the page.
                 return Page();
             }
             // Check if the found user is the current one.
-            if (await _userManager.GetUserAsync(User) == user)
+            if (await userManager.GetUserAsync(User) == user)
             {
                 // Log out the user.
-                await _signInManager.SignOutAsync();
+                await signInManager.SignOutAsync();
                 // Display a message.
                 TempData["StatusMessage"] = $"Info: 1 user role created successfully. The roles assigned to your account have changed, so you have been signed out.";
                 // Redirect to the index page.

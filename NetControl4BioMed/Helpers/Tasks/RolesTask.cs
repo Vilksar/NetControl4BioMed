@@ -30,8 +30,58 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public void Create(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Throw an exception.
-            throw new NotImplementedException();
+            // Check if there weren't any valid items found.
+            if (Items == null || !Items.Any())
+            {
+                // Throw an exception.
+                throw new ArgumentException("No valid items could be found with the provided data.");
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (var index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Create a new scope.
+                using var scope = serviceProvider.CreateScope();
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Use a new role manager instance.
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
+                {
+                    // Define the corresponding item.
+                    var role = new Role
+                    {
+                        Name = batchItem.Name,
+                        DateTimeCreated = DateTime.Now
+                    };
+                    // Try to create the new role.
+                    var result = Task.Run(() => roleManager.CreateAsync(role)).Result;
+                    // Check if any of the operations has failed.
+                    if (!result.Succeeded)
+                    {
+                        // Define the exception message.
+                        var message = string.Empty;
+                        // Go over each of the encountered errors.
+                        foreach (var error in result.Errors)
+                        {
+                            // Add the error to the message.
+                            message += error.Description;
+                        }
+                        // Throw an exception.
+                        throw new DbUpdateException(message);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -41,8 +91,65 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public void Edit(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Throw an exception.
-            throw new NotImplementedException();
+            // Check if there weren't any valid items found.
+            if (Items == null || !Items.Any())
+            {
+                // Throw an exception.
+                throw new ArgumentException("No valid items could be found with the provided data.");
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (var index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Create a new scope.
+                using var scope = serviceProvider.CreateScope();
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Use a new role manager instance.
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
+                // Get the items corresponding to the current batch.
+                var roles = context.Roles
+                    .Where(item => batchIds.Contains(item.Id));
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
+                {
+                    // Get the corresponding item.
+                    var role = roles.First(item => item.Id == batchItem.Id);
+                    // Define a new identity result.
+                    var result = IdentityResult.Success;
+                    // Check if the name is different from the current one.
+                    if (batchItem.Name != role.Name)
+                    {
+                        // Try to set the new role name.
+                        result = Task.Run(() => roleManager.SetRoleNameAsync(role, batchItem.Name)).Result;
+                    }
+                    // Check if any of the operations has failed.
+                    if (!result.Succeeded)
+                    {
+                        // Define the exception message.
+                        var message = string.Empty;
+                        // Go over each of the encountered errors.
+                        foreach (var error in result.Errors)
+                        {
+                            // Add the error to the message.
+                            message += error.Description;
+                        }
+                        // Throw an exception.
+                        throw new DbUpdateException(message);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -69,31 +176,38 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Get the IDs of the items in the current batch.
-                var batchIds = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize).Select(item => item.Id);
                 // Create a new scope.
                 using var scope = serviceProvider.CreateScope();
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Use a new role manager instance.
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
                 var roles = context.Roles
                     .Where(item => batchIds.Contains(item.Id));
-                // Try to delete the items.
-                try
+                // Go over each item.
+                foreach (var role in roles.ToList())
                 {
-                    // Go over each of the item.
-                    foreach (var role in roles.ToList())
+                    // Delete it.
+                    var result = Task.Run(() => roleManager.DeleteAsync(role)).Result;
+                    // Check if any of the operations has failed.
+                    if (!result.Succeeded)
                     {
-                        // Delete it.
-                        Task.Run(() => roleManager.DeleteAsync(role)).Wait();
+                        // Define the exception message.
+                        var message = string.Empty;
+                        // Go over each of the encountered errors.
+                        foreach (var error in result.Errors)
+                        {
+                            // Add the error to the message.
+                            message += error.Description;
+                        }
+                        // Throw an exception.
+                        throw new DbUpdateException(message);
                     }
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
                 }
             }
         }

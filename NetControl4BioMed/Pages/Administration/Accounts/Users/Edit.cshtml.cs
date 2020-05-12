@@ -2,27 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Accounts.Users
 {
     [Authorize(Roles = "Administrator")]
     public class EditModel : PageModel
     {
-        private readonly UserManager<User> _userManager;
-        private readonly ApplicationDbContext _context;
+        private readonly IServiceProvider _serviceProvider;
 
-        public EditModel(UserManager<User> userManager, ApplicationDbContext context)
+        public EditModel(IServiceProvider serviceProvider)
         {
-            _userManager = userManager;
-            _context = context;
+            _serviceProvider = serviceProvider;
         }
 
         [BindProperty]
@@ -59,8 +61,12 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Users/Index");
             }
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the query.
-            var query = _context.Users
+            var query = context.Users
                 .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
@@ -87,7 +93,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(Input.Id))
@@ -97,8 +103,14 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Users/Index");
             }
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Use a new user manager instance.
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             // Define the query.
-            var query = _context.Users
+            var query = context.Users
                 .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel
@@ -122,51 +134,31 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 // Redisplay the page.
                 return Page();
             }
-            // Check if the e-mail is different from the current one.
-            if (Input.Email != View.User.Email)
+            // Define a new task.
+            var task = new UsersTask
             {
-                // Get the current user e-mail.
-                var email = View.User.Email;
-                // Try to update the username.
-                var result = await _userManager.SetUserNameAsync(View.User, Input.Email);
-                // Try to update the e-mail.
-                result = result.Succeeded ? await _userManager.SetEmailAsync(View.User, Input.Email) : result;
-                // Check if the update was not successful.
-                if (!result.Succeeded)
+                Items = new List<UserInputModel>
                 {
-                    // Go over the encountered errors
-                    foreach (var error in result.Errors)
+                    new UserInputModel
                     {
-                        // and add them to the model
-                        ModelState.AddModelError(string.Empty, error.Description);
+                        Email = Input.Email,
+                        EmailConfirmed = Input.EmailConfirmed
                     }
-                    // Return the page.
-                    return Page();
                 }
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
-            }
-            // Check if we should set the e-mail as confirmed.
-            if (!View.User.EmailConfirmed && Input.EmailConfirmed)
+            };
+            // Try to run the task.
+            try
             {
-                // Generate the token and try to set it.
-                var token = await _userManager.GenerateEmailConfirmationTokenAsync(View.User);
-                var result = await _userManager.ConfirmEmailAsync(View.User, token);
-                // Check if the update was not successful.
-                if (!result.Succeeded)
-                {
-                    // Go over the encountered errors
-                    foreach (var error in result.Errors)
-                    {
-                        // and add them to the model
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    // Return the page.
-                    return Page();
-                }
+                // Run the task.
+                task.Edit(_serviceProvider, CancellationToken.None);
             }
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
             // Display a message.
             TempData["StatusMessage"] = $"Success: 1 user updated successfully.";
             // Redirect to the index page.

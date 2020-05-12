@@ -30,19 +30,68 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public void Create(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Throw an exception.
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Edits the items in the database.
-        /// </summary>
-        /// <param name="serviceProvider">The application service provider.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        public void Edit(IServiceProvider serviceProvider, CancellationToken token)
-        {
-            // Throw an exception.
-            throw new NotImplementedException();
+            // Check if there weren't any valid items found.
+            if (Items == null || !Items.Any())
+            {
+                // Throw an exception.
+                throw new ArgumentException("No valid items could be found with the provided data.");
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (var index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Create a new scope.
+                using var scope = serviceProvider.CreateScope();
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Use a new user manager instance.
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
+                {
+                    // Get the corresponding related entities.
+                    var user = context.Users.FirstOrDefault(item => item.Id == batchItem.UserId);
+                    // Check if there was no user found.
+                    if (user == null)
+                    {
+                        // Throw an exception.
+                        throw new ArgumentException("No user could be found matching the provided ID.");
+                    }
+                    // Get the corresponding related entities.
+                    var role = context.Roles.FirstOrDefault(item => item.Id == batchItem.RoleId);
+                    // Check if there was no role found.
+                    if (role == null)
+                    {
+                        // Throw an exception.
+                        throw new ArgumentException("No role could be found matching the provided ID.");
+                    }
+                    // Try to add the user to the role.
+                    var result = Task.Run(() => userManager.AddToRoleAsync(user, role.Name)).Result;
+                    // Check if any of the operations has failed.
+                    if (!result.Succeeded)
+                    {
+                        // Define the exception message.
+                        var message = string.Empty;
+                        // Go over each of the encountered errors.
+                        foreach (var error in result.Errors)
+                        {
+                            // Add the error to the message.
+                            message += error.Description;
+                        }
+                        // Throw an exception.
+                        throw new DbUpdateException(message);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -69,14 +118,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Get the IDs of the items in the current batch.
-                var batchIds = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize).Select(item => (item.UserId, item.RoleId));
                 // Create a new scope.
                 using var scope = serviceProvider.CreateScope();
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Use a new user manager instance.
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => (item.UserId, item.RoleId));
                 // Get the items with the provided IDs.
                 var userRoles = context.UserRoles
                     .Where(item => batchIds.Any(item1 => item1.UserId == item.User.Id && item1.RoleId == item.Role.Id));
