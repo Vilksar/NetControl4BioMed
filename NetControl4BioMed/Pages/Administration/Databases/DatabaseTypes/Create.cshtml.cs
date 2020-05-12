@@ -47,6 +47,10 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
 
         public IActionResult OnPost()
         {
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
             {
@@ -55,10 +59,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                 // Redisplay the page.
                 return Page();
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Check if there is another database type with the same name.
             if (context.DatabaseTypes.Any(item => item.Name == Input.Name))
             {
@@ -79,8 +79,19 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                     }
                 }
             };
-            // Run the task.
-            task.Create(_serviceProvider, CancellationToken.None);
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Create(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 database type created successfully.";
             // Redirect to the index page.

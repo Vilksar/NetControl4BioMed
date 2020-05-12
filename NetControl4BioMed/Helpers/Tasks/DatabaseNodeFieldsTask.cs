@@ -125,21 +125,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 foreach (var databaseNodeField in databaseNodeFields)
                 {
                     // Get the corresponding batch item.
-                    var batchItem = batchItems.FirstOrDefault(item => item.Id == databaseNodeField.Id);
-                    // Check if there wasn't any batch item found.
-                    if (batchItem == null)
-                    {
-                        // Continue.
-                        continue;
-                    }
+                    var batchItem = batchItems.First(item => item.Id == databaseNodeField.Id);
                     // Get the related entities.
-                    var database = databases.FirstOrDefault(item1 => item1.Id == batchItem.DatabaseId);
-                    // Check if there was no entity found.
-                    if (database == null)
-                    {
-                        // Continue.
-                        continue;
-                    }
+                    var database = databases.First(item1 => item1.Id == batchItem.DatabaseId);
                     // Update the item.
                     databaseNodeField.Name = batchItem.Name;
                     databaseNodeField.Description = batchItem.Description;

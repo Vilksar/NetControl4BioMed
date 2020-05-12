@@ -21,11 +21,6 @@
         public string Password { get; set; }
 
         /// <summary>
-        /// Represents the password confirmation of the user.
-        /// </summary>
-        public string ConfirmPassword { get; set; }
-
-        /// <summary>
         /// Represents the e-mail confirmation status of the user.
         /// </summary>
         public bool EmailConfirmed { get; set; }

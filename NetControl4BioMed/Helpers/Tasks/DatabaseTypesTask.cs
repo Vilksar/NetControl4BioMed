@@ -113,13 +113,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 foreach (var databaseType in databaseTypes)
                 {
                     // Get the corresponding batch item.
-                    var batchItem = batchItems.FirstOrDefault(item => item.Id == databaseType.Id);
-                    // Check if there wasn't any batch item found.
-                    if (batchItem == null)
-                    {
-                        // Continue.
-                        continue;
-                    }
+                    var batchItem = batchItems.First(item => item.Id == databaseType.Id);
                     // Update the item.
                     databaseType.Name = batchItem.Name;
                     databaseType.Description = batchItem.Description;

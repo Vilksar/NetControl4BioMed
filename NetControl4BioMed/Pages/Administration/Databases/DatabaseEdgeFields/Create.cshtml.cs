@@ -131,8 +131,19 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                     }
                 }
             };
-            // Run the task.
-            task.Create(_serviceProvider, CancellationToken.None);
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Create(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 database edge field created successfully.";
             // Redirect to the index page.

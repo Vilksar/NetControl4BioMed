@@ -169,8 +169,19 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                     }
                 }
             };
-            // Run the task.
-            task.Edit(_serviceProvider, CancellationToken.None);
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Edit(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 database type updated successfully.";
             // Redirect to the index page.
