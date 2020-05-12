@@ -30,19 +30,44 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public void Create(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Throw an exception.
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Edits the items in the database.
-        /// </summary>
-        /// <param name="serviceProvider">The application service provider.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        public void Edit(IServiceProvider serviceProvider, CancellationToken token)
-        {
-            // Throw an exception.
-            throw new NotImplementedException();
+            // Check if there weren't any valid items found.
+            if (Items == null || !Items.Any())
+            {
+                // Throw an exception.
+                throw new ArgumentException("No valid items could be found with the provided data.");
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (var index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Create a new scope.
+                using var scope = serviceProvider.CreateScope();
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the related entities that appear in the current batch.
+                var databaseIds = batchItems.Select(item => item.DatabaseId);
+                // Get the related entities that appear in the current batch.
+                var databases = context.Databases.Where(item => databaseIds.Contains(item.Id));
+                // Define the items corresponding to the current batch.
+                var databaseUserInvitations = batchItems.Select(item => new DatabaseUserInvitation
+                {
+                    DatabaseId = item.DatabaseId,
+                    Database = databases.First(item1 => item1.Id == item.DatabaseId),
+                    Email = item.Email,
+                    DateTimeCreated = DateTime.Now
+                });
+                // Create the items.
+                IEnumerableExtensions.Create(databaseUserInvitations, context, token);
+            }
         }
 
         /// <summary>
@@ -69,26 +94,19 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Get the IDs of the items in the current batch.
-                var batchIds = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize).Select(item => (item.DatabaseId, item.Email));
                 // Create a new scope.
                 using var scope = serviceProvider.CreateScope();
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => (item.DatabaseId, item.Email));
                 // Get the items with the provided IDs.
                 var databaseUserInvitations = context.DatabaseUserInvitations
                     .Where(item => batchIds.Any(item1 => item1.DatabaseId == item.Database.Id && item1.Email == item.Email));
-                // Try to delete the items.
-                try
-                {
-                    // Delete the items.
-                    IQueryableExtensions.Delete(databaseUserInvitations, context, token);
-                }
-                catch (Exception exception)
-                {
-                    // Throw an exception.
-                    throw exception;
-                }
+                // Delete the items.
+                IQueryableExtensions.Delete(databaseUserInvitations, context, token);
             }
         }
     }

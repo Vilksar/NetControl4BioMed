@@ -1,24 +1,31 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitations
 {
     [Authorize(Roles = "Administrator")]
     public class DeleteModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IServiceProvider _serviceProvider;
 
-        public DeleteModel(ApplicationDbContext context)
+        public DeleteModel(IServiceProvider serviceProvider)
         {
-            _context = context;
+            _serviceProvider = serviceProvider;
         }
 
         [BindProperty]
@@ -47,12 +54,16 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Permissions/DatabaseUserInvitations/Index");
             }
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get the IDs of all selected users and databases.
             var ids = emails.Zip(databaseIds);
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.DatabaseUserInvitations
+                Items = context.DatabaseUserInvitations
                     .Where(item => emails.Contains(item.Email) && databaseIds.Contains(item.Database.Id))
                     .Include(item => item.Database)
                     .AsEnumerable()
@@ -70,7 +81,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there aren't any e-mails or IDs provided.
             if (Input.Emails == null || Input.DatabaseIds == null || !Input.Emails.Any() || !Input.DatabaseIds.Any() || Input.Emails.Count() != Input.DatabaseIds.Count())
@@ -80,12 +91,16 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Permissions/DatabaseUserInvitations/Index");
             }
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get the IDs of all selected users and databases.
             var ids = Input.Emails.Zip(Input.DatabaseIds);
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.DatabaseUserInvitations
+                Items = context.DatabaseUserInvitations
                     .Where(item => Input.Emails.Contains(item.Email) && Input.DatabaseIds.Contains(item.Database.Id))
                     .Include(item => item.Database)
                     .AsEnumerable()
@@ -108,13 +123,30 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 return Page();
             }
             // Save the number of items found.
-            var databaseUserInvitationCount = View.Items.Count();
-            // Mark them for removal.
-            _context.DatabaseUserInvitations.RemoveRange(View.Items);
-            // Save the changes.
-            await _context.SaveChangesAsync();
+            var itemCount = View.Items.Count();
+            // Define a new task.
+            var task = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteDatabaseUserInvitations)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new DatabaseUserInvitationsTask
+                {
+                    Items = View.Items.Select(item => new DatabaseUserInvitationInputModel
+                    {
+                        DatabaseId = item.DatabaseId,
+                        Email = item.Email
+                    })
+                })
+            };
+            // Mark the task for addition.
+            context.BackgroundTasks.Add(task);
+            // Save the changes to the database.
+            context.SaveChanges();
+            // Create a new Hangfire background job.
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteDatabaseUserInvitations(task.Id, CancellationToken.None));
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {databaseUserInvitationCount.ToString()} database user invitation{(databaseUserInvitationCount != 1 ? "s" : string.Empty)} deleted successfully.";
+            TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} database user invitation{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Permissions/DatabaseUserInvitations/Index");
         }
