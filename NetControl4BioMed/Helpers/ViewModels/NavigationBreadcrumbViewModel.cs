@@ -177,6 +177,16 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
+        /// Gets the navigation breadcrumb for the administration created background tasks index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AdministrationCreatedBackgroundTasksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Networks",
+            Title = "Networks",
+            Link = "/Administration/Created/BackgroundTasks/Index"
+        };
+
+        /// <summary>
         /// Gets the navigation breadcrumb for the administration created networks index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel AdministrationCreatedNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
