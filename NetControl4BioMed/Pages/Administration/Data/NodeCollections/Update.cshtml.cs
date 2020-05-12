@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Office.CustomUI;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,9 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
@@ -21,6 +24,30 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
     [Authorize(Roles = "Administrator")]
     public class UpdateModel : PageModel
     {
+        private static List<NodeCollectionInputModel> DefaultNodeCollectionInputModel { get; } = new List<NodeCollectionInputModel>
+        {
+            new NodeCollectionInputModel
+            {
+                Id = "ID",
+                Name = "Name",
+                Description = "Description",
+                NodeCollectionDatabases = new List<NodeCollectionDatabaseInputModel>
+                {
+                    new NodeCollectionDatabaseInputModel
+                    {
+                        DatabaseId = "Database ID"
+                    }
+                },
+                NodeCollectionNodes = new List<NodeCollectionNodeInputModel>
+                {
+                    new NodeCollectionNodeInputModel
+                    {
+                        NodeId = "Node ID"
+                    }
+                }
+            }
+        };
+
         private readonly ApplicationDbContext _context;
 
         public UpdateModel(ApplicationDbContext context)
@@ -52,10 +79,15 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
 
         public IActionResult OnGet(string type = null, IEnumerable<string> ids = null)
         {
+            // Define the JSON serializer options.
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(new List<DataUpdateNodeCollectionViewModel> { DataUpdateNodeCollectionViewModel.Default }, new JsonSerializerOptions { WriteIndented = true })
+                JsonModel = JsonSerializer.Serialize(DefaultNodeCollectionInputModel, jsonSerializerOptions)
             };
             // Check if there are any IDs provided.
             ids ??= Enumerable.Empty<string>();
@@ -63,31 +95,41 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             var nodeCollections = _context.NodeCollections
                 .Where(item => ids.Contains(item.Id));
             // Get the items for the view.
-            var items = nodeCollections.Select(item =>
-                new DataUpdateNodeCollectionViewModel
+            var items = nodeCollections.Select(item => new NodeCollectionInputModel
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Description = item.Description,
+                NodeCollectionDatabases = item.NodeCollectionDatabases.Select(item1 => new NodeCollectionDatabaseInputModel
                 {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Description = item.Description,
-                    DatabaseIds = item.NodeCollectionDatabases.Select(item1 => item1.Database.Id),
-                    NodeIds = item.NodeCollectionNodes.Select(item1 => item1.Node.Id)
-                });
+                    DatabaseId = item1.Database.Id
+                }),
+                NodeCollectionNodes = item.NodeCollectionNodes.Select(item1 => new NodeCollectionNodeInputModel
+                {
+                    NodeId = item1.Node.Id
+                })
+            });
             // Define the input.
             Input = new InputModel
             {
                 Type = type,
-                Data = JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true })
+                Data = JsonSerializer.Serialize(items, jsonSerializerOptions)
             };
             // Return the page.
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
+            // Define the JSON serializer options.
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(new List<DataUpdateNodeCollectionViewModel> { DataUpdateNodeCollectionViewModel.Default }, new JsonSerializerOptions { WriteIndented = true })
+                JsonModel = JsonSerializer.Serialize(DefaultNodeCollectionInputModel, jsonSerializerOptions)
             };
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
@@ -98,18 +140,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 return Page();
             }
             // Try to deserialize the data.
-            if (!Input.Data.TryDeserializeJsonObject<IEnumerable<DataUpdateNodeCollectionViewModel>>(out var items))
+            if (!Input.Data.TryDeserializeJsonObject<IEnumerable<NodeCollectionInputModel>>(out var items) || items == null)
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The provided data is not a valid JSON object.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Check if any of the items has any null values.
-            if (items.Any(item => item.Id == null || item.Name == null || item.Description == null || item.DatabaseIds == null || item.NodeIds == null))
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided JSON data can't contain any \"null\" values. Please replace them, eventually with an empty string.");
                 // Redisplay the page.
                 return Page();
             }
@@ -140,8 +174,22 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 }
                 // Save the number of items.
                 itemCount = items.Count();
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.CreateNodeCollections(items, CancellationToken.None));
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.CreateNodeCollections)}",
+                    Data = JsonSerializer.Serialize(new NodeCollectionsTask
+                    {
+                        Items = items
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.CreateNodeCollections(task.Id, CancellationToken.None));
             }
             // Check if the items should be edited.
             else if (Input.Type == "Edit")
@@ -159,8 +207,22 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 }
                 // Save the number of items.
                 itemCount = items.Count();
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.UpdateNodeCollections(items, CancellationToken.None));
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.EditNodeCollections)}",
+                    Data = JsonSerializer.Serialize(new NodeCollectionsTask
+                    {
+                        Items = items
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.EditNodeCollections(task.Id, CancellationToken.None));
             }
             // Check if the items should be deleted.
             else if (Input.Type == "Delete")
@@ -170,14 +232,30 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                     .Where(item => !string.IsNullOrEmpty(item.Id));
                 // Get the list of IDs from the provided items.
                 var itemIds = items.Select(item => item.Id);
-                // Get the IDs of the node collections that have the given IDs.
-                var ids = _context.NodeCollections
-                    .Where(item => itemIds.Contains(item.Id))
-                    .Select(item => item.Id);
-                // Save the number of nodes found.
-                itemCount = items.Count();
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodeCollections(ids, CancellationToken.None));
+                // Get the node collections that have the given IDs.
+                var nodeCollections = _context.NodeCollections
+                    .Where(item => itemIds.Contains(item.Id));
+                // Save the number of node collections found.
+                itemCount = nodeCollections.Count();
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNodeCollections)}",
+                    Data = JsonSerializer.Serialize(new NodeCollectionsTask
+                    {
+                        Items = nodeCollections.Select(item => new NodeCollectionInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNodeCollections(task.Id, CancellationToken.None));
             }
             // Check if the type is not valid.
             else

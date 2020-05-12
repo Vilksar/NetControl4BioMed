@@ -47,12 +47,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
                 // Create a new scope.
                 using var scope = serviceProvider.CreateScope();
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
                 // Get the manually provided IDs of all the items that are to be created.
                 var itemNodeCollectionIds = batchItems
                     .Where(item => !string.IsNullOrEmpty(item.Id))
@@ -195,12 +195,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
                 // Create a new scope.
                 using var scope = serviceProvider.CreateScope();
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
                 // Get the list of IDs from the provided items.
                 var itemIds = batchItems.Select(item => item.Id);
                 // Get the node collections from the database that have the given IDs.
@@ -344,12 +344,14 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Get the IDs of the items in the current batch.
-                var batchIds = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize).Select(item => item.Id);
                 // Create a new scope.
                 using var scope = serviceProvider.CreateScope();
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the current batch IDs.
                 var nodeCollections = context.NodeCollections
                     .Where(item => batchIds.Contains(item.Id));
