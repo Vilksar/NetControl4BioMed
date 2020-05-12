@@ -30,8 +30,56 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public void Create(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Throw an exception.
-            throw new NotImplementedException();
+            // Check if there weren't any valid items found.
+            if (Items == null || !Items.Any())
+            {
+                // Throw an exception.
+                throw new ArgumentException("No valid items could be found with the provided data.");
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (var index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Create a new scope.
+                using var scope = serviceProvider.CreateScope();
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the related entities that appear in the current batch.
+                var databaseIds = batchItems.Select(item => item.DatabaseId);
+                // Get the related entities that appear in the current batch.
+                var databases = context.Databases.Where(item => databaseIds.Contains(item.Id));
+                // Define the items corresponding to the current batch.
+                var databaseEdgeFields = batchItems.Select(item => new DatabaseEdgeField
+                {
+                    Name = item.Name,
+                    Description = item.Description,
+                    DateTimeCreated = DateTime.Now,
+                    Url = item.Url,
+                    IsSearchable = item.IsSearchable,
+                    DatabaseId = item.DatabaseId,
+                    Database = databases.FirstOrDefault(item1 => item1.Id == item.DatabaseId)
+                }).Where(item => item.Database != null);
+                // Try to create the items.
+                try
+                {
+                    // Create the items.
+                    IEnumerableExtensions.Create(databaseEdgeFields, context, token);
+                }
+                catch (Exception exception)
+                {
+                    // Throw an exception.
+                    throw exception;
+                }
+            }
         }
 
         /// <summary>
@@ -41,8 +89,77 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public void Edit(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Throw an exception.
-            throw new NotImplementedException();
+            // Check if there weren't any valid items found.
+            if (Items == null || !Items.Any())
+            {
+                // Throw an exception.
+                throw new ArgumentException("No valid items could be found with the provided data.");
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (var index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Create a new scope.
+                using var scope = serviceProvider.CreateScope();
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
+                // Get the IDs of the related entities that appear in the current batch.
+                var databaseIds = batchItems.Select(item => item.DatabaseId);
+                // Get the related entities that appear in the current batch.
+                var databases = context.Databases.Where(item => databaseIds.Contains(item.Id));
+                // Get the items corresponding to the current batch.
+                var databaseEdgeFields = context.DatabaseEdgeFields
+                    .Where(item => batchIds.Contains(item.Id));
+                // Go over each item.
+                foreach (var databaseEdgeField in databaseEdgeFields)
+                {
+                    // Get the corresponding batch item.
+                    var batchItem = batchItems.FirstOrDefault(item => item.Id == databaseEdgeField.Id);
+                    // Check if there wasn't any batch item found.
+                    if (batchItem == null)
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the related entities.
+                    var database = databases.FirstOrDefault(item1 => item1.Id == batchItem.DatabaseId);
+                    // Check if there was no entity found.
+                    if (database == null)
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Update the item.
+                    databaseEdgeField.Name = batchItem.Name;
+                    databaseEdgeField.Description = batchItem.Description;
+                    databaseEdgeField.Url = batchItem.Url;
+                    databaseEdgeField.IsSearchable = batchItem.IsSearchable;
+                    databaseEdgeField.DatabaseId = database.Id;
+                    databaseEdgeField.Database = database;
+                }
+                // Try to create the items.
+                try
+                {
+                    // Edit the items.
+                    IEnumerableExtensions.Edit(databaseEdgeFields, context, token);
+                }
+                catch (Exception exception)
+                {
+                    // Throw an exception.
+                    throw exception;
+                }
+            }
         }
 
         /// <summary>

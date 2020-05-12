@@ -1,24 +1,31 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
 {
     [Authorize(Roles = "Administrator")]
     public class DeleteModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IServiceProvider _serviceProvider;
 
-        public DeleteModel(ApplicationDbContext context)
+        public DeleteModel(IServiceProvider serviceProvider)
         {
-            _context = context;
+            _serviceProvider = serviceProvider;
         }
 
         [BindProperty]
@@ -46,10 +53,14 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.DatabaseNodeFields
+                Items = context.DatabaseNodeFields
                     .Where(item => ids.Contains(item.Id))
                     .Include(item => item.Database)
             };
@@ -61,11 +72,11 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
-            // Check if any database node fields of the generic database are among the items to be deleted.
-            if (View.Items.Any(item => item.Database.Name == "Generic"))
+            // Check if the generic database node field is among the items to be deleted.
+            if (View.Items.Any(item => item.Database.DatabaseType.Name == "Generic"))
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: The database node fields of the \"Generic\" database can't be deleted.";
+                TempData["StatusMessage"] = "Error: The generic database node field can't be deleted.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
@@ -73,7 +84,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())
@@ -83,10 +94,14 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.DatabaseNodeFields
+                Items = context.DatabaseNodeFields
                     .Where(item => Input.Ids.Contains(item.Id))
                     .Include(item => item.Database)
             };
@@ -98,11 +113,11 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
-            // Check if any database node fields of the generic database are among the items to be deleted.
-            if (View.Items.Any(item => item.Database.Name == "Generic"))
+            // Check if the generic database node field is among the items to be deleted.
+            if (View.Items.Any(item => item.Database.DatabaseType.Name == "Generic"))
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: The database node fields of the \"Generic\" database can't be deleted.";
+                TempData["StatusMessage"] = "Error: The generic database node field can't be deleted.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
@@ -115,26 +130,29 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 return Page();
             }
             // Save the number of items found.
-            var databaseNodeFieldCount = View.Items.Count();
-            // Get the related entities that use the items.
-            var nodes = _context.Nodes
-                .Where(item => item.DatabaseNodeFieldNodes.Any(item1 => View.Items.Contains(item1.DatabaseNodeField)));
-            var edges = _context.Edges
-                .Where(item => item.EdgeNodes.Any(item1 => nodes.Contains(item1.Node)));
-            var networks = _context.Networks
-                .Where(item => item.NetworkNodes.Any(item1 => nodes.Contains(item1.Node)));
-            var analyses = _context.Analyses
-                .Where(item => item.AnalysisNodes.Any(item1 => nodes.Contains(item1.Node)));
-            // Mark the items for deletion.
-            _context.Analyses.RemoveRange(analyses);
-            _context.Networks.RemoveRange(networks);
-            _context.Edges.RemoveRange(edges);
-            _context.Nodes.RemoveRange(nodes);
-            _context.DatabaseNodeFields.RemoveRange(View.Items);
+            var itemCount = View.Items.Count();
+            // Define a new task.
+            var task = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteDatabaseNodeFields)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new DatabaseNodeFieldsTask
+                {
+                    Items = View.Items.Select(item => new DatabaseNodeFieldInputModel
+                    {
+                        Id = item.Id
+                    })
+                })
+            };
+            // Mark the task for addition.
+            context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            context.SaveChanges();
+            // Create a new Hangfire background job.
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteDatabaseNodeFields(task.Id, CancellationToken.None));
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {databaseNodeFieldCount.ToString()} database node field{(databaseNodeFieldCount != 1 ? "s" : string.Empty)} deleted successfully.";
+            TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} database node field{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
         }

@@ -2,25 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
 {
     [Authorize(Roles = "Administrator")]
     public class EditModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IServiceProvider _serviceProvider;
 
-        public EditModel(ApplicationDbContext context)
+        public EditModel(IServiceProvider serviceProvider)
         {
-            _context = context;
+            _serviceProvider = serviceProvider;
         }
 
         [BindProperty]
@@ -68,8 +72,12 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the query.
-            var query = _context.DatabaseNodeFields
+            var query = context.DatabaseNodeFields
                 .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
@@ -87,11 +95,11 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
-            // Check if the corresponding database is of the generic type.
+            // Check if the database node field is the generic database node field.
             if (View.DatabaseNodeField.Database.DatabaseType.Name == "Generic")
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: Databases of \"Generic\" type can't be edited.";
+                TempData["StatusMessage"] = "Error: The generic database node field can't be edited.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
@@ -109,7 +117,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(Input.Id))
@@ -119,8 +127,12 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the query.
-            var query = _context.DatabaseNodeFields
+            var query = context.DatabaseNodeFields
                 .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel
@@ -138,11 +150,11 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
-            // Check if the corresponding database is of the generic type.
+            // Check if the database node field is the generic database node field.
             if (View.DatabaseNodeField.Database.DatabaseType.Name == "Generic")
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: Databases of \"Generic\" type can't be edited.";
+                TempData["StatusMessage"] = "Error: The generic database node field can't be edited.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
@@ -155,7 +167,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 return Page();
             }
             // Check if the name has changed and there is another database node field with the same name.
-            if (View.DatabaseNodeField.Name != Input.Name && _context.DatabaseNodeFields.Any(item => item.Name == Input.Name))
+            if (View.DatabaseNodeField.Name != Input.Name && context.DatabaseNodeFields.Any(item => item.Name == Input.Name))
             {
                 // Add an error to the model
                 ModelState.AddModelError(string.Empty, $"A database node field with the name \"{Input.Name}\" already exists.");
@@ -163,7 +175,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 return Page();
             }
             // Get the corresponding database.
-            var database = _context.Databases
+            var database = context.Databases
                 .Where(item => item.DatabaseType.Name != "Generic")
                 .FirstOrDefault(item => item.Id == Input.DatabaseString || item.Name == Input.DatabaseString);
             // Check if no database has been found.
@@ -182,17 +194,24 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redisplay the page.
                 return Page();
             }
-            // Mark the item for updating.
-            _context.DatabaseNodeFields.Update(View.DatabaseNodeField);
-            // Update the data.
-            View.DatabaseNodeField.Name = Input.Name;
-            View.DatabaseNodeField.Description = Input.Description;
-            View.DatabaseNodeField.Url = Input.Url;
-            View.DatabaseNodeField.IsSearchable = Input.IsSearchable;
-            View.DatabaseNodeField.DatabaseId = database.Id;
-            View.DatabaseNodeField.Database = database;
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            // Define a new task.
+            var task = new DatabaseNodeFieldsTask
+            {
+                Items = new List<DatabaseNodeFieldInputModel>
+                {
+                    new DatabaseNodeFieldInputModel
+                    {
+                        Id = Input.Id,
+                        Name = Input.Name,
+                        Description = Input.Description,
+                        Url = Input.Url,
+                        IsSearchable = Input.IsSearchable,
+                        DatabaseId = database.Id
+                    }
+                }
+            };
+            // Run the task.
+            task.Edit(_serviceProvider, CancellationToken.None);
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 database node field updated successfully.";
             // Redirect to the index page.

@@ -2,25 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
 {
     [Authorize(Roles = "Administrator")]
     public class CreateModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IServiceProvider _serviceProvider;
 
-        public CreateModel(ApplicationDbContext context)
+        public CreateModel(IServiceProvider serviceProvider)
         {
-            _context = context;
+            _serviceProvider = serviceProvider;
         }
 
         [BindProperty]
@@ -49,11 +53,15 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
 
         public IActionResult OnGet(string databaseString = null)
         {
-            // Check if there aren't any databases of non-generic type.
-            if (!_context.Databases.Where(item => item.DatabaseType.Name != "Generic").Any())
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Check if there aren't any non-generic databases.
+            if (!context.Databases.Any(item => item.DatabaseType.Name != "Generic"))
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No databases of non-generic type could be found. Please create a database first.";
+                TempData["StatusMessage"] = "Error: No non-generic databases could be found. Please create a database first.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
@@ -66,13 +74,17 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
-            // Check if there aren't any databases of non-generic type.
-            if (!_context.Databases.Where(item => item.DatabaseType.Name != "Generic").Any())
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Check if there aren't any non-generic databases.
+            if (!context.Databases.Any(item => item.DatabaseType.Name != "Generic"))
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No databases of non-generic type could be found. Please create a database first.";
+                TempData["StatusMessage"] = "Error: No non-generic databases could be found. Please create a database first.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
@@ -85,7 +97,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 return Page();
             }
             // Check if there is another database node field with the same name.
-            if (_context.DatabaseNodeFields.Any(item => item.Name == Input.Name))
+            if (context.DatabaseNodeFields.Any(item => item.Name == Input.Name))
             {
                 // Add an error to the model
                 ModelState.AddModelError(string.Empty, $"A database node field with the name \"{Input.Name}\" already exists.");
@@ -93,7 +105,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 return Page();
             }
             // Get the corresponding database.
-            var database = _context.Databases
+            var database = context.Databases
                 .Where(item => item.DatabaseType.Name != "Generic")
                 .FirstOrDefault(item => item.Id == Input.DatabaseString || item.Name == Input.DatabaseString);
             // Check if no database has been found.
@@ -104,21 +116,23 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redisplay the page.
                 return Page();
             }
-            // Define the new database node field.
-            var databaseNodeField = new DatabaseNodeField
+            // Define a new task.
+            var task = new DatabaseNodeFieldsTask
             {
-                Name = Input.Name,
-                Description = Input.Description,
-                Url = Input.Url,
-                IsSearchable = Input.IsSearchable,
-                DatabaseId = database.Id,
-                Database = database,
-                DateTimeCreated = DateTime.Now
+                Items = new List<DatabaseNodeFieldInputModel>
+                {
+                    new DatabaseNodeFieldInputModel
+                    {
+                        Name = Input.Name,
+                        Description = Input.Description,
+                        Url = Input.Url,
+                        IsSearchable = Input.IsSearchable,
+                        DatabaseId = database.Id
+                    }
+                }
             };
-            // Mark it for addition.
-            _context.DatabaseNodeFields.Add(databaseNodeField);
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            // Run the task.
+            task.Create(_serviceProvider, CancellationToken.None);
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 database node field created successfully.";
             // Redirect to the index page.

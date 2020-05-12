@@ -30,8 +30,48 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public void Create(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Throw an exception.
-            throw new NotImplementedException();
+            // Check if there weren't any valid items found.
+            if (Items == null || !Items.Any())
+            {
+                // Throw an exception.
+                throw new ArgumentException("No valid items could be found with the provided data.");
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (var index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Create a new scope.
+                using var scope = serviceProvider.CreateScope();
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Define the items corresponding to the current batch.
+                var databaseTypes = batchItems.Select(item => new DatabaseType
+                {
+                    Name = item.Name,
+                    Description = item.Description,
+                    DateTimeCreated = DateTime.Now
+                });
+                // Try to create the items.
+                try
+                {
+                    // Create the items.
+                    IEnumerableExtensions.Create(databaseTypes, context, token);
+                }
+                catch (Exception exception)
+                {
+                    // Throw an exception.
+                    throw exception;
+                }
+            }
         }
 
         /// <summary>
@@ -41,8 +81,61 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public void Edit(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Throw an exception.
-            throw new NotImplementedException();
+            // Check if there weren't any valid items found.
+            if (Items == null || !Items.Any())
+            {
+                // Throw an exception.
+                throw new ArgumentException("No valid items could be found with the provided data.");
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (var index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Create a new scope.
+                using var scope = serviceProvider.CreateScope();
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
+                // Get the items corresponding to the current batch.
+                var databaseTypes = context.DatabaseTypes
+                    .Where(item => batchIds.Contains(item.Id));
+                // Go over each item.
+                foreach (var databaseType in databaseTypes)
+                {
+                    // Get the corresponding batch item.
+                    var batchItem = batchItems.FirstOrDefault(item => item.Id == databaseType.Id);
+                    // Check if there wasn't any batch item found.
+                    if (batchItem == null)
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Update the item.
+                    databaseType.Name = batchItem.Name;
+                    databaseType.Description = batchItem.Description;
+                }
+                // Try to create the items.
+                try
+                {
+                    // Edit the items.
+                    IEnumerableExtensions.Edit(databaseTypes, context, token);
+                }
+                catch (Exception exception)
+                {
+                    // Throw an exception.
+                    throw exception;
+                }
+            }
         }
 
         /// <summary>
@@ -69,12 +162,14 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Get the IDs of the items in the current batch.
-                var batchIds = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize).Select(item => item.Id);
                 // Create a new scope.
                 using var scope = serviceProvider.CreateScope();
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
                 var databaseTypes = context.DatabaseTypes
                     .Where(item => batchIds.Contains(item.Id));
