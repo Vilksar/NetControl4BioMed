@@ -263,7 +263,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 return Page();
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: A new background task was created to {Input.Type.ToLower()} ({itemCount} node{(itemCount != 1 ? "s" : string.Empty)}.";
+            TempData["StatusMessage"] = $"Success: A new background task was created to {Input.Type.ToLower()} {itemCount} node{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Data/Nodes/Index");
         }
