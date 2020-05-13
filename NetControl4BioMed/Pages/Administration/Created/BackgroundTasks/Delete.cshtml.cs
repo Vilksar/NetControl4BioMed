@@ -21,10 +21,12 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
     public class DeleteModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ApplicationDbContext _context;
 
-        public DeleteModel(IServiceProvider serviceProvider)
+        public DeleteModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _context = context;
         }
 
         [BindProperty]
@@ -52,14 +54,10 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Created/BackgroundTasks/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the view.
             View = new ViewModel
             {
-                Items = context.BackgroundTasks
+                Items = _context.BackgroundTasks
                     .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -84,14 +82,10 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Created/BackgroundTasks/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the view.
             View = new ViewModel
             {
-                Items = context.BackgroundTasks
+                Items = _context.BackgroundTasks
                     .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -113,9 +107,9 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
             // Save the number of items found.
             var itemCount = View.Items.Count();
             // Mark the items for removal.
-            context.BackgroundTasks.RemoveRange(View.Items);
+            _context.BackgroundTasks.RemoveRange(View.Items);
             // Save the changes to the database.
-            context.SaveChanges();
+            _context.SaveChanges();
             // Display a message.
             TempData["StatusMessage"] = $"Success: {itemCount} background task{(itemCount != 1 ? "s" : string.Empty)} deleted successfully.";
             // Redirect to the index page.

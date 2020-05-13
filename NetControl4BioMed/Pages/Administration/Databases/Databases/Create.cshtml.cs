@@ -19,10 +19,12 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
     public class CreateModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ApplicationDbContext _context;
 
-        public CreateModel(IServiceProvider serviceProvider)
+        public CreateModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _context = context;
         }
 
         [BindProperty]
@@ -51,12 +53,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
 
         public IActionResult OnGet(string databaseTypeString = null)
         {
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Check if there aren't any non-generic database types.
-            if (!context.DatabaseTypes.Any(item => item.Name != "Generic"))
+            if (!_context.DatabaseTypes.Any(item => item.Name != "Generic"))
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No non-generic database types could be found. Please create a database type first.";
@@ -74,12 +72,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
 
         public IActionResult OnPost()
         {
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Check if there aren't any non-generic database types.
-            if (!context.DatabaseTypes.Any(item => item.Name != "Generic"))
+            if (!_context.DatabaseTypes.Any(item => item.Name != "Generic"))
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No non-generic database types could be found. Please create a database type first.";
@@ -95,7 +89,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 return Page();
             }
             // Check if there is another database with the same name.
-            if (context.Databases.Any(item => item.Name == Input.Name))
+            if (_context.Databases.Any(item => item.Name == Input.Name))
             {
                 // Add an error to the model
                 ModelState.AddModelError(string.Empty, $"A database with the name \"{Input.Name}\" already exists.");
@@ -103,7 +97,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 return Page();
             }
             // Get the corresponding database type.
-            var databaseType = context.DatabaseTypes
+            var databaseType = _context.DatabaseTypes
                 .Where(item => item.Name != "Generic")
                 .FirstOrDefault(item => item.Id == Input.DatabaseTypeString || item.Name == Input.DatabaseTypeString);
             // Check if no database type has been found.

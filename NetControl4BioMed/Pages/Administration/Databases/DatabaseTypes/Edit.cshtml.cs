@@ -20,10 +20,12 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
     public class EditModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ApplicationDbContext _context;
 
-        public EditModel(IServiceProvider serviceProvider)
+        public EditModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _context = context;
         }
 
         [BindProperty]
@@ -61,12 +63,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseTypes/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the query.
-            var query = context.DatabaseTypes
+            var query = _context.DatabaseTypes
                 .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
@@ -111,12 +109,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseTypes/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the query.
-            var query = context.DatabaseTypes
+            var query = _context.DatabaseTypes
                 .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel
@@ -149,7 +143,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                 return Page();
             }
             // Check if there is another database type with the same name.
-            if (context.DatabaseTypes.Any(item => item.Id != View.DatabaseType.Id && item.Name == Input.Name))
+            if (_context.DatabaseTypes.Any(item => item.Id != View.DatabaseType.Id && item.Name == Input.Name))
             {
                 // Add an error to the model
                 ModelState.AddModelError(string.Empty, $"A database type with the name \"{Input.Name}\" already exists.");

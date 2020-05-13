@@ -21,10 +21,12 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
     public class EditModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ApplicationDbContext _context;
 
-        public EditModel(IServiceProvider serviceProvider)
+        public EditModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _context = context;
         }
 
         [BindProperty]
@@ -61,12 +63,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Users/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the query.
-            var query = context.Users
+            var query = _context.Users
                 .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
@@ -103,14 +101,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Users/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            // Use a new user manager instance.
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             // Define the query.
-            var query = context.Users
+            var query = _context.Users
                 .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel

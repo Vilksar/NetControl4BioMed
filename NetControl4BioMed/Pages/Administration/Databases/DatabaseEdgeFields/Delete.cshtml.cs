@@ -21,10 +21,12 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
     public class DeleteModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ApplicationDbContext _context;
 
-        public DeleteModel(IServiceProvider serviceProvider)
+        public DeleteModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _context = context;
         }
 
         [BindProperty]
@@ -52,14 +54,10 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseEdgeFields/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the view.
             View = new ViewModel
             {
-                Items = context.DatabaseEdgeFields
+                Items = _context.DatabaseEdgeFields
                     .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -92,14 +90,10 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseEdgeFields/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the view.
             View = new ViewModel
             {
-                Items = context.DatabaseEdgeFields
+                Items = _context.DatabaseEdgeFields
                     .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -143,9 +137,9 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 })
             };
             // Mark the task for addition.
-            context.BackgroundTasks.Add(task);
+            _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            context.SaveChanges();
+            _context.SaveChanges();
             // Create a new Hangfire background job.
             var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteDatabaseEdgeFields(task.Id, CancellationToken.None));
             // Display a message.

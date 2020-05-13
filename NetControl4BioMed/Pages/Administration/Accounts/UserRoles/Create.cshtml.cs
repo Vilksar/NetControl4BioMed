@@ -20,10 +20,16 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
     public class CreateModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly ApplicationDbContext _context;
 
-        public CreateModel(IServiceProvider serviceProvider)
+        public CreateModel(IServiceProvider serviceProvider, UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _context = context;
         }
 
         [BindProperty]
@@ -54,14 +60,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            // Use a new user manager instance.
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-            // Use a new sign in manager instance.
-            var signInManager = scope.ServiceProvider.GetRequiredService<SignInManager<User>>();
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
             {
@@ -71,7 +69,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return Page();
             }
             // Get the user based on the provided string.
-            var user = context.Users.FirstOrDefault(item => item.Id == Input.UserString || item.Email == Input.UserString);
+            var user = _context.Users.FirstOrDefault(item => item.Id == Input.UserString || item.Email == Input.UserString);
             // Check if there was no user found.
             if (user == null)
             {
@@ -81,7 +79,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return Page();
             }
             // Get the role based on the provided string.
-            var role = context.Roles.FirstOrDefault(item => item.Id == Input.RoleString || item.Name == Input.RoleString);
+            var role = _context.Roles.FirstOrDefault(item => item.Id == Input.RoleString || item.Name == Input.RoleString);
             // Check if there was no role found.
             if (role == null)
             {
@@ -116,10 +114,10 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return Page();
             }
             // Check if the found user is the current one.
-            if (await userManager.GetUserAsync(User) == user)
+            if (await _userManager.GetUserAsync(User) == user)
             {
                 // Log out the user.
-                await signInManager.SignOutAsync();
+                await _signInManager.SignOutAsync();
                 // Display a message.
                 TempData["StatusMessage"] = $"Info: 1 user role created successfully. The roles assigned to your account have changed, so you have been signed out.";
                 // Redirect to the index page.

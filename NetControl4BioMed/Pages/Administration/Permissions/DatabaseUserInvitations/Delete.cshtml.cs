@@ -22,10 +22,12 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
     public class DeleteModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ApplicationDbContext _context;
 
-        public DeleteModel(IServiceProvider serviceProvider)
+        public DeleteModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _context = context;
         }
 
         [BindProperty]
@@ -54,16 +56,12 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Permissions/DatabaseUserInvitations/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get the IDs of all selected users and databases.
             var ids = emails.Zip(databaseIds);
             // Define the view.
             View = new ViewModel
             {
-                Items = context.DatabaseUserInvitations
+                Items = _context.DatabaseUserInvitations
                     .Where(item => emails.Contains(item.Email) && databaseIds.Contains(item.Database.Id))
                     .Include(item => item.Database)
                     .AsEnumerable()
@@ -91,16 +89,12 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Permissions/DatabaseUserInvitations/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get the IDs of all selected users and databases.
             var ids = Input.Emails.Zip(Input.DatabaseIds);
             // Define the view.
             View = new ViewModel
             {
-                Items = context.DatabaseUserInvitations
+                Items = _context.DatabaseUserInvitations
                     .Where(item => Input.Emails.Contains(item.Email) && Input.DatabaseIds.Contains(item.Database.Id))
                     .Include(item => item.Database)
                     .AsEnumerable()
@@ -140,9 +134,9 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 })
             };
             // Mark the task for addition.
-            context.BackgroundTasks.Add(task);
+            _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            context.SaveChanges();
+            _context.SaveChanges();
             // Create a new Hangfire background job.
             var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteDatabaseUserInvitations(task.Id, CancellationToken.None));
             // Display a message.

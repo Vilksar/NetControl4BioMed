@@ -19,10 +19,12 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
     public class CreateModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ApplicationDbContext _context;
 
-        public CreateModel(IServiceProvider serviceProvider)
+        public CreateModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _context = context;
         }
 
         [BindProperty]
@@ -47,10 +49,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
 
         public IActionResult OnPost()
         {
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
             {
@@ -60,7 +58,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                 return Page();
             }
             // Check if there is another database type with the same name.
-            if (context.DatabaseTypes.Any(item => item.Name == Input.Name))
+            if (_context.DatabaseTypes.Any(item => item.Name == Input.Name))
             {
                 // Add an error to the model
                 ModelState.AddModelError(string.Empty, $"A database type with the name \"{Input.Name}\" already exists.");

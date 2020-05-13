@@ -24,10 +24,16 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
     public class DeleteModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly ApplicationDbContext _context;
 
-        public DeleteModel(IServiceProvider serviceProvider)
+        public DeleteModel(IServiceProvider serviceProvider, UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _context = context;
         }
 
         [BindProperty]
@@ -59,24 +65,18 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/UserRoles/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            // Use a new user manager instance.
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             // Get the IDs of all selected users and roles.
             var ids = userIds.Zip(roleIds);
             // Define the view.
             View = new ViewModel
             {
-                Items = context.UserRoles
+                Items = _context.UserRoles
                     .Where(item => userIds.Contains(item.User.Id) && roleIds.Contains(item.Role.Id))
                     .Include(item => item.User)
                     .Include(item => item.Role)
                     .AsEnumerable()
                     .Where(item => ids.Contains((item.User.Id, item.Role.Id))),
-                IsCurrentUserSelected = userIds.Contains((await userManager.GetUserAsync(User)).Id)
+                IsCurrentUserSelected = userIds.Contains((await _userManager.GetUserAsync(User)).Id)
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -87,7 +87,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return RedirectToPage("/Administration/Accounts/UserRoles/Index");
             }
             // Check if there would be no administrator users after removal.
-            if (View.Items.Where(item => item.Role.Name == "Administrator").Count() == (await userManager.GetUsersInRoleAsync("Administrator")).Count())
+            if (View.Items.Where(item => item.Role.Name == "Administrator").Count() == (await _userManager.GetUsersInRoleAsync("Administrator")).Count())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No administrator users would remain after deleting the selected user roles.";
@@ -108,26 +108,18 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/UserRoles/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            // Use a new user manager instance.
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-            // Use a new sign in manager instance.
-            var signInManager = scope.ServiceProvider.GetRequiredService<SignInManager<User>>();
             // Get the IDs of all selected users and roles.
             var ids = Input.UserIds.Zip(Input.RoleIds);
             // Define the view.
             View = new ViewModel
             {
-                Items = context.UserRoles
+                Items = _context.UserRoles
                     .Where(item => Input.UserIds.Contains(item.User.Id) && Input.RoleIds.Contains(item.Role.Id))
                     .Include(item => item.User)
                     .Include(item => item.Role)
                     .AsEnumerable()
                     .Where(item => ids.Contains((item.User.Id, item.Role.Id))),
-                IsCurrentUserSelected = Input.UserIds.Contains((await userManager.GetUserAsync(User)).Id)
+                IsCurrentUserSelected = Input.UserIds.Contains((await _userManager.GetUserAsync(User)).Id)
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -138,7 +130,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return RedirectToPage("/Administration/Accounts/UserRoles/Index");
             }
             // Check if there would be no administrator users after removal.
-            if (View.Items.Where(item => item.Role.Name == "Administrator").Count() == (await userManager.GetUsersInRoleAsync("Administrator")).Count())
+            if (View.Items.Where(item => item.Role.Name == "Administrator").Count() == (await _userManager.GetUsersInRoleAsync("Administrator")).Count())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No administrator users would remain after deleting the selected user roles.";
@@ -171,16 +163,16 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 })
             };
             // Mark the task for addition.
-            context.BackgroundTasks.Add(task);
+            _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            context.SaveChanges();
+            _context.SaveChanges();
             // Create a new Hangfire background job.
             var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteUserRoles(task.Id, CancellationToken.None));
             // Check if the current user is selected.
             if (View.IsCurrentUserSelected)
             {
                 // Log out the user.
-                await signInManager.SignOutAsync();
+                await _signInManager.SignOutAsync();
                 // Display a message.
                 TempData["StatusMessage"] = $"Info: A new background job was created to delete {itemCount} user role{(itemCount != 1 ? "s" : string.Empty)}. The roles assigned to your account will change, so you have been signed out.";
                 // Redirect to the index page.

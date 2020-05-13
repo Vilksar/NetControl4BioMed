@@ -21,10 +21,12 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
     public class EditModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ApplicationDbContext _context;
 
-        public EditModel(IServiceProvider serviceProvider)
+        public EditModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _context = context;
         }
 
         [BindProperty]
@@ -72,12 +74,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseEdgeFields/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the query.
-            var query = context.DatabaseEdgeFields
+            var query = _context.DatabaseEdgeFields
                 .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
@@ -127,12 +125,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseEdgeFields/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the query.
-            var query = context.DatabaseEdgeFields
+            var query = _context.DatabaseEdgeFields
                 .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel
@@ -167,7 +161,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 return Page();
             }
             // Check if the name has changed and there is another database node field with the same name.
-            if (View.DatabaseEdgeField.Name != Input.Name && context.DatabaseEdgeFields.Any(item => item.Name == Input.Name))
+            if (View.DatabaseEdgeField.Name != Input.Name && _context.DatabaseEdgeFields.Any(item => item.Name == Input.Name))
             {
                 // Add an error to the model
                 ModelState.AddModelError(string.Empty, $"A database edge field with the name \"{Input.Name}\" already exists.");
@@ -175,7 +169,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 return Page();
             }
             // Get the corresponding database.
-            var database = context.Databases
+            var database = _context.Databases
                 .Where(item => item.DatabaseType.Name != "Generic")
                 .FirstOrDefault(item => item.Id == Input.DatabaseString || item.Name == Input.DatabaseString);
             // Check if no database has been found.

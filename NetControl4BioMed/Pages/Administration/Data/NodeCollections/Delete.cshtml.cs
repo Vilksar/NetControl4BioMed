@@ -21,10 +21,12 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
     public class DeleteModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ApplicationDbContext _context;
 
-        public DeleteModel(IServiceProvider serviceProvider)
+        public DeleteModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _context = context;
         }
 
         [BindProperty]
@@ -52,14 +54,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Data/NodeCollections/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the view.
             View = new ViewModel
             {
-                Items = context.NodeCollections
+                Items = _context.NodeCollections
                     .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -84,14 +82,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Data/NodeCollections/Index");
             }
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the view.
             View = new ViewModel
             {
-                Items = context.NodeCollections
+                Items = _context.NodeCollections
                     .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -127,9 +121,9 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 })
             };
             // Mark the task for addition.
-            context.BackgroundTasks.Add(task);
+            _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            context.SaveChanges();
+            _context.SaveChanges();
             // Create a new Hangfire background job.
             var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNodeCollections(task.Id, CancellationToken.None));
             // Display a message.

@@ -19,10 +19,12 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
     public class CreateModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ApplicationDbContext _context;
 
-        public CreateModel(IServiceProvider serviceProvider)
+        public CreateModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _context = context;
         }
 
         [BindProperty]
@@ -41,12 +43,8 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
 
         public IActionResult OnGet(string email = null, string databaseString = null)
         {
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Check if there aren't any databases.
-            if (!context.Databases.Any())
+            if (!_context.Databases.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No databases could be found. Please create a database first.";
@@ -65,12 +63,8 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
 
         public IActionResult OnPost()
         {
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Check if there aren't any databases.
-            if (!context.Databases.Any())
+            if (!_context.Databases.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No databases could be found. Please create a database first.";
@@ -86,7 +80,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 return Page();
             }
             // Try to get the user with the provided e-mail.
-            var user = context.Users.FirstOrDefault(item => item.Email == Input.Email);
+            var user = _context.Users.FirstOrDefault(item => item.Email == Input.Email);
             // Check if there was any user found.
             if (user != null)
             {
@@ -96,7 +90,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 return Page();
             }
             // Get the database based on the provided string.
-            var database = context.Databases.FirstOrDefault(item => item.Id == Input.DatabaseString || item.Name == Input.DatabaseString);
+            var database = _context.Databases.FirstOrDefault(item => item.Id == Input.DatabaseString || item.Name == Input.DatabaseString);
             // Check if there was no database found.
             if (database == null)
             {

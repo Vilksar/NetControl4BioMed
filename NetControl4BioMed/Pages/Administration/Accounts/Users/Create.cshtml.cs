@@ -57,12 +57,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
 
         public IActionResult OnPost()
         {
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            // Use a new user manager instance.
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
             {
