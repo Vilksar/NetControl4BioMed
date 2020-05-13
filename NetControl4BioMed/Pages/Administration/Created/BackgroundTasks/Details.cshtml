@@ -51,10 +51,10 @@
                 <span asp-validation-for="View.BackgroundTask.IsRecurring" class="text-danger small"></span>
             </div>
             <div class="form-group">
-                <label asp-for="View.Data" class="font-weight-bold">Data</label>
-                <input asp-for="View.Data" class="form-control" readonly />
-                <span asp-description-for="View.Data" class="text-muted small">The data of the background task.</span>
-                <span asp-validation-for="View.Data" class="text-danger small"></span>
+                <label asp-for="View.BackgroundTask.Data" class="font-weight-bold">Data</label>
+                <textarea asp-for="View.BackgroundTask.Data" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.BackgroundTask.Data" class="text-muted small">The data of the background task.</span>
+                <span asp-validation-for="View.BackgroundTask.Data" class="text-danger small"></span>
             </div>
         </form>
     </div>

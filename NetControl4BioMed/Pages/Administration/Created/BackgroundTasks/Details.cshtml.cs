@@ -28,8 +28,6 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
         public class ViewModel
         {
             public BackgroundTask BackgroundTask { get; set; }
-
-            public string Data { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -58,17 +56,6 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
                 TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Created/BackgroundTasks/Index");
-            }
-            // Try to deserialize the data.
-            if (View.BackgroundTask.Data.TryDeserializeJsonObject<object>(out var data))
-            {
-                // Display the formatted data.
-                View.Data = JsonSerializer.Serialize(data);
-            }
-            else
-            {
-                // Display the unformatted data.
-                View.Data = View.BackgroundTask.Data;
             }
             // Return the page.
             return Page();
