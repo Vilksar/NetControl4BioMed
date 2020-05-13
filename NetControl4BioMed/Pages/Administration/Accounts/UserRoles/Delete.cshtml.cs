@@ -1,27 +1,36 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
 {
     [Authorize(Roles = "Administrator")]
     public class DeleteModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ApplicationDbContext _context;
 
-        public DeleteModel(UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
+        public DeleteModel(IServiceProvider serviceProvider, UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
@@ -137,36 +146,40 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 return Page();
             }
             // Save the number of items found.
-            var userRoleCount = View.Items.Count();
-            // Go over each of the items.
-            foreach (var userRole in View.Items.ToList())
+            var itemCount = View.Items.Count();
+            // Define a new task.
+            var task = new BackgroundTask
             {
-                // Try to delete the item.
-                var result = await _userManager.RemoveFromRoleAsync(userRole.User, userRole.Role.Name);
-                // Check if the deletion was not successful.
-                if (!result.Succeeded)
+                DateTimeCreated = DateTime.Now,
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteUserRoles)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new UserRolesTask
                 {
-                    // Go over the errors and add them to the model.
-                    foreach (var error in result.Errors)
+                    Items = View.Items.Select(item => new UserRoleInputModel
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    // Redisplay the page.
-                    return Page();
-                }
-            }
+                        UserId = item.User.Id,
+                        RoleId = item.Role.Id
+                    })
+                })
+            };
+            // Mark the task for addition.
+            _context.BackgroundTasks.Add(task);
+            // Save the changes to the database.
+            _context.SaveChanges();
+            // Create a new Hangfire background job.
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteUserRoles(task.Id, CancellationToken.None));
             // Check if the current user is selected.
             if (View.IsCurrentUserSelected)
             {
                 // Log out the user.
                 await _signInManager.SignOutAsync();
                 // Display a message.
-                TempData["StatusMessage"] = $"Info: {userRoleCount.ToString()} user role{(userRoleCount != 1 ? "s" : string.Empty)} deleted successfully. The roles assigned to your account have changed, so you have been signed out.";
+                TempData["StatusMessage"] = $"Info: A new background job was created to delete {itemCount} user role{(itemCount != 1 ? "s" : string.Empty)}. The roles assigned to your account will change, so you have been signed out.";
                 // Redirect to the index page.
                 return RedirectToPage("/Index");
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {userRoleCount.ToString()} user role{(userRoleCount != 1 ? "s" : string.Empty)} deleted successfully.";
+            TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} user role{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Accounts/UserRoles/Index");
         }

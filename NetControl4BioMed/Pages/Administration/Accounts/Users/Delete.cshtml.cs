@@ -1,24 +1,33 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Accounts.Users
 {
     [Authorize(Roles = "Administrator")]
     public class DeleteModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public DeleteModel(UserManager<User> userManager, ApplicationDbContext context)
+        public DeleteModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _userManager = userManager;
             _context = context;
         }
@@ -119,45 +128,29 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 return Page();
             }
             // Save the number of items found.
-            var userCount = View.Items.Count();
-            // Go over each of the items and try to delete it.
-            foreach (var user in View.Items.ToList())
+            var itemCount = View.Items.Count();
+            // Define a new task.
+            var task = new BackgroundTask
             {
-                // Try to delete the item.
-                var result = await _userManager.DeleteAsync(user);
-                // Check if the deletion was not successful.
-                if (!result.Succeeded)
+                DateTimeCreated = DateTime.Now,
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteUsers)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new UsersTask
                 {
-                    // Go over the errors and add them to the model.
-                    foreach (var error in result.Errors)
+                    Items = View.Items.Select(item => new UserInputModel
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    // Redisplay the page.
-                    return Page();
-                }
-            }
-            // Go over all of the networks and analyses and get the ones without any users.
-            var networks = _context.Networks
-                .Where(item => !item.NetworkUsers.Any());
-            var analyses = _context.Analyses
-                .Where(item => !item.AnalysisUsers.Any() || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
-            // Get the generic entities among them.
-            var genericNetworks = networks
-                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
-            var genericNodes = _context.Nodes
-                .Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
-            var genericEdges = _context.Edges
-                .Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
-            // Mark the items for deletion.
-            _context.Analyses.RemoveRange(analyses);
-            _context.Networks.RemoveRange(networks);
-            _context.Edges.RemoveRange(genericEdges);
-            _context.Nodes.RemoveRange(genericNodes);
-            // Save the changes in the database.
-            await _context.SaveChangesAsync();
+                        Id = item.Id
+                    })
+                })
+            };
+            // Mark the task for addition.
+            _context.BackgroundTasks.Add(task);
+            // Save the changes to the database.
+            _context.SaveChanges();
+            // Create a new Hangfire background job.
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteUsers(task.Id, CancellationToken.None));
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {userCount.ToString()} user{(userCount != 1 ? "s" : string.Empty)} deleted successfully.";
+            TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} user{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Accounts/Users/Index");
         }

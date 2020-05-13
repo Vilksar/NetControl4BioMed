@@ -14,7 +14,9 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Administration.Data.Nodes
@@ -22,6 +24,23 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
     [Authorize(Roles = "Administrator")]
     public class UpdateModel : PageModel
     {
+        private static List<NodeInputModel> DefaultNodeInputModel { get; } = new List<NodeInputModel>
+        {
+            new NodeInputModel
+            {
+                Id = "ID",
+                Description = "Description",
+                DatabaseNodeFieldNodes = new List<DatabaseNodeFieldNodeInputModel>
+                {
+                    new DatabaseNodeFieldNodeInputModel
+                    {
+                        DatabaseNodeFieldId = "Database node field ID",
+                        Value = "Value"
+                    }
+                }
+            }
+        };
+
         private readonly ApplicationDbContext _context;
 
         public UpdateModel(ApplicationDbContext context)
@@ -53,10 +72,15 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
 
         public IActionResult OnGet(string type = null, IEnumerable<string> ids = null)
         {
+            // Define the JSON serializer options.
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(new List<DataUpdateNodeViewModel> { DataUpdateNodeViewModel.Default }, new JsonSerializerOptions { WriteIndented = true })
+                JsonModel = JsonSerializer.Serialize(DefaultNodeInputModel, jsonSerializerOptions)
             };
             // Check if there are any IDs provided.
             ids ??= Enumerable.Empty<string>();
@@ -65,29 +89,37 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 .Where(item => !item.DatabaseNodes.Any(item => item.Database.DatabaseType.Name == "Generic"))
                 .Where(item => ids.Contains(item.Id));
             // Get the items for the view.
-            var items = nodes.Select(item =>
-                new DataUpdateNodeViewModel
+            var items = nodes.Select(item => new NodeInputModel
+            {
+                Id = item.Id,
+                Description = item.Description,
+                DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes.Select(item1 => new DatabaseNodeFieldNodeInputModel
                 {
-                    Id = item.Id,
-                    Description = item.Description,
-                    Fields = item.DatabaseNodeFieldNodes.Select(item1 => new DataUpdateNodeViewModel.FieldModel { Key = item1.DatabaseNodeField.Id, Value = item1.Value })
-                });
+                    DatabaseNodeFieldId = item1.DatabaseNodeField.Id,
+                    Value = item1.Value
+                })
+            });
             // Define the input.
             Input = new InputModel
             {
                 Type = type,
-                Data = JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true })
+                Data = JsonSerializer.Serialize(items, jsonSerializerOptions)
             };
             // Return the page.
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
+            // Define the JSON serializer options.
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(new List<DataUpdateNodeViewModel> { DataUpdateNodeViewModel.Default }, new JsonSerializerOptions { WriteIndented = true })
+                JsonModel = JsonSerializer.Serialize(DefaultNodeInputModel, jsonSerializerOptions)
             };
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
@@ -98,18 +130,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 return Page();
             }
             // Try to deserialize the data.
-            if (!Input.Data.TryDeserializeJsonObject<IEnumerable<DataUpdateNodeViewModel>>(out var items))
+            if (!Input.Data.TryDeserializeJsonObject<IEnumerable<NodeInputModel>>(out var items) || items == null)
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The provided data is not a valid JSON object.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Check if any of the items has any null values.
-            if (items.Any(item => item.Id == null || item.Description == null || item.Fields == null || item.Fields.Any(item1 => item1.Key == null || item1.Value == null)))
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided JSON data can't contain any \"null\" values. Please replace them, eventually with an empty string.");
                 // Redisplay the page.
                 return Page();
             }
@@ -120,7 +144,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
             {
                 // Keep only the valid items.
                 items = items
-                    .Where(item => item.Fields != null && item.Fields.Any());
+                    .Where(item => item.DatabaseNodeFieldNodes != null && item.DatabaseNodeFieldNodes.Any());
                 // Check if there weren't any valid items found.
                 if (items == null || !items.Any())
                 {
@@ -143,15 +167,30 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 }
                 // Save the number of items.
                 itemCount = items.Count();
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.CreateNodes(items, CancellationToken.None));
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.CreateNodes)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new NodesTask
+                    {
+                        Items = items
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.CreateNodes(task.Id, CancellationToken.None));
             }
             // Check if the items should be edited.
             else if (Input.Type == "Edit")
             {
                 // Keep only the valid items.
                 items = items
-                    .Where(item => !string.IsNullOrEmpty(item.Id) && item.Fields != null && item.Fields.Any());
+                    .Where(item => !string.IsNullOrEmpty(item.Id) && item.DatabaseNodeFieldNodes != null && item.DatabaseNodeFieldNodes.Any());
                 // Check if there weren't any valid items found.
                 if (items == null || !items.Any())
                 {
@@ -162,8 +201,23 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 }
                 // Save the number of items.
                 itemCount = items.Count();
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.UpdateNodes(items, CancellationToken.None));
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.EditNodes)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new NodesTask
+                    {
+                        Items = items
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.EditNodes(task.Id, CancellationToken.None));
             }
             // Check if the items should be deleted.
             else if (Input.Type == "Delete")
@@ -173,15 +227,32 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                     .Where(item => !string.IsNullOrEmpty(item.Id));
                 // Get the list of IDs from the provided items.
                 var itemIds = items.Select(item => item.Id);
-                // Get the IDs of the nodes from the non-generic databases that have the given IDs.
-                var ids = _context.Nodes
+                // Get the nodes from the non-generic databases that have the given IDs.
+                var nodes = _context.Nodes
                     .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => itemIds.Contains(item.Id))
-                    .Select(item => item.Id);
+                    .Where(item => itemIds.Contains(item.Id));
                 // Save the number of nodes found.
-                itemCount = items.Count();
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodes(ids, CancellationToken.None));
+                itemCount = nodes.Count();
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNodes)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new NodesTask
+                    {
+                        Items = nodes.Select(item => new NodeInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNodes(task.Id, CancellationToken.None));
             }
             // Check if the type is not valid.
             else
@@ -192,7 +263,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 return Page();
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: The background task for updating the data ({itemCount.ToString()} item{(itemCount != 1 ? "s" : string.Empty)} of type \"{Input.Type}\") has been created and scheduled successfully. You can view the progress on the Hangfire dashboard.";
+            TempData["StatusMessage"] = $"Success: A new background task was created to {Input.Type.ToLower()} {itemCount} node{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Data/Nodes/Index");
         }

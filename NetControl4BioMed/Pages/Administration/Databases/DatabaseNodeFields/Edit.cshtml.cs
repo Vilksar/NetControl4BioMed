@@ -2,24 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
 {
     [Authorize(Roles = "Administrator")]
     public class EditModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationDbContext _context;
 
-        public EditModel(ApplicationDbContext context)
+        public EditModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _context = context;
         }
 
@@ -87,11 +93,11 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
-            // Check if the corresponding database is of the generic type.
+            // Check if the database node field is the generic database node field.
             if (View.DatabaseNodeField.Database.DatabaseType.Name == "Generic")
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: Databases of \"Generic\" type can't be edited.";
+                TempData["StatusMessage"] = "Error: The generic database node field can't be edited.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
@@ -109,7 +115,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(Input.Id))
@@ -138,11 +144,11 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
-            // Check if the corresponding database is of the generic type.
+            // Check if the database node field is the generic database node field.
             if (View.DatabaseNodeField.Database.DatabaseType.Name == "Generic")
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: Databases of \"Generic\" type can't be edited.";
+                TempData["StatusMessage"] = "Error: The generic database node field can't be edited.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseNodeFields/Index");
             }
@@ -182,17 +188,35 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redisplay the page.
                 return Page();
             }
-            // Mark the item for updating.
-            _context.DatabaseNodeFields.Update(View.DatabaseNodeField);
-            // Update the data.
-            View.DatabaseNodeField.Name = Input.Name;
-            View.DatabaseNodeField.Description = Input.Description;
-            View.DatabaseNodeField.Url = Input.Url;
-            View.DatabaseNodeField.IsSearchable = Input.IsSearchable;
-            View.DatabaseNodeField.DatabaseId = database.Id;
-            View.DatabaseNodeField.Database = database;
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            // Define a new task.
+            var task = new DatabaseNodeFieldsTask
+            {
+                Items = new List<DatabaseNodeFieldInputModel>
+                {
+                    new DatabaseNodeFieldInputModel
+                    {
+                        Id = Input.Id,
+                        Name = Input.Name,
+                        Description = Input.Description,
+                        Url = Input.Url,
+                        IsSearchable = Input.IsSearchable,
+                        DatabaseId = database.Id
+                    }
+                }
+            };
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Edit(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 database node field updated successfully.";
             // Redirect to the index page.

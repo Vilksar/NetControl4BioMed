@@ -2,23 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Databases.Databases
 {
     [Authorize(Roles = "Administrator")]
     public class EditModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationDbContext _context;
 
-        public EditModel(ApplicationDbContext context)
+        public EditModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _context = context;
         }
 
@@ -89,7 +95,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             if (View.Database.DatabaseType.Name == "Generic")
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: Databases of \"Generic\" type can't be edited.";
+                TempData["StatusMessage"] = "Error: The generic database can't be edited.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/Databases/Index");
             }
@@ -107,7 +113,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(Input.Id))
@@ -136,10 +142,10 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 return RedirectToPage("/Administration/Databases/Databases/Index");
             }
             // Check if the database is the generic database.
-            if (View.Database.Name == "Generic")
+            if (View.Database.DatabaseType.Name == "Generic")
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: Databases of \"Generic\" type can't be edited.";
+                TempData["StatusMessage"] = "Error: The generic database can't be edited.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/Databases/Index");
             }
@@ -167,7 +173,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             if (databaseType == null)
             {
                 // Add an error to the model
-                ModelState.AddModelError(string.Empty, "No database of non-generic type could be found with the provided string.");
+                ModelState.AddModelError(string.Empty, "No non-generic database could be found with the provided string.");
                 // Redisplay the page.
                 return Page();
             }
@@ -179,17 +185,35 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 // Redisplay the page.
                 return Page();
             }
-            // Mark the item for updating.
-            _context.Databases.Update(View.Database);
-            // Update the data.
-            View.Database.Name = Input.Name;
-            View.Database.Description = Input.Description;
-            View.Database.Url = Input.Url;
-            View.Database.IsPublic = Input.IsPublic;
-            View.Database.DatabaseTypeId = databaseType.Id;
-            View.Database.DatabaseType = databaseType;
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            // Define a new task.
+            var task = new DatabasesTask
+            {
+                Items = new List<DatabaseInputModel>
+                {
+                    new DatabaseInputModel
+                    {
+                        Id = Input.Id,
+                        Name = Input.Name,
+                        Description = Input.Description,
+                        Url = Input.Url,
+                        IsPublic = Input.IsPublic,
+                        DatabaseTypeId = databaseType.Id
+                    }
+                }
+            };
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Edit(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 database updated successfully.";
             // Redirect to the index page.

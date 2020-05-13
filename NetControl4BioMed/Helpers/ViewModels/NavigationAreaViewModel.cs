@@ -391,6 +391,15 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     {
                         new NavigationPageViewModel
                         {
+                            Id = "BackgroundTasks",
+                            Title = "Background tasks",
+                            Description = string.Empty,
+                            Icon = "fa-tasks",
+                            Color = "light",
+                            Link = "/Administration/Created/BackgroundTasks/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
                             Id = "Networks",
                             Title = "Networks",
                             Description = string.Empty,

@@ -1,23 +1,32 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
 {
     [Authorize(Roles = "Administrator")]
     public class DeleteModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationDbContext _context;
 
-        public DeleteModel(ApplicationDbContext context)
+        public DeleteModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _context = context;
         }
 
@@ -72,7 +81,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there aren't any e-mails or IDs provided.
             if (Input.UserIds == null || Input.DatabaseIds == null || !Input.UserIds.Any() || !Input.DatabaseIds.Any() || Input.UserIds.Count() != Input.DatabaseIds.Count())
@@ -111,13 +120,30 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
                 return Page();
             }
             // Save the number of items found.
-            var databaseUserCount = View.Items.Count();
-            // Mark them for removal.
-            _context.DatabaseUsers.RemoveRange(View.Items);
-            // Save the changes.
-            await _context.SaveChangesAsync();
+            var itemCount = View.Items.Count();
+            // Define a new task.
+            var task = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteDatabaseUsers)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new DatabaseUsersTask
+                {
+                    Items = View.Items.Select(item => new DatabaseUserInputModel
+                    {
+                        DatabaseId = item.DatabaseId,
+                        UserId = item.UserId
+                    })
+                })
+            };
+            // Mark the task for addition.
+            _context.BackgroundTasks.Add(task);
+            // Save the changes to the database.
+            _context.SaveChanges();
+            // Create a new Hangfire background job.
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteDatabaseUsers(task.Id, CancellationToken.None));
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {databaseUserCount.ToString()} database user{(databaseUserCount != 1 ? "s" : string.Empty)} deleted successfully.";
+            TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} database user{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Permissions/DatabaseUsers/Index");
         }

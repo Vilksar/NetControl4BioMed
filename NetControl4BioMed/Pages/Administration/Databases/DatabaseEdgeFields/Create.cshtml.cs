@@ -2,24 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
 {
     [Authorize(Roles = "Administrator")]
     public class CreateModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationDbContext _context;
 
-        public CreateModel(ApplicationDbContext context)
+        public CreateModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _context = context;
         }
 
@@ -49,11 +55,11 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
 
         public IActionResult OnGet(string databaseString = null)
         {
-            // Check if there aren't any databases of non-generic type.
-            if (!_context.Databases.Where(item => item.DatabaseType.Name != "Generic").Any())
+            // Check if there aren't any non-generic databases.
+            if (!_context.Databases.Any(item => item.DatabaseType.Name != "Generic"))
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No databases of non-generic type could be found. Please create a database first.";
+                TempData["StatusMessage"] = "Error: No non-generic databases could be found. Please create a database first.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseEdgeFields/Index");
             }
@@ -66,13 +72,13 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
-            // Check if there aren't any databases of non-generic type.
-            if (!_context.Databases.Where(item => item.DatabaseType.Name != "Generic").Any())
+            // Check if there aren't any non-generic databases.
+            if (!_context.Databases.Any(item => item.DatabaseType.Name != "Generic"))
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No databases of non-generic type could be found. Please create a database first.";
+                TempData["StatusMessage"] = "Error: No non-generic databases could be found. Please create a database first.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseEdgeFields/Index");
             }
@@ -104,21 +110,34 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
                 // Redisplay the page.
                 return Page();
             }
-            // Define the new database node field.
-            var databaseEdgeField = new DatabaseEdgeField
+            // Define a new task.
+            var task = new DatabaseEdgeFieldsTask
             {
-                Name = Input.Name,
-                Description = Input.Description,
-                Url = Input.Url,
-                IsSearchable = Input.IsSearchable,
-                DatabaseId = database.Id,
-                Database = database,
-                DateTimeCreated = DateTime.Now
+                Items = new List<DatabaseEdgeFieldInputModel>
+                {
+                    new DatabaseEdgeFieldInputModel
+                    {
+                        Name = Input.Name,
+                        Description = Input.Description,
+                        Url = Input.Url,
+                        IsSearchable = Input.IsSearchable,
+                        DatabaseId = database.Id
+                    }
+                }
             };
-            // Mark it for addition.
-            _context.DatabaseEdgeFields.Add(databaseEdgeField);
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Create(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 database edge field created successfully.";
             // Redirect to the index page.

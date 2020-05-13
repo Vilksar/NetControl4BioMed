@@ -35,10 +35,5 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the data of the background task.
         /// </summary>
         public string Data { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ID of the background job corresponding to the background task.
-        /// </summary>
-        public string JobId { get; set; }
     }
 }

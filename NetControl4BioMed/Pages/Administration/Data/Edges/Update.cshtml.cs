@@ -14,7 +14,9 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Administration.Data.Edges
@@ -22,6 +24,43 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
     [Authorize(Roles = "Administrator")]
     public class UpdateModel : PageModel
     {
+        private static List<EdgeInputModel> DefaultEdgeInputModel { get; } = new List<EdgeInputModel>
+        {
+            new EdgeInputModel
+            {
+                Id = "ID",
+                Description = "Description",
+                DatabaseEdges = new List<DatabaseEdgeInputModel>
+                {
+                    new DatabaseEdgeInputModel
+                    {
+                        DatabaseId = "Database ID"
+                    }
+                },
+                EdgeNodes = new List<EdgeNodeInputModel>
+                {
+                    new EdgeNodeInputModel
+                    {
+                        NodeId = "Node ID",
+                        Type = "Source"
+                    },
+                    new EdgeNodeInputModel
+                    {
+                        NodeId = "Node ID",
+                        Type = "Target"
+                    }
+                },
+                DatabaseEdgeFieldEdges = new List<DatabaseEdgeFieldEdgeInputModel>
+                {
+                    new DatabaseEdgeFieldEdgeInputModel
+                    {
+                        DatabaseEdgeFieldId = "Database edge field ID",
+                        Value = "Value"
+                    }
+                }
+            }
+        };
+
         private readonly ApplicationDbContext _context;
 
         public UpdateModel(ApplicationDbContext context)
@@ -53,10 +92,15 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
 
         public IActionResult OnGet(string type = null, IEnumerable<string> ids = null)
         {
+            // Define the JSON serializer options.
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(new List<DataUpdateEdgeViewModel> { DataUpdateEdgeViewModel.Default }, new JsonSerializerOptions { WriteIndented = true })
+                JsonModel = JsonSerializer.Serialize(DefaultEdgeInputModel, jsonSerializerOptions)
             };
             // Check if there are any IDs provided.
             ids ??= Enumerable.Empty<string>();
@@ -70,31 +114,46 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                     .ThenInclude(item => item.Database)
                 .Include(item => item.DatabaseEdgeFieldEdges);
             // Get the items for the view.
-            var items = edges.Select(item =>
-                new DataUpdateEdgeViewModel
+            var items = edges.Select(item => new EdgeInputModel
+            {
+                Id = item.Id,
+                Description = item.Description,
+                EdgeNodes = item.EdgeNodes.Select(item1 => new EdgeNodeInputModel
                 {
-                    Id = item.Id,
-                    Description = item.Description,
-                    DatabaseIds = item.DatabaseEdges.Select(item1 => item1.Database.Id),
-                    Nodes = item.EdgeNodes.Select(item1 => new DataUpdateEdgeViewModel.NodeModel { Id = item1.Node.Id, Type = item1.Type.ToString() }),
-                    Fields = item.DatabaseEdgeFieldEdges.Select(item1 => new DataUpdateEdgeViewModel.FieldModel { Key = item1.DatabaseEdgeField.Id, Value = item1.Value })
-                });
+                    NodeId = item1.Node.Id,
+                    Type = item1.Type.ToString()
+                }),
+                DatabaseEdges = item.DatabaseEdges.Select(item1 => new DatabaseEdgeInputModel
+                {
+                    DatabaseId = item1.Database.Id
+                }),
+                DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges.Select(item1 => new DatabaseEdgeFieldEdgeInputModel
+                {
+                    DatabaseEdgeFieldId = item1.DatabaseEdgeField.Id,
+                    Value = item1.Value
+                })
+            });
             // Define the input.
             Input = new InputModel
             {
                 Type = type,
-                Data = JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true })
+                Data = JsonSerializer.Serialize(items, jsonSerializerOptions)
             };
             // Return the page.
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
+            // Define the JSON serializer options.
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(new List<DataUpdateEdgeViewModel> { DataUpdateEdgeViewModel.Default }, new JsonSerializerOptions { WriteIndented = true })
+                JsonModel = JsonSerializer.Serialize(DefaultEdgeInputModel, jsonSerializerOptions)
             };
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
@@ -105,18 +164,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 return Page();
             }
             // Try to deserialize the data.
-            if (!Input.Data.TryDeserializeJsonObject<IEnumerable<DataUpdateEdgeViewModel>>(out var items))
+            if (!Input.Data.TryDeserializeJsonObject<IEnumerable<EdgeInputModel>>(out var items) || items == null)
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The provided data is not a valid JSON object.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Check if any of the items has any null values.
-            if (items.Any(item => item.Id == null || item.Description == null || item.DatabaseIds == null || item.Nodes == null || item.Nodes.Any(item1 => item1.Id == null || item1.Type == null) || item.Fields == null || item.Fields.Any(item1 => item1.Key == null || item1.Value == null)))
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided JSON data can't contain any \"null\" values. Please replace them, eventually with an empty string.");
                 // Redisplay the page.
                 return Page();
             }
@@ -127,7 +178,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
             {
                 // Keep only the valid items.
                 items = items
-                    .Where(item => item.Nodes != null && item.Nodes.Any() && ((item.DatabaseIds != null && item.DatabaseIds.Any()) || (item.Fields != null && item.Fields.Any())));
+                    .Where(item => item.EdgeNodes != null && item.EdgeNodes.Any() && ((item.DatabaseEdges != null && item.DatabaseEdges.Any()) || (item.DatabaseEdgeFieldEdges != null && item.DatabaseEdgeFieldEdges.Any())));
                 // Check if there weren't any valid items found.
                 if (items == null || !items.Any())
                 {
@@ -150,15 +201,29 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 }
                 // Save the number of items.
                 itemCount = items.Count();
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.CreateEdges(items, CancellationToken.None));
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.CreateEdges)}",
+                    Data = JsonSerializer.Serialize(new EdgesTask
+                    {
+                        Items = items
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.CreateEdges(task.Id, CancellationToken.None));
             }
             // Check if the items should be edited.
             else if (Input.Type == "Edit")
             {
                 // Keep only the valid items.
                 items = items
-                    .Where(item => !string.IsNullOrEmpty(item.Id) && item.Nodes != null && item.Nodes.Any() && ((item.DatabaseIds != null && item.DatabaseIds.Any()) || (item.Fields != null && item.Fields.Any())));
+                    .Where(item => !string.IsNullOrEmpty(item.Id) && item.EdgeNodes != null && item.EdgeNodes.Any() && ((item.DatabaseEdges != null && item.DatabaseEdges.Any()) || (item.DatabaseEdgeFieldEdges != null && item.DatabaseEdgeFieldEdges.Any())));
                 // Check if there weren't any valid items found.
                 if (items == null || !items.Any())
                 {
@@ -169,8 +234,22 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 }
                 // Save the number of items.
                 itemCount = items.Count();
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.UpdateEdges(items, CancellationToken.None));
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.EditEdges)}",
+                    Data = JsonSerializer.Serialize(new EdgesTask
+                    {
+                        Items = items
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.EditEdges(task.Id, CancellationToken.None));
             }
             // Check if the items should be deleted.
             else if (Input.Type == "Delete")
@@ -180,15 +259,31 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                     .Where(item => !string.IsNullOrEmpty(item.Id));
                 // Get the list of IDs from the provided items.
                 var itemIds = items.Select(item => item.Id);
-                // Get the IDs of the edges from the non-generic databases that have the given IDs.
-                var ids = _context.Edges
+                // Get the edges from the non-generic databases that have the given IDs.
+                var edges = _context.Edges
                     .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => itemIds.Contains(item.Id))
-                    .Select(item => item.Id);
-                // Save the number of nodes found.
-                itemCount = items.Count();
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteEdges(ids, CancellationToken.None));
+                    .Where(item => itemIds.Contains(item.Id));
+                // Save the number of edges found.
+                itemCount = edges.Count();
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteEdges)}",
+                    Data = JsonSerializer.Serialize(new EdgesTask
+                    {
+                        Items = edges.Select(item => new EdgeInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteEdges(task.Id, CancellationToken.None));
             }
             // Check if the type is not valid.
             else
@@ -199,7 +294,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 return Page();
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: The background task for updating the data ({itemCount.ToString()} item{(itemCount != 1 ? "s" : string.Empty)} of type \"{Input.Type}\") has been created and scheduled successfully. You can view the progress on the Hangfire dashboard.";
+            TempData["StatusMessage"] = $"Success: A new background task was created to {Input.Type.ToLower()} {itemCount} edge{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Data/Edges/Index");
         }

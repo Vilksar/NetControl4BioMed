@@ -1,22 +1,31 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
 {
     [Authorize(Roles = "Administrator")]
     public class DeleteModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationDbContext _context;
 
-        public DeleteModel(ApplicationDbContext context)
+        public DeleteModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _context = context;
         }
 
@@ -63,7 +72,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())
@@ -96,20 +105,29 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 return Page();
             }
             // Save the number of items found.
-            var nodeCollectionCount = View.Items.Count();
-            // Get the related entities that use the items.
-            var networks = _context.Networks
-                .Where(item => item.NetworkNodeCollections.Any(item1 => View.Items.Contains(item1.NodeCollection)));
-            var analyses = _context.Analyses
-                .Where(item => item.AnalysisNodeCollections.Any(item1 => View.Items.Contains(item1.NodeCollection)) || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
-            // Mark the items for deletion.
-            _context.Analyses.RemoveRange(analyses);
-            _context.Networks.RemoveRange(networks);
-            _context.NodeCollections.RemoveRange(View.Items);
+            var itemCount = View.Items.Count();
+            // Define a new task.
+            var task = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNodes)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new NodeCollectionsTask
+                {
+                    Items = View.Items.Select(item => new NodeCollectionInputModel
+                    {
+                        Id = item.Id
+                    })
+                })
+            };
+            // Mark the task for addition.
+            _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
+            // Create a new Hangfire background job.
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNodeCollections(task.Id, CancellationToken.None));
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {nodeCollectionCount.ToString()} node collection{(nodeCollectionCount != 1 ? "s" : string.Empty)} deleted successfully.";
+            TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} node collection{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Data/NodeCollections/Index");
         }

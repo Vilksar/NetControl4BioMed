@@ -15,6 +15,11 @@ namespace NetControl4BioMed.Data
     public class ApplicationDbContext : IdentityDbContext<User, Role, string, IdentityUserClaim<string>, UserRole, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
         /// <summary>
+        /// Represents the default batch size for a database operation.
+        /// </summary>
+        public static int BatchSize { get; } = 200;
+
+        /// <summary>
         /// Gets or sets the database table containing the analyses.
         /// </summary>
         public DbSet<Analysis> Analyses { get; set; }

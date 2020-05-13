@@ -1,22 +1,31 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Data.Edges
 {
     [Authorize(Roles = "Administrator")]
     public class DeleteModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationDbContext _context;
 
-        public DeleteModel(ApplicationDbContext context)
+        public DeleteModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _context = context;
         }
 
@@ -64,7 +73,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())
@@ -98,20 +107,29 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 return Page();
             }
             // Save the number of items found.
-            var edgeCount = View.Items.Count();
-            // Get the related entities that use the items.
-            var networks = _context.Networks
-                .Where(item => item.NetworkEdges.Any(item1 => View.Items.Contains(item1.Edge)));
-            var analyses = _context.Analyses
-                .Where(item => item.AnalysisEdges.Any(item1 => View.Items.Contains(item1.Edge)));
-            // Mark the items for deletion.
-            _context.Analyses.RemoveRange(analyses);
-            _context.Networks.RemoveRange(networks);
-            _context.Edges.RemoveRange(View.Items);
+            var itemCount = View.Items.Count();
+            // Define a new task.
+            var task = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteEdges)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new EdgesTask
+                {
+                    Items = View.Items.Select(item => new EdgeInputModel
+                    {
+                        Id = item.Id
+                    })
+                })
+            };
+            // Mark the task for addition.
+            _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
+            // Create a new Hangfire background job.
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteEdges(task.Id, CancellationToken.None));
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {edgeCount.ToString()} edge{(edgeCount != 1 ? "s" : string.Empty)} deleted successfully.";
+            TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} edge{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
             return RedirectToPage("/Administration/Data/Edges/Index");
         }

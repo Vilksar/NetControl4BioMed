@@ -18,8 +18,10 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Services;
+using NetControl4BioMed.Helpers.Tasks;
 using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Administration
@@ -61,161 +63,6 @@ namespace NetControl4BioMed.Pages.Administration
 
         public IActionResult OnGet()
         {
-            // Check if the count needs to be reset.
-            if (!bool.TryParse(_configuration["Data:ItemCount:Reset"], out var resetItemCount) || resetItemCount)
-            {
-                // Update the reset status.
-                _configuration["Data:ItemCount:Reset"] = false.ToString();
-                // Update the counts.
-                _configuration["Data:ItemCount:Users"] = _context.Users
-                    .Count()
-                    .ToString();
-                _configuration["Data:ItemCount:Roles"] = _context.Roles
-                    .Count()
-                    .ToString();
-                _configuration["Data:ItemCount:DatabaseTypes"] = _context.DatabaseTypes
-                    .Count()
-                    .ToString();
-                _configuration["Data:ItemCount:Databases"] = _context.Databases
-                    .Count()
-                    .ToString();
-                _configuration["Data:ItemCount:DatabaseNodeFields"] = _context.DatabaseNodeFields
-                    .Count()
-                    .ToString();
-                _configuration["Data:ItemCount:DatabaseEdgeFields"] = _context.DatabaseEdgeFields
-                    .Count()
-                    .ToString();
-                _configuration["Data:ItemCount:Nodes"] = _context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Count()
-                    .ToString();
-                _configuration["Data:ItemCount:Edges"] = _context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Count()
-                    .ToString();
-                _configuration["Data:ItemCount:NodeCollections"] = _context.NodeCollections
-                    .Count()
-                    .ToString();
-                _configuration["Data:ItemCount:Networks"] = _context.Networks
-                    .Count()
-                    .ToString();
-                _configuration["Data:ItemCount:Analyses"] = _context.Analyses
-                    .Count()
-                    .ToString();
-                // Get the current status message.
-                var statusMessage = (string)TempData["StatusMessage"];
-                // Display a message.
-                TempData["StatusMessage"] = $"{(!string.IsNullOrEmpty(statusMessage) ? statusMessage : "Success: ")} The item count has been successfully updated.";
-            }
-            // Check if the issue count needs to be reset.
-            if (!bool.TryParse(_configuration["Data:IssueCount:Reset"], out var resetIssueCount) || resetIssueCount)
-            {
-                // Update the reset status.
-                _configuration["Data:IssueCount:Reset"] = false.ToString();
-                // Update the duplicate counts.
-                _configuration["Data:IssueCount:Duplicate:DatabaseTypes"] = _context.DatabaseTypes
-                    .Where(item => item.Name != "Generic")
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Duplicate:Databases"] = _context.Databases
-                    .Where(item => item.DatabaseType.Name != "Generic")
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Duplicate:DatabaseNodeFields"] = _context.DatabaseNodeFields
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Duplicate:DatabaseEdgeFields"] = _context.DatabaseEdgeFields
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Duplicate:DatabaseNodeFieldNodes"] = _context.DatabaseNodeFieldNodes
-                    .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
-                    .Where(item => item.DatabaseNodeField.IsSearchable)
-                    .GroupBy(item => item.Value)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Duplicate:Nodes"] = _context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Duplicate:Edges"] = _context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Duplicate:NodeCollections"] = _context.NodeCollections
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .Count()
-                    .ToString();
-                // Update the orphaned counts.
-                _configuration["Data:IssueCount:Orphaned:Nodes"] = _context.Nodes
-                    .Where(item => !item.DatabaseNodeFieldNodes.Any())
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Orphaned:Edges"] = _context.Edges
-                    .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Orphaned:NodeCollections"] = _context.NodeCollections
-                    .Where(item => !item.NodeCollectionNodes.Any())
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Orphaned:Networks"] = _context.Networks
-                    .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any())
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Orphaned:Analyses"] = _context.Analyses
-                    .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any())
-                    .Count()
-                    .ToString();
-                // Update the inconsistent counts.
-                _configuration["Data:IssueCount:Inconsistent:Nodes"] = _context.Nodes
-                    .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Inconsistent:Edges"] = _context.Edges
-                    .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Inconsistent:NodeCollections"] = _context.NodeCollections
-                    .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Inconsistent:Networks"] = _context.Networks
-                    .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .Count()
-                    .ToString();
-                _configuration["Data:IssueCount:Inconsistent:Analyses"] = _context.Analyses
-                    .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .Count()
-                    .ToString();
-                // Get the current status message.
-                var statusMessage = (string)TempData["StatusMessage"];
-                // Display a message.
-                TempData["StatusMessage"] = $"{(!string.IsNullOrEmpty(statusMessage) ? statusMessage : "Success: ")} The issue count has been successfully updated.";
-            }
             // Get the data from configuration.
             var count = _configuration
                 .GetSection("Data")
@@ -247,16 +94,151 @@ namespace NetControl4BioMed.Pages.Administration
 
         public IActionResult OnPostResetIssueCount()
         {
-            // Update the reset status.
-            _configuration["Data:IssueCount:Reset"] = true.ToString();
+            // Update the duplicate counts.
+            _configuration["Data:IssueCount:Duplicate:DatabaseTypes"] = _context.DatabaseTypes
+                .Where(item => item.Name != "Generic")
+                .GroupBy(item => item.Name)
+                .Where(item => item.Count() > 1)
+                .Select(item => item.Key)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Duplicate:Databases"] = _context.Databases
+                .Where(item => item.DatabaseType.Name != "Generic")
+                .GroupBy(item => item.Name)
+                .Where(item => item.Count() > 1)
+                .Select(item => item.Key)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Duplicate:DatabaseNodeFields"] = _context.DatabaseNodeFields
+                .Where(item => item.Database.DatabaseType.Name != "Generic")
+                .GroupBy(item => item.Name)
+                .Where(item => item.Count() > 1)
+                .Select(item => item.Key)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Duplicate:DatabaseEdgeFields"] = _context.DatabaseEdgeFields
+                .Where(item => item.Database.DatabaseType.Name != "Generic")
+                .GroupBy(item => item.Name)
+                .Where(item => item.Count() > 1)
+                .Select(item => item.Key)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Duplicate:DatabaseNodeFieldNodes"] = _context.DatabaseNodeFieldNodes
+                .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
+                .Where(item => item.DatabaseNodeField.IsSearchable)
+                .GroupBy(item => item.Value)
+                .Where(item => item.Count() > 1)
+                .Select(item => item.Key)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Duplicate:Nodes"] = _context.Nodes
+                .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .GroupBy(item => item.Name)
+                .Where(item => item.Count() > 1)
+                .Select(item => item.Key)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Duplicate:Edges"] = _context.Edges
+                .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .GroupBy(item => item.Name)
+                .Where(item => item.Count() > 1)
+                .Select(item => item.Key)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Duplicate:NodeCollections"] = _context.NodeCollections
+                .GroupBy(item => item.Name)
+                .Where(item => item.Count() > 1)
+                .Select(item => item.Key)
+                .Count()
+                .ToString();
+            // Update the orphaned counts.
+            _configuration["Data:IssueCount:Orphaned:Nodes"] = _context.Nodes
+                .Where(item => !item.DatabaseNodeFieldNodes.Any())
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Orphaned:Edges"] = _context.Edges
+                .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Orphaned:NodeCollections"] = _context.NodeCollections
+                .Where(item => !item.NodeCollectionNodes.Any())
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Orphaned:Networks"] = _context.Networks
+                .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any())
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Orphaned:Analyses"] = _context.Analyses
+                .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any())
+                .Count()
+                .ToString();
+            // Update the inconsistent counts.
+            _configuration["Data:IssueCount:Inconsistent:Nodes"] = _context.Nodes
+                .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Inconsistent:Edges"] = _context.Edges
+                .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Inconsistent:NodeCollections"] = _context.NodeCollections
+                .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Inconsistent:Networks"] = _context.Networks
+                .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Inconsistent:Analyses"] = _context.Analyses
+                .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                .Count()
+                .ToString();
+            // Display a message.
+            TempData["StatusMessage"] = "Success: The issue count has been successfully updated.";
             // Redirect to the page.
             return RedirectToPage();
         }
 
         public IActionResult OnPostResetItemCount()
         {
-            // Update the reset status.
-            _configuration["Data:ItemCount:Reset"] = true.ToString();
+            // Update the counts.
+            _configuration["Data:ItemCount:Users"] = _context.Users
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:Roles"] = _context.Roles
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:DatabaseTypes"] = _context.DatabaseTypes
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:Databases"] = _context.Databases
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:DatabaseNodeFields"] = _context.DatabaseNodeFields
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:DatabaseEdgeFields"] = _context.DatabaseEdgeFields
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:Nodes"] = _context.Nodes
+                .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:Edges"] = _context.Edges
+                .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:NodeCollections"] = _context.NodeCollections
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:Networks"] = _context.Networks
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:Analyses"] = _context.Analyses
+                .Count()
+                .ToString();
+            // Display a message.
+            TempData["StatusMessage"] = "Success: The item count has been successfully updated.";
             // Redirect to the page.
             return RedirectToPage();
         }
@@ -277,20 +259,42 @@ namespace NetControl4BioMed.Pages.Administration
             return RedirectToPage();
         }
 
-        public IActionResult OnPostResetHangfireRecurrentJobs()
+        public async Task<IActionResult> OnPostResetHangfireRecurrentJobsAsync()
         {
-            // Delete any existing recurring tasks of cleaning the database.
-            RecurringJob.RemoveIfExists(nameof(IHangfireRecurringJobRunner));
-            // Define the view model for the recurring task of cleaning the database.
-            var viewModel = new HangfireRecurringCleanerViewModel
+            // Get the name of the task and job for cleaning the database.
+            var name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.Clean)}";
+            // Get the existing tasks.
+            var tasks = _context.BackgroundTasks
+                .Where(item => item.Name == name);
+            // Delete any existing jobs.
+            RecurringJob.RemoveIfExists(name);
+            // Mark the existing tasks for deletion.
+            _context.BackgroundTasks.RemoveRange(tasks);
+            // Save the changes to the database.
+            await _context.SaveChangesAsync();
+            // Define a new background task.
+            var task = new BackgroundTask
             {
-                Scheme = HttpContext.Request.Scheme,
-                HostValue = HttpContext.Request.Host.Value
+                DateTimeCreated = DateTime.Now,
+                Name = name,
+                IsRecurring = true,
+                Data = JsonSerializer.Serialize(new CleaningTask
+                {
+                    Scheme = HttpContext.Request.Scheme,
+                    HostValue = HttpContext.Request.Host.Value,
+                    DaysBeforeStop = 7,
+                    DaysBeforeAlert = 24,
+                    DaysBeforeDelete = 31
+                })
             };
-            // Create a daily recurring Hangfire task of cleaning the database.
-            RecurringJob.AddOrUpdate<IHangfireRecurringJobRunner>(nameof(IHangfireRecurringJobRunner), item => item.Run(viewModel), Cron.Daily());
+            // Mark the background task for addition.
+            _context.BackgroundTasks.Add(task);
+            // Save the changes to the database.
+            await _context.SaveChangesAsync();
+            // Create a new Hangfire daily recurring job.
+            RecurringJob.AddOrUpdate<IAdministrationTaskManager>(name, item => item.Clean(task.Id, CancellationToken.None), Cron.Daily());
             // Display a message.
-            TempData["StatusMessage"] = "Success: The Hangfire recurrent jobs have been successfully reset. You can view more details on the Hangfire dashboard.";
+            TempData["StatusMessage"] = "Success: The database cleaning job has been successfully reset. You can view more details on the Hangfire dashboard.";
             // Redirect to the page.
             return RedirectToPage();
         }
@@ -1115,51 +1119,139 @@ namespace NetControl4BioMed.Pages.Administration
             if (deleteItems.Contains("Nodes"))
             {
                 // Get the items.
-                var ids = _context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Select(item => item.Id);
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodes(ids, CancellationToken.None));
+                var items = _context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNodes)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new NodesTask
+                    {
+                        Items = items.Select(item => new NodeInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNodes(task.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Edges"))
             {
                 // Get the items.
-                var ids = _context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Select(item => item.Id);
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteEdges(ids, CancellationToken.None));
+                var items = _context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteEdges)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new EdgesTask
+                    {
+                        Items = items.Select(item => new EdgeInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteEdges(task.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("NodeCollections"))
             {
                 // Get the items.
-                var ids = _context.NodeCollections
-                    .Select(item => item.Id);
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNodeCollections(ids, CancellationToken.None));
+                var items = _context.NodeCollections
+                    .AsQueryable();
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNodeCollections)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new NodeCollectionsTask
+                    {
+                        Items = items.Select(item => new NodeCollectionInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNodeCollections(task.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Networks"))
             {
                 // Get the items.
-                var ids = _context.Networks
-                    .Select(item => item.Id);
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteNetworks(ids, CancellationToken.None));
+                var items = _context.Networks
+                    .AsQueryable();
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNetworks)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new NetworksTask
+                    {
+                        Items = items.Select(item => new NetworkInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNetworks(task.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Analyses"))
             {
                 // Get the items.
-                var ids = _context.Analyses
-                    .Select(item => item.Id);
-                // Create a new Hangfire background task.
-                var jobId = BackgroundJob.Enqueue<IDatabaseDataManager>(item => item.DeleteAnalyses(ids, CancellationToken.None));
+                var items = _context.Analyses
+                    .AsQueryable();
+                // Define a new background task.
+                var task = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.Now,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAnalyses)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new AnalysesTask
+                    {
+                        Items = items.Select(item => new AnalysisInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAnalyses(task.Id, CancellationToken.None));
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: The background tasks for deleting the data have been created and started successfully. You can view the progress on the Hangfire dashboard. It is recommended to not perform any other operations on the database until everything will complete.";
+            TempData["StatusMessage"] = $"Success: A new background task was created to delete {string.Join("and ", deleteItems.Select(item => $"all {item.ToLower()}"))}.";
             // Redirect to the page.
             return RedirectToPage();
         }

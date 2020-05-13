@@ -2,25 +2,31 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
 {
     [Authorize(Roles = "Administrator")]
     public class CreateModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ApplicationDbContext _context;
 
-        public CreateModel(UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
+        public CreateModel(IServiceProvider serviceProvider, UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
@@ -82,17 +88,28 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 // Redisplay the page.
                 return Page();
             }
-            // Try to add the user to the role.
-            var result = await _userManager.AddToRoleAsync(user, role.Name);
-            // Check if the operations has failed.
-            if (!result.Succeeded)
+            // Define a new task.
+            var task = new UserRolesTask
             {
-                // Go over each of the encountered errors.
-                foreach (var error in result.Errors)
+                Items = new List<UserRoleInputModel>
                 {
-                    // Add the error to the model.
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    new UserRoleInputModel
+                    {
+                        UserId = user.Id,
+                        RoleId = role.Id
+                    }
                 }
+            };
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Create(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
                 // Redisplay the page.
                 return Page();
             }

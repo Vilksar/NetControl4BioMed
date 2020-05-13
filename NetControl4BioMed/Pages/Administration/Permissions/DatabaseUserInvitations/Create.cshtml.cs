@@ -2,22 +2,28 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitations
 {
     [Authorize(Roles = "Administrator")]
     public class CreateModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationDbContext _context;
 
-        public CreateModel(ApplicationDbContext context)
+        public CreateModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _context = context;
         }
 
@@ -55,7 +61,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there aren't any databases.
             if (!_context.Databases.Any())
@@ -93,18 +99,31 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 // Redisplay the page.
                 return Page();
             }
-            // Create a new database user.
-            var databaseUserInvitation = new DatabaseUserInvitation
+            // Define a new task.
+            var task = new DatabaseUserInvitationsTask
             {
-                DatabaseId = database.Id,
-                Database = database,
-                Email = Input.Email,
-                DateTimeCreated = DateTime.Now
+                Items = new List<DatabaseUserInvitationInputModel>
+                {
+                    new DatabaseUserInvitationInputModel
+                    {
+                        DatabaseId = database.Id,
+                        Email = Input.Email
+                    }
+                }
             };
-            // Mark it for addition to the database.
-            _context.DatabaseUserInvitations.Add(databaseUserInvitation);
-            // Save the changes.
-            await _context.SaveChangesAsync();
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Create(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 database user invitation created successfully.";
             // Redirect to the index page.

@@ -2,23 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
 {
     [Authorize(Roles = "Administrator")]
     public class EditModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly ApplicationDbContext _context;
 
-        public EditModel(ApplicationDbContext context)
+        public EditModel(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _context = context;
         }
 
@@ -78,7 +84,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             if (View.DatabaseType.Name == "Generic")
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: The \"Generic\" database type can't be edited.";
+                TempData["StatusMessage"] = "Error: The generic database type can't be edited.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseTypes/Index");
             }
@@ -93,7 +99,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(Input.Id))
@@ -124,7 +130,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             if (View.DatabaseType.Name == "Generic")
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: The \"Generic\" database type can't be edited.";
+                TempData["StatusMessage"] = "Error: The generic database type can't be edited.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/DatabaseTypes/Index");
             }
@@ -144,13 +150,32 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                 // Redisplay the page.
                 return Page();
             }
-            // Mark the item for updating.
-            _context.DatabaseTypes.Update(View.DatabaseType);
-            // Update the data.
-            View.DatabaseType.Name = Input.Name;
-            View.DatabaseType.Description = Input.Description;
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            // Define a new task.
+            var task = new DatabaseTypesTask
+            {
+                Items = new List<DatabaseTypeInputModel>
+                {
+                    new DatabaseTypeInputModel
+                    {
+                        Id = Input.Id,
+                        Name = Input.Name,
+                        Description = Input.Description
+                    }
+                }
+            };
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Edit(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 database type updated successfully.";
             // Redirect to the index page.
