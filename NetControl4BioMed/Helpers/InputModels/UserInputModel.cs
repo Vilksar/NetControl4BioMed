@@ -16,9 +16,14 @@
         public string Email { get; set; }
 
         /// <summary>
-        /// Represents the password of the user.
+        /// Represents the type of the user.
         /// </summary>
-        public string Password { get; set; }
+        public string Type { get; set; }
+
+        /// <summary>
+        /// Represents the data of the user.
+        /// </summary>
+        public string Data { get; set; }
 
         /// <summary>
         /// Represents the e-mail confirmation status of the user.

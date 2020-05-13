@@ -9,6 +9,7 @@ using NetControl4BioMed.Helpers.InputModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -66,15 +67,45 @@ namespace NetControl4BioMed.Helpers.Tasks
                         Email = batchItem.Email,
                         DateTimeCreated = DateTime.Now
                     };
-                    // Try to create the new user.
-                    var result = Task.Run(() => userManager.CreateAsync(user, batchItem.Password)).Result;
+                    // Define a new identity result.
+                    var result = IdentityResult.Success;
+                    // Check the type of the item.
+                    if (batchItem.Type == "Password")
+                    {
+                        // Try to get the passsord from the data.
+                        if (!batchItem.Data.TryDeserializeJsonObject<string>(out var password))
+                        {
+                            // Throw an exception.
+                            throw new ArgumentException("The provided data couldn't be deserialized.");
+                        }
+                        // Try to create the new user.
+                        result = result.Succeeded? Task.Run(() => userManager.CreateAsync(user, password)).Result : result;
+                    }
+                    else if (batchItem.Type == "External")
+                    {
+                        // Try to get the passsord from the data.
+                        if (!batchItem.Data.TryDeserializeJsonObject<ExternalLoginInfo>(out var info))
+                        {
+                            // Throw an exception.
+                            throw new ArgumentException("The provided data couldn't be deserialized.");
+                        }
+                        // Try to create the new user.
+                        result = result.Succeeded ? Task.Run(() => userManager.CreateAsync(user)).Result : result;
+                        // Add the external login.
+                        result = result.Succeeded ? Task.Run(() => userManager.AddLoginAsync(user, info)).Result : result;
+                    }
+                    else
+                    {
+                        // Throw an exception.
+                        throw new ArgumentException("The provided data type is invalid.");
+                    }
                     // Check if the e-mail should be set as confirmed.
                     if (batchItem.EmailConfirmed)
                     {
                         // Generate the token for e-mail confirmation.
                         var confirmationToken = Task.Run(() => userManager.GenerateEmailConfirmationTokenAsync(user)).Result;
                         // Confirm the e-mail address.
-                        result = Task.Run(() => userManager.ConfirmEmailAsync(user, confirmationToken)).Result;
+                        result = result.Succeeded ? Task.Run(() => userManager.ConfirmEmailAsync(user, confirmationToken)).Result : result;
                     }
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
@@ -191,7 +222,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         // Generate the token and try to set it.
                         var confirmationToken = Task.Run(() => userManager.GenerateEmailConfirmationTokenAsync(user)).Result;
-                        result = Task.Run(() => userManager.ConfirmEmailAsync(user, confirmationToken)).Result;
+                        result = result.Succeeded ? Task.Run(() => userManager.ConfirmEmailAsync(user, confirmationToken)).Result : result;
                     }
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)

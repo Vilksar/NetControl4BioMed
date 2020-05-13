@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -73,7 +74,8 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                     new UserInputModel
                     {
                         Email = Input.Email,
-                        Password = Input.Password,
+                        Type = "Password",
+                        Data = JsonSerializer.Serialize(Input.Password),
                         EmailConfirmed = Input.EmailConfirmed
                     }
                 }

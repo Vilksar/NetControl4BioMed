@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -11,7 +13,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Identity
@@ -19,17 +23,17 @@ namespace NetControl4BioMed.Pages.Identity
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ISendGridEmailSender _emailSender;
-        private readonly ApplicationDbContext _context;
         private readonly LinkGenerator _linkGenerator;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public RegisterModel(UserManager<User> userManager, ISendGridEmailSender emailSender, ApplicationDbContext context, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public RegisterModel(IServiceProvider serviceProvider, UserManager<User> userManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
+            _serviceProvider = serviceProvider;
             _userManager = userManager;
             _emailSender = emailSender;
-            _context = context;
             _linkGenerator = linkGenerator;
             _reCaptchaChecker = reCaptchaChecker;
         }
@@ -97,25 +101,40 @@ namespace NetControl4BioMed.Pages.Identity
                 // Return the page.
                 return Page();
             }
-            // Define the new user.
-            var user = new User
+            // Define a new task.
+            var task = new UsersTask
             {
-                UserName = Input.Email,
-                Email = Input.Email,
-                DateTimeCreated = DateTime.Now
-            };
-            // Try to create the user with the given details.
-            var result = await _userManager.CreateAsync(user, Input.Password);
-            // Check if the user creation has failed.
-            if (!result.Succeeded)
-            {
-                // Go over the encountered errors
-                foreach (var error in result.Errors)
+                Items = new List<UserInputModel>
                 {
-                    // and add them to the model
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    new UserInputModel
+                    {
+                        Email = Input.Email,
+                        Type = "Password",
+                        Data = JsonSerializer.Serialize(Input.Password)
+                    }
                 }
-                // Return the page.
+            };
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Create(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
+            // Get the new user.
+            var user = await _userManager.FindByNameAsync(Input.Email);
+            // Check if there wasn't any user found.
+            if (user == null)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "An error was encountered. Please try again.");
+                // Redisplay the page.
                 return Page();
             }
             // Generate an e-mail confirmation code.
@@ -131,24 +150,6 @@ namespace NetControl4BioMed.Pages.Identity
             };
             // Send the confirmation e-mail for the user.
             await _emailSender.SendEmailConfirmationEmailAsync(emailViewModel);
-            // Get all the databases, networks and analyses to which the user already has access.
-            var databaseUserInvitations = _context.DatabaseUserInvitations.Where(item => item.Email == user.Email);
-            var networkUserInvitations = _context.NetworkUserInvitations.Where(item => item.Email == user.Email);
-            var analysisUserInvitations = _context.AnalysisUserInvitations.Where(item => item.Email == user.Email);
-            // Create, for each, a corresponding user entry.
-            var databaseUsers = databaseUserInvitations.Select(item => new DatabaseUser { DatabaseId = item.DatabaseId, Database = item.Database, UserId = user.Id, User = user, DateTimeCreated = item.DateTimeCreated });
-            var networkUsers = networkUserInvitations.Select(item => new NetworkUser { NetworkId = item.NetworkId, Network = item.Network, UserId = user.Id, User = user, DateTimeCreated = item.DateTimeCreated });
-            var analysisUsers = analysisUserInvitations.Select(item => new AnalysisUser { AnalysisId = item.AnalysisId, Analysis = item.Analysis, UserId = user.Id, User = user, DateTimeCreated = item.DateTimeCreated });
-            // Mark the new items for addition.
-            _context.DatabaseUsers.AddRange(databaseUsers);
-            _context.NetworkUsers.AddRange(networkUsers);
-            _context.AnalysisUsers.AddRange(analysisUsers);
-            // Mark the old items for deletion.
-            _context.DatabaseUserInvitations.RemoveRange(databaseUserInvitations);
-            _context.NetworkUserInvitations.RemoveRange(networkUserInvitations);
-            _context.AnalysisUserInvitations.RemoveRange(analysisUserInvitations);
-            // Save the changes in the database.
-            await _context.SaveChangesAsync();
             // Display a message to the user.
             TempData["StatusMessage"] = "Success: The account has been created successfully. Please check the provided e-mail address for instructions on confirming your e-mail, in order to log in.";
             // Redirect to the return URL.
