@@ -26,15 +26,15 @@ namespace NetControl4BioMed.Helpers.Extensions
             if (items == null)
             {
                 // Throw an exception.
-                throw new ArgumentNullException(nameof(items));
+                throw new ArgumentNullException("There provided items can't be null.");
             }
             // Get the corresponding database set.
             var set = context.Set<T>();
             // Check if the correpsonding set doesn't exist.
-            if (set == null || !set.Any())
+            if (set == null)
             {
                 // Throw an exception.
-                throw new ArgumentException(nameof(T));
+                throw new ArgumentException("The provided type is not valid.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)items.Count() / ApplicationDbContext.BatchSize);

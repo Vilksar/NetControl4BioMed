@@ -31,7 +31,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         public void Create(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
-            if (Items == null || !Items.Any())
+            if (Items == null)
             {
                 // Throw an exception.
                 throw new ArgumentException("No valid items could be found with the provided data.");
@@ -78,7 +78,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         public void Delete(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
-            if (Items == null || !Items.Any())
+            if (Items == null)
             {
                 // Throw an exception.
                 throw new ArgumentException("No valid items could be found with the provided data.");
