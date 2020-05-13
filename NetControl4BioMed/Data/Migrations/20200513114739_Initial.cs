@@ -80,8 +80,7 @@ namespace NetControl4BioMed.Data.Migrations
                     DateTimeCreated = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     IsRecurring = table.Column<bool>(nullable: false),
-                    Data = table.Column<string>(nullable: true),
-                    JobId = table.Column<string>(nullable: true)
+                    Data = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

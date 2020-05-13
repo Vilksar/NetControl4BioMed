@@ -288,9 +288,6 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<bool>("IsRecurring")
                         .HasColumnType("bit");
 
-                    b.Property<string>("JobId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
