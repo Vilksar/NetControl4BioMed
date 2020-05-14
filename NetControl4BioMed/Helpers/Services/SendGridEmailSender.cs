@@ -51,7 +51,7 @@ namespace NetControl4BioMed.Helpers.Services
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var to = new EmailAddress(viewModel.Email, viewModel.Email);
-            var subject = "NetControl4BioMed - Confirm your e-mail";
+            var subject = "NetControl4BioMed - Confirm your e-mail address";
             var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailEmailConfirmationPartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail containing the URL.
@@ -87,7 +87,7 @@ namespace NetControl4BioMed.Helpers.Services
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var to = new EmailAddress(viewModel.OldEmail, viewModel.OldEmail);
-            var subject = "NetControl4BioMed - Your e-mail has been changed";
+            var subject = "NetControl4BioMed - Your e-mail address has been changed";
             var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailEmailChangedPartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail containing the URL.
@@ -123,7 +123,7 @@ namespace NetControl4BioMed.Helpers.Services
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var tos = _configuration.GetSection("Administrators").GetChildren().Select(item => new EmailAddress(item.GetSection("Email").Value, item.GetSection("Email").Value));
-            var subject = "Message from NetControl4BioMed";
+            var subject = "NetControl4BioMed - You have received a new message";
             var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailContactPartial", viewModel);
             var msg = MailHelper.CreateSingleEmailToMultipleRecipients(from, tos.ToList(), subject, string.Empty, htmlContent);
             // Send the e-mail containing the message.
@@ -159,7 +159,7 @@ namespace NetControl4BioMed.Helpers.Services
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var to = new EmailAddress(viewModel.Email, viewModel.Email);
-            var subject = "NetControl4BioMed - A network was shared with you";
+            var subject = "NetControl4BioMed - Someone shared a network with you";
             var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailWasAddedToNetworkPartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail.
@@ -195,7 +195,7 @@ namespace NetControl4BioMed.Helpers.Services
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var to = new EmailAddress(viewModel.Email, viewModel.Email);
-            var subject = "NetControl4BioMed - An analysis was shared with you";
+            var subject = "NetControl4BioMed - Someone shared an analysis with you";
             var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailWasAddedToAnalysisPartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail.
@@ -213,7 +213,7 @@ namespace NetControl4BioMed.Helpers.Services
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var to = new EmailAddress(viewModel.Email, viewModel.Email);
-            var subject = "NetControl4BioMed - Analysis ended";
+            var subject = "NetControl4BioMed - An analysis has ended";
             var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailAnalysisEndedPartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail.
@@ -231,7 +231,7 @@ namespace NetControl4BioMed.Helpers.Services
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
             var to = new EmailAddress(viewModel.Email, viewModel.Email);
-            var subject = "NetControl4BioMed - Items to be deleted";
+            var subject = "NetControl4BioMed - Data will soon be deleted";
             var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailAlertDeletePartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail.

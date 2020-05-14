@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,23 +10,25 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Account.Manage.PersonalData
 {
     [Authorize]
     public class DeleteModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly ApplicationDbContext _context;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public DeleteModel(UserManager<User> userManager, SignInManager<User> signInManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
+        public DeleteModel(IServiceProvider serviceProvider, UserManager<User> userManager, SignInManager<User> signInManager, IReCaptchaChecker reCaptchaChecker)
         {
+            _serviceProvider = serviceProvider;
             _userManager = userManager;
             _signInManager = signInManager;
-            _context = context;
             _reCaptchaChecker = reCaptchaChecker;
         }
 
@@ -118,36 +121,32 @@ namespace NetControl4BioMed.Pages.Account.Manage.PersonalData
                 // Return the page.
                 return Page();
             }
-            // Try to delete the user.
-            var result = await _userManager.DeleteAsync(user);
-            // Check if the user deletion was not successful.
-            if (!result.Succeeded)
+            // Define a new task.
+            var task = new UsersTask
             {
-                // Go over the encountered errors
-                foreach (var error in result.Errors)
+                Items = new List<UserInputModel>
                 {
-                    // and add them to the model
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    new UserInputModel
+                    {
+                        Id = user.Id
+                    }
                 }
-                // Return the page.
+            };
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                task.Delete(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
                 return Page();
             }
             // Sign out the user.
             await _signInManager.SignOutAsync();
-            // Go over all of the networks and analyses and find the ones without any assigned users.
-            var networks = _context.Networks.Where(item => !item.NetworkUsers.Any());
-            var analyses = _context.Analyses.Where(item => !item.AnalysisUsers.Any() || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
-            // Get the generic entities among them.
-            var genericNetworks = networks.Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
-            var genericNodes = _context.Nodes.Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
-            var genericEdges = _context.Edges.Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
-            // Mark the items for deletion.
-            _context.Analyses.RemoveRange(analyses);
-            _context.Networks.RemoveRange(networks);
-            _context.Edges.RemoveRange(genericEdges);
-            _context.Nodes.RemoveRange(genericNodes);
-            // Save the changes in the database.
-            await _context.SaveChangesAsync();
             // Display a message to the user.
             TempData["StatusMessage"] = "Success: Your account has been successfully deleted, together with all of the associated data.";
             // Redirect to the home page.
