@@ -71,6 +71,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Select(item => item.Id));
                 // Get the IDs of all of the node fields that are to be updated.
                 var itemNodeFieldIds = batchItems
+                    .Where(item => item.DatabaseNodeFieldNodes != null)
                     .Select(item => item.DatabaseNodeFieldNodes)
                     .SelectMany(item => item)
                     .Where(item => !string.IsNullOrEmpty(item.DatabaseNodeFieldId) && !string.IsNullOrEmpty(item.Value))
@@ -103,17 +104,19 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Get the valid item fields and the node field nodes to add.
-                    var nodeFieldNodes = batchItem.DatabaseNodeFieldNodes
-                        .Select(item => (item.DatabaseNodeFieldId, item.Value))
-                        .Distinct()
-                        .Where(item => validItemNodeFieldIds.Contains(item.DatabaseNodeFieldId))
-                        .Select(item => new DatabaseNodeFieldNode
-                        {
-                            DatabaseNodeFieldId = item.DatabaseNodeFieldId,
-                            DatabaseNodeField = nodeFields.FirstOrDefault(item1 => item.DatabaseNodeFieldId == item1.Id),
-                            Value = item.Value
-                        })
-                        .Where(item => item.DatabaseNodeField != null);
+                    var nodeFieldNodes = batchItem.DatabaseNodeFieldNodes != null ?
+                            batchItem.DatabaseNodeFieldNodes
+                            .Select(item => (item.DatabaseNodeFieldId, item.Value))
+                            .Distinct()
+                            .Where(item => validItemNodeFieldIds.Contains(item.DatabaseNodeFieldId))
+                            .Select(item => new DatabaseNodeFieldNode
+                            {
+                                DatabaseNodeFieldId = item.DatabaseNodeFieldId,
+                                DatabaseNodeField = nodeFields.FirstOrDefault(item1 => item.DatabaseNodeFieldId == item1.Id),
+                                Value = item.Value
+                            })
+                            .Where(item => item.DatabaseNodeField != null) :
+                        Enumerable.Empty<DatabaseNodeFieldNode>();
                     // Check if there weren't any node fields found.
                     if (nodeFieldNodes == null || !nodeFieldNodes.Any() || !nodeFieldNodes.Any(item => item.DatabaseNodeField.IsSearchable))
                     {
@@ -198,6 +201,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 }
                 // Get the IDs of all of the node fields that are to be updated.
                 var itemNodeFieldIds = batchItems
+                    .Where(item => item.DatabaseNodeFieldNodes != null)
                     .Select(item => item.DatabaseNodeFieldNodes)
                     .SelectMany(item => item)
                     .Where(item => !string.IsNullOrEmpty(item.DatabaseNodeFieldId) && !string.IsNullOrEmpty(item.Value))
@@ -232,19 +236,21 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Get the valid item fields and the node field nodes to add.
-                    var nodeFieldNodes = batchItem.DatabaseNodeFieldNodes
-                        .Select(item => (item.DatabaseNodeFieldId, item.Value))
-                        .Distinct()
-                        .Where(item => validItemNodeFieldIds.Contains(item.DatabaseNodeFieldId))
-                        .Select(item => new DatabaseNodeFieldNode
-                        {
-                            DatabaseNodeFieldId = item.DatabaseNodeFieldId,
-                            DatabaseNodeField = nodeFields.FirstOrDefault(item1 => item.DatabaseNodeFieldId == item1.Id),
-                            NodeId = node.Id,
-                            Node = node,
-                            Value = item.Value
-                        })
-                        .Where(item => item.DatabaseNodeField != null && item.Node != null);
+                    var nodeFieldNodes = batchItem.DatabaseNodeFieldNodes != null ?
+                        batchItem.DatabaseNodeFieldNodes
+                            .Select(item => (item.DatabaseNodeFieldId, item.Value))
+                            .Distinct()
+                            .Where(item => validItemNodeFieldIds.Contains(item.DatabaseNodeFieldId))
+                            .Select(item => new DatabaseNodeFieldNode
+                            {
+                                DatabaseNodeFieldId = item.DatabaseNodeFieldId,
+                                DatabaseNodeField = nodeFields.FirstOrDefault(item1 => item.DatabaseNodeFieldId == item1.Id),
+                                NodeId = node.Id,
+                                Node = node,
+                                Value = item.Value
+                            })
+                            .Where(item => item.DatabaseNodeField != null && item.Node != null) :
+                        Enumerable.Empty<DatabaseNodeFieldNode>();
                     // Check if there weren't any node fields found.
                     if (nodeFieldNodes == null || !nodeFieldNodes.Any() || !nodeFieldNodes.Any(item => item.DatabaseNodeField.IsSearchable))
                     {

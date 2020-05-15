@@ -55,8 +55,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
                 // Get the manually provided IDs of all the items that are to be created.
                 var itemEdgeIds = batchItems
-                .Where(item => !string.IsNullOrEmpty(item.Id))
-                .Select(item => item.Id);
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id);
                 // Check if any of the manually provided IDs are repeating in the list.
                 if (itemEdgeIds.Distinct().Count() != itemEdgeIds.Count())
                 {
@@ -71,6 +71,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Select(item => item.Id));
                 // Get the IDs of all of the nodes that are to be added to the edges.
                 var itemNodeIds = batchItems
+                    .Where(item => item.EdgeNodes != null)
                     .Select(item => item.EdgeNodes)
                     .SelectMany(item => item)
                     .Where(item => !string.IsNullOrEmpty(item.NodeId) && (item.Type == "Source" || item.Type == "Target"))
@@ -92,6 +93,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Select(item => item.Id);
                 // Get the IDs of all of the edge fields that are to be updated.
                 var itemEdgeFieldIds = batchItems
+                    .Where(item => item.DatabaseEdgeFieldEdges != null)
                     .Select(item => item.DatabaseEdgeFieldEdges)
                     .SelectMany(item => item)
                     .Where(item => !string.IsNullOrEmpty(item.DatabaseEdgeFieldId) && !string.IsNullOrEmpty(item.Value))
@@ -105,6 +107,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .AsEnumerable();
                 // Get the IDs of all of the databases that are to be updated.
                 var itemDatabaseIds = batchItems
+                    .Where(item => item.DatabaseEdges != null)
                     .Select(item => item.DatabaseEdges)
                     .SelectMany(item => item)
                     .Select(item => item.DatabaseId)
@@ -139,19 +142,27 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
+                    // Check if there aren't any edge nodes.
+                    if (batchItem.EdgeNodes == null)
+                    {
+                        // Continue.
+                        continue;
+                    }
                     // Get the valid item nodes and the edge nodes to add.
-                    var edgeNodes = batchItem.EdgeNodes
-                        .Where(item => item.Type == "Source" || item.Type == "Target")
-                        .Select(item => (item.NodeId, item.Type))
-                        .Distinct()
-                        .Where(item => validItemNodeIds.Contains(item.NodeId))
-                        .Select(item => new EdgeNode
-                        {
-                            NodeId = item.NodeId,
-                            Node = nodes.FirstOrDefault(item1 => item.NodeId == item1.Id),
-                            Type = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>(item.Type)
-                        })
-                        .Where(item1 => item1.Node != null);
+                    var edgeNodes = batchItem.EdgeNodes != null ?
+                        batchItem.EdgeNodes
+                            .Where(item => item.Type == "Source" || item.Type == "Target")
+                            .Select(item => (item.NodeId, item.Type))
+                            .Distinct()
+                            .Where(item => validItemNodeIds.Contains(item.NodeId))
+                            .Select(item => new EdgeNode
+                            {
+                                NodeId = item.NodeId,
+                                Node = nodes.FirstOrDefault(item1 => item.NodeId == item1.Id),
+                                Type = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>(item.Type)
+                            })
+                            .Where(item1 => item1.Node != null) :
+                        Enumerable.Empty<EdgeNode>();
                     // Check if there weren't any nodes found, or if there isn't at least one source node and one target node.
                     if (edgeNodes == null || !edgeNodes.Any() || edgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source) == null || edgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target) == null)
                     {
@@ -159,28 +170,33 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Get the valid item fields and the edge field edges to add.
-                    var edgeFieldEdges = batchItem.DatabaseEdgeFieldEdges
-                        .Select(item => (item.DatabaseEdgeFieldId, item.Value))
-                        .Distinct()
-                        .Where(item => validItemEdgeFieldIds.Contains(item.DatabaseEdgeFieldId))
-                        .Select(item => new DatabaseEdgeFieldEdge
-                        {
-                            DatabaseEdgeFieldId = item.DatabaseEdgeFieldId,
-                            DatabaseEdgeField = edgeFields.FirstOrDefault(item1 => item.DatabaseEdgeFieldId == item1.Id),
-                            Value = item.Value
-                        })
-                        .Where(item => item.DatabaseEdgeField != null);
+                    var edgeFieldEdges = batchItem.DatabaseEdgeFieldEdges != null ?
+                        batchItem.DatabaseEdgeFieldEdges
+                            .Select(item => (item.DatabaseEdgeFieldId, item.Value))
+                            .Distinct()
+                            .Where(item => validItemEdgeFieldIds.Contains(item.DatabaseEdgeFieldId))
+                            .Select(item => new DatabaseEdgeFieldEdge
+                            {
+                                DatabaseEdgeFieldId = item.DatabaseEdgeFieldId,
+                                DatabaseEdgeField = edgeFields.FirstOrDefault(item1 => item.DatabaseEdgeFieldId == item1.Id),
+                                Value = item.Value
+                            })
+                            .Where(item => item.DatabaseEdgeField != null) :
+                        Enumerable.Empty<DatabaseEdgeFieldEdge>();
                     // Get the valid item databases and the database edges to add.
-                    var databaseEdges = batchItem.DatabaseEdges
-                        .Select(item => item.DatabaseId)
-                        .Where(item => validItemDatabaseIds.Contains(item))
-                        .Concat(edgeFieldEdges.Select(item1 => item1.DatabaseEdgeField.Database.Id))
-                        .Distinct()
-                        .Select(item => new DatabaseEdge
-                        {
-                            DatabaseId = item,
-                            Database = databases.FirstOrDefault(item1 => item == item1.Id)
-                        });
+                    var databaseEdges = batchItem.DatabaseEdges != null ?
+                        batchItem.DatabaseEdges
+                            .Select(item => item.DatabaseId)
+                            .Where(item => validItemDatabaseIds.Contains(item))
+                            .Concat(edgeFieldEdges.Select(item1 => item1.DatabaseEdgeField.Database.Id))
+                            .Distinct()
+                            .Select(item => new DatabaseEdge
+                            {
+                                DatabaseId = item,
+                                Database = databases.FirstOrDefault(item1 => item == item1.Id)
+                            })
+                            .Where(item => item.Database != null) :
+                        Enumerable.Empty<DatabaseEdge>();
                     // Check if there weren't any databases or edge fields found.
                     if (databaseEdges == null || !databaseEdges.Any())
                     {
@@ -265,6 +281,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 }
                 // Get the IDs of all of the nodes that are to be added to the edges.
                 var itemNodeIds = batchItems
+                    .Where(item => item.EdgeNodes != null)
                     .Select(item => item.EdgeNodes)
                     .SelectMany(item => item)
                     .Where(item => !string.IsNullOrEmpty(item.NodeId) && (item.Type == "Source" || item.Type == "Target"))
@@ -286,6 +303,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Select(item => item.Id);
                 // Get the IDs of all of the edge fields that are to be updated.
                 var itemEdgeFieldIds = batchItems
+                    .Where(item => item.DatabaseEdgeFieldEdges != null)
                     .Select(item => item.DatabaseEdgeFieldEdges)
                     .SelectMany(item => item)
                     .Where(item => !string.IsNullOrEmpty(item.DatabaseEdgeFieldId) && !string.IsNullOrEmpty(item.Value))
@@ -299,6 +317,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .AsEnumerable();
                 // Get the IDs of all of the databases that are to be updated.
                 var itemDatabaseIds = batchItems
+                    .Where(item => item.DatabaseEdges != null)
                     .Select(item => item.DatabaseEdges)
                     .SelectMany(item => item)
                     .Select(item => item.DatabaseId)
@@ -336,17 +355,22 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Get the valid item nodes and the edge nodes to add.
-                    var edgeNodes = batchItem.EdgeNodes
-                        .Where(item => item.Type == "Source" || item.Type == "Target")
-                        .Select(item => (item.NodeId, item.Type))
-                        .Distinct()
-                        .Where(item => validItemNodeIds.Contains(item.NodeId))
-                        .Select(item => new EdgeNode
-                        {
-                            NodeId = item.NodeId,
-                            Node = nodes.FirstOrDefault(item1 => item.NodeId == item1.Id),
-                            Type = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>(item.Type) })
-                        .Where(item => item.Node != null);
+                    var edgeNodes = batchItem.EdgeNodes != null ?
+                        batchItem.EdgeNodes
+                            .Where(item => item.Type == "Source" || item.Type == "Target")
+                            .Select(item => (item.NodeId, item.Type))
+                            .Distinct()
+                            .Where(item => validItemNodeIds.Contains(item.NodeId))
+                            .Select(item => new EdgeNode
+                            {
+                                EdgeId = edge.Id,
+                                Edge = edge,
+                                NodeId = item.NodeId,
+                                Node = nodes.FirstOrDefault(item1 => item.NodeId == item1.Id),
+                                Type = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>(item.Type)
+                            })
+                            .Where(item => item.Edge != null && item.Node != null) :
+                        Enumerable.Empty<EdgeNode>();
                     // Check if there weren't any nodes found, or if there isn't at least one source node and one target node.
                     if (edgeNodes == null || !edgeNodes.Any() || edgeNodes.FirstOrDefault(item => item.Type == EdgeNodeType.Source) == null || edgeNodes.FirstOrDefault(item => item.Type == EdgeNodeType.Target) == null)
                     {
@@ -354,32 +378,37 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Get the valid item fields and the edge field edges to add.
-                    var edgeFieldEdges = batchItem.DatabaseEdgeFieldEdges
-                        .Select(item => (item.DatabaseEdgeFieldId, item.Value))
-                        .Distinct()
-                        .Where(item => validItemEdgeFieldIds.Contains(item.DatabaseEdgeFieldId))
-                        .Select(item => new DatabaseEdgeFieldEdge
-                        {
-                            DatabaseEdgeFieldId = item.DatabaseEdgeFieldId,
-                            DatabaseEdgeField = edgeFields.FirstOrDefault(item1 => item.DatabaseEdgeFieldId == item1.Id),
-                            EdgeId = edge.Id,
-                            Edge = edge,
-                            Value = item.Value
-                        })
-                        .Where(item => item.DatabaseEdgeField != null);
+                    var edgeFieldEdges = batchItem.DatabaseEdgeFieldEdges != null ?
+                        batchItem.DatabaseEdgeFieldEdges
+                            .Select(item => (item.DatabaseEdgeFieldId, item.Value))
+                            .Distinct()
+                            .Where(item => validItemEdgeFieldIds.Contains(item.DatabaseEdgeFieldId))
+                            .Select(item => new DatabaseEdgeFieldEdge
+                            {
+                                DatabaseEdgeFieldId = item.DatabaseEdgeFieldId,
+                                DatabaseEdgeField = edgeFields.FirstOrDefault(item1 => item.DatabaseEdgeFieldId == item1.Id),
+                                EdgeId = edge.Id,
+                                Edge = edge,
+                                Value = item.Value
+                            })
+                            .Where(item => item.DatabaseEdgeField != null && item.Edge != null) :
+                        Enumerable.Empty<DatabaseEdgeFieldEdge>();
                     // Get the valid item databases and the database edges to add.
-                    var databaseEdges = batchItem.DatabaseEdges
-                        .Select(item => item.DatabaseId)
-                        .Where(item => validItemDatabaseIds.Contains(item))
-                        .Concat(edgeFieldEdges.Select(item => item.DatabaseEdgeField.Database.Id))
-                        .Distinct()
-                        .Select(item => new DatabaseEdge
-                        {
-                            DatabaseId = item,
-                            Database = databases.FirstOrDefault(item1 => item == item1.Id),
-                            EdgeId = edge.Id,
-                            Edge = edge
-                        });
+                    var databaseEdges = batchItem.DatabaseEdges != null ?
+                        batchItem.DatabaseEdges
+                            .Select(item => item.DatabaseId)
+                            .Where(item => validItemDatabaseIds.Contains(item))
+                            .Concat(edgeFieldEdges.Select(item => item.DatabaseEdgeField.Database.Id))
+                            .Distinct()
+                            .Select(item => new DatabaseEdge
+                            {
+                                DatabaseId = item,
+                                Database = databases.FirstOrDefault(item1 => item == item1.Id),
+                                EdgeId = edge.Id,
+                                Edge = edge
+                            })
+                            .Where(item => item.Database != null && item.Edge != null) :
+                        Enumerable.Empty<DatabaseEdge>();
                     // Check if there weren't any databases or edge fields found.
                     if (databaseEdges == null || !databaseEdges.Any())
                     {

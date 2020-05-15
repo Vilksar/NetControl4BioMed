@@ -70,6 +70,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Select(item => item.Id));
                 // Get the IDs of all of the databases that are to be used by the collections.
                 var itemDatabaseIds = batchItems
+                    .Where(item => item.NodeCollectionDatabases != null)
                     .Select(item => item.NodeCollectionDatabases)
                     .SelectMany(item => item)
                     .Select(item => item.DatabaseId)
@@ -84,6 +85,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .AsEnumerable();
                 // Get the IDs of all of the nodes that are to be added to the collections.
                 var itemNodeIds = batchItems
+                    .Where(item => item.NodeCollectionNodes != null)
                     .Select(item => item.NodeCollectionNodes)
                     .SelectMany(item => item)
                     .Select(item => item.NodeId)
@@ -114,27 +116,31 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Get the valid databases and the node collection databases to add.
-                    var nodeCollectionDatabases = batchItem.NodeCollectionDatabases
-                        .Select(item => item.DatabaseId)
-                        .Where(item => validItemDatabaseIds.Contains(item))
-                        .Distinct()
-                        .Select(item => new NodeCollectionDatabase
-                        {
-                            DatabaseId = item,
-                            Database = databases.FirstOrDefault(item1 => item == item1.Id)
-                        })
-                        .Where(item => item.Database != null);
+                    var nodeCollectionDatabases = batchItem.NodeCollectionDatabases != null ?
+                        batchItem.NodeCollectionDatabases
+                            .Select(item => item.DatabaseId)
+                            .Where(item => validItemDatabaseIds.Contains(item))
+                            .Distinct()
+                            .Select(item => new NodeCollectionDatabase
+                            {
+                                DatabaseId = item,
+                                Database = databases.FirstOrDefault(item1 => item == item1.Id)
+                            })
+                            .Where(item => item.Database != null) :
+                        Enumerable.Empty<NodeCollectionDatabase>();
                     // Get the valid nodes and the node collection nodes to add.
-                    var nodeCollectionNodes = batchItem.NodeCollectionNodes
-                        .Select(item => item.NodeId)
-                        .Where(item => validItemNodeIds.Contains(item))
-                        .Distinct()
-                        .Select(item => new NodeCollectionNode
-                        {
-                            NodeId = item,
-                            Node = nodes.FirstOrDefault(item1 => item == item1.Id)
-                        })
-                        .Where(item => item.Node != null);
+                    var nodeCollectionNodes = batchItem.NodeCollectionNodes != null ?
+                        batchItem.NodeCollectionNodes
+                            .Select(item => item.NodeId)
+                            .Where(item => validItemNodeIds.Contains(item))
+                            .Distinct()
+                            .Select(item => new NodeCollectionNode
+                            {
+                                NodeId = item,
+                                Node = nodes.FirstOrDefault(item1 => item == item1.Id)
+                            })
+                            .Where(item => item.Node != null) :
+                        Enumerable.Empty<NodeCollectionNode>();
                     // Define the new node collection.
                     var nodeCollection = new NodeCollection
                     {
@@ -206,6 +212,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 }
                 // Get the IDs of all of the databases that are to be used by the collections.
                 var itemDatabaseIds = batchItems
+                    .Where(item => item.NodeCollectionDatabases != null)
                     .Select(item => item.NodeCollectionDatabases)
                     .SelectMany(item => item)
                     .Select(item => item.DatabaseId)
@@ -220,6 +227,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .AsEnumerable();
                 // Get the IDs of all of the nodes that are to be added to the collections.
                 var itemNodeIds = batchItems
+                    .Where(item => item.NodeCollectionNodes != null)
                     .Select(item => item.NodeCollectionNodes)
                     .SelectMany(item => item)
                     .Select(item => item.NodeId)
@@ -252,31 +260,35 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Get the valid databases and the node collection databases to add.
-                    var nodeCollectionDatabases = batchItem.NodeCollectionDatabases
-                        .Select(item => item.DatabaseId)
-                        .Where(item => validItemDatabaseIds.Contains(item))
-                        .Distinct()
-                        .Select(item => new NodeCollectionDatabase
-                        {
-                            NodeCollectionId = nodeCollection.Id,
-                            NodeCollection = nodeCollection,
-                            DatabaseId = item,
-                            Database = databases.FirstOrDefault(item1 => item == item1.Id)
-                        })
-                        .Where(item => item.NodeCollection != null && item.Database != null);
+                    var nodeCollectionDatabases = batchItem.NodeCollectionDatabases != null ?
+                        batchItem.NodeCollectionDatabases
+                            .Select(item => item.DatabaseId)
+                            .Where(item => validItemDatabaseIds.Contains(item))
+                            .Distinct()
+                            .Select(item => new NodeCollectionDatabase
+                            {
+                                NodeCollectionId = nodeCollection.Id,
+                                NodeCollection = nodeCollection,
+                                DatabaseId = item,
+                                Database = databases.FirstOrDefault(item1 => item == item1.Id)
+                            })
+                            .Where(item => item.NodeCollection != null && item.Database != null) :
+                        Enumerable.Empty<NodeCollectionDatabase>();
                     // Get the valid nodes and the node collection nodes to add.
-                    var nodeCollectionNodes = batchItem.NodeCollectionNodes
-                        .Select(item => item.NodeId)
-                        .Where(item => validItemNodeIds.Contains(item))
-                        .Distinct()
-                        .Select(item => new NodeCollectionNode
-                        {
-                            NodeCollectionId = nodeCollection.Id,
-                            NodeCollection = nodeCollection,
-                            NodeId = item,
-                            Node = nodes.FirstOrDefault(item1 => item == item1.Id)
-                        })
-                        .Where(item => item.NodeCollection != null && item.Node != null);
+                    var nodeCollectionNodes = batchItem.NodeCollectionNodes != null ?
+                        batchItem.NodeCollectionNodes
+                            .Select(item => item.NodeId)
+                            .Where(item => validItemNodeIds.Contains(item))
+                            .Distinct()
+                            .Select(item => new NodeCollectionNode
+                            {
+                                NodeCollectionId = nodeCollection.Id,
+                                NodeCollection = nodeCollection,
+                                NodeId = item,
+                                Node = nodes.FirstOrDefault(item1 => item == item1.Id)
+                            })
+                            .Where(item => item.NodeCollection != null && item.Node != null) :
+                        Enumerable.Empty<NodeCollectionNode>();
                     // Update the node collection.
                     nodeCollection.Name = batchItem.Name;
                     nodeCollection.Description = batchItem.Description;
