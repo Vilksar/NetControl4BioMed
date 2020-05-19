@@ -159,7 +159,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             try
             {
                 // Run the task.
-                task.Edit(_serviceProvider, CancellationToken.None);
+                var databaseTypes = task.Edit(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {

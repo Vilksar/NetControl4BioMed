@@ -71,7 +71,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             try
             {
                 // Run the task.
-                task.Create(_serviceProvider, CancellationToken.None);
+                var databaseTypes = task.Create(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {

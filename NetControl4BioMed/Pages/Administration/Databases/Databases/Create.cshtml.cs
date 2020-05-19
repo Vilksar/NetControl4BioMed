@@ -110,7 +110,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             try
             {
                 // Run the task.
-                task.Create(_serviceProvider, CancellationToken.None);
+                var databases = task.Create(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {
