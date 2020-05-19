@@ -1,22 +1,22 @@
 ﻿namespace NetControl4BioMed.Helpers.InputModels
 {
     /// <summary>
-    /// Represents the input model for an edge node.
+    /// Represents the input model for an analysis node.
     /// </summary>
-    public class EdgeNodeInputModel
+    public class AnalysisNodeInputModel
     {
         /// <summary>
-        /// Represents the edge of the edge node.
+        /// Represents the analysis of the analysis node.
         /// </summary>
-        public EdgeInputModel Edge { get; set; }
+        public AnalysisInputModel Analysis { get; set; }
 
         /// <summary>
-        /// Represents the node of the edge node.
+        /// Represents the node of the analysis node.
         /// </summary>
         public NodeInputModel Node { get; set; }
 
         /// <summary>
-        /// Represents the type of the edge node.
+        /// Represents the type of the analysis node.
         /// </summary>
         public string Type { get; set; }
     }

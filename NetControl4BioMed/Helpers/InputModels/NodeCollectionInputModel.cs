@@ -31,5 +31,15 @@ namespace NetControl4BioMed.Helpers.InputModels
         /// Represents the node collection nodes of the node collection.
         /// </summary>
         public IEnumerable<NodeCollectionNodeInputModel> NodeCollectionNodes { get; set; }
+
+        /// <summary>
+        /// Represents the network node collections of the node collection.
+        /// </summary>
+        public IEnumerable<NetworkNodeCollectionInputModel> NetworkNodeCollections { get; set; }
+
+        /// <summary>
+        /// Represents the analysis node collections of the node collection.
+        /// </summary>
+        public IEnumerable<AnalysisNodeCollectionInputModel> AnalysisNodeCollections { get; set; }
     }
 }

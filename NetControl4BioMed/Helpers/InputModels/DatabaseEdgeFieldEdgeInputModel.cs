@@ -6,14 +6,14 @@
     public class DatabaseEdgeFieldEdgeInputModel
     {
         /// <summary>
-        /// Represents the database edge field ID of the database edge field edge.
+        /// Represents the database edge field of the database edge field edge.
         /// </summary>
-        public string DatabaseEdgeFieldId { get; set; }
+        public DatabaseEdgeFieldInputModel DatabaseEdgeField { get; set; }
 
         /// <summary>
-        /// Represents the edge ID of the database edge field edge.
+        /// Represents the edge of the database edge field edge.
         /// </summary>
-        public string EdgeId { get; set; }
+        public EdgeInputModel Edge { get; set; }
 
         /// <summary>
         /// Represents the value of the database edge field edge.

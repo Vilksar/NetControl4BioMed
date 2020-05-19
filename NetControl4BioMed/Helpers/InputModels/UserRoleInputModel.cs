@@ -6,13 +6,13 @@
     public class UserRoleInputModel
     {
         /// <summary>
-        /// Represents the user ID of the user role.
+        /// Represents the user of the user role.
         /// </summary>
-        public string UserId { get; set; }
+        public UserInputModel User { get; set; }
 
         /// <summary>
-        /// Represents the role ID of the user role.
+        /// Represents the role of the user role.
         /// </summary>
-        public string RoleId { get; set; }
+        public RoleInputModel RoleId { get; set; }
     }
 }

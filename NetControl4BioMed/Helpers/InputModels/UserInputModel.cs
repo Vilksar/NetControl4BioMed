@@ -1,4 +1,6 @@
-﻿namespace NetControl4BioMed.Helpers.InputModels
+﻿using System.Collections.Generic;
+
+namespace NetControl4BioMed.Helpers.InputModels
 {
     /// <summary>
     /// Represents the input model for a user.
@@ -29,5 +31,25 @@
         /// Represents the e-mail confirmation status of the user.
         /// </summary>
         public bool EmailConfirmed { get; set; }
+
+        /// <summary>
+        /// Represents the user roles of the user.
+        /// </summary>
+        public IEnumerable<UserRoleInputModel> UserRoles { get; set; }
+
+        /// <summary>
+        /// Represents the database users of the user.
+        /// </summary>
+        public IEnumerable<DatabaseUserInputModel> DatabaseUsers { get; set; }
+
+        /// <summary>
+        /// Represents the network users of the user.
+        /// </summary>
+        public IEnumerable<NetworkUserInputModel> NetworkUsers { get; set; }
+
+        /// <summary>
+        /// Represents the analysis users of the user.
+        /// </summary>
+        public IEnumerable<AnalysisUserInputModel> AnalysisUsers { get; set; }
     }
 }

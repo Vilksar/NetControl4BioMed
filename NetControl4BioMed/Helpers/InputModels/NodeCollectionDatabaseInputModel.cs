@@ -6,13 +6,13 @@
     public class NodeCollectionDatabaseInputModel
     {
         /// <summary>
-        /// Represents the node collection ID of the node collection database.
+        /// Represents the node collection of the node collection database.
         /// </summary>
-        public string NodeCollectionId { get; set; }
+        public NodeCollectionInputModel NodeCollection { get; set; }
 
         /// <summary>
-        /// Represents the database ID of the node collection database.
+        /// Represents the database of the node collection database.
         /// </summary>
-        public string DatabaseId { get; set; }
+        public DatabaseInputModel Database { get; set; }
     }
 }

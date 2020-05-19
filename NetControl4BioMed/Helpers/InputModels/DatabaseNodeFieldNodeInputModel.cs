@@ -6,14 +6,14 @@
     public class DatabaseNodeFieldNodeInputModel
     {
         /// <summary>
-        /// Represents the database node field ID of the database node field node.
+        /// Represents the database node field of the database node field node.
         /// </summary>
-        public string DatabaseNodeFieldId { get; set; }
+        public DatabaseNodeFieldInputModel DatabaseNodeField { get; set; }
 
         /// <summary>
-        /// Represents the node ID of the database node field node.
+        /// Represents the node of the database node field node.
         /// </summary>
-        public string NodeId { get; set; }
+        public NodeInputModel Node { get; set; }
 
         /// <summary>
         /// Represents the value of the database node field node.

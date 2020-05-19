@@ -6,13 +6,13 @@
     public class DatabaseEdgeInputModel
     {
         /// <summary>
-        /// Represents the database ID of the database edge.
+        /// Represents the database of the database edge.
         /// </summary>
-        public string DatabaseId { get; set; }
+        public DatabaseInputModel Database { get; set; }
 
         /// <summary>
-        /// Represents the edge ID of the database edge.
+        /// Represents the edge of the database edge.
         /// </summary>
-        public string EdgeId { get; set; }
+        public EdgeInputModel Edge { get; set; }
     }
 }

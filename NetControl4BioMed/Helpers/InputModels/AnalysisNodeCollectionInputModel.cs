@@ -6,14 +6,14 @@
     public class AnalysisNodeCollectionInputModel
     {
         /// <summary>
-        /// Represents the analysis ID of the analysis node collection.
+        /// Represents the analysis of the analysis node collection.
         /// </summary>
-        public string AnalysisId { get; set; }
+        public AnalysisInputModel Analysis { get; set; }
 
         /// <summary>
-        /// Represents the node collection ID of the analysis node collection.
+        /// Represents the node collection of the analysis node collection.
         /// </summary>
-        public string NodeCollectionId { get; set; }
+        public NodeCollectionInputModel NodeCollection { get; set; }
 
         /// <summary>
         /// Represents the type of the analysis node collection.
