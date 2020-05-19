@@ -51,10 +51,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
             public bool IsSearchable { get; set; }
-
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
-            public string DatabaseString { get; set; }
         }
 
         public ViewModel View { get; set; }
@@ -108,8 +104,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 Name = View.DatabaseNodeField.Name,
                 Description = View.DatabaseNodeField.Description,
                 Url = View.DatabaseNodeField.Url,
-                IsSearchable = View.DatabaseNodeField.IsSearchable,
-                DatabaseString = View.DatabaseNodeField.Database.Name
+                IsSearchable = View.DatabaseNodeField.IsSearchable
             };
             // Return the page.
             return Page();
@@ -160,34 +155,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                 // Redisplay the page.
                 return Page();
             }
-            // Check if the name has changed and there is another database node field with the same name.
-            if (View.DatabaseNodeField.Name != Input.Name && _context.DatabaseNodeFields.Any(item => item.Name == Input.Name))
-            {
-                // Add an error to the model
-                ModelState.AddModelError(string.Empty, $"A database node field with the name \"{Input.Name}\" already exists.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Get the corresponding database.
-            var database = _context.Databases
-                .Where(item => item.DatabaseType.Name != "Generic")
-                .FirstOrDefault(item => item.Id == Input.DatabaseString || item.Name == Input.DatabaseString);
-            // Check if no database has been found.
-            if (database == null)
-            {
-                // Add an error to the model
-                ModelState.AddModelError(string.Empty, "No non-generic database could be found with the provided string.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Check if the database is to be changed, and the new database is of a different type.
-            if (database.Id != View.DatabaseNodeField.Database.Id && database.DatabaseType.Id != View.DatabaseNodeField.Database.DatabaseType.Id)
-            {
-                // Add an error to the model
-                ModelState.AddModelError(string.Empty, "The new database is of a different type.");
-                // Redisplay the page.
-                return Page();
-            }
             // Define a new task.
             var task = new DatabaseNodeFieldsTask
             {
@@ -199,8 +166,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
                         Name = Input.Name,
                         Description = Input.Description,
                         Url = Input.Url,
-                        IsSearchable = Input.IsSearchable,
-                        DatabaseId = database.Id
+                        IsSearchable = Input.IsSearchable
                     }
                 }
             };

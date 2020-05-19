@@ -50,10 +50,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
             public bool IsPublic { get; set; }
-
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
-            public string DatabaseTypeString { get; set; }
         }
 
         public ViewModel View { get; set; }
@@ -106,8 +102,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 Name = View.Database.Name,
                 Description = View.Database.Description,
                 Url = View.Database.Url,
-                IsPublic = View.Database.IsPublic,
-                DatabaseTypeString = View.Database.DatabaseType.Name
+                IsPublic = View.Database.IsPublic
             };
             // Return the page.
             return Page();
@@ -157,34 +152,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 // Redisplay the page.
                 return Page();
             }
-            // Check if there is another database with the same name.
-            if (_context.Databases.Any(item => item.Id != View.Database.Id && item.Name == Input.Name))
-            {
-                // Add an error to the model
-                ModelState.AddModelError(string.Empty, $"A database with the name \"{Input.Name}\" already exists.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Get the corresponding database type.
-            var databaseType = _context.DatabaseTypes
-                .Where(item => item.Name != "Generic")
-                .FirstOrDefault(item => item.Id == Input.DatabaseTypeString || item.Name == Input.DatabaseTypeString);
-            // Check if no database type has been found.
-            if (databaseType == null)
-            {
-                // Add an error to the model
-                ModelState.AddModelError(string.Empty, "No non-generic database could be found with the provided string.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Check if the database type is to be changed, and the database has networks or analyses.
-            if (databaseType.Id != View.Database.DatabaseType.Id && (View.Database.DatabaseNodes.Any() || View.Database.DatabaseEdges.Any() || View.Database.NodeCollectionDatabases.Any() || View.Database.NetworkDatabases.Any() || View.Database.AnalysisDatabases.Any()))
-            {
-                // Add an error to the model
-                ModelState.AddModelError(string.Empty, "The database type can't be changed while the database has nodes, edges, node collections, networks or analyses.");
-                // Redisplay the page.
-                return Page();
-            }
             // Define a new task.
             var task = new DatabasesTask
             {
@@ -196,8 +163,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                         Name = Input.Name,
                         Description = Input.Description,
                         Url = Input.Url,
-                        IsPublic = Input.IsPublic,
-                        DatabaseTypeId = databaseType.Id
+                        IsPublic = Input.IsPublic
                     }
                 }
             };

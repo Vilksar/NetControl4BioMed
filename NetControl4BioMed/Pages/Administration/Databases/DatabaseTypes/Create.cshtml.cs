@@ -19,12 +19,10 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
     public class CreateModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ApplicationDbContext _context;
 
-        public CreateModel(IServiceProvider serviceProvider, ApplicationDbContext context)
+        public CreateModel(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _context = context;
         }
 
         [BindProperty]
@@ -54,14 +52,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "An error has been encountered. Please check again the input fields.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Check if there is another database type with the same name.
-            if (_context.DatabaseTypes.Any(item => item.Name == Input.Name))
-            {
-                // Add an error to the model
-                ModelState.AddModelError(string.Empty, $"A database type with the name \"{Input.Name}\" already exists.");
                 // Redisplay the page.
                 return Page();
             }
