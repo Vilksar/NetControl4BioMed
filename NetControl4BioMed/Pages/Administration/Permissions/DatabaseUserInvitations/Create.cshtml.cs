@@ -32,16 +32,16 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
 
         public class InputModel
         {
+            [DataType(DataType.Text)]
+            [Required(ErrorMessage = "This field is required.")]
+            public string DatabaseId { get; set; }
+
             [DataType(DataType.EmailAddress)]
             [Required(ErrorMessage = "This field is required.")]
             public string Email { get; set; }
-
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
-            public string DatabaseString { get; set; }
         }
 
-        public IActionResult OnGet(string email = null, string databaseString = null)
+        public IActionResult OnGet(string databaseId = null, string email = null)
         {
             // Check if there aren't any databases.
             if (!_context.Databases.Any())
@@ -54,8 +54,8 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
             // Define the input.
             Input = new InputModel
             {
-                Email = email,
-                DatabaseString = databaseString
+                DatabaseId = databaseId,
+                Email = email
             };
             // Return the page.
             return Page();
@@ -79,26 +79,6 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 // Redisplay the page.
                 return Page();
             }
-            // Try to get the user with the provided e-mail.
-            var user = _context.Users.FirstOrDefault(item => item.Email == Input.Email);
-            // Check if there was any user found.
-            if (user != null)
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "A user with the provided e-mail already exists.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Get the database based on the provided string.
-            var database = _context.Databases.FirstOrDefault(item => item.Id == Input.DatabaseString || item.Name == Input.DatabaseString);
-            // Check if there was no database found.
-            if (database == null)
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No database could be found with the given string.");
-                // Redisplay the page.
-                return Page();
-            }
             // Define a new task.
             var task = new DatabaseUserInvitationsTask
             {
@@ -106,7 +86,10 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 {
                     new DatabaseUserInvitationInputModel
                     {
-                        DatabaseId = database.Id,
+                        Database = new DatabaseInputModel
+                        {
+                            Id = Input.DatabaseId
+                        },
                         Email = Input.Email
                     }
                 }
@@ -115,7 +98,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
             try
             {
                 // Run the task.
-                task.Create(_serviceProvider, CancellationToken.None);
+                var databaseUserInvitations = task.Create(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {

@@ -18,21 +18,21 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>This page allows giving a registered user access to a database. If the user you wish to add is not yet registered, please use <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Create" asp-route-databaseString="@Model.Input.DatabaseString" class="alert-link">this link</a> instead.</span>
+            <span>This page allows giving a registered user access to a database. If the user you wish to add is not yet registered, please use <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Create" asp-route-databaseId="@Model.Input.DatabaseId" class="alert-link">this link</a> instead.</span>
         </div>
         <form method="post" class="text-justify">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
             <div class="form-group">
-                <label asp-for="Input.UserString" class="font-weight-bold">User ID / e-mail</label>
-                <input asp-for="Input.UserString" class="form-control" />
-                <span asp-description-for="Input.UserString" class="text-muted small">The ID or the e-mail of the user (case-sensitive).</span>
-                <span asp-validation-for="Input.UserString" class="text-danger small"></span>
+                <label asp-for="Input.DatabaseId" class="font-weight-bold">Database ID</label>
+                <input asp-for="Input.DatabaseId" class="form-control" />
+                <span asp-description-for="Input.DatabaseId" class="text-muted small">The ID of the database.</span>
+                <span asp-validation-for="Input.DatabaseId" class="text-danger small"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Input.DatabaseString" class="font-weight-bold">Database ID / name</label>
-                <input asp-for="Input.DatabaseString" class="form-control" />
-                <span asp-description-for="Input.DatabaseString" class="text-muted small">The ID or the name of the database (case-sensitive).</span>
-                <span asp-validation-for="Input.DatabaseString" class="text-danger small"></span>
+                <label asp-for="Input.UserId" class="font-weight-bold">User ID</label>
+                <input asp-for="Input.UserId" class="form-control" />
+                <span asp-description-for="Input.UserId" class="text-muted small">The ID of the user.</span>
+                <span asp-validation-for="Input.UserId" class="text-danger small"></span>
             </div>
             <button type="submit" class="btn btn-block btn-success" title="Create">
                 <span>Create</span>

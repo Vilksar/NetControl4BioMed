@@ -28,7 +28,8 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Create(IServiceProvider serviceProvider, CancellationToken token)
+        /// <returns>The created items.</returns>
+        public IEnumerable<AnalysisUserInvitation> Create(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -52,21 +53,79 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the related entities that appear in the current batch.
-                var analysisIds = batchItems.Select(item => item.AnalysisId);
+                var batchAnalysisIds = batchItems
+                    .Where(item => item.Analysis != null)
+                    .Select(item => item.Analysis)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
+                var batchUserEmails = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Email))
+                    .Select(item => item.Email)
+                    .Distinct();
                 // Get the related entities that appear in the current batch.
-                var analyses = context.Analyses.Where(item => analysisIds.Contains(item.Id));
-                // Define the items corresponding to the current batch.
-                var analysisUserInvitations = batchItems.Select(item => new AnalysisUserInvitation
+                var batchAnalyses = context.Analyses
+                    .Where(item => batchAnalysisIds.Contains(item.Id));
+                var batchUsers = context.Users
+                    .Where(item => batchUserEmails.Contains(item.Email));
+                // Save the items to add.
+                var analysisUserInvitationsToAdd = new List<AnalysisUserInvitation>();
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
                 {
-                    AnalysisId = item.AnalysisId,
-                    Analysis = analyses.First(item1 => item1.Id == item.AnalysisId),
-                    Email = item.Email,
-                    DateTimeCreated = DateTime.Now
-                });
+                    // Check if there was no analysis provided.
+                    if (batchItem.Analysis == null || string.IsNullOrEmpty(batchItem.Analysis.Id))
+                    {
+                        // Throw an exception.
+                        throw new ArgumentException("There was no analysis provided for the analysis user invitation.");
+                    }
+                    // Get the analysis.
+                    var analysis = batchAnalyses
+                        .FirstOrDefault(item => item.Id == batchItem.Analysis.Id);
+                    // Check if there was no analysis found.
+                    if (analysis == null)
+                    {
+                        // Throw an exception.
+                        throw new ArgumentException($"There was no analysis found for the analysis user invitation.");
+                    }
+                    // Check if there was no e-mail provided.
+                    if (string.IsNullOrEmpty(batchItem.Email))
+                    {
+                        // Throw an exception.
+                        throw new ArgumentException($"There was no e-mail provided for the analysis user invitation.");
+                    }
+                    // Try to get the user.
+                    var user = batchUsers
+                        .FirstOrDefault(item => item.Email == batchItem.Email);
+                    // Check if there was a user found.
+                    if (user != null)
+                    {
+                        // Throw an exception.
+                        throw new ArgumentException($"The user with the provided e-mail already exists.");
+                    }
+                    // Define the new item.
+                    var analysisUserInvitation = new AnalysisUserInvitation
+                    {
+                        DateTimeCreated = DateTime.Now,
+                        AnalysisId = analysis.Id,
+                        Analysis = analysis,
+                        Email = batchItem.Email
+                    };
+                    // Add the item to the list.
+                    analysisUserInvitationsToAdd.Add(analysisUserInvitation);
+                }
                 // Create the items.
-                IEnumerableExtensions.Create(analysisUserInvitations, context, token);
+                IEnumerableExtensions.Create(analysisUserInvitationsToAdd, context, token);
+                // Go over each item.
+                foreach (var analysisUserInvitation in analysisUserInvitationsToAdd)
+                {
+                    // Yield return it.
+                    yield return analysisUserInvitation;
+                }
             }
         }
 
@@ -99,12 +158,17 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
-                var batchIds = batchItems.Select(item => (item.AnalysisId, item.Email));
+                var batchIds = batchItems
+                    .Where(item => item.Analysis != null && !string.IsNullOrEmpty(item.Analysis.Id))
+                    .Where(item => !string.IsNullOrEmpty(item.Email))
+                    .Select(item => (item.Analysis.Id, item.Email));
                 // Get the items with the provided IDs.
                 var analysisUserInvitations = context.AnalysisUserInvitations
-                    .Where(item => batchIds.Any(item1 => item1.AnalysisId == item.Analysis.Id && item1.Email == item.Email));
+                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.Analysis.Id && item1.Item2 == item.Email));
                 // Delete the items.
                 IQueryableExtensions.Delete(analysisUserInvitations, context, token);
             }

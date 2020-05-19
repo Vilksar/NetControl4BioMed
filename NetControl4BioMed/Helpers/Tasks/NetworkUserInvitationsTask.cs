@@ -28,7 +28,8 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Create(IServiceProvider serviceProvider, CancellationToken token)
+        /// <returns>The created items.</returns>
+        public IEnumerable<NetworkUserInvitation> Create(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -52,21 +53,79 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the related entities that appear in the current batch.
-                var networkIds = batchItems.Select(item => item.NetworkId);
+                var batchNetworkIds = batchItems
+                    .Where(item => item.Network != null)
+                    .Select(item => item.Network)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
+                var batchUserEmails = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Email))
+                    .Select(item => item.Email)
+                    .Distinct();
                 // Get the related entities that appear in the current batch.
-                var networks = context.Networks.Where(item => networkIds.Contains(item.Id));
-                // Define the items corresponding to the current batch.
-                var networkUserInvitations = batchItems.Select(item => new NetworkUserInvitation
+                var batchNetworks = context.Networks
+                    .Where(item => batchNetworkIds.Contains(item.Id));
+                var batchUsers = context.Users
+                    .Where(item => batchUserEmails.Contains(item.Email));
+                // Save the items to add.
+                var networkUserInvitationsToAdd = new List<NetworkUserInvitation>();
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
                 {
-                    NetworkId = item.NetworkId,
-                    Network = networks.First(item1 => item1.Id == item.NetworkId),
-                    Email = item.Email,
-                    DateTimeCreated = DateTime.Now
-                });
+                    // Check if there was no network provided.
+                    if (batchItem.Network == null || string.IsNullOrEmpty(batchItem.Network.Id))
+                    {
+                        // Throw an exception.
+                        throw new ArgumentException("There was no network provided for the network user invitation.");
+                    }
+                    // Get the network.
+                    var network = batchNetworks
+                        .FirstOrDefault(item => item.Id == batchItem.Network.Id);
+                    // Check if there was no network found.
+                    if (network == null)
+                    {
+                        // Throw an exception.
+                        throw new ArgumentException($"There was no network found for the network user invitation.");
+                    }
+                    // Check if there was no e-mail provided.
+                    if (string.IsNullOrEmpty(batchItem.Email))
+                    {
+                        // Throw an exception.
+                        throw new ArgumentException($"There was no e-mail provided for the network user invitation.");
+                    }
+                    // Try to get the user.
+                    var user = batchUsers
+                        .FirstOrDefault(item => item.Email == batchItem.Email);
+                    // Check if there was a user found.
+                    if (user != null)
+                    {
+                        // Throw an exception.
+                        throw new ArgumentException($"The user with the provided e-mail already exists.");
+                    }
+                    // Define the new item.
+                    var networkUserInvitation = new NetworkUserInvitation
+                    {
+                        DateTimeCreated = DateTime.Now,
+                        NetworkId = network.Id,
+                        Network = network,
+                        Email = batchItem.Email
+                    };
+                    // Add the item to the list.
+                    networkUserInvitationsToAdd.Add(networkUserInvitation);
+                }
                 // Create the items.
-                IEnumerableExtensions.Create(networkUserInvitations, context, token);
+                IEnumerableExtensions.Create(networkUserInvitationsToAdd, context, token);
+                // Go over each item.
+                foreach (var networkUserInvitation in networkUserInvitationsToAdd)
+                {
+                    // Yield return it.
+                    yield return networkUserInvitation;
+                }
             }
         }
 
@@ -99,12 +158,17 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
-                var batchIds = batchItems.Select(item => (item.NetworkId, item.Email));
+                var batchIds = batchItems
+                    .Where(item => item.Network != null && !string.IsNullOrEmpty(item.Network.Id))
+                    .Where(item => !string.IsNullOrEmpty(item.Email))
+                    .Select(item => (item.Network.Id, item.Email));
                 // Get the items with the provided IDs.
                 var networkUserInvitations = context.NetworkUserInvitations
-                    .Where(item => batchIds.Any(item1 => item1.NetworkId == item.Network.Id && item1.Email == item.Email));
+                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.Network.Id && item1.Item2 == item.Email));
                 // Delete the items.
                 IQueryableExtensions.Delete(networkUserInvitations, context, token);
             }
