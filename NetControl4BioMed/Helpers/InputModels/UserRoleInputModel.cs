@@ -13,6 +13,6 @@
         /// <summary>
         /// Represents the role of the user role.
         /// </summary>
-        public RoleInputModel RoleId { get; set; }
+        public RoleInputModel Role { get; set; }
     }
 }

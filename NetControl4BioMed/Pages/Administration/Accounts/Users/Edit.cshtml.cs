@@ -142,7 +142,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
             try
             {
                 // Run the task.
-                task.Edit(_serviceProvider, CancellationToken.None);
+                var users = task.Edit(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {

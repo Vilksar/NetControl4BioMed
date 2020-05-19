@@ -67,7 +67,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             try
             {
                 // Run the task.
-                task.Create(_serviceProvider, CancellationToken.None);
+                var roles = task.Create(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {
