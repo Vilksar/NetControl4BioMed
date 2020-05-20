@@ -34,19 +34,28 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 {
                     new DatabaseEdgeInputModel
                     {
-                        DatabaseId = "Database ID"
+                        Database = new DatabaseInputModel
+                        {
+                            Id = "Database ID"
+                        }
                     }
                 },
                 EdgeNodes = new List<EdgeNodeInputModel>
                 {
                     new EdgeNodeInputModel
                     {
-                        NodeId = "Node ID",
+                        Node = new NodeInputModel
+                        {
+                            Id = "Node ID"
+                        },
                         Type = "Source"
                     },
                     new EdgeNodeInputModel
                     {
-                        NodeId = "Node ID",
+                        Node = new NodeInputModel
+                        {
+                            Id = "Node ID"
+                        },
                         Type = "Target"
                     }
                 },
@@ -54,7 +63,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 {
                     new DatabaseEdgeFieldEdgeInputModel
                     {
-                        DatabaseEdgeFieldId = "Database edge field ID",
+                        DatabaseEdgeField = new DatabaseEdgeFieldInputModel
+                        {
+                            Id = "Database edge field ID"
+                        },
                         Value = "Value"
                     }
                 }
@@ -120,16 +132,25 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 Description = item.Description,
                 EdgeNodes = item.EdgeNodes.Select(item1 => new EdgeNodeInputModel
                 {
-                    NodeId = item1.Node.Id,
+                    Node = new NodeInputModel
+                    {
+                        Id = item1.Node.Id
+                    },
                     Type = item1.Type.ToString()
                 }),
                 DatabaseEdges = item.DatabaseEdges.Select(item1 => new DatabaseEdgeInputModel
                 {
-                    DatabaseId = item1.Database.Id
+                    Database = new DatabaseInputModel
+                    {
+                        Id = item1.Database.Id
+                    }
                 }),
                 DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges.Select(item1 => new DatabaseEdgeFieldEdgeInputModel
                 {
-                    DatabaseEdgeFieldId = item1.DatabaseEdgeField.Id,
+                    DatabaseEdgeField = new DatabaseEdgeFieldInputModel
+                    {
+                        Id = item1.DatabaseEdgeField.Id
+                    },
                     Value = item1.Value
                 })
             });

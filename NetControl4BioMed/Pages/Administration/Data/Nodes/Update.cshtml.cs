@@ -34,7 +34,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 {
                     new DatabaseNodeFieldNodeInputModel
                     {
-                        DatabaseNodeFieldId = "Database node field ID",
+                        DatabaseNodeField = new DatabaseNodeFieldInputModel
+                        {
+                            Id = "Database node field ID"
+                        },
                         Value = "Value"
                     }
                 }
@@ -95,7 +98,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 Description = item.Description,
                 DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes.Select(item1 => new DatabaseNodeFieldNodeInputModel
                 {
-                    DatabaseNodeFieldId = item1.DatabaseNodeField.Id,
+                    DatabaseNodeField = new DatabaseNodeFieldInputModel
+                    {
+                        Id = item1.DatabaseNodeField.Id
+                    },
                     Value = item1.Value
                 })
             });

@@ -35,14 +35,20 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 {
                     new NodeCollectionDatabaseInputModel
                     {
-                        DatabaseId = "Database ID"
+                        Database = new DatabaseInputModel
+                        {
+                            Id = "Database ID"
+                        }
                     }
                 },
                 NodeCollectionNodes = new List<NodeCollectionNodeInputModel>
                 {
                     new NodeCollectionNodeInputModel
                     {
-                        NodeId = "Node ID"
+                        Node = new NodeInputModel
+                        {
+                            Id = "Node ID"
+                        }
                     }
                 }
             }
@@ -102,11 +108,17 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 Description = item.Description,
                 NodeCollectionDatabases = item.NodeCollectionDatabases.Select(item1 => new NodeCollectionDatabaseInputModel
                 {
-                    DatabaseId = item1.Database.Id
+                    Database = new DatabaseInputModel
+                    {
+                        Id = item1.Database.Id
+                    }
                 }),
                 NodeCollectionNodes = item.NodeCollectionNodes.Select(item1 => new NodeCollectionNodeInputModel
                 {
-                    NodeId = item1.Node.Id
+                    Node = new NodeInputModel
+                    {
+                        Id = item1.Node.Id
+                    }
                 })
             });
             // Define the input.

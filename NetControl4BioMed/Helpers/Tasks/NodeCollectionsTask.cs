@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
@@ -28,7 +29,8 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Create(IServiceProvider serviceProvider, CancellationToken token)
+        /// <returns>The created items.</returns>
+        public IEnumerable<NodeCollection> Create(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -52,107 +54,120 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
-                // Get the manually provided IDs of all the items that are to be created.
-                var itemNodeCollectionIds = batchItems
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id);
-                // Check if any of the manually provided IDs are repeating in the list.
-                if (itemNodeCollectionIds.Distinct().Count() != itemNodeCollectionIds.Count())
+                // Check if any of the IDs are repeating in the list.
+                if (batchIds.Distinct().Count() != batchIds.Count())
                 {
                     // Throw an exception.
-                    throw new ArgumentException("One or more of the manually provided IDs are duplicated.");
+                    throw new ArgumentException("Two or more of the manually provided IDs are duplicated.");
                 }
-                // Get the valid manually provided IDs, that do not appear in the database.
-                var validItemNodeCollectionIds = itemNodeCollectionIds
-                    .Except(context.NodeCollections
-                        .Where(item => itemNodeCollectionIds.Contains(item.Id))
+                // Get the valid IDs, that do not appear in the database.
+                var validBatchIds = batchIds
+                    .Except(context.Edges
+                        .Where(item => batchIds.Contains(item.Id))
                         .Select(item => item.Id));
-                // Get the IDs of all of the databases that are to be used by the collections.
-                var itemDatabaseIds = batchItems
+                // Get the IDs of the related entities that appear in the current batch.
+                var batchDatabaseIds = batchItems
                     .Where(item => item.NodeCollectionDatabases != null)
                     .Select(item => item.NodeCollectionDatabases)
                     .SelectMany(item => item)
-                    .Select(item => item.DatabaseId)
-                    .Where(item => !string.IsNullOrEmpty(item))
+                    .Where(item => item.Database != null)
+                    .Select(item => item.Database)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
                     .Distinct();
-                // Get the databases that are to be used by the collections.
-                var databases = context.Databases
-                    .Where(item => item.DatabaseType.Name != "Generic")
-                    .Where(item => itemDatabaseIds.Contains(item.Id))
-                    .Include(item => item.DatabaseNodes)
-                        .ThenInclude(item => item.Node)
-                    .AsEnumerable();
-                // Get the IDs of all of the nodes that are to be added to the collections.
-                var itemNodeIds = batchItems
+                var batchNodeIds = batchItems
                     .Where(item => item.NodeCollectionNodes != null)
                     .Select(item => item.NodeCollectionNodes)
                     .SelectMany(item => item)
-                    .Select(item => item.NodeId)
-                    .Where(item => !string.IsNullOrEmpty(item))
+                    .Where(item => item.Node != null)
+                    .Select(item => item.Node)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
                     .Distinct();
-                // Get the nodes that are to be added to the collections.
-                var nodes = context.Nodes
+                // Get the related entities that appear in the current batch.
+                var batchDatabases = context.Databases
+                    .Where(item => item.DatabaseType.Name != "Generic")
+                    .Where(item => batchDatabaseIds.Contains(item.Id))
+                    .Distinct();
+                var batchNodes = context.Nodes
                     .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => itemNodeIds.Contains(item.Id))
-                    .Include(item => item.DatabaseNodes)
-                        .ThenInclude(item => item.Database)
-                    .AsEnumerable();
-                // Get the valid database IDs.
-                var validItemDatabaseIds = databases
-                    .Select(item => item.Id);
-                // Get the valid node IDs.
-                var validItemNodeIds = nodes
-                    .Select(item => item.Id);
-                // Save the node collections to add.
-                var nodeCollections = new List<NodeCollection>();
+                    .Where(item => batchNodeIds.Contains(item.Id));
+                // Save the items to add.
+                var nodeCollectionsToAdd = new List<NodeCollection>();
                 // Go over each of the items.
                 foreach (var batchItem in batchItems)
                 {
-                    // Check if the ID of the current item is valid.
-                    if (!string.IsNullOrEmpty(batchItem.Id) && !validItemNodeCollectionIds.Contains(batchItem.Id))
+                    // Check if the ID of the item is not valid.
+                    if (!string.IsNullOrEmpty(batchItem.Id) && !validBatchIds.Contains(batchItem.Id))
                     {
                         // Continue.
                         continue;
                     }
-                    // Get the valid databases and the node collection databases to add.
-                    var nodeCollectionDatabases = batchItem.NodeCollectionDatabases != null ?
-                        batchItem.NodeCollectionDatabases
-                            .Select(item => item.DatabaseId)
-                            .Where(item => validItemDatabaseIds.Contains(item))
-                            .Distinct()
-                            .Select(item => new NodeCollectionDatabase
-                            {
-                                DatabaseId = item,
-                                Database = databases.FirstOrDefault(item1 => item == item1.Id)
-                            })
-                            .Where(item => item.Database != null) :
-                        Enumerable.Empty<NodeCollectionDatabase>();
-                    // Get the valid nodes and the node collection nodes to add.
-                    var nodeCollectionNodes = batchItem.NodeCollectionNodes != null ?
-                        batchItem.NodeCollectionNodes
-                            .Select(item => item.NodeId)
-                            .Where(item => validItemNodeIds.Contains(item))
-                            .Distinct()
-                            .Select(item => new NodeCollectionNode
-                            {
-                                NodeId = item,
-                                Node = nodes.FirstOrDefault(item1 => item == item1.Id)
-                            })
-                            .Where(item => item.Node != null) :
-                        Enumerable.Empty<NodeCollectionNode>();
+                    // Check if there were no node collection databases provided.
+                    if (batchItem.NodeCollectionDatabases == null || !batchItem.NodeCollectionDatabases.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no node collection databases provided.", batchItem);
+                    }
+                    // Get the node collection databases.
+                    var nodeCollectionDatabases = batchItem.NodeCollectionDatabases
+                        .Where(item => item.Database != null)
+                        .Where(item => !string.IsNullOrEmpty(item.Database.Id))
+                        .Select(item => item.Database.Id)
+                        .Distinct()
+                        .Where(item => batchDatabases.Any(item1 => item1.Id == item))
+                        .Select(item => new NodeCollectionDatabase
+                        {
+                            DatabaseId = item,
+                            Database = batchDatabases
+                                .FirstOrDefault(item1 => item1.Id == item)
+                        })
+                        .Where(item => item.Database != null);
+                    // Check if there were no node collection databases found.
+                    if (nodeCollectionDatabases == null || !nodeCollectionDatabases.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no node collection databases found.", batchItem);
+                    }
+                    // Check if there were no node collection nodes provided.
+                    if (batchItem.NodeCollectionNodes == null)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no node collection nodes provided.", batchItem);
+                    }
+                    // Get the node collection nodes.
+                    var nodeCollectionNodes = batchItem.NodeCollectionNodes
+                        .Where(item => item.Node != null)
+                        .Where(item => !string.IsNullOrEmpty(item.Node.Id))
+                        .Where(item => batchNodes.Any(item1 => item1.Id == item.Node.Id))
+                        .Select(item => new NodeCollectionNode
+                        {
+                            NodeId = item.Node.Id,
+                            Node = batchNodes
+                                .FirstOrDefault(item1 => item1.Id == item.Node.Id)
+                        })
+                        .Where(item => item.Node != null);
+                    // Check if there were no edge nodes found.
+                    if (nodeCollectionNodes == null)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no node collection nodes found.", batchItem);
+                    }
                     // Define the new node collection.
                     var nodeCollection = new NodeCollection
                     {
+                        DateTimeCreated = DateTime.Now,
                         Name = batchItem.Name,
                         Description = batchItem.Description,
-                        DateTimeCreated = DateTime.Now,
-                        NodeCollectionDatabases = nodeCollectionDatabases
-                            .Where(item => item.Database.DatabaseNodes.Any(item1 => validItemNodeIds.Contains(item1.Node.Id)))
-                            .ToList(),
-                        NodeCollectionNodes = nodeCollectionNodes
-                            .Where(item => item.Node.DatabaseNodes.Any(item1 => validItemDatabaseIds.Contains(item1.Database.Id)))
-                            .ToList()
+                        NodeCollectionDatabases = nodeCollectionDatabases.ToList(),
+                        NodeCollectionNodes = nodeCollectionNodes.ToList()
                     };
                     // Check if there is any ID provided.
                     if (!string.IsNullOrEmpty(batchItem.Id))
@@ -161,10 +176,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                         nodeCollection.Id = batchItem.Id;
                     }
                     // Add the new node collection to the list.
-                    nodeCollections.Add(nodeCollection);
+                    nodeCollectionsToAdd.Add(nodeCollection);
                 }
                 // Create the items.
-                IEnumerableExtensions.Create(nodeCollections, context, token);
+                IEnumerableExtensions.Create(nodeCollectionsToAdd, context, token);
+                // Go over each item.
+                foreach (var nodeCollection in nodeCollectionsToAdd)
+                {
+                    // Yield return it.
+                    yield return nodeCollection;
+                }
             }
         }
 
@@ -173,7 +194,8 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Edit(IServiceProvider serviceProvider, CancellationToken token)
+        /// <returns>The edited items.</returns>
+        public IEnumerable<NodeCollection> Edit(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -197,120 +219,132 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
-                // Get the list of IDs from the provided items.
-                var itemIds = batchItems.Select(item => item.Id);
-                // Get the node collections from the database that have the given IDs.
-                var nodeCollections = context.NodeCollections
-                    .Where(item => itemIds.Contains(item.Id))
-                    .AsEnumerable();
-                // Check if there weren't any node collections found.
-                if (nodeCollections == null || !nodeCollections.Any())
-                {
-                    // Throw an exception.
-                    throw new ArgumentException("No node collections could be found in the database with the provided IDs.");
-                }
-                // Get the IDs of all of the databases that are to be used by the collections.
-                var itemDatabaseIds = batchItems
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id);
+                // Get the IDs of the related entities that appear in the current batch.
+                var batchDatabaseIds = batchItems
                     .Where(item => item.NodeCollectionDatabases != null)
                     .Select(item => item.NodeCollectionDatabases)
                     .SelectMany(item => item)
-                    .Select(item => item.DatabaseId)
-                    .Where(item => !string.IsNullOrEmpty(item))
+                    .Where(item => item.Database != null)
+                    .Select(item => item.Database)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
                     .Distinct();
-                // Get the databases that are to be used by the collections.
-                var databases = context.Databases
-                    .Where(item => item.DatabaseType.Name != "Generic")
-                    .Where(item => itemDatabaseIds.Contains(item.Id))
-                    .Include(item => item.DatabaseNodes)
-                        .ThenInclude(item => item.Node)
-                    .AsEnumerable();
-                // Get the IDs of all of the nodes that are to be added to the collections.
-                var itemNodeIds = batchItems
+                var batchNodeIds = batchItems
                     .Where(item => item.NodeCollectionNodes != null)
                     .Select(item => item.NodeCollectionNodes)
                     .SelectMany(item => item)
-                    .Select(item => item.NodeId)
-                    .Where(item => !string.IsNullOrEmpty(item))
+                    .Where(item => item.Node != null)
+                    .Select(item => item.Node)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
                     .Distinct();
-                // Get the nodes that are to be added to the collections.
-                var nodes = context.Nodes
+                // Get the related entities that appear in the current batch.
+                var batchDatabases = context.Databases
+                    .Where(item => item.DatabaseType.Name != "Generic")
+                    .Where(item => batchDatabaseIds.Contains(item.Id))
+                    .Distinct();
+                var batchNodes = context.Nodes
                     .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => itemNodeIds.Contains(item.Id))
-                    .Include(item => item.DatabaseNodes)
-                        .ThenInclude(item => item.Database)
-                    .AsEnumerable();
-                // Get the valid database IDs.
-                var validItemDatabaseIds = databases
-                    .Select(item => item.Id);
-                // Get the valid node IDs.
-                var validItemNodeIds = nodes
-                    .Select(item => item.Id);
-                // Save the nodes to update.
-                var nodeCollectionsToUpdate = new List<NodeCollection>();
+                    .Where(item => batchNodeIds.Contains(item.Id));
+                // Get the items corresponding to the current batch.
+                var nodeCollections = context.NodeCollections
+                    .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Where(item => batchIds.Contains(item.Id));
+                // Save the items to edit.
+                var nodeCollectionsToEdit = new List<NodeCollection>();
                 // Go over each of the valid items.
                 foreach (var batchItem in batchItems)
                 {
-                    // Get the corresponding node collection.
-                    var nodeCollection = nodeCollections.FirstOrDefault(item => batchItem.Id == item.Id);
-                    // Check if there was no node collection found.
+                    // Get the corresponding item.
+                    var nodeCollection = nodeCollections
+                        .FirstOrDefault(item => batchItem.Id == item.Id);
+                    // Check if there was no item found.
                     if (nodeCollection == null)
                     {
                         // Continue.
                         continue;
                     }
-                    // Get the valid databases and the node collection databases to add.
-                    var nodeCollectionDatabases = batchItem.NodeCollectionDatabases != null ?
-                        batchItem.NodeCollectionDatabases
-                            .Select(item => item.DatabaseId)
-                            .Where(item => validItemDatabaseIds.Contains(item))
-                            .Distinct()
-                            .Select(item => new NodeCollectionDatabase
-                            {
-                                NodeCollectionId = nodeCollection.Id,
-                                NodeCollection = nodeCollection,
-                                DatabaseId = item,
-                                Database = databases.FirstOrDefault(item1 => item == item1.Id)
-                            })
-                            .Where(item => item.NodeCollection != null && item.Database != null) :
-                        Enumerable.Empty<NodeCollectionDatabase>();
-                    // Get the valid nodes and the node collection nodes to add.
-                    var nodeCollectionNodes = batchItem.NodeCollectionNodes != null ?
-                        batchItem.NodeCollectionNodes
-                            .Select(item => item.NodeId)
-                            .Where(item => validItemNodeIds.Contains(item))
-                            .Distinct()
-                            .Select(item => new NodeCollectionNode
-                            {
-                                NodeCollectionId = nodeCollection.Id,
-                                NodeCollection = nodeCollection,
-                                NodeId = item,
-                                Node = nodes.FirstOrDefault(item1 => item == item1.Id)
-                            })
-                            .Where(item => item.NodeCollection != null && item.Node != null) :
-                        Enumerable.Empty<NodeCollectionNode>();
+                    // Check if there were no node collection databases provided.
+                    if (batchItem.NodeCollectionDatabases == null || !batchItem.NodeCollectionDatabases.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no node collection databases provided.", batchItem);
+                    }
+                    // Get the node collection databases.
+                    var nodeCollectionDatabases = batchItem.NodeCollectionDatabases
+                        .Where(item => item.Database != null)
+                        .Where(item => !string.IsNullOrEmpty(item.Database.Id))
+                        .Select(item => item.Database.Id)
+                        .Distinct()
+                        .Where(item => batchDatabases.Any(item1 => item1.Id == item))
+                        .Select(item => new NodeCollectionDatabase
+                        {
+                            DatabaseId = item,
+                            Database = batchDatabases
+                                .FirstOrDefault(item1 => item1.Id == item)
+                        })
+                        .Where(item => item.Database != null);
+                    // Check if there were no node collection databases found.
+                    if (nodeCollectionDatabases == null || !nodeCollectionDatabases.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no node collection databases found.", batchItem);
+                    }
+                    // Check if there were no node collection nodes provided.
+                    if (batchItem.NodeCollectionNodes == null)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no node collection nodes provided.", batchItem);
+                    }
+                    // Get the node collection nodes.
+                    var nodeCollectionNodes = batchItem.NodeCollectionNodes
+                        .Where(item => item.Node != null)
+                        .Where(item => !string.IsNullOrEmpty(item.Node.Id))
+                        .Where(item => batchNodes.Any(item1 => item1.Id == item.Node.Id))
+                        .Select(item => new NodeCollectionNode
+                        {
+                            NodeId = item.Node.Id,
+                            Node = batchNodes
+                                .FirstOrDefault(item1 => item1.Id == item.Node.Id)
+                        })
+                        .Where(item => item.Node != null);
+                    // Check if there were no edge nodes found.
+                    if (nodeCollectionNodes == null)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no node collection nodes found.", batchItem);
+                    }
                     // Update the node collection.
                     nodeCollection.Name = batchItem.Name;
                     nodeCollection.Description = batchItem.Description;
-                    nodeCollection.NodeCollectionDatabases = nodeCollectionDatabases
-                            .Where(item => item.Database.DatabaseNodes.Any(item1 => validItemNodeIds.Contains(item1.Node.Id)))
-                            .ToList();
-                    nodeCollection.NodeCollectionNodes = nodeCollectionNodes
-                            .Where(item => item.Node.DatabaseNodes.Any(item1 => validItemDatabaseIds.Contains(item1.Database.Id)))
-                            .ToList();
+                    nodeCollection.NodeCollectionDatabases = nodeCollectionDatabases.ToList();
+                    nodeCollection.NodeCollectionNodes = nodeCollectionNodes.ToList();
                     // Add the node collection to the list.
-                    nodeCollectionsToUpdate.Add(nodeCollection);
+                    nodeCollectionsToEdit.Add(nodeCollection);
                 }
                 // Get the networks and analyses that use the node collections.
                 var networks = context.Networks
-                    .Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollectionsToUpdate.Contains(item1.NodeCollection)));
+                    .Where(item => item.NetworkNodeCollections.Any(item1 => nodeCollectionsToEdit.Contains(item1.NodeCollection)));
                 var analyses = context.Analyses
-                    .Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollectionsToUpdate.Contains(item1.NodeCollection)));
+                    .Where(item => item.AnalysisNodeCollections.Any(item1 => nodeCollectionsToEdit.Contains(item1.NodeCollection)));
                 // Delete the items.
                 IQueryableExtensions.Delete(analyses, context, token);
                 IQueryableExtensions.Delete(networks, context, token);
                 // Update the items.
-                IEnumerableExtensions.Edit(nodeCollectionsToUpdate, context, token);
+                IEnumerableExtensions.Edit(nodeCollectionsToEdit, context, token);
+                // Go over each item.
+                foreach (var nodeCollection in nodeCollectionsToEdit)
+                {
+                    // Yield return it.
+                    yield return nodeCollection;
+                }
             }
         }
 
@@ -343,7 +377,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the current batch IDs.

@@ -3,11 +3,13 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,7 +30,8 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Create(IServiceProvider serviceProvider, CancellationToken token)
+        /// <returns>The created items.</returns>
+        public IEnumerable<Node> Create(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -52,85 +55,86 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
-                // Get the manually provided IDs of all the items that are to be created.
-                var itemNodeIds = batchItems
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id);
-                // Check if any of the manually provided IDs are repeating in the list.
-                if (itemNodeIds.Distinct().Count() != itemNodeIds.Count())
+                // Check if any of the IDs are repeating in the list.
+                if (batchIds.Distinct().Count() != batchIds.Count())
                 {
                     // Throw an exception.
-                    throw new ArgumentException("One or more of the manually provided IDs are duplicated.");
+                    throw new ArgumentException("Two or more of the manually provided IDs are duplicated.");
                 }
-                // Get the valid manually provided IDs, that do not appear in the database.
-                var validItemNodeIds = itemNodeIds
+                // Get the valid IDs, that do not appear in the database.
+                var validBatchIds = batchIds
                     .Except(context.Nodes
-                        .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                        .Where(item => itemNodeIds.Contains(item.Id))
+                        .Where(item => batchIds.Contains(item.Id))
                         .Select(item => item.Id));
-                // Get the IDs of all of the node fields that are to be updated.
-                var itemNodeFieldIds = batchItems
+                // Get the IDs of the related entities that appear in the current batch.
+                var batchDatabaseNodeFieldIds = batchItems
                     .Where(item => item.DatabaseNodeFieldNodes != null)
                     .Select(item => item.DatabaseNodeFieldNodes)
                     .SelectMany(item => item)
-                    .Where(item => !string.IsNullOrEmpty(item.DatabaseNodeFieldId) && !string.IsNullOrEmpty(item.Value))
-                    .Select(item => item.DatabaseNodeFieldId)
+                    .Where(item => item.DatabaseNodeField != null)
+                    .Select(item => item.DatabaseNodeField)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
                     .Distinct();
-                // Get the node fields that are to be updated.
-                var nodeFields = context.DatabaseNodeFields
+                // Get the related entities that appear in the current batch.
+                var batchDatabaseNodeFields = context.DatabaseNodeFields
                     .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .Where(item => itemNodeFieldIds.Contains(item.Id))
-                    .Include(item => item.Database)
-                    .AsEnumerable();
-                // Check if there weren't any node fields found.
-                if (nodeFields == null || !nodeFields.Any())
-                {
-                    // Throw an exception.
-                    throw new ArgumentException("No database node fields could be found in the database with the provided IDs.");
-                }
-                // Get the valid database node field IDs.
-                var validItemNodeFieldIds = nodeFields
-                    .Select(item => item.Id);
-                // Save the nodes to add.
-                var nodes = new List<Node>();
-                // Go over each of the items.
+                    .Where(item => batchDatabaseNodeFieldIds.Contains(item.Id));
+                // Save the items to add.
+                var nodesToAdd = new List<Node>();
+                // Go over each item in the current batch.
                 foreach (var batchItem in batchItems)
                 {
-                    // Check if the ID of the current item is valid.
-                    if (!string.IsNullOrEmpty(batchItem.Id) && !validItemNodeIds.Contains(batchItem.Id))
+                    // Check if the ID of the item is not valid.
+                    if (!string.IsNullOrEmpty(batchItem.Id) && !validBatchIds.Contains(batchItem.Id))
                     {
                         // Continue.
                         continue;
                     }
-                    // Get the valid item fields and the node field nodes to add.
-                    var nodeFieldNodes = batchItem.DatabaseNodeFieldNodes != null ?
-                            batchItem.DatabaseNodeFieldNodes
-                            .Select(item => (item.DatabaseNodeFieldId, item.Value))
-                            .Distinct()
-                            .Where(item => validItemNodeFieldIds.Contains(item.DatabaseNodeFieldId))
-                            .Select(item => new DatabaseNodeFieldNode
-                            {
-                                DatabaseNodeFieldId = item.DatabaseNodeFieldId,
-                                DatabaseNodeField = nodeFields.FirstOrDefault(item1 => item.DatabaseNodeFieldId == item1.Id),
-                                Value = item.Value
-                            })
-                            .Where(item => item.DatabaseNodeField != null) :
-                        Enumerable.Empty<DatabaseNodeFieldNode>();
-                    // Check if there weren't any node fields found.
-                    if (nodeFieldNodes == null || !nodeFieldNodes.Any() || !nodeFieldNodes.Any(item => item.DatabaseNodeField.IsSearchable))
+                    // Check if there are no database node field nodes provided.
+                    if (batchItem.DatabaseNodeFieldNodes == null || !batchItem.DatabaseNodeFieldNodes.Any())
                     {
-                        // Continue.
-                        continue;
+                        // Throw an exception.
+                        throw new TaskException("There were no database node field nodes provided.", batchItem);
+                    }
+                    // Get the database node field nodes.
+                    var databaseNodeFieldNodes = batchItem.DatabaseNodeFieldNodes
+                        .Where(item => item.DatabaseNodeField != null)
+                        .Where(item => !string.IsNullOrEmpty(item.DatabaseNodeField.Id))
+                        .Where(item => !string.IsNullOrEmpty(item.Value))
+                        .Select(item => (item.DatabaseNodeField.Id, item.Value))
+                        .Distinct()
+                        .Where(item => batchDatabaseNodeFields.Any(item1 => item1.Id == item.Item1))
+                        .Select(item => new DatabaseNodeFieldNode
+                        {
+                            DatabaseNodeFieldId = item.Item1,
+                            DatabaseNodeField = batchDatabaseNodeFields
+                                .FirstOrDefault(item1 => item1.Id == item.Item1),
+                            Value = item.Item2
+                        })
+                        .Where(item => item.DatabaseNodeField != null);
+                    // Check if there were no database node field nodes found.
+                    if (databaseNodeFieldNodes == null || !databaseNodeFieldNodes.Any(item => item.DatabaseNodeField.IsSearchable))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no database node field nodes found.", batchItem);
                     }
                     // Define the new node.
                     var node = new Node
                     {
-                        Name = nodeFieldNodes.First(item => item.DatabaseNodeField.IsSearchable).Value,
-                        Description = batchItem.Description,
                         DateTimeCreated = DateTime.Now,
-                        DatabaseNodeFieldNodes = nodeFieldNodes.ToList(),
-                        DatabaseNodes = nodeFieldNodes
+                        Name = databaseNodeFieldNodes
+                            .FirstOrDefault(item => item.DatabaseNodeField.IsSearchable)?.Value ?? "Unnamed node",
+                        Description = batchItem.Description,
+                        DatabaseNodeFieldNodes = databaseNodeFieldNodes.ToList(),
+                        DatabaseNodes = databaseNodeFieldNodes
                             .Select(item => item.DatabaseNodeField.Database)
                             .Distinct()
                             .Select(item => new DatabaseNode
@@ -143,14 +147,20 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if there is any ID provided.
                     if (!string.IsNullOrEmpty(batchItem.Id))
                     {
-                        // Assign it to the node.
+                        // Assign it to the item.
                         node.Id = batchItem.Id;
                     }
-                    // Add the new node to the list.
-                    nodes.Add(node);
+                    // Add the item to the list.
+                    nodesToAdd.Add(node);
                 }
                 // Create the items.
-                IEnumerableExtensions.Create(nodes, context, token);
+                IEnumerableExtensions.Create(nodesToAdd, context, token);
+                // Go over each item.
+                foreach (var node in nodesToAdd)
+                {
+                    // Yield return it.
+                    yield return node;
+                }
             }
         }
 
@@ -159,7 +169,8 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Edit(IServiceProvider serviceProvider, CancellationToken token)
+        /// <returns>The edited items.</returns>
+        public IEnumerable<Node> Edit(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -183,85 +194,80 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
-                // Get the list of IDs from the provided items.
-                var itemIds = batchItems.Select(item => item.Id);
-                // Get the nodes from the database that have the given IDs.
-                var nodes = context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => itemIds.Contains(item.Id))
-                    .Include(item => item.DatabaseNodeFieldNodes)
-                    .Include(item => item.DatabaseNodes)
-                    .AsEnumerable();
-                // Check if there weren't any nodes found.
-                if (nodes == null || !nodes.Any())
-                {
-                    // Throw an exception.
-                    throw new ArgumentException("No nodes could be found in the database with the provided IDs.");
-                }
-                // Get the IDs of all of the node fields that are to be updated.
-                var itemNodeFieldIds = batchItems
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
+                // Get the IDs of the related entities that appear in the current batch.
+                var batchDatabaseNodeFieldIds = batchItems
                     .Where(item => item.DatabaseNodeFieldNodes != null)
                     .Select(item => item.DatabaseNodeFieldNodes)
                     .SelectMany(item => item)
-                    .Where(item => !string.IsNullOrEmpty(item.DatabaseNodeFieldId) && !string.IsNullOrEmpty(item.Value))
-                    .Select(item => item.DatabaseNodeFieldId)
+                    .Where(item => item.DatabaseNodeField != null)
+                    .Select(item => item.DatabaseNodeField)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
                     .Distinct();
-                // Get the node fields that are to be updated.
-                var nodeFields = context.DatabaseNodeFields
+                // Get the related entities that appear in the current batch.
+                var batchDatabaseNodeFields = context.DatabaseNodeFields
                     .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .Where(item => itemNodeFieldIds.Contains(item.Id))
-                    .Include(item => item.Database)
-                    .AsEnumerable();
-                // Check if there weren't any node fields found.
-                if (nodeFields == null || !nodeFields.Any())
-                {
-                    // Throw an exception.
-                    throw new ArgumentException("No database node fields could be found in the database with the provided IDs.");
-                }
-                // Get the valid database node field IDs.
-                var validItemNodeFieldIds = nodeFields
-                    .Select(item => item.Id);
-                // Save the nodes to update.
-                var nodesToUpdate = new List<Node>();
-                // Go over each of the valid items.
+                    .Where(item => batchDatabaseNodeFieldIds.Contains(item.Id));
+                // Get the items corresponding to the current batch.
+                var nodes = context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Where(item => batchIds.Contains(item.Id));
+                // Save the items to edit.
+                var nodesToEdit = new List<Node>();
+                // Go over each item in the current batch.
                 foreach (var batchItem in batchItems)
                 {
-                    // Get the corresponding node.
-                    var node = nodes.FirstOrDefault(item => batchItem.Id == item.Id);
-                    // Check if there was no node found.
+                    // Get the corresponding item.
+                    var node = nodes
+                        .FirstOrDefault(item => item.Id == batchItem.Id);
+                    // Check if there was no item found.
                     if (node == null)
                     {
                         // Continue.
                         continue;
                     }
-                    // Get the valid item fields and the node field nodes to add.
-                    var nodeFieldNodes = batchItem.DatabaseNodeFieldNodes != null ?
-                        batchItem.DatabaseNodeFieldNodes
-                            .Select(item => (item.DatabaseNodeFieldId, item.Value))
-                            .Distinct()
-                            .Where(item => validItemNodeFieldIds.Contains(item.DatabaseNodeFieldId))
-                            .Select(item => new DatabaseNodeFieldNode
-                            {
-                                DatabaseNodeFieldId = item.DatabaseNodeFieldId,
-                                DatabaseNodeField = nodeFields.FirstOrDefault(item1 => item.DatabaseNodeFieldId == item1.Id),
-                                NodeId = node.Id,
-                                Node = node,
-                                Value = item.Value
-                            })
-                            .Where(item => item.DatabaseNodeField != null && item.Node != null) :
-                        Enumerable.Empty<DatabaseNodeFieldNode>();
-                    // Check if there weren't any node fields found.
-                    if (nodeFieldNodes == null || !nodeFieldNodes.Any() || !nodeFieldNodes.Any(item => item.DatabaseNodeField.IsSearchable))
+                    // Check if there are no database node field nodes provided.
+                    if (batchItem.DatabaseNodeFieldNodes == null || !batchItem.DatabaseNodeFieldNodes.Any())
                     {
-                        // Continue.
-                        continue;
+                        // Throw an exception.
+                        throw new TaskException("There were no database node field nodes provided.", batchItem);
+                    }
+                    // Get the database node field nodes.
+                    var databaseNodeFieldNodes = batchItem.DatabaseNodeFieldNodes
+                        .Where(item => item.DatabaseNodeField != null)
+                        .Where(item => !string.IsNullOrEmpty(item.DatabaseNodeField.Id))
+                        .Where(item => !string.IsNullOrEmpty(item.Value))
+                        .Select(item => (item.DatabaseNodeField.Id, item.Value))
+                        .Distinct()
+                        .Where(item => batchDatabaseNodeFields.Any(item1 => item1.Id == item.Item1))
+                        .Select(item => new DatabaseNodeFieldNode
+                        {
+                            DatabaseNodeFieldId = item.Item1,
+                            DatabaseNodeField = batchDatabaseNodeFields
+                                .FirstOrDefault(item1 => item1.Id == item.Item1),
+                            Value = item.Item2
+                        })
+                        .Where(item => item.DatabaseNodeField != null);
+                    // Check if there were no database node field nodes found.
+                    if (databaseNodeFieldNodes == null || !databaseNodeFieldNodes.Any(item => item.DatabaseNodeField.IsSearchable))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no database node field nodes found.", batchItem);
                     }
                     // Update the node.
-                    node.Name = nodeFieldNodes.First(item => item.DatabaseNodeField.IsSearchable).Value;
+                    node.Name = databaseNodeFieldNodes
+                            .FirstOrDefault(item => item.DatabaseNodeField.IsSearchable)?.Value ?? "Unnamed node";
                     node.Description = batchItem.Description;
-                    node.DatabaseNodeFieldNodes = nodeFieldNodes.ToList();
-                    node.DatabaseNodes = nodeFieldNodes
+                    node.DatabaseNodeFieldNodes = databaseNodeFieldNodes.ToList();
+                    node.DatabaseNodes = databaseNodeFieldNodes
                         .Select(item => item.DatabaseNodeField.Database)
                         .Distinct()
                         .Select(item => new DatabaseNode
@@ -273,32 +279,38 @@ namespace NetControl4BioMed.Helpers.Tasks
                         })
                         .ToList();
                     // Add the node to the list.
-                    nodesToUpdate.Add(node);
+                    nodesToEdit.Add(node);
                 }
                 // Get the networks and analyses that contain the nodes.
                 var networks = context.Networks
-                    .Where(item => item.NetworkNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
+                    .Where(item => item.NetworkNodes.Any(item1 => nodesToEdit.Contains(item1.Node)));
                 var analyses = context.Analyses
-                    .Where(item => item.AnalysisNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)));
+                    .Where(item => item.AnalysisNodes.Any(item1 => nodesToEdit.Contains(item1.Node)));
                 // Delete the items.
                 IQueryableExtensions.Delete(analyses, context, token);
                 IQueryableExtensions.Delete(networks, context, token);
-                // Update the items.
-                IEnumerableExtensions.Edit(nodesToUpdate, context, token);
+                // Edit the items.
+                IEnumerableExtensions.Edit(nodesToEdit, context, token);
                 // Get the edges that contain the nodes.
                 var edges = context.Edges
-                    .Where(item => item.EdgeNodes.Any(item1 => nodesToUpdate.Contains(item1.Node)))
+                    .Where(item => item.EdgeNodes.Any(item1 => nodesToEdit.Contains(item1.Node)))
                     .Include(item => item.EdgeNodes)
                         .ThenInclude(item => item.Node)
-                    .AsEnumerable();
+                    .AsQueryable();
                 // Go over each edge.
                 foreach (var edge in edges)
                 {
                     // Update its name.
-                    edge.Name = string.Concat(edge.EdgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " -> ", edge.EdgeNodes.First(item => item.Type == EdgeNodeType.Target).Node.Name);
+                    edge.Name = string.Concat(edge.EdgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " - ", edge.EdgeNodes.First(item => item.Type == EdgeNodeType.Target).Node.Name);
                 }
                 // Update the items.
                 IEnumerableExtensions.Edit(edges, context, token);
+                // Go over each item.
+                foreach (var node in nodesToEdit)
+                {
+                    // Yield return it.
+                    yield return node;
+                }
             }
         }
 
@@ -331,7 +343,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the current batch IDs.
