@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
@@ -36,7 +37,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -65,11 +66,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                 if (batchIds.Distinct().Count() != batchIds.Count())
                 {
                     // Throw an exception.
-                    throw new ArgumentException("Two or more of the manually provided IDs are duplicated.");
+                    throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
                 // Get the valid IDs, that do not appear in the database.
                 var validBatchIds = batchIds
-                    .Except(context.DatabaseTypes
+                    .Except(context.Databases
                         .Where(item => batchIds.Contains(item.Id))
                         .Select(item => item.Id));
                 // Get the IDs of the related entities that appear in the current batch.
@@ -97,13 +98,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (context.Databases.Any(item => item.Name == batchItem.Name) || databasesToAdd.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"A database with the name \"{batchItem.Name}\" already exists.");
+                        throw new TaskException("A database with the same name already exists.", batchItem);
                     }
                     // Check if there was no database type provided.
                     if (batchItem.DatabaseType == null || string.IsNullOrEmpty(batchItem.DatabaseType.Id))
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"There was no database type provided for the database \"{batchItem.Name}\".");
+                        throw new TaskException("There was no database type provided.", batchItem);
                     }
                     // Get the database type.
                     var databaseType = batchDatabaseTypes
@@ -112,13 +113,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseType == null)
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"There was no database type found for the database \"{batchItem.Name}\".");
+                        throw new TaskException("There was no database type found.", batchItem);
                     }
                     // Check if the database type is generic.
                     if (databaseType.Name == "Generic")
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"The database \"{batchItem.Name}\" can't be generic.");
+                        throw new TaskException($"The database can't be generic.", batchItem);
                     }
                     // Define the new item.
                     var database = new Database
@@ -163,7 +164,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -189,16 +190,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the IDs of the related entities that appear in the current batch.
-                var batchDatabaseTypeIds = batchItems
-                    .Where(item => item.DatabaseType != null)
-                    .Select(item => item.DatabaseType)
-                    .Where(item => !string.IsNullOrEmpty(item.Id))
-                    .Select(item => item.Id)
-                    .Distinct();
-                // Get the related entities that appear in the current batch.
-                var batchDatabaseTypes = context.DatabaseTypes
-                    .Where(item => batchDatabaseTypeIds.Contains(item.Id));
                 // Get the items corresponding to the current batch.
                 var databases = context.Databases
                     .Where(item => batchIds.Contains(item.Id));
@@ -221,13 +212,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (database.DatabaseType.Name == "Generic")
                     {
                         // Throw an exception.
-                        throw new ArgumentException("The generic database can't be edited.");
+                        throw new TaskException("The generic database can't be edited.", batchItem);
                     }
                     // Check if there is another database with the same name.
                     if (context.Databases.Any(item => item.Id != database.Id && item.Name == batchItem.Name) || databasesToEdit.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"A database with the name \"{batchItem.Name}\" already exists.");
+                        throw new TaskException("A database with the same name already exists.", batchItem);
                     }
                     // Update the item.
                     database.Name = batchItem.Name;
@@ -259,7 +250,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);

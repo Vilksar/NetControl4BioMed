@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Enumerations;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
@@ -35,7 +35,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -66,11 +66,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                 if (batchIds.Distinct().Count() != batchIds.Count())
                 {
                     // Throw an exception.
-                    throw new ArgumentException("Two or more of the manually provided IDs are duplicated.");
+                    throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
                 // Get the valid IDs, that do not appear in the database.
                 var validBatchIds = batchIds
-                    .Except(context.DatabaseTypes
+                    .Except(context.Roles
                         .Where(item => batchIds.Contains(item.Id))
                         .Select(item => item.Id));
                 // Go over each item in the current batch.
@@ -99,16 +99,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
                     {
-                        // Define the exception message.
-                        var message = string.Empty;
-                        // Go over each of the encountered errors.
-                        foreach (var error in result.Errors)
-                        {
-                            // Add the error to the message.
-                            message += error.Description;
-                        }
+                        // Define the exception messages.
+                        var messages = result.Errors
+                            .Select(item => item.Description);
                         // Throw an exception.
-                        throw new DbUpdateException(message);
+                        throw new TaskException(string.Join(" ", messages), batchItem);
                     }
                     // Yield return the item.
                     yield return role;
@@ -128,7 +123,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -182,16 +177,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
                     {
-                        // Define the exception message.
-                        var message = string.Empty;
-                        // Go over each of the encountered errors.
-                        foreach (var error in result.Errors)
-                        {
-                            // Add the error to the message.
-                            message += error.Description;
-                        }
+                        // Define the exception messages.
+                        var messages = result.Errors
+                            .Select(item => item.Description);
                         // Throw an exception.
-                        throw new DbUpdateException(message);
+                        throw new TaskException(string.Join(" ", messages), batchItem);
                     }
                     // Yield return the item.
                     yield return role;
@@ -210,7 +200,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -246,16 +236,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
                     {
-                        // Define the exception message.
-                        var message = string.Empty;
-                        // Go over each of the encountered errors.
-                        foreach (var error in result.Errors)
-                        {
-                            // Add the error to the message.
-                            message += error.Description;
-                        }
+                        // Define the exception messages.
+                        var messages = result.Errors
+                            .Select(item => item.Description);
                         // Throw an exception.
-                        throw new DbUpdateException(message);
+                        throw new TaskException(string.Join(" ", messages));
                     }
                 }
             }

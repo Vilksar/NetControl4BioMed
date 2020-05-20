@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
@@ -35,7 +36,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -64,7 +65,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 if (batchIds.Distinct().Count() != batchIds.Count())
                 {
                     // Throw an exception.
-                    throw new ArgumentException("Two or more of the manually provided IDs are duplicated.");
+                    throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
                 // Get the valid IDs, that do not appear in the database.
                 var validBatchIds = batchIds
@@ -86,7 +87,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (context.DatabaseTypes.Any(item => item.Name == batchItem.Name) || databaseTypesToAdd.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"A database type with the name \"{batchItem.Name}\" already exists.");
+                        throw new TaskException("A database type with the same name already exists.", batchItem);
                     }
                     // Define the new item.
                     var databaseType = new DatabaseType
@@ -127,7 +128,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -174,13 +175,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseType.Name == "Generic")
                     {
                         // Throw an exception.
-                        throw new ArgumentException("The generic database type can't be edited.");
+                        throw new TaskException("The generic database type can't be edited.", batchItem);
                     }
                     // Check if there is another database type with the same name.
                     if (context.DatabaseTypes.Any(item => item.Id != databaseType.Id && item.Name == batchItem.Name) || databaseTypesToEdit.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"A database type with the name \"{batchItem.Name}\" already exists.");
+                        throw new TaskException("A database type with the same name already exists.", batchItem);
                     }
                     // Update the item.
                     databaseType.Name = batchItem.Name;
@@ -210,7 +211,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
@@ -35,7 +36,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -81,7 +82,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.Network == null || string.IsNullOrEmpty(batchItem.Network.Id))
                     {
                         // Throw an exception.
-                        throw new ArgumentException("There was no network provided for the network user invitation.");
+                        throw new TaskException("There was no network provided.", batchItem);
                     }
                     // Get the network.
                     var network = batchNetworks
@@ -90,13 +91,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (network == null)
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"There was no network found for the network user invitation.");
+                        throw new TaskException("There was no network found.", batchItem);
                     }
                     // Check if there was no e-mail provided.
                     if (string.IsNullOrEmpty(batchItem.Email))
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"There was no e-mail provided for the network user invitation.");
+                        throw new TaskException("There was no e-mail provided.", batchItem);
                     }
                     // Try to get the user.
                     var user = batchUsers
@@ -105,7 +106,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (user != null)
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"The user with the provided e-mail already exists.");
+                        throw new TaskException("The user with the provided e-mail already exists.", batchItem);
                     }
                     // Define the new item.
                     var networkUserInvitation = new NetworkUserInvitation
@@ -140,7 +141,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);

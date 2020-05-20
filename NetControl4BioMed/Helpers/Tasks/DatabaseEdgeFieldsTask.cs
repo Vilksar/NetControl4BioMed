@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
@@ -35,7 +36,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -64,11 +65,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                 if (batchIds.Distinct().Count() != batchIds.Count())
                 {
                     // Throw an exception.
-                    throw new ArgumentException("Two or more of the manually provided IDs are duplicated.");
+                    throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
                 // Get the valid IDs, that do not appear in the database.
                 var validBatchIds = batchIds
-                    .Except(context.DatabaseTypes
+                    .Except(context.DatabaseEdgeFields
                         .Where(item => batchIds.Contains(item.Id))
                         .Select(item => item.Id));
                 // Get the IDs of the related entities that appear in the current batch.
@@ -96,13 +97,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (context.DatabaseEdgeFields.Any(item => item.Name == batchItem.Name) || databaseEdgeFieldsToAdd.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"A database edge field with the name \"{batchItem.Name}\" already exists.");
+                        throw new TaskException("A database edge field with the same name already exists.", batchItem);
                     }
                     // Check if there was no database provided.
                     if (batchItem.Database == null || string.IsNullOrEmpty(batchItem.Database.Id))
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"There was no database provided for the database edge field \"{batchItem.Name}\".");
+                        throw new TaskException("There was no database provided.", batchItem);
                     }
                     // Get the database.
                     var database = batchDatabases
@@ -112,13 +113,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (database == null)
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"There was no database found for the database edge field \"{batchItem.Name}\".");
+                        throw new TaskException("There was no database found.", batchItem);
                     }
                     // Check if the database is generic.
                     if (database.DatabaseType.Name == "Generic")
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"The database edge field \"{batchItem.Name}\" can't be generic.");
+                        throw new TaskException("The database edge field can't be generic.", batchItem);
                     }
                     // Define the new item.
                     var databaseEdgeField = new DatabaseEdgeField
@@ -163,7 +164,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -222,13 +223,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseEdgeField.Database.DatabaseType.Name == "Generic")
                     {
                         // Throw an exception.
-                        throw new ArgumentException("The generic database edge field can't be edited.");
+                        throw new TaskException("The generic database edge field can't be edited.", batchItem);
                     }
                     // Check if there is another database edge field with the same name.
                     if (context.DatabaseEdgeFields.Any(item => item.Id != databaseEdgeField.Id && item.Name == batchItem.Name) || databaseEdgeFieldsToEdit.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"A database edge field with the name \"{batchItem.Name}\" already exists.");
+                        throw new TaskException("A database edge field with the name already exists.", batchItem);
                     }
                     // Update the item.
                     databaseEdgeField.Name = batchItem.Name;
@@ -260,7 +261,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);

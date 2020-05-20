@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
@@ -35,7 +36,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -83,7 +84,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.Network == null || string.IsNullOrEmpty(batchItem.Network.Id))
                     {
                         // Throw an exception.
-                        throw new ArgumentException("There was no network provided for the network user.");
+                        throw new TaskException("There was no network provided.", batchItem);
                     }
                     // Get the network.
                     var network = batchNetworks
@@ -92,13 +93,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (network == null)
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"There was no network found for the network user.");
+                        throw new TaskException("There was no network found.", batchItem);
                     }
                     // Check if there was no user provided.
                     if (batchItem.User == null || string.IsNullOrEmpty(batchItem.User.Id))
                     {
                         // Throw an exception.
-                        throw new ArgumentException("There was no user provided for the network user.");
+                        throw new TaskException("There was no user provided.", batchItem);
                     }
                     // Get the user.
                     var user = batchUsers
@@ -107,7 +108,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (user == null)
                     {
                         // Throw an exception.
-                        throw new ArgumentException($"There was no user found for the network user.");
+                        throw new TaskException("There was no user found.", batchItem);
                     }
                     // Define the new item.
                     var networkUser = new NetworkUser
@@ -143,7 +144,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);

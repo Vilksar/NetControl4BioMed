@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
@@ -37,7 +38,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -68,11 +69,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                 if (batchIds.Distinct().Count() != batchIds.Count())
                 {
                     // Throw an exception.
-                    throw new ArgumentException("Two or more of the manually provided IDs are duplicated.");
+                    throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
                 // Get the valid IDs, that do not appear in the database.
                 var validBatchIds = batchIds
-                    .Except(context.DatabaseTypes
+                    .Except(context.Users
                         .Where(item => batchIds.Contains(item.Id))
                         .Select(item => item.Id));
                 // Go over each item in the current batch.
@@ -106,7 +107,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         if (!batchItem.Data.TryDeserializeJsonObject<string>(out var password))
                         {
                             // Throw an exception.
-                            throw new ArgumentException("The provided data couldn't be deserialized.");
+                            throw new TaskException("The provided data couldn't be deserialized.", batchItem);
                         }
                         // Try to create the new user.
                         result = result.Succeeded? Task.Run(() => userManager.CreateAsync(user, password)).Result : result;
@@ -117,7 +118,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         if (!batchItem.Data.TryDeserializeJsonObject<ExternalLoginInfo>(out var info))
                         {
                             // Throw an exception.
-                            throw new ArgumentException("The provided data couldn't be deserialized.");
+                            throw new TaskException("The provided data couldn't be deserialized.", batchItem);
                         }
                         // Try to create the new user.
                         result = result.Succeeded ? Task.Run(() => userManager.CreateAsync(user)).Result : result;
@@ -127,7 +128,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     else
                     {
                         // Throw an exception.
-                        throw new ArgumentException("The provided data type is invalid.");
+                        throw new TaskException("The provided data type is invalid.", batchItem);
                     }
                     // Check if the e-mail should be set as confirmed.
                     if (batchItem.EmailConfirmed)
@@ -140,16 +141,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
                     {
-                        // Define the exception message.
-                        var message = string.Empty;
-                        // Go over each of the encountered errors.
-                        foreach (var error in result.Errors)
-                        {
-                            // Add the error to the message.
-                            message += error.Description;
-                        }
+                        // Define the exception messages.
+                        var messages = result.Errors
+                            .Select(item => item.Description);
                         // Throw an exception.
-                        throw new DbUpdateException(message);
+                        throw new TaskException(string.Join(" ", messages), batchItem);
                     }
                     // Get all the databases, networks and analyses to which the user already has access.
                     var databaseUserInvitations = context.DatabaseUserInvitations
@@ -209,7 +205,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -272,16 +268,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
                     {
-                        // Define the exception message.
-                        var message = string.Empty;
-                        // Go over each of the encountered errors.
-                        foreach (var error in result.Errors)
-                        {
-                            // Add the error to the message.
-                            message += error.Description;
-                        }
+                        // Define the exception messages.
+                        var messages = result.Errors
+                            .Select(item => item.Description);
                         // Throw an exception.
-                        throw new DbUpdateException(message);
+                        throw new TaskException(string.Join(" ", messages), batchItem);
                     }
                     // Yield return the item.
                     yield return user;
@@ -300,7 +291,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -336,16 +327,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if the operation has failed.
                     if (!result.Succeeded)
                     {
-                        // Define the exception message.
-                        var message = string.Empty;
-                        // Go over each of the encountered errors.
-                        foreach (var error in result.Errors)
-                        {
-                            // Add the error to the message.
-                            message += error.Description;
-                        }
+                        // Define the exception messages.
+                        var messages = result.Errors
+                            .Select(item => item.Description);
                         // Throw an exception.
-                        throw new DbUpdateException(message);
+                        throw new TaskException(string.Join(" ", messages));
                     }
                 }
                 // Get the related entities that use the items.
