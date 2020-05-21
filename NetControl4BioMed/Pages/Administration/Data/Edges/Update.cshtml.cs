@@ -24,55 +24,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
     [Authorize(Roles = "Administrator")]
     public class UpdateModel : PageModel
     {
-        private static List<EdgeInputModel> DefaultEdgeInputModel { get; } = new List<EdgeInputModel>
-        {
-            new EdgeInputModel
-            {
-                Id = "ID",
-                Description = "Description",
-                DatabaseEdges = new List<DatabaseEdgeInputModel>
-                {
-                    new DatabaseEdgeInputModel
-                    {
-                        Database = new DatabaseInputModel
-                        {
-                            Id = "Database ID"
-                        }
-                    }
-                },
-                EdgeNodes = new List<EdgeNodeInputModel>
-                {
-                    new EdgeNodeInputModel
-                    {
-                        Node = new NodeInputModel
-                        {
-                            Id = "Node ID"
-                        },
-                        Type = "Source"
-                    },
-                    new EdgeNodeInputModel
-                    {
-                        Node = new NodeInputModel
-                        {
-                            Id = "Node ID"
-                        },
-                        Type = "Target"
-                    }
-                },
-                DatabaseEdgeFieldEdges = new List<DatabaseEdgeFieldEdgeInputModel>
-                {
-                    new DatabaseEdgeFieldEdgeInputModel
-                    {
-                        DatabaseEdgeField = new DatabaseEdgeFieldInputModel
-                        {
-                            Id = "Database edge field ID"
-                        },
-                        Value = "Value"
-                    }
-                }
-            }
-        };
-
         private readonly ApplicationDbContext _context;
 
         public UpdateModel(ApplicationDbContext context)
@@ -112,7 +63,54 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(DefaultEdgeInputModel, jsonSerializerOptions)
+                JsonModel = JsonSerializer.Serialize(new List<EdgeInputModel>
+                {
+                    new EdgeInputModel
+                    {
+                        Id = "ID",
+                        Description = "Description",
+                        DatabaseEdges = new List<DatabaseEdgeInputModel>
+                        {
+                            new DatabaseEdgeInputModel
+                            {
+                                Database = new DatabaseInputModel
+                                {
+                                    Id = "Database ID"
+                                }
+                            }
+                        },
+                        EdgeNodes = new List<EdgeNodeInputModel>
+                        {
+                            new EdgeNodeInputModel
+                            {
+                                Node = new NodeInputModel
+                                {
+                                    Id = "Node ID"
+                                },
+                                Type = "Source"
+                            },
+                            new EdgeNodeInputModel
+                            {
+                                Node = new NodeInputModel
+                                {
+                                    Id = "Node ID"
+                                },
+                                Type = "Target"
+                            }
+                        },
+                        DatabaseEdgeFieldEdges = new List<DatabaseEdgeFieldEdgeInputModel>
+                        {
+                            new DatabaseEdgeFieldEdgeInputModel
+                            {
+                                DatabaseEdgeField = new DatabaseEdgeFieldInputModel
+                                {
+                                    Id = "Database edge field ID"
+                                },
+                                Value = "Value"
+                            }
+                        }
+                    }
+                }, jsonSerializerOptions)
             };
             // Check if there are any IDs provided.
             ids ??= Enumerable.Empty<string>();
@@ -174,7 +172,54 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(DefaultEdgeInputModel, jsonSerializerOptions)
+                JsonModel = JsonSerializer.Serialize(new List<EdgeInputModel>
+                {
+                    new EdgeInputModel
+                    {
+                        Id = "ID",
+                        Description = "Description",
+                        DatabaseEdges = new List<DatabaseEdgeInputModel>
+                        {
+                            new DatabaseEdgeInputModel
+                            {
+                                Database = new DatabaseInputModel
+                                {
+                                    Id = "Database ID"
+                                }
+                            }
+                        },
+                        EdgeNodes = new List<EdgeNodeInputModel>
+                        {
+                            new EdgeNodeInputModel
+                            {
+                                Node = new NodeInputModel
+                                {
+                                    Id = "Node ID"
+                                },
+                                Type = "Source"
+                            },
+                            new EdgeNodeInputModel
+                            {
+                                Node = new NodeInputModel
+                                {
+                                    Id = "Node ID"
+                                },
+                                Type = "Target"
+                            }
+                        },
+                        DatabaseEdgeFieldEdges = new List<DatabaseEdgeFieldEdgeInputModel>
+                        {
+                            new DatabaseEdgeFieldEdgeInputModel
+                            {
+                                DatabaseEdgeField = new DatabaseEdgeFieldInputModel
+                                {
+                                    Id = "Database edge field ID"
+                                },
+                                Value = "Value"
+                            }
+                        }
+                    }
+                }, jsonSerializerOptions)
             };
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)

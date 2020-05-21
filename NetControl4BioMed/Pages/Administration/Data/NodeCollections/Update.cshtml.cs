@@ -24,36 +24,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
     [Authorize(Roles = "Administrator")]
     public class UpdateModel : PageModel
     {
-        private static List<NodeCollectionInputModel> DefaultNodeCollectionInputModel { get; } = new List<NodeCollectionInputModel>
-        {
-            new NodeCollectionInputModel
-            {
-                Id = "ID",
-                Name = "Name",
-                Description = "Description",
-                NodeCollectionDatabases = new List<NodeCollectionDatabaseInputModel>
-                {
-                    new NodeCollectionDatabaseInputModel
-                    {
-                        Database = new DatabaseInputModel
-                        {
-                            Id = "Database ID"
-                        }
-                    }
-                },
-                NodeCollectionNodes = new List<NodeCollectionNodeInputModel>
-                {
-                    new NodeCollectionNodeInputModel
-                    {
-                        Node = new NodeInputModel
-                        {
-                            Id = "Node ID"
-                        }
-                    }
-                }
-            }
-        };
-
         private readonly ApplicationDbContext _context;
 
         public UpdateModel(ApplicationDbContext context)
@@ -93,7 +63,35 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(DefaultNodeCollectionInputModel, jsonSerializerOptions)
+                JsonModel = JsonSerializer.Serialize(new List<NodeCollectionInputModel>
+                {
+                    new NodeCollectionInputModel
+                    {
+                        Id = "ID",
+                        Name = "Name",
+                        Description = "Description",
+                        NodeCollectionDatabases = new List<NodeCollectionDatabaseInputModel>
+                        {
+                            new NodeCollectionDatabaseInputModel
+                            {
+                                Database = new DatabaseInputModel
+                                {
+                                    Id = "Database ID"
+                                }
+                            }
+                        },
+                        NodeCollectionNodes = new List<NodeCollectionNodeInputModel>
+                        {
+                            new NodeCollectionNodeInputModel
+                            {
+                                Node = new NodeInputModel
+                                {
+                                    Id = "Node ID"
+                                }
+                            }
+                        }
+                    }
+                }, jsonSerializerOptions)
             };
             // Check if there are any IDs provided.
             ids ??= Enumerable.Empty<string>();
@@ -141,7 +139,35 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(DefaultNodeCollectionInputModel, jsonSerializerOptions)
+                JsonModel = JsonSerializer.Serialize(new List<NodeCollectionInputModel>
+                {
+                    new NodeCollectionInputModel
+                    {
+                        Id = "ID",
+                        Name = "Name",
+                        Description = "Description",
+                        NodeCollectionDatabases = new List<NodeCollectionDatabaseInputModel>
+                        {
+                            new NodeCollectionDatabaseInputModel
+                            {
+                                Database = new DatabaseInputModel
+                                {
+                                    Id = "Database ID"
+                                }
+                            }
+                        },
+                        NodeCollectionNodes = new List<NodeCollectionNodeInputModel>
+                        {
+                            new NodeCollectionNodeInputModel
+                            {
+                                Node = new NodeInputModel
+                                {
+                                    Id = "Node ID"
+                                }
+                            }
+                        }
+                    }
+                }, jsonSerializerOptions)
             };
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)

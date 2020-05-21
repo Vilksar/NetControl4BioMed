@@ -24,26 +24,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
     [Authorize(Roles = "Administrator")]
     public class UpdateModel : PageModel
     {
-        private static List<NodeInputModel> DefaultNodeInputModel { get; } = new List<NodeInputModel>
-        {
-            new NodeInputModel
-            {
-                Id = "ID",
-                Description = "Description",
-                DatabaseNodeFieldNodes = new List<DatabaseNodeFieldNodeInputModel>
-                {
-                    new DatabaseNodeFieldNodeInputModel
-                    {
-                        DatabaseNodeField = new DatabaseNodeFieldInputModel
-                        {
-                            Id = "Database node field ID"
-                        },
-                        Value = "Value"
-                    }
-                }
-            }
-        };
-
         private readonly ApplicationDbContext _context;
 
         public UpdateModel(ApplicationDbContext context)
@@ -83,7 +63,25 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(DefaultNodeInputModel, jsonSerializerOptions)
+                JsonModel = JsonSerializer.Serialize(new List<NodeInputModel>
+                {
+                    new NodeInputModel
+                    {
+                        Id = "ID",
+                        Description = "Description",
+                        DatabaseNodeFieldNodes = new List<DatabaseNodeFieldNodeInputModel>
+                        {
+                            new DatabaseNodeFieldNodeInputModel
+                            {
+                                DatabaseNodeField = new DatabaseNodeFieldInputModel
+                                {
+                                    Id = "Database node field ID"
+                                },
+                                Value = "Value"
+                            }
+                        }
+                    }
+                }, jsonSerializerOptions)
             };
             // Check if there are any IDs provided.
             ids ??= Enumerable.Empty<string>();
@@ -125,7 +123,25 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(DefaultNodeInputModel, jsonSerializerOptions)
+                JsonModel = JsonSerializer.Serialize(new List<NodeInputModel>
+                {
+                    new NodeInputModel
+                    {
+                        Id = "ID",
+                        Description = "Description",
+                        DatabaseNodeFieldNodes = new List<DatabaseNodeFieldNodeInputModel>
+                        {
+                            new DatabaseNodeFieldNodeInputModel
+                            {
+                                DatabaseNodeField = new DatabaseNodeFieldInputModel
+                                {
+                                    Id = "Database node field ID"
+                                },
+                                Value = "Value"
+                            }
+                        }
+                    }
+                }, jsonSerializerOptions)
             };
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
