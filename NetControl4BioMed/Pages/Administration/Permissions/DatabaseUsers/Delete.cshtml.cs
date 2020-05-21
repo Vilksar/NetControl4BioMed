@@ -131,8 +131,14 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
                 {
                     Items = View.Items.Select(item => new DatabaseUserInputModel
                     {
-                        DatabaseId = item.DatabaseId,
-                        UserId = item.UserId
+                        Database = new DatabaseInputModel
+                        {
+                            Id = item.Database.Id
+                        },
+                        User = new UserInputModel
+                        {
+                            Id = item.User.Id
+                        }
                     })
                 })
             };
