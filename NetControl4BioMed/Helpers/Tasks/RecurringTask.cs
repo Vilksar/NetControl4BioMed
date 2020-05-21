@@ -17,9 +17,9 @@ using System.Threading.Tasks;
 namespace NetControl4BioMed.Helpers.Tasks
 {
     /// <summary>
-    /// Implements a task to clean the database.
+    /// Implements a recurring task database.
     /// </summary>
-    public class CleaningTask
+    public class RecurringTask
     {
         /// <summary>
         /// Gets or sets the HTTP context scheme.
@@ -47,28 +47,11 @@ namespace NetControl4BioMed.Helpers.Tasks
         public int DaysBeforeDelete { get; set; }
 
         /// <summary>
-        /// Cleans the database.
-        /// </summary>
-        /// <param name="serviceProvider">The application service provider.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        public void Clean(IServiceProvider serviceProvider, CancellationToken token)
-        {
-            // Stop the long running analyses.
-            StopAnalyses(serviceProvider, token);
-            // Alert on deleting the long standing items.
-            AlertItems(serviceProvider, token);
-            // Delete the long standing networks.
-            DeleteNetworks(serviceProvider, token);
-            // Delete the long standing analyses.
-            DeleteAnalyses(serviceProvider, token);
-        }
-
-        /// <summary>
         /// Stops the long-running analyses.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        private void StopAnalyses(IServiceProvider serviceProvider, CancellationToken token)
+        public void StopAnalyses(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Create a new scope.
             using var scope = serviceProvider.CreateScope();
@@ -98,7 +81,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        private void AlertItems(IServiceProvider serviceProvider, CancellationToken token)
+        public void AlertUsers(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Create a new scope.
             using var scope = serviceProvider.CreateScope();
@@ -176,7 +159,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        private void DeleteNetworks(IServiceProvider serviceProvider, CancellationToken token)
+        public void DeleteNetworks(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Create a new scope.
             using var scope = serviceProvider.CreateScope();
@@ -205,7 +188,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        private void DeleteAnalyses(IServiceProvider serviceProvider, CancellationToken token)
+        public void DeleteAnalyses(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Create a new scope.
             using var scope = serviceProvider.CreateScope();

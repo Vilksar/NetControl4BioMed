@@ -389,23 +389,6 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
-        /// Cleans the database of long-standing items.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        public void Clean(string id, CancellationToken token)
-        {
-            // Get the background task with the provided ID.
-            var backgroundTask = GetBackgroundTask(id);
-           // Get the task corresponding to the background task.
-            var task = GetTask<CleaningTask>(backgroundTask);
-            // Run the task.
-            task.Clean(_serviceProvider, token);
-            // Complete the task.
-            CompleteTask(backgroundTask);
-        }
-
-        /// <summary>
         /// Gets from the database the background task with the provided ID.
         /// </summary>
         /// <param name="id">The internal ID of the background task.</param>

@@ -261,40 +261,94 @@ namespace NetControl4BioMed.Pages.Administration
 
         public async Task<IActionResult> OnPostResetHangfireRecurrentJobsAsync()
         {
-            // Get the name of the task and job for cleaning the database.
-            var name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.Clean)}";
-            // Get the existing tasks.
-            var tasks = _context.BackgroundTasks
-                .Where(item => item.Name == name);
-            // Delete any existing jobs.
-            RecurringJob.RemoveIfExists(name);
-            // Mark the existing tasks for deletion.
-            _context.BackgroundTasks.RemoveRange(tasks);
+            // Define the names of the recurring background tasks.
+            var nameStopAnalyses = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.StopAnalyses)}";
+            var nameAlertUsers = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.AlertUsers)}";
+            var nameDeleteNetworks = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteNetworks)}";
+            var nameDeleteAnalyses = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteAnalyses)}";
+            // Delete the existing corresponding recurring jobs.
+            RecurringJob.RemoveIfExists(nameStopAnalyses);
+            RecurringJob.RemoveIfExists(nameAlertUsers);
+            RecurringJob.RemoveIfExists(nameDeleteNetworks);
+            RecurringJob.RemoveIfExists(nameDeleteAnalyses);
+            // Get the existing background tasks.
+            var backgroundTasks = _context.BackgroundTasks
+                .Where(item => item.Name == nameStopAnalyses || item.Name == nameAlertUsers || item.Name == nameDeleteNetworks || item.Name == nameDeleteAnalyses);
+            // Mark the existing background tasks for deletion.
+            _context.BackgroundTasks.RemoveRange(backgroundTasks);
             // Save the changes to the database.
             await _context.SaveChangesAsync();
-            // Define a new background task.
-            var task = new BackgroundTask
+            // Define the new background tasks.
+            var backgroundTaskStopAnalyses = new BackgroundTask
             {
                 DateTimeCreated = DateTime.Now,
-                Name = name,
+                Name = nameStopAnalyses,
                 IsRecurring = true,
-                Data = JsonSerializer.Serialize(new CleaningTask
+                Data = JsonSerializer.Serialize(new RecurringTask
                 {
                     Scheme = HttpContext.Request.Scheme,
                     HostValue = HttpContext.Request.Host.Value,
-                    DaysBeforeStop = 7,
-                    DaysBeforeAlert = 24,
-                    DaysBeforeDelete = 31
+                    DaysBeforeStop = ApplicationDbContext.DaysBeforeStop,
+                    DaysBeforeAlert = ApplicationDbContext.DaysBeforeAlert,
+                    DaysBeforeDelete = ApplicationDbContext.DaysBeforeDelete
                 })
             };
-            // Mark the background task for addition.
-            _context.BackgroundTasks.Add(task);
+            var backgroundTaskAlertUsers = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = nameAlertUsers,
+                IsRecurring = true,
+                Data = JsonSerializer.Serialize(new RecurringTask
+                {
+                    Scheme = HttpContext.Request.Scheme,
+                    HostValue = HttpContext.Request.Host.Value,
+                    DaysBeforeStop = ApplicationDbContext.DaysBeforeStop,
+                    DaysBeforeAlert = ApplicationDbContext.DaysBeforeAlert,
+                    DaysBeforeDelete = ApplicationDbContext.DaysBeforeDelete
+                })
+            };
+            var backgroundTaskDeleteNetworks = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = nameDeleteNetworks,
+                IsRecurring = true,
+                Data = JsonSerializer.Serialize(new RecurringTask
+                {
+                    Scheme = HttpContext.Request.Scheme,
+                    HostValue = HttpContext.Request.Host.Value,
+                    DaysBeforeStop = ApplicationDbContext.DaysBeforeStop,
+                    DaysBeforeAlert = ApplicationDbContext.DaysBeforeAlert,
+                    DaysBeforeDelete = ApplicationDbContext.DaysBeforeDelete
+                })
+            };
+            var backgroundTaskDeleteAnalyses = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = nameDeleteAnalyses,
+                IsRecurring = true,
+                Data = JsonSerializer.Serialize(new RecurringTask
+                {
+                    Scheme = HttpContext.Request.Scheme,
+                    HostValue = HttpContext.Request.Host.Value,
+                    DaysBeforeStop = ApplicationDbContext.DaysBeforeStop,
+                    DaysBeforeAlert = ApplicationDbContext.DaysBeforeAlert,
+                    DaysBeforeDelete = ApplicationDbContext.DaysBeforeDelete
+                })
+            };
+            // Mark the background tasks for addition.
+            _context.BackgroundTasks.Add(backgroundTaskStopAnalyses);
+            _context.BackgroundTasks.Add(backgroundTaskAlertUsers);
+            _context.BackgroundTasks.Add(backgroundTaskDeleteNetworks);
+            _context.BackgroundTasks.Add(backgroundTaskDeleteAnalyses);
             // Save the changes to the database.
             await _context.SaveChangesAsync();
-            // Create a new Hangfire daily recurring job.
-            RecurringJob.AddOrUpdate<IAdministrationTaskManager>(name, item => item.Clean(task.Id, CancellationToken.None), Cron.Daily());
+            // Create the new Hangfire daily recurring jobs.
+            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameStopAnalyses, item => item.StopAnalyses(backgroundTaskStopAnalyses.Id, CancellationToken.None), Cron.Daily());
+            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameAlertUsers, item => item.AlertUsers(backgroundTaskAlertUsers.Id, CancellationToken.None), Cron.Daily());
+            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteNetworks, item => item.DeleteNetworks(backgroundTaskDeleteNetworks.Id, CancellationToken.None), Cron.Daily());
+            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteAnalyses, item => item.DeleteAnalyses(backgroundTaskDeleteAnalyses.Id, CancellationToken.None), Cron.Daily());
             // Display a message.
-            TempData["StatusMessage"] = "Success: The database cleaning job has been successfully reset. You can view more details on the Hangfire dashboard.";
+            TempData["StatusMessage"] = "Success: The database recurring jobs have been successfully reset. You can view more details on the Hangfire dashboard.";
             // Redirect to the page.
             return RedirectToPage();
         }
