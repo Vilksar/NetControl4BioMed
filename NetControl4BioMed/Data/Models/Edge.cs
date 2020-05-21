@@ -31,6 +31,16 @@ namespace NetControl4BioMed.Data.Models
         public string Description { get; set; }
 
         /// <summary>
+        /// Gets or sets the databases in which appear the edge appears.
+        /// </summary>
+        public ICollection<DatabaseEdge> DatabaseEdges { get; set; }
+
+        /// <summary>
+        /// Gets or sets the edge database fields which have a value corresponding to the edge.
+        /// </summary>
+        public ICollection<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }
+
+        /// <summary>
         /// Gets or sets the nodes which appear in the edge.
         /// </summary>
         public ICollection<EdgeNode> EdgeNodes { get; set; }
@@ -49,15 +59,5 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the paths which contain the edge.
         /// </summary>
         public ICollection<PathEdge> PathEdges { get; set; }
-
-        /// <summary>
-        /// Gets or sets the databases in which appear the edge appears.
-        /// </summary>
-        public ICollection<DatabaseEdge> DatabaseEdges { get; set; }
-
-        /// <summary>
-        /// Gets or sets the edge database fields which have a value corresponding to the edge.
-        /// </summary>
-        public ICollection<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }
     }
 }

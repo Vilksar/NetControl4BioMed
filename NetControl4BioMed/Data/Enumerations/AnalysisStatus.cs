@@ -12,6 +12,18 @@ namespace NetControl4BioMed.Data.Enumerations
     public enum AnalysisStatus
     {
         /// <summary>
+        /// Represents an analysis which has encountered an error.
+        /// </summary>
+        [Display(Name = "Error", Description = "The analysis has encountered an error.")]
+        Error,
+
+        /// <summary>
+        /// Represents an analysis which has been defined.
+        /// </summary>
+        [Display(Name = "Defined", Description = "The analysis has been defined.")]
+        Defined,
+
+        /// <summary>
         /// Represents an analysis which has been scheduled to start.
         /// </summary>
         [Display(Name = "Scheduled", Description = "The analysis has been scheduled to start.")]
@@ -45,12 +57,6 @@ namespace NetControl4BioMed.Data.Enumerations
         /// Represents an analysis which has completed successfully.
         /// </summary>
         [Display(Name = "Completed", Description = "The analysis has completed successfully.")]
-        Completed,
-
-        /// <summary>
-        /// Represents an analysis which has encountered an error and will not be started again.
-        /// </summary>
-        [Display(Name = "Error", Description = "The analysis has encountered an error and will not be started again.")]
-        Error
+        Completed
     }
 }

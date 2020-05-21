@@ -31,9 +31,24 @@ namespace NetControl4BioMed.Data.Models
         public string Description { get; set; }
 
         /// <summary>
+        /// Gets or sets the databases in which appear the node appears.
+        /// </summary>
+        public ICollection<DatabaseNode> DatabaseNodes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the node database fields which have a value corresponding to the node.
+        /// </summary>
+        public ICollection<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }
+
+        /// <summary>
         /// Gets or sets the edges which contain the node.
         /// </summary>
         public ICollection<EdgeNode> EdgeNodes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the node collections which contain the node.
+        /// </summary>
+        public ICollection<NodeCollectionNode> NodeCollectionNodes { get; set; }
 
         /// <summary>
         /// Gets or sets the networks which contain the node.
@@ -49,20 +64,5 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the paths which contain the node.
         /// </summary>
         public ICollection<PathNode> PathNodes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the node collections which contain the node.
-        /// </summary>
-        public ICollection<NodeCollectionNode> NodeCollectionNodes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the databases in which appear the node appears.
-        /// </summary>
-        public ICollection<DatabaseNode> DatabaseNodes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the node database fields which have a value corresponding to the node.
-        /// </summary>
-        public ICollection<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }
     }
 }

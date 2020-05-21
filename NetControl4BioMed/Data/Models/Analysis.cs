@@ -42,14 +42,14 @@ namespace NetControl4BioMed.Data.Models
         public AnalysisStatus Status { get; set; }
 
         /// <summary>
-        /// Gets or sets the message log of the analysis, with an underlying format of List&lt;string&gt;.
+        /// Gets or sets the message log of the analysis.
         /// </summary>
         public string Log { get; set; }
 
         /// <summary>
-        /// Gets or sets the Hangfire job ID of the analysis.
+        /// Gets or sets the data used to generate the analysis.
         /// </summary>
-        public string JobId { get; set; }
+        public string Data { get; set; }
 
         /// <summary>
         /// Gets or sets the current iteration of the algorithm that the analysis uses.
@@ -92,6 +92,11 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<AnalysisUserInvitation> AnalysisUserInvitations { get; set; }
 
         /// <summary>
+        /// Gets or sets the databases which are used by the analysis.
+        /// </summary>
+        public ICollection<AnalysisDatabase> AnalysisDatabases { get; set; }
+
+        /// <summary>
         /// Gets or sets the nodes which appear in the network corresponding to the analysis.
         /// </summary>
         public ICollection<AnalysisNode> AnalysisNodes { get; set; }
@@ -102,19 +107,14 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<AnalysisEdge> AnalysisEdges { get; set; }
 
         /// <summary>
-        /// Gets or sets the networks which form the network corresponding to the analysis.
-        /// </summary>
-        public ICollection<AnalysisNetwork> AnalysisNetworks { get; set; }
-
-        /// <summary>
-        /// Gets or sets the databases which are used by the analysis.
-        /// </summary>
-        public ICollection<AnalysisDatabase> AnalysisDatabases { get; set; }
-
-        /// <summary>
         /// Gets or sets the node collections which are used by the analysis.
         /// </summary>
         public ICollection<AnalysisNodeCollection> AnalysisNodeCollections { get; set; }
+
+        /// <summary>
+        /// Gets or sets the networks which form the network corresponding to the analysis.
+        /// </summary>
+        public ICollection<AnalysisNetwork> AnalysisNetworks { get; set; }
 
         /// <summary>
         /// Gets or sets the control paths found by the analysis.
