@@ -19,11 +19,6 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class RolesTask
     {
         /// <summary>
-        /// Gets or sets the exception item show status.
-        /// </summary>
-        public bool ShowExceptionItem { get; set; }
-
-        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<RoleInputModel> Items { get; set; }
@@ -42,6 +37,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -108,7 +105,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         var messages = result.Errors
                             .Select(item => item.Description);
                         // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages), ShowExceptionItem, batchItem);
+                        throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                     }
                     // Yield return the item.
                     yield return role;
@@ -130,6 +127,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -186,7 +185,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         var messages = result.Errors
                             .Select(item => item.Description);
                         // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages), ShowExceptionItem, batchItem);
+                        throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                     }
                     // Yield return the item.
                     yield return role;

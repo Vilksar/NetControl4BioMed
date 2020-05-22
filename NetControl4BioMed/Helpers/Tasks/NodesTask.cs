@@ -21,11 +21,6 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class NodesTask
     {
         /// <summary>
-        /// Gets or sets the exception item show status.
-        /// </summary>
-        public bool ShowExceptionItem { get; set; }
-        
-        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<NodeInputModel> Items { get; set; }
@@ -42,8 +37,10 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -71,7 +68,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 if (batchIds.Distinct().Count() != batchIds.Count())
                 {
                     // Throw an exception.
-                    throw new ArgumentException("Two or more of the manually provided IDs are duplicated.");
+                    throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
                 // Get the valid IDs, that do not appear in the database.
                 var validBatchIds = batchIds
@@ -107,7 +104,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.DatabaseNodeFieldNodes == null || !batchItem.DatabaseNodeFieldNodes.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database node field nodes provided.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There were no database node field nodes provided.", showExceptionItem, batchItem);
                     }
                     // Get the database node field nodes.
                     var databaseNodeFieldNodes = batchItem.DatabaseNodeFieldNodes
@@ -129,7 +126,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseNodeFieldNodes == null || !databaseNodeFieldNodes.Any(item => item.DatabaseNodeField.IsSearchable))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database node field nodes found.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There were no database node field nodes found.", showExceptionItem, batchItem);
                     }
                     // Define the new node.
                     var node = new Node
@@ -181,8 +178,10 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -243,7 +242,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.DatabaseNodeFieldNodes == null || !batchItem.DatabaseNodeFieldNodes.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database node field nodes provided.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There were no database node field nodes provided.", showExceptionItem, batchItem);
                     }
                     // Get the database node field nodes.
                     var databaseNodeFieldNodes = batchItem.DatabaseNodeFieldNodes
@@ -265,7 +264,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseNodeFieldNodes == null || !databaseNodeFieldNodes.Any(item => item.DatabaseNodeField.IsSearchable))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database node field nodes found.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There were no database node field nodes found.", showExceptionItem, batchItem);
                     }
                     // Update the node.
                     node.Name = databaseNodeFieldNodes
@@ -329,7 +328,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);

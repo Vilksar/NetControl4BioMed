@@ -20,11 +20,6 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class DatabaseTypesTask
     {
         /// <summary>
-        /// Gets or sets the exception item show status.
-        /// </summary>
-        public bool ShowExceptionItem { get; set; }
-
-        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<DatabaseTypeInputModel> Items { get; set; }
@@ -43,6 +38,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -92,7 +89,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (context.DatabaseTypes.Any(item => item.Name == batchItem.Name) || databaseTypesToAdd.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new TaskException("A database type with the same name already exists.", ShowExceptionItem, batchItem);
+                        throw new TaskException("A database type with the same name already exists.", showExceptionItem, batchItem);
                     }
                     // Define the new item.
                     var databaseType = new DatabaseType
@@ -135,6 +132,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -180,13 +179,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseType.Name == "Generic")
                     {
                         // Throw an exception.
-                        throw new TaskException("The generic database type can't be edited.", ShowExceptionItem, batchItem);
+                        throw new TaskException("The generic database type can't be edited.", showExceptionItem, batchItem);
                     }
                     // Check if there is another database type with the same name.
                     if (context.DatabaseTypes.Any(item => item.Id != databaseType.Id && item.Name == batchItem.Name) || databaseTypesToEdit.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new TaskException("A database type with the same name already exists.", ShowExceptionItem, batchItem);
+                        throw new TaskException("A database type with the same name already exists.", showExceptionItem, batchItem);
                     }
                     // Update the item.
                     databaseType.Name = batchItem.Name;

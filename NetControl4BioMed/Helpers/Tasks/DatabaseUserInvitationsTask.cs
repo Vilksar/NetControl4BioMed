@@ -20,11 +20,6 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class DatabaseUserInvitationsTask
     {
         /// <summary>
-        /// Gets or sets the exception item show status.
-        /// </summary>
-        public bool ShowExceptionItem { get; set; }
-
-        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<DatabaseUserInvitationInputModel> Items { get; set; }
@@ -43,6 +38,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -87,7 +84,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.Database == null || string.IsNullOrEmpty(batchItem.Database.Id))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no database provided.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There was no database provided.", showExceptionItem, batchItem);
                     }
                     // Get the database.
                     var database = batchDatabases
@@ -96,13 +93,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (database == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no database found.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There was no database found.", showExceptionItem, batchItem);
                     }
                     // Check if there was no e-mail provided.
                     if (string.IsNullOrEmpty(batchItem.Email))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no e-mail provided.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There was no e-mail provided.", showExceptionItem, batchItem);
                     }
                     // Try to get the user.
                     var user = batchUsers
@@ -111,7 +108,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (user != null)
                     {
                         // Throw an exception.
-                        throw new TaskException("The user with the provided e-mail already exists.", ShowExceptionItem, batchItem);
+                        throw new TaskException("The user with the provided e-mail already exists.", showExceptionItem, batchItem);
                     }
                     // Define the new item.
                     var databaseUserInvitation = new DatabaseUserInvitation

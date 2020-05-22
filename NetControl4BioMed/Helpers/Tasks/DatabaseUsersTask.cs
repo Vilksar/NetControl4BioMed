@@ -20,11 +20,6 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class DatabaseUsersTask
     {
         /// <summary>
-        /// Gets or sets the exception item show status.
-        /// </summary>
-        public bool ShowExceptionItem { get; set; }
-
-        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<DatabaseUserInputModel> Items { get; set; }
@@ -43,6 +38,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -89,7 +86,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.Database == null || string.IsNullOrEmpty(batchItem.Database.Id))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no database provided.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There was no database provided.", showExceptionItem, batchItem);
                     }
                     // Get the database.
                     var database = batchDatabases
@@ -98,13 +95,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (database == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no database found.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There was no database found.", showExceptionItem, batchItem);
                     }
                     // Check if there was no user provided.
                     if (batchItem.User == null || string.IsNullOrEmpty(batchItem.User.Id))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no user provided.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There was no user provided.", showExceptionItem, batchItem);
                     }
                     // Get the user.
                     var user = batchUsers
@@ -113,7 +110,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (user == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no user found.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There was no user found.", showExceptionItem, batchItem);
                     }
                     // Define the new item.
                     var databaseUser = new DatabaseUser

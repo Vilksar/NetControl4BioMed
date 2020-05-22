@@ -22,11 +22,6 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class UsersTask
     {
         /// <summary>
-        /// Gets or sets the exception item show status.
-        /// </summary>
-        public bool ShowExceptionItem { get; set; }
-
-        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<UserInputModel> Items { get; set; }
@@ -45,6 +40,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -112,7 +109,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         if (!batchItem.Data.TryDeserializeJsonObject<string>(out var password))
                         {
                             // Throw an exception.
-                            throw new TaskException("The provided data couldn't be deserialized.", ShowExceptionItem, batchItem);
+                            throw new TaskException("The provided data couldn't be deserialized.", showExceptionItem, batchItem);
                         }
                         // Try to create the new user.
                         result = result.Succeeded? Task.Run(() => userManager.CreateAsync(user, password)).Result : result;
@@ -123,7 +120,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         if (!batchItem.Data.TryDeserializeJsonObject<ExternalLoginInfo>(out var info))
                         {
                             // Throw an exception.
-                            throw new TaskException("The provided data couldn't be deserialized.", ShowExceptionItem, batchItem);
+                            throw new TaskException("The provided data couldn't be deserialized.", showExceptionItem, batchItem);
                         }
                         // Try to create the new user.
                         result = result.Succeeded ? Task.Run(() => userManager.CreateAsync(user)).Result : result;
@@ -133,7 +130,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     else
                     {
                         // Throw an exception.
-                        throw new TaskException("The provided data type is invalid.", ShowExceptionItem, batchItem);
+                        throw new TaskException("The provided data type is invalid.", showExceptionItem, batchItem);
                     }
                     // Check if the e-mail should be set as confirmed.
                     if (batchItem.EmailConfirmed)
@@ -150,7 +147,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         var messages = result.Errors
                             .Select(item => item.Description);
                         // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages), ShowExceptionItem, batchItem);
+                        throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                     }
                     // Get all the databases, networks and analyses to which the user already has access.
                     var databaseUserInvitations = context.DatabaseUserInvitations
@@ -212,6 +209,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -277,7 +276,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         var messages = result.Errors
                             .Select(item => item.Description);
                         // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages), ShowExceptionItem, batchItem);
+                        throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                     }
                     // Yield return the item.
                     yield return user;

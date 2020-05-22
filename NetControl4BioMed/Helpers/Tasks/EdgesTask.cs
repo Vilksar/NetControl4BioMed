@@ -20,11 +20,6 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class EdgesTask
     {
         /// <summary>
-        /// Gets or sets the exception item show status.
-        /// </summary>
-        public bool ShowExceptionItem { get; set; }
-
-        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<EdgeInputModel> Items { get; set; }
@@ -43,6 +38,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -134,7 +131,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.EdgeNodes == null || !batchItem.EdgeNodes.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no edge nodes provided.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There were no edge nodes provided.", showExceptionItem, batchItem);
                     }
                     // Get the edge nodes.
                     var edgeNodes = batchItem.EdgeNodes
@@ -156,13 +153,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (edgeNodes == null || !edgeNodes.Any(item => item.Type == EdgeNodeType.Source) || !edgeNodes.Any(item => item.Type == EdgeNodeType.Target))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no edge nodes found.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There were no edge nodes found.", showExceptionItem, batchItem);
                     }
                     // Check if there were no database edges or database edge field edges provided.
                     if ((batchItem.DatabaseEdges == null || !batchItem.DatabaseEdges.Any()) && (batchItem.DatabaseEdgeFieldEdges == null || !batchItem.DatabaseEdgeFieldEdges.Any()))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database edges or database edge field edges provided.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There were no database edges or database edge field edges provided.", showExceptionItem, batchItem);
                     }
                     // Get the database edge field edges.
                     var databaseEdgeFieldEdges = batchItem.DatabaseEdgeFieldEdges != null ?
@@ -203,7 +200,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseEdges == null || !databaseEdges.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database edges found.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There were no database edges found.", showExceptionItem, batchItem);
                     }
                     // Define the new edge.
                     var edge = new Edge
@@ -253,6 +250,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -340,7 +339,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.EdgeNodes == null || !batchItem.EdgeNodes.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no edge nodes provided.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There were no edge nodes provided.", showExceptionItem, batchItem);
                     }
                     // Get the edge nodes.
                     var edgeNodes = batchItem.EdgeNodes
@@ -360,13 +359,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (edgeNodes == null || !edgeNodes.Any(item => item.Type == EdgeNodeType.Source) || !edgeNodes.Any(item => item.Type == EdgeNodeType.Target))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no edge nodes found.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There were no edge nodes found.", showExceptionItem, batchItem);
                     }
                     // Check if there were no database edges or database edge field edges provided.
                     if ((batchItem.DatabaseEdges == null || !batchItem.DatabaseEdges.Any()) && (batchItem.DatabaseEdgeFieldEdges == null || !batchItem.DatabaseEdgeFieldEdges.Any()))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database edges or database edge field edges provided.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There were no database edges or database edge field edges provided.", showExceptionItem, batchItem);
                     }
                     // Get the database edge field edges.
                     var databaseEdgeFieldEdges = batchItem.DatabaseEdgeFieldEdges != null ?
@@ -407,7 +406,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseEdges == null || !databaseEdges.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database edges found.", ShowExceptionItem, batchItem);
+                        throw new TaskException("There were no database edges found.", showExceptionItem, batchItem);
                     }
                     // Update the edge.
                     edge.Name = string.Concat(edgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " - ", edgeNodes.First(item => item.Type == EdgeNodeType.Target).Node.Name);
