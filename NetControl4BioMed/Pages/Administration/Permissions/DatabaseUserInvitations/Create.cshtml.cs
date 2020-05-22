@@ -98,7 +98,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
             try
             {
                 // Run the task.
-                var databaseUserInvitations = task.Create(_serviceProvider, CancellationToken.None).ToList();
+                _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {

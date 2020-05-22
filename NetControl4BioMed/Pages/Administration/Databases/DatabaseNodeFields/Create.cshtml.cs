@@ -112,7 +112,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
             try
             {
                 // Run the task.
-                var databaseNodeFields = task.Create(_serviceProvider, CancellationToken.None).ToList();
+                _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {

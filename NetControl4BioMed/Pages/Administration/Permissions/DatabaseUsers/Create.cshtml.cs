@@ -101,7 +101,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
             try
             {
                 // Run the task.
-                var databaseUsers = task.Create(_serviceProvider, CancellationToken.None).ToList();
+                _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {

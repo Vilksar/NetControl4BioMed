@@ -171,7 +171,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             try
             {
                 // Run the task.
-                var databases = task.Edit(_serviceProvider, CancellationToken.None).ToList();
+                _ = task.Edit(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {

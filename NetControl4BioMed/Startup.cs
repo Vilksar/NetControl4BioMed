@@ -154,7 +154,7 @@ namespace NetControl4BioMed
             });
             app.UseHangfireServer(new BackgroundJobServerOptions
             {
-                WorkerCount = Environment.ProcessorCount > 1 ? (Environment.ProcessorCount - 1) * 2 : 1
+                WorkerCount = Environment.ProcessorCount > 1 ? Environment.ProcessorCount - 1 : 1
             });
             // Seed the database.
             app.SeedDatabaseAsync(Configuration).Wait();

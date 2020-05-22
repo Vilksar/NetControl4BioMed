@@ -23,12 +23,18 @@ namespace NetControl4BioMed.Helpers.Services
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
+        /// Represents the application database context.
+        /// </summary>
+        private readonly ApplicationDbContext _context;
+
+        /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
-        public RecurringTaskManager(IServiceProvider serviceProvider)
+        public RecurringTaskManager(IServiceProvider serviceProvider, ApplicationDbContext context)
         {
             _serviceProvider = serviceProvider;
+            _context = context;
         }
 
         /// <summary>
@@ -44,8 +50,6 @@ namespace NetControl4BioMed.Helpers.Services
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
             task.StopAnalyses(_serviceProvider, token);
-            // Complete the task.
-            CompleteTask(backgroundTask);
         }
 
         /// <summary>
@@ -61,8 +65,6 @@ namespace NetControl4BioMed.Helpers.Services
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
             task.AlertUsers(_serviceProvider, token);
-            // Complete the task.
-            CompleteTask(backgroundTask);
         }
 
         /// <summary>
@@ -78,8 +80,6 @@ namespace NetControl4BioMed.Helpers.Services
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
             task.DeleteNetworks(_serviceProvider, token);
-            // Complete the task.
-            CompleteTask(backgroundTask);
         }
 
         /// <summary>
@@ -95,8 +95,6 @@ namespace NetControl4BioMed.Helpers.Services
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
             task.DeleteAnalyses(_serviceProvider, token);
-            // Complete the task.
-            CompleteTask(backgroundTask);
         }
 
         /// <summary>
@@ -106,12 +104,8 @@ namespace NetControl4BioMed.Helpers.Services
         /// <returns>The background task corresponding to the provided ID.</returns>
         private BackgroundTask GetBackgroundTask(string id)
         {
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Try to get the background task with the provided ID.
-            var backgroundTask = context.BackgroundTasks
+            var backgroundTask = _context.BackgroundTasks
                 .Where(item => item.Id == id)
                 .FirstOrDefault();
             // Check if there was any task found.
@@ -140,37 +134,6 @@ namespace NetControl4BioMed.Helpers.Services
             }
             // Return the task.
             return task;
-        }
-
-        /// <summary>
-        /// Completes the provided background task.
-        /// </summary>
-        /// <typeparam name="T">The type of the background job.</typeparam>
-        /// <param name="backgroundTask">The current background task.</param>
-        private void CompleteTask(BackgroundTask backgroundTask)
-        {
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            // Reload the background task.
-            context.Entry(backgroundTask).Reload();
-            // Check if the background task doesn't exist anymore.
-            if (backgroundTask == null)
-            {
-                // End the function.
-                return;
-            }
-            // Check if the background task is recurring.
-            if (backgroundTask.IsRecurring)
-            {
-                // End the function.
-                return;
-            }
-            // Mark the task for deletion.
-            context.BackgroundTasks.Remove(backgroundTask);
-            // Save the changes.
-            context.SaveChanges();
         }
     }
 }

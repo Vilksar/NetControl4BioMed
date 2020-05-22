@@ -190,16 +190,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the IDs of the related entities that appear in the current batch.
-                var batchDatabaseIds = batchItems
-                    .Where(item => item.Database != null)
-                    .Select(item => item.Database)
-                    .Where(item => !string.IsNullOrEmpty(item.Id))
-                    .Select(item => item.Id)
-                    .Distinct();
-                // Get the related entities that appear in the current batch.
-                var batchDatabases = context.Databases
-                    .Where(item => batchDatabaseIds.Contains(item.Id));
                 // Get the items corresponding to the current batch.
                 var databaseEdgeFields = context.DatabaseEdgeFields
                     .Where(item => batchIds.Contains(item.Id));
