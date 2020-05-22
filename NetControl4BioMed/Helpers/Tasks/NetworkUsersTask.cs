@@ -20,6 +20,11 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class NetworkUsersTask
     {
         /// <summary>
+        /// Gets or sets the exception item show status.
+        /// </summary>
+        public bool ShowExceptionItem { get; set; }
+
+        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<NetworkUserInputModel> Items { get; set; }
@@ -84,7 +89,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.Network == null || string.IsNullOrEmpty(batchItem.Network.Id))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no network provided.", batchItem);
+                        throw new TaskException("There was no network provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the network.
                     var network = batchNetworks
@@ -93,13 +98,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (network == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no network found.", batchItem);
+                        throw new TaskException("There was no network found.", ShowExceptionItem, batchItem);
                     }
                     // Check if there was no user provided.
                     if (batchItem.User == null || string.IsNullOrEmpty(batchItem.User.Id))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no user provided.", batchItem);
+                        throw new TaskException("There was no user provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the user.
                     var user = batchUsers
@@ -108,7 +113,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (user == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no user found.", batchItem);
+                        throw new TaskException("There was no user found.", ShowExceptionItem, batchItem);
                     }
                     // Define the new item.
                     var networkUser = new NetworkUser

@@ -20,6 +20,11 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class NodeCollectionsTask
     {
         /// <summary>
+        /// Gets or sets the exception item show status.
+        /// </summary>
+        public bool ShowExceptionItem { get; set; }
+        
+        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<NodeCollectionInputModel> Items { get; set; }
@@ -114,7 +119,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.NodeCollectionDatabases == null || !batchItem.NodeCollectionDatabases.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no node collection databases provided.", batchItem);
+                        throw new TaskException("There were no node collection databases provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the node collection databases.
                     var nodeCollectionDatabases = batchItem.NodeCollectionDatabases
@@ -134,13 +139,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (nodeCollectionDatabases == null || !nodeCollectionDatabases.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no node collection databases found.", batchItem);
+                        throw new TaskException("There were no node collection databases found.", ShowExceptionItem, batchItem);
                     }
                     // Check if there were no node collection nodes provided.
                     if (batchItem.NodeCollectionNodes == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no node collection nodes provided.", batchItem);
+                        throw new TaskException("There were no node collection nodes provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the node collection nodes.
                     var nodeCollectionNodes = batchItem.NodeCollectionNodes
@@ -158,7 +163,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (nodeCollectionNodes == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no node collection nodes found.", batchItem);
+                        throw new TaskException("There were no node collection nodes found.", ShowExceptionItem, batchItem);
                     }
                     // Define the new node collection.
                     var nodeCollection = new NodeCollection
@@ -275,7 +280,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.NodeCollectionDatabases == null || !batchItem.NodeCollectionDatabases.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no node collection databases provided.", batchItem);
+                        throw new TaskException("There were no node collection databases provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the node collection databases.
                     var nodeCollectionDatabases = batchItem.NodeCollectionDatabases
@@ -295,13 +300,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (nodeCollectionDatabases == null || !nodeCollectionDatabases.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no node collection databases found.", batchItem);
+                        throw new TaskException("There were no node collection databases found.", ShowExceptionItem, batchItem);
                     }
                     // Check if there were no node collection nodes provided.
                     if (batchItem.NodeCollectionNodes == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no node collection nodes provided.", batchItem);
+                        throw new TaskException("There were no node collection nodes provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the node collection nodes.
                     var nodeCollectionNodes = batchItem.NodeCollectionNodes
@@ -319,7 +324,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (nodeCollectionNodes == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no node collection nodes found.", batchItem);
+                        throw new TaskException("There were no node collection nodes found.", ShowExceptionItem, batchItem);
                     }
                     // Update the node collection.
                     nodeCollection.Name = batchItem.Name;

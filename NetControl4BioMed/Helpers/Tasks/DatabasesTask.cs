@@ -21,6 +21,11 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class DatabasesTask
     {
         /// <summary>
+        /// Gets or sets the exception item show status.
+        /// </summary>
+        public bool ShowExceptionItem { get; set; }
+
+        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<DatabaseInputModel> Items { get; set; }
@@ -98,13 +103,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (context.Databases.Any(item => item.Name == batchItem.Name) || databasesToAdd.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new TaskException("A database with the same name already exists.", batchItem);
+                        throw new TaskException("A database with the same name already exists.", ShowExceptionItem, batchItem);
                     }
                     // Check if there was no database type provided.
                     if (batchItem.DatabaseType == null || string.IsNullOrEmpty(batchItem.DatabaseType.Id))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no database type provided.", batchItem);
+                        throw new TaskException("There was no database type provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the database type.
                     var databaseType = batchDatabaseTypes
@@ -113,13 +118,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseType == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no database type found.", batchItem);
+                        throw new TaskException("There was no database type found.", ShowExceptionItem, batchItem);
                     }
                     // Check if the database type is generic.
                     if (databaseType.Name == "Generic")
                     {
                         // Throw an exception.
-                        throw new TaskException($"The database can't be generic.", batchItem);
+                        throw new TaskException($"The database can't be generic.", ShowExceptionItem, batchItem);
                     }
                     // Define the new item.
                     var database = new Database
@@ -192,6 +197,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Distinct();
                 // Get the items corresponding to the current batch.
                 var databases = context.Databases
+                    .Include(item => item.DatabaseType)
                     .Where(item => batchIds.Contains(item.Id));
                 // Save the items to edit.
                 var databasesToEdit = new List<Database>();
@@ -200,7 +206,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 {
                     // Get the corresponding items.
                     var database = databases
-                        .Include(item => item.DatabaseType)
                         .FirstOrDefault(item => item.Id == batchItem.Id);
                     // Check if there was no item found.
                     if (database == null)
@@ -212,13 +217,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (database.DatabaseType.Name == "Generic")
                     {
                         // Throw an exception.
-                        throw new TaskException("The generic database can't be edited.", batchItem);
+                        throw new TaskException("The generic database can't be edited.", ShowExceptionItem, batchItem);
                     }
                     // Check if there is another database with the same name.
                     if (context.Databases.Any(item => item.Id != database.Id && item.Name == batchItem.Name) || databasesToEdit.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new TaskException("A database with the same name already exists.", batchItem);
+                        throw new TaskException("A database with the same name already exists.", ShowExceptionItem, batchItem);
                     }
                     // Update the item.
                     database.Name = batchItem.Name;

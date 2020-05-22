@@ -21,6 +21,11 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class NodesTask
     {
         /// <summary>
+        /// Gets or sets the exception item show status.
+        /// </summary>
+        public bool ShowExceptionItem { get; set; }
+        
+        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<NodeInputModel> Items { get; set; }
@@ -102,7 +107,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.DatabaseNodeFieldNodes == null || !batchItem.DatabaseNodeFieldNodes.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database node field nodes provided.", batchItem);
+                        throw new TaskException("There were no database node field nodes provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the database node field nodes.
                     var databaseNodeFieldNodes = batchItem.DatabaseNodeFieldNodes
@@ -124,7 +129,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseNodeFieldNodes == null || !databaseNodeFieldNodes.Any(item => item.DatabaseNodeField.IsSearchable))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database node field nodes found.", batchItem);
+                        throw new TaskException("There were no database node field nodes found.", ShowExceptionItem, batchItem);
                     }
                     // Define the new node.
                     var node = new Node
@@ -238,7 +243,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.DatabaseNodeFieldNodes == null || !batchItem.DatabaseNodeFieldNodes.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database node field nodes provided.", batchItem);
+                        throw new TaskException("There were no database node field nodes provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the database node field nodes.
                     var databaseNodeFieldNodes = batchItem.DatabaseNodeFieldNodes
@@ -260,7 +265,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseNodeFieldNodes == null || !databaseNodeFieldNodes.Any(item => item.DatabaseNodeField.IsSearchable))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database node field nodes found.", batchItem);
+                        throw new TaskException("There were no database node field nodes found.", ShowExceptionItem, batchItem);
                     }
                     // Update the node.
                     node.Name = databaseNodeFieldNodes
@@ -293,10 +298,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 IEnumerableExtensions.Edit(nodesToEdit, context, token);
                 // Get the edges that contain the nodes.
                 var edges = context.Edges
-                    .Where(item => item.EdgeNodes.Any(item1 => nodesToEdit.Contains(item1.Node)))
                     .Include(item => item.EdgeNodes)
                         .ThenInclude(item => item.Node)
-                    .AsQueryable();
+                    .Where(item => item.EdgeNodes.Any(item1 => nodesToEdit.Contains(item1.Node)));
                 // Go over each edge.
                 foreach (var edge in edges)
                 {

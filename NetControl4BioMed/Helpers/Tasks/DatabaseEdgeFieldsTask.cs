@@ -20,6 +20,11 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class DatabaseEdgeFieldsTask
     {
         /// <summary>
+        /// Gets or sets the exception item show status.
+        /// </summary>
+        public bool ShowExceptionItem { get; set; }
+
+        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<DatabaseEdgeFieldInputModel> Items { get; set; }
@@ -81,6 +86,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Distinct();
                 // Get the related entities that appear in the current batch.
                 var batchDatabases = context.Databases
+                    .Include(item => item.DatabaseType)
                     .Where(item => batchDatabaseIds.Contains(item.Id));
                 // Save the items to add.
                 var databaseEdgeFieldsToAdd = new List<DatabaseEdgeField>();
@@ -97,29 +103,28 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (context.DatabaseEdgeFields.Any(item => item.Name == batchItem.Name) || databaseEdgeFieldsToAdd.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new TaskException("A database edge field with the same name already exists.", batchItem);
+                        throw new TaskException("A database edge field with the same name already exists.", ShowExceptionItem, batchItem);
                     }
                     // Check if there was no database provided.
                     if (batchItem.Database == null || string.IsNullOrEmpty(batchItem.Database.Id))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no database provided.", batchItem);
+                        throw new TaskException("There was no database provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the database.
                     var database = batchDatabases
-                        .Include(item => item.DatabaseType)
                         .FirstOrDefault(item => item.Id == batchItem.Database.Id);
                     // Check if there was no database found.
                     if (database == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no database found.", batchItem);
+                        throw new TaskException("There was no database found.", ShowExceptionItem, batchItem);
                     }
                     // Check if the database is generic.
                     if (database.DatabaseType.Name == "Generic")
                     {
                         // Throw an exception.
-                        throw new TaskException("The database edge field can't be generic.", batchItem);
+                        throw new TaskException("The database edge field can't be generic.", ShowExceptionItem, batchItem);
                     }
                     // Define the new item.
                     var databaseEdgeField = new DatabaseEdgeField
@@ -192,6 +197,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Distinct();
                 // Get the items corresponding to the current batch.
                 var databaseEdgeFields = context.DatabaseEdgeFields
+                    .Include(item => item.Database)
+                        .ThenInclude(item => item.DatabaseType)
                     .Where(item => batchIds.Contains(item.Id));
                 // Save the items to edit.
                 var databaseEdgeFieldsToEdit = new List<DatabaseEdgeField>();
@@ -200,8 +207,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 {
                     // Get the corresponding items.
                     var databaseEdgeField = databaseEdgeFields
-                        .Include(item => item.Database)
-                            .ThenInclude(item => item.DatabaseType)
                         .FirstOrDefault(item => item.Id == batchItem.Id);
                     // Check if there was no item found.
                     if (databaseEdgeField == null)
@@ -213,13 +218,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseEdgeField.Database.DatabaseType.Name == "Generic")
                     {
                         // Throw an exception.
-                        throw new TaskException("The generic database edge field can't be edited.", batchItem);
+                        throw new TaskException("The generic database edge field can't be edited.", ShowExceptionItem, batchItem);
                     }
                     // Check if there is another database edge field with the same name.
                     if (context.DatabaseEdgeFields.Any(item => item.Id != databaseEdgeField.Id && item.Name == batchItem.Name) || databaseEdgeFieldsToEdit.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new TaskException("A database edge field with the name already exists.", batchItem);
+                        throw new TaskException("A database edge field with the name already exists.", ShowExceptionItem, batchItem);
                     }
                     // Update the item.
                     databaseEdgeField.Name = batchItem.Name;

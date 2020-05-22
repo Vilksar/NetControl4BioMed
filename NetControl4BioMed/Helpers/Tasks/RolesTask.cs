@@ -19,6 +19,11 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class RolesTask
     {
         /// <summary>
+        /// Gets or sets the exception item show status.
+        /// </summary>
+        public bool ShowExceptionItem { get; set; }
+
+        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<RoleInputModel> Items { get; set; }
@@ -103,7 +108,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         var messages = result.Errors
                             .Select(item => item.Description);
                         // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages), batchItem);
+                        throw new TaskException(string.Join(" ", messages), ShowExceptionItem, batchItem);
                     }
                     // Yield return the item.
                     yield return role;
@@ -181,7 +186,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         var messages = result.Errors
                             .Select(item => item.Description);
                         // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages), batchItem);
+                        throw new TaskException(string.Join(" ", messages), ShowExceptionItem, batchItem);
                     }
                     // Yield return the item.
                     yield return role;

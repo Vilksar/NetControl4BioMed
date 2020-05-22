@@ -20,6 +20,11 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class NetworkUserInvitationsTask
     {
         /// <summary>
+        /// Gets or sets the exception item show status.
+        /// </summary>
+        public bool ShowExceptionItem { get; set; }
+
+        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<NetworkUserInvitationInputModel> Items { get; set; }
@@ -82,7 +87,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.Network == null || string.IsNullOrEmpty(batchItem.Network.Id))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no network provided.", batchItem);
+                        throw new TaskException("There was no network provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the network.
                     var network = batchNetworks
@@ -91,13 +96,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (network == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no network found.", batchItem);
+                        throw new TaskException("There was no network found.", ShowExceptionItem, batchItem);
                     }
                     // Check if there was no e-mail provided.
                     if (string.IsNullOrEmpty(batchItem.Email))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no e-mail provided.", batchItem);
+                        throw new TaskException("There was no e-mail provided.", ShowExceptionItem, batchItem);
                     }
                     // Try to get the user.
                     var user = batchUsers
@@ -106,7 +111,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (user != null)
                     {
                         // Throw an exception.
-                        throw new TaskException("The user with the provided e-mail already exists.", batchItem);
+                        throw new TaskException("The user with the provided e-mail already exists.", ShowExceptionItem, batchItem);
                     }
                     // Define the new item.
                     var networkUserInvitation = new NetworkUserInvitation

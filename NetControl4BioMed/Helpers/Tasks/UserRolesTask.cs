@@ -20,6 +20,11 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class UserRolesTask
     {
         /// <summary>
+        /// Gets or sets the exception item show status.
+        /// </summary>
+        public bool ShowExceptionItem { get; set; }
+
+        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<UserRoleInputModel> Items { get; set; }
@@ -84,7 +89,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.User == null || string.IsNullOrEmpty(batchItem.User.Id))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no user provided.", batchItem);
+                        throw new TaskException("There was no user provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the user.
                     var user = batchUsers
@@ -93,13 +98,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (user == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no user found.", batchItem);
+                        throw new TaskException("There was no user found.", ShowExceptionItem, batchItem);
                     }
                     // Check if there was no role provided.
                     if (batchItem.Role == null || string.IsNullOrEmpty(batchItem.Role.Id))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no role provided.", batchItem);
+                        throw new TaskException("There was no role provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the role.
                     var role = batchRoles
@@ -108,7 +113,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (role == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no role found.", batchItem);
+                        throw new TaskException("There was no role found.", ShowExceptionItem, batchItem);
                     }
                     // Try to add the user to the role.
                     var result = Task.Run(() => userManager.AddToRoleAsync(user, role.Name)).Result;

@@ -39,7 +39,7 @@ namespace NetControl4BioMed.Helpers.Exceptions
         /// </summary>
         /// <param name="message"></param>
         /// <param name="item"></param>
-        public TaskException(string message, object item) : base(GetJson(message, item)) { }
+        public TaskException(string message, bool showExceptionItem, object item) : base(GetMessage(message, showExceptionItem, item)) { }
 
         /// <summary>
         /// Initializes a new instance of the exception.
@@ -61,14 +61,20 @@ namespace NetControl4BioMed.Helpers.Exceptions
         /// <param name="message">The message of the exception.</param>
         /// <param name="item">The item that caused the exception.</param>
         /// <returns></returns>
-        private static string GetJson(string message, object item)
+        private static string GetMessage(string message, bool showExceptionItem, object item)
         {
-            // Return the JSON string.
-            return JsonSerializer.Serialize(new
+            // Check if the exception item should be shown.
+            if (showExceptionItem)
             {
-                Message = message,
-                Item = item
-            }, _jsonSerializerOptions);
+                // Update the message.
+                message += (!string.IsNullOrEmpty(message) ? string.Empty : " ") +
+                    "The item that triggered the exception will be displayed below." +
+                    Environment.NewLine +
+                    Environment.NewLine +
+                    JsonSerializer.Serialize(item, _jsonSerializerOptions);
+            }
+            // Return the message.
+            return message;
         }
     }
 }

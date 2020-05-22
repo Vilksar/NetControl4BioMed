@@ -20,6 +20,11 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class DatabaseNodeFieldsTask
     {
         /// <summary>
+        /// Gets or sets the exception item show status.
+        /// </summary>
+        public bool ShowExceptionItem { get; set; }
+
+        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<DatabaseNodeFieldInputModel> Items { get; set; }
@@ -81,6 +86,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Distinct();
                 // Get the related entities that appear in the current batch.
                 var batchDatabases = context.Databases
+                    .Include(item => item.DatabaseType)
                     .Where(item => batchDatabaseIds.Contains(item.Id));
                 // Save the items to add.
                 var databaseNodeFieldsToAdd = new List<DatabaseNodeField>();
@@ -97,29 +103,28 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (context.DatabaseNodeFields.Any(item => item.Name == batchItem.Name) || databaseNodeFieldsToAdd.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new TaskException("A database node field with the same name already exists.", batchItem);
+                        throw new TaskException("A database node field with the same name already exists.", ShowExceptionItem, batchItem);
                     }
                     // Check if there was no database provided.
                     if (batchItem.Database == null || string.IsNullOrEmpty(batchItem.Database.Id))
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no database provided.", batchItem);
+                        throw new TaskException("There was no database provided.", ShowExceptionItem, batchItem);
                     }
                     // Get the database.
                     var database = batchDatabases
-                        .Include(item => item.DatabaseType)
                         .FirstOrDefault(item => item.Id == batchItem.Database.Id);
                     // Check if there was no database found.
                     if (database == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There was no database found.", batchItem);
+                        throw new TaskException("There was no database found.", ShowExceptionItem, batchItem);
                     }
                     // Check if the database is generic.
                     if (database.DatabaseType.Name == "Generic")
                     {
                         // Throw an exception.
-                        throw new TaskException("The database node field can't be generic.", batchItem);
+                        throw new TaskException("The database node field can't be generic.", ShowExceptionItem, batchItem);
                     }
                     // Define the new item.
                     var databaseNodeField = new DatabaseNodeField
@@ -192,6 +197,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Distinct();
                 // Get the items corresponding to the current batch.
                 var databaseNodeFields = context.DatabaseNodeFields
+                    .Include(item => item.Database)
+                        .ThenInclude(item => item.DatabaseType)
                     .Where(item => batchIds.Contains(item.Id));
                 // Save the items to edit.
                 var databaseNodeFieldsToEdit = new List<DatabaseNodeField>();
@@ -200,8 +207,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 {
                     // Get the corresponding items.
                     var databaseNodeField = databaseNodeFields
-                        .Include(item => item.Database)
-                            .ThenInclude(item => item.DatabaseType)
                         .FirstOrDefault(item => item.Id == batchItem.Id);
                     // Check if there was no item found.
                     if (databaseNodeField == null)
@@ -213,13 +218,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (databaseNodeField.Database.DatabaseType.Name == "Generic")
                     {
                         // Throw an exception.
-                        throw new TaskException("The generic database node field can't be edited.", batchItem);
+                        throw new TaskException("The generic database node field can't be edited.", ShowExceptionItem, batchItem);
                     }
                     // Check if there is another database node field with the same name.
                     if (context.DatabaseNodeFields.Any(item => item.Id != databaseNodeField.Id && item.Name == batchItem.Name) || databaseNodeFieldsToEdit.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
-                        throw new TaskException("A database node field with the same name already exists.", batchItem);
+                        throw new TaskException("A database node field with the same name already exists.", ShowExceptionItem, batchItem);
                     }
                     // Update the item.
                     databaseNodeField.Name = batchItem.Name;
