@@ -92,5 +92,40 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
             // Return the page.
             return Page();
         }
+
+        public async Task<IActionResult> OnGetRefreshAsync(string id)
+        {
+            // Get the current user.
+            var user = await _userManager.GetUserAsync(User);
+            // Check if the user does not exist.
+            if (user == null)
+            {
+                // Return an empty result.
+                return new JsonResult(new { });
+            }
+            // Check if there isn't any ID provided.
+            if (string.IsNullOrEmpty(id))
+            {
+                // Return an empty result.
+                return new JsonResult(new { });
+            }
+            // Get the item with the provided ID.
+            var item = _context.Networks
+                .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                .Where(item => item.Id == id)
+                .FirstOrDefault();
+            // Check if there was no item found.
+            if (item == null)
+            {
+                // Return an empty result.
+                return new JsonResult(new { });
+            }
+            // Return the analysis data.
+            return new JsonResult(new
+            {
+                Status = item.Status.ToString(),
+                DateTimeCreated = item.DateTimeCreated != null ? item.DateTimeCreated.ToString() : "--/--/---- --:--:--"
+            });
+        }
     }
 }

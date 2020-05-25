@@ -104,7 +104,7 @@ namespace NetControl4BioMed
             services.AddTransient<ISendGridEmailSender, SendGridEmailSender>();
             services.AddTransient<IRecurringTaskManager, RecurringTaskManager>();
             services.AddTransient<IAdministrationTaskManager, AdministrationTaskManager>();
-            services.AddTransient<IAnalysisRunner, AnalysisRunner>();
+            services.AddTransient<IContentTaskManager, ContentTaskManager>();
             // Add Razor pages.
             services.AddRazorPages();
         }

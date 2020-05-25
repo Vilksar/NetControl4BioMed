@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,19 +16,26 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks
 {
     [Authorize]
     public class CreateModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public CreateModel(UserManager<User> userManager, ApplicationDbContext context)
+        public CreateModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
         {
+            _serviceProvider = serviceProvider;
             _userManager = userManager;
             _context = context;
+            _reCaptchaChecker = reCaptchaChecker;
         }
 
         [BindProperty]
@@ -46,7 +56,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public NetworkAlgorithm Algorithm { get; set; }
+            public string Algorithm { get; set; }
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
@@ -57,6 +67,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             public IEnumerable<string> EdgeDatabaseIds { get; set; }
 
             public IEnumerable<string> SeedNodeCollectionIds { get; set; }
+
+            public string ReCaptchaToken { get; set; }
         }
 
         public ViewModel View { get; set; }
@@ -74,7 +86,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
 
         public class ItemModel
         {
-            public string SourceNode { get; set; } 
+            public string SourceNode { get; set; }
 
             public string TargetNode { get; set; }
         }
@@ -158,61 +170,123 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
-            // Define the input.
-            Input = !networksFound ?
-                new InputModel
-                {
-                    DatabaseTypeId = databaseType.Id,
-                    SeedData = View.IsGeneric ? JsonSerializer.Serialize(Enumerable.Empty<ItemModel>()) : JsonSerializer.Serialize(Enumerable.Empty<string>()),
-                    NodeDatabaseIds = View.IsGeneric ? View.NodeDatabases.Select(item => item.Id) : Enumerable.Empty<string>(),
-                    EdgeDatabaseIds = View.IsGeneric ? View.EdgeDatabases.Select(item => item.Id) : Enumerable.Empty<string>()
-                } :
-                new InputModel
-                {
-                    DatabaseTypeId = databaseType.Id,
-                    Name = networks
-                        .Select(item => item.Name)
-                        .FirstOrDefault(),
-                    Description = networks
-                        .Select(item => item.Description)
-                        .FirstOrDefault(),
-                    Algorithm = networks
-                        .Select(item => item.Algorithm)
-                        .FirstOrDefault(),
-                    SeedData = View.IsGeneric ?
-                        JsonSerializer.Serialize(networks
-                            .Select(item => item.NetworkEdges)
-                            .SelectMany(item => item)
-                            .Select(item => new ItemModel
-                            {
-                                SourceNode = item.Edge.EdgeNodes.Where(item1 => item1.Type == EdgeNodeType.Source).Select(item1 => item1.Node.Name).FirstOrDefault(),
-                                TargetNode = item.Edge.EdgeNodes.Where(item1 => item1.Type == EdgeNodeType.Target).Select(item1 => item1.Node.Name).FirstOrDefault()
-                            })
-                            .Where(item => !string.IsNullOrEmpty(item.SourceNode) && !string.IsNullOrEmpty(item.TargetNode))) :
-                        JsonSerializer.Serialize(networks
+            // Define the input based on the database type and the provided networks.
+            switch ((networksFound, View.IsGeneric))
+            {
+                case (false, false):
+                    Input = new InputModel
+                    {
+                        DatabaseTypeId = databaseType.Id,
+                        SeedData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
+                        NodeDatabaseIds = Enumerable.Empty<string>(),
+                        EdgeDatabaseIds = Enumerable.Empty<string>()
+                    };
+                    break;
+                case (false, true):
+                    Input = new InputModel
+                    {
+                        DatabaseTypeId = databaseType.Id,
+                        SeedData = JsonSerializer.Serialize(Enumerable.Empty<ItemModel>()),
+                        NodeDatabaseIds = View.NodeDatabases.Select(item => item.Id),
+                        EdgeDatabaseIds = View.EdgeDatabases.Select(item => item.Id)
+                    };
+                    break;
+                case (true, false):
+                    Input = new InputModel
+                    {
+                        DatabaseTypeId = databaseType.Id,
+                        Name = networks
+                                .Select(item => item.Name)
+                                .FirstOrDefault(),
+                        Description = networks
+                                .Select(item => item.Description)
+                                .FirstOrDefault(),
+                        Algorithm = networks
+                                .Select(item => item.Algorithm)
+                                .FirstOrDefault()
+                                .ToString(),
+                        SeedData = JsonSerializer.Serialize(networks
+                            .Include(item => item.NetworkNodes)
+                                .ThenInclude(item => item.Node)
                             .Select(item => item.NetworkNodes)
                             .SelectMany(item => item)
                             .Where(item => item.Type == NetworkNodeType.Seed)
                             .Select(item => item.Node.Name)),
-                    NodeDatabaseIds = networks
-                        .Select(item => item.NetworkDatabases)
-                        .SelectMany(item => item)
-                        .Select(item => item.Database)
-                        .Intersect(View.NodeDatabases)
-                        .Select(item => item.Id),
-                    EdgeDatabaseIds = networks
-                        .Select(item => item.NetworkDatabases)
-                        .SelectMany(item => item)
-                        .Select(item => item.Database)
-                        .Intersect(View.EdgeDatabases)
-                        .Select(item => item.Id),
-                    SeedNodeCollectionIds = networks
-                        .Select(item => item.NetworkNodeCollections)
-                        .SelectMany(item => item)
-                        .Select(item => item.NodeCollection)
-                        .Intersect(View.SeedNodeCollections)
-                        .Select(item => item.Id)
-                };
+                        NodeDatabaseIds = networks
+                            .Select(item => item.NetworkDatabases)
+                            .SelectMany(item => item)
+                            .Select(item => item.Database)
+                            .Intersect(View.NodeDatabases)
+                            .Select(item => item.Id),
+                        EdgeDatabaseIds = networks
+                            .Select(item => item.NetworkDatabases)
+                            .SelectMany(item => item)
+                            .Select(item => item.Database)
+                            .Intersect(View.EdgeDatabases)
+                            .Select(item => item.Id),
+                        SeedNodeCollectionIds = networks
+                            .Select(item => item.NetworkNodeCollections)
+                            .SelectMany(item => item)
+                            .Select(item => item.NodeCollection)
+                            .Intersect(View.SeedNodeCollections)
+                            .Select(item => item.Id)
+                    };
+                    break;
+                case (true, true):
+                    Input = new InputModel
+                    {
+                        DatabaseTypeId = databaseType.Id,
+                        Name = networks
+                                .Select(item => item.Name)
+                                .FirstOrDefault(),
+                        Description = networks
+                                .Select(item => item.Description)
+                                .FirstOrDefault(),
+                        Algorithm = networks
+                                .Select(item => item.Algorithm)
+                                .FirstOrDefault()
+                                .ToString(),
+                        SeedData = JsonSerializer.Serialize(networks
+                            .Include(item => item.NetworkEdges)
+                                .ThenInclude(item => item.Edge)
+                                    .ThenInclude(item => item.EdgeNodes)
+                                        .ThenInclude(item => item.Node)
+                            .Select(item => item.NetworkEdges)
+                            .SelectMany(item => item)
+                            .Select(item => new ItemModel
+                            {
+                                SourceNode = item.Edge.EdgeNodes
+                                    .Where(item1 => item1.Type == EdgeNodeType.Source)
+                                    .Select(item1 => item1.Node.Name)
+                                    .FirstOrDefault(),
+                                TargetNode = item.Edge.EdgeNodes
+                                    .Where(item1 => item1.Type == EdgeNodeType.Target)
+                                    .Select(item1 => item1.Node.Name)
+                                    .FirstOrDefault()
+                            })
+                            .Where(item => !string.IsNullOrEmpty(item.SourceNode) && !string.IsNullOrEmpty(item.TargetNode))),
+                        NodeDatabaseIds = networks
+                            .Select(item => item.NetworkDatabases)
+                            .SelectMany(item => item)
+                            .Select(item => item.Database)
+                            .Intersect(View.NodeDatabases)
+                            .Select(item => item.Id),
+                        EdgeDatabaseIds = networks
+                            .Select(item => item.NetworkDatabases)
+                            .SelectMany(item => item)
+                            .Select(item => item.Database)
+                            .Intersect(View.EdgeDatabases)
+                            .Select(item => item.Id),
+                        SeedNodeCollectionIds = networks
+                            .Select(item => item.NetworkNodeCollections)
+                            .SelectMany(item => item)
+                            .Select(item => item.NodeCollection)
+                            .Intersect(View.SeedNodeCollections)
+                            .Select(item => item.Id)
+                    };
+                    break;
+                default:
+            }
             // Return the page.
             return Page();
         }
@@ -256,11 +330,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 NodeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => !isGeneric ? item.DatabaseNodeFields.Any(item1 => item1.IsSearchable) : true),
+                    .Where(item => isGeneric || item.DatabaseNodeFields.Any(item1 => item1.IsSearchable)),
                 EdgeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => !isGeneric ? item.DatabaseEdges.Any() : true),
+                    .Where(item => isGeneric || item.DatabaseEdges.Any()),
                 SeedNodeCollections = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
@@ -281,6 +355,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
+            // Check if the reCaptcha is valid.
+            if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The reCaptcha verification failed.");
+                // Return the page.
+                return Page();
+            }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
             {
@@ -289,11 +371,24 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 // Redisplay the page.
                 return Page();
             }
-            // Check if the algorithm is not valid.
-            if (View.IsGeneric ^ Input.Algorithm == NetworkAlgorithm.None)
+            // Try to get the algorithm.
+            try
+            {
+                // Get the algorithm.
+                var algorithm = EnumerationExtensions.GetEnumerationValue<NetworkAlgorithm>(Input.Algorithm);
+            }
+            catch (Exception)
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The algorithm is not valid for the provided database type.");
+                ModelState.AddModelError(string.Empty, "The network generation algorithm couldn't be determined from the provided string.");
+                // Redisplay the page.
+                return Page();
+            }
+            // Check if the algorithm is not valid.
+            if (View.IsGeneric ^ Input.Algorithm == "None")
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The network generation algorithm is not valid for the provided database type.");
                 // Redisplay the page.
                 return Page();
             }
@@ -337,318 +432,178 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 // Redisplay the page.
                 return Page();
             }
-            // Check if the network is generic.
+            // Get the provided seed node collection IDs.
+            var seedNodeCollectionIds = Input.SeedNodeCollectionIds ?? Enumerable.Empty<string>();
+            // Try to get the seed node collections with the provided IDs.
+            var seedNodeCollections = View.SeedNodeCollections.Where(item => seedNodeCollectionIds.Contains(item.Id));
+            // Define the data for generating the network.
+            var data = string.Empty;
+            // Check the database type of the network.
             if (View.IsGeneric)
             {
                 // Try to deserialize the seed data.
-                if (!Input.SeedData.TryDeserializeJsonObject<IEnumerable<ItemModel>>(out var seedItems))
+                if (!Input.SeedData.TryDeserializeJsonObject<IEnumerable<ItemModel>>(out var items) || items == null)
                 {
                     // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "The provided seed data is not a valid JSON object of edges.");
+                    ModelState.AddModelError(string.Empty, "The provided seed data could not be deserialized.");
                     // Redisplay the page.
                     return Page();
                 }
-                // Get the edges from the items.
-                var seedEdges = seedItems
-                    .Where(item => !string.IsNullOrEmpty(item.SourceNode) && !string.IsNullOrEmpty(item.TargetNode))
-                    .Select(item => (item.SourceNode, item.TargetNode))
-                    .Distinct();
-                // Check if there haven't been any edges found.
-                if (seedEdges == null || !seedEdges.Any())
+                // Check if there weren't any items found.
+                if (!items.Any())
                 {
                     // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "No seed edges could be found with the provided seed data.");
+                    ModelState.AddModelError(string.Empty, "No edges could be found within the provided seed data.");
                     // Redisplay the page.
                     return Page();
                 }
-                // Get a list of all the nodes in the edges.
-                var seedNodes = seedEdges
-                    .Select(item => item.SourceNode)
-                    .Concat(seedEdges.Select(item => item.TargetNode))
-                    .Distinct();
-                // Define the new network.
-                var network = new Network
-                {
-                    DateTimeCreated = DateTime.Now,
-                    Name = Input.Name,
-                    Description = Input.Description,
-                    Algorithm = Input.Algorithm,
-                    NetworkDatabases = nodeDatabases
-                        .Concat(edgeDatabases)
-                        .Distinct()
-                        .Select(item => new NetworkDatabase
-                        {
-                            Database = item
-                        })
-                        .ToList(),
-                    NetworkUsers = new List<NetworkUser>
+                // Serialize the seed data.
+                data += JsonSerializer.Serialize(items
+                    .Select(item => new NetworkEdgeInputModel
                     {
-                        new NetworkUser
+                        Edge = new EdgeInputModel
                         {
-                            User = user,
-                            DateTimeCreated = DateTime.Now
+                            EdgeNodes = new List<EdgeNodeInputModel>
+                                    {
+                                        new EdgeNodeInputModel
+                                        {
+                                            Node = new NodeInputModel
+                                            {
+                                                Id = item.SourceNode
+                                            },
+                                            Type = "Source"
+                                        },
+                                        new EdgeNodeInputModel
+                                        {
+                                            Node = new NodeInputModel
+                                            {
+                                                Id = item.TargetNode
+                                            },
+                                            Type = "Target"
+                                        }
+                                    }
                         }
-                    }
-                };
-                // Define the related entities.
-                network.NetworkNodes = seedNodes
-                    .Select(item => new NetworkNode
-                    {
-                        Node = new Node
-                        {
-                            DateTimeCreated = DateTime.Now,
-                            Name = item,
-                            Description = $"This is an automatically generated node for the network \"{Input.Name}\".",
-                            DatabaseNodes = nodeDatabases
-                                .Select(item1 => new DatabaseNode
-                                {
-                                    Database = item1
-                                })
-                                .ToList(),
-                            DatabaseNodeFieldNodes = nodeDatabases
-                                .Select(item1 => item1.DatabaseNodeFields)
-                                .SelectMany(item1 => item1)
-                                .Select(item1 => new DatabaseNodeFieldNode
-                                {
-                                    DatabaseNodeField = item1,
-                                    Value = item
-                                })
-                                .ToList()
-                        },
-                        Type = NetworkNodeType.None
-                    })
-                    .ToList();
-                network.NetworkEdges = seedEdges
-                    .Select(item => new NetworkEdge
-                    {
-                        Edge = new Edge
-                        {
-                            DateTimeCreated = DateTime.Now,
-                            Name = $"{item.SourceNode} - {item.TargetNode}",
-                            Description = $"This is an automatically generated edge for the network \"{Input.Name}\".",
-                            DatabaseEdges = edgeDatabases
-                                .Select(item1 => new DatabaseEdge
-                                {
-                                    Database = item1
-                                })
-                                .ToList(),
-                            DatabaseEdgeFieldEdges = edgeDatabases
-                                .Select(item1 => item1.DatabaseEdgeFields)
-                                .SelectMany(item1 => item1)
-                                .Select(item1 => new DatabaseEdgeFieldEdge
-                                {
-                                    DatabaseEdgeField = item1,
-                                    Value = $"{item.SourceNode} - {item.TargetNode}"
-                                })
-                                .ToList(),
-                            EdgeNodes = new List<EdgeNode>
-                            {
-                                new EdgeNode
-                                {
-                                    Node = network.NetworkNodes
-                                        .FirstOrDefault(item1 => item1.Node.Name == item.SourceNode)
-                                        ?.Node,
-                                    Type = EdgeNodeType.Source
-                                },
-                                new EdgeNode
-                                {
-                                    Node = network.NetworkNodes
-                                        .FirstOrDefault(item1 => item1.Node.Name == item.TargetNode)
-                                        ?.Node,
-                                    Type = EdgeNodeType.Target
-                                }
-                            }
-                            .Where(item1 => item1.Node != null)
-                            .ToList()
-                        }
-                    })
-                    .ToList();
-                // Mark the data for addition.
-                _context.Networks.Add(network);
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
+                    }));
             }
             else
             {
-                // Try to deserialize the data.
-                if (!Input.SeedData.TryDeserializeJsonObject<IEnumerable<string>>(out var seedItems))
+
+                // Try to deserialize the seed data.
+                if (!Input.SeedData.TryDeserializeJsonObject<IEnumerable<string>>(out var items) || items == null)
                 {
                     // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "The provided seed data is not a valid JSON object of nodes.");
+                    ModelState.AddModelError(string.Empty, "The provided seed data could not be deserialized.");
                     // Redisplay the page.
                     return Page();
                 }
-                // Get the provided seed node collection IDs.
-                var seedNodeCollectionIds = Input.SeedNodeCollectionIds ?? Enumerable.Empty<string>();
-                // Try to get the seed node collections with the provided IDs.
-                var seedNodeCollections = View.SeedNodeCollections
-                    .Where(item => seedNodeCollectionIds.Contains(item.Id));
-                // Get all of the nodes in the provided node databases that match the given data.
-                var seedNodes = nodeDatabases
-                    .Select(item => item.DatabaseNodeFields)
-                    .SelectMany(item => item)
-                    .Where(item => item.IsSearchable)
-                    .Select(item => item.DatabaseNodeFieldNodes)
-                    .SelectMany(item => item)
-                    .Where(item => seedItems.Contains(item.Node.Id) || seedItems.Contains(item.Value))
-                    .Select(item => item.Node)
-                    .Concat(seedNodeCollections
-                        .Select(item => item.NodeCollectionNodes)
-                        .SelectMany(item => item)
-                        .Select(item => item.Node))
-                    .Distinct();
-                // Check if there haven't been any seed nodes found.
-                if (seedNodes == null || !seedNodes.Any())
+                // Check if there weren't any items found.
+                if (!items.Any() && !seedNodeCollections.Any())
                 {
                     // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "No seed nodes could be found with the provided seed data.");
+                    ModelState.AddModelError(string.Empty, "No items could be found within the provided seed data or the selected seed node collections.");
                     // Redisplay the page.
                     return Page();
                 }
-                // Get all of the edges in the provided edge databases that match the given data.
-                var seedEdges = edgeDatabases
-                    .Select(item => item.DatabaseEdges)
-                    .SelectMany(item => item)
-                    .Select(item => item.Edge);
-                // Check if there haven't been any seed edges found.
-                if (seedEdges == null || !seedEdges.Any())
-                {
-                    // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "No seed edges could be found with the provided seed data.");
-                    // Redisplay the page.
-                    return Page();
-                }
-                // Define the edges of the network.
-                var edges = new List<Edge>();
-                // Check which algorithm is selected.
-                if (Input.Algorithm == NetworkAlgorithm.Neighbors)
-                {
-                    // Add all of the edges which contain the seed nodes.
-                    edges.AddRange(seedEdges.Where(item => item.EdgeNodes.Any(item1 => seedNodes.Contains(item1.Node))));
-                }
-                else if (Input.Algorithm == NetworkAlgorithm.Gap0 || Input.Algorithm == NetworkAlgorithm.Gap1 || Input.Algorithm == NetworkAlgorithm.Gap2 || Input.Algorithm == NetworkAlgorithm.Gap3 || Input.Algorithm == NetworkAlgorithm.Gap4)
-                {
-                    // Get the gap value.
-                    var gap = Input.Algorithm == NetworkAlgorithm.Gap0 ? 0 :
-                        Input.Algorithm == NetworkAlgorithm.Gap1 ? 1 :
-                        Input.Algorithm == NetworkAlgorithm.Gap2 ? 2 :
-                        Input.Algorithm == NetworkAlgorithm.Gap3 ? 3 : 4;
-                    // Define the list to store the edges.
-                    var list = new List<List<Edge>>();
-                    // For "gap" times, for all terminal nodes, add all possible edges.
-                    for (int index = 0; index < gap + 1; index++)
+                // Serialize the seed data.
+                data += JsonSerializer.Serialize(items
+                    .Select(item => new NetworkNodeInputModel
                     {
-                        // Get the terminal nodes (the seed nodes for the first iteration, the target nodes of all edges in the previous iteration for the subsequent iterations).
-                        var terminalNodes = index == 0 ? seedNodes : list.Last()
-                            .Select(item => item.EdgeNodes
-                                .Where(item => item.Type == EdgeNodeType.Target)
-                                .Select(item => item.Node))
-                            .SelectMany(item => item);
-                        // Get all edges that start in the terminal nodes.
-                        var temporaryList = seedEdges
-                            .Where(item => item.EdgeNodes
-                                .Any(item1 => item1.Type == EdgeNodeType.Source && terminalNodes.Contains(item1.Node)))
-                            .ToList();
-                        // Add them to the list.
-                        list.Add(temporaryList);
-                    }
-                    // Define a variable to store, at each step, the nodes to keep.
-                    var nodesToKeep = seedNodes.AsEnumerable();
-                    // Starting from the right, mark all terminal nodes that are not seed nodes for removal.
-                    for (int index = gap; index >= 0; index--)
-                    {
-                        // Remove from the list all edges that do not end in nodes to keep.
-                        list.ElementAt(index)
-                            .RemoveAll(item => item.EdgeNodes.Any(item1 => item1.Type == EdgeNodeType.Target && !nodesToKeep.Contains(item1.Node)));
-                        // Update the nodes to keep to be the source nodes of the interactions of the current step together with the seed nodes.
-                        nodesToKeep = list.ElementAt(index)
-                            .Select(item => item.EdgeNodes.Where(item1 => item1.Type == EdgeNodeType.Source).Select(item1 => item1.Node))
-                            .SelectMany(item => item)
-                            .Concat(seedNodes)
-                            .Distinct();
-                    }
-                    // Add all of the remaining edges.
-                    edges.AddRange(list.SelectMany(item => item).Distinct());
-                }
-                else
-                {
-                    // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "The provided algorithm is not yet implemented. Please select another algorithm.");
-                    // Redisplay the page.
-                    return Page();
-                }
-                // Check if there haven't been any edges found.
-                if (edges == null || !edges.Any())
-                {
-                    // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "No edges could be found with the provided data using the provided algorithm.");
-                    // Redisplay the page.
-                    return Page();
-                }
-                // Get all of the nodes used by the found edges.
-                var nodes = edges
-                    .Select(item => item.EdgeNodes)
-                    .SelectMany(item => item)
-                    .Select(item => item.Node)
-                    .Distinct();
-                // Define the new network.
-                var network = new Network
-                {
-                    DateTimeCreated = DateTime.Now,
-                    Name = Input.Name,
-                    Description = Input.Description,
-                    Algorithm = Input.Algorithm,
-                    NetworkDatabases = nodeDatabases
-                        .Concat(edgeDatabases)
-                        .Distinct()
-                        .Select(item => new NetworkDatabase
+                        Node = new NodeInputModel
                         {
-                            Database = item
-                        })
-                        .ToList(),
-                    NetworkNodes = nodes
-                        .Intersect(seedNodes)
-                        .Select(item => new NetworkNode
-                        {
-                            Node = item,
-                            Type = NetworkNodeType.Seed
-                        })
-                        .Concat(nodes
-                            .Select(item => new NetworkNode
-                            {
-                                Node = item,
-                                Type = NetworkNodeType.None
-                            }))
-                        .ToList(),
-                    NetworkEdges = edges
-                        .Select(item => new NetworkEdge
-                        {
-                            Edge = item
-                        })
-                        .ToList(),
-                    NetworkNodeCollections = seedNodeCollections
-                        .Select(item => new NetworkNodeCollection
-                        {
-                            NodeCollection = item,
-                            Type = NetworkNodeCollectionType.Seed
-                        })
-                        .ToList(),
-                    NetworkUsers = new List<NetworkUser>
-                    {
-                        new NetworkUser
-                        {
-                            User = user,
-                            DateTimeCreated = DateTime.Now
+                            Id = item
                         }
-                    }
-                };
-                // Mark the data for addition.
-                _context.Networks.Add(network);
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
+                    }));
             }
+            // Define a new task.
+            var task = new NetworksTask
+            {
+                Items = new List<NetworkInputModel>
+                {
+                    new NetworkInputModel
+                    {
+                        Name = Input.Name,
+                        Description = Input.Description,
+                        Algorithm = Input.Algorithm,
+                        Data = data,
+                        NetworkDatabases = nodeDatabases
+                            .Select(item => item.Id)
+                            .Select(item => new NetworkDatabaseInputModel
+                            {
+                                Database = new DatabaseInputModel
+                                {
+                                    Id = item
+                                },
+                                Type = "Node"
+                            })
+                            .Concat(edgeDatabases
+                                .Select(item => item.Id)
+                                .Select(item => new NetworkDatabaseInputModel
+                                {
+                                    Database = new DatabaseInputModel
+                                    {
+                                        Id = item
+                                    },
+                                    Type = "Edge"
+                                })),
+                        NetworkUsers = new List<NetworkUserInputModel>
+                        {
+                            new NetworkUserInputModel
+                            {
+                                User = new UserInputModel
+                                {
+                                    Id = user.Id
+                                }
+                            }
+                        },
+                        NetworkNodeCollections = seedNodeCollections
+                            .Select(item => item.Id)
+                            .Select(item => new NetworkNodeCollectionInputModel
+                            {
+                                NodeCollection = new NodeCollectionInputModel
+                                {
+                                    Id = item
+                                }
+                            })
+                    }
+                }
+            };
+            // Define a variable to store the networks that will be created.
+            var networks = new List<Network>();
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                networks.AddRange(task.Create(_serviceProvider, CancellationToken.None).ToList());
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
+            // Define a new background task.
+            var backgroundTask = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.GenerateNetworks)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new NetworksTask
+                {
+                    Items = networks.Select(item => new NetworkInputModel
+                    {
+                        Id = item.Id
+                    })
+                })
+            };
+            // Mark the task for addition.
+            _context.BackgroundTasks.Add(backgroundTask);
+            // Save the changes to the database.
+            _context.SaveChanges();
+            // Create a new Hangfire background job.
+            var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateNetworks(backgroundTask.Id, CancellationToken.None));
             // Display a message.
-            TempData["StatusMessage"] = $"Success: 1 network of type \"{databaseType.Name}\" created successfully.";
+            TempData["StatusMessage"] = $"Success: 1 network of type \"{databaseType.Name}\" defined successfully and scheduled for generation.";
             // Redirect to the index page.
             return RedirectToPage("/Content/Created/Networks/Index");
         }

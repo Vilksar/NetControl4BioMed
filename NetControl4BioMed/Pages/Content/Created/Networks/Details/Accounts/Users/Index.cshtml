@@ -16,11 +16,13 @@
     <div class="row align-items-center">
         <div class="col-lg-6 mb-3">
             <a asp-page="/Content/Created/Networks/Details/Accounts/Users/Add" asp-route-id="@Model.View.Network.Id" class="btn btn-success btn-block" title="Add">
+                <span><i class="fas fa-user-plus"></i></span>
                 <span>Add a new user</span>
             </a>
         </div>
         <div class="col-lg-6 mb-3">
             <button type="submit" asp-page="/Content/Created/Networks/Details/Accounts/Users/Remove" asp-route-id="@Model.View.Network.Id" class="btn btn-danger btn-block item-group-button" title="Remove" disabled>
+                <span><i class="fas fa-user-minus"></i></span>
                 <span>Remove selected users</span>
             </button>
         </div>
@@ -71,7 +73,7 @@
                             <span title="@item.DateTimeCreated.ToString()">@item.DateTimeCreated.ToString()</span>
                         </td>
                         <td class="text-center text-break">
-                            <a asp-page="/Content/Created/Networks/Details/Accounts/Users/Remove" asp-route-id="@Model.View.Network.Id" asp-route-emails="@item.Email" class="btn btn-danger m-1" title="Remove">
+                            <a asp-page="/Content/Created/Networks/Details/Accounts/Users/Remove" asp-route-id="@Model.View.Network.Id" asp-route-emails="@item.Email" title="Remove">
                                 <span>Remove</span>
                             </a>
                         </td>

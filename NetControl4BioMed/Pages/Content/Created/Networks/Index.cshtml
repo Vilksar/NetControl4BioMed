@@ -1,5 +1,7 @@
 ﻿@page
 @model IndexModel
+@using NetControl4BioMed.Data.Enumerations 
+@using Helpers.Extensions
 @{
     ViewData["Title"] = "Networks";
 }
@@ -66,6 +68,9 @@
                     <th class="d-none d-lg-table-cell text-center text-break">
                         <span>Edges</span>
                     </th>
+                    <th class="text-center text-break">
+                        <span>Status</span>
+                    </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
                         <span>Actions</span>
                     </th>
@@ -74,7 +79,7 @@
             <tbody>
                 @foreach (var item in Model.View.Search.Items)
                 {
-                    <tr class="item-group-item">
+                    <tr class="item-group-item item-refresh" data-id="@item.Id" data-status="@item.Status.ToString()" data-refresh="@(item.Status == NetworkStatus.Defined)">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" id="checkbox-@item.Id" name="ids" value="@item.Id" class="custom-control-input item-group-item-checkbox" title="Select" />
@@ -89,6 +94,23 @@
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break">
                             <span title="@item.NetworkEdges.Count()">@item.NetworkEdges.Count()</span>
+                        </td>
+                        <td class="text-center text-break">
+                            @switch (item.Status)
+                            {
+                                case NetworkStatus.Error:
+                                    <span class="text-danger"><i class="fas fa-times-circle"></i></span>
+                                    break;
+                                case NetworkStatus.Defined:
+                                    <span class="text-primary"><i class="fas fa-hashtag"></i></span>
+                                    break;
+                                case NetworkStatus.Generated:
+                                    <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                                    break;
+                                default:
+                                    break;
+                            }
+                            <span title="@item.Status.GetDisplayDescription()">@item.Status.GetDisplayName()</span>
                         </td>
                         <td class="text-center text-break">
                             <a asp-page="/Content/Created/Networks/Details/Index" asp-route-id="@item.Id" class="btn btn-info my-1 mr-1" title="Details">

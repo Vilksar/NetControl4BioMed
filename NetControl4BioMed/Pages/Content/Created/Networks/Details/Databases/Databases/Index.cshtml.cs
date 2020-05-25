@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
+using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
 
@@ -34,6 +35,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Databases.Dat
         {
             public Network Network { get; set; }
 
+            public bool IsGeneric { get; set; }
+
             public SearchViewModel<NetworkDatabase> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
@@ -46,6 +49,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Databases.Dat
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsNode", "Is of type \"Node\"" },
+                    { "IsNotNode", "Is not of type \"Node\"" },
+                    { "IsEdge", "Is of type \"Edge\"" },
+                    { "IsNotEdge", "Is not of type \"Edge\"" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -105,6 +112,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Databases.Dat
                     input.SearchIn.Contains("Id") && item.Database.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Database.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Description") && item.Database.Description.Contains(input.SearchString));
+            // Select the results matching the filter parameter.
+            query = query
+                .Where(item => input.Filter.Contains("IsNode") ? item.Type == NetworkDatabaseType.Node : true)
+                .Where(item => input.Filter.Contains("IsNotNode") ? item.Type != NetworkDatabaseType.Node : true)
+                .Where(item => input.Filter.Contains("IsEdge") ? item.Type == NetworkDatabaseType.Edge : true)
+                .Where(item => input.Filter.Contains("IsNotEdge") ? item.Type != NetworkDatabaseType.Edge : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -131,6 +144,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Databases.Dat
             {
                 Network = items
                     .First(),
+                IsGeneric = items
+                    .Select(item => item.NetworkDatabases)
+                    .SelectMany(item => item)
+                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 Search = new SearchViewModel<NetworkDatabase>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.
