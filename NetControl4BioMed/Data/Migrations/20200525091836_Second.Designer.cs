@@ -10,8 +10,8 @@ using NetControl4BioMed.Data;
 namespace NetControl4BioMed.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200521102436_Current")]
-    partial class Current
+    [Migration("20200525091836_Second")]
+    partial class Second
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -171,7 +171,7 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.HasKey("AnalysisId", "DatabaseId");
+                    b.HasKey("AnalysisId", "DatabaseId", "Type");
 
                     b.HasIndex("DatabaseId");
 
@@ -615,7 +615,7 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.HasKey("NetworkId", "DatabaseId");
+                    b.HasKey("NetworkId", "DatabaseId", "Type");
 
                     b.HasIndex("DatabaseId");
 

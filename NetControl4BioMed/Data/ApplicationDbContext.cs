@@ -231,7 +231,7 @@ namespace NetControl4BioMed.Data
             });
             modelBuilder.Entity<AnalysisDatabase>(entity =>
             {
-                entity.HasKey(item => new { item.AnalysisId, item.DatabaseId });
+                entity.HasKey(item => new { item.AnalysisId, item.DatabaseId, item.Type });
                 entity.HasOne(item => item.Analysis)
                     .WithMany(item => item.AnalysisDatabases)
                     .HasForeignKey(item => item.AnalysisId)
@@ -447,7 +447,7 @@ namespace NetControl4BioMed.Data
             });
             modelBuilder.Entity<NetworkDatabase>(entity =>
             {
-                entity.HasKey(item => new { item.NetworkId, item.DatabaseId });
+                entity.HasKey(item => new { item.NetworkId, item.DatabaseId, item.Type });
                 entity.HasOne(item => item.Network)
                     .WithMany(item => item.NetworkDatabases)
                     .HasForeignKey(item => item.NetworkId)

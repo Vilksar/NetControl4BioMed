@@ -2,10 +2,18 @@
 
 namespace NetControl4BioMed.Data.Migrations
 {
-    public partial class Current : Migration
+    public partial class Second : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_NetworkDatabases",
+                table: "NetworkDatabases");
+
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_AnalysisDatabase",
+                table: "AnalysisDatabase");
+
             migrationBuilder.DropColumn(
                 name: "JobId",
                 table: "Analyses");
@@ -42,10 +50,28 @@ namespace NetControl4BioMed.Data.Migrations
                 name: "Data",
                 table: "Analyses",
                 nullable: true);
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_NetworkDatabases",
+                table: "NetworkDatabases",
+                columns: new[] { "NetworkId", "DatabaseId", "Type" });
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_AnalysisDatabase",
+                table: "AnalysisDatabase",
+                columns: new[] { "AnalysisId", "DatabaseId", "Type" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_NetworkDatabases",
+                table: "NetworkDatabases");
+
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_AnalysisDatabase",
+                table: "AnalysisDatabase");
+
             migrationBuilder.DropColumn(
                 name: "Data",
                 table: "Networks");
@@ -75,6 +101,16 @@ namespace NetControl4BioMed.Data.Migrations
                 table: "Analyses",
                 type: "nvarchar(max)",
                 nullable: true);
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_NetworkDatabases",
+                table: "NetworkDatabases",
+                columns: new[] { "NetworkId", "DatabaseId" });
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_AnalysisDatabase",
+                table: "AnalysisDatabase",
+                columns: new[] { "AnalysisId", "DatabaseId" });
         }
     }
 }

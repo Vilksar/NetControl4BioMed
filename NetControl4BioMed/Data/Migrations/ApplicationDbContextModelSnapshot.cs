@@ -169,7 +169,7 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.HasKey("AnalysisId", "DatabaseId");
+                    b.HasKey("AnalysisId", "DatabaseId", "Type");
 
                     b.HasIndex("DatabaseId");
 
@@ -613,7 +613,7 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.HasKey("NetworkId", "DatabaseId");
+                    b.HasKey("NetworkId", "DatabaseId", "Type");
 
                     b.HasIndex("DatabaseId");
 
