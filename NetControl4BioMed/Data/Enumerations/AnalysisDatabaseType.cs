@@ -12,9 +12,15 @@ namespace NetControl4BioMed.Data.Enumerations
     public enum AnalysisDatabaseType
     {
         /// <summary>
-        /// Represents an analysis database of no particular type.
+        /// Represents a database whose nodes are used by the analysis.
         /// </summary>
-        [Display(Name = "Node", Description = "The database has no particular type.")]
-        None
+        [Display(Name = "Node", Description = "The database's nodes are used by the analysis.")]
+        Node,
+
+        /// <summary>
+        /// Represents a database whose edges are used by the analysis.
+        /// </summary>
+        [Display(Name = "Edge", Description = "The database's edges are used by the analysis.")]
+        Edge
     }
 }

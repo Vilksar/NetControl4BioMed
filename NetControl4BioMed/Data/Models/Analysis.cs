@@ -17,6 +17,11 @@ namespace NetControl4BioMed.Data.Models
         public string Id { get; set; }
 
         /// <summary>
+        /// Gets or sets the date when the analysis has been created.
+        /// </summary>
+        public DateTime DateTimeCreated { get; set; }
+
+        /// <summary>
         /// Gets or sets the date when the analysis has started.
         /// </summary>
         public DateTime? DateTimeStarted { get; set; }

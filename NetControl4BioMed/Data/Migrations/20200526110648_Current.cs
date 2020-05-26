@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace NetControl4BioMed.Data.Migrations
 {
-    public partial class Second : Migration
+    public partial class Current : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -51,6 +52,12 @@ namespace NetControl4BioMed.Data.Migrations
                 table: "Analyses",
                 nullable: true);
 
+            migrationBuilder.AddColumn<DateTime>(
+                name: "DateTimeCreated",
+                table: "Analyses",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
             migrationBuilder.AddPrimaryKey(
                 name: "PK_NetworkDatabases",
                 table: "NetworkDatabases",
@@ -94,6 +101,10 @@ namespace NetControl4BioMed.Data.Migrations
 
             migrationBuilder.DropColumn(
                 name: "Data",
+                table: "Analyses");
+
+            migrationBuilder.DropColumn(
+                name: "DateTimeCreated",
                 table: "Analyses");
 
             migrationBuilder.AddColumn<string>(

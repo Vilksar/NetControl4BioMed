@@ -10,8 +10,8 @@ using NetControl4BioMed.Data;
 namespace NetControl4BioMed.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200525091836_Second")]
-    partial class Second
+    [Migration("20200526110648_Current")]
+    partial class Current
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -127,6 +127,9 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.Property<string>("Data")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateTimeEnded")
                         .HasColumnType("datetime2");
