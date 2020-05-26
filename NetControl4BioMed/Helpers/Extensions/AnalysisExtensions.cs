@@ -17,60 +17,10 @@ namespace NetControl4BioMed.Helpers.Extensions
     public static class AnalysisExtensions
     {
         /// <summary>
-        /// Runs the current analysis within the given database context.
-        /// </summary>
-        /// <param name="analysis">The current analysis.</param>
-        /// <param name="context">The database context containing the analysis.</param>
-        public static async Task Run(this Analysis analysis, ApplicationDbContext context)
-        {
-            // Mark the analysis for updating.
-            context.Update(analysis);
-            // Check if the analysis doesn't exist.
-            if (analysis == null)
-            {
-                // End the function.
-                return;
-            }
-            // Check the algorithm to run the analysis.
-            switch (analysis.Algorithm)
-            {
-                case AnalysisAlgorithm.Algorithm1:
-                    // Run the algorithm on the analysis.
-                    await Algorithms.Algorithm1.Algorithm.RunAsync(context, analysis);
-                    // End the switch.
-                    break;
-                case AnalysisAlgorithm.Algorithm2:
-                    // Run the algorithm on the analysis.
-                    await Algorithms.Algorithm2.Algorithm.RunAsync(context, analysis);
-                    // End the switch.
-                    break;
-                default:
-                    // Update the analysis log.
-                    analysis.Log = analysis.AppendToLog("The algorithm is not defined.");
-                    // Update the analysis status.
-                    analysis.Status = AnalysisStatus.Error;
-                    // Update the analysis start time.
-                    analysis.DateTimeStarted = DateTime.Now;
-                    // Update the analysis end time.
-                    analysis.DateTimeEnded = DateTime.Now;
-                    // Save the changes in the database.
-                    await context.SaveChangesAsync();
-                    // End the switch.
-                    break;
-            }
-            // Reload the analysis.
-            await context.Entry(analysis).ReloadAsync();
-            // Add an ending message to the log.
-            analysis.Log = analysis.AppendToLog($"The analysis has ended with the status \"{analysis.Status.GetDisplayName()}\".");
-            // Save the changes in the database.
-            await context.SaveChangesAsync();
-        }
-
-        /// <summary>
         /// Gets the log of the analysis.
         /// </summary>
         /// <param name="analysis">The current analysis.</param>
-        /// <returns>Returns the log of the analysis.</returns>
+        /// <returns>The log of the analysis.</returns>
         public static List<string> GetLog(this Analysis analysis)
         {
             // Return the list of log entries.
@@ -82,7 +32,7 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// </summary>
         /// <param name="analysis">The current analysis.</param>
         /// <param name="message">The message to add as a new entry to the analysis log.</param>
-        /// <returns>Returns the updated log of the analysis.</returns>
+        /// <returns>The updated log of the analysis.</returns>
         public static string AppendToLog(this Analysis analysis, string message)
         {
             // Return the log entries with the message appended.
@@ -93,8 +43,8 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// Gets the Cytoscape view model corresponding to the provided analysis.
         /// </summary>
         /// <param name="analysis">The current analysis.</param>
-        /// <param name="linkGenerator">Represents the link generator.</param>
-        /// <returns>Returns the Cytoscape view model corresponding to the provided network.</returns>
+        /// <param name="linkGenerator">The link generator.</param>
+        /// <returns>The Cytoscape view model corresponding to the provided network.</returns>
         public static CytoscapeViewModel GetCytoscapeViewModel(this Analysis analysis, LinkGenerator linkGenerator)
         {
             // Get the default values.

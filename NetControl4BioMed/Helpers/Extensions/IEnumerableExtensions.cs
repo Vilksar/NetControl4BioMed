@@ -48,7 +48,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                     break;
                 }
                 // Get the items in the current batch.
-                var batchItems = items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Mark the items for addition.
                 set.AddRange(batchItems);
                 // Save the changes to the database.
@@ -91,12 +93,26 @@ namespace NetControl4BioMed.Helpers.Extensions
                     break;
                 }
                 // Get the items in the current batch.
-                var batchItems = items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Mark the items for update.
                 set.UpdateRange(batchItems);
                 // Save the changes to the database.
                 context.SaveChanges();
             }
+        }
+
+        /// <summary>
+        /// Yield returns the provided item as an enumerable.
+        /// </summary>
+        /// <typeparam name="T">The type of the item.</typeparam>
+        /// <param name="item">The item to return.</param>
+        /// <returns>The provided item as an enumerable.</returns>
+        public static IEnumerable<T> Yield<T>(this T item)
+        {
+            // Yield return the item.
+            yield return item;
         }
     }
 }

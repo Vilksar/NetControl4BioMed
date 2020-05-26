@@ -12,7 +12,6 @@ namespace NetControl4BioMed.Helpers.Interfaces
     /// Provides an abstraction for the content task manager.
     /// </summary>
     [AutomaticRetry(Attempts = 0)]
-    [DisableConcurrentExecution(86400)]
     public interface IContentTaskManager
     {
         /// <summary>
@@ -61,7 +60,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         void StartAnalyses(string id, CancellationToken token);
 
         /// <summary>
-        /// Starts analyses.
+        /// Stops analyses.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>

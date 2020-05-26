@@ -48,7 +48,8 @@ namespace NetControl4BioMed.Helpers.Extensions
                     break;
                 }
                 // Get the items in the current batch.
-                var batchItems = items.Take(ApplicationDbContext.BatchSize);
+                var batchItems = items
+                    .Take(ApplicationDbContext.BatchSize);
                 // Mark the items for deletion.
                 set.RemoveRange(batchItems);
                 // Save the changes to the database.

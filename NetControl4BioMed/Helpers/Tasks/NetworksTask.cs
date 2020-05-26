@@ -59,7 +59,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems
                     .Where(item => !string.IsNullOrEmpty(item.Id))
@@ -260,7 +262,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -303,7 +305,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     network.Name = batchItem.Name;
                     network.Description = batchItem.Description;
                     // Append a message to the log.
-                    network.Log = network.AppendToLog("The network name and / or description have been updated.");
+                    network.Log = network.AppendToLog("The network details have been updated.");
                     // Add the item to the list.
                     networksToEdit.Add(network);
                 }
@@ -329,7 +331,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -381,7 +383,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -416,8 +418,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .ThenInclude(item => item.Database)
                             .ThenInclude(item => item.DatabaseEdgeFields)
                     .Where(item => batchIds.Contains(item.Id));
-                // Save the items to edit.
-                var networksToEdit = new List<Network>();
                 // Go over each item in the current batch.
                 foreach (var batchItem in batchItems)
                 {
@@ -440,8 +440,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         network.Status = NetworkStatus.Error;
                         // Add a message to the log.
                         network.Log = network.AppendToLog("There was an error in retrieving related data from the database.");
-                        // Add the item to the list.
-                        networksToEdit.Add(network);
+                        // Edit the network.
+                        IEnumerableExtensions.Edit(network.Yield(), context, token);
                         // Continue.
                         continue;
                     }
@@ -452,8 +452,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         network.Status = NetworkStatus.Error;
                         // Add a message to the log.
                         network.Log = network.AppendToLog("No database types corresponding to the network databases could be found.");
-                        // Add the item to the list.
-                        networksToEdit.Add(network);
+                        // Edit the network.
+                        IEnumerableExtensions.Edit(network.Yield(), context, token);
                         // Continue.
                         continue;
                     }
@@ -464,8 +464,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         network.Status = NetworkStatus.Error;
                         // Add a message to the log.
                         network.Log = network.AppendToLog("The database types corresponding to the network databases are different.");
-                        // Add the item to the list.
-                        networksToEdit.Add(network);
+                        // Edit the network.
+                        IEnumerableExtensions.Edit(network.Yield(), context, token);
                         // Continue.
                         continue;
                     }
@@ -478,8 +478,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         network.Status = NetworkStatus.Error;
                         // Add a message to the log.
                         network.Log = network.AppendToLog("The database type corresponding to the network databases and the network algorithm don't match.");
-                        // Add the item to the list.
-                        networksToEdit.Add(network);
+                        // Edit the network.
+                        IEnumerableExtensions.Edit(network.Yield(), context, token);
                         // Continue.
                         continue;
                     }
@@ -493,8 +493,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                             network.Status = NetworkStatus.Error;
                             // Add a message to the log.
                             network.Log = network.AppendToLog("The seed data corresponding to the network could not be deserialized.");
-                            // Add the item to the list.
-                            networksToEdit.Add(network);
+                            // Edit the network.
+                            IEnumerableExtensions.Edit(network.Yield(), context, token);
                             // Continue.
                             continue;
                         }
@@ -517,8 +517,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                             network.Status = NetworkStatus.Error;
                             // Add a message to the log.
                             network.Log = network.AppendToLog("The seed data corresponding to the network does not contain any valid edges.");
-                            // Add the item to the list.
-                            networksToEdit.Add(network);
+                            // Edit the network.
+                            IEnumerableExtensions.Edit(network.Yield(), context, token);
                             // Continue.
                             continue;
                         }
@@ -624,8 +624,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                             network.Status = NetworkStatus.Error;
                             // Add a message to the log.
                             network.Log = network.AppendToLog("The seed data corresponding to the network could not be deserialized.");
-                            // Add the item to the list.
-                            networksToEdit.Add(network);
+                            // Edit the network.
+                            IEnumerableExtensions.Edit(network.Yield(), context, token);
                             // Continue.
                             continue;
                         }
@@ -640,19 +640,20 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Select(item => item.Database)
                             .Distinct()
                             .Select(item => item.Id);
-                        var nodeCollectionIds = network.NetworkNodeCollections
+                        var seedNodeCollectionIds = network.NetworkNodeCollections
                             .Where(item => item.Type == NetworkNodeCollectionType.Seed)
                             .Select(item => item.NodeCollection)
                             .Distinct()
                             .Select(item => item.Id);
-                        // Get the seed node identifiers from the data.
+                        // Get the node identifiers from the data.
                         var seedNodeIdentifiers = data
+                            .Where(item => item.Type == "Seed")
                             .Where(item => item.Node != null)
                             .Select(item => item.Node)
                             .Where(item => !string.IsNullOrEmpty(item.Id))
                             .Select(item => item.Id)
                             .Distinct();
-                        // Get the seed nodes in the provided data.
+                        // Get the nodes in the provided data.
                         var seedNodesByIdentifiers = context.Databases
                             .Where(item => nodeDatabaseIds.Contains(item.Id))
                             .Select(item => item.DatabaseNodeFields)
@@ -663,15 +664,15 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Where(item => seedNodeIdentifiers.Contains(item.Node.Id) || seedNodeIdentifiers.Contains(item.Value))
                             .Select(item => item.Node)
                             .Distinct();
-                        // Get the seed nodes in the provided node collections.
+                        // Get the nodes in the provided node collections.
                         var seedNodesByNodeCollections = context.NodeCollections
-                            .Where(item => nodeCollectionIds.Contains(item.Id))
+                            .Where(item => seedNodeCollectionIds.Contains(item.Id))
                             .Select(item => item.NodeCollectionNodes)
                             .SelectMany(item => item)
                             .Select(item => item.Node)
                             .Where(item => item.DatabaseNodeFieldNodes.Any(item1 => nodeDatabaseIds.Contains(item1.DatabaseNodeField.Database.Id)))
                             .Distinct();
-                        // Get the seed nodes.
+                        // Get the nodes.
                         var seedNodes = seedNodesByIdentifiers.Concat(seedNodesByNodeCollections);
                         // Check if there haven't been any seed nodes found.
                         if (seedNodes == null || !seedNodes.Any())
@@ -680,8 +681,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                             network.Status = NetworkStatus.Error;
                             // Add a message to the log.
                             network.Log = network.AppendToLog("No seed nodes could be found with the provided seed data.");
-                            // Add the item to the list.
-                            networksToEdit.Add(network);
+                            // Edit the network.
+                            IEnumerableExtensions.Edit(network.Yield(), context, token);
                             // Continue.
                             continue;
                         }
@@ -699,8 +700,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                             network.Status = NetworkStatus.Error;
                             // Add a message to the log.
                             network.Log = network.AppendToLog("No seed edges could be found in the selected databases.");
-                            // Add the item to the list.
-                            networksToEdit.Add(network);
+                            // Edit the network.
+                            IEnumerableExtensions.Edit(network.Yield(), context, token);
                             // Continue.
                             continue;
                         }
@@ -772,8 +773,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                             network.Status = NetworkStatus.Error;
                             // Add a message to the log.
                             network.Log = network.AppendToLog("The provided network generation algorithm is invalid.");
-                            // Add the item to the list.
-                            networksToEdit.Add(network);
+                            // Edit the network.
+                            IEnumerableExtensions.Edit(network.Yield(), context, token);
                             // Continue.
                             continue;
                         }
@@ -784,8 +785,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                             network.Status = NetworkStatus.Error;
                             // Add a message to the log.
                             network.Log = network.AppendToLog("No edges could be found with the provided data using the provided algorithm.");
-                            // Add the item to the list.
-                            networksToEdit.Add(network);
+                            // Edit the network.
+                            IEnumerableExtensions.Edit(network.Yield(), context, token);
                             // Continue.
                             continue;
                         }
@@ -823,11 +824,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                     network.Log = network.AppendToLog("The network has been successfully generated.");
                     // Remove the generation data.
                     network.Data = null;
-                    // Add the item to the list.
-                    networksToEdit.Add(network);
+                    // Edit the network.
+                    IEnumerableExtensions.Edit(network.Yield(), context, token);
                 }
-                // Edit the items.
-                IEnumerableExtensions.Edit(networksToEdit, context, token);
             }
         }
     }

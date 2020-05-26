@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
@@ -21,7 +22,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// </summary>
         /// <param name="context">The database context of the analysis.</param>
         /// <param name="analysis">The analysis which to run using the algorithm.</param>
-        public static async Task RunAsync(ApplicationDbContext context, Analysis analysis)
+        public static async Task RunAsync(Analysis analysis, ApplicationDbContext context, CancellationToken token)
         {
             // Mark the analysis for updating.
             context.Update(analysis);
@@ -124,7 +125,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             // Save the changes in the database.
             await context.SaveChangesAsync();
             // Run as long as the analysis exists and the final iteration hasn't been reached.
-            while (analysis != null && analysis.Status == AnalysisStatus.Ongoing && currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement)
+            while (analysis != null && analysis.Status == AnalysisStatus.Ongoing && currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement && !token.IsCancellationRequested)
             {
                 // Move on to the next iterations.
                 currentIteration += 1;
