@@ -45,8 +45,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
         {
             public Network Network { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public IEnumerable<ItemModel> Items { get; set; }
 
             public bool IsCurrentUserSelected { get; set; }
@@ -100,9 +98,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
                     .Include(item => item.NetworkUsers)
                         .ThenInclude(item => item.User)
                     .Include(item => item.NetworkUserInvitations)
-                    .First(),
-                IsGeneric = items
-                    .Any(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .First()
             };
             // Get the items for the view.
             var items1 = View.Network.NetworkUsers
@@ -185,8 +181,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
             // Define the view.
             View = new ViewModel
             {
-                IsGeneric = items
-                    .Any(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic")),
                 Network = items
                     .Include(item => item.NetworkUsers)
                         .ThenInclude(item => item.User)

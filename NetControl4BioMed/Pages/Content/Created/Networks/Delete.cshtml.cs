@@ -133,7 +133,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             var task = new BackgroundTask
             {
                 DateTimeCreated = DateTime.Now,
-                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNetworks)}",
+                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.DeleteNetworks)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new NetworksTask
                 {

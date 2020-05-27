@@ -458,36 +458,35 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     return Page();
                 }
                 // Serialize the seed data.
-                data += JsonSerializer.Serialize(items
+                data = JsonSerializer.Serialize(items
                     .Select(item => new NetworkEdgeInputModel
                     {
                         Edge = new EdgeInputModel
                         {
                             EdgeNodes = new List<EdgeNodeInputModel>
+                            {
+                                new EdgeNodeInputModel
+                                {
+                                    Node = new NodeInputModel
                                     {
-                                        new EdgeNodeInputModel
-                                        {
-                                            Node = new NodeInputModel
-                                            {
-                                                Id = item.SourceNode
-                                            },
-                                            Type = "Source"
-                                        },
-                                        new EdgeNodeInputModel
-                                        {
-                                            Node = new NodeInputModel
-                                            {
-                                                Id = item.TargetNode
-                                            },
-                                            Type = "Target"
-                                        }
-                                    }
+                                        Id = item.SourceNode
+                                    },
+                                    Type = "Source"
+                                },
+                                new EdgeNodeInputModel
+                                {
+                                    Node = new NodeInputModel
+                                    {
+                                        Id = item.TargetNode
+                                    },
+                                    Type = "Target"
+                                }
+                            }
                         }
                     }));
             }
             else
             {
-
                 // Try to deserialize the seed data.
                 if (!Input.SeedData.TryDeserializeJsonObject<IEnumerable<string>>(out var items) || items == null)
                 {
@@ -505,13 +504,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     return Page();
                 }
                 // Serialize the seed data.
-                data += JsonSerializer.Serialize(items
+                data = JsonSerializer.Serialize(items
                     .Select(item => new NetworkNodeInputModel
                     {
                         Node = new NodeInputModel
                         {
                             Id = item
-                        }
+                        },
+                        Type = "Seed"
                     }));
             }
             // Define a new task.
@@ -562,7 +562,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                                 NodeCollection = new NodeCollectionInputModel
                                 {
                                     Id = item
-                                }
+                                },
+                                Type = "Seed"
                             })
                     }
                 }
@@ -583,7 +584,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 return Page();
             }
             // Define a new background task.
-            var backgroundTask = new BackgroundTask
+            var generateBackgroundTask = new BackgroundTask
             {
                 DateTimeCreated = DateTime.Now,
                 Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.GenerateNetworks)}",
@@ -597,11 +598,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 })
             };
             // Mark the task for addition.
-            _context.BackgroundTasks.Add(backgroundTask);
+            _context.BackgroundTasks.Add(generateBackgroundTask);
             // Save the changes to the database.
             _context.SaveChanges();
             // Create a new Hangfire background job.
-            var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateNetworks(backgroundTask.Id, CancellationToken.None));
+            var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateNetworks(generateBackgroundTask.Id, CancellationToken.None));
             // Display a message.
             TempData["StatusMessage"] = $"Success: 1 network of type \"{databaseType.Name}\" defined successfully and scheduled for generation.";
             // Redirect to the index page.
