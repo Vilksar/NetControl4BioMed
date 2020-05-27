@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,17 +10,21 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.Users
 {
     [Authorize]
     public class RemoveModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public RemoveModel(UserManager<User> userManager, ApplicationDbContext context)
+        public RemoveModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _userManager = userManager;
             _context = context;
         }
@@ -227,32 +232,87 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 // Redisplay the page.
                 return Page();
             }
+            // Get all of the analysis users and analysis user invitations.
+            var analysisUsers = View.Analysis.AnalysisUsers
+                .Where(item => Input.Emails.Contains(item.User.Email));
+            var analysisUserInvitations = View.Analysis.AnalysisUserInvitations
+                .Where(item => Input.Emails.Contains(item.Email));
             // Save the number of items found.
-            var userCount = View.Items.Count();
+            var itemCount = analysisUsers.Count() + analysisUserInvitations.Count();
+            // Define the new tasks.
+            var analysisUsersTask = new AnalysisUsersTask
+            {
+                Items = analysisUsers.Select(item => new AnalysisUserInputModel
+                {
+                    Analysis = new AnalysisInputModel
+                    {
+                        Id = View.Analysis.Id
+                    },
+                    User = new UserInputModel
+                    {
+                        Id = item.User.Id
+                    }
+                })
+            };
+            var analysisUserInvitationsTask = new AnalysisUserInvitationsTask
+            {
+                Items = analysisUserInvitations.Select(item => new AnalysisUserInvitationInputModel
+                {
+                    Analysis = new AnalysisInputModel
+                    {
+                        Id = View.Analysis.Id
+                    },
+                    Email = item.Email
+                })
+            };
+            // Try to run the tasks.
+            try
+            {
+                // Run the tasks.
+                analysisUsersTask.Delete(_serviceProvider, CancellationToken.None);
+                analysisUserInvitationsTask.Delete(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
             // Check if all of the users have been selected.
             if (View.AreAllUsersSelected)
             {
-                // Mark the network for deletion.
-                _context.Analyses.Remove(View.Analysis);
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
+                // Define a new task.
+                var analysesTask = new AnalysesTask
+                {
+                    Items = new List<AnalysisInputModel>
+                    {
+                        new AnalysisInputModel
+                        {
+                            Id = View.Analysis.Id
+                        }
+                    }
+                };
+                // Try to run the task.
+                try
+                {
+                    // Run the tasks.
+                    analysesTask.Delete(_serviceProvider, CancellationToken.None);
+                }
+                catch (Exception exception)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, exception.Message);
+                    // Redisplay the page.
+                    return Page();
+                }
                 // Display a message.
                 TempData["StatusMessage"] = $"Success: 1 analysis deleted successfully.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
-            // Get all of the network users and network user invitations.
-            var networkUsers = View.Analysis.AnalysisUsers
-                .Where(item => Input.Emails.Contains(item.User.Email));
-            var networkUserInvitations = View.Analysis.AnalysisUserInvitations
-                .Where(item => Input.Emails.Contains(item.Email));
-            // Mark the items for deletion.
-            _context.AnalysisUsers.RemoveRange(networkUsers);
-            _context.AnalysisUserInvitations.RemoveRange(networkUserInvitations);
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {userCount.ToString()} user{(userCount != 1 ? "s" : string.Empty)} removed successfully.";
+            TempData["StatusMessage"] = $"Success: {itemCount.ToString()} user{(itemCount != 1 ? "s" : string.Empty)} removed successfully.";
             // Check if the current user was selected.
             if (View.IsCurrentUserSelected)
             {

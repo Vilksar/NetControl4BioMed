@@ -46,7 +46,7 @@
                 <select asp-for="Input.Algorithm" class="custom-select">
                     @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
                     {
-                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                        <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
                     }
                 </select>
                 <span asp-description-for="Input.Algorithm" class="text-muted small">The algorithm to be used by the new analysis.</span>
@@ -381,7 +381,7 @@
                     <span asp-validation-for="Input.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
                 </div>
             </div>
-            @if (Model.View.Algorithm == NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm.Algorithm1)
+            @if (Model.View.Algorithm == NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm.Algorithm1.ToString())
             {
                 <div class="row">
                     <div class="col-lg-6 order-1 order-lg-1 align-self-center">
@@ -467,7 +467,7 @@
                     </div>
                 </div>
             }
-            else if (Model.View.Algorithm == NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm.Algorithm2)
+            else if (Model.View.Algorithm == NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm.Algorithm2.ToString())
             {
                 <div class="row">
                     <div class="col-lg-6 order-1 order-lg-1 align-self-center">
@@ -580,6 +580,12 @@
             }
         </div>
     </div>
+    <div class="form-group" hidden>
+        <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+        <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+        <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+        <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+    </div>
     <button type="submit" class="btn btn-block btn-success" title="Create">
         <span>Create</span>
     </button>
@@ -587,4 +593,5 @@
 
 @section Scripts {
     <partial name="_ScriptsValidationPartial" />
+    <partial name="_ScriptsReCaptchaPartial" />
 }

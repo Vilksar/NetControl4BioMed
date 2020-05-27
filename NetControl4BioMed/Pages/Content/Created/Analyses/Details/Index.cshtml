@@ -430,3 +430,28 @@
         }
     </div>
 </div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-list"></i></span>
+            </div>
+            <div>
+                <span>Log</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (Model.View.Analysis.Log.TryDeserializeJsonObject<IEnumerable<string>>(out var logEntries))
+        {
+            <ul class="mb-0">
+                @foreach (var logEntry in logEntries)
+                {
+                    <li class="">
+                        <span>@logEntry</span>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>

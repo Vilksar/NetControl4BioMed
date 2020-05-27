@@ -21,7 +21,7 @@
                 <select name="algorithm" class="custom-select">
                     @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
                     {
-                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                        <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
                     }
                 </select>
                 <div class="input-group-append">

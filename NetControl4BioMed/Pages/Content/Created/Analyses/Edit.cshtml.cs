@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,17 +10,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Content.Created.Analyses
 {
     [Authorize]
     public class EditModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public EditModel(UserManager<User> userManager, ApplicationDbContext context)
+        public EditModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _userManager = userManager;
             _context = context;
         }
@@ -68,12 +73,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
+            // Define the query.
+            var query = _context.Analyses
+                .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
+                .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel
             {
-                Analysis = _context.Analyses
-                    .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.Id == id)
+                Analysis = query
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.
@@ -115,12 +122,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
+            // Define the query.
+            var query = _context.Analyses
+                .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
+                .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel
             {
-                Analysis = _context.Analyses
-                    .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.Id == Input.Id)
+                Analysis = query
                     .FirstOrDefault()
             };
             // Check if the item hasn't been found.
@@ -139,13 +148,32 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 // Redisplay the page.
                 return Page();
             }
-            // Mark the item for updating.
-            _context.Analyses.Update(View.Analysis);
-            // Update the data.
-            View.Analysis.Name = Input.Name;
-            View.Analysis.Description = Input.Description;
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            // Define a new task.
+            var task = new AnalysesTask
+            {
+                Items = new List<AnalysisInputModel>
+                {
+                    new AnalysisInputModel
+                    {
+                        Id = Input.Id,
+                        Name = Input.Name,
+                        Description = Input.Description
+                    }
+                }
+            };
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                _ = task.Edit(_serviceProvider, CancellationToken.None).ToList();
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 analysis updated successfully.";
             // Redirect to the index page.

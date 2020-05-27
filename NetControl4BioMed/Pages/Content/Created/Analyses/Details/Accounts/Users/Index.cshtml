@@ -16,13 +16,13 @@
     <div class="row align-items-center">
         <div class="col-lg-6 mb-3">
             <a asp-page="/Content/Created/Analyses/Details/Accounts/Users/Add" asp-route-id="@Model.View.Analysis.Id" class="btn btn-success btn-block" title="Add">
-                <span><i class="fas fa-plus"></i></span>
+                <span><i class="fas fa-user-plus"></i></span>
                 <span>Add a new user</span>
             </a>
         </div>
         <div class="col-lg-6 mb-3">
             <button type="submit" asp-page="/Content/Created/Analyses/Details/Accounts/Users/Remove" asp-route-id="@Model.View.Analysis.Id" class="btn btn-danger btn-block item-group-button" title="Remove" disabled>
-                <span><i class="fas fa-trash"></i></span>
+                <span><i class="fas fa-user-minus"></i></span>
                 <span>Remove selected users</span>
             </button>
         </div>
@@ -70,16 +70,11 @@
                             <span title="@item.Email" class="font-weight-bold">@item.Email</span>
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break">
-                            <div>
-                                <span title="@item.DateTimeCreated.ToShortDateString()">@item.DateTimeCreated.ToShortDateString()</span>
-                            </div>
-                            <div>
-                                <span title="@item.DateTimeCreated.ToShortTimeString()">@item.DateTimeCreated.ToShortTimeString()</span>
-                            </div>
+                            <span title="@item.DateTimeCreated.ToString()">@item.DateTimeCreated.ToString()</span>
                         </td>
                         <td class="text-center text-break">
-                            <a asp-page="/Content/Created/Analyses/Details/Accounts/Users/Remove" asp-route-id="@Model.View.Analysis.Id" asp-route-emails="@item.Email" class="btn btn-danger m-1" title="Delete">
-                                <span><i class="fas fa-trash"></i></span>
+                            <a asp-page="/Content/Created/Analyses/Details/Accounts/Users/Remove" asp-route-id="@Model.View.Analysis.Id" asp-route-emails="@item.Email" title="Remove">
+                                <span>Remove</span>
                             </a>
                         </td>
                     </tr>

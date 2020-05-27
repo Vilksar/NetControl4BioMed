@@ -24,9 +24,6 @@ else
                 <th class="text-left text-break">
                     <span>Name</span>
                 </th>
-                <th class="text-left text-break">
-                    <span>ID</span>
-                </th>
                 <th class="text-center text-break" data-orderable="false" data-searchable="false">
                     <span>Links</span>
                 </th>
@@ -41,9 +38,6 @@ else
                     </td>
                     <td class="text-left text-break">
                         <span title="@item.Network.Name" class="font-weight-bold">@item.Network.Name</span>
-                    </td>
-                    <td class="text-left text-break">
-                        <span title="@item.Network.Id" class="small text-muted">@item.Network.Id</span>
                     </td>
                     <td class="text-center text-break">
                         <a asp-page="/Content/Created/Networks/Details/Index" asp-route-id="@item.Network.Id" title="Details">

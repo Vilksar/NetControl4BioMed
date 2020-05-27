@@ -25,11 +25,14 @@ else
                     <span>Name</span>
                 </th>
                 <th class="text-left text-break">
-                    <span>ID</span>
+                    <span>Type</span>
                 </th>
-                <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                    <span>Links</span>
-                </th>
+                @if (!Model.View.IsGeneric)
+                {
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <span>Links</span>
+                    </th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -43,13 +46,16 @@ else
                         <span title="@item.Database.Name" class="font-weight-bold">@item.Database.Name</span>
                     </td>
                     <td class="text-left text-break">
-                        <span title="@item.Database.Id" class="small text-muted">@item.Database.Id</span>
+                        <span title="@item.Type.ToString()">@item.Type.ToString()</span>
                     </td>
-                    <td class="text-center text-break">
-                        <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@item.Database.Id" title="Details">
-                            <span>Details</span>
-                        </a>
-                    </td>
+                    @if (!Model.View.IsGeneric)
+                    {
+                        <td class="text-center text-break">
+                            <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@item.Database.Id" title="Details">
+                                <span>Details</span>
+                            </a>
+                        </td>
+                    }
                 </tr>
             }
         </tbody>

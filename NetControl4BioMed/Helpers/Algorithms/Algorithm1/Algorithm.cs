@@ -297,6 +297,9 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             analysis.ControlPaths = controlPaths;
             analysis.Status = currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement ? AnalysisStatus.Stopped : AnalysisStatus.Completed;
             analysis.DateTimeEnded = DateTime.Now;
+            analysis.Log = analysis.AppendToLog($"The analysis has ended with the status \"{analysis.Status.GetDisplayName()}\".");
+            // Edit the analysis.
+            IEnumerableExtensions.Edit(analysis.Yield(), context, token);
             // Save the changes in the database.
             await context.SaveChangesAsync();
             // End the function.
