@@ -22,18 +22,16 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// </summary>
         /// <param name="context">The database context of the analysis.</param>
         /// <param name="analysis">The analysis which to run using the algorithm.</param>
-        public static async Task RunAsync(Analysis analysis, ApplicationDbContext context, CancellationToken token)
+        public static void Run(Analysis analysis, ApplicationDbContext context, CancellationToken token)
         {
-            // Mark the analysis for updating.
-            context.Update(analysis);
             // Update the analysis status and stats.
             analysis.ControlPaths = new List<ControlPath>();
             analysis.Status = AnalysisStatus.Initializing;
             analysis.DateTimeStarted = DateTime.Now;
-            // Save the changes in the database.
-            await context.SaveChangesAsync();
-            // Reload it for a fresh start.
-            await context.Entry(analysis).ReloadAsync();
+            // Update the analysis.
+            IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+            // Reload the analysis for a fresh start.
+            Task.Run(() => context.Entry(analysis).ReloadAsync()).Wait();
             // Get the nodes, edges, target nodes and source (preferred) nodes.
             var nodes = analysis.AnalysisNodes
                 .Where(item => item.Type == AnalysisNodeType.None)
@@ -61,8 +59,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 analysis.Status = AnalysisStatus.Error;
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.Now;
-                // Save the changes in the database.
-                await context.SaveChangesAsync();
+                // Update the analysis.
+                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // End the function.
                 return;
             }
@@ -75,8 +73,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 analysis.Status = AnalysisStatus.Error;
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.Now;
-                // Save the changes in the database.
-                await context.SaveChangesAsync();
+                // Update the analysis.
+                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // End the function.
                 return;
             }
@@ -89,8 +87,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 analysis.Status = AnalysisStatus.Error;
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.Now;
-                // Save the changes in the database.
-                await context.SaveChangesAsync();
+                // Update the analysis.
+                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // End the function.
                 return;
             }
@@ -103,8 +101,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 analysis.Status = AnalysisStatus.Error;
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.Now;
-                // Save the changes in the database.
-                await context.SaveChangesAsync();
+                // Update the analysis.
+                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // End the function.
                 return;
             }
@@ -122,8 +120,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             // Update the analysis status and parameters.
             analysis.Parameters = JsonSerializer.Serialize(parameters);
             analysis.Status = AnalysisStatus.Ongoing;
-            // Save the changes in the database.
-            await context.SaveChangesAsync();
+            // Update the analysis.
+            IEnumerableExtensions.Edit(analysis.Yield(), context, token);
             // Run as long as the analysis exists and the final iteration hasn't been reached.
             while (analysis != null && analysis.Status == AnalysisStatus.Ongoing && currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement && !token.IsCancellationRequested)
             {
@@ -133,8 +131,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 // Update the iteration count.
                 analysis.CurrentIteration = currentIteration;
                 analysis.CurrentIterationWithoutImprovement = currentIterationWithoutImprovement;
-                // Save the changes to the analysis.
-                await context.SaveChangesAsync();
+                // Update the analysis.
+                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // Define a variable to store the control paths.
                 var controlPath = new Dictionary<string, List<string>>();
                 // Set up the control path to start from the target nodes.
@@ -151,8 +149,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                     var currentTargets = new List<string>(targets);
                     // Set the current path length to 0.
                     var currentPathLength = 0;
-                    // The optimization part for the "repeats" starts here. If it is the first check of the current iteration, we have no kept nodes, so the current targets are simply the targets.
-                    // Get the target nodes to keep.
+                    // Get the target nodes to keep. The optimization part for the "repeats" starts here. If it is the first check of the current iteration, we have no kept nodes, so the current targets are simply the targets.
                     var keptNodes = GetControllingNodes(controlPath).Where(item => item.Value.Count() > 1).Select(item => item.Value).SelectMany(item => item);
                     // Go over each of the paths corresponding to the target nodes to reset.
                     foreach (var item in controlPath.Keys.Except(keptNodes).ToList())
@@ -169,9 +166,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                         var unmatched = new List<string>(); unmatched.AddRange(currentTargets);
                         // Set all nodes in the network as free.
                         var free = new List<string>(); free.AddRange(nodes);
-                        // If it is the first check of the current iteration, there are no kept nodes, so the left nodes and edges remain unchanged.
-                        // Otherwise, remove from the left nodes the corresponding nodes in the current step in the control paths for the kept nodes.
-                        // The optimization part for the "repeat" begins here.
+                        // If it is the first check of the current iteration, there are no kept nodes, so the left nodes and edges remain unchanged. Otherwise, remove from the left nodes the corresponding nodes in the current step in the control paths for the kept nodes. The optimization part for the "repeat" begins here.
                         foreach (var item in keptNodes)
                         {
                             if (currentPathLength + 1 < controlPath[item].Count)
@@ -260,7 +255,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                     }
                 }
                 // Reload it for the next iteration.
-                await context.Entry(analysis).ReloadAsync();
+                Task.Run(() => context.Entry(analysis).ReloadAsync()).Wait();
             }
             // Check if the analysis doesn't exist anymore (if it has been deleted).
             if (analysis == null)
@@ -298,12 +293,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             analysis.Status = currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement ? AnalysisStatus.Stopped : AnalysisStatus.Completed;
             analysis.DateTimeEnded = DateTime.Now;
             analysis.Log = analysis.AppendToLog($"The analysis has ended with the status \"{analysis.Status.GetDisplayName()}\".");
-            // Edit the analysis.
+            // Update the analysis.
             IEnumerableExtensions.Edit(analysis.Yield(), context, token);
-            // Save the changes in the database.
-            await context.SaveChangesAsync();
-            // End the function.
-            return;
         }
 
         /// <summary>

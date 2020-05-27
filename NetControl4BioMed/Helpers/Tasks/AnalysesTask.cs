@@ -735,12 +735,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                         {
                             case AnalysisAlgorithm.Algorithm1:
                                 // Run the algorithm on the analysis.
-                                Task.Run(() => Algorithms.Algorithm1.Algorithm.RunAsync(analysis, context, token)).Wait();
+                                Algorithms.Algorithm1.Algorithm.Run(analysis, context, token);
                                 // End the switch.
                                 break;
                             case AnalysisAlgorithm.Algorithm2:
                                 // Run the algorithm on the analysis.
-                                Task.Run(() => Algorithms.Algorithm2.Algorithm.RunAsync(analysis, context, token)).Wait();
+                                Algorithms.Algorithm2.Algorithm.Run(analysis, context, token);
                                 // End the switch.
                                 break;
                             default:
@@ -756,6 +756,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     catch (Exception exception)
                     {
+                        // Check if there was no item found.
+                        if (analysis == null)
+                        {
+                            // Continue.
+                            continue;
+                        }
                         // Update the analysis log.
                         analysis.Log = analysis.AppendToLog(exception.Message);
                         // Update the analysis status.
