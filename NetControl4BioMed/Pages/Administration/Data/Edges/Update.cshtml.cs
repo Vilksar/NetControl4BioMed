@@ -58,7 +58,8 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
             // Define the JSON serializer options.
             var jsonSerializerOptions = new JsonSerializerOptions
             {
-                WriteIndented = true
+                WriteIndented = true,
+                IgnoreNullValues = true
             };
             // Define the view.
             View = new ViewModel
@@ -167,7 +168,8 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
             // Define the JSON serializer options.
             var jsonSerializerOptions = new JsonSerializerOptions
             {
-                WriteIndented = true
+                WriteIndented = true,
+                IgnoreNullValues = true
             };
             // Define the view.
             View = new ViewModel

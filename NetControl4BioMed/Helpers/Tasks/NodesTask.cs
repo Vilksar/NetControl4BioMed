@@ -87,6 +87,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Distinct();
                 // Get the related entities that appear in the current batch.
                 var batchDatabaseNodeFields = context.DatabaseNodeFields
+                    .Include(item => item.Database)
                     .Where(item => item.Database.DatabaseType.Name != "Generic")
                     .Where(item => batchDatabaseNodeFieldIds.Contains(item.Id));
                 // Save the items to add.

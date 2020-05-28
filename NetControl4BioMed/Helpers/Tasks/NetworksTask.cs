@@ -630,21 +630,27 @@ namespace NetControl4BioMed.Helpers.Tasks
                             continue;
                         }
                         // Get the IDs of the required related data.
-                        var nodeDatabaseIds = network.NetworkDatabases
-                            .Where(item => item.Type == NetworkDatabaseType.Node)
-                            .Select(item => item.Database)
-                            .Distinct()
-                            .Select(item => item.Id);
-                        var edgeDatabaseIds = network.NetworkDatabases
-                            .Where(item => item.Type == NetworkDatabaseType.Edge)
-                            .Select(item => item.Database)
-                            .Distinct()
-                            .Select(item => item.Id);
-                        var seedNodeCollectionIds = network.NetworkNodeCollections
-                            .Where(item => item.Type == NetworkNodeCollectionType.Seed)
-                            .Select(item => item.NodeCollection)
-                            .Distinct()
-                            .Select(item => item.Id);
+                        var nodeDatabaseIds = network.NetworkDatabases != null ?
+                            network.NetworkDatabases
+                                .Where(item => item.Type == NetworkDatabaseType.Node)
+                                .Select(item => item.Database)
+                                .Distinct()
+                                .Select(item => item.Id) :
+                            Enumerable.Empty<string>();
+                        var edgeDatabaseIds = network.NetworkDatabases != null ?
+                            network.NetworkDatabases
+                                .Where(item => item.Type == NetworkDatabaseType.Edge)
+                                .Select(item => item.Database)
+                                .Distinct()
+                                .Select(item => item.Id) :
+                            Enumerable.Empty<string>();
+                        var seedNodeCollectionIds = network.NetworkNodeCollections != null ?
+                            network.NetworkNodeCollections
+                                .Where(item => item.Type == NetworkNodeCollectionType.Seed)
+                                .Select(item => item.NodeCollection)
+                                .Distinct()
+                                .Select(item => item.Id) :
+                            Enumerable.Empty<string>();
                         // Get the node identifiers from the data.
                         var seedNodeIdentifiers = data
                             .Where(item => item.Type == "Seed")
@@ -673,7 +679,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Where(item => item.DatabaseNodeFieldNodes.Any(item1 => nodeDatabaseIds.Contains(item1.DatabaseNodeField.Database.Id)))
                             .Distinct();
                         // Get the nodes.
-                        var seedNodes = seedNodesByIdentifiers.Concat(seedNodesByNodeCollections);
+                        var seedNodes = seedNodesByIdentifiers
+                            .Concat(seedNodesByNodeCollections)
+                            .Distinct()
+                            .AsEnumerable();
                         // Check if there haven't been any seed nodes found.
                         if (seedNodes == null || !seedNodes.Any())
                         {
@@ -688,6 +697,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                         }
                         // Get all of the edges in the provided edge databases that match the given data.
                         var seedEdges = context.Databases
+                            .Include(item => item.DatabaseEdges)
+                                .ThenInclude(item => item.Edge)
+                                    .ThenInclude(item => item.EdgeNodes)
+                                        .ThenInclude(item => item.Node)
                             .Where(item => edgeDatabaseIds.Contains(item.Id))
                             .Select(item => item.DatabaseEdges)
                             .SelectMany(item => item)
@@ -711,7 +724,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         if (network.Algorithm == NetworkAlgorithm.Neighbors)
                         {
                             // Get all edges that contain the seed nodes.
-                            var currentEdges = seedEdges.Where(item => item.EdgeNodes.Any(item1 => seedNodes.Contains(item1.Node)));
+                            var currentEdges = seedEdges
+                                .Where(item => item.EdgeNodes.Any(item1 => seedNodes.Contains(item1.Node)));
                             // Add the edges to the list.
                             edges.AddRange(currentEdges);
                         }
@@ -797,8 +811,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Select(item => item.Node)
                             .Distinct();
                         // Define the related entities.
-                        network.NetworkNodes = nodes
-                            .Intersect(seedNodes)
+                        network.NetworkNodes = seedNodes
+                            .Intersect(nodes)
                             .Select(item => new NetworkNode
                             {
                                 Node = item,

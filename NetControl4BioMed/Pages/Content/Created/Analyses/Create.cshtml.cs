@@ -411,7 +411,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             var targetNodeCollections = View.TargetNodeCollections
                 .Where(item => targetNodeCollectionIds.Contains(item.Id));
             // Check if there wasn't any target data found.
-            if (!targetItems.Any() || !targetNodeCollections.Any())
+            if (!targetItems.Any() && !targetNodeCollections.Any())
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "No target data has been provided.");
@@ -531,6 +531,19 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new AnalysesTask
                 {
+                    Items = analyses.Select(item => new AnalysisInputModel
+                    {
+                        Id = item.Id
+                    })
+                })
+            };
+            var sendEndedEmailsBackgroundTask = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.SendEndedEmails)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new AnalysesTask
+                {
                     Scheme = HttpContext.Request.Scheme,
                     HostValue = HttpContext.Request.Host.Value,
                     Items = analyses.Select(item => new AnalysisInputModel
@@ -542,11 +555,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             // Mark the task for addition.
             _context.BackgroundTasks.Add(generateBackgroundTask);
             _context.BackgroundTasks.Add(startBackgroundTask);
+            _context.BackgroundTasks.Add(sendEndedEmailsBackgroundTask);
             // Save the changes to the database.
             _context.SaveChanges();
             // Create a new Hangfire background job.
-            var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateAnalyses(generateBackgroundTask.Id, CancellationToken.None));
-            var continuationJobId = BackgroundJob.ContinueJobWith<IContentTaskManager>(jobId, item => item.StartAnalyses(startBackgroundTask.Id, CancellationToken.None), JobContinuationOptions.OnlyOnSucceededState);
+            var generateJobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateAnalyses(generateBackgroundTask.Id, CancellationToken.None));
+            var startJobId = BackgroundJob.ContinueJobWith<IContentTaskManager>(generateJobId, item => item.StartAnalyses(startBackgroundTask.Id, CancellationToken.None), JobContinuationOptions.OnlyOnSucceededState);
+            var sendEndedEmailsJobId = BackgroundJob.ContinueJobWith<IContentTaskManager>(startJobId, item => item.SendEndedEmails(sendEndedEmailsBackgroundTask.Id, CancellationToken.None), JobContinuationOptions.OnlyOnSucceededState);
             // Display a message.
             TempData["StatusMessage"] = $"Success: 1 analysis of type \"{databaseType.Name}\" with algorithm \"{Input.Algorithm}\" defined successfully and scheduled for generation.";
             // Redirect to the index page.

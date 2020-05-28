@@ -289,7 +289,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Add the new item to the list.
                     analysesToAdd.Add(analysis);
                 }
-                // Create the items.
+                // Edit the items.
                 IEnumerableExtensions.Create(analysesToAdd, context, token);
                 // Go over each item.
                 foreach (var analysisToAdd in analysesToAdd)
@@ -480,30 +480,40 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Get the IDs of the required related data.
-                    var nodeDatabaseIds = analysis.AnalysisDatabases
-                        .Where(item => item.Type == AnalysisDatabaseType.Node)
-                        .Select(item => item.Database)
-                        .Distinct()
-                        .Select(item => item.Id);
-                    var edgeDatabaseIds = analysis.AnalysisDatabases
-                        .Where(item => item.Type == AnalysisDatabaseType.Edge)
-                        .Select(item => item.Database)
-                        .Distinct()
-                        .Select(item => item.Id);
-                    var sourceNodeCollectionIds = analysis.AnalysisNodeCollections
-                        .Where(item => item.Type == AnalysisNodeCollectionType.Source)
-                        .Select(item => item.NodeCollection)
-                        .Distinct()
-                        .Select(item => item.Id);
-                    var targetNodeCollectionIds = analysis.AnalysisNodeCollections
-                        .Where(item => item.Type == AnalysisNodeCollectionType.Source)
-                        .Select(item => item.NodeCollection)
-                        .Distinct()
-                        .Select(item => item.Id);
-                    var networkIds = analysis.AnalysisNetworks
-                        .Select(item => item.Network)
-                        .Distinct()
-                        .Select(item => item.Id);
+                    var nodeDatabaseIds = analysis.AnalysisDatabases != null ?
+                        analysis.AnalysisDatabases
+                            .Where(item => item.Type == AnalysisDatabaseType.Node)
+                            .Select(item => item.Database)
+                            .Distinct()
+                            .Select(item => item.Id) :
+                        Enumerable.Empty<string>();
+                    var edgeDatabaseIds = analysis.AnalysisDatabases != null ?
+                        analysis.AnalysisDatabases
+                            .Where(item => item.Type == AnalysisDatabaseType.Edge)
+                            .Select(item => item.Database)
+                            .Distinct()
+                            .Select(item => item.Id) :
+                        Enumerable.Empty<string>();
+                    var sourceNodeCollectionIds = analysis.AnalysisNodeCollections != null ?
+                        analysis.AnalysisNodeCollections
+                            .Where(item => item.Type == AnalysisNodeCollectionType.Source)
+                            .Select(item => item.NodeCollection)
+                            .Distinct()
+                            .Select(item => item.Id) :
+                        Enumerable.Empty<string>();
+                    var targetNodeCollectionIds = analysis.AnalysisNodeCollections != null ?
+                        analysis.AnalysisNodeCollections
+                            .Where(item => item.Type == AnalysisNodeCollectionType.Target)
+                            .Select(item => item.NodeCollection)
+                            .Distinct()
+                            .Select(item => item.Id) :
+                        Enumerable.Empty<string>();
+                    var networkIds = analysis.AnalysisNetworks != null ?
+                        analysis.AnalysisNetworks
+                            .Select(item => item.Network)
+                            .Distinct()
+                            .Select(item => item.Id) :
+                        Enumerable.Empty<string>();
                     // Get the identifiers of the nodes in the provided data.
                     var sourceNodeIdentifiers = data
                         .Where(item => item.Type == "Source")
@@ -537,7 +547,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => item.IsSearchable)
                         .Select(item => item.DatabaseNodeFieldNodes)
                         .SelectMany(item => item)
-                        .Where(item => targetNodeIdentifiers.Contains(item.Node.Id) || sourceNodeIdentifiers.Contains(item.Value))
+                        .Where(item => targetNodeIdentifiers.Contains(item.Node.Id) || targetNodeIdentifiers.Contains(item.Value))
                         .Select(item => item.Node)
                         .Distinct();
                     // Get the nodes in the provided node collections.
@@ -690,10 +700,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 using var scope = serviceProvider.CreateScope();
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Use a new e-mail sender instance.
-                var emailSender = scope.ServiceProvider.GetRequiredService<ISendGridEmailSender>();
-                // Use a new link generator instance.
-                var linkGenerator = scope.ServiceProvider.GetRequiredService<LinkGenerator>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -702,6 +708,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
                 var analyses = context.Analyses
+                    .Include(item => item.AnalysisNodes)
+                        .ThenInclude(item => item.Node)
+                    .Include(item => item.AnalysisEdges)
+                        .ThenInclude(item => item.Edge)
+                            .ThenInclude(item => item.EdgeNodes)
+                                .ThenInclude(item => item.Node)
                     .Where(item => batchIds.Contains(item.Id));
                 // Go over each item in the current batch.
                 foreach (var batchItem in batchItems)
@@ -762,8 +774,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Continue.
                             continue;
                         }
+                        // Get the error message
+                        var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
                         // Update the analysis log.
-                        analysis.Log = analysis.AppendToLog(exception.Message);
+                        analysis.Log = analysis.AppendToLog("An error occured while running the analysis." + message);
                         // Update the analysis status.
                         analysis.Status = AnalysisStatus.Error;
                         // Update the end time.
@@ -772,30 +786,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                         // Continue.
                         continue;
-                    }
-                    // Reload the analysis.
-                    Task.Run(() => context.Entry(analysis).ReloadAsync()).Wait();
-                    // Check if there was no item found.
-                    if (analysis == null)
-                    {
-                        // Continue.
-                        continue;
-                    }
-                    // Define the HTTP context host.
-                    var host = new HostString(HostValue);
-                    // Go over each registered user in the analysis.
-                    foreach (var user in analysis.AnalysisUsers.Where(item => item.User != null).Select(item => item.User))
-                    {
-                        // Send an analysis ending e-mail.
-                        Task.Run(() => emailSender.SendAnalysisEndedEmailAsync(new EmailAnalysisEndedViewModel
-                        {
-                            Email = user.Email,
-                            Id = analysis.Id,
-                            Name = analysis.Name,
-                            Status = analysis.Status.GetDisplayName(),
-                            Url = linkGenerator.GetUriByPage("/Content/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }, scheme: Scheme, host: host),
-                            ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
-                        })).Wait();
                     }
                 }
             }
@@ -838,8 +828,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the items with the provided IDs.
                 var analyses = context.Analyses
                     .Where(item => batchIds.Contains(item.Id));
-                // Save the items to add.
-                var analysesToEdit = new List<Analysis>();
                 // Go over each item in the current batch.
                 foreach (var batchItem in batchItems)
                 {
@@ -856,11 +844,86 @@ namespace NetControl4BioMed.Helpers.Tasks
                     analysis.Log = analysis.AppendToLog("The analysis has been scheduled to stop.");
                     // Update the status.
                     analysis.Status = AnalysisStatus.Stopping;
-                    // Add the item to the list.
-                    analysesToEdit.Add(analysis);
+                    // Update the items.
+                    IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 }
-                // Update the items.
-                IEnumerableExtensions.Edit(analyses, context, token);
+            }
+        }
+
+
+
+        /// <summary>
+        /// Sends the e-mails to the corresponding users once the items have ended.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public void SendEndedEmails(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Check if there weren't any valid items found.
+            if (Items == null)
+            {
+                // Throw an exception.
+                throw new TaskException("No valid items could be found with the provided data.");
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (var index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Create a new scope.
+                using var scope = serviceProvider.CreateScope();
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Use a new e-mail sender instance.
+                var emailSender = scope.ServiceProvider.GetRequiredService<ISendGridEmailSender>();
+                // Use a new link generator instance.
+                var linkGenerator = scope.ServiceProvider.GetRequiredService<LinkGenerator>();
+                // Get the items in the current batch.
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
+                // Get the items with the provided IDs.
+                var analyses = context.Analyses
+                    .Include(item => item.AnalysisUsers)
+                        .ThenInclude(item => item.User)
+                    .Where(item => batchIds.Contains(item.Id));
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
+                {
+                    // Get the corresponding item.
+                    var analysis = analyses
+                        .FirstOrDefault(item => item.Id == batchItem.Id);
+                    // Check if there was no item found.
+                    if (analysis == null)
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Define the HTTP context host.
+                    var host = new HostString(HostValue);
+                    // Go over each registered user in the analysis.
+                    foreach (var user in analysis.AnalysisUsers.Select(item => item.User))
+                    {
+                        // Send an analysis ending e-mail.
+                        Task.Run(() => emailSender.SendAnalysisEndedEmailAsync(new EmailAnalysisEndedViewModel
+                        {
+                            Email = user.Email,
+                            Id = analysis.Id,
+                            Name = analysis.Name,
+                            Status = analysis.Status.GetDisplayName(),
+                            Url = linkGenerator.GetUriByPage("/Content/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }, scheme: Scheme, host: host),
+                            ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
+                        })).Wait();
+                    }
+                }
             }
         }
     }

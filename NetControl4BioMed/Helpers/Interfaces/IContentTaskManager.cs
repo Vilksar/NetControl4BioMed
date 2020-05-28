@@ -67,5 +67,14 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         void StopAnalyses(string id, CancellationToken token);
+
+        /// <summary>
+        /// Sends ended e-mails to the corresponding analysis users.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        /// <returns></returns>
+        [AutomaticRetry(Attempts = 0)]
+        void SendEndedEmails(string id, CancellationToken token);
     }
 }
