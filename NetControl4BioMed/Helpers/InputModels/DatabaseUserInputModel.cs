@@ -6,13 +6,13 @@
     public class DatabaseUserInputModel
     {
         /// <summary>
-        /// Represents the database ID of the database user.
+        /// Represents the database of the database user.
         /// </summary>
-        public string DatabaseId { get; set; }
+        public DatabaseInputModel Database { get; set; }
 
         /// <summary>
-        /// Represents the user ID of the database user.
+        /// Represents the user of the database user.
         /// </summary>
-        public string UserId { get; set; }
+        public UserInputModel User { get; set; }
     }
 }

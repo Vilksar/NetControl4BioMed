@@ -154,7 +154,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             try
             {
                 // Run the task.
-                task.Edit(_serviceProvider, CancellationToken.None);
+                _ = task.Edit(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {

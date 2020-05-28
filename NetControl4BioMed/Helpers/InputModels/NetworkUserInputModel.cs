@@ -6,13 +6,13 @@
     public class NetworkUserInputModel
     {
         /// <summary>
-        /// Represents the network ID of the network user.
+        /// Represents the network of the network user.
         /// </summary>
-        public string NetworkId { get; set; }
+        public NetworkInputModel Network { get; set; }
 
         /// <summary>
-        /// Represents the user ID of the network user.
+        /// Represents the user of the network user.
         /// </summary>
-        public string UserId { get; set; }
+        public UserInputModel User { get; set; }
     }
 }

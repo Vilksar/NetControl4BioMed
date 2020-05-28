@@ -6,13 +6,13 @@
     public class NodeCollectionNodeInputModel
     {
         /// <summary>
-        /// Represents the node collection ID of the node collection node.
+        /// Represents the node collection of the node collection node.
         /// </summary>
-        public string NodeCollectionId { get; set; }
+        public NodeCollectionInputModel NodeCollection { get; set; }
 
         /// <summary>
-        /// Represents the node ID of the node collection node.
+        /// Represents the node of the node collection node.
         /// </summary>
-        public string NodeId { get; set; }
+        public NodeInputModel Node { get; set; }
     }
 }

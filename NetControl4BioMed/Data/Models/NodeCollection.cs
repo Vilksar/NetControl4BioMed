@@ -36,9 +36,9 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }
 
         /// <summary>
-        /// Gets or sets the analyses using the node collection.
+        /// Gets or sets the nodes which appear in the node collection.
         /// </summary>
-        public ICollection<AnalysisNodeCollection> AnalysisNodeCollections { get; set; }
+        public ICollection<NodeCollectionNode> NodeCollectionNodes { get; set; }
 
         /// <summary>
         /// Gets or sets the networks using the node collection.
@@ -46,8 +46,8 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<NetworkNodeCollection> NetworkNodeCollections { get; set; }
 
         /// <summary>
-        /// Gets or sets the nodes which appear in the node collection.
+        /// Gets or sets the analyses using the node collection.
         /// </summary>
-        public ICollection<NodeCollectionNode> NodeCollectionNodes { get; set; }
+        public ICollection<AnalysisNodeCollection> AnalysisNodeCollections { get; set; }
     }
 }

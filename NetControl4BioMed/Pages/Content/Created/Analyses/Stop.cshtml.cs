@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +12,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Content.Created.Analyses
 {
@@ -124,19 +130,29 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 return Page();
             }
             // Save the number of items found.
-            var analysisCount = View.Items.Count();
-            // Mark the items for update.
-            _context.Analyses.UpdateRange(View.Items);
-            // Go over each of the items.
-            foreach (var item in View.Items)
+            var itemCount = View.Items.Count();
+            // Define a new task.
+            var task = new BackgroundTask
             {
-                // Schedule it to stop.
-                item.Status = AnalysisStatus.Stopping;
-            }
+                DateTimeCreated = DateTime.Now,
+                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.StopAnalyses)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new AnalysesTask
+                {
+                    Items = View.Items.Select(item => new AnalysisInputModel
+                    {
+                        Id = item.Id
+                    })
+                })
+            };
+            // Mark the task for addition.
+            _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
+            // Create a new Hangfire background job.
+            var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.StopAnalyses(task.Id, CancellationToken.None));
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {analysisCount.ToString()} analys{(analysisCount != 1 ? "e" : "i")}s scheduled to stop successfully.";
+            TempData["StatusMessage"] = $"Success: A new background job was created to stop {itemCount} analys{(itemCount != 1 ? "e" : "i")}s.";
             // Redirect to the index page.
             return RedirectToPage("/Content/Created/Analyses/Index");
         }

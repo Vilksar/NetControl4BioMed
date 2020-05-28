@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +12,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks
 {
@@ -104,12 +110,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 Items = _context.Networks
                     .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                     .Where(item => Input.Ids.Contains(item.Id))
-                    .Include(item => item.NetworkDatabases)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseType)
-                    .Include(item => item.NetworkNodes)
-                        .ThenInclude(item => item.Node)
-                    .Include(item => item.NetworkEdges)
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -128,22 +128,29 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 return Page();
             }
             // Save the number of items found.
-            var networkCount = View.Items.Count();
-            // Get the related entities that use the items.
-            var analyses = _context.Analyses.Where(item => item.AnalysisNetworks.Any(item1 => View.Items.Contains(item1.Network)));
-            // Get the generic entities among them.
-            var genericNetworks = View.Items.Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
-            var genericNodes = _context.Nodes.Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
-            var genericEdges = _context.Edges.Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
-            // Mark the items for deletion.
-            _context.Analyses.RemoveRange(analyses);
-            _context.Networks.RemoveRange(View.Items);
-            _context.Edges.RemoveRange(genericEdges);
-            _context.Nodes.RemoveRange(genericNodes);
+            var itemCount = View.Items.Count();
+            // Define a new task.
+            var task = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.DeleteNetworks)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new NetworksTask
+                {
+                    Items = View.Items.Select(item => new NetworkInputModel
+                    {
+                        Id = item.Id
+                    })
+                })
+            };
+            // Mark the task for addition.
+            _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
+            // Create a new Hangfire background job.
+            var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.DeleteNetworks(task.Id, CancellationToken.None));
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {networkCount.ToString()} network{(networkCount != 1 ? "s" : string.Empty)} deleted successfully.";
+            TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} network{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
             return RedirectToPage("/Content/Created/Networks/Index");
         }

@@ -120,7 +120,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 })
                 .AsEnumerable();
             var query = query1
-                .Concat(query2);
+                .Concat(query2)
+                .AsQueryable();
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
@@ -151,7 +152,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                         .ThenInclude(item => item.User)
                     .Include(item => item.AnalysisUserInvitations)
                     .First(),
-                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.AsQueryable())
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.
             return Page();

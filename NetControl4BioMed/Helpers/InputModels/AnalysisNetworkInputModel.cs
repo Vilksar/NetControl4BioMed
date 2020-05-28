@@ -6,13 +6,13 @@
     public class AnalysisNetworkInputModel
     {
         /// <summary>
-        /// Represents the analysis ID of the analysis network.
+        /// Represents the analysis of the analysis network.
         /// </summary>
-        public string AnalysisId { get; set; }
+        public AnalysisInputModel Analysis { get; set; }
 
         /// <summary>
         /// Represents the network ID of the analysis network.
         /// </summary>
-        public string NetworkId { get; set; }
+        public NetworkInputModel Network { get; set; }
     }
 }

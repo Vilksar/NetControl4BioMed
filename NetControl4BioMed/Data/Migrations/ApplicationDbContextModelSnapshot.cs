@@ -15,7 +15,7 @@ namespace NetControl4BioMed.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.3")
+                .HasAnnotation("ProductVersion", "3.1.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -123,6 +123,12 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<int>("CurrentIterationWithoutImprovement")
                         .HasColumnType("int");
 
+                    b.Property<string>("Data")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("DateTimeEnded")
                         .HasColumnType("datetime2");
 
@@ -130,9 +136,6 @@ namespace NetControl4BioMed.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("JobId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Log")
@@ -166,7 +169,10 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("DatabaseId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("AnalysisId", "DatabaseId");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("AnalysisId", "DatabaseId", "Type");
 
                     b.HasIndex("DatabaseId");
 
@@ -576,14 +582,23 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<int>("Algorithm")
                         .HasColumnType("int");
 
+                    b.Property<string>("Data")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Log")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -598,7 +613,10 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("DatabaseId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("NetworkId", "DatabaseId");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("NetworkId", "DatabaseId", "Type");
 
                     b.HasIndex("DatabaseId");
 

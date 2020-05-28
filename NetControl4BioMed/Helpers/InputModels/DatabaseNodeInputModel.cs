@@ -6,13 +6,13 @@
     public class DatabaseNodeInputModel
     {
         /// <summary>
-        /// Represents the database ID of the database node.
+        /// Represents the database of the database node.
         /// </summary>
-        public string DatabaseId { get; set; }
+        public DatabaseInputModel Database { get; set; }
 
         /// <summary>
-        /// Represents the node ID of the database node.
+        /// Represents the node of the database node.
         /// </summary>
-        public string NodeId { get; set; }
+        public NodeInputModel Node { get; set; }
     }
 }

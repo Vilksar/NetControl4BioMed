@@ -6,14 +6,14 @@
     public class EdgeNodeInputModel
     {
         /// <summary>
-        /// Represents the edge ID of the edge node.
+        /// Represents the edge of the edge node.
         /// </summary>
-        public string EdgeId { get; set; }
+        public EdgeInputModel Edge { get; set; }
 
         /// <summary>
-        /// Represents the node ID of the edge node.
+        /// Represents the node of the edge node.
         /// </summary>
-        public string NodeId { get; set; }
+        public NodeInputModel Node { get; set; }
 
         /// <summary>
         /// Represents the type of the edge node.

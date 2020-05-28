@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
@@ -28,14 +29,17 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Create(IServiceProvider serviceProvider, CancellationToken token)
+        /// <returns>The created items.</returns>
+        public IEnumerable<DatabaseUser> Create(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -52,24 +56,82 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the related entities that appear in the current batch.
-                var databaseIds = batchItems.Select(item => item.DatabaseId);
-                var userIds = batchItems.Select(item => item.UserId);
+                var batchDatabaseIds = batchItems
+                    .Where(item => item.Database != null)
+                    .Select(item => item.Database)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
+                var batchUserIds = batchItems
+                    .Where(item => item.User != null)
+                    .Select(item => item.User)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
                 // Get the related entities that appear in the current batch.
-                var databases = context.Databases.Where(item => databaseIds.Contains(item.Id));
-                var users = context.Users.Where(item => userIds.Contains(item.Id));
-                // Define the items corresponding to the current batch.
-                var databaseUsers = batchItems.Select(item => new DatabaseUser
+                var batchDatabases = context.Databases
+                    .Where(item => batchDatabaseIds.Contains(item.Id));
+                var batchUsers = context.Users
+                    .Where(item => batchUserIds.Contains(item.Id));
+                // Save the items to add.
+                var databaseUsersToAdd = new List<DatabaseUser>();
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
                 {
-                    DatabaseId = item.DatabaseId,
-                    Database = databases.First(item1 => item1.Id == item.DatabaseId),
-                    UserId = item.UserId,
-                    User = users.First(item1 => item1.Id == item.UserId),
-                    DateTimeCreated = DateTime.Now
-                });
+                    // Check if there was no database provided.
+                    if (batchItem.Database == null || string.IsNullOrEmpty(batchItem.Database.Id))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There was no database provided.", showExceptionItem, batchItem);
+                    }
+                    // Get the database.
+                    var database = batchDatabases
+                        .FirstOrDefault(item => item.Id == batchItem.Database.Id);
+                    // Check if there was no database found.
+                    if (database == null)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There was no database found.", showExceptionItem, batchItem);
+                    }
+                    // Check if there was no user provided.
+                    if (batchItem.User == null || string.IsNullOrEmpty(batchItem.User.Id))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There was no user provided.", showExceptionItem, batchItem);
+                    }
+                    // Get the user.
+                    var user = batchUsers
+                        .FirstOrDefault(item => item.Id == batchItem.User.Id);
+                    // Check if there was no user found.
+                    if (user == null)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There was no user found.", showExceptionItem, batchItem);
+                    }
+                    // Define the new item.
+                    var databaseUser = new DatabaseUser
+                    {
+                        DateTimeCreated = DateTime.Now,
+                        DatabaseId = database.Id,
+                        Database = database,
+                        UserId = user.Id,
+                        User = user
+                    };
+                    // Add the item to the list.
+                    databaseUsersToAdd.Add(databaseUser);
+                }
                 // Create the items.
-                IEnumerableExtensions.Create(databaseUsers, context, token);
+                IEnumerableExtensions.Create(databaseUsersToAdd, context, token);
+                // Go over each item.
+                foreach (var databaseUser in databaseUsersToAdd)
+                {
+                    // Yield return it.
+                    yield return databaseUser;
+                }
             }
         }
 
@@ -84,7 +146,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -102,12 +164,17 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
-                var batchIds = batchItems.Select(item => (item.DatabaseId, item.UserId));
+                var batchIds = batchItems
+                    .Where(item => item.Database != null && !string.IsNullOrEmpty(item.Database.Id))
+                    .Where(item => item.User != null && !string.IsNullOrEmpty(item.User.Id))
+                    .Select(item => (item.Database.Id, item.User.Id));
                 // Get the items with the provided IDs.
                 var databaseUsers = context.DatabaseUsers
-                    .Where(item => batchIds.Any(item1 => item1.DatabaseId == item.Database.Id && item1.UserId == item.User.Id));
+                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.Database.Id && item1.Item2 == item.User.Id));
                 // Delete the items.
                 IQueryableExtensions.Delete(databaseUsers, context, token);
             }

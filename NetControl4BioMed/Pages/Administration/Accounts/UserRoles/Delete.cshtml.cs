@@ -157,8 +157,14 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                 {
                     Items = View.Items.Select(item => new UserRoleInputModel
                     {
-                        UserId = item.User.Id,
-                        RoleId = item.Role.Id
+                        User = new UserInputModel
+                        {
+                            Id = item.User.Id
+                        },
+                        Role = new RoleInputModel
+                        {
+                            Id = item.Role.Id
+                        }
                     })
                 })
             };

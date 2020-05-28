@@ -18,12 +18,7 @@ namespace NetControl4BioMed.Helpers.InputModels
         public string Description { get; set; }
 
         /// <summary>
-        /// Represents the edge nodes of the edge.
-        /// </summary>
-        public IEnumerable<EdgeNodeInputModel> EdgeNodes { get; set; }
-
-        /// <summary>
-        /// Represents the IDs of the databases to be assigned to the edge.
+        /// Represents the database edges of the edge.
         /// </summary>
         public IEnumerable<DatabaseEdgeInputModel> DatabaseEdges { get; set; }
 
@@ -31,5 +26,20 @@ namespace NetControl4BioMed.Helpers.InputModels
         /// Represents the database edge field edges of the edge.
         /// </summary>
         public IEnumerable<DatabaseEdgeFieldEdgeInputModel> DatabaseEdgeFieldEdges { get; set; }
+
+        /// <summary>
+        /// Represents the edge nodes of the edge.
+        /// </summary>
+        public IEnumerable<EdgeNodeInputModel> EdgeNodes { get; set; }
+
+        /// <summary>
+        /// Represents the network edges of the edge.
+        /// </summary>
+        public IEnumerable<NetworkEdgeInputModel> NetworkEdges { get; set; }
+
+        /// <summary>
+        /// Represents the analysis edges of the edge.
+        /// </summary>
+        public IEnumerable<AnalysisEdgeInputModel> AnalysisEdges { get; set; }
     }
 }

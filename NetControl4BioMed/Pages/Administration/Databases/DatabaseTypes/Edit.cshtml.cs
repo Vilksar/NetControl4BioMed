@@ -142,14 +142,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
                 // Redisplay the page.
                 return Page();
             }
-            // Check if there is another database type with the same name.
-            if (_context.DatabaseTypes.Any(item => item.Id != View.DatabaseType.Id && item.Name == Input.Name))
-            {
-                // Add an error to the model
-                ModelState.AddModelError(string.Empty, $"A database type with the name \"{Input.Name}\" already exists.");
-                // Redisplay the page.
-                return Page();
-            }
             // Define a new task.
             var task = new DatabaseTypesTask
             {
@@ -167,7 +159,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             try
             {
                 // Run the task.
-                task.Edit(_serviceProvider, CancellationToken.None);
+                _ = task.Edit(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {

@@ -21,9 +21,6 @@ else
                 <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
                     <span>#</span>
                 </th>
-                <th class="text-left text-break">
-                    <span>ID</span>
-                </th>
                 <th class="text-center text-break">
                     <span>Control nodes</span>
                 </th>
@@ -38,9 +35,6 @@ else
                 <tr>
                     <td class="text-center text-break">
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
-                    </td>
-                    <td class="text-left text-break">
-                        <span title="@item.Id" class="small text-muted">@item.Id</span>
                     </td>
                     <td class="d-none d-lg-table-cell text-center text-break">
                         <span>@item.Paths.Select(item1 => item1.PathNodes).SelectMany(item => item).Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Source).Select(item => item.Node).Distinct().Count()</span>

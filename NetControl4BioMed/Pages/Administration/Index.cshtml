@@ -136,10 +136,19 @@
     <div class="card-body">
         <div class="alert alert-warning text-justify text-wrap">
             <span><i class="fas fa-exclamation-triangle"></i></span>
-            <span>You can (re)set all of the Hangfire recurrent jobs by clicking on the button below. The jobs are unset by default. The recurring jobs are:</span>
+            <span>You can (re)set all of the Hangfire recurrent jobs by clicking on the button below. They are scheduled to run every day at midnight. The jobs are unset by default. The recurring jobs are:</span>
             <ul class="mt-1 mb-0">
                 <li>
-                    <span><span class="font-weight-bold">Recurring Cleaner</span>, which runs every day at midnight to stop ongoing long-running analyses, forcefully stop long-stopping analyses, and delete the networks and analyses created over a month before the current date.</span>
+                    <span><span class="font-weight-bold">Stop analyses</span>, which stops all analyses created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeStop days before the current date.</span>
+                </li>
+                <li>
+                    <span><span class="font-weight-bold">Alert users</span>, which sends an e-mail to all users which have access to a network or to an analysis created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeAlert days before the current date, and scheduled to be automatically deleted in @(NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete - NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeAlert) days.</span>
+                </li>
+                <li>
+                    <span><span class="font-weight-bold">Delete networks</span>, which deletes all networks created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete days before the current date.</span>
+                </li>
+                <li>
+                    <span><span class="font-weight-bold">Delete analyses</span>, which deletes all analyses created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete days before the current date.</span>
                 </li>
             </ul>
         </div>

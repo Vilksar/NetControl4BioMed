@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,17 +10,21 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.Users
 {
     [Authorize]
     public class RemoveModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public RemoveModel(UserManager<User> userManager, ApplicationDbContext context)
+        public RemoveModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context)
         {
+            _serviceProvider = serviceProvider;
             _userManager = userManager;
             _context = context;
         }
@@ -39,8 +44,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
         public class ViewModel
         {
             public Network Network { get; set; }
-
-            public bool IsGeneric { get; set; }
 
             public IEnumerable<ItemModel> Items { get; set; }
 
@@ -95,9 +98,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
                     .Include(item => item.NetworkUsers)
                         .ThenInclude(item => item.User)
                     .Include(item => item.NetworkUserInvitations)
-                    .First(),
-                IsGeneric = items
-                    .Any(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .First()
             };
             // Get the items for the view.
             var items1 = View.Network.NetworkUsers
@@ -180,13 +181,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
             // Define the view.
             View = new ViewModel
             {
-                IsGeneric = items
-                    .Any(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic")),
                 Network = items
-                    .Include(item => item.NetworkNodes)
-                        .ThenInclude(item => item.Node)
-                    .Include(item => item.NetworkEdges)
-                        .ThenInclude(item => item.Edge)
                     .Include(item => item.NetworkUsers)
                         .ThenInclude(item => item.User)
                     .Include(item => item.NetworkUserInvitations)
@@ -237,46 +232,87 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
                 // Redisplay the page.
                 return Page();
             }
-            // Save the number of items found.
-            var userCount = View.Items.Count();
-            // Check if all of the users have been selected.
-            if (View.AreAllUsersSelected)
-            {
-                // Get the related entities that use the current network.
-                var analyses = View.Network.AnalysisNetworks.Select(item => item.Analysis);
-                // Mark the items for deletion.
-                _context.Analyses.RemoveRange(analyses);
-                // Check if the network is generic.
-                if (View.IsGeneric)
-                {
-                    // Get the related entities for the current network.
-                    var genericNodes = View.Network.NetworkNodes.Select(item => item.Node);
-                    var genericEdges = View.Network.NetworkEdges.Select(item => item.Edge);
-                    // Mark the items for deletion.
-                    _context.Edges.RemoveRange(genericEdges);
-                    _context.Nodes.RemoveRange(genericNodes);
-                }
-                // Mark the network for deletion.
-                _context.Networks.Remove(View.Network);
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
-                // Display a message.
-                TempData["StatusMessage"] = $"Success: 1 network deleted successfully.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/Created/Networks/Index");
-            }
             // Get all of the network users and network user invitations.
             var networkUsers = View.Network.NetworkUsers
                 .Where(item => Input.Emails.Contains(item.User.Email));
             var networkUserInvitations = View.Network.NetworkUserInvitations
                 .Where(item => Input.Emails.Contains(item.Email));
-            // Mark the items for deletion.
-            _context.NetworkUsers.RemoveRange(networkUsers);
-            _context.NetworkUserInvitations.RemoveRange(networkUserInvitations);
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            // Save the number of items found.
+            var itemCount = networkUsers.Count() + networkUserInvitations.Count();
+            // Define the new tasks.
+            var networkUsersTask = new NetworkUsersTask
+            {
+                Items = networkUsers.Select(item => new NetworkUserInputModel
+                {
+                    Network = new NetworkInputModel
+                    {
+                        Id = View.Network.Id
+                    },
+                    User = new UserInputModel
+                    {
+                        Id = item.User.Id
+                    }
+                })
+            };
+            var networkUserInvitationsTask = new NetworkUserInvitationsTask
+            {
+                Items = networkUserInvitations.Select(item => new NetworkUserInvitationInputModel
+                {
+                    Network = new NetworkInputModel
+                    {
+                        Id = View.Network.Id
+                    },
+                    Email = item.Email
+                })
+            };
+            // Try to run the tasks.
+            try
+            {
+                // Run the tasks.
+                networkUsersTask.Delete(_serviceProvider, CancellationToken.None);
+                networkUserInvitationsTask.Delete(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, exception.Message);
+                // Redisplay the page.
+                return Page();
+            }
+            // Check if all of the users have been selected.
+            if (View.AreAllUsersSelected)
+            {
+                // Define a new task.
+                var networksTask = new NetworksTask
+                {
+                    Items = new List<NetworkInputModel>
+                    {
+                        new NetworkInputModel
+                        {
+                            Id = View.Network.Id
+                        }
+                    }
+                };
+                // Try to run the task.
+                try
+                {
+                    // Run the tasks.
+                    networksTask.Delete(_serviceProvider, CancellationToken.None);
+                }
+                catch (Exception exception)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, exception.Message);
+                    // Redisplay the page.
+                    return Page();
+                }
+                // Display a message.
+                TempData["StatusMessage"] = $"Success: 1 network deleted successfully.";
+                // Redirect to the index page.
+                return RedirectToPage("/Content/Created/Networks/Index");
+            }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {userCount.ToString()} user{(userCount != 1 ? "s" : string.Empty)} removed successfully.";
+            TempData["StatusMessage"] = $"Success: {itemCount.ToString()} user{(itemCount != 1 ? "s" : string.Empty)} removed successfully.";
             // Check if the current user was selected.
             if (View.IsCurrentUserSelected)
             {

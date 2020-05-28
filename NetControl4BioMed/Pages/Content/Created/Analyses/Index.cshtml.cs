@@ -52,6 +52,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsDefined", "Is defined" },
+                    { "IsNotDefined", "Is not defined" },
                     { "IsScheduled", "Is scheduled" },
                     { "IsNotScheduled", "Is not scheduled" },
                     { "IsInitializing", "Is initializing" },
@@ -131,6 +133,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     input.SearchIn.Contains("AnalysisNetworks") && item.AnalysisNetworks.Any(item1 => item1.Network.Id.Contains(input.SearchString) || item1.Network.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
+                .Where(item => input.Filter.Contains("IsError") ? item.Status == AnalysisStatus.Error : true)
+                .Where(item => input.Filter.Contains("IsNotError") ? item.Status != AnalysisStatus.Error : true)
+                .Where(item => input.Filter.Contains("IsDefined") ? item.Status == AnalysisStatus.Defined : true)
+                .Where(item => input.Filter.Contains("IsNotDefined") ? item.Status != AnalysisStatus.Defined : true)
                 .Where(item => input.Filter.Contains("IsScheduled") ? item.Status == AnalysisStatus.Scheduled : true)
                 .Where(item => input.Filter.Contains("IsNotScheduled") ? item.Status != AnalysisStatus.Scheduled : true)
                 .Where(item => input.Filter.Contains("IsInitializing") ? item.Status == AnalysisStatus.Initializing : true)
@@ -143,8 +149,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 .Where(item => input.Filter.Contains("IsNotStopped") ? item.Status != AnalysisStatus.Stopped : true)
                 .Where(item => input.Filter.Contains("IsCompleted") ? item.Status == AnalysisStatus.Completed : true)
                 .Where(item => input.Filter.Contains("IsNotCompleted") ? item.Status != AnalysisStatus.Completed : true)
-                .Where(item => input.Filter.Contains("IsError") ? item.Status == AnalysisStatus.Error : true)
-                .Where(item => input.Filter.Contains("IsNotError") ? item.Status != AnalysisStatus.Error : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithm1") ? item.Algorithm == AnalysisAlgorithm.Algorithm1 : true)
                 .Where(item => input.Filter.Contains("UsesNotAlgorithm1") ? item.Algorithm != AnalysisAlgorithm.Algorithm1 : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithm2") ? item.Algorithm == AnalysisAlgorithm.Algorithm2 : true)

@@ -84,7 +84,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
             try
             {
                 // Run the task.
-                task.Create(_serviceProvider, CancellationToken.None);
+                _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {

@@ -48,10 +48,10 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string DatabaseTypeString { get; set; }
+            public string DatabaseTypeId { get; set; }
         }
 
-        public IActionResult OnGet(string databaseTypeString = null)
+        public IActionResult OnGet(string databaseTypeId = null)
         {
             // Check if there aren't any non-generic database types.
             if (!_context.DatabaseTypes.Any(item => item.Name != "Generic"))
@@ -64,7 +64,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             // Define the input.
             Input = new InputModel
             {
-                DatabaseTypeString = databaseTypeString
+                DatabaseTypeId = databaseTypeId
             };
             // Return the page.
             return Page();
@@ -88,26 +88,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 // Redisplay the page.
                 return Page();
             }
-            // Check if there is another database with the same name.
-            if (_context.Databases.Any(item => item.Name == Input.Name))
-            {
-                // Add an error to the model
-                ModelState.AddModelError(string.Empty, $"A database with the name \"{Input.Name}\" already exists.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Get the corresponding database type.
-            var databaseType = _context.DatabaseTypes
-                .Where(item => item.Name != "Generic")
-                .FirstOrDefault(item => item.Id == Input.DatabaseTypeString || item.Name == Input.DatabaseTypeString);
-            // Check if no database type has been found.
-            if (databaseType == null)
-            {
-                // Add an error to the model
-                ModelState.AddModelError(string.Empty, "No non-generic database type could be found with the provided string.");
-                // Redisplay the page.
-                return Page();
-            }
             // Define a new task.
             var task = new DatabasesTask
             {
@@ -119,7 +99,10 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                         Description = Input.Description,
                         Url = Input.Url,
                         IsPublic = Input.IsPublic,
-                        DatabaseTypeId = databaseType.Id
+                        DatabaseType = new DatabaseTypeInputModel
+                        {
+                            Id = Input.DatabaseTypeId
+                        }
                     }
                 }
             };
@@ -127,7 +110,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             try
             {
                 // Run the task.
-                task.Create(_serviceProvider, CancellationToken.None);
+                _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {

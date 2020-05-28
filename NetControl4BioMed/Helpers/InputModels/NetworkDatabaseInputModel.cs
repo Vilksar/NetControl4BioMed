@@ -6,13 +6,18 @@
     public class NetworkDatabaseInputModel
     {
         /// <summary>
-        /// Represents the network ID of the network database.
+        /// Represents the network of the network database.
         /// </summary>
-        public string NetworkId { get; set; }
+        public NetworkInputModel Network { get; set; }
 
         /// <summary>
-        /// Represents the database ID of the network database.
+        /// Represents the database of the network database.
         /// </summary>
-        public string DatabaseId { get; set; }
+        public DatabaseInputModel Database { get; set; }
+
+        /// <summary>
+        /// Represents the type of the network database.
+        /// </summary>
+        public string Type { get; set; }
     }
 }

@@ -128,8 +128,10 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                 {
                     Items = View.Items.Select(item => new DatabaseUserInvitationInputModel
                     {
-                        DatabaseId = item.DatabaseId,
-                        Email = item.Email
+                        Database = new DatabaseInputModel
+                        {
+                            Id = item.Database.Id
+                        }
                     })
                 })
             };

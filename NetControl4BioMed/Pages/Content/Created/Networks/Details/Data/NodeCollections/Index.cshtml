@@ -24,9 +24,6 @@ else
                 <th class="text-left text-break">
                     <span>Name</span>
                 </th>
-                <th class="text-left text-break">
-                    <span>ID</span>
-                </th>
                 @if (!Model.View.IsGeneric)
                 {
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -44,9 +41,6 @@ else
                     </td>
                     <td class="text-left text-break">
                         <span title="@item.NodeCollection.Name" class="font-weight-bold">@item.NodeCollection.Name</span>
-                    </td>
-                    <td class="text-left text-break">
-                        <span title="@item.NodeCollection.Id" class="small text-muted">@item.NodeCollection.Id</span>
                     </td>
                     @if (!Model.View.IsGeneric)
                     {

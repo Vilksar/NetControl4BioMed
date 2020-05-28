@@ -224,15 +224,5 @@ namespace NetControl4BioMed.Helpers.Interfaces
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
         void StopAnalyses(string id, CancellationToken token);
-
-        /// <summary>
-        /// Cleans the database of long-standing items.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
-        [AutomaticRetry(Attempts = 0)]
-        [DisableConcurrentExecution(86400)]
-        void Clean(string id, CancellationToken token);
     }
 }

@@ -20,6 +20,21 @@ namespace NetControl4BioMed.Data
         public static int BatchSize { get; } = 200;
 
         /// <summary>
+        /// Gets or sets the number of days before user-created database items will be automatically stopped.
+        /// </summary>
+        public static int DaysBeforeStop { get; } = 7;
+
+        /// <summary>
+        /// Gets or sets the number of days before an alert on user-created database items close to deletion will be automatically sent.
+        /// </summary>
+        public static int DaysBeforeAlert { get; } = 24;
+
+        /// <summary>
+        /// Gets or sets the number of days before user-created database items will be automatically deleted.
+        /// </summary>
+        public static int DaysBeforeDelete { get; } = 31;
+
+        /// <summary>
         /// Gets or sets the database table containing the analyses.
         /// </summary>
         public DbSet<Analysis> Analyses { get; set; }
@@ -216,7 +231,7 @@ namespace NetControl4BioMed.Data
             });
             modelBuilder.Entity<AnalysisDatabase>(entity =>
             {
-                entity.HasKey(item => new { item.AnalysisId, item.DatabaseId });
+                entity.HasKey(item => new { item.AnalysisId, item.DatabaseId, item.Type });
                 entity.HasOne(item => item.Analysis)
                     .WithMany(item => item.AnalysisDatabases)
                     .HasForeignKey(item => item.AnalysisId)
@@ -432,7 +447,7 @@ namespace NetControl4BioMed.Data
             });
             modelBuilder.Entity<NetworkDatabase>(entity =>
             {
-                entity.HasKey(item => new { item.NetworkId, item.DatabaseId });
+                entity.HasKey(item => new { item.NetworkId, item.DatabaseId, item.Type });
                 entity.HasOne(item => item.Network)
                     .WithMany(item => item.NetworkDatabases)
                     .HasForeignKey(item => item.NetworkId)

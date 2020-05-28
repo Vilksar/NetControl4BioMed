@@ -102,8 +102,9 @@ namespace NetControl4BioMed
             services.AddTransient<IPartialViewRenderer, PartialViewRenderer>();
             services.AddTransient<IReCaptchaChecker, ReCaptchaChecker>();
             services.AddTransient<ISendGridEmailSender, SendGridEmailSender>();
+            services.AddTransient<IRecurringTaskManager, RecurringTaskManager>();
             services.AddTransient<IAdministrationTaskManager, AdministrationTaskManager>();
-            services.AddTransient<IAnalysisRunner, AnalysisRunner>();
+            services.AddTransient<IContentTaskManager, ContentTaskManager>();
             // Add Razor pages.
             services.AddRazorPages();
         }
@@ -153,7 +154,7 @@ namespace NetControl4BioMed
             });
             app.UseHangfireServer(new BackgroundJobServerOptions
             {
-                WorkerCount = Environment.ProcessorCount > 1 ? (Environment.ProcessorCount - 1) * 2 : 1
+                WorkerCount = Environment.ProcessorCount > 1 ? Environment.ProcessorCount - 1 : 1
             });
             // Seed the database.
             app.SeedDatabaseAsync(Configuration).Wait();

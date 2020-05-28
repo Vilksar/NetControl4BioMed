@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
@@ -28,14 +29,17 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Create(IServiceProvider serviceProvider, CancellationToken token)
+        /// <returns>The created items.</returns>
+        public IEnumerable<NetworkUser> Create(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -52,24 +56,82 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the related entities that appear in the current batch.
-                var networkIds = batchItems.Select(item => item.NetworkId);
-                var userIds = batchItems.Select(item => item.UserId);
+                var batchNetworkIds = batchItems
+                    .Where(item => item.Network != null)
+                    .Select(item => item.Network)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
+                var batchUserIds = batchItems
+                    .Where(item => item.User != null)
+                    .Select(item => item.User)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
                 // Get the related entities that appear in the current batch.
-                var networks = context.Networks.Where(item => networkIds.Contains(item.Id));
-                var users = context.Users.Where(item => userIds.Contains(item.Id));
-                // Define the items corresponding to the current batch.
-                var networkUsers = batchItems.Select(item => new NetworkUser
+                var batchNetworks = context.Networks
+                    .Where(item => batchNetworkIds.Contains(item.Id));
+                var batchUsers = context.Users
+                    .Where(item => batchUserIds.Contains(item.Id));
+                // Save the items to add.
+                var networkUsersToAdd = new List<NetworkUser>();
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
                 {
-                    NetworkId = item.NetworkId,
-                    Network = networks.First(item1 => item1.Id == item.NetworkId),
-                    UserId = item.UserId,
-                    User = users.First(item1 => item1.Id == item.UserId),
-                    DateTimeCreated = DateTime.Now
-                });
+                    // Check if there was no network provided.
+                    if (batchItem.Network == null || string.IsNullOrEmpty(batchItem.Network.Id))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There was no network provided.", showExceptionItem, batchItem);
+                    }
+                    // Get the network.
+                    var network = batchNetworks
+                        .FirstOrDefault(item => item.Id == batchItem.Network.Id);
+                    // Check if there was no network found.
+                    if (network == null)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There was no network found.", showExceptionItem, batchItem);
+                    }
+                    // Check if there was no user provided.
+                    if (batchItem.User == null || string.IsNullOrEmpty(batchItem.User.Id))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There was no user provided.", showExceptionItem, batchItem);
+                    }
+                    // Get the user.
+                    var user = batchUsers
+                        .FirstOrDefault(item => item.Id == batchItem.User.Id);
+                    // Check if there was no user found.
+                    if (user == null)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There was no user found.", showExceptionItem, batchItem);
+                    }
+                    // Define the new item.
+                    var networkUser = new NetworkUser
+                    {
+                        DateTimeCreated = DateTime.Now,
+                        NetworkId = network.Id,
+                        Network = network,
+                        UserId = user.Id,
+                        User = user
+                    };
+                    // Add the item to the list.
+                    networkUsersToAdd.Add(networkUser);
+                }
                 // Create the items.
-                IEnumerableExtensions.Create(networkUsers, context, token);
+                IEnumerableExtensions.Create(networkUsersToAdd, context, token);
+                // Go over each item.
+                foreach (var networkUser in networkUsersToAdd)
+                {
+                    // Yield return it.
+                    yield return networkUser;
+                }
             }
         }
 
@@ -84,7 +146,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -102,12 +164,17 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
-                var batchIds = batchItems.Select(item => (item.NetworkId, item.UserId));
+                var batchIds = batchItems
+                    .Where(item => item.Network != null && !string.IsNullOrEmpty(item.Network.Id))
+                    .Where(item => item.User != null && !string.IsNullOrEmpty(item.User.Id))
+                    .Select(item => (item.Network.Id, item.User.Id));
                 // Get the items with the provided IDs.
                 var networkUsers = context.NetworkUsers
-                    .Where(item => batchIds.Any(item1 => item1.NetworkId == item.Network.Id && item1.UserId == item.User.Id));
+                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.Network.Id && item1.Item2 == item.User.Id));
                 // Delete the items.
                 IQueryableExtensions.Delete(networkUsers, context, token);
             }

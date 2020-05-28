@@ -1,4 +1,6 @@
-﻿namespace NetControl4BioMed.Helpers.InputModels
+﻿using System.Collections.Generic;
+
+namespace NetControl4BioMed.Helpers.InputModels
 {
     /// <summary>
     /// Represents the input model for a database edge field.
@@ -31,8 +33,13 @@
         public bool IsSearchable { get; set; }
 
         /// <summary>
-        /// Represents the database ID of the database edge field.
+        /// Represents the database of the database edge field.
         /// </summary>
-        public string DatabaseId { get; set; }
+        public DatabaseInputModel Database { get; set; }
+
+        /// <summary>
+        /// Represents the database edge field edges of the database edge field.
+        /// </summary>
+        public IEnumerable<DatabaseEdgeFieldEdgeInputModel> DatabaseEdgeFieldEdges { get; set; }
     }
 }

@@ -6,9 +6,9 @@
     public class AnalysisUserInvitationInputModel
     {
         /// <summary>
-        /// Represents the analysis ID of the analysis user invitation.
+        /// Represents the analysis of the analysis user invitation.
         /// </summary>
-        public string AnalysisId { get; set; }
+        public AnalysisInputModel Analysis { get; set; }
 
         /// <summary>
         /// Represents the e-mail of the analysis user invitation.

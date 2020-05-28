@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -11,7 +12,9 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.Users
@@ -19,14 +22,16 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
     [Authorize]
     public class AddModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly ISendGridEmailSender _emailSender;
         private readonly LinkGenerator _linkGenerator;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public AddModel(UserManager<User> userManager, ApplicationDbContext context, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public AddModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
+            _serviceProvider = serviceProvider;
             _userManager = userManager;
             _context = context;
             _emailSender = emailSender;
@@ -175,34 +180,68 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             // Check if any user has been found.
             if (userToAdd != null)
             {
-                // Create the user permission.
-                var networkUser = new AnalysisUser
+                // Define a new task.
+                var task = new AnalysisUsersTask
                 {
-                    UserId = userToAdd.Id,
-                    User = userToAdd,
-                    AnalysisId = View.Analysis.Id,
-                    Analysis = View.Analysis,
-                    DateTimeCreated = DateTime.Now
+                    Items = new List<AnalysisUserInputModel>
+                    {
+                        new AnalysisUserInputModel
+                        {
+                            Analysis = new AnalysisInputModel
+                            {
+                                Id = View.Analysis.Id
+                            },
+                            User = new UserInputModel
+                            {
+                                Id = userToAdd.Id
+                            }
+                        }
+                    }
                 };
-                // Mark it for addition to the database.
-                _context.AnalysisUsers.Add(networkUser);
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
+                // Try to run the task.
+                try
+                {
+                    // Run the task.
+                    _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
+                }
+                catch (Exception exception)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, exception.Message);
+                    // Redisplay the page.
+                    return Page();
+                }
             }
             else
             {
-                // Create the user permission.
-                var networkUserInvitation = new AnalysisUserInvitation
+                // Define a new task.
+                var task = new AnalysisUserInvitationsTask
                 {
-                    Email = Input.Email,
-                    AnalysisId = View.Analysis.Id,
-                    Analysis = View.Analysis,
-                    DateTimeCreated = DateTime.Now
+                    Items = new List<AnalysisUserInvitationInputModel>
+                    {
+                        new AnalysisUserInvitationInputModel
+                        {
+                            Analysis = new AnalysisInputModel
+                            {
+                                Id = View.Analysis.Id
+                            },
+                            Email = Input.Email
+                        }
+                    }
                 };
-                // Mark it for addition to the database.
-                _context.AnalysisUserInvitations.Add(networkUserInvitation);
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
+                // Try to run the task.
+                try
+                {
+                    // Run the task.
+                    _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
+                }
+                catch (Exception exception)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, exception.Message);
+                    // Redisplay the page.
+                    return Page();
+                }
             }
             // Define the view model for the e-mails.
             var emailAddedToAnalysisViewModel = new EmailAddedToAnalysisViewModel
@@ -225,7 +264,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             await _emailSender.SendAddedToAnalysisEmailAsync(emailAddedToAnalysisViewModel);
             await _emailSender.SendWasAddedToAnalysisEmailAsync(emailWasAddedToAnalysisViewModel);
             // Display a message to the user.
-            TempData["StatusMessage"] = "Success: 1 user added successfully to the network.";
+            TempData["StatusMessage"] = "Success: 1 user added successfully to the analysis.";
             // Redirect to the users page.
             return RedirectToPage("/Content/Created/Analyses/Details/Accounts/Users/Index", new { id = View.Analysis.Id });
         }

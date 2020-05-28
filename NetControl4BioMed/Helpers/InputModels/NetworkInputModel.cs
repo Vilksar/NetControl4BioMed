@@ -13,11 +13,6 @@ namespace NetControl4BioMed.Helpers.InputModels
         public string Id { get; set; }
 
         /// <summary>
-        /// Represents the database type ID of the network.
-        /// </summary>
-        public string DatabaseTypeId { get; set; }
-
-        /// <summary>
         /// Represents the name of the network.
         /// </summary>
         public string Name { get; set; }
@@ -33,9 +28,19 @@ namespace NetControl4BioMed.Helpers.InputModels
         public string Algorithm { get; set; }
 
         /// <summary>
-        /// Represents the seed data for generating the network.
+        /// Represents the data for generating the network.
         /// </summary>
-        public string SeedData { get; set; }
+        public string Data { get; set; }
+
+        /// <summary>
+        /// Represents the network users of the network.
+        /// </summary>
+        public IEnumerable<NetworkUserInputModel> NetworkUsers { get; set; }
+
+        /// <summary>
+        /// Represents the network user invitations of the network.
+        /// </summary>
+        public IEnumerable<NetworkUserInvitationInputModel> NetworkUserInvitations { get; set; }
 
         /// <summary>
         /// Represents the network databases of the network.
@@ -43,8 +48,23 @@ namespace NetControl4BioMed.Helpers.InputModels
         public IEnumerable<NetworkDatabaseInputModel> NetworkDatabases { get; set; }
 
         /// <summary>
+        /// Represents the network nodes of the network.
+        /// </summary>
+        public IEnumerable<NetworkNodeInputModel> NetworkNodes { get; set; }
+
+        /// <summary>
+        /// Represents the network edges of the network.
+        /// </summary>
+        public IEnumerable<NetworkEdgeInputModel> NetworkEdges { get; set; }
+
+        /// <summary>
         /// Represents the network node collections of the network.
         /// </summary>
         public IEnumerable<NetworkNodeCollectionInputModel> NetworkNodeCollections { get; set; }
+
+        /// <summary>
+        /// Represents the analysis networks of the network.
+        /// </summary>
+        public IEnumerable<AnalysisNetworkInputModel> AnalysisNetworks { get; set; }
     }
 }

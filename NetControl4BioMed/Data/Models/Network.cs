@@ -32,9 +32,24 @@ namespace NetControl4BioMed.Data.Models
         public string Description { get; set; }
 
         /// <summary>
+        /// Gets or sets the status the network.
+        /// </summary>
+        public NetworkStatus Status { get; set; }
+
+        /// <summary>
+        /// Gets or sets the message log of the network.
+        /// </summary>
+        public string Log { get; set; }
+
+        /// <summary>
         /// Gets or sets the algorithm used to generate the network.
         /// </summary>
         public NetworkAlgorithm Algorithm { get; set; }
+
+        /// <summary>
+        /// Gets or sets the data used to generate the network.
+        /// </summary>
+        public string Data { get; set; }
 
         /// <summary>
         /// Gets or sets the users which have access to the network.
@@ -47,6 +62,11 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<NetworkUserInvitation> NetworkUserInvitations { get; set; }
 
         /// <summary>
+        /// Gets or sets the databases which are used by the network.
+        /// </summary>
+        public ICollection<NetworkDatabase> NetworkDatabases { get; set; }
+
+        /// <summary>
         /// Gets or sets the nodes which appear in the network.
         /// </summary>
         public ICollection<NetworkNode> NetworkNodes { get; set; }
@@ -57,18 +77,13 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<NetworkEdge> NetworkEdges { get; set; }
 
         /// <summary>
-        /// Gets or sets the analyses which use the network.
-        /// </summary>
-        public ICollection<AnalysisNetwork> AnalysisNetworks { get; set; }
-
-        /// <summary>
-        /// Gets or sets the databases which are used by the network.
-        /// </summary>
-        public ICollection<NetworkDatabase> NetworkDatabases { get; set; }
-
-        /// <summary>
         /// Gets or sets the node collections which are used by the network.
         /// </summary>
         public ICollection<NetworkNodeCollection> NetworkNodeCollections { get; set; }
+
+        /// <summary>
+        /// Gets or sets the analyses which use the network.
+        /// </summary>
+        public ICollection<AnalysisNetwork> AnalysisNetworks { get; set; }
     }
 }

@@ -21,7 +21,7 @@
                 <select name="algorithm" class="custom-select">
                     @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
                     {
-                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                        <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
                     }
                 </select>
                 <div class="input-group-append">
@@ -88,7 +88,7 @@
             <tbody>
                 @foreach (var item in Model.View.Search.Items)
                 {
-                    <tr class="item-group-item item-refresh" data-id="@item.Id" data-status="@item.Status.ToString()" data-refresh="@(item.Status == AnalysisStatus.Scheduled || item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing || item.Status == AnalysisStatus.Stopping)">
+                    <tr class="item-group-item item-refresh" data-id="@item.Id" data-status="@item.Status.ToString()" data-refresh="@(item.Status == AnalysisStatus.Defined || item.Status == AnalysisStatus.Scheduled || item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing || item.Status == AnalysisStatus.Stopping)">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" id="checkbox-@item.Id" name="ids" value="@item.Id" class="custom-control-input item-group-item-checkbox" title="Select" />

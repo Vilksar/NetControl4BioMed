@@ -52,6 +52,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsError", "Is error" },
+                    { "IsNotError", "Is not error" },
+                    { "IsDefined", "Is defined" },
+                    { "IsNotDefined", "Is not defined" },
+                    { "IsGenerated", "Is generated" },
+                    { "IsNotGenerated", "Is not generated" },
                     { "UsesAlgorithmNone", "Was provided by user" },
                     { "UsesNotAlgorithmNone", "Was not provided by user" },
                     { "UsesAlgorithmNeighbors", "Was generated using \"Neighbors\" algorithm" },
@@ -78,6 +84,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     { "Id", "ID" },
                     { "DateTimeCreated", "Date created" },
                     { "Name", "Name" },
+                    { "Status", "Status" },
                     { "NetworkUserCount", "Number of users" },
                     { "NetworkUserInvitationCount", "Number of user invitations" },
                     { "NetworkDatabaseCount", "Number of databases" },
@@ -125,6 +132,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     input.SearchIn.Contains("AnalysisNetworks") && item.AnalysisNetworks.Any(item1 => item1.Analysis.Id.Contains(input.SearchString) || item1.Analysis.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
+                .Where(item => input.Filter.Contains("IsError") ? item.Status == NetworkStatus.Error : true)
+                .Where(item => input.Filter.Contains("IsNotError") ? item.Status != NetworkStatus.Error : true)
+                .Where(item => input.Filter.Contains("IsDefined") ? item.Status == NetworkStatus.Defined : true)
+                .Where(item => input.Filter.Contains("IsNotDefined") ? item.Status != NetworkStatus.Defined : true)
+                .Where(item => input.Filter.Contains("IsGenerated") ? item.Status == NetworkStatus.Generated : true)
+                .Where(item => input.Filter.Contains("IsNotGenerated") ? item.Status != NetworkStatus.Generated : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmNone") ? item.Algorithm == NetworkAlgorithm.None : true)
                 .Where(item => input.Filter.Contains("UsesNotAlgorithmNone") ? item.Algorithm != NetworkAlgorithm.None : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmNeighbors") ? item.Algorithm == NetworkAlgorithm.Neighbors : true)
@@ -165,6 +178,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     break;
                 case var sort when sort == ("Name", "Descending"):
                     query = query.OrderByDescending(item => item.Name);
+                    break;
+                case var sort when sort == ("Status", "Ascending"):
+                    query = query.OrderBy(item => item.Status);
+                    break;
+                case var sort when sort == ("Status", "Descending"):
+                    query = query.OrderByDescending(item => item.Status);
                     break;
                 case var sort when sort == ("NetworkUserCount", "Ascending"):
                     query = query.OrderBy(item => item.NetworkUsers.Count());
@@ -213,9 +232,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             }
             // Include the related entitites.
             query = query
-                .Include(item => item.NetworkDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
                 .Include(item => item.NetworkNodes)
                 .Include(item => item.NetworkEdges);
             // Define the view.
@@ -226,6 +242,40 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             };
             // Return the page.
             return Page();
+        }
+
+        public async Task<IActionResult> OnGetRefreshAsync(string id)
+        {
+            // Get the current user.
+            var user = await _userManager.GetUserAsync(User);
+            // Check if the user does not exist.
+            if (user == null)
+            {
+                // Return an empty result.
+                return new JsonResult(new { });
+            }
+            // Check if there isn't any ID provided.
+            if (string.IsNullOrEmpty(id))
+            {
+                // Return an empty result.
+                return new JsonResult(new { });
+            }
+            // Get the item with the provided ID.
+            var item = _context.Networks
+                .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                .Where(item => item.Id == id)
+                .FirstOrDefault();
+            // Check if there was no item found.
+            if (item == null)
+            {
+                // Return an empty result.
+                return new JsonResult(new { });
+            }
+            // Return the analysis data.
+            return new JsonResult(new
+            {
+                Status = item.Status.ToString()
+            });
         }
     }
 }

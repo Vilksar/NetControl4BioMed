@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Enumerations;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
@@ -28,14 +28,17 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Create(IServiceProvider serviceProvider, CancellationToken token)
+        /// <returns>The created items.</returns>
+        public IEnumerable<Role> Create(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -54,32 +57,58 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new role manager instance.
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id);
+                // Check if any of the IDs are repeating in the list.
+                if (batchIds.Distinct().Count() != batchIds.Count())
+                {
+                    // Throw an exception.
+                    throw new TaskException("Two or more of the manually provided IDs are duplicated.");
+                }
+                // Get the valid IDs, that do not appear in the database.
+                var validBatchIds = batchIds
+                    .Except(context.Roles
+                        .Where(item => batchIds.Contains(item.Id))
+                        .Select(item => item.Id));
                 // Go over each item in the current batch.
                 foreach (var batchItem in batchItems)
                 {
+                    // Check if the ID of the item is not valid.
+                    if (!string.IsNullOrEmpty(batchItem.Id) && !validBatchIds.Contains(batchItem.Id))
+                    {
+                        // Continue.
+                        continue;
+                    }
                     // Define the corresponding item.
                     var role = new Role
                     {
                         Name = batchItem.Name,
                         DateTimeCreated = DateTime.Now
                     };
+                    // Check if there is any ID provided.
+                    if (!string.IsNullOrEmpty(batchItem.Id))
+                    {
+                        // Assign it to the item.
+                        role.Id = batchItem.Id;
+                    }
                     // Try to create the new role.
                     var result = Task.Run(() => roleManager.CreateAsync(role)).Result;
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
                     {
-                        // Define the exception message.
-                        var message = string.Empty;
-                        // Go over each of the encountered errors.
-                        foreach (var error in result.Errors)
-                        {
-                            // Add the error to the message.
-                            message += error.Description;
-                        }
+                        // Define the exception messages.
+                        var messages = result.Errors
+                            .Select(item => item.Description);
                         // Throw an exception.
-                        throw new DbUpdateException(message);
+                        throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                     }
+                    // Yield return the item.
+                    yield return role;
                 }
             }
         }
@@ -89,14 +118,17 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Edit(IServiceProvider serviceProvider, CancellationToken token)
+        /// <returns>The edited items.</returns>
+        public IEnumerable<Role> Edit(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -115,9 +147,14 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new role manager instance.
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
-                var batchIds = batchItems.Select(item => item.Id);
+                var batchIds = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
                 // Get the items corresponding to the current batch.
                 var roles = context.Roles
                     .Where(item => batchIds.Contains(item.Id));
@@ -125,7 +162,14 @@ namespace NetControl4BioMed.Helpers.Tasks
                 foreach (var batchItem in batchItems)
                 {
                     // Get the corresponding item.
-                    var role = roles.First(item => item.Id == batchItem.Id);
+                    var role = roles
+                        .FirstOrDefault(item => item.Id == batchItem.Id);
+                    // Check if there was no item found.
+                    if (role == null)
+                    {
+                        // Continue.
+                        continue;
+                    }
                     // Define a new identity result.
                     var result = IdentityResult.Success;
                     // Check if the name is different from the current one.
@@ -137,17 +181,14 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
                     {
-                        // Define the exception message.
-                        var message = string.Empty;
-                        // Go over each of the encountered errors.
-                        foreach (var error in result.Errors)
-                        {
-                            // Add the error to the message.
-                            message += error.Description;
-                        }
+                        // Define the exception messages.
+                        var messages = result.Errors
+                            .Select(item => item.Description);
                         // Throw an exception.
-                        throw new DbUpdateException(message);
+                        throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                     }
+                    // Yield return the item.
+                    yield return role;
                 }
             }
         }
@@ -163,7 +204,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -183,7 +224,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new role manager instance.
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
@@ -197,16 +240,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
                     {
-                        // Define the exception message.
-                        var message = string.Empty;
-                        // Go over each of the encountered errors.
-                        foreach (var error in result.Errors)
-                        {
-                            // Add the error to the message.
-                            message += error.Description;
-                        }
+                        // Define the exception messages.
+                        var messages = result.Errors
+                            .Select(item => item.Description);
                         // Throw an exception.
-                        throw new DbUpdateException(message);
+                        throw new TaskException(string.Join(" ", messages));
                     }
                 }
             }

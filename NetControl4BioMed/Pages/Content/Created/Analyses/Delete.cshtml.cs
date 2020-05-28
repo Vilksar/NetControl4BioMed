@@ -1,13 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Content.Created.Analyses
 {
@@ -121,13 +127,29 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 return Page();
             }
             // Save the number of items found.
-            var analysisCount = View.Items.Count();
-            // Mark the items for deletion.
-            _context.Analyses.RemoveRange(View.Items);
+            var itemCount = View.Items.Count();
+            // Define a new task.
+            var task = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.DeleteAnalyses)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new AnalysesTask
+                {
+                    Items = View.Items.Select(item => new AnalysisInputModel
+                    {
+                        Id = item.Id
+                    })
+                })
+            };
+            // Mark the task for addition.
+            _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
+            // Create a new Hangfire background job.
+            var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.DeleteAnalyses(task.Id, CancellationToken.None));
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {analysisCount.ToString()} analys{(analysisCount != 1 ? "e" : "i")}s deleted successfully.";
+            TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} analys{(itemCount != 1 ? "e" : "i")}s.";
             // Redirect to the index page.
             return RedirectToPage("/Content/Created/Analyses/Index");
         }

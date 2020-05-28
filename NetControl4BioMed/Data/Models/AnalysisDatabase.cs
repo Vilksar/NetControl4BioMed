@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetControl4BioMed.Data.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,5 +30,10 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the database of the relationship.
         /// </summary>
         public Database Database { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of the relationship.
+        /// </summary>
+        public AnalysisDatabaseType Type { get; set; }
     }
 }

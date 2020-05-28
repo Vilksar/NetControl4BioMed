@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 
 namespace NetControl4BioMed.Helpers.Extensions
 {
@@ -15,11 +16,34 @@ namespace NetControl4BioMed.Helpers.Extensions
     public static class NetworkExtensions
     {
         /// <summary>
+        /// Gets the log of the network.
+        /// </summary>
+        /// <param name="network">The current network.</param>
+        /// <returns>The log of the network.</returns>
+        public static List<string> GetLog(this Network network)
+        {
+            // Return the list of log entries.
+            return JsonSerializer.Deserialize<List<string>>(network.Log);
+        }
+
+        /// <summary>
+        /// Appends to the list a new entry to the log of the network and returns the updated list.
+        /// </summary>
+        /// <param name="analysis">The current network.</param>
+        /// <param name="message">The message to add as a new entry to the network log.</param>
+        /// <returns>The updated log of the network.</returns>
+        public static string AppendToLog(this Network network, string message)
+        {
+            // Return the log entries with the message appended.
+            return JsonSerializer.Serialize(network.GetLog().Append($"{DateTime.Now}: {message}"));
+        }
+
+        /// <summary>
         /// Gets the Cytoscape view model corresponding to the provided network.
         /// </summary>
         /// <param name="network">The current network.</param>
-        /// <param name="linkGenerator">Represents the link generator.</param>
-        /// <returns>Returns the Cytoscape view model corresponding to the provided network.</returns>
+        /// <param name="linkGenerator">The link generator.</param>
+        /// <returns>The Cytoscape view model corresponding to the provided network.</returns>
         public static CytoscapeViewModel GetCytoscapeViewModel(this Network network, LinkGenerator linkGenerator)
         {
             // Get the default values.

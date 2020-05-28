@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
@@ -21,7 +22,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         /// </summary>
         /// <param name="context">The database context of the analysis.</param>
         /// <param name="analysis">The analysis which to run using the algorithm.</param>
-        public static async Task RunAsync(ApplicationDbContext context, Analysis analysis)
+        public static void Run(Analysis analysis, ApplicationDbContext context, CancellationToken token)
         {
             // Mark the analysis for updating.
             context.Update(analysis);
@@ -29,10 +30,10 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             analysis.ControlPaths = new List<ControlPath>();
             analysis.Status = AnalysisStatus.Initializing;
             analysis.DateTimeStarted = DateTime.Now;
-            // Save the changes in the database.
-            await context.SaveChangesAsync();
-            // Reload it for a fresh start.
-            await context.Entry(analysis).ReloadAsync();
+            // Update the analysis.
+            IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+            // Reload the analysis for a fresh start.
+            Task.Run(() => context.Entry(analysis).ReloadAsync()).Wait();
             // Get the nodes, edges, target nodes and source (preferred) nodes.
             var nodes = analysis.AnalysisNodes
                 .Where(item => item.Type == AnalysisNodeType.None)
@@ -60,8 +61,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 analysis.Status = AnalysisStatus.Error;
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.Now;
-                // Save the changes in the database.
-                await context.SaveChangesAsync();
+                // Update the analysis.
+                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // End the function.
                 return;
             }
@@ -74,8 +75,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 analysis.Status = AnalysisStatus.Error;
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.Now;
-                // Save the changes in the database.
-                await context.SaveChangesAsync();
+                // Update the analysis.
+                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // End the function.
                 return;
             }
@@ -88,8 +89,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 analysis.Status = AnalysisStatus.Error;
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.Now;
-                // Save the changes in the database.
-                await context.SaveChangesAsync();
+                // Update the analysis.
+                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // End the function.
                 return;
             }
@@ -102,8 +103,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 analysis.Status = AnalysisStatus.Error;
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.Now;
-                // Save the changes in the database.
-                await context.SaveChangesAsync();
+                // Update the analysis.
+                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // End the function.
                 return;
             }
@@ -117,8 +118,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             var targetAncestors = GetTargetAncestors(powersMatrixA, targets, nodeIndex);
             // Update the analysis status.
             analysis.Status = AnalysisStatus.Ongoing;
-            // Save the changes in the database.
-            await context.SaveChangesAsync();
+            // Update the analysis.
+            IEnumerableExtensions.Edit(analysis.Yield(), context, token);
             // Set up the first iteration.
             var random = new Random(parameters.RandomSeed);
             var currentIteration = analysis.CurrentIteration;
@@ -129,7 +130,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             // Initialize a new population.
             var population = new Population(nodeIndex, targets, targetAncestors, powersMatrixCA, nodeIsPreferred, parameters, random);
             // Run as long as the analysis exists and the final iteration hasn't been reached.
-            while (analysis != null && analysis.Status == AnalysisStatus.Ongoing && currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement)
+            while (analysis != null && analysis.Status == AnalysisStatus.Ongoing && currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement && !token.IsCancellationRequested)
             {
                 // Move on to the next iterations.
                 currentIteration += 1;
@@ -137,8 +138,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 // Update the iteration count.
                 analysis.CurrentIteration = currentIteration;
                 analysis.CurrentIterationWithoutImprovement = currentIterationWithoutImprovement;
-                // Save the changes to the analysis.
-                await context.SaveChangesAsync();
+                // Update the analysis.
+                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // Move on to the next population.
                 population = new Population(population, nodeIndex, targets, targetAncestors, powersMatrixCA, nodeIsPreferred, parameters, random);
                 // Get the best fitness of the current solution.
@@ -152,7 +153,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                     currentIterationWithoutImprovement = 0;
                 }
                 // And reload it for the next iteration.
-                await context.Entry(analysis).ReloadAsync();
+                Task.Run(() => context.Entry(analysis).ReloadAsync()).Wait();
             }
             // Check if the analysis doesn't exist anymore (if it has been deleted).
             if (analysis == null)
@@ -189,8 +190,9 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             analysis.ControlPaths = controlPaths;
             analysis.Status = currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement ? AnalysisStatus.Stopped : AnalysisStatus.Completed;
             analysis.DateTimeEnded = DateTime.Now;
-            // Save the changes in the database.
-            await context.SaveChangesAsync();
+            analysis.Log = analysis.AppendToLog($"The analysis has ended with the status \"{analysis.Status.GetDisplayName()}\".");
+            // Update the analysis.
+            IEnumerableExtensions.Edit(analysis.Yield(), context, token);
             // End the function.
             return;
         }

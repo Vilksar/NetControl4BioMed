@@ -13,11 +13,6 @@ namespace NetControl4BioMed.Helpers.InputModels
         public string Id { get; set; }
 
         /// <summary>
-        /// Represents the database type ID of the analysis.
-        /// </summary>
-        public string DatabaseTypeId { get; set; }
-
-        /// <summary>
         /// Represents the name of the analysis.
         /// </summary>
         public string Name { get; set; }
@@ -33,14 +28,9 @@ namespace NetControl4BioMed.Helpers.InputModels
         public string Algorithm { get; set; }
 
         /// <summary>
-        /// Represents the source data of the analysis.
+        /// Represents the data of the analysis.
         /// </summary>
-        public string SourceData { get; set; }
-
-        /// <summary>
-        /// Represents the target data of the analysis.
-        /// </summary>
-        public string TargetData { get; set; }
+        public string Data { get; set; }
 
         /// <summary>
         /// Represents the maximum number of iterations of the analysis.
@@ -58,13 +48,38 @@ namespace NetControl4BioMed.Helpers.InputModels
         public string Parameters { get; set; }
 
         /// <summary>
-        /// Represents the analysis networks of the analysis.
+        /// Represents the analysis users of the analysis.
         /// </summary>
-        public IEnumerable<AnalysisNetworkInputModel> AnalysisNetworks { get; set; }
+        public IEnumerable<AnalysisUserInputModel> AnalysisUsers { get; set; }
+
+        /// <summary>
+        /// Represents the analysis user invitations of the analysis.
+        /// </summary>
+        public IEnumerable<AnalysisUserInvitationInputModel> AnalysisUserInvitations { get; set; }
+
+        /// <summary>
+        /// Represents the analysis databases of the analysis.
+        /// </summary>
+        public IEnumerable<AnalysisDatabaseInputModel> AnalysisDatabases { get; set; }
+
+        /// <summary>
+        /// Represents the analysis nodes of the analysis.
+        /// </summary>
+        public IEnumerable<AnalysisNodeInputModel> AnalysisNodes { get; set; }
+
+        /// <summary>
+        /// Represents the analysis edges of the analysis.
+        /// </summary>
+        public IEnumerable<AnalysisEdgeInputModel> AnalysisEdges { get; set; }
 
         /// <summary>
         /// Represents the analysis node collections of the analysis.
         /// </summary>
         public IEnumerable<AnalysisNodeCollectionInputModel> AnalysisNodeCollections { get; set; }
+
+        /// <summary>
+        /// Represents the analysis networks of the analysis.
+        /// </summary>
+        public IEnumerable<AnalysisNetworkInputModel> AnalysisNetworks { get; set; }
     }
 }

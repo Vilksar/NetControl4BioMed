@@ -24,23 +24,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
     [Authorize(Roles = "Administrator")]
     public class UpdateModel : PageModel
     {
-        private static List<NodeInputModel> DefaultNodeInputModel { get; } = new List<NodeInputModel>
-        {
-            new NodeInputModel
-            {
-                Id = "ID",
-                Description = "Description",
-                DatabaseNodeFieldNodes = new List<DatabaseNodeFieldNodeInputModel>
-                {
-                    new DatabaseNodeFieldNodeInputModel
-                    {
-                        DatabaseNodeFieldId = "Database node field ID",
-                        Value = "Value"
-                    }
-                }
-            }
-        };
-
         private readonly ApplicationDbContext _context;
 
         public UpdateModel(ApplicationDbContext context)
@@ -75,12 +58,31 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
             // Define the JSON serializer options.
             var jsonSerializerOptions = new JsonSerializerOptions
             {
-                WriteIndented = true
+                WriteIndented = true,
+                IgnoreNullValues = true
             };
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(DefaultNodeInputModel, jsonSerializerOptions)
+                JsonModel = JsonSerializer.Serialize(new List<NodeInputModel>
+                {
+                    new NodeInputModel
+                    {
+                        Id = "ID",
+                        Description = "Description",
+                        DatabaseNodeFieldNodes = new List<DatabaseNodeFieldNodeInputModel>
+                        {
+                            new DatabaseNodeFieldNodeInputModel
+                            {
+                                DatabaseNodeField = new DatabaseNodeFieldInputModel
+                                {
+                                    Id = "Database node field ID"
+                                },
+                                Value = "Value"
+                            }
+                        }
+                    }
+                }, jsonSerializerOptions)
             };
             // Check if there are any IDs provided.
             ids ??= Enumerable.Empty<string>();
@@ -95,7 +97,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 Description = item.Description,
                 DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes.Select(item1 => new DatabaseNodeFieldNodeInputModel
                 {
-                    DatabaseNodeFieldId = item1.DatabaseNodeField.Id,
+                    DatabaseNodeField = new DatabaseNodeFieldInputModel
+                    {
+                        Id = item1.DatabaseNodeField.Id
+                    },
                     Value = item1.Value
                 })
             });
@@ -114,12 +119,31 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
             // Define the JSON serializer options.
             var jsonSerializerOptions = new JsonSerializerOptions
             {
-                WriteIndented = true
+                WriteIndented = true,
+                IgnoreNullValues = true
             };
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(DefaultNodeInputModel, jsonSerializerOptions)
+                JsonModel = JsonSerializer.Serialize(new List<NodeInputModel>
+                {
+                    new NodeInputModel
+                    {
+                        Id = "ID",
+                        Description = "Description",
+                        DatabaseNodeFieldNodes = new List<DatabaseNodeFieldNodeInputModel>
+                        {
+                            new DatabaseNodeFieldNodeInputModel
+                            {
+                                DatabaseNodeField = new DatabaseNodeFieldInputModel
+                                {
+                                    Id = "Database node field ID"
+                                },
+                                Value = "Value"
+                            }
+                        }
+                    }
+                }, jsonSerializerOptions)
             };
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)

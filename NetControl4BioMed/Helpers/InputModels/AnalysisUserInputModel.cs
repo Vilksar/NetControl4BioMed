@@ -6,13 +6,13 @@
     public class AnalysisUserInputModel
     {
         /// <summary>
-        /// Represents the analysis ID of the analysis user.
+        /// Represents the analysis of the analysis user.
         /// </summary>
-        public string AnalysisId { get; set; }
+        public AnalysisInputModel Analysis { get; set; }
 
         /// <summary>
-        /// Represents the user ID of the analysis user.
+        /// Represents the user of the analysis user.
         /// </summary>
-        public string UserId { get; set; }
+        public UserInputModel User { get; set; }
     }
 }

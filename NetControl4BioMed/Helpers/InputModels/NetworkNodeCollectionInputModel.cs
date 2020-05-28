@@ -6,14 +6,14 @@
     public class NetworkNodeCollectionInputModel
     {
         /// <summary>
-        /// Represents the network ID of the network node collection.
+        /// Represents the network of the network node collection.
         /// </summary>
-        public string NetworkId { get; set; }
+        public NetworkInputModel Network { get; set; }
 
         /// <summary>
-        /// Represents the node collection ID of the network node collection.
+        /// Represents the node collection of the network node collection.
         /// </summary>
-        public string NodeCollectionId { get; set; }
+        public NodeCollectionInputModel NodeCollection { get; set; }
 
         /// <summary>
         /// Represents the type of the network node collection.

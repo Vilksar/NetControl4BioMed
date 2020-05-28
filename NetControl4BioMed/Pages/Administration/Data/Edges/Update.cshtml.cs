@@ -24,43 +24,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
     [Authorize(Roles = "Administrator")]
     public class UpdateModel : PageModel
     {
-        private static List<EdgeInputModel> DefaultEdgeInputModel { get; } = new List<EdgeInputModel>
-        {
-            new EdgeInputModel
-            {
-                Id = "ID",
-                Description = "Description",
-                DatabaseEdges = new List<DatabaseEdgeInputModel>
-                {
-                    new DatabaseEdgeInputModel
-                    {
-                        DatabaseId = "Database ID"
-                    }
-                },
-                EdgeNodes = new List<EdgeNodeInputModel>
-                {
-                    new EdgeNodeInputModel
-                    {
-                        NodeId = "Node ID",
-                        Type = "Source"
-                    },
-                    new EdgeNodeInputModel
-                    {
-                        NodeId = "Node ID",
-                        Type = "Target"
-                    }
-                },
-                DatabaseEdgeFieldEdges = new List<DatabaseEdgeFieldEdgeInputModel>
-                {
-                    new DatabaseEdgeFieldEdgeInputModel
-                    {
-                        DatabaseEdgeFieldId = "Database edge field ID",
-                        Value = "Value"
-                    }
-                }
-            }
-        };
-
         private readonly ApplicationDbContext _context;
 
         public UpdateModel(ApplicationDbContext context)
@@ -95,12 +58,60 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
             // Define the JSON serializer options.
             var jsonSerializerOptions = new JsonSerializerOptions
             {
-                WriteIndented = true
+                WriteIndented = true,
+                IgnoreNullValues = true
             };
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(DefaultEdgeInputModel, jsonSerializerOptions)
+                JsonModel = JsonSerializer.Serialize(new List<EdgeInputModel>
+                {
+                    new EdgeInputModel
+                    {
+                        Id = "ID",
+                        Description = "Description",
+                        DatabaseEdges = new List<DatabaseEdgeInputModel>
+                        {
+                            new DatabaseEdgeInputModel
+                            {
+                                Database = new DatabaseInputModel
+                                {
+                                    Id = "Database ID"
+                                }
+                            }
+                        },
+                        EdgeNodes = new List<EdgeNodeInputModel>
+                        {
+                            new EdgeNodeInputModel
+                            {
+                                Node = new NodeInputModel
+                                {
+                                    Id = "Node ID"
+                                },
+                                Type = "Source"
+                            },
+                            new EdgeNodeInputModel
+                            {
+                                Node = new NodeInputModel
+                                {
+                                    Id = "Node ID"
+                                },
+                                Type = "Target"
+                            }
+                        },
+                        DatabaseEdgeFieldEdges = new List<DatabaseEdgeFieldEdgeInputModel>
+                        {
+                            new DatabaseEdgeFieldEdgeInputModel
+                            {
+                                DatabaseEdgeField = new DatabaseEdgeFieldInputModel
+                                {
+                                    Id = "Database edge field ID"
+                                },
+                                Value = "Value"
+                            }
+                        }
+                    }
+                }, jsonSerializerOptions)
             };
             // Check if there are any IDs provided.
             ids ??= Enumerable.Empty<string>();
@@ -120,16 +131,25 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 Description = item.Description,
                 EdgeNodes = item.EdgeNodes.Select(item1 => new EdgeNodeInputModel
                 {
-                    NodeId = item1.Node.Id,
+                    Node = new NodeInputModel
+                    {
+                        Id = item1.Node.Id
+                    },
                     Type = item1.Type.ToString()
                 }),
                 DatabaseEdges = item.DatabaseEdges.Select(item1 => new DatabaseEdgeInputModel
                 {
-                    DatabaseId = item1.Database.Id
+                    Database = new DatabaseInputModel
+                    {
+                        Id = item1.Database.Id
+                    }
                 }),
                 DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges.Select(item1 => new DatabaseEdgeFieldEdgeInputModel
                 {
-                    DatabaseEdgeFieldId = item1.DatabaseEdgeField.Id,
+                    DatabaseEdgeField = new DatabaseEdgeFieldInputModel
+                    {
+                        Id = item1.DatabaseEdgeField.Id
+                    },
                     Value = item1.Value
                 })
             });
@@ -148,12 +168,60 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
             // Define the JSON serializer options.
             var jsonSerializerOptions = new JsonSerializerOptions
             {
-                WriteIndented = true
+                WriteIndented = true,
+                IgnoreNullValues = true
             };
             // Define the view.
             View = new ViewModel
             {
-                JsonModel = JsonSerializer.Serialize(DefaultEdgeInputModel, jsonSerializerOptions)
+                JsonModel = JsonSerializer.Serialize(new List<EdgeInputModel>
+                {
+                    new EdgeInputModel
+                    {
+                        Id = "ID",
+                        Description = "Description",
+                        DatabaseEdges = new List<DatabaseEdgeInputModel>
+                        {
+                            new DatabaseEdgeInputModel
+                            {
+                                Database = new DatabaseInputModel
+                                {
+                                    Id = "Database ID"
+                                }
+                            }
+                        },
+                        EdgeNodes = new List<EdgeNodeInputModel>
+                        {
+                            new EdgeNodeInputModel
+                            {
+                                Node = new NodeInputModel
+                                {
+                                    Id = "Node ID"
+                                },
+                                Type = "Source"
+                            },
+                            new EdgeNodeInputModel
+                            {
+                                Node = new NodeInputModel
+                                {
+                                    Id = "Node ID"
+                                },
+                                Type = "Target"
+                            }
+                        },
+                        DatabaseEdgeFieldEdges = new List<DatabaseEdgeFieldEdgeInputModel>
+                        {
+                            new DatabaseEdgeFieldEdgeInputModel
+                            {
+                                DatabaseEdgeField = new DatabaseEdgeFieldInputModel
+                                {
+                                    Id = "Database edge field ID"
+                                },
+                                Value = "Value"
+                            }
+                        }
+                    }
+                }, jsonSerializerOptions)
             };
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)

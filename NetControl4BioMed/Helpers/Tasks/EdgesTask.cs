@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using NetControl4BioMed.Helpers.Extensions;
 using System.Threading.Tasks;
+using NetControl4BioMed.Helpers.Exceptions;
 
 namespace NetControl4BioMed.Helpers.Tasks
 {
@@ -28,14 +29,17 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Create(IServiceProvider serviceProvider, CancellationToken token)
+        /// <returns>The created items.</returns>
+        public IEnumerable<Edge> Create(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -52,169 +56,164 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
-                // Get the manually provided IDs of all the items that are to be created.
-                var itemEdgeIds = batchItems
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id);
-                // Check if any of the manually provided IDs are repeating in the list.
-                if (itemEdgeIds.Distinct().Count() != itemEdgeIds.Count())
+                // Check if any of the IDs are repeating in the list.
+                if (batchIds.Distinct().Count() != batchIds.Count())
                 {
                     // Throw an exception.
-                    throw new ArgumentException("One or more of the manually provided IDs are duplicated.");
+                    throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
-                // Get the valid manually provided IDs, that do not appear in the database.
-                var validItemEdgeIds = itemEdgeIds
+                // Get the valid IDs, that do not appear in the database.
+                var validBatchIds = batchIds
                     .Except(context.Edges
-                        .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                        .Where(item => itemEdgeIds.Contains(item.Id))
+                        .Where(item => batchIds.Contains(item.Id))
                         .Select(item => item.Id));
-                // Get the IDs of all of the nodes that are to be added to the edges.
-                var itemNodeIds = batchItems
-                    .Where(item => item.EdgeNodes != null)
-                    .Select(item => item.EdgeNodes)
-                    .SelectMany(item => item)
-                    .Where(item => !string.IsNullOrEmpty(item.NodeId) && (item.Type == "Source" || item.Type == "Target"))
-                    .Select(item => item.NodeId)
-                    .Distinct();
-                // Get the nodes that are to be added to the edges.
-                var nodes = context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => itemNodeIds.Contains(item.Id))
-                    .AsEnumerable();
-                // Check if there weren't any nodes found.
-                if (nodes == null || !nodes.Any())
-                {
-                    // Throw an exception.
-                    throw new ArgumentException("No nodes could be found in the database with the provided IDs.");
-                }
-                // Get the valid database node field IDs.
-                var validItemNodeIds = nodes
-                    .Select(item => item.Id);
-                // Get the IDs of all of the edge fields that are to be updated.
-                var itemEdgeFieldIds = batchItems
-                    .Where(item => item.DatabaseEdgeFieldEdges != null)
-                    .Select(item => item.DatabaseEdgeFieldEdges)
-                    .SelectMany(item => item)
-                    .Where(item => !string.IsNullOrEmpty(item.DatabaseEdgeFieldId) && !string.IsNullOrEmpty(item.Value))
-                    .Select(item => item.DatabaseEdgeFieldId)
-                    .Distinct();
-                // Get the edge fields that are to be updated.
-                var edgeFields = context.DatabaseEdgeFields
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .Where(item => itemEdgeFieldIds.Contains(item.Id))
-                    .Include(item => item.Database)
-                    .AsEnumerable();
-                // Get the IDs of all of the databases that are to be updated.
-                var itemDatabaseIds = batchItems
+                // Get the IDs of the related entities that appear in the current batch.
+                var batchDatabaseIds = batchItems
                     .Where(item => item.DatabaseEdges != null)
                     .Select(item => item.DatabaseEdges)
                     .SelectMany(item => item)
-                    .Select(item => item.DatabaseId)
-                    .Where(item => !string.IsNullOrEmpty(item))
-                    .Concat(edgeFields.Select(item => item.Database.Id))
+                    .Where(item => item.Database != null)
+                    .Select(item => item.Database)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
                     .Distinct();
-                // Get all of the databases that are to be updated.
-                var databases = context.Databases
+                var batchDatabaseEdgeFieldIds = batchItems
+                    .Where(item => item.DatabaseEdgeFieldEdges != null)
+                    .Select(item => item.DatabaseEdgeFieldEdges)
+                    .SelectMany(item => item)
+                    .Where(item => item.DatabaseEdgeField != null)
+                    .Select(item => item.DatabaseEdgeField)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
+                var batchNodeIds = batchItems
+                    .Where(item => item.EdgeNodes != null)
+                    .Select(item => item.EdgeNodes)
+                    .SelectMany(item => item)
+                    .Where(item => item.Node != null)
+                    .Select(item => item.Node)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
+                // Get the related entities that appear in the current batch.
+                var batchDatabaseEdgeFields = context.DatabaseEdgeFields
+                    .Include(item => item.Database)
+                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                    .Where(item => batchDatabaseEdgeFieldIds.Contains(item.Id));
+                var batchDatabases = context.Databases
                     .Where(item => item.DatabaseType.Name != "Generic")
-                    .Where(item => itemDatabaseIds.Contains(item.Id))
-                    .AsEnumerable();
-                // Check if there weren't any databases or edge fields found.
-                if (databases == null || !databases.Any())
-                {
-                    // Throw an exception.
-                    throw new ArgumentException("No databases could be found in the database with the provided IDs.");
-                }
-                // Get the valid database IDs.
-                var validItemDatabaseIds = databases
-                    .Select(item => item.Id);
-                // Get the valid database edge field IDs.
-                var validItemEdgeFieldIds = edgeFields
-                    .Select(item => item.Id);
-                // Save the edges to add.
-                var edges = new List<Edge>();
+                    .Where(item => batchDatabaseIds.Contains(item.Id))
+                    .Concat(batchDatabaseEdgeFields
+                        .Select(item => item.Database))
+                    .Distinct();
+                var batchNodes = context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Where(item => batchNodeIds.Contains(item.Id));
+                // Save the items to add.
+                var edgesToAdd = new List<Edge>();
                 // Go over each of the items.
                 foreach (var batchItem in batchItems)
                 {
-                    // Check if the ID of the current item is valid.
-                    if (!string.IsNullOrEmpty(batchItem.Id) && !validItemEdgeIds.Contains(batchItem.Id))
+                    // Check if the ID of the item is not valid.
+                    if (!string.IsNullOrEmpty(batchItem.Id) && !validBatchIds.Contains(batchItem.Id))
                     {
                         // Continue.
                         continue;
                     }
-                    // Check if there aren't any edge nodes.
-                    if (batchItem.EdgeNodes == null)
+                    // Check if there were no edge nodes provided.
+                    if (batchItem.EdgeNodes == null || !batchItem.EdgeNodes.Any())
                     {
-                        // Continue.
-                        continue;
+                        // Throw an exception.
+                        throw new TaskException("There were no edge nodes provided.", showExceptionItem, batchItem);
                     }
-                    // Get the valid item nodes and the edge nodes to add.
-                    var edgeNodes = batchItem.EdgeNodes != null ?
-                        batchItem.EdgeNodes
-                            .Where(item => item.Type == "Source" || item.Type == "Target")
-                            .Select(item => (item.NodeId, item.Type))
-                            .Distinct()
-                            .Where(item => validItemNodeIds.Contains(item.NodeId))
-                            .Select(item => new EdgeNode
-                            {
-                                NodeId = item.NodeId,
-                                Node = nodes.FirstOrDefault(item1 => item.NodeId == item1.Id),
-                                Type = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>(item.Type)
-                            })
-                            .Where(item1 => item1.Node != null) :
-                        Enumerable.Empty<EdgeNode>();
-                    // Check if there weren't any nodes found, or if there isn't at least one source node and one target node.
-                    if (edgeNodes == null || !edgeNodes.Any() || edgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source) == null || edgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target) == null)
+                    // Get the edge nodes.
+                    var edgeNodes = batchItem.EdgeNodes
+                        .Where(item => item.Node != null)
+                        .Where(item => !string.IsNullOrEmpty(item.Node.Id))
+                        .Where(item => item.Type == "Source" || item.Type == "Target")
+                        .Select(item => (item.Node.Id, item.Type))
+                        .Distinct()
+                        .Where(item => batchNodes.Any(item1 => item1.Id == item.Item1))
+                        .Select(item => new EdgeNode
+                        {
+                            NodeId = item.Item1,
+                            Node = batchNodes
+                                .FirstOrDefault(item1 => item1.Id == item.Item1),
+                            Type = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>(item.Item2)
+                        })
+                        .Where(item => item.Node != null);
+                    // Check if there were no edge nodes found.
+                    if (edgeNodes == null || !edgeNodes.Any(item => item.Type == EdgeNodeType.Source) || !edgeNodes.Any(item => item.Type == EdgeNodeType.Target))
                     {
-                        // Continue.
-                        continue;
+                        // Throw an exception.
+                        throw new TaskException("There were no edge nodes found.", showExceptionItem, batchItem);
                     }
-                    // Get the valid item fields and the edge field edges to add.
-                    var edgeFieldEdges = batchItem.DatabaseEdgeFieldEdges != null ?
+                    // Check if there were no database edges or database edge field edges provided.
+                    if ((batchItem.DatabaseEdges == null || !batchItem.DatabaseEdges.Any()) && (batchItem.DatabaseEdgeFieldEdges == null || !batchItem.DatabaseEdgeFieldEdges.Any()))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no database edges or database edge field edges provided.", showExceptionItem, batchItem);
+                    }
+                    // Get the database edge field edges.
+                    var databaseEdgeFieldEdges = batchItem.DatabaseEdgeFieldEdges != null ?
                         batchItem.DatabaseEdgeFieldEdges
-                            .Select(item => (item.DatabaseEdgeFieldId, item.Value))
+                            .Where(item => item.DatabaseEdgeField != null)
+                            .Where(item => !string.IsNullOrEmpty(item.DatabaseEdgeField.Id))
+                            .Where(item => !string.IsNullOrEmpty(item.Value))
+                            .Select(item => (item.DatabaseEdgeField.Id, item.Value))
                             .Distinct()
-                            .Where(item => validItemEdgeFieldIds.Contains(item.DatabaseEdgeFieldId))
+                            .Where(item => batchDatabaseEdgeFields.Any(item1 => item1.Id == item.Item1))
                             .Select(item => new DatabaseEdgeFieldEdge
                             {
-                                DatabaseEdgeFieldId = item.DatabaseEdgeFieldId,
-                                DatabaseEdgeField = edgeFields.FirstOrDefault(item1 => item.DatabaseEdgeFieldId == item1.Id),
-                                Value = item.Value
+                                DatabaseEdgeFieldId = item.Item1,
+                                DatabaseEdgeField = batchDatabaseEdgeFields
+                                    .FirstOrDefault(item1 => item1.Id == item.Item1),
+                                Value = item.Item2
                             })
                             .Where(item => item.DatabaseEdgeField != null) :
                         Enumerable.Empty<DatabaseEdgeFieldEdge>();
-                    // Get the valid item databases and the database edges to add.
+                    // Get the database edges.
                     var databaseEdges = batchItem.DatabaseEdges != null ?
                         batchItem.DatabaseEdges
-                            .Select(item => item.DatabaseId)
-                            .Where(item => validItemDatabaseIds.Contains(item))
-                            .Concat(edgeFieldEdges.Select(item1 => item1.DatabaseEdgeField.Database.Id))
+                            .Where(item => item.Database != null)
+                            .Where(item => !string.IsNullOrEmpty(item.Database.Id))
+                            .Select(item => item.Database.Id)
+                            .Concat(databaseEdgeFieldEdges.Select(item => item.DatabaseEdgeField.Database.Id))
                             .Distinct()
+                            .Where(item => batchDatabases.Any(item1 => item1.Id == item))
                             .Select(item => new DatabaseEdge
                             {
                                 DatabaseId = item,
-                                Database = databases.FirstOrDefault(item1 => item == item1.Id)
+                                Database = batchDatabases
+                                    .FirstOrDefault(item1 => item1.Id == item)
                             })
                             .Where(item => item.Database != null) :
                         Enumerable.Empty<DatabaseEdge>();
-                    // Check if there weren't any databases or edge fields found.
+                    // Check if there were no database edges found.
                     if (databaseEdges == null || !databaseEdges.Any())
                     {
-                        // Continue.
-                        continue;
+                        // Throw an exception.
+                        throw new TaskException("There were no database edges found.", showExceptionItem, batchItem);
                     }
                     // Define the new edge.
                     var edge = new Edge
                     {
+                        DateTimeCreated = DateTime.Now,
                         Name = string.Concat(edgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " - ", edgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name),
                         Description = batchItem.Description,
-                        DateTimeCreated = DateTime.Now,
                         EdgeNodes = new List<EdgeNode>
                         {
                             edgeNodes.First(item => item.Type == EdgeNodeType.Source),
                             edgeNodes.First(item => item.Type == EdgeNodeType.Target)
                         },
-                        DatabaseEdgeFieldEdges = edgeFieldEdges.ToList(),
+                        DatabaseEdgeFieldEdges = databaseEdgeFieldEdges.ToList(),
                         DatabaseEdges = databaseEdges.ToList()
                     };
                     // Check if there is any ID provided.
@@ -224,10 +223,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                         edge.Id = batchItem.Id;
                     }
                     // Add the new node to the list.
-                    edges.Add(edge);
+                    edgesToAdd.Add(edge);
                 }
                 // Create the items.
-                IEnumerableExtensions.Create(edges, context, token);
+                IEnumerableExtensions.Create(edgesToAdd, context, token);
+                // Go over each item.
+                foreach (var edge in edgesToAdd)
+                {
+                    // Yield return it.
+                    yield return edge;
+                }
             }
         }
 
@@ -236,14 +241,17 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Edit(IServiceProvider serviceProvider, CancellationToken token)
+        /// <returns>The edited items.</returns>
+        public IEnumerable<Edge> Edit(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -260,160 +268,145 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
-                // Get the list of IDs from the provided items.
-                var itemIds = batchItems.Select(item => item.Id);
-                // Get the edges from the database that have the given IDs.
-                var edges = context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => itemIds.Contains(item.Id))
-                    .Include(item => item.EdgeNodes)
-                        .ThenInclude(item => item.Node)
-                    .Include(item => item.DatabaseEdges)
-                        .ThenInclude(item => item.Database)
-                    .Include(item => item.DatabaseEdgeFieldEdges)
-                    .AsEnumerable();
-                // Check if there weren't any edges found.
-                if (edges == null || !edges.Any())
-                {
-                    // Throw an exception.
-                    throw new ArgumentException("No edges could be found in the database with the provided IDs.");
-                }
-                // Get the IDs of all of the nodes that are to be added to the edges.
-                var itemNodeIds = batchItems
-                    .Where(item => item.EdgeNodes != null)
-                    .Select(item => item.EdgeNodes)
-                    .SelectMany(item => item)
-                    .Where(item => !string.IsNullOrEmpty(item.NodeId) && (item.Type == "Source" || item.Type == "Target"))
-                    .Select(item => item.NodeId)
-                    .Distinct();
-                // Get the nodes that are to be added to the edges.
-                var nodes = context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => itemNodeIds.Contains(item.Id))
-                    .AsEnumerable();
-                // Check if there weren't any nodes found.
-                if (nodes == null || !nodes.Any())
-                {
-                    // Throw an exception.
-                    throw new ArgumentException("No nodes could be found in the database with the provided IDs.");
-                }
-                // Get the valid database node field IDs.
-                var validItemNodeIds = nodes
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id);
-                // Get the IDs of all of the edge fields that are to be updated.
-                var itemEdgeFieldIds = batchItems
-                    .Where(item => item.DatabaseEdgeFieldEdges != null)
-                    .Select(item => item.DatabaseEdgeFieldEdges)
-                    .SelectMany(item => item)
-                    .Where(item => !string.IsNullOrEmpty(item.DatabaseEdgeFieldId) && !string.IsNullOrEmpty(item.Value))
-                    .Select(item => item.DatabaseEdgeFieldId)
-                    .Distinct();
-                // Get the edge fields that are to be updated.
-                var edgeFields = context.DatabaseEdgeFields
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .Where(item => itemEdgeFieldIds.Contains(item.Id))
-                    .Include(item => item.Database)
-                    .AsEnumerable();
-                // Get the IDs of all of the databases that are to be updated.
-                var itemDatabaseIds = batchItems
+                // Get the IDs of the related entities that appear in the current batch.
+                var batchDatabaseIds = batchItems
                     .Where(item => item.DatabaseEdges != null)
                     .Select(item => item.DatabaseEdges)
                     .SelectMany(item => item)
-                    .Select(item => item.DatabaseId)
-                    .Where(item => !string.IsNullOrEmpty(item))
-                    .Concat(edgeFields.Select(item => item.Database.Id))
+                    .Where(item => item.Database != null)
+                    .Select(item => item.Database)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
                     .Distinct();
-                // Get all of the databases that are to be updated.
-                var databases = context.Databases
+                var batchDatabaseEdgeFieldIds = batchItems
+                    .Where(item => item.DatabaseEdgeFieldEdges != null)
+                    .Select(item => item.DatabaseEdgeFieldEdges)
+                    .SelectMany(item => item)
+                    .Where(item => item.DatabaseEdgeField != null)
+                    .Select(item => item.DatabaseEdgeField)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
+                var batchNodeIds = batchItems
+                    .Where(item => item.EdgeNodes != null)
+                    .Select(item => item.EdgeNodes)
+                    .SelectMany(item => item)
+                    .Where(item => item.Node != null)
+                    .Select(item => item.Node)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
+                // Get the related entities that appear in the current batch.
+                var batchDatabaseEdgeFields = context.DatabaseEdgeFields
+                    .Include(item => item.Database)
+                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                    .Where(item => batchDatabaseEdgeFieldIds.Contains(item.Id));
+                var batchDatabases = context.Databases
                     .Where(item => item.DatabaseType.Name != "Generic")
-                    .Where(item => itemDatabaseIds.Contains(item.Id))
-                    .AsEnumerable();
-                // Check if there weren't any databases or edge fields found.
-                if (databases == null || !databases.Any())
-                {
-                    // Throw an exception.
-                    throw new ArgumentException("No databases could be found in the database with the provided IDs.");
-                }
-                // Get the valid database IDs.
-                var validItemDatabaseIds = databases
-                    .Select(item => item.Id);
-                // Get the valid database node field IDs.
-                var validItemEdgeFieldIds = edgeFields
-                    .Select(item => item.Id);
-                // Save the edges to update.
-                var edgesToUpdate = new List<Edge>();
+                    .Where(item => batchDatabaseIds.Contains(item.Id))
+                    .Concat(batchDatabaseEdgeFields
+                        .Select(item => item.Database))
+                    .Distinct();
+                var batchNodes = context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Where(item => batchNodeIds.Contains(item.Id));
+                // Get the items corresponding to the current batch.
+                var edges = context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Where(item => batchIds.Contains(item.Id));
+                // Save the items to edit.
+                var edgesToEdit = new List<Edge>();
                 // Go over each of the valid items.
                 foreach (var batchItem in batchItems)
                 {
-                    // Get the corresponding edge.
-                    var edge = edges.FirstOrDefault(item => batchItem.Id == item.Id);
-                    // Check if there was no edge found.
+                    // Get the corresponding item.
+                    var edge = edges
+                        .FirstOrDefault(item => batchItem.Id == item.Id);
+                    // Check if there was no item found.
                     if (edge == null)
                     {
                         // Continue.
                         continue;
                     }
-                    // Get the valid item nodes and the edge nodes to add.
-                    var edgeNodes = batchItem.EdgeNodes != null ?
-                        batchItem.EdgeNodes
-                            .Where(item => item.Type == "Source" || item.Type == "Target")
-                            .Select(item => (item.NodeId, item.Type))
-                            .Distinct()
-                            .Where(item => validItemNodeIds.Contains(item.NodeId))
-                            .Select(item => new EdgeNode
-                            {
-                                EdgeId = edge.Id,
-                                Edge = edge,
-                                NodeId = item.NodeId,
-                                Node = nodes.FirstOrDefault(item1 => item.NodeId == item1.Id),
-                                Type = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>(item.Type)
-                            })
-                            .Where(item => item.Edge != null && item.Node != null) :
-                        Enumerable.Empty<EdgeNode>();
-                    // Check if there weren't any nodes found, or if there isn't at least one source node and one target node.
-                    if (edgeNodes == null || !edgeNodes.Any() || edgeNodes.FirstOrDefault(item => item.Type == EdgeNodeType.Source) == null || edgeNodes.FirstOrDefault(item => item.Type == EdgeNodeType.Target) == null)
+                    // Check if there were no edge nodes provided.
+                    if (batchItem.EdgeNodes == null || !batchItem.EdgeNodes.Any())
                     {
-                        // Continue.
-                        continue;
+                        // Throw an exception.
+                        throw new TaskException("There were no edge nodes provided.", showExceptionItem, batchItem);
                     }
-                    // Get the valid item fields and the edge field edges to add.
-                    var edgeFieldEdges = batchItem.DatabaseEdgeFieldEdges != null ?
+                    // Get the edge nodes.
+                    var edgeNodes = batchItem.EdgeNodes
+                        .Where(item => item.Node != null)
+                        .Where(item => !string.IsNullOrEmpty(item.Node.Id))
+                        .Where(item => item.Type == "Source" || item.Type == "Target")
+                        .Where(item => batchNodes.Any(item1 => item1.Id == item.Node.Id))
+                        .Select(item => new EdgeNode
+                        {
+                            NodeId = item.Node.Id,
+                            Node = batchNodes
+                                .FirstOrDefault(item1 => item1.Id == item.Node.Id),
+                            Type = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>(item.Type)
+                        })
+                        .Where(item => item.Node != null);
+                    // Check if there were no edge nodes found.
+                    if (edgeNodes == null || !edgeNodes.Any(item => item.Type == EdgeNodeType.Source) || !edgeNodes.Any(item => item.Type == EdgeNodeType.Target))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no edge nodes found.", showExceptionItem, batchItem);
+                    }
+                    // Check if there were no database edges or database edge field edges provided.
+                    if ((batchItem.DatabaseEdges == null || !batchItem.DatabaseEdges.Any()) && (batchItem.DatabaseEdgeFieldEdges == null || !batchItem.DatabaseEdgeFieldEdges.Any()))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no database edges or database edge field edges provided.", showExceptionItem, batchItem);
+                    }
+                    // Get the database edge field edges.
+                    var databaseEdgeFieldEdges = batchItem.DatabaseEdgeFieldEdges != null ?
                         batchItem.DatabaseEdgeFieldEdges
-                            .Select(item => (item.DatabaseEdgeFieldId, item.Value))
+                            .Where(item => item.DatabaseEdgeField != null)
+                            .Where(item => !string.IsNullOrEmpty(item.DatabaseEdgeField.Id))
+                            .Where(item => !string.IsNullOrEmpty(item.Value))
+                            .Select(item => (item.DatabaseEdgeField.Id, item.Value))
                             .Distinct()
-                            .Where(item => validItemEdgeFieldIds.Contains(item.DatabaseEdgeFieldId))
+                            .Where(item => batchDatabaseEdgeFields.Any(item1 => item1.Id == item.Item1))
                             .Select(item => new DatabaseEdgeFieldEdge
                             {
-                                DatabaseEdgeFieldId = item.DatabaseEdgeFieldId,
-                                DatabaseEdgeField = edgeFields.FirstOrDefault(item1 => item.DatabaseEdgeFieldId == item1.Id),
-                                EdgeId = edge.Id,
-                                Edge = edge,
-                                Value = item.Value
+                                DatabaseEdgeFieldId = item.Item1,
+                                DatabaseEdgeField = batchDatabaseEdgeFields
+                                    .FirstOrDefault(item1 => item1.Id == item.Item1),
+                                Value = item.Item2
                             })
-                            .Where(item => item.DatabaseEdgeField != null && item.Edge != null) :
+                            .Where(item => item.DatabaseEdgeField != null) :
                         Enumerable.Empty<DatabaseEdgeFieldEdge>();
-                    // Get the valid item databases and the database edges to add.
+                    // Get the database edges.
                     var databaseEdges = batchItem.DatabaseEdges != null ?
                         batchItem.DatabaseEdges
-                            .Select(item => item.DatabaseId)
-                            .Where(item => validItemDatabaseIds.Contains(item))
-                            .Concat(edgeFieldEdges.Select(item => item.DatabaseEdgeField.Database.Id))
+                            .Where(item => item.Database != null)
+                            .Where(item => !string.IsNullOrEmpty(item.Database.Id))
+                            .Select(item => item.Database.Id)
+                            .Concat(databaseEdgeFieldEdges.Select(item => item.DatabaseEdgeField.Database.Id))
                             .Distinct()
+                            .Where(item => batchDatabases.Any(item1 => item1.Id == item))
                             .Select(item => new DatabaseEdge
                             {
                                 DatabaseId = item,
-                                Database = databases.FirstOrDefault(item1 => item == item1.Id),
-                                EdgeId = edge.Id,
-                                Edge = edge
+                                Database = batchDatabases
+                                    .FirstOrDefault(item1 => item1.Id == item)
                             })
-                            .Where(item => item.Database != null && item.Edge != null) :
+                            .Where(item => item.Database != null) :
                         Enumerable.Empty<DatabaseEdge>();
-                    // Check if there weren't any databases or edge fields found.
+                    // Check if there were no database edges found.
                     if (databaseEdges == null || !databaseEdges.Any())
                     {
-                        // Continue.
-                        continue;
+                        // Throw an exception.
+                        throw new TaskException("There were no database edges found.", showExceptionItem, batchItem);
                     }
                     // Update the edge.
                     edge.Name = string.Concat(edgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " - ", edgeNodes.First(item => item.Type == EdgeNodeType.Target).Node.Name);
@@ -423,21 +416,27 @@ namespace NetControl4BioMed.Helpers.Tasks
                         edgeNodes.First(item => item.Type == EdgeNodeType.Source),
                         edgeNodes.First(item => item.Type == EdgeNodeType.Target)
                     };
-                    edge.DatabaseEdgeFieldEdges = edgeFieldEdges.ToList();
+                    edge.DatabaseEdgeFieldEdges = databaseEdgeFieldEdges.ToList();
                     edge.DatabaseEdges = databaseEdges.ToList().ToList();
                     // Add the edge to the list.
-                    edgesToUpdate.Add(edge);
+                    edgesToEdit.Add(edge);
                 }
                 // Get the networks and analyses that contain the edges.
                 var networks = context.Networks
-                    .Where(item => item.NetworkEdges.Any(item1 => edgesToUpdate.Contains(item1.Edge)));
+                    .Where(item => item.NetworkEdges.Any(item1 => edgesToEdit.Contains(item1.Edge)));
                 var analyses = context.Analyses
-                    .Where(item => item.AnalysisEdges.Any(item1 => edgesToUpdate.Contains(item1.Edge)));
+                    .Where(item => item.AnalysisEdges.Any(item1 => edgesToEdit.Contains(item1.Edge)));
                 // Delete the items.
                 IQueryableExtensions.Delete(analyses, context, token);
                 IQueryableExtensions.Delete(networks, context, token);
                 // Update the items.
-                IEnumerableExtensions.Edit(edgesToUpdate, context, token);
+                IEnumerableExtensions.Edit(edgesToEdit, context, token);
+                // Go over each item.
+                foreach (var edge in edgesToEdit)
+                {
+                    // Yield return it.
+                    yield return edge;
+                }
             }
         }
 
@@ -452,7 +451,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             if (Items == null)
             {
                 // Throw an exception.
-                throw new ArgumentException("No valid items could be found with the provided data.");
+                throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
@@ -470,7 +469,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                var batchItems = Items.Skip(index * ApplicationDbContext.BatchSize).Take(ApplicationDbContext.BatchSize);
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the current batch IDs.

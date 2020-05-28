@@ -34,14 +34,14 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
         {
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string UserString { get; set; }
+            public string DatabaseId { get; set; }
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string DatabaseString { get; set; }
+            public string UserId { get; set; }
         }
 
-        public IActionResult OnGet(string userString = null, string databaseString = null)
+        public IActionResult OnGet(string databaseId = null, string userId = null)
         {
             // Check if there aren't any databases.
             if (!_context.Databases.Any())
@@ -54,8 +54,8 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
             // Define the input.
             Input = new InputModel
             {
-                UserString = userString,
-                DatabaseString = databaseString
+                DatabaseId = databaseId,
+                UserId = userId
             };
             // Return the page.
             return Page();
@@ -79,26 +79,6 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
                 // Redisplay the page.
                 return Page();
             }
-            // Get the user based on the provided string.
-            var user = _context.Users.FirstOrDefault(item => item.Id == Input.UserString || item.Email == Input.UserString);
-            // Check if there was no user found.
-            if (user == null)
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No user could be found with the given string.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Get the database based on the provided string.
-            var database = _context.Databases.FirstOrDefault(item => item.Id == Input.DatabaseString || item.Name == Input.DatabaseString);
-            // Check if there was no database found.
-            if (database == null)
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No database could be found with the given string.");
-                // Redisplay the page.
-                return Page();
-            }
             // Define a new task.
             var task = new DatabaseUsersTask
             {
@@ -106,8 +86,14 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
                 {
                     new DatabaseUserInputModel
                     {
-                        DatabaseId = database.Id,
-                        UserId = user.Id
+                        Database = new DatabaseInputModel
+                        {
+                            Id = Input.DatabaseId
+                        },
+                        User = new UserInputModel
+                        {
+                            Id = Input.UserId
+                        }
                     }
                 }
             };
@@ -115,7 +101,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
             try
             {
                 // Run the task.
-                task.Create(_serviceProvider, CancellationToken.None);
+                _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {
