@@ -112,6 +112,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Include(item => item.DatabaseType)
                     .Where(item => batchDatabaseIds.Contains(item.Id));
                 var batchNodeCollections = context.NodeCollections
+                    .Include(item => item.NodeCollectionDatabases)
+                        .ThenInclude(item => item.Database)
                     .Where(item => batchNodeCollectionIds.Contains(item.Id));
                 // Save the items to add.
                 var networksToAdd = new List<Network>();
@@ -185,6 +187,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("The network databases found have different database types.", showExceptionItem, batchItem);
                     }
+                    // Get the node databases.
+                    var nodeDatabases = networkDatabases
+                        .Where(item => item.Type == NetworkDatabaseType.Node)
+                        .Select(item => item.Database);
                     // Get the network node collections.
                     var networkNodeCollections = batchItem.NetworkNodeCollections != null ?
                         batchItem.NetworkNodeCollections
@@ -198,7 +204,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             {
                                 NodeCollectionId = item.Item1,
                                 NodeCollection = batchNodeCollections
-                                    .FirstOrDefault(item1 => item1.Id == item.Item1),
+                                    .FirstOrDefault(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabases.Contains(item2.Database))),
                                 Type = EnumerationExtensions.GetEnumerationValue<NetworkNodeCollectionType>(item.Item2)
                             })
                             .Where(item => item.NodeCollection != null) :
@@ -665,28 +671,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Where(item => !string.IsNullOrEmpty(item.Id))
                             .Select(item => item.Id)
                             .Distinct();
-                        // Get the nodes in the provided data.
-                        var seedNodesByIdentifiers = context.Databases
-                            .Where(item => nodeDatabaseIds.Contains(item.Id))
-                            .Select(item => item.DatabaseNodeFields)
-                            .SelectMany(item => item)
-                            .Where(item => item.IsSearchable)
-                            .Select(item => item.DatabaseNodeFieldNodes)
-                            .SelectMany(item => item)
-                            .Where(item => seedNodeIdentifiers.Contains(item.Node.Id) || seedNodeIdentifiers.Contains(item.Value))
-                            .Select(item => item.Node)
-                            .Distinct();
-                        // Get the nodes in the provided node collections.
-                        var seedNodesByNodeCollections = context.NodeCollections
-                            .Where(item => seedNodeCollectionIds.Contains(item.Id))
-                            .Select(item => item.NodeCollectionNodes)
-                            .SelectMany(item => item)
-                            .Select(item => item.Node)
-                            .Where(item => item.DatabaseNodeFieldNodes.Any(item1 => nodeDatabaseIds.Contains(item1.DatabaseNodeField.Database.Id)))
-                            .Distinct();
-                        // Get the nodes.
-                        var seedNodes = seedNodesByIdentifiers
-                            .Concat(seedNodesByNodeCollections)
+                        // Get the available nodes.
+                        var availableNodes = context.Nodes
+                            .Where(item => item.DatabaseNodes.Any(item1 => nodeDatabaseIds.Contains(item1.Database.Id)));
+                        // Get the seed nodes.
+                        var seedNodesByIdentifier = availableNodes
+                            .Where(item => seedNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => seedNodeIdentifiers.Contains(item1.Value)));
+                        var seedNodesByNodeCollection = availableNodes
+                            .Where(item => item.NodeCollectionNodes.Any(item1 => seedNodeCollectionIds.Contains(item1.NodeCollection.Id)));
+                        var seedNodes = seedNodesByIdentifier
+                            .Concat(seedNodesByNodeCollection)
                             .Distinct()
                             .AsEnumerable();
                         // Check if there haven't been any seed nodes found.
@@ -701,24 +695,18 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Continue.
                             continue;
                         }
-                        // Get all of the edges in the provided edge databases that match the given data.
-                        var seedEdges = context.Databases
-                            .Include(item => item.DatabaseEdges)
-                                .ThenInclude(item => item.Edge)
-                                    .ThenInclude(item => item.EdgeNodes)
-                                        .ThenInclude(item => item.Node)
-                            .Where(item => edgeDatabaseIds.Contains(item.Id))
-                            .Select(item => item.DatabaseEdges)
-                            .SelectMany(item => item)
-                            .Select(item => item.Edge)
-                            .Distinct();
-                        // Check if there haven't been any seed edges found.
-                        if (seedEdges == null || !seedEdges.Any())
+                        // Get the available edges.
+                        var availableEdges = context.Edges
+                            .Include(item => item.EdgeNodes)
+                                .ThenInclude(item => item.Node)
+                            .Where(item => item.DatabaseEdges.Any(item1 => edgeDatabaseIds.Contains(item1.Database.Id)));
+                        // Check if there haven't been any available edges found.
+                        if (availableEdges == null || !availableEdges.Any())
                         {
                             // Update the status of the item.
                             network.Status = NetworkStatus.Error;
                             // Add a message to the log.
-                            network.Log = network.AppendToLog("No seed edges could be found in the selected databases.");
+                            network.Log = network.AppendToLog("No available edges could be found in the selected databases.");
                             // Edit the network.
                             IEnumerableExtensions.Edit(network.Yield(), context, token);
                             // Continue.
@@ -730,7 +718,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         if (network.Algorithm == NetworkAlgorithm.Neighbors)
                         {
                             // Get all edges that contain the seed nodes.
-                            var currentEdges = seedEdges
+                            var currentEdges = availableEdges
                                 .Where(item => item.EdgeNodes.Any(item1 => seedNodes.Contains(item1.Node)));
                             // Add the edges to the list.
                             edges.AddRange(currentEdges);
@@ -757,7 +745,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                             .Select(item => item.Node))
                                         .SelectMany(item => item);
                                 // Get all edges that start in the terminal nodes.
-                                var temporaryList = seedEdges
+                                var temporaryList = availableEdges
                                     .Where(item => item.EdgeNodes
                                         .Any(item1 => item1.Type == EdgeNodeType.Source && terminalNodes.Contains(item1.Node)))
                                     .ToList();

@@ -120,6 +120,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchUsers = context.Users
                     .Where(item => batchUserIds.Contains(item.Id));
                 var batchNodeCollections = context.NodeCollections
+                    .Include(item => item.NodeCollectionDatabases)
+                        .ThenInclude(item => item.Database)
                     .Where(item => batchNodeCollectionIds.Contains(item.Id));
                 var batchNetworks = context.Networks
                     .Include(item => item.NetworkDatabases)
@@ -163,24 +165,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no analysis users found.", showExceptionItem, batchItem);
                     }
-                    // Get the analysis node collections.
-                    var analysisNodeCollections = batchItem.AnalysisNodeCollections != null ?
-                        batchItem.AnalysisNodeCollections
-                            .Where(item => item.NodeCollection != null)
-                            .Where(item => !string.IsNullOrEmpty(item.NodeCollection.Id))
-                            .Where(item => item.Type == "Source" || item.Type == "Target")
-                            .Select(item => (item.NodeCollection.Id, item.Type))
-                            .Distinct()
-                            .Where(item => batchNodeCollections.Any(item1 => item1.Id == item.Item1))
-                            .Select(item => new AnalysisNodeCollection
-                            {
-                                NodeCollectionId = item.Item1,
-                                NodeCollection = batchNodeCollections
-                                    .FirstOrDefault(item1 => item1.Id == item.Item1),
-                                Type = EnumerationExtensions.GetEnumerationValue<AnalysisNodeCollectionType>(item.Item2)
-                            })
-                            .Where(item => item.NodeCollection != null) :
-                        Enumerable.Empty<AnalysisNodeCollection>();
                     // Check if there are no analysis networks provided.
                     if (batchItem.AnalysisNetworks == null || !batchItem.AnalysisNetworks.Any())
                     {
@@ -247,6 +231,28 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no edge analysis databases found.", showExceptionItem, batchItem);
                     }
+                    // Get the node databases.
+                    var nodeDatabases = nodeAnalysisDatabases
+                        .Where(item => item.Type == AnalysisDatabaseType.Node)
+                        .Select(item => item.Database);
+                    // Get the analysis node collections.
+                    var analysisNodeCollections = batchItem.AnalysisNodeCollections != null ?
+                        batchItem.AnalysisNodeCollections
+                            .Where(item => item.NodeCollection != null)
+                            .Where(item => !string.IsNullOrEmpty(item.NodeCollection.Id))
+                            .Where(item => item.Type == "Source" || item.Type == "Target")
+                            .Select(item => (item.NodeCollection.Id, item.Type))
+                            .Distinct()
+                            .Where(item => batchNodeCollections.Any(item1 => item1.Id == item.Item1))
+                            .Select(item => new AnalysisNodeCollection
+                            {
+                                NodeCollectionId = item.Item1,
+                                NodeCollection = batchNodeCollections
+                                    .FirstOrDefault(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabases.Contains(item2.Database))),
+                                Type = EnumerationExtensions.GetEnumerationValue<AnalysisNodeCollectionType>(item.Item2)
+                            })
+                            .Where(item => item.NodeCollection != null) :
+                        Enumerable.Empty<AnalysisNodeCollection>();
                     // Define the new item.
                     var analysis = new Analysis
                     {
@@ -535,50 +541,22 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => !string.IsNullOrEmpty(item.Id))
                         .Select(item => item.Id)
                         .Distinct();
-                    // Get the nodes in the provided data.
-                    var sourceNodesByIdentifiers = context.Databases
-                        .Where(item => nodeDatabaseIds.Contains(item.Id))
-                        .Select(item => item.DatabaseNodeFields)
-                        .SelectMany(item => item)
-                        .Where(item => item.IsSearchable)
-                        .Select(item => item.DatabaseNodeFieldNodes)
-                        .SelectMany(item => item)
-                        .Where(item => sourceNodeIdentifiers.Contains(item.Node.Id) || sourceNodeIdentifiers.Contains(item.Value))
-                        .Select(item => item.Node)
-                        .Distinct();
-                    var targetNodesByIdentifiers = context.Databases
-                        .Where(item => nodeDatabaseIds.Contains(item.Id))
-                        .Select(item => item.DatabaseNodeFields)
-                        .SelectMany(item => item)
-                        .Where(item => item.IsSearchable)
-                        .Select(item => item.DatabaseNodeFieldNodes)
-                        .SelectMany(item => item)
-                        .Where(item => targetNodeIdentifiers.Contains(item.Node.Id) || targetNodeIdentifiers.Contains(item.Value))
-                        .Select(item => item.Node)
-                        .Distinct();
-                    // Get the nodes in the provided node collections.
-                    var sourceNodesByNodeCollections = context.NodeCollections
-                        .Where(item => sourceNodeCollectionIds.Contains(item.Id))
-                        .Select(item => item.NodeCollectionNodes)
-                        .SelectMany(item => item)
-                        .Select(item => item.Node)
-                        .Where(item => item.DatabaseNodeFieldNodes.Any(item1 => nodeDatabaseIds.Contains(item1.DatabaseNodeField.Database.Id)))
-                        .Distinct();
-                    var targetNodesByNodeCollections = context.NodeCollections
-                        .Where(item => targetNodeCollectionIds.Contains(item.Id))
-                        .Select(item => item.NodeCollectionNodes)
-                        .SelectMany(item => item)
-                        .Select(item => item.Node)
-                        .Where(item => item.DatabaseNodeFieldNodes.Any(item1 => nodeDatabaseIds.Contains(item1.DatabaseNodeField.Database.Id)))
-                        .Distinct();
+                    // Get the available nodes.
+                    var availableNodes = context.Nodes
+                        .Where(item => item.DatabaseNodes.Any(item1 => nodeDatabaseIds.Contains(item1.Database.Id)));
+                    // Get the nodes by identifier.
+                    var sourceNodesByIdentifier = availableNodes
+                        .Where(item => sourceNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => sourceNodeIdentifiers.Contains(item1.Value)));
+                    var targetNodesByIdentifier = availableNodes
+                        .Where(item => targetNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => targetNodeIdentifiers.Contains(item1.Value)));
+                    // Get the nodes by node collection.
+                    var sourceNodesByNodeCollection = availableNodes
+                        .Where(item => item.NodeCollectionNodes.Any(item1 => sourceNodeCollectionIds.Contains(item1.NodeCollection.Id)));
+                    var targetNodesByNodeCollection = availableNodes
+                        .Where(item => item.NodeCollectionNodes.Any(item1 => targetNodeCollectionIds.Contains(item1.NodeCollection.Id)));
                     // Get the nodes in the analysis.
-                    var nodes = context.Networks
-                        .Where(item => networkIds.Contains(item.Id))
-                        .Select(item => item.NetworkNodes)
-                        .SelectMany(item => item)
-                        .Select(item => item.Node)
-                        .Where(item => item.DatabaseNodeFieldNodes.Any(item1 => nodeDatabaseIds.Contains(item1.DatabaseNodeField.Database.Id)))
-                        .Distinct();
+                    var nodes = availableNodes
+                        .Where(item => item.NetworkNodes.Any(item1 => networkIds.Contains(item1.Network.Id)));
                     // Check if there haven't been any nodes found.
                     if (nodes == null || !nodes.Any())
                     {
@@ -591,14 +569,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
+                    // Get the available edges.
+                    var availableEdges = context.Edges
+                        .Where(item => item.DatabaseEdges.Any(item1 => edgeDatabaseIds.Contains(item1.Database.Id)));
                     // Get the edges in the analysis.
-                    var edges = context.Networks
-                        .Where(item => networkIds.Contains(item.Id))
-                        .Select(item => item.NetworkEdges)
-                        .SelectMany(item => item)
-                        .Select(item => item.Edge)
-                        .Where(item => item.DatabaseEdges.Any(item1 => edgeDatabaseIds.Contains(item1.Database.Id)))
-                        .Distinct();
+                    var edges = availableEdges
+                        .Where(item => item.NetworkEdges.Any(item1 => networkIds.Contains(item1.Network.Id)));
                     // Check if there haven't been any edges found.
                     if (edges == null || !edges.Any())
                     {
@@ -611,13 +587,15 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
-                    // Get the nodes.
-                    var sourceNodes = sourceNodesByIdentifiers
-                        .Concat(sourceNodesByNodeCollections)
-                        .Intersect(nodes);
-                    var targetNodes = targetNodesByIdentifiers
-                        .Concat(targetNodesByNodeCollections)
-                        .Intersect(nodes);
+                    // Get the nodes in the analysis.
+                    var sourceNodes = sourceNodesByIdentifier
+                        .Concat(sourceNodesByNodeCollection)
+                        .Intersect(nodes)
+                        .Distinct();
+                    var targetNodes = targetNodesByIdentifier
+                        .Concat(targetNodesByNodeCollection)
+                        .Intersect(nodes)
+                        .Distinct();
                     // Check if there haven't been any target nodes found.
                     if (targetNodes == null || !targetNodes.Any())
                     {
