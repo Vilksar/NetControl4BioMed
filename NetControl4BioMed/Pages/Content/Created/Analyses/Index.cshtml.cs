@@ -52,8 +52,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsError", "Is error" },
+                    { "IsNotError", "Is not error" },
                     { "IsDefined", "Is defined" },
                     { "IsNotDefined", "Is not defined" },
+                    { "IsGenerating", "Is generating" },
+                    { "IsNotGenerating", "Is not generating" },
                     { "IsScheduled", "Is scheduled" },
                     { "IsNotScheduled", "Is not scheduled" },
                     { "IsInitializing", "Is initializing" },
@@ -66,8 +70,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     { "IsNotStopped", "Is not stopped" },
                     { "IsCompleted", "Is completed" },
                     { "IsNotCompleted", "Is not completed" },
-                    { "IsError", "Is error" },
-                    { "IsNotError", "Is not error" },
                     { "UsesAlgorithm1", "Uses the first algorithm" },
                     { "UsesNotAlgorithm1", "Doesn't use the first algorithm" },
                     { "UsesAlgorithm2", "Uses the second algorithm" },
@@ -137,6 +139,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 .Where(item => input.Filter.Contains("IsNotError") ? item.Status != AnalysisStatus.Error : true)
                 .Where(item => input.Filter.Contains("IsDefined") ? item.Status == AnalysisStatus.Defined : true)
                 .Where(item => input.Filter.Contains("IsNotDefined") ? item.Status != AnalysisStatus.Defined : true)
+                .Where(item => input.Filter.Contains("IsGenerating") ? item.Status == AnalysisStatus.Generating : true)
+                .Where(item => input.Filter.Contains("IsNotGenerating") ? item.Status != AnalysisStatus.Generating : true)
                 .Where(item => input.Filter.Contains("IsScheduled") ? item.Status == AnalysisStatus.Scheduled : true)
                 .Where(item => input.Filter.Contains("IsNotScheduled") ? item.Status != AnalysisStatus.Scheduled : true)
                 .Where(item => input.Filter.Contains("IsInitializing") ? item.Status == AnalysisStatus.Initializing : true)
@@ -247,11 +251,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 default:
                     break;
             }
-            // Include the related entitites.
-            query = query
-                .Include(item => item.AnalysisDatabases)
-                    .ThenInclude(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType);
             // Define the view.
             View = new ViewModel
             {

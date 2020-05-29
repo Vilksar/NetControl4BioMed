@@ -1,7 +1,7 @@
 ﻿@page
 @model IndexModel
 @using NetControl4BioMed.Data.Enumerations
-@using Helpers.Extensions
+@using Helpers.Extensions 
 @{
     ViewData["Title"] = "Network details";
 }
@@ -9,26 +9,10 @@
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetNetworkNavigationTitleCard(Model.View.Network)" />
 <div class="card mb-3" title="Status">
     <div class="card-body text-center">
-        <div class="text-uppercase">
-            @switch (Model.View.Network.Status)
-            {
-                case NetworkStatus.Error:
-                    <span class="text-danger"><i class="fas fa-times-circle"></i></span>
-                    break;
-                case NetworkStatus.Defined:
-                    <span class="text-primary"><i class="fas fa-hashtag"></i></span>
-                    break;
-                case NetworkStatus.Generated:
-                    <span class="text-success"><i class="fas fa-check-circle"></i></span>
-                    break;
-                default:
-                    break;
-            }
-            <span title="@Model.View.Network.Status.GetDisplayDescription()">@Model.View.Network.Status.GetDisplayName()</span>
-        </div>
+        <partial name="_NetworkStatusPartial" model="@Model.View.Network.Status" />
     </div>
 </div>
-<div class="item-refresh" data-id="@Model.View.Network.Id" data-status="@Model.View.Network.Status.ToString()" data-refresh="@(Model.View.Network.Status == NetworkStatus.Defined)">
+<div class="item-refresh" data-id="@Model.View.Network.Id" data-status="@Model.View.Network.Status.ToString()" data-refresh="@(Model.View.Network.Status == NetworkStatus.Defined || Model.View.Network.Status == NetworkStatus.Generating)">
     <div class="card mb-3">
         <div class="card-body text-center">
             <div class="row align-items-center">
@@ -68,7 +52,7 @@
         </div>
     </div>
 }
-<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetNetworkNavigationQuickLinks(Model.View.Network)" />
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetNetworkNavigationQuickLinks(Model.View.Network.Id, Model.View.UserCount, Model.View.UserInvitationCount, Model.View.DatabaseCount, Model.View.NodeCount, Model.View.EdgeCount, Model.View.NodeCollectionCount)" />
 @if (Model.View.ShowVisualization)
 {
     <div class="card mb-3">

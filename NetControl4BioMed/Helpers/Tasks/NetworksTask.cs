@@ -430,6 +430,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
+                    // Update the status of the item.
+                    network.Status = NetworkStatus.Generating;
+                    // Add a message to the log.
+                    network.Log = network.AppendToLog("The network is now generating.");
+                    // Edit the network.
+                    IEnumerableExtensions.Edit(network.Yield(), context, token);
                     // Get the related data of the item.
                     var databaseTypes = network.NetworkDatabases
                         .Select(item => item.Database.DatabaseType);
@@ -833,7 +839,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .ToList();
                     }
                     // Update the status of the item.
-                    network.Status = NetworkStatus.Generated;
+                    network.Status = NetworkStatus.Completed;
                     // Add a message to the log.
                     network.Log = network.AppendToLog("The network has been successfully generated.");
                     // Remove the generation data.

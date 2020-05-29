@@ -56,8 +56,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     { "IsNotError", "Is not error" },
                     { "IsDefined", "Is defined" },
                     { "IsNotDefined", "Is not defined" },
-                    { "IsGenerated", "Is generated" },
-                    { "IsNotGenerated", "Is not generated" },
+                    { "IsGenerating", "Is generating" },
+                    { "IsNotGenerating", "Is not generating" },
+                    { "IsCompleted", "Is completed" },
+                    { "IsNotCompleted", "Is not completed" },
                     { "UsesAlgorithmNone", "Was provided by user" },
                     { "UsesNotAlgorithmNone", "Was not provided by user" },
                     { "UsesAlgorithmNeighbors", "Was generated using \"Neighbors\" algorithm" },
@@ -136,8 +138,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 .Where(item => input.Filter.Contains("IsNotError") ? item.Status != NetworkStatus.Error : true)
                 .Where(item => input.Filter.Contains("IsDefined") ? item.Status == NetworkStatus.Defined : true)
                 .Where(item => input.Filter.Contains("IsNotDefined") ? item.Status != NetworkStatus.Defined : true)
-                .Where(item => input.Filter.Contains("IsGenerated") ? item.Status == NetworkStatus.Generated : true)
-                .Where(item => input.Filter.Contains("IsNotGenerated") ? item.Status != NetworkStatus.Generated : true)
+                .Where(item => input.Filter.Contains("IsGenerating") ? item.Status == NetworkStatus.Generating : true)
+                .Where(item => input.Filter.Contains("IsNotGenerating") ? item.Status != NetworkStatus.Generating : true)
+                .Where(item => input.Filter.Contains("IsCompleted") ? item.Status == NetworkStatus.Completed : true)
+                .Where(item => input.Filter.Contains("IsNotCompleted") ? item.Status != NetworkStatus.Completed : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmNone") ? item.Algorithm == NetworkAlgorithm.None : true)
                 .Where(item => input.Filter.Contains("UsesNotAlgorithmNone") ? item.Algorithm != NetworkAlgorithm.None : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmNeighbors") ? item.Algorithm == NetworkAlgorithm.Neighbors : true)
@@ -230,10 +234,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 default:
                     break;
             }
-            // Include the related entitites.
-            query = query
-                .Include(item => item.NetworkNodes)
-                .Include(item => item.NetworkEdges);
             // Define the view.
             View = new ViewModel
             {

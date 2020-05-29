@@ -39,6 +39,18 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
             public Helpers.Algorithms.Algorithm1.Parameters Algorithm1Parameters { get; set; }
 
             public Helpers.Algorithms.Algorithm2.Parameters Algorithm2Parameters { get; set; }
+
+            public int UserCount { get; set; }
+
+            public int UserInvitationCount { get; set; }
+
+            public int DatabaseCount { get; set; }
+
+            public int NodeCount { get; set; }
+
+            public int EdgeCount { get; set; }
+
+            public int NodeCollectionCount { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -77,21 +89,36 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
             View = new ViewModel
             {
                 Analysis = items
-                    .Include(item => item.AnalysisNodes)
-                    .Include(item => item.AnalysisEdges)
-                    .Include(item => item.AnalysisDatabases)
-                    .Include(item => item.AnalysisNodeCollections)
-                    .Include(item => item.AnalysisUsers)
-                    .Include(item => item.AnalysisUserInvitations)
-                    .Include(item => item.AnalysisNetworks)
                     .First(),
-                ShowVisualization = items
+                Algorithm1Parameters = null,
+                Algorithm2Parameters = null,
+                UserCount = items
+                    .Select(item => item.AnalysisUsers)
+                    .SelectMany(item => item)
+                    .Count(),
+                UserInvitationCount = items
+                    .Select(item => item.AnalysisUserInvitations)
+                    .SelectMany(item => item)
+                    .Count(),
+                DatabaseCount = items
+                    .Select(item => item.AnalysisDatabases)
+                    .SelectMany(item => item)
+                    .Count(),
+                NodeCount = items
                     .Select(item => item.AnalysisNodes)
                     .SelectMany(item => item)
-                    .Count(item => item.Type == AnalysisNodeType.None) < 500,
-                Algorithm1Parameters = null,
-                Algorithm2Parameters = null
+                    .Count(item => item.Type == AnalysisNodeType.None),
+                EdgeCount = items
+                    .Select(item => item.AnalysisEdges)
+                    .SelectMany(item => item)
+                    .Count(),
+                NodeCollectionCount = items
+                    .Select(item => item.AnalysisNodeCollections)
+                    .SelectMany(item => item)
+                    .Count()
             };
+            // Check if the visualization should be enabled.
+            View.ShowVisualization = (View.Analysis.Status == AnalysisStatus.Stopped || View.Analysis.Status == AnalysisStatus.Completed) && View.NodeCount < 500;
             // Check which algorithm is used and try to deserialize the parameters.
             if (View.Analysis.Algorithm == AnalysisAlgorithm.Algorithm1)
             {
@@ -148,9 +175,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                 Status = item.Status.ToString(),
                 Progress = ((double)item.CurrentIteration * 100 / item.MaximumIterations).ToString("0.00"),
                 ProgressWithoutImprovement = ((double)item.CurrentIterationWithoutImprovement * 100 / item.MaximumIterationsWithoutImprovement).ToString("0.00"),
+                DateTimeCreated = item.DateTimeCreated != null ? item.DateTimeCreated.ToString() : "--/--/---- --:--:--",
+                DateTimeElapsed = item.DateTimeStarted != null ? ((item.DateTimeEnded ?? DateTime.Now) - item.DateTimeStarted).ToString() : "--:--:--.-------",
                 DateTimeStarted = item.DateTimeStarted != null ? item.DateTimeStarted.ToString() : "--/--/---- --:--:--",
-                DateTimeEnded = item.DateTimeEnded != null ? item.DateTimeEnded.ToString() : "--/--/---- --:--:--",
-                DateTimeElapsed = item.DateTimeStarted != null ? ((item.DateTimeEnded ?? DateTime.Now) - item.DateTimeStarted).ToString() : "--:--:--.-------"
+                DateTimeEnded = item.DateTimeEnded != null ? item.DateTimeEnded.ToString() : "--/--/---- --:--:--"
             });
         }
     }

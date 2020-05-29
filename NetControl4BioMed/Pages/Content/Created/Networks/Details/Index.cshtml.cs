@@ -31,9 +31,19 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
         {
             public Network Network { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public bool ShowVisualization { get; set; }
+
+            public int UserCount { get; set; }
+
+            public int UserInvitationCount { get; set; }
+
+            public int DatabaseCount { get; set; }
+
+            public int NodeCount { get; set; }
+
+            public int EdgeCount { get; set; }
+
+            public int NodeCollectionCount { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -71,24 +81,35 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
             // Define the view.
             View = new ViewModel
             {
-                IsGeneric = items
+                Network = items
+                    .First(),
+                UserCount = items
+                    .Select(item => item.NetworkUsers)
+                    .SelectMany(item => item)
+                    .Count(),
+                UserInvitationCount = items
+                    .Select(item => item.NetworkUserInvitations)
+                    .SelectMany(item => item)
+                    .Count(),
+                DatabaseCount = items
                     .Select(item => item.NetworkDatabases)
                     .SelectMany(item => item)
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                Network = items
-                    .Include(item => item.NetworkNodes)
-                    .Include(item => item.NetworkEdges)
-                    .Include(item => item.NetworkDatabases)
-                    .Include(item => item.NetworkNodeCollections)
-                    .Include(item => item.NetworkUsers)
-                    .Include(item => item.NetworkUserInvitations)
-                    .Include(item => item.AnalysisNetworks)
-                    .First(),
-                ShowVisualization = items
+                    .Count(),
+                NodeCount = items
                     .Select(item => item.NetworkNodes)
                     .SelectMany(item => item)
-                    .Count(item => item.Type == NetworkNodeType.None) < 500
+                    .Count(item => item.Type == NetworkNodeType.None),
+                EdgeCount = items
+                    .Select(item => item.NetworkEdges)
+                    .SelectMany(item => item)
+                    .Count(),
+                NodeCollectionCount = items
+                    .Select(item => item.NetworkNodeCollections)
+                    .SelectMany(item => item)
+                    .Count()
             };
+            // Check if the visualization should be enabled.
+            View.ShowVisualization = View.Network.Status == NetworkStatus.Completed && View.NodeCount < 500;
             // Return the page.
             return Page();
         }

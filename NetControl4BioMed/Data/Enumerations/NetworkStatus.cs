@@ -24,9 +24,15 @@ namespace NetControl4BioMed.Data.Enumerations
         Defined,
 
         /// <summary>
-        /// Represents a network which has been generated.
+        /// Represents a network which is currently generating.
         /// </summary>
-        [Display(Name = "Generated", Description = "The network has been generated.")]
-        Generated
+        [Display(Name = "Generating", Description = "The network is currently generating.")]
+        Generating,
+
+        /// <summary>
+        /// Represents a network which has been generated successfully.
+        /// </summary>
+        [Display(Name = "Completed", Description = "The network has been generated successfully.")]
+        Completed
     }
 }

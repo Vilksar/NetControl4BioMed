@@ -24,6 +24,12 @@ namespace NetControl4BioMed.Data.Enumerations
         Defined,
 
         /// <summary>
+        /// Represents an analysis which has been defined.
+        /// </summary>
+        [Display(Name = "Generating", Description = "The analysis is currently generating.")]
+        Generating,
+
+        /// <summary>
         /// Represents an analysis which has been scheduled to start.
         /// </summary>
         [Display(Name = "Scheduled", Description = "The analysis has been scheduled to start.")]

@@ -315,12 +315,12 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets the navigation quick links for the administration index page.
         /// </summary>
-        /// <param name="userCount">Represents the current number of users.</param>
-        /// <param name="roleCount">Represents the current number of roles.</param>
-        /// <param name="databaseCount">Represents the current number of databases.</param>
-        /// <param name="nodeCollectionCount">Represents the current number of node collections.</param>
-        /// <param name="nodeCount">Represents the current number of nodes.</param>
-        /// <param name="edgeCount">Represents the current number of edges.</param>
+        /// <param name="userCount">The current number of users.</param>
+        /// <param name="roleCount">The current number of roles.</param>
+        /// <param name="databaseCount">The current number of databases.</param>
+        /// <param name="nodeCollectionCount">The current number of node collections.</param>
+        /// <param name="nodeCount">The current number of nodes.</param>
+        /// <param name="edgeCount">The current number of edges.</param>
         /// <returns>The navigation quick links for the content index page.</returns>
         public static IEnumerable<NavigationQuickLinkViewModel> GetAdministrationNavigationQuickLinks(int userCount = 0, int roleCount = 0, int databaseCount = 0, int nodeCollectionCount = 0, int nodeCount = 0, int edgeCount = 0)
         {
@@ -353,8 +353,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets the navigation quick links for the content index page.
         /// </summary>
-        /// <param name="networkCount">Represents the current number of networks.</param>
-        /// <param name="analysisCount">Represents the current number of analyses.</param>
+        /// <param name="networkCount">The current number of networks.</param>
+        /// <param name="analysisCount">The current number of analyses.</param>
         /// <returns>The navigation quick links for the content index page.</returns>
         public static IEnumerable<NavigationQuickLinkViewModel> GetContentNavigationQuickLinks(int networkCount = 0, int analysisCount = 0)
         {
@@ -375,78 +375,102 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets the navigation quick links for the network index page.
         /// </summary>
-        /// <param name="network">Represents the current network.</param>
+        /// <param name="networkId">The ID of the current network.</param>
+        /// <param name="userCount">The number of network users.</param>
+        /// <param name="userInvitationCount">The number of network user invitations.</param>
+        /// <param name="databaseCount">The number of network databases.</param>
+        /// <param name="nodeCount">The number of network nodes.</param>
+        /// <param name="edgeCount">The number of network edges.</param>
+        /// <param name="nodeCollectionCount">The number of network node collections.</param>
         /// <returns>The navigation quick links for the network index page.</returns>
-        public static IEnumerable<NavigationQuickLinkViewModel> GetNetworkNavigationQuickLinks(Network network)
+        public static IEnumerable<NavigationQuickLinkViewModel> GetNetworkNavigationQuickLinks(string networkId = null, int userCount = 0, int userInvitationCount = 0, int databaseCount = 0, int nodeCount = 0, int edgeCount = 0, int nodeCollectionCount = 0)
         {
+            // Check if there is no network ID provided.
+            if (string.IsNullOrEmpty(networkId))
+            {
+                // Assign the empty string to it.
+                networkId = string.Empty;
+            }
             // Get the corresponding navigation quick links.
-            var networkNodesNavigationQuickLink = NetworkNodesNavigationQuickLink;
-            var networkEdgesNavigationQuickLink = NetworkEdgesNavigationQuickLink;
-            var networkDatabasesNavigationQuickLink = NetworkDatabasesNavigationQuickLink;
-            var networkNodeCollectionsNavigationQuickLink = NetworkNodeCollectionsNavigationQuickLink;
             var networkUsersNavigationQuickLink = NetworkUsersNavigationQuickLink;
             var networkUserInvitationsNavigationQuickLink = NetworkUserInvitationsNavigationQuickLink;
+            var networkDatabasesNavigationQuickLink = NetworkDatabasesNavigationQuickLink;
+            var networkNodesNavigationQuickLink = NetworkNodesNavigationQuickLink;
+            var networkEdgesNavigationQuickLink = NetworkEdgesNavigationQuickLink;
+            var networkNodeCollectionsNavigationQuickLink = NetworkNodeCollectionsNavigationQuickLink;
             // Update the count and the route ID.
-            networkNodesNavigationQuickLink.ItemCount = network.NetworkNodes.Count(item => item.Type == NetworkNodeType.None);
-            networkNodesNavigationQuickLink.RouteId = network.Id;
-            networkEdgesNavigationQuickLink.ItemCount = network.NetworkEdges.Count();
-            networkEdgesNavigationQuickLink.RouteId = network.Id;
-            networkDatabasesNavigationQuickLink.ItemCount = network.NetworkDatabases.Count();
-            networkDatabasesNavigationQuickLink.RouteId = network.Id;
-            networkNodeCollectionsNavigationQuickLink.ItemCount = network.NetworkNodeCollections.Count();
-            networkNodeCollectionsNavigationQuickLink.RouteId = network.Id;
-            networkUsersNavigationQuickLink.ItemCount = network.NetworkUsers.Count();
-            networkUsersNavigationQuickLink.RouteId = network.Id;
-            networkUserInvitationsNavigationQuickLink.ItemCount = network.NetworkUserInvitations.Count();
-            networkUserInvitationsNavigationQuickLink.RouteId = network.Id;
+            networkUsersNavigationQuickLink.ItemCount = userCount;
+            networkUsersNavigationQuickLink.RouteId = networkId;
+            networkUserInvitationsNavigationQuickLink.ItemCount = userInvitationCount;
+            networkUserInvitationsNavigationQuickLink.RouteId = networkId;
+            networkDatabasesNavigationQuickLink.ItemCount = databaseCount;
+            networkDatabasesNavigationQuickLink.RouteId = networkId;
+            networkNodesNavigationQuickLink.ItemCount = nodeCount;
+            networkNodesNavigationQuickLink.RouteId = networkId;
+            networkEdgesNavigationQuickLink.ItemCount = edgeCount;
+            networkEdgesNavigationQuickLink.RouteId = networkId;
+            networkNodeCollectionsNavigationQuickLink.ItemCount = nodeCollectionCount;
+            networkNodeCollectionsNavigationQuickLink.RouteId = networkId;
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
+                networkUsersNavigationQuickLink,
+                networkUserInvitationsNavigationQuickLink,
+                networkDatabasesNavigationQuickLink,
                 networkNodesNavigationQuickLink,
                 networkEdgesNavigationQuickLink,
-                networkDatabasesNavigationQuickLink,
-                networkNodeCollectionsNavigationQuickLink,
-                networkUsersNavigationQuickLink,
-                networkUserInvitationsNavigationQuickLink
+                networkNodeCollectionsNavigationQuickLink
             };
         }
 
         /// <summary>
         /// Gets the navigation quick links for the analysis index page.
         /// </summary>
-        /// <param name="analysis">Represents the current analysis.</param>
+        /// <param name="analysisId">The ID of the current analysis.</param>
+        /// <param name="userCount">The number of analysis users.</param>
+        /// <param name="userInvitationCount">The number of analysis user invitations.</param>
+        /// <param name="databaseCount">The number of analysis databases.</param>
+        /// <param name="nodeCount">The number of analysis nodes.</param>
+        /// <param name="edgeCount">The number of analysis edges.</param>
+        /// <param name="nodeCollectionCount">The number of analysis node collections.</param>
         /// <returns>The navigation quick links for the analysis index page.</returns>
-        public static IEnumerable<NavigationQuickLinkViewModel> GetAnalysisNavigationQuickLinks(Analysis analysis)
+        public static IEnumerable<NavigationQuickLinkViewModel> GetAnalysisNavigationQuickLinks(string analysisId = null, int userCount = 0, int userInvitationCount = 0, int databaseCount = 0, int nodeCount = 0, int edgeCount = 0, int nodeCollectionCount = 0)
         {
+            // Check if there is no analysis ID provided.
+            if (string.IsNullOrEmpty(analysisId))
+            {
+                // Assign the empty string to it.
+                analysisId = string.Empty;
+            }
             // Get the corresponding navigation quick links.
-            var analysisNodesNavigationQuickLink = AnalysisNodesNavigationQuickLink;
-            var analysisEdgesNavigationQuickLink = AnalysisEdgesNavigationQuickLink;
-            var analysisDatabasesNavigationQuickLink = AnalysisDatabasesNavigationQuickLink;
-            var analysisNodeCollectionsNavigationQuickLink = AnalysisNodeCollectionsNavigationQuickLink;
             var analysisUsersNavigationQuickLink = AnalysisUsersNavigationQuickLink;
             var analysisUserInvitationsNavigationQuickLink = AnalysisUserInvitationsNavigationQuickLink;
+            var analysisDatabasesNavigationQuickLink = AnalysisDatabasesNavigationQuickLink;
+            var analysisNodesNavigationQuickLink = AnalysisNodesNavigationQuickLink;
+            var analysisEdgesNavigationQuickLink = AnalysisEdgesNavigationQuickLink;
+            var analysisNodeCollectionsNavigationQuickLink = AnalysisNodeCollectionsNavigationQuickLink;
             // Update the count and the route ID.
-            analysisNodesNavigationQuickLink.ItemCount = analysis.AnalysisNodes.Count(item => item.Type == AnalysisNodeType.None);
-            analysisNodesNavigationQuickLink.RouteId = analysis.Id;
-            analysisEdgesNavigationQuickLink.ItemCount = analysis.AnalysisEdges.Count();
-            analysisEdgesNavigationQuickLink.RouteId = analysis.Id;
-            analysisDatabasesNavigationQuickLink.ItemCount = analysis.AnalysisDatabases.Count();
-            analysisDatabasesNavigationQuickLink.RouteId = analysis.Id;
-            analysisNodeCollectionsNavigationQuickLink.ItemCount = analysis.AnalysisNodeCollections.Count();
-            analysisNodeCollectionsNavigationQuickLink.RouteId = analysis.Id;
-            analysisUsersNavigationQuickLink.ItemCount = analysis.AnalysisUsers.Count();
-            analysisUsersNavigationQuickLink.RouteId = analysis.Id;
-            analysisUserInvitationsNavigationQuickLink.ItemCount = analysis.AnalysisUserInvitations.Count();
-            analysisUserInvitationsNavigationQuickLink.RouteId = analysis.Id;
+            analysisUsersNavigationQuickLink.ItemCount = userCount;
+            analysisUsersNavigationQuickLink.RouteId = analysisId;
+            analysisUserInvitationsNavigationQuickLink.ItemCount = userInvitationCount;
+            analysisUserInvitationsNavigationQuickLink.RouteId = analysisId;
+            analysisDatabasesNavigationQuickLink.ItemCount = databaseCount;
+            analysisDatabasesNavigationQuickLink.RouteId = analysisId;
+            analysisNodesNavigationQuickLink.ItemCount = nodeCount;
+            analysisNodesNavigationQuickLink.RouteId = analysisId;
+            analysisEdgesNavigationQuickLink.ItemCount = edgeCount;
+            analysisEdgesNavigationQuickLink.RouteId = analysisId;
+            analysisNodeCollectionsNavigationQuickLink.ItemCount = nodeCollectionCount;
+            analysisNodeCollectionsNavigationQuickLink.RouteId = analysisId;
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
+                analysisUsersNavigationQuickLink,
+                analysisUserInvitationsNavigationQuickLink,
+                analysisDatabasesNavigationQuickLink,
                 analysisNodesNavigationQuickLink,
                 analysisEdgesNavigationQuickLink,
-                analysisDatabasesNavigationQuickLink,
-                analysisNodeCollectionsNavigationQuickLink,
-                analysisUsersNavigationQuickLink,
-                analysisUserInvitationsNavigationQuickLink
+                analysisNodeCollectionsNavigationQuickLink
             };
         }
     }

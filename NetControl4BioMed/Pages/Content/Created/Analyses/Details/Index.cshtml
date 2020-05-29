@@ -1,7 +1,7 @@
 ﻿@page
 @model IndexModel
 @using NetControl4BioMed.Data.Enumerations
-@using Helpers.Extensions
+@using Helpers.Extensions 
 @{
     ViewData["Title"] = "Analysis details";
 }
@@ -9,38 +9,10 @@
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetAnalysisNavigationTitleCard(Model.View.Analysis)" />
 <div class="card mb-3" title="Status">
     <div class="card-body text-center">
-        <div class="text-uppercase">
-            @switch (Model.View.Analysis.Status)
-            {
-                case AnalysisStatus.Scheduled:
-                    <span class="text-warning"><i class="fas fa-clock"></i></span>
-                    break;
-                case AnalysisStatus.Initializing:
-                    <span class="text-primary"><i class="fas fa-play-circle"></i></span>
-                    break;
-                case AnalysisStatus.Ongoing:
-                    <span class="text-primary"><i class="fas fa-sync-alt fa-spin"></i></span>
-                    break;
-                case AnalysisStatus.Stopping:
-                    <span class="text-danger"><i class="fas fa-stopwatch"></i></span>
-                    break;
-                case AnalysisStatus.Stopped:
-                    <span class="text-danger"><i class="fas fa-stop-circle"></i></span>
-                    break;
-                case AnalysisStatus.Completed:
-                    <span class="text-success"><i class="fas fa-check-circle"></i></span>
-                    break;
-                case AnalysisStatus.Error:
-                    <span class="text-danger"><i class="fas fa-times-circle"></i></span>
-                    break;
-                default:
-                    break;
-            }
-            <span title="@Model.View.Analysis.Status.GetDisplayDescription()">@Model.View.Analysis.Status.GetDisplayName()</span>
-        </div>
+        <partial name="_AnalysisStatusPartial" model="@Model.View.Analysis.Status" />
     </div>
 </div>
-<div class="item-refresh" data-id="@Model.View.Analysis.Id" data-status="@Model.View.Analysis.Status.ToString()" data-refresh="@(Model.View.Analysis.Status == AnalysisStatus.Scheduled || Model.View.Analysis.Status == AnalysisStatus.Initializing || Model.View.Analysis.Status == AnalysisStatus.Ongoing || Model.View.Analysis.Status == AnalysisStatus.Stopping)">
+<div class="item-refresh" data-id="@Model.View.Analysis.Id" data-status="@Model.View.Analysis.Status.ToString()" data-refresh="@(Model.View.Analysis.Status == AnalysisStatus.Defined || Model.View.Analysis.Status == AnalysisStatus.Generating || Model.View.Analysis.Status == AnalysisStatus.Scheduled || Model.View.Analysis.Status == AnalysisStatus.Initializing || Model.View.Analysis.Status == AnalysisStatus.Ongoing || Model.View.Analysis.Status == AnalysisStatus.Stopping)">
     <div class="card mb-3" title="Progress">
         <div class="card-body text-center">
             <div class="font-weight-bold">
@@ -53,15 +25,19 @@
     <div class="card mb-3">
         <div class="card-body text-center">
             <div class="row align-items-center">
-                <div class="col-lg-4" title="Date started">
+                <div class="col-lg-6" title="Date created">
                     <span><i class="fas fa-calendar"></i></span>
-                    <span class="item-refresh-item" data-type="dateTimeStarted"></span>
+                    <span class="item-refresh-item" data-type="dateTimeCreated"></span>
                 </div>
-                <div class="col-lg-4 my-1 my-lg-0" title="Time elapsed">
+                <div class="col-lg-6 my-1 my-lg-0" title="Time elapsed">
                     <span><i class="fas fa-clock"></i></span>
                     <span class="item-refresh-item" data-type="dateTimeElapsed"></span>
                 </div>
-                <div class="col-lg-4" title="Date ended">
+                <div class="col-lg-6" title="Date started">
+                    <span><i class="fas fa-calendar"></i></span>
+                    <span class="item-refresh-item" data-type="dateTimeStarted"></span>
+                </div>
+                <div class="col-lg-6" title="Date ended">
                     <span><i class="fas fa-calendar"></i></span>
                     <span class="item-refresh-item" data-type="dateTimeEnded"></span>
                 </div>
@@ -106,7 +82,7 @@
         </div>
     </div>
 }
-<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAnalysisNavigationQuickLinks(Model.View.Analysis)" />
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAnalysisNavigationQuickLinks(Model.View.Analysis.Id, Model.View.UserCount, Model.View.UserInvitationCount, Model.View.DatabaseCount, Model.View.NodeCount, Model.View.EdgeCount, Model.View.NodeCollectionCount)" />
 @if (Model.View.ShowVisualization)
 {
     <div class="card mb-3">

@@ -467,6 +467,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
+                    // Update the status of the item.
+                    analysis.Status = AnalysisStatus.Generating;
+                    // Add a message to the log.
+                    analysis.Log = analysis.AppendToLog("The analysis is now generating.");
+                    // Edit the network.
+                    IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                     // Try to deserialize the data.
                     if (!analysis.Data.TryDeserializeJsonObject<IEnumerable<AnalysisNodeInputModel>>(out var data) || data == null)
                     {
