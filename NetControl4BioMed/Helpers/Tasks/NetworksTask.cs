@@ -682,7 +682,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         var seedNodes = seedNodesByIdentifier
                             .Concat(seedNodesByNodeCollection)
                             .Distinct()
-                            .AsEnumerable();
+                            .ToList();
                         // Check if there haven't been any seed nodes found.
                         if (seedNodes == null || !seedNodes.Any())
                         {
@@ -719,7 +719,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         {
                             // Get all edges that contain the seed nodes.
                             var currentEdges = availableEdges
-                                .Where(item => item.EdgeNodes.Any(item1 => seedNodes.Contains(item1.Node)));
+                                .Where(item => item.EdgeNodes.Any(item1 => seedNodes.Contains(item1.Node)))
+                                .ToList();
                             // Add the edges to the list.
                             edges.AddRange(currentEdges);
                         }
@@ -743,7 +744,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                                         .Select(item => item.EdgeNodes
                                             .Where(item => item.Type == EdgeNodeType.Target)
                                             .Select(item => item.Node))
-                                        .SelectMany(item => item);
+                                        .SelectMany(item => item)
+                                        .Distinct()
+                                        .ToList();
                                 // Get all edges that start in the terminal nodes.
                                 var temporaryList = availableEdges
                                     .Where(item => item.EdgeNodes
@@ -753,7 +756,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 currentEdgeList.Add(temporaryList);
                             }
                             // Define a variable to store, at each step, the nodes to keep.
-                            var nodesToKeep = seedNodes.AsEnumerable();
+                            var nodesToKeep = seedNodes.ToList();
                             // Starting from the right, mark all terminal nodes that are not seed nodes for removal.
                             for (int gapIndex = gap; gapIndex >= 0; gapIndex--)
                             {
@@ -762,16 +765,21 @@ namespace NetControl4BioMed.Helpers.Tasks
                                     .RemoveAll(item => item.EdgeNodes
                                         .Any(item1 => item1.Type == EdgeNodeType.Target && !nodesToKeep.Contains(item1.Node)));
                                 // Update the nodes to keep to be the source nodes of the interactions of the current step together with the seed nodes.
-                                nodesToKeep = currentEdgeList.ElementAt(gapIndex)
+                                nodesToKeep = currentEdgeList
+                                    .ElementAt(gapIndex)
                                     .Select(item => item.EdgeNodes
                                         .Where(item1 => item1.Type == EdgeNodeType.Source)
                                         .Select(item1 => item1.Node))
                                     .SelectMany(item => item)
                                     .Concat(seedNodes)
-                                    .Distinct();
+                                    .Distinct()
+                                    .ToList();
                             }
                             // Get the remaining edges.
-                            var currentEdges = currentEdgeList.SelectMany(item => item).Distinct();
+                            var currentEdges = currentEdgeList
+                                .SelectMany(item => item)
+                                .Distinct()
+                                .ToList();
                             // Add all of the remaining edges.
                             edges.AddRange(currentEdges);
                         }
