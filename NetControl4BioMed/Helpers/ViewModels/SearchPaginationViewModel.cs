@@ -63,8 +63,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
             ItemsPerPageFirst = 0 < TotalItems ? (CurrentPage - 1) * input.ItemsPerPage + 1 : 0;
             ItemsPerPageLast = 0 < TotalItems ? CurrentPage * Math.Min(input.ItemsPerPage, TotalItems) < TotalItems ? CurrentPage * Math.Min(input.ItemsPerPage, TotalItems) : TotalItems : 0;
             // Create the links for the next and the previous pages.
-            PreviousPageLink = CurrentPage == 1 || TotalPages == 0 ? null : linkGenerator.GetPathByRouteValues(httpContext: httpContext, routeName: null, values: new { searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = CurrentPage - 1 });
-            NextPageLink = CurrentPage == TotalPages || TotalPages == 0 ? null : linkGenerator.GetPathByRouteValues(httpContext: httpContext, routeName: null, values: new { searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = CurrentPage + 1 });
+            PreviousPageLink = CurrentPage == 1 || TotalPages == 0 ? null : linkGenerator.GetPathByRouteValues(httpContext: httpContext, routeName: null, values: new { id = input.Id, searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = CurrentPage - 1 });
+            NextPageLink = CurrentPage == TotalPages || TotalPages == 0 ? null : linkGenerator.GetPathByRouteValues(httpContext: httpContext, routeName: null, values: new { id = input.Id, searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = CurrentPage + 1 });
         }
     }
 }
