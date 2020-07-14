@@ -76,29 +76,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                 Analysis = items
                     .Select(item => item.Analysis)
                     .First(),
-                CytoscapeJson = JsonSerializer.Serialize(items
-                    .Include(item => item.Analysis)
-                        .ThenInclude(item => item.AnalysisDatabases)
-                            .ThenInclude(item => item.Database)
-                                .ThenInclude(item => item.DatabaseType)
-                    .Include(item => item.Analysis)
-                        .ThenInclude(item => item.AnalysisNodes)
-                            .ThenInclude(item => item.Node)
-                                .ThenInclude(item => item.DatabaseNodeFieldNodes)
-                                    .ThenInclude(item => item.DatabaseNodeField)
-                    .Include(item => item.Analysis)
-                        .ThenInclude(item => item.AnalysisEdges)
-                            .ThenInclude(item => item.Edge)
-                                .ThenInclude(item => item.EdgeNodes)
-                                    .ThenInclude(item => item.Node)
-                    .Include(item => item.Paths)
-                        .ThenInclude(item => item.PathNodes)
-                            .ThenInclude(item => item.Node)
-                    .Include(item => item.Paths)
-                        .ThenInclude(item => item.PathEdges)
-                            .ThenInclude(item => item.Edge)
-                    .First()
-                    .GetCytoscapeViewModel(_linkGenerator), new JsonSerializerOptions { IgnoreNullValues = true })
+                CytoscapeJson = JsonSerializer.Serialize(items.First().GetCytoscapeViewModel(_linkGenerator, _context), new JsonSerializerOptions { IgnoreNullValues = true })
             };
             // Return the page.
             return Page();

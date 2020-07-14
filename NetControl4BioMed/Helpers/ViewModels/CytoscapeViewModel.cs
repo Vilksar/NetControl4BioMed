@@ -190,16 +190,28 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 public string Content { get; set; }
 
                 /// <summary>
+                /// Represents the arrow color of an element.
+                /// </summary>
+                [JsonPropertyName("target-arrow-color")]
+                public string TargetArrowColor { get; set; }
+
+                /// <summary>
                 /// Represents the arrow shape of an element.
                 /// </summary>
-                [JsonPropertyName("mid-target-arrow-shape")]
-                public string MidTargetArrowShape { get; set; }
+                [JsonPropertyName("target-arrow-shape")]
+                public string TargetArrowShape { get; set; }
 
                 /// <summary>
                 /// Represents the line color of an element.
                 /// </summary>
                 [JsonPropertyName("line-color")]
                 public string LineColor { get; set; }
+
+                /// <summary>
+                /// Represents the curve style of an element.
+                /// </summary>
+                [JsonPropertyName("curve-style")]
+                public string CurveStyle { get; set; }
 
                 /// <summary>
                 /// Represents the background color of an element.
@@ -236,8 +248,10 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 Selector = "edge",
                 Css = new CytoscapeStyle.CytoscapeCSS
                 {
-                    MidTargetArrowShape = "triangle",
-                    LineColor = "lightgray"
+                    TargetArrowColor = "lightgray",
+                    TargetArrowShape = "triangle",
+                    LineColor = "lightgray",
+                    CurveStyle = "bezier"
                 }
             }
         };
@@ -330,7 +344,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 Selector = "edge.control",
                 Css = new CytoscapeStyle.CytoscapeCSS
                 {
-                    LineColor = "lightgreen"
+                    TargetArrowColor = "black",
+                    LineColor = "black"
                 }
             },
         };
