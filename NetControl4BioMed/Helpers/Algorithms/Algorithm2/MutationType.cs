@@ -12,27 +12,27 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
     public enum MutationType
     {
         /// <summary>
-        /// Represents the default, standard, mutation algorithm.
+        /// Represents the default mutation algorithm.
         /// </summary>
-        [Display(Name = "Weighted random ancestor", Description = "The default, standard, mutation algorithm.")]
-        WeightedRandomAncestor,
+        [Display(Name = "Weighted random ancestor")]
+        WeightedRandom,
 
         /// <summary>
-        /// Represents the default, standard, mutation algorithm that is twice less likely to mutate preferred nodes.
+        /// Represents the default mutation algorithm that is twice less likely to mutate preferred nodes.
         /// </summary>
-        [Display(Name = "Weighted random preferred ancestor", Description = "The default, standard, mutation algorithm that is twice less likely to mutate preferred nodes.")]
-        WeightedRandomAncestorWithPreference,
+        [Display(Name = "Weighted random preferred ancestor")]
+        WeightedRandomPreferred,
 
         /// <summary>
-        /// Represents the previously used mutation algorithm.
+        /// Represents the default mutation algorithm that chooses a completely random mutation..
         /// </summary>
-        [Display(Name = "Random ancestor", Description = "The previously used mutation algorithm.")]
-        RandomAncestor,
+        [Display(Name = "Random ancestor")]
+        Random,
 
         /// <summary>
-        /// Represents the previously used mutation algorithm that mutates into preferred nodes whenever possible.
+        /// Represents the default mutation algorithm that mutates into preferred nodes whenever possible.
         /// </summary>
-        [Display(Name = "Random preferred ancestor", Description = "The previously used mutation algorithm that mutates into preferred nodes whenever possible.")]
-        RandomAncestorWithPreference
+        [Display(Name = "Random preferred ancestor")]
+        RandomPreferred
     }
 }

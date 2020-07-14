@@ -196,7 +196,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                     // End the switch statement.
                     break;
                 // If we have a standard crossover with preference.
-                case CrossoverType.WeightedRandomWithPreference:
+                case CrossoverType.WeightedRandomPreferred:
                     // Repeat while the chromosome is not valid.
                     while (tries > 0)
                     {
@@ -265,7 +265,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                     // End the switch statement.
                     break;
                 // If we have a default crossover with preference.
-                case CrossoverType.DominantWithPreference:
+                case CrossoverType.DominantPreferred:
                     // Repeat while the chromosome is not valid.
                     while (tries > 0)
                     {
@@ -346,7 +346,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             switch (mutationType)
             {
                 // If we have a standard mutation.
-                case MutationType.WeightedRandomAncestor:
+                case MutationType.WeightedRandom:
                     // Repeat while the chromosome is not valid.
                     while (genesMutateDictionary.Any())
                     {
@@ -388,7 +388,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                     // End the switch statement.
                     break;
                 // If we have a stadard mutation with preference.
-                case MutationType.WeightedRandomAncestorWithPreference:
+                case MutationType.WeightedRandomPreferred:
                     // Repeat while the chromosome is not valid.
                     while (genesMutateDictionary.Any())
                     {
@@ -430,7 +430,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                     // End the switch statement.
                     break;
                 // If we have a default mutation.
-                case MutationType.RandomAncestor:
+                case MutationType.Random:
                     // Repeat while the chromosome is not valid.
                     while (genesMutateDictionary.Any())
                     {
@@ -464,7 +464,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                     // End the switch statement.
                     break;
                 // If we have a default mutation with preference.
-                case MutationType.RandomAncestorWithPreference:
+                case MutationType.RandomPreferred:
                     // Repeat while the chromosome is not valid.
                     while (genesMutateDictionary.Any())
                     {

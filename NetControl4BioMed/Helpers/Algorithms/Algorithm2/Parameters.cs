@@ -23,14 +23,14 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         /// </summary>
         [Range(0, 25, ErrorMessage = "The value must be between {1} and {2}.")]
         [Required(ErrorMessage = "This field is required.")]
-        public int MaximumPathLength { get; set; } = 15;
+        public int MaximumPathLength { get; set; } = 5;
 
         /// <summary>
         /// Gets or sets the number of chromosomes in each population.
         /// </summary>
         [Range(2, 150, ErrorMessage = "The value must be between {1} and {2}.")]
         [Required(ErrorMessage = "This field is required.")]
-        public int PopulationSize { get; set; } = 80;
+        public int PopulationSize { get; set; } = 20;
 
         /// <summary>
         /// Gets or sets the maximum number of genes whose value can be simultaneously randomly generated.
@@ -70,7 +70,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         /// Gets or sets the mutation algorithm to be used.
         /// </summary>
         [Required(ErrorMessage = "This field is required.")]
-        public MutationType MutationType { get; set; } = MutationType.WeightedRandomAncestor;
+        public MutationType MutationType { get; set; } = MutationType.WeightedRandom;
 
         /// <summary>
         /// Checks if the parameters are valid.

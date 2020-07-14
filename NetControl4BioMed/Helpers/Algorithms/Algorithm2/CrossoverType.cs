@@ -12,27 +12,27 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
     public enum CrossoverType
     {
         /// <summary>
-        /// Represents the default, standard, crossover algorithm.
+        /// Represents the default crossover algorithm.
         /// </summary>
-        [Display(Name = "Weighted random parent", Description = "The default, standard, crossover algorithm.")]
+        [Display(Name = "Weighted random parent")]
         WeightedRandom,
 
         /// <summary>
-        /// Represents the default, standard, crossover algorithm that is twice more likely to choose preferred nodes.
+        /// Represents the default crossover algorithm that is twice more likely to choose preferred nodes.
         /// </summary>
-        [Display(Name = "Weighted random preferred parent", Description = "The default, standard, crossover algorithm that is twice more likely to choose preferred nodes.")]
-        WeightedRandomWithPreference,
+        [Display(Name = "Weighted random preferred parent")]
+        WeightedRandomPreferred,
 
         /// <summary>
-        /// Represents the previously used crossover algorithm.
+        /// Represents the default crossover algorithm that always chooses the dominant gene.
         /// </summary>
-        [Display(Name = "Dominant parent", Description = "The previously used crossover algorithm.")]
+        [Display(Name = "Dominant parent")]
         Dominant,
 
         /// <summary>
-        /// Represents the previously used crossover algorithm that chooses preferred nodes whenever possible.
+        /// Represents the default crossover algorithm that always chooses preferred nodes whenever possible.
         /// </summary>
-        [Display(Name = "Dominant preferred parent", Description = "The previously used crossover algorithm that chooses preferred nodes whenever possible.")]
-        DominantWithPreference
+        [Display(Name = "Dominant preferred parent")]
+        DominantPreferred
     }
 }

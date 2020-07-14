@@ -27,7 +27,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// </summary>
         [Range(0, 25, ErrorMessage = "The value must be between {1} and {2}.")]
         [Required(ErrorMessage = "This field is required.")]
-        public int MaximumPathLength { get; set; } = 15;
+        public int MaximumPathLength { get; set; } = 5;
 
         /// <summary>
         /// Gets or sets the number of times that each heuristic will be repeated in one iteration..
