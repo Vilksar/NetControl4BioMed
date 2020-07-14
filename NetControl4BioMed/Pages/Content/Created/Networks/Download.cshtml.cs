@@ -125,27 +125,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 Items = _context.Networks
                     .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                     .Where(item => Input.Ids.Contains(item.Id))
-                    .Include(item => item.NetworkDatabases)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseType)
-                    .Include(item => item.NetworkDatabases)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseNodeFields)
-                                .ThenInclude(item => item.DatabaseNodeFieldNodes)
-                                    .ThenInclude(item => item.Node)
-                    .Include(item => item.NetworkDatabases)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseEdgeFields)
-                                .ThenInclude(item => item.DatabaseEdgeFieldEdges)
-                                    .ThenInclude(item => item.Edge)
-                    .Include(item => item.NetworkNodes)
-                        .ThenInclude(item => item.Node)
-                    .Include(item => item.NetworkEdges)
-                        .ThenInclude(item => item.Edge)
-                            .ThenInclude(item => item.EdgeNodes)
-                                .ThenInclude(item => item.Node)
-                    .Include(item => item.AnalysisNetworks)
-                        .ThenInclude(item => item.Analysis)
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -179,15 +158,31 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                         // Define the stream writer for the file.
                         using var streamWriter = new StreamWriter(stream);
                         // Get the default values.
-                        var interactionType = network.NetworkDatabases
-                            .FirstOrDefault()?.Database.DatabaseType.Name.ToLower();
+                        var interactionType = _context.NetworkDatabases
+                            .Where(item => item.Network == network)
+                            .Select(item => item.Database.DatabaseType.Name.ToLower())
+                            .FirstOrDefault() ?? "unknown";
                         // Get the required data.
-                        var data = string.Join("\n", network.NetworkEdges.Select(item => item.Edge).Select(item =>
-                        {
-                            var sourceNode = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source)?.Node;
-                            var targetNode = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)?.Node;
-                            return $"{sourceNode?.Name}\t{interactionType}\t{targetNode.Name}";
-                        }));
+                        var data = string.Join("\n", _context.NetworkEdges
+                            .Where(item => item.Network == network)
+                            .Select(item => item.Edge)
+                            .Select(item => new
+                            {
+                                SourceNodeName = item.EdgeNodes
+                                    .Where(item1 => item1.Type == EdgeNodeType.Source)
+                                    .Select(item1 => item1.Node)
+                                    .Where(item1 => item1 != null)
+                                    .Select(item1 => item1.Name)
+                                    .FirstOrDefault(),
+                                TargetNodeName = item.EdgeNodes
+                                    .Where(item1 => item1.Type == EdgeNodeType.Target)
+                                    .Select(item1 => item1.Node)
+                                    .Where(item1 => item1 != null)
+                                    .Select(item1 => item1.Name)
+                                    .FirstOrDefault()
+                            })
+                            .Where(item => !string.IsNullOrEmpty(item.SourceNodeName) && !string.IsNullOrEmpty(item.TargetNodeName))
+                            .Select(item => $"{item.SourceNodeName}\t{interactionType}\t{item.TargetNodeName}"));
                         // Write the corresponding to the file.
                         await streamWriter.WriteAsync(data);
                     }
@@ -211,7 +206,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                             Name = network.Name,
                             Description = network.Description,
                             Algorithm = network.Algorithm.ToString(),
-                            Nodes = network.NetworkNodes
+                            Nodes = _context.NetworkNodes
+                                .Where(item => item.Network == network)
+                                .Where(item => item.Type == NetworkNodeType.None)
                                 .Select(item => item.Node)
                                 .Select(item => new
                                 {
@@ -228,7 +225,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                                             Value = item1.Value
                                         })
                                 }),
-                            Edges = network.NetworkEdges
+                            Edges = _context.NetworkEdges
+                                .Where(item => item.Network == network)
                                 .Select(item => item.Edge)
                                 .Select(item => new
                                 {
@@ -261,7 +259,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     // Define the JSON serializer options for all of the returned files.
                     var jsonSerializerOptions = new JsonSerializerOptions
                     {
-                        IgnoreNullValues = true
+                        IgnoreNullValues = true,
+                        WriteIndented = true
                     };
                     // Go over each of the networks to download.
                     foreach (var network in View.Items)
@@ -269,7 +268,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                         // Create a new entry in the archive and open it.
                         using var stream = archive.CreateEntry($"{network.Name}-{network.Id}.json", CompressionLevel.Fastest).Open();
                         // Write the data corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, network.GetCytoscapeViewModel(_linkGenerator), jsonSerializerOptions);
+                        await JsonSerializer.SerializeAsync(stream, network.GetCytoscapeViewModel(_linkGenerator, _context), jsonSerializerOptions);
                     }
                 }
                 else if (Input.FileFormat == "Excel")
@@ -280,15 +279,21 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                         // Create a new entry in the archive and open it.
                         using var stream = archive.CreateEntry($"{network.Name}-{network.Id}.xlsx", CompressionLevel.Fastest).Open();
                         // Get the required data.
-                        var databases = network.NetworkDatabases
+                        var databases = _context.NetworkDatabases
+                            .Where(item => item.Network == network)
                             .Select(item => item.Database)
-                            .Where(item1 => item1.IsPublic || item1.DatabaseUsers.Any(item2 => item2.User == user));
-                        var databaseNodeFields = databases
-                            .Select(item => item.DatabaseNodeFields)
-                            .SelectMany(item => item);
-                        var databaseEdgeFields = databases
-                            .Select(item => item.DatabaseEdgeFields)
-                            .SelectMany(item => item);
+                            .Where(item1 => item1.IsPublic || item1.DatabaseUsers.Any(item2 => item2.User == user))
+                            .ToList();
+                        var databaseNodeFields = _context.DatabaseNodeFields
+                            .Where(item => databases.Contains(item.Database))
+                            .Include(item => item.DatabaseNodeFieldNodes)
+                                .ThenInclude(item => item.Node)
+                            .ToList();
+                        var databaseEdgeFields = _context.DatabaseEdgeFields
+                            .Where(item => databases.Contains(item.Database))
+                            .Include(item => item.DatabaseEdgeFieldEdges)
+                                .ThenInclude(item => item.Edge)
+                            .ToList();
                         // Define the rows in the first sheet.
                         var worksheet1Rows = new List<List<string>>
                         {
@@ -303,31 +308,43 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                                     .Select(item => $"({item.Database.Name}) {item.Name}"))
                                 .ToList()
                         }
-                        .Concat(network.NetworkNodes
-                            .Select(item =>
-                                new List<string> { item.Node.Id, item.Node.Name, item.Type.ToString() }
-                                    .Concat(databaseNodeFields
-                                        .Select(item1 => item1.DatabaseNodeFieldNodes.FirstOrDefault(item2 => item2.Node == item.Node)?.Value))
-                                    .ToList()))
+                        .Concat(_context.NetworkNodes
+                            .Where(item => item.Network == network)
+                            .Select(item => new List<string> { item.Node.Id, item.Node.Name, item.Type.ToString() }
+                                .Concat(databaseNodeFields
+                                    .Select(item1 => item1.DatabaseNodeFieldNodes.FirstOrDefault(item2 => item2.Node == item.Node))
+                                    .Select(item1 => item1 != null ? item1.Value : string.Empty))
+                                .ToList()))
                         .ToList();
                         // Define the rows in the third sheet.
                         var worksheet3Rows = new List<List<string>>
                         {
                             new List<string> { "Internal ID", "Source node ID", "Source node name", "Target node ID", "Target node name" }
                                 .Concat(databaseEdgeFields
-                                    .Select(item => item.Name))
+                                    .Select(item => $"({item.Database.Name}) {item.Name}"))
                                 .ToList()
                         }
-                        .Concat(network.NetworkEdges
-                            .Select(item =>
+                        .Concat(_context.NetworkEdges
+                            .Where(item => item.Network == network)
+                            .Select(item => item.Edge)
+                            .Select(item => new
                             {
-                                var sourceNode = item.Edge.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source)?.Node;
-                                var targetNode = item.Edge.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)?.Node;
-                                return new List<string> { item.Edge.Id, sourceNode?.Id, sourceNode?.Name, targetNode?.Id, targetNode?.Name }
-                                    .Concat(databaseEdgeFields
-                                        .Select(item1 => item1.DatabaseEdgeFieldEdges.FirstOrDefault(item2 => item2.Edge == item.Edge)?.Value))
-                                    .ToList();
-                            }))
+                                Edge = item,
+                                SourceNode = item.EdgeNodes
+                                    .Where(item1 => item1.Type == EdgeNodeType.Source)
+                                    .Select(item1 => item1.Node)
+                                    .FirstOrDefault(),
+                                TargetNode = item.EdgeNodes
+                                    .Where(item1 => item1.Type == EdgeNodeType.Target)
+                                    .Select(item1 => item1.Node)
+                                    .FirstOrDefault()
+                            })
+                            .Where(item => item.SourceNode != null && item.TargetNode != null)
+                            .Select(item => new List<string> { item.Edge.Id, item.SourceNode.Id, item.SourceNode.Name, item.TargetNode.Id, item.TargetNode.Name }
+                                .Concat(databaseEdgeFields
+                                    .Select(item1 => item1.DatabaseEdgeFieldEdges.FirstOrDefault(item2 => item2.Edge == item.Edge))
+                                    .Select(item1 => item1 != null ? item1.Value : string.Empty))
+                                .ToList()))
                         .ToList();
                         // Define the stream for the file.
                         var fileStream = new MemoryStream();

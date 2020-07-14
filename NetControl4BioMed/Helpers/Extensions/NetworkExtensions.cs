@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
@@ -44,19 +46,35 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <param name="network">The current network.</param>
         /// <param name="linkGenerator">The link generator.</param>
         /// <returns>The Cytoscape view model corresponding to the provided network.</returns>
-        public static CytoscapeViewModel GetCytoscapeViewModel(this Network network, LinkGenerator linkGenerator)
+        public static CytoscapeViewModel GetCytoscapeViewModel(this Network network, LinkGenerator linkGenerator, ApplicationDbContext context)
         {
             // Get the default values.
-            var interactionType = network.NetworkDatabases.FirstOrDefault().Database.DatabaseType.Name.ToLower();
+            var emptyEnumerable = Enumerable.Empty<string>();
+            var interactionType = context.NetworkDatabases
+                .Select(item => item.Database.DatabaseType.Name.ToLower())
+                .FirstOrDefault();
             var isGeneric = interactionType == "generic";
             // Return the view model.
             return new CytoscapeViewModel
             {
                 Elements = new CytoscapeViewModel.CytoscapeElements
                 {
-                    Nodes = network.NetworkNodes
+                    Nodes = context.NetworkNodes
+                        .Where(item => item.Network == network)
                         .Where(item => item.Type == NetworkNodeType.None)
                         .Select(item => item.Node)
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            Name = item.Name,
+                            Alias = item.DatabaseNodeFieldNodes
+                                .Where(item1 => item1.DatabaseNodeField.IsSearchable)
+                                .Select(item1 => item1.Value),
+                            Classes = item.NetworkNodes
+                                .Where(item1 => item1.Network == network)
+                                .Select(item => item.Type.ToString().ToLower())
+                        })
+                        .AsEnumerable()
                         .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeNode
                         {
                             Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeNode.CytoscapeNodeData
@@ -64,27 +82,42 @@ namespace NetControl4BioMed.Helpers.Extensions
                                 Id = item.Id,
                                 Name = item.Name,
                                 Href = isGeneric ? string.Empty : linkGenerator.GetPathByPage(page: "/Content/Data/Nodes/Details", values: new { id = item.Id }),
-                                Alias = item.DatabaseNodeFieldNodes
-                                    .Where(item1 => item1.DatabaseNodeField.IsSearchable)
-                                    .Select(item1 => item1.Value)
+                                Alias = item.Alias
                             },
-                            Classes = item.NetworkNodes
-                                .Where(item1 => item1.Network == network)
-                                .Select(item => item.Type.ToString().ToLower())
+                            Classes = item.Classes
                         }),
-                    Edges = network.NetworkEdges
+                    Edges = context.NetworkEdges
+                        .Where(item => item.Network == network)
                         .Select(item => item.Edge)
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            Name = item.Name,
+                            SourceNodeId = item.EdgeNodes
+                                .Where(item1 => item1.Type == EdgeNodeType.Source)
+                                .Select(item1 => item1.Node)
+                                .Where(item1 => item1 != null)
+                                .Select(item1 => item1.Id)
+                                .FirstOrDefault(),
+                            TargetNodeId = item.EdgeNodes
+                                .Where(item1 => item1.Type == EdgeNodeType.Target)
+                                .Select(item1 => item1.Node)
+                                .Where(item1 => item1 != null)
+                                .Select(item1 => item1.Id)
+                                .FirstOrDefault()
+                        })
+                        .AsEnumerable()
                         .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge
                         {
                             Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge.CytoscapeEdgeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
-                                Source = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source)?.Node.Id,
-                                Target = item.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)?.Node.Id,
+                                Source = item.SourceNodeId,
+                                Target = item.TargetNodeId,
                                 Interaction = interactionType
                             },
-                            Classes = Enumerable.Empty<string>()
+                            Classes = emptyEnumerable
                         })
                 },
                 Layout = CytoscapeViewModel.DefaultLayout,

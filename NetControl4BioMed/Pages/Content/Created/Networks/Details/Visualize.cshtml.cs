@@ -75,20 +75,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
             {
                 Network = items
                     .First(),
-                CytoscapeJson = JsonSerializer.Serialize(items
-                    .Include(item => item.NetworkDatabases)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseType)
-                    .Include(item => item.NetworkNodes)
-                        .ThenInclude(item => item.Node)
-                            .ThenInclude(item => item.DatabaseNodeFieldNodes)
-                                .ThenInclude(item => item.DatabaseNodeField)
-                    .Include(item => item.NetworkEdges)
-                        .ThenInclude(item => item.Edge)
-                            .ThenInclude(item => item.EdgeNodes)
-                                .ThenInclude(item => item.Node)
-                    .First()
-                    .GetCytoscapeViewModel(_linkGenerator), new JsonSerializerOptions { IgnoreNullValues = true })
+                CytoscapeJson = JsonSerializer.Serialize(items.First().GetCytoscapeViewModel(_linkGenerator, _context), new JsonSerializerOptions { IgnoreNullValues = true })
             };
             // Return the page.
             return Page();
