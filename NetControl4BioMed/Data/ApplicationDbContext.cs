@@ -40,6 +40,11 @@ namespace NetControl4BioMed.Data
         public DbSet<Analysis> Analyses { get; set; }
 
         /// <summary>
+        /// Gets or sets the database table containing the one-to-one relationship between analyses and databases.
+        /// </summary>
+        public DbSet<AnalysisDatabase> AnalysisDatabases { get; set; }
+
+        /// <summary>
         /// Gets or sets the database table containing the one-to-one relationship between analyses and edges.
         /// </summary>
         public DbSet<AnalysisEdge> AnalysisEdges { get; set; }

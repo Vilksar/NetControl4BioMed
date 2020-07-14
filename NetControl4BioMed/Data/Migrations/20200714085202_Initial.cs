@@ -12,13 +12,14 @@ namespace NetControl4BioMed.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
+                    DateTimeCreated = table.Column<DateTime>(nullable: false),
                     DateTimeStarted = table.Column<DateTime>(nullable: true),
                     DateTimeEnded = table.Column<DateTime>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     Status = table.Column<int>(nullable: false),
                     Log = table.Column<string>(nullable: true),
-                    JobId = table.Column<string>(nullable: true),
+                    Data = table.Column<string>(nullable: true),
                     CurrentIteration = table.Column<int>(nullable: false),
                     CurrentIterationWithoutImprovement = table.Column<int>(nullable: false),
                     MaximumIterations = table.Column<int>(nullable: false),
@@ -123,7 +124,10 @@ namespace NetControl4BioMed.Data.Migrations
                     DateTimeCreated = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
-                    Algorithm = table.Column<int>(nullable: false)
+                    Status = table.Column<int>(nullable: false),
+                    Log = table.Column<string>(nullable: true),
+                    Algorithm = table.Column<int>(nullable: false),
+                    Data = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -633,23 +637,24 @@ namespace NetControl4BioMed.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AnalysisDatabase",
+                name: "AnalysisDatabases",
                 columns: table => new
                 {
                     AnalysisId = table.Column<string>(nullable: false),
-                    DatabaseId = table.Column<string>(nullable: false)
+                    DatabaseId = table.Column<string>(nullable: false),
+                    Type = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AnalysisDatabase", x => new { x.AnalysisId, x.DatabaseId });
+                    table.PrimaryKey("PK_AnalysisDatabases", x => new { x.AnalysisId, x.DatabaseId, x.Type });
                     table.ForeignKey(
-                        name: "FK_AnalysisDatabase_Analyses_AnalysisId",
+                        name: "FK_AnalysisDatabases_Analyses_AnalysisId",
                         column: x => x.AnalysisId,
                         principalTable: "Analyses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AnalysisDatabase_Databases_DatabaseId",
+                        name: "FK_AnalysisDatabases_Databases_DatabaseId",
                         column: x => x.DatabaseId,
                         principalTable: "Databases",
                         principalColumn: "Id",
@@ -799,11 +804,12 @@ namespace NetControl4BioMed.Data.Migrations
                 columns: table => new
                 {
                     NetworkId = table.Column<string>(nullable: false),
-                    DatabaseId = table.Column<string>(nullable: false)
+                    DatabaseId = table.Column<string>(nullable: false),
+                    Type = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NetworkDatabases", x => new { x.NetworkId, x.DatabaseId });
+                    table.PrimaryKey("PK_NetworkDatabases", x => new { x.NetworkId, x.DatabaseId, x.Type });
                     table.ForeignKey(
                         name: "FK_NetworkDatabases_Databases_DatabaseId",
                         column: x => x.DatabaseId,
@@ -942,8 +948,8 @@ namespace NetControl4BioMed.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AnalysisDatabase_DatabaseId",
-                table: "AnalysisDatabase",
+                name: "IX_AnalysisDatabases_DatabaseId",
+                table: "AnalysisDatabases",
                 column: "DatabaseId");
 
             migrationBuilder.CreateIndex(
@@ -1114,7 +1120,7 @@ namespace NetControl4BioMed.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AnalysisDatabase");
+                name: "AnalysisDatabases");
 
             migrationBuilder.DropTable(
                 name: "AnalysisEdges");

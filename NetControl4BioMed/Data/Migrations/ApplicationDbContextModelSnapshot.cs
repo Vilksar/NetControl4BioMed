@@ -176,7 +176,7 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.HasIndex("DatabaseId");
 
-                    b.ToTable("AnalysisDatabase");
+                    b.ToTable("AnalysisDatabases");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisEdge", b =>
