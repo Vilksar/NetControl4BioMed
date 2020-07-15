@@ -281,17 +281,24 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                         var databases = _context.AnalysisDatabases
                             .Where(item => item.Analysis == analysis)
                             .Select(item => item.Database)
-                            .Where(item1 => item1.IsPublic || item1.DatabaseUsers.Any(item2 => item2.User == user))
-                            .ToList();
+                            .Where(item1 => item1.IsPublic || item1.DatabaseUsers.Any(item2 => item2.User == user));
                         var databaseNodeFields = _context.DatabaseNodeFields
                             .Where(item => databases.Contains(item.Database))
-                            .Include(item => item.DatabaseNodeFieldNodes)
-                                .ThenInclude(item => item.Node)
+                            .Select(item => new
+                            {
+                                Id = item.Id,
+                                Name = item.Name,
+                                DatabaseName = item.Database.Name
+                            })
                             .ToList();
                         var databaseEdgeFields = _context.DatabaseEdgeFields
                             .Where(item => databases.Contains(item.Database))
-                            .Include(item => item.DatabaseEdgeFieldEdges)
-                                .ThenInclude(item => item.Edge)
+                            .Select(item => new
+                            {
+                                Id = item.Id,
+                                Name = item.Name,
+                                DatabaseName = item.Database.Name
+                            })
                             .ToList();
                         // Define the rows in the first sheet.
                         var worksheet1Rows = new List<List<string>>
@@ -304,23 +311,43 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                         {
                             new List<string> { "Internal ID", "Name", "Type" }
                                 .Concat(databaseNodeFields
-                                    .Select(item => $"({item.Database.Name}) {item.Name}"))
+                                    .Select(item => $"{item.Name} ({item.DatabaseName})")
+                                    .ToList())
                                 .ToList()
                         }
                         .Concat(_context.AnalysisNodes
                             .Where(item => item.Analysis == analysis)
-                            .Select(item => new List<string> { item.Node.Id, item.Node.Name, item.Type.ToString() }
+                            .Where(item => item.Type == AnalysisNodeType.None)
+                            .Select(item => item.Node)
+                            .Select(item => new
+                            {
+                                Id = item.Id,
+                                Name = item.Name,
+                                Description = item.Description,
+                                Values = item.DatabaseNodeFieldNodes
+                                    .Select(item1 => new
+                                    {
+                                        DatabaseNodeFieldId = item1.DatabaseNodeField.Id,
+                                        Value = item1.Value
+                                    }),
+                                Types = item.AnalysisNodes
+                                    .Where(item1 => item1.Analysis == analysis)
+                                    .Select(item => item.Type.ToString().ToLower())
+                            })
+                            .AsEnumerable()
+                            .Select(item => new List<string> { item.Id, item.Name, string.Join(", ", item.Types) }
                                 .Concat(databaseNodeFields
-                                    .Select(item1 => item1.DatabaseNodeFieldNodes.FirstOrDefault(item2 => item2.Node == item.Node))
-                                    .Select(item1 => item1 != null ? item1.Value : string.Empty))
-                                .ToList()))
+                                    .Select(item1 => item.Values.FirstOrDefault(item2 => item2.DatabaseNodeFieldId == item1.Id))
+                                    .Select(item1 => item1 == null ? string.Empty : item1.Value)
+                                    .ToList())))
                         .ToList();
                         // Define the rows in the third sheet.
                         var worksheet3Rows = new List<List<string>>
                         {
                             new List<string> { "Internal ID", "Source node ID", "Source node name", "Target node ID", "Target node name" }
                                 .Concat(databaseEdgeFields
-                                    .Select(item => $"({item.Database.Name}) {item.Name}"))
+                                    .Select(item => $"{item.Name} ({item.DatabaseName})")
+                                    .ToList())
                                 .ToList()
                         }
                         .Concat(_context.AnalysisEdges
@@ -328,7 +355,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                             .Select(item => item.Edge)
                             .Select(item => new
                             {
-                                Edge = item,
+                                Id = item.Id,
                                 SourceNode = item.EdgeNodes
                                     .Where(item1 => item1.Type == EdgeNodeType.Source)
                                     .Select(item1 => item1.Node)
@@ -336,14 +363,21 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                                 TargetNode = item.EdgeNodes
                                     .Where(item1 => item1.Type == EdgeNodeType.Target)
                                     .Select(item1 => item1.Node)
-                                    .FirstOrDefault()
+                                    .FirstOrDefault(),
+                                Values = item.DatabaseEdgeFieldEdges
+                                    .Select(item1 => new
+                                    {
+                                        DatabaseEdgeFieldId = item1.DatabaseEdgeField.Id,
+                                        Value = item1.Value
+                                    })
                             })
                             .Where(item => item.SourceNode != null && item.TargetNode != null)
-                            .Select(item => new List<string> { item.Edge.Id, item.SourceNode.Id, item.SourceNode.Name, item.TargetNode.Id, item.TargetNode.Name }
+                            .AsEnumerable()
+                            .Select(item => new List<string> { item.Id, item.SourceNode.Id, item.SourceNode.Name, item.TargetNode.Id, item.TargetNode.Name }
                                 .Concat(databaseEdgeFields
-                                    .Select(item1 => item1.DatabaseEdgeFieldEdges.FirstOrDefault(item2 => item2.Edge == item.Edge))
-                                    .Select(item1 => item1 != null ? item1.Value : string.Empty))
-                                .ToList()))
+                                    .Select(item1 => item.Values.FirstOrDefault(item2 => item2.DatabaseEdgeFieldId == item1.Id))
+                                    .Select(item1 => item1 == null ? string.Empty : item1.Value)
+                                    .ToList())))
                         .ToList();
                         // Define the stream for the file.
                         var fileStream = new MemoryStream();
