@@ -692,12 +692,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
                 var analyses = context.Analyses
-                    .Include(item => item.AnalysisNodes)
-                        .ThenInclude(item => item.Node)
-                    .Include(item => item.AnalysisEdges)
-                        .ThenInclude(item => item.Edge)
-                            .ThenInclude(item => item.EdgeNodes)
-                                .ThenInclude(item => item.Node)
                     .Where(item => batchIds.Contains(item.Id));
                 // Go over each item in the current batch.
                 foreach (var batchItem in batchItems)
@@ -718,6 +712,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         analysis.Log = analysis.AppendToLog("The status of the analysis is not valid in order to be started.");
                         // Update the analysis status.
                         analysis.Status = AnalysisStatus.Error;
+                        // Update the end time.
+                        analysis.DateTimeEnded = DateTime.Now;
                         // Edit the analysis.
                         IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                         // Continue.
@@ -744,6 +740,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 analysis.Log = analysis.AppendToLog("The running algorithm is not valid.");
                                 // Update the analysis status.
                                 analysis.Status = AnalysisStatus.Error;
+                                // Update the end time.
+                                analysis.DateTimeEnded = DateTime.Now;
                                 // Edit the analysis.
                                 IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                                 // End the switch.

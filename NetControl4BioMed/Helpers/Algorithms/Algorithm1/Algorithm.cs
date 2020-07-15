@@ -33,25 +33,42 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             // Reload the analysis for a fresh start.
             Task.Run(() => context.Entry(analysis).ReloadAsync()).Wait();
             // Get the nodes, edges, target nodes and source (preferred) nodes.
-            var nodes = analysis.AnalysisNodes
+            var nodes = context.AnalysisNodes
+                .Where(item => item.Analysis == analysis)
                 .Where(item => item.Type == AnalysisNodeType.None)
                 .Select(item => item.Node.Id)
                 .ToList();
-            var edges = analysis.AnalysisEdges
-                .Select(item => (item.Edge.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source), item.Edge.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)))
-                .Where(item => item.Item1 != null && item.Item2 != null)
-                .Select(item => (item.Item1.Node.Id, item.Item2.Node.Id))
+            var edges = context.AnalysisEdges
+                .Where(item => item.Analysis == analysis)
+                .Select(item => item.Edge)
+                .Select(item => new
+                {
+                    SourceNodeId = item.EdgeNodes
+                        .Where(item1 => item1.Type == EdgeNodeType.Source)
+                        .Select(item1 => item1.Node.Id)
+                        .FirstOrDefault(),
+                    TargetNodeId = item.EdgeNodes
+                        .Where(item1 => item1.Type == EdgeNodeType.Target)
+                        .Select(item1 => item1.Node.Id)
+                        .FirstOrDefault()
+                })
+                .Where(item => !string.IsNullOrEmpty(item.SourceNodeId) && !string.IsNullOrEmpty(item.TargetNodeId))
+                .AsEnumerable()
+                .Select(item => (item.SourceNodeId, item.TargetNodeId))
+                .Distinct()
                 .ToList();
-            var targets = analysis.AnalysisNodes
-                .Where(item => item.Type == AnalysisNodeType.Target)
-                .Select(item => item.Node.Id)
-                .ToList();
-            var sources = analysis.AnalysisNodes
+            var sources = context.AnalysisNodes
+                .Where(item => item.Analysis == analysis)
                 .Where(item => item.Type == AnalysisNodeType.Source)
                 .Select(item => item.Node.Id)
                 .ToList();
+            var targets = context.AnalysisNodes
+                .Where(item => item.Analysis == analysis)
+                .Where(item => item.Type == AnalysisNodeType.Target)
+                .Select(item => item.Node.Id)
+                .ToList();
             // Check if there is any node in an edge that does not appear in the list of nodes.
-            if (edges.Select(item => item.Item1).Concat(edges.Select(item => item.Item2)).Except(nodes).Any())
+            if (edges.Select(item => item.Item1).Concat(edges.Select(item => item.Item2)).Distinct().Except(nodes).Any())
             {
                 // Update the analysis with an error message.
                 analysis.Log = analysis.AppendToLog("There are edges which contain unknown nodes.");
@@ -163,46 +180,47 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                     while (currentTargets.Any() && currentPathLength < parameters.MaximumPathLength)
                     {
                         // Set all of the current targets as unmatched.
-                        var unmatched = new List<string>(); unmatched.AddRange(currentTargets);
-                        // Set all nodes in the network as free.
-                        var free = new List<string>(); free.AddRange(nodes);
+                        var unmatchedNodes = currentTargets.ToList();
+                        // Set all nodes in the network as available to match.
+                        var availableNodes = nodes.ToList();
                         // If it is the first check of the current iteration, there are no kept nodes, so the left nodes and edges remain unchanged. Otherwise, remove from the left nodes the corresponding nodes in the current step in the control paths for the kept nodes. The optimization part for the "repeat" begins here.
                         foreach (var item in keptNodes)
                         {
                             if (currentPathLength + 1 < controlPath[item].Count)
                             {
                                 var leftNode = controlPath[item][currentPathLength + 1];
-                                free.Remove(leftNode);
+                                availableNodes.Remove(leftNode);
                             }
                         }
-                        // We determine a maximal matching by computing several maximum matchings, in steps, for each heuristic.
+                        // Define a variable to store the matched edges of the matching.
                         var matchedEdges = new List<(string, string)>();
-                        foreach (var heuristic in heuristics)
+                        // Go over each heuristic set.
+                        foreach (var heuristicSet in heuristics)
                         {
-                            // The left nodes, right nodes, and edges of the current matching.
-                            var left = new List<string>(); left.AddRange(free);
-                            var right = new List<string>(); right.AddRange(unmatched);
-                            var currentEdges = new List<(string, string)>();
-                            currentEdges = GetSingleHeuristicEdges(left, right, edges, heuristic, controlPath, sources);
-                            var matchingEdges = GetMaximumMatching(left, right, currentEdges, random);
-                            // For all matching edges, add them to the maximal matchings, and remove their corresponding nodes from free and unmatched lists.
-                            foreach (var edge in matchingEdges)
-                            {
-                                matchedEdges.Add(edge);
-                                free.Remove(edge.Item1);
-                                unmatched.Remove(edge.Item2);
-                            }
+                            // Get the left nodes, right nodes, and edges of the current matching.
+                            var leftNodes = availableNodes.ToList();
+                            var rightNodes = unmatchedNodes.ToList();
+                            var currentEdges = GetSingleHeuristicEdges(leftNodes, rightNodes, edges, heuristicSet, controlPath, sources);
+                            var matchingEdges = GetMaximumMatching(leftNodes, rightNodes, currentEdges, random);
+                            // Add the matched edges to the list.
+                            matchedEdges.AddRange(matchingEdges);
+                            availableNodes.RemoveAll(item => matchingEdges.Any(item1 => item1.Item1 == item));
+                            unmatchedNodes.RemoveAll(item => matchingEdges.Any(item1 => item1.Item2 == item));
                         }
                         // Update the current targets to the current matched edge source nodes, and the control path.
-                        currentTargets = matchedEdges.Select((edge) => edge.Item1).Distinct().ToList();
+                        currentTargets = matchedEdges.Select(item => item.Item1).Distinct().ToList();
                         // Go over all of the matched edges.
-                        foreach (var item in matchedEdges)
+                        foreach (var edge in matchedEdges)
                         {
-                            // Go over all of the paths in the control path that start from the target node of the edge.
-                            foreach (var item2 in controlPath.Where(item3 => item3.Value.Last() == item.Item2))
+                            // Get the keys of all paths to update, as the ones starting with the target node of the edge.
+                            var keys = controlPath
+                                .Where(item => item.Value.Last() == edge.Item2)
+                                .Select(item => item.Key);
+                            // Go over all of the keys.
+                            foreach (var key in keys)
                             {
-                                // Add the source node of the edge to the path.
-                                item2.Value.Add(item.Item1);
+                                // Add the source node of the edge to the corresponding path.
+                                controlPath[key].Add(edge.Item1);
                             }
                         }
                         // Update the current path length.
@@ -241,14 +259,12 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                     currentIterationWithoutImprovement = 0;
                     // Reset the best control paths.
                     bestControlPaths.RemoveAll(item => true);
-                    // Update the best control paths.
-                    bestControlPaths.Add(controlPath);
                 }
                 // Check if the current solution is as good as the previously obtained best solutions.
                 if (controlNodes.Count() == bestSolutionSize)
                 {
                     // Check if none of the previous solutions has the same nodes.
-                    if (!bestControlPaths.Any(item => item.Keys.All(key => controlPath.ContainsKey(key) && !item[key].Except(controlPath[key]).Any() && !controlPath[key].Except(item[key]).Any())))
+                    if (!bestControlPaths.Any(item => !item.Keys.Except(controlPath.Keys).Any() && !controlPath.Keys.Except(item.Keys).Any()))
                     {
                         // Update the best control paths.
                         bestControlPaths.Add(controlPath);
@@ -263,6 +279,29 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 // End the function.
                 return;
             }
+            // Get the required data.
+            var analysisNodes = context.AnalysisNodes
+                .Where(item => item.Analysis == analysis)
+                .Where(item => item.Type == AnalysisNodeType.None)
+                .Select(item => item.Node)
+                .ToList();
+            var analysisEdges = context.AnalysisEdges
+                .Where(item => item.Analysis == analysis)
+                .Select(item => item.Edge)
+                .Select(item => new
+                {
+                    Edge = item,
+                    SourceNodeId = item.EdgeNodes
+                        .Where(item1 => item1.Type == EdgeNodeType.Source)
+                        .Select(item1 => item1.Node.Id)
+                        .FirstOrDefault(),
+                    TargetNodeId = item.EdgeNodes
+                        .Where(item1 => item1.Type == EdgeNodeType.Target)
+                        .Select(item1 => item1.Node.Id)
+                        .FirstOrDefault()
+                })
+                .Where(item => !string.IsNullOrEmpty(item.SourceNodeId) && !string.IsNullOrEmpty(item.TargetNodeId))
+                .ToList();
             // Get the control paths.
             var controlPaths = bestControlPaths.Select(item => new ControlPath
             {
@@ -270,12 +309,16 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 {
                     // Get the nodes and edges in the path.
                     var pathNodes = item1
-                        .Select(item2 => analysis.AnalysisNodes.First(item3 => item3.Node.Id == item2).Node)
-                        .Where(item => item != null)
+                        .Distinct()
+                        .Select(item2 => analysisNodes.FirstOrDefault(item3 => item3.Id == item2))
+                        .Where(item2 => item2 != null)
                         .ToList();
                     var pathEdges = item1
-                        .Zip(item1.Skip(1), (item2, item3) => (item2.ToString(), item3.ToString()))
-                        .Select(item2 => analysis.AnalysisEdges.First(item3 => item3.Edge.EdgeNodes.First(item4 => item4.Type == EdgeNodeType.Source).Node.Id == item2.Item2 && item3.Edge.EdgeNodes.First(item4 => item4.Type == EdgeNodeType.Target).Node.Id == item2.Item1).Edge)
+                        .Zip(item1.Skip(1), (item2, item3) => (item3.ToString(), item2.ToString()))
+                        .Distinct()
+                        .Select(item2 => analysisEdges.FirstOrDefault(item3 => item3.SourceNodeId == item2.Item1 && item3.TargetNodeId == item2.Item2))
+                        .Where(item2 => item2 != null)
+                        .Select(item2 => item2.Edge)
                         .ToList();
                     // Return the path.
                     return new Path
@@ -305,9 +348,17 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         private static Dictionary<string, IEnumerable<string>> GetControllingNodes(Dictionary<string, List<string>> controlPath)
         {
             // Get the pairs of corresponding control nodes and target nodes for each path in the control path.
-            var pairs = controlPath.Select(item => (item.Key.ToString(), item.Value.Last()));
+            var pairs = controlPath
+                .Select(item => new
+                {
+                    TargetNode = item.Key,
+                    ControlNode = item.Value.Last()
+                });
             // Return, for each control node, the target nodes that it controls.
-            return pairs.Select(item => item.Item1).ToDictionary(item => item, item => pairs.Where(item1 => item1.Item1 == item).Select(item => item.Item2));
+            return pairs
+                .Select(item => item.ControlNode)
+                .Distinct()
+                .ToDictionary(item => item, item => pairs.Where(item1 => item1.ControlNode == item).Select(item => item.TargetNode));
         }
 
         /// <summary>
@@ -316,141 +367,104 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// <param name="leftNodes">Represents the left nodes of the bipartite graph.</param>
         /// <param name="rightNodes">Represents the right nodes of the bipartite graph.</param>
         /// <param name="edges">Represents the edges of the bipartite graph.</param>
-        /// <param name="heuristic">Represents the heuristic to be used in the search.</param>
+        /// <param name="heuristicSet">Represents the heuristic set to be used in the search.</param>
         /// <param name="controlPath">Represents the current control path.</param>
         /// <param name="sources">Represents the source (drug-target) nodes.</param>
         /// <returns></returns>
-        private static List<(string, string)> GetSingleHeuristicEdges(List<string> leftNodes, List<string> rightNodes, List<(string, string)> edges, List<string> heuristic, Dictionary<string, List<string>> controlPath, List<string> sources)
+        private static List<(string, string)> GetSingleHeuristicEdges(List<string> leftNodes, List<string> rightNodes, List<(string, string)> edges, List<string> heuristicSet, Dictionary<string, List<string>> controlPath, List<string> sources)
         {
             // Define the variable to return.
             var heuristicEdges = new List<(string, string)>();
             // Get all edges in the current control path, if needed.
-            var currentEdges = new List<(string, string)>();
-            if (heuristic.Contains("A") || heuristic.Contains("C") || heuristic.Contains("E"))
-            {
-                foreach (var item in controlPath)
-                {
-                    for (int index = 0; index < item.Value.Count - 1; index++)
-                    {
-                        currentEdges.Add((item.Value[index + 1], item.Value[index]));
-                    }
-                }
-                currentEdges = currentEdges.Distinct().ToList();
-            }
-            // Get all existing driven nodes, if needed.
-            var drivenNodes = new List<string>();
-            var currentLength = controlPath.Max((item) => item.Value.Count);
-            if (heuristic.Contains("C") || heuristic.Contains("D"))
-            {
-                foreach (var item in controlPath)
-                {
-                    if (item.Value.Count < currentLength)
-                    {
-                        drivenNodes.Add(item.Value.Last());
-                    }
-                }
-            }
+            var currentEdges = heuristicSet.Contains("A") || heuristicSet.Contains("C") || heuristicSet.Contains("E") ?
+                controlPath.Select(item => item.Value.Zip(item.Value.Skip(1), (item1, item2) => (item2.ToString(), item1.ToString())))
+                    .SelectMany(item => item)
+                    .Distinct():
+                Enumerable.Empty<(string, string)>();
+            // Get all already identified control nodes, if needed.
+            var currentLength = controlPath.Max(item => item.Value.Count());
+            var controlNodes = heuristicSet.Contains("C") || heuristicSet.Contains("D") ?
+                controlPath.Where(item => item.Value.Count() < currentLength)
+                    .Select(item => item.Value.Last())
+                    .AsEnumerable() :
+                Enumerable.Empty<string>();
             // Get all previously seen nodes in the control paths, if needed.
-            var currentNodes = new List<string>();
-            if (heuristic.Contains("E") || heuristic.Contains("F"))
-            {
-                foreach (var item in controlPath)
-                {
-                    foreach (var node in item.Value)
-                    {
-                        currentNodes.Add(node);
-                    }
-                }
-                currentNodes = currentNodes.Distinct().ToList();
-            }
-            // Get all edges starting from a drug target node and ending in target nodes, if needed.
-            var temporaryDrugEdges = new List<(string, string)>();
-            if (sources != null && (heuristic.Contains("A") || heuristic.Contains("B")))
-            {
-                temporaryDrugEdges = edges.Where((edge) => rightNodes.Contains(edge.Item2) && sources.Contains(edge.Item1)).ToList();
-            }
-            // Get all edges starting from an already driven node and ending in target nodes, if needed.
-            var temporaryDrivenEdges = new List<(string, string)>();
-            if (heuristic.Contains("C") || heuristic.Contains("D"))
-            {
-                temporaryDrivenEdges = edges.Where((edge) => rightNodes.Contains(edge.Item2) && drivenNodes.Contains(edge.Item1)).ToList();
-            }
-            // Get all edges starting from a previously seen node in the control paths, if needed.
-            var temporarySeenEdges = new List<(string, string)>();
-            if (heuristic.Contains("E") || heuristic.Contains("F"))
-            {
-                temporarySeenEdges = edges.Where((edge) => rightNodes.Contains(edge.Item2) && currentNodes.Contains(edge.Item1)).ToList();
-            }
-            // Get all edges not starting from a node in the current control path for a node, if needed (to avoid loops).
-            var temporaryControlEdges = new List<(string, string)>();
-            if (heuristic.Contains("G"))
-            {
-                foreach (var target in rightNodes)
-                {
-                    // Get the nodes in the current control path.
-                    var currentPathNodes = controlPath.First((item) => item.Value.Last() == target).Value.Distinct();
-                    // Get all edges from nodes not in the current control path to the current target and add them to list.
-                    temporaryControlEdges.AddRange(edges.Where((edge) => edge.Item2 == target && !currentPathNodes.Contains(edge.Item1)));
-                }
-            }
+            var currentNodes = heuristicSet.Contains("E") || heuristicSet.Contains("F") ?
+                controlPath.Select(item => item.Value)
+                    .SelectMany(item => item)
+                    .Distinct() :
+                Enumerable.Empty<string>();
+            // Get all edges starting from a source node and ending in target nodes, if needed.
+            var sourceEdges = heuristicSet.Contains("A") || heuristicSet.Contains("B") ?
+                edges.Where(item => rightNodes.Contains(item.Item2) && sources.Contains(item.Item1)) :
+                Enumerable.Empty<(string, string)>();
+            // Get all edges starting from an already identified control node and ending in target nodes, if needed.
+            var controlEdges = heuristicSet.Contains("C") || heuristicSet.Contains("D") ?
+                edges.Where(item => rightNodes.Contains(item.Item2) && controlNodes.Contains(item.Item1)) :
+                Enumerable.Empty<(string, string)>();
+            // Get all edges starting from a previously seen node, if needed.
+            var seenEdges = heuristicSet.Contains("E") || heuristicSet.Contains("F") ?
+                edges.Where(item => rightNodes.Contains(item.Item2) && currentNodes.Contains(item.Item1)) :
+                Enumerable.Empty<(string, string)>();
+            // Get all edges not starting from a node in the current control path, if needed (to avoid loops).
+            var differentEdges = heuristicSet.Contains("G") ?
+                edges.Where(item => rightNodes.Contains(item.Item2) && !controlPath.Where(item1 => item1.Value.Last() == item.Item2).Any(item1 => item1.Value.Contains(item.Item1))) :
+                Enumerable.Empty<(string, string)>();
             // Get all possible edges.
-            var allEdges = edges.Where((edge) => rightNodes.Contains(edge.Item2)).ToList();
-            // For every target node.
-            foreach (var target in rightNodes)
+            var allEdges = edges.Where(item => rightNodes.Contains(item.Item2));
+            // Go over all heuristic items.
+            foreach (var heuristic in heuristicSet)
             {
-                // We define a new list of edges which will end in the target node.
-                var temporaryHeuristicEdges = new List<(string, string)>();
-                // For all heuristic strings, separated by ";"
-                foreach (var h in heuristic)
+                // Check the current heuristic item.
+                switch (heuristic)
                 {
-                    // Add previously seen edges from drug-target nodes.
-                    if (sources != null && h == "A")
-                    {
-                        temporaryHeuristicEdges.AddRange(currentEdges.Where((edge) => edge.Item2 == target).Intersect(temporaryDrugEdges.Where((edge) => edge.Item2 == target)));
-                    }
-                    // Add all edges from drug-target nodes.
-                    else if (sources != null && h == "B")
-                    {
-                        temporaryHeuristicEdges.AddRange(temporaryDrugEdges.Where((edge) => edge.Item2 == target));
-                    }
-                    // Add previously seen edges from already driven nodes.
-                    else if (h == "C")
-                    {
-                        temporaryHeuristicEdges.AddRange(currentEdges.Where((edge) => edge.Item2 == target).Intersect(temporaryDrivenEdges.Where((edge) => edge.Item2 == target)));
-                    }
-                    // Add all edges from already driven nodes.
-                    else if (h == "D")
-                    {
-                        temporaryHeuristicEdges.AddRange(temporaryDrivenEdges.Where((edge) => edge.Item2 == target));
-                    }
-                    // Add previously seen edges from anywhere in the control path.
-                    else if (h == "E")
-                    {
-                        temporaryHeuristicEdges.AddRange(currentEdges.Where((edge) => edge.Item2 == target).Intersect(temporarySeenEdges.Where((edge) => edge.Item2 == target)));
-                    }
-                    // Add all edges from previously seen nodes anywhere in the control path.
-                    else if (h == "F")
-                    {
-                        temporaryHeuristicEdges.AddRange(temporarySeenEdges.Where((edge) => edge.Item2 == target));
-                    }
-                    // Add all edges from a node that has not appeared in the current control path (to preferably avoid loops).
-                    else if (h == "G")
-                    {
-                        temporaryHeuristicEdges.AddRange(temporaryControlEdges.Where((edge) => edge.Item2 == target));
-                    }
-                    // Add all possible edges.
-                    else if (h == "Z")
-                    {
-                        temporaryHeuristicEdges.AddRange(allEdges.Where((edge) => edge.Item2 == target));
-                    }
+                    case "A":
+                        // Add previously seen edges from source nodes.
+                        heuristicEdges.AddRange(currentEdges.Intersect(sourceEdges));
+                        // End the switch.
+                        break;
+                    case "B":
+                        // Add all edges from source nodes.
+                        heuristicEdges.AddRange(sourceEdges);
+                        // End the switch.
+                        break;
+                    case "C":
+                        // Add previously seen edges from already identified control nodes.
+                        heuristicEdges.AddRange(currentEdges.Intersect(controlEdges));
+                        // End the switch.
+                        break;
+                    case "D":
+                        // Add all edges from already identified control nodes.
+                        heuristicEdges.AddRange(controlEdges);
+                        // End the switch.
+                        break;
+                    case "E":
+                        // Add previously seen edges.
+                        heuristicEdges.AddRange(currentEdges.Intersect(seenEdges));
+                        // End the switch.
+                        break;
+                    case "F":
+                        // Add all edges from previously seen nodes.
+                        heuristicEdges.AddRange(seenEdges);
+                        // End the switch.
+                        break;
+                    case "G":
+                        // Add all edges not starting from a node in the current control path (to avoid loops).
+                        heuristicEdges.AddRange(differentEdges);
+                        // End the switch.
+                        break;
+                    case "Z":
+                        // Add all possible edges.
+                        heuristicEdges.AddRange(allEdges);
+                        // End the switch.
+                        break;
+                    default:
+                        // End the switch.
+                        break;
                 }
-                // We add the heuristic edges of the current node to the list of edges.
-                heuristicEdges.AddRange(temporaryHeuristicEdges);
             }
-            // Remove all edges which don't start from one of the left nodes.
-            heuristicEdges = heuristicEdges.Where((edge) => leftNodes.Contains(edge.Item1)).ToList();
-            // We return all of the obtained edges.
-            return heuristicEdges;
+            // Return all edges that start in a left node.
+            return heuristicEdges.Where(item => leftNodes.Contains(item.Item1)).ToList();
         }
 
         /// <summary>
