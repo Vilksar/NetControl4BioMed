@@ -264,16 +264,18 @@ namespace NetControl4BioMed.Pages.Administration
             // Define the names of the recurring background tasks.
             var nameStopAnalyses = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.StopAnalyses)}";
             var nameAlertUsers = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.AlertUsers)}";
+            var nameDeleteUsers = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteUsers)}";
             var nameDeleteNetworks = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteNetworks)}";
             var nameDeleteAnalyses = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteAnalyses)}";
             // Delete the existing corresponding recurring jobs.
             RecurringJob.RemoveIfExists(nameStopAnalyses);
             RecurringJob.RemoveIfExists(nameAlertUsers);
+            RecurringJob.RemoveIfExists(nameDeleteUsers);
             RecurringJob.RemoveIfExists(nameDeleteNetworks);
             RecurringJob.RemoveIfExists(nameDeleteAnalyses);
             // Get the existing background tasks.
             var backgroundTasks = _context.BackgroundTasks
-                .Where(item => item.Name == nameStopAnalyses || item.Name == nameAlertUsers || item.Name == nameDeleteNetworks || item.Name == nameDeleteAnalyses);
+                .Where(item => item.Name == nameStopAnalyses || item.Name == nameAlertUsers || item.Name == nameDeleteUsers || item.Name == nameDeleteNetworks || item.Name == nameDeleteAnalyses);
             // Mark the existing background tasks for deletion.
             _context.BackgroundTasks.RemoveRange(backgroundTasks);
             // Save the changes to the database.
@@ -297,6 +299,20 @@ namespace NetControl4BioMed.Pages.Administration
             {
                 DateTimeCreated = DateTime.Now,
                 Name = nameAlertUsers,
+                IsRecurring = true,
+                Data = JsonSerializer.Serialize(new RecurringTask
+                {
+                    Scheme = HttpContext.Request.Scheme,
+                    HostValue = HttpContext.Request.Host.Value,
+                    DaysBeforeStop = ApplicationDbContext.DaysBeforeStop,
+                    DaysBeforeAlert = ApplicationDbContext.DaysBeforeAlert,
+                    DaysBeforeDelete = ApplicationDbContext.DaysBeforeDelete
+                })
+            };
+            var backgroundTaskDeleteUsers = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.Now,
+                Name = nameDeleteUsers,
                 IsRecurring = true,
                 Data = JsonSerializer.Serialize(new RecurringTask
                 {
@@ -338,6 +354,7 @@ namespace NetControl4BioMed.Pages.Administration
             // Mark the background tasks for addition.
             _context.BackgroundTasks.Add(backgroundTaskStopAnalyses);
             _context.BackgroundTasks.Add(backgroundTaskAlertUsers);
+            _context.BackgroundTasks.Add(backgroundTaskDeleteUsers);
             _context.BackgroundTasks.Add(backgroundTaskDeleteNetworks);
             _context.BackgroundTasks.Add(backgroundTaskDeleteAnalyses);
             // Save the changes to the database.
@@ -345,6 +362,7 @@ namespace NetControl4BioMed.Pages.Administration
             // Create the new Hangfire daily recurring jobs.
             RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameStopAnalyses, item => item.StopAnalyses(backgroundTaskStopAnalyses.Id, CancellationToken.None), Cron.Daily());
             RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameAlertUsers, item => item.AlertUsers(backgroundTaskAlertUsers.Id, CancellationToken.None), Cron.Daily());
+            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteUsers, item => item.DeleteUsers(backgroundTaskDeleteUsers.Id, CancellationToken.None), Cron.Daily());
             RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteNetworks, item => item.DeleteNetworks(backgroundTaskDeleteNetworks.Id, CancellationToken.None), Cron.Daily());
             RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteAnalyses, item => item.DeleteAnalyses(backgroundTaskDeleteAnalyses.Id, CancellationToken.None), Cron.Daily());
             // Display a message.

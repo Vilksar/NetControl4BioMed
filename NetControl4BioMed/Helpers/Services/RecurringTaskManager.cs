@@ -68,6 +68,21 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
+        /// Deletes users from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public void DeleteUsers(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<RecurringTask>(backgroundTask);
+            // Run the task.
+            task.DeleteUsers(_serviceProvider, token);
+        }
+
+        /// <summary>
         /// Deletes networks from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>

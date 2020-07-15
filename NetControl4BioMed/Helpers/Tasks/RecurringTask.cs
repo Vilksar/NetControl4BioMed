@@ -155,6 +155,36 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
+        /// Deletes the unconfirmed users.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public void DeleteUsers(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Create a new scope.
+            using var scope = serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Define the limit date.
+            var limitDate = DateTime.Today - TimeSpan.FromDays(DaysBeforeDelete);
+            // Get the items to stop.
+            var items = context.Users
+                .Where(item => !item.EmailConfirmed)
+                .Where(item => item.DateTimeCreated < limitDate);
+            // Define a new task.
+            var task = new UsersTask
+            {
+                Items = items
+                    .Select(item => new UserInputModel
+                    {
+                        Id = item.Id
+                    })
+            };
+            // Run the task.
+            task.Delete(serviceProvider, token);
+        }
+
+        /// <summary>
         /// Deletes the long-standing networks.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
@@ -167,7 +197,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the limit date.
             var limitDate = DateTime.Today - TimeSpan.FromDays(DaysBeforeDelete);
-            // Get the items to stop.
+            // Get the items to delete.
             var items = context.Networks
                 .Where(item => item.DateTimeCreated < limitDate);
             // Define a new task.
@@ -196,7 +226,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the limit date.
             var limitDate = DateTime.Today - TimeSpan.FromDays(DaysBeforeDelete);
-            // Get the items to stop.
+            // Get the items to delete.
             var items = context.Analyses
                 .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
                 .Where(item => item.DateTimeEnded < limitDate);

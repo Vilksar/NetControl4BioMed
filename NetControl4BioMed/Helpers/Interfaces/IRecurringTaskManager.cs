@@ -26,6 +26,16 @@ namespace NetControl4BioMed.Helpers.Interfaces
         void AlertUsers(string id, CancellationToken token);
 
         /// <summary>
+        /// Deletes users from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        /// <returns></returns>
+        [AutomaticRetry(Attempts = 0)]
+        [DisableConcurrentExecution(86400)]
+        void DeleteUsers(string id, CancellationToken token);
+
+        /// <summary>
         /// Deletes networks from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>

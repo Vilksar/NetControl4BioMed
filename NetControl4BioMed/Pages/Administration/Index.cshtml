@@ -145,6 +145,9 @@
                     <span><span class="font-weight-bold">Alert users</span>, which sends an e-mail to all users which have access to a network or to an analysis created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeAlert days before the current date, and scheduled to be automatically deleted in @(NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete - NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeAlert) days.</span>
                 </li>
                 <li>
+                    <span><span class="font-weight-bold">Delete users</span>, which deletes all users with accounts created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete days before the current date, but with still unconfirmed e-mails.</span>
+                </li>
+                <li>
                     <span><span class="font-weight-bold">Delete networks</span>, which deletes all networks created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete days before the current date.</span>
                 </li>
                 <li>
