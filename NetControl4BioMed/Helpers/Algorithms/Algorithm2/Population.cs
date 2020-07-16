@@ -13,6 +13,11 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
     public class Population
     {
         /// <summary>
+        /// Represents the maximum number of parallel operations.
+        /// </summary>
+        private static readonly int DegreeOfParallelism = (int)Math.Floor((double)(Environment.ProcessorCount - 1) / 2) + 1;
+
+        /// <summary>
         /// Represents the chromosomes in the population.
         /// </summary>
         public List<Chromosome> Chromosomes { get; set; }
@@ -62,13 +67,13 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             var randomSeeds = new ConcurrentQueue<int>(Enumerable.Range(0, parameters.PopulationSize).Select(item => random.Next()));
             var defaultRandomSeed = random.Next();
             // Repeat for each group.
-            Parallel.For(0, numberOfGroups, index1 =>
+            Parallel.For(0, numberOfGroups, new ParallelOptions { MaxDegreeOfParallelism = DegreeOfParallelism }, index1 =>
             {
                 // Get the lower and upper limits.
                 var lowerLimit = geneGroups[index1];
                 var upperLimit = geneGroups[index1 + 1];
                 // Repeat for the number of elements in the group.
-                Parallel.For(0, chromosomeGroups[index1], index2 =>
+                Parallel.For(0, chromosomeGroups[index1], new ParallelOptions { MaxDegreeOfParallelism = DegreeOfParallelism }, index2 =>
                 {
                     // Try to get a new random seed from the list of random random seeds.
                     if (!randomSeeds.TryDequeue(out var randomSeed))
@@ -111,7 +116,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             // Define a new concurrent bag for chromosomes.
             var bag = new ConcurrentBag<Chromosome>();
             // Add the specified number of random chromosomes.
-            Parallel.For(Chromosomes.Count(), (int)Math.Min(Chromosomes.Count() + (int)Math.Floor(parameters.PercentageRandom * parameters.PopulationSize), parameters.PopulationSize), index =>
+            Parallel.For(Chromosomes.Count(), (int)Math.Min(Chromosomes.Count() + (int)Math.Floor(parameters.PercentageRandom * parameters.PopulationSize), parameters.PopulationSize), new ParallelOptions { MaxDegreeOfParallelism = DegreeOfParallelism }, index =>
             {
                 // Try to get a new random seed from the list of random random seeds.
                 if (!randomSeeds.TryDequeue(out var randomSeed))
@@ -132,7 +137,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             // Reset the concurrent bag for chromosomes.
             bag = new ConcurrentBag<Chromosome>();
             // Add new chromosomes.
-            Parallel.For(Chromosomes.Count(), parameters.PopulationSize, index =>
+            Parallel.For(Chromosomes.Count(), parameters.PopulationSize, new ParallelOptions { MaxDegreeOfParallelism = DegreeOfParallelism }, index =>
             {
                 // Try to get a new random seed from the list of random random seeds.
                 if (!randomSeeds.TryDequeue(out var randomSeed))
@@ -154,37 +159,13 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         }
 
         /// <summary>
-        /// Gets the maximum fitness of the chromosomes in the population.
+        /// Gets the fitness list of the population.
         /// </summary>
-        /// <returns>The maximum fitness.</returns>
-        public double GetMaximumFitness()
+        /// <returns>The fitness list.</returns>
+        public List<double> GetFitnessList()
         {
             // Return the fitness list.
-            return Chromosomes.Max(item => item.GetFitness());
-        }
-
-        /// <summary>
-        /// Returns all of the unique chromosomes with the highest fitness in the population (providing an unique combination of genes).
-        /// </summary>
-        /// <returns>The chromosome solutions of the current population.</returns>
-        public IEnumerable<Chromosome> GetSolutions()
-        {
-            // Get the best fitness of the population.
-            var bestFitness = GetFitnessList().Max();
-            // Define the variable to return.
-            var solutions = new List<Chromosome>();
-            // Go over all of the chromosomes with the best fitness.
-            foreach (var chromosome in Chromosomes.Where(item => item.GetFitness() == bestFitness))
-            {
-                // Check if the current combination already exists in the list of solutions.
-                if (!solutions.Any(item => new HashSet<string>(item.GetUniqueControlNodes()).SetEquals(new HashSet<string>(chromosome.GetUniqueControlNodes()))))
-                {
-                    // If not, then add it.
-                    solutions.Add(chromosome);
-                }
-            }
-            // Return the solutions.
-            return solutions;
+            return Chromosomes.Select(item => item.GetFitness()).ToList();
         }
 
         /// <summary>
@@ -211,16 +192,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             var (dist, next) = GetFloydWarshallMatrices(edges, nodes);
             // Get the chromosome control paths.
             return solutionChromosomes.Select(item => item.Genes.ToDictionary(item1 => item1.Key, item1 => GetPath(next, nodeIndex[item1.Value], nodeIndex[item1.Key], nodes).Reverse().ToList())).ToList();
-        }
-
-        /// <summary>
-        /// Gets the fitness list of the population.
-        /// </summary>
-        /// <returns>The fitness list.</returns>
-        private List<double> GetFitnessList()
-        {
-            // Return the fitness list.
-            return Chromosomes.Select(item => item.GetFitness()).ToList();
         }
 
         /// <summary>

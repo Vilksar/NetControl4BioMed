@@ -35,21 +35,38 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             // Reload the analysis for a fresh start.
             Task.Run(() => context.Entry(analysis).ReloadAsync()).Wait();
             // Get the nodes, edges, target nodes and source (preferred) nodes.
-            var nodes = analysis.AnalysisNodes
+            var nodes = context.AnalysisNodes
+                .Where(item => item.Analysis == analysis)
                 .Where(item => item.Type == AnalysisNodeType.None)
                 .Select(item => item.Node.Id)
                 .ToList();
-            var edges = analysis.AnalysisEdges
-                .Select(item => (item.Edge.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Source), item.Edge.EdgeNodes.FirstOrDefault(item1 => item1.Type == EdgeNodeType.Target)))
-                .Where(item => item.Item1 != null && item.Item2 != null)
-                .Select(item => (item.Item1.Node.Id, item.Item2.Node.Id))
+            var edges = context.AnalysisEdges
+                .Where(item => item.Analysis == analysis)
+                .Select(item => item.Edge)
+                .Select(item => new
+                {
+                    SourceNodeId = item.EdgeNodes
+                        .Where(item1 => item1.Type == EdgeNodeType.Source)
+                        .Select(item1 => item1.Node.Id)
+                        .FirstOrDefault(),
+                    TargetNodeId = item.EdgeNodes
+                        .Where(item1 => item1.Type == EdgeNodeType.Target)
+                        .Select(item1 => item1.Node.Id)
+                        .FirstOrDefault()
+                })
+                .Where(item => !string.IsNullOrEmpty(item.SourceNodeId) && !string.IsNullOrEmpty(item.TargetNodeId))
+                .AsEnumerable()
+                .Select(item => (item.SourceNodeId, item.TargetNodeId))
+                .Distinct()
                 .ToList();
-            var targets = analysis.AnalysisNodes
-                .Where(item => item.Type == AnalysisNodeType.Target)
+            var sources = context.AnalysisNodes
+                .Where(item => item.Analysis == analysis)
+                .Where(item => item.Type == AnalysisNodeType.Source)
                 .Select(item => item.Node.Id)
                 .ToList();
-            var sources = analysis.AnalysisNodes
-                .Where(item => item.Type == AnalysisNodeType.Source)
+            var targets = context.AnalysisNodes
+                .Where(item => item.Analysis == analysis)
+                .Where(item => item.Type == AnalysisNodeType.Target)
                 .Select(item => item.Node.Id)
                 .ToList();
             // Check if there is any node in an edge that does not appear in the list of nodes.
@@ -143,7 +160,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 // Move on to the next population.
                 population = new Population(population, nodeIndex, targets, targetAncestors, powersMatrixCA, nodeIsPreferred, parameters, random);
                 // Get the best fitness of the current solution.
-                var currentSolutionSize = population.GetMaximumFitness();
+                var currentSolutionSize = population.GetFitnessList().Max();
                 // Check if the current solution is better than the previously obtained best solutions.
                 if (bestSolutionSize < currentSolutionSize)
                 {
@@ -161,6 +178,29 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 // End the function.
                 return;
             }
+            // Get the required data.
+            var analysisNodes = context.AnalysisNodes
+                .Where(item => item.Analysis == analysis)
+                .Where(item => item.Type == AnalysisNodeType.None)
+                .Select(item => item.Node)
+                .ToList();
+            var analysisEdges = context.AnalysisEdges
+                .Where(item => item.Analysis == analysis)
+                .Select(item => item.Edge)
+                .Select(item => new
+                {
+                    Edge = item,
+                    SourceNodeId = item.EdgeNodes
+                        .Where(item1 => item1.Type == EdgeNodeType.Source)
+                        .Select(item1 => item1.Node.Id)
+                        .FirstOrDefault(),
+                    TargetNodeId = item.EdgeNodes
+                        .Where(item1 => item1.Type == EdgeNodeType.Target)
+                        .Select(item1 => item1.Node.Id)
+                        .FirstOrDefault()
+                })
+                .Where(item => !string.IsNullOrEmpty(item.SourceNodeId) && !string.IsNullOrEmpty(item.TargetNodeId))
+                .ToList();
             // Get the control paths.
             var controlPaths = population.GetControlPaths(nodeIndex, nodes, edges).Select(item => new ControlPath
             {
@@ -168,12 +208,16 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 {
                     // Get the nodes and edges in the path.
                     var pathNodes = item1
-                        .Select(item2 => analysis.AnalysisNodes.First(item3 => item3.Node.Id == item2).Node)
-                        .Where(item => item != null)
+                        .Distinct()
+                        .Select(item2 => analysisNodes.FirstOrDefault(item3 => item3.Id == item2))
+                        .Where(item2 => item2 != null)
                         .ToList();
                     var pathEdges = item1
-                        .Zip(item1.Skip(1), (item2, item3) => (item2.ToString(), item3.ToString()))
-                        .Select(item2 => analysis.AnalysisEdges.First(item3 => item3.Edge.EdgeNodes.First(item4 => item4.Type == EdgeNodeType.Source).Node.Id == item2.Item2 && item3.Edge.EdgeNodes.First(item4 => item4.Type == EdgeNodeType.Target).Node.Id == item2.Item1).Edge)
+                        .Zip(item1.Skip(1), (item2, item3) => (item3.ToString(), item2.ToString()))
+                        .Distinct()
+                        .Select(item2 => analysisEdges.FirstOrDefault(item3 => item3.SourceNodeId == item2.Item1 && item3.TargetNodeId == item2.Item2))
+                        .Where(item2 => item2 != null)
+                        .Select(item2 => item2.Edge)
                         .ToList();
                     // Return the path.
                     return new Path

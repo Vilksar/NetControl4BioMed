@@ -712,6 +712,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         analysis.Log = analysis.AppendToLog("The status of the analysis is not valid in order to be started.");
                         // Update the analysis status.
                         analysis.Status = AnalysisStatus.Error;
+                        // Update the start time.
+                        analysis.DateTimeStarted = DateTime.Now;
                         // Update the end time.
                         analysis.DateTimeEnded = DateTime.Now;
                         // Edit the analysis.
@@ -740,6 +742,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 analysis.Log = analysis.AppendToLog("The running algorithm is not valid.");
                                 // Update the analysis status.
                                 analysis.Status = AnalysisStatus.Error;
+                                // Update the start time.
+                                analysis.DateTimeStarted = DateTime.Now;
                                 // Update the end time.
                                 analysis.DateTimeEnded = DateTime.Now;
                                 // Edit the analysis.
@@ -762,6 +766,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         analysis.Log = analysis.AppendToLog("An error occured while running the analysis." + message);
                         // Update the analysis status.
                         analysis.Status = AnalysisStatus.Error;
+                        // Update the start time, if needed.
+                        analysis.DateTimeStarted = analysis.DateTimeStarted ?? DateTime.Now;
                         // Update the end time.
                         analysis.DateTimeEnded = DateTime.Now;
                         // Edit the analysis.

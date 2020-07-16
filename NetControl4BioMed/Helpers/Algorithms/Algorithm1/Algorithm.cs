@@ -132,7 +132,11 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             var bestSolutionSize = targets.Count() + 1;
             var bestControlPaths = new List<Dictionary<string, List<string>>>();
             // Update the parameters.
-            var heuristics = JsonSerializer.Deserialize<List<List<string>>>(parameters.Heuristics).TakeWhile(item => !item.Contains("Z")).Select(item => item.Distinct().ToList()).Append(new List<string> { "Z" }).ToList();
+            var heuristics = JsonSerializer.Deserialize<List<List<string>>>(parameters.Heuristics)
+                .TakeWhile(item => !item.Contains("Z"))
+                .Select(item => item.Distinct().ToList())
+                .Append(new List<string> { "Z" })
+                .ToList();
             parameters.Heuristics = JsonSerializer.Serialize(heuristics);
             // Update the analysis status and parameters.
             analysis.Parameters = JsonSerializer.Serialize(parameters);
@@ -166,16 +170,22 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                     var currentTargets = new List<string>(targets);
                     // Set the current path length to 0.
                     var currentPathLength = 0;
-                    // Get the target nodes to keep. The optimization part for the "repeats" starts here. If it is the first check of the current iteration, we have no kept nodes, so the current targets are simply the targets.
-                    var keptNodes = GetControllingNodes(controlPath).Where(item => item.Value.Count() > 1).Select(item => item.Value).SelectMany(item => item);
+                    // Get the target nodes to keep. If it is the first check of the current iteration, we have no kept nodes, so the current targets are simply the targets. This is a part of the "repeat" optimization.
+                    var keptTargetNodes = GetControllingNodes(controlPath)
+                        .Where(item => item.Value.Count() > 1)
+                        .Select(item => item.Value)
+                        .SelectMany(item => item)
+                        .ToHashSet();
                     // Go over each of the paths corresponding to the target nodes to reset.
-                    foreach (var item in controlPath.Keys.Except(keptNodes).ToList())
+                    foreach (var item in controlPath.Keys.Except(keptTargetNodes).ToList())
                     {
                         // Reset the control path.
                         controlPath[item] = new List<string>() { item };
                     }
                     // Get the new targets.
-                    currentTargets = currentTargets.Except(keptNodes).ToList();
+                    currentTargets = currentTargets
+                        .Except(keptTargetNodes)
+                        .ToList();
                     // Run until there are no current targets or we reached the maximum path length.
                     while (currentTargets.Any() && currentPathLength < parameters.MaximumPathLength)
                     {
@@ -183,15 +193,14 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                         var unmatchedNodes = currentTargets.ToList();
                         // Set all nodes in the network as available to match.
                         var availableNodes = nodes.ToList();
-                        // If it is the first check of the current iteration, there are no kept nodes, so the left nodes and edges remain unchanged. Otherwise, remove from the left nodes the corresponding nodes in the current step in the control paths for the kept nodes. The optimization part for the "repeat" begins here.
-                        foreach (var item in keptNodes)
-                        {
-                            if (currentPathLength + 1 < controlPath[item].Count)
-                            {
-                                var leftNode = controlPath[item][currentPathLength + 1];
-                                availableNodes.Remove(leftNode);
-                            }
-                        }
+                        // If it is the first check of the current iteration, there are no kept nodes, so the left nodes and edges remain unchanged. Otherwise, remove from the left nodes the corresponding nodes in the current step in the control paths for the kept nodes. This is a part of the "repeat" optimization.
+                        availableNodes = availableNodes
+                            .Except(controlPath
+                                .Where(item => keptTargetNodes.Contains(item.Key))
+                                .Select(item => item.Value)
+                                .Where(item => currentPathLength + 1 < item.Count())
+                                .Select(item => item[currentPathLength + 1]))
+                            .ToList();
                         // Define a variable to store the matched edges of the matching.
                         var matchedEdges = new List<(string, string)>();
                         // Go over each heuristic set.
@@ -229,25 +238,30 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                     // Update the current repeat count.
                     currentRepeat++;
                 }
-                // The optimization part for the "cut to driven" parameter begins here.
-                var stop = false;
-                while (!stop)
+                // Define a variable to store if any path cuts have been performed. This is a part of the "cut-to-driven" optimization.
+                var pathCutsPerformed = false;
+                // Repeat until there are no more cuts.
+                do
                 {
-                    stop = true;
-                    foreach (var item1 in controlPath)
+                    // Reset the cut paths status.
+                    pathCutsPerformed = false;
+                    // Get the controlling nodes for the path.
+                    var controllingNodes = GetControllingNodes(controlPath).Keys.ToHashSet();
+                    // Go over each path in the control path.
+                    foreach (var key in controlPath.Keys.ToList())
                     {
-                        var controllingNode = item1.Value.Last();
-                        foreach (var item2 in controlPath)
+                        // Get the first index of any control node.
+                        var index = controlPath[key].FindIndex(item => controllingNodes.Contains(item));
+                        // Check if the index doesn't correspond to the last element in the list.
+                        if (index < controlPath[key].Count() - 1)
                         {
-                            var firstIndex = item2.Value.IndexOf(controllingNode);
-                            if (firstIndex != -1 && firstIndex != item2.Value.Count - 1)
-                            {
-                                item2.Value.RemoveRange(firstIndex, item2.Value.Count - 1 - firstIndex);
-                                stop = false;
-                            }
+                            // Cut the path up to the first index of any control node.
+                            controlPath[key] = controlPath[key].Take(index + 1).ToList();
+                            // Mark the cut as performed.
+                            pathCutsPerformed = true;
                         }
                     }
-                }
+                } while (pathCutsPerformed);
                 // Compute the result.
                 var controlNodes = GetControllingNodes(controlPath).Keys.ToList();
                 // Check if the current solution is better than the previously obtained best solutions.
@@ -338,6 +352,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             analysis.Log = analysis.AppendToLog($"The analysis has ended with the status \"{analysis.Status.GetDisplayName()}\".");
             // Update the analysis.
             IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+            // End the function.
+            return;
         }
 
         /// <summary>
