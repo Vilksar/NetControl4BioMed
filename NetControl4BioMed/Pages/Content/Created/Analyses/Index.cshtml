@@ -19,7 +19,7 @@
                     }
                 </select>
                 <select name="algorithm" class="custom-select">
-                    @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>().Where(item => item == AnalysisAlgorithm.Algorithm1))
+                    @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
                     {
                         <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
                     }
@@ -103,8 +103,10 @@
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break">
                             <span class="item-refresh-item" data-type="progress"></span>
+                            <span>%</span>
                             <span>/</span>
                             <span class="item-refresh-item" data-type="progressWithoutImprovement"></span>
+                            <span>%</span>
                         </td>
                         <td class="text-center text-break">
                             <a asp-page="/Content/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="btn btn-info my-1 mr-1" title="Details">

@@ -35,6 +35,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
         {
             public Analysis Analysis { get; set; }
 
+            public HashSet<Node> SourceNodes { get; set; }
+
             public SearchViewModel<ControlPath> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
@@ -146,6 +148,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
             {
                 Analysis = items
                     .First(),
+                SourceNodes = items
+                    .Select(item => item.AnalysisNodes)
+                    .SelectMany(item => item)
+                    .Where(item => item.Type == AnalysisNodeType.Source)
+                    .Select(item => item.Node)
+                    .ToHashSet(),
                 Search = new SearchViewModel<ControlPath>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.

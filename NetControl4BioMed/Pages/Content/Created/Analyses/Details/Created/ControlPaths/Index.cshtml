@@ -24,6 +24,12 @@ else
                 <th class="text-center text-break">
                     <span>Control nodes</span>
                 </th>
+                @if (Model.View.SourceNodes.Any())
+                {
+                    <th class="d-none d-lg-table-cell text-center text-break">
+                        <span>Source nodes</span>
+                    </th>
+                }
                 <th class="text-center text-break" data-orderable="false" data-searchable="false">
                     <span>Links</span>
                 </th>
@@ -32,19 +38,31 @@ else
         <tbody>
             @foreach (var (item, index) in Model.View.Search.Items.Select((item, index) => (item, index)))
             {
-                <tr>
-                    <td class="text-center text-break">
-                        <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
-                    </td>
+                var controlNodes = item.Paths
+                    .Select(item1 => item1.PathNodes)
+                    .SelectMany(item => item)
+                    .Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Source)
+                    .Select(item => item.Node)
+                    .Distinct();
+            <tr>
+                <td class="text-center text-break">
+                    <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
+                </td>
+                <td class="text-center text-break">
+                    <span>@controlNodes.Count()</span>
+                </td>
+                @if (Model.View.SourceNodes.Any())
+                {
                     <td class="d-none d-lg-table-cell text-center text-break">
-                        <span>@item.Paths.Select(item1 => item1.PathNodes).SelectMany(item => item).Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Source).Select(item => item.Node).Distinct().Count()</span>
+                        <span>@controlNodes.Where(item => Model.View.SourceNodes.Contains(item)).Count()</span>
                     </td>
-                    <td class="text-center text-break">
-                        <a asp-page="/Content/Created/Analyses/Details/Created/ControlPaths/Details" asp-route-id="@item.Id" title="Details">
-                            <span>Details</span>
-                        </a>
-                    </td>
-                </tr>
+                }
+                <td class="text-center text-break">
+                    <a asp-page="/Content/Created/Analyses/Details/Created/ControlPaths/Details" asp-route-id="@item.Id" title="Details">
+                        <span>Details</span>
+                    </a>
+                </td>
+            </tr>
             }
         </tbody>
     </table>

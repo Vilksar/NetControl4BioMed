@@ -37,7 +37,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
 
             public ControlPath ControlPath { get; set; }
 
-            public IEnumerable<Node> UniqueControlNodes { get; set; }
+            public HashSet<Node> SourceNodes { get; set; }
+
+            public Dictionary<Node, int> UniqueControlNodes { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -88,6 +90,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                     .Count(item => item.Type == AnalysisNodeType.None) < 500,
                 ControlPath = items
                     .First(),
+                SourceNodes = items
+                    .Select(item => item.Analysis)
+                    .Select(item => item.AnalysisNodes)
+                    .SelectMany(item => item)
+                    .Where(item => item.Type == AnalysisNodeType.Source)
+                    .Select(item => item.Node)
+                    .ToHashSet(),
                 UniqueControlNodes = items
                     .Select(item => item.Paths)
                     .SelectMany(item => item)
@@ -95,7 +104,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                     .SelectMany(item => item)
                     .Where(item => item.Type == PathNodeType.Source)
                     .Select(item => item.Node)
-                    .Distinct()
+                    .AsEnumerable()
+                    .GroupBy(item => item)
+                    .ToDictionary(item => item.Key, item => item.Count())
             };
             // Return the page.
             return Page();
