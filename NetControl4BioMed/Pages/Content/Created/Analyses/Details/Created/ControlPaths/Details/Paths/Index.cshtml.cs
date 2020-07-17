@@ -13,7 +13,7 @@ using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
 
-namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
+namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.ControlPaths.Details.Paths
 {
     [Authorize]
     public class IndexModel : PageModel
@@ -96,7 +96,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
             if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
+                TempData["StatusMessage"] = "Error: No control path has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }

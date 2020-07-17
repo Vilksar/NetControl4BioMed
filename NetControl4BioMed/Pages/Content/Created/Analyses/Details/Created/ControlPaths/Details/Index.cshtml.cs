@@ -1,32 +1,28 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
+using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Helpers.Extensions;
 
-namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.ControlPaths
+namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.ControlPaths.Details
 {
     [Authorize]
-    public class VisualizeModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
-        private readonly LinkGenerator _linkGenerator;
 
-        public VisualizeModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator)
+        public IndexModel(UserManager<User> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _context = context;
-            _linkGenerator = linkGenerator;
         }
 
         public ViewModel View { get; set; }
@@ -35,7 +31,15 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
         {
             public Analysis Analysis { get; set; }
 
-            public string CytoscapeJson { get; set; }
+            public bool IsGeneric { get; set; }
+
+            public bool ShowVisualization { get; set; }
+
+            public ControlPath ControlPath { get; set; }
+
+            public HashSet<Node> SourceNodes { get; set; }
+
+            public Dictionary<Node, int> UniqueControlNodes { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -66,7 +70,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
             if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
+                TempData["StatusMessage"] = "Error: No control path has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
@@ -76,7 +80,33 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                 Analysis = items
                     .Select(item => item.Analysis)
                     .First(),
-                CytoscapeJson = JsonSerializer.Serialize(items.First().GetCytoscapeViewModel(_linkGenerator, _context), new JsonSerializerOptions { IgnoreNullValues = true })
+                IsGeneric = items
+                    .Select(item => item.Analysis.AnalysisDatabases)
+                    .SelectMany(item => item)
+                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
+                ShowVisualization = items
+                    .Select(item => item.Analysis.AnalysisNodes)
+                    .SelectMany(item => item)
+                    .Count(item => item.Type == AnalysisNodeType.None) < 500,
+                ControlPath = items
+                    .First(),
+                SourceNodes = items
+                    .Select(item => item.Analysis)
+                    .Select(item => item.AnalysisNodes)
+                    .SelectMany(item => item)
+                    .Where(item => item.Type == AnalysisNodeType.Source)
+                    .Select(item => item.Node)
+                    .ToHashSet(),
+                UniqueControlNodes = items
+                    .Select(item => item.Paths)
+                    .SelectMany(item => item)
+                    .Select(item => item.PathNodes)
+                    .SelectMany(item => item)
+                    .Where(item => item.Type == PathNodeType.Source)
+                    .Select(item => item.Node)
+                    .AsEnumerable()
+                    .GroupBy(item => item)
+                    .ToDictionary(item => item.Key, item => item.Count())
             };
             // Return the page.
             return Page();

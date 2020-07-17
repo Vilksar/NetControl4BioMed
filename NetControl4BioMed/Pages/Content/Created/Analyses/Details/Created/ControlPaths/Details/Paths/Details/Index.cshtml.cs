@@ -11,15 +11,15 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 
-namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.ControlPaths
+namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.ControlPaths.Details.Paths.Details
 {
     [Authorize]
-    public class DetailsModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public DetailsModel(UserManager<User> userManager, ApplicationDbContext context)
+        public IndexModel(UserManager<User> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _context = context;
@@ -35,11 +35,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
 
             public bool ShowVisualization { get; set; }
 
-            public ControlPath ControlPath { get; set; }
+            public Path Path { get; set; }
 
-            public HashSet<Node> SourceNodes { get; set; }
+            public IEnumerable<PathNode> PathNodes { get; set; }
 
-            public Dictionary<Node, int> UniqueControlNodes { get; set; }
+            public IEnumerable<PathEdge> PathEdges { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -63,14 +63,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Get the item with the provided ID.
-            var items = _context.ControlPaths
-                .Where(item => item.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
+            var items = _context.Paths
+                .Where(item => item.ControlPath.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
             if (items == null || !items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
+                TempData["StatusMessage"] = "Error: No path has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
@@ -78,35 +78,26 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
             View = new ViewModel
             {
                 Analysis = items
-                    .Select(item => item.Analysis)
+                    .Select(item => item.ControlPath.Analysis)
                     .First(),
                 IsGeneric = items
-                    .Select(item => item.Analysis.AnalysisDatabases)
+                    .Select(item => item.ControlPath.Analysis.AnalysisDatabases)
                     .SelectMany(item => item)
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 ShowVisualization = items
-                    .Select(item => item.Analysis.AnalysisNodes)
+                    .Select(item => item.ControlPath.Analysis.AnalysisNodes)
                     .SelectMany(item => item)
                     .Count(item => item.Type == AnalysisNodeType.None) < 500,
-                ControlPath = items
+                Path = items
                     .First(),
-                SourceNodes = items
-                    .Select(item => item.Analysis)
-                    .Select(item => item.AnalysisNodes)
-                    .SelectMany(item => item)
-                    .Where(item => item.Type == AnalysisNodeType.Source)
-                    .Select(item => item.Node)
-                    .ToHashSet(),
-                UniqueControlNodes = items
-                    .Select(item => item.Paths)
-                    .SelectMany(item => item)
+                PathNodes = items
                     .Select(item => item.PathNodes)
                     .SelectMany(item => item)
-                    .Where(item => item.Type == PathNodeType.Source)
-                    .Select(item => item.Node)
-                    .AsEnumerable()
-                    .GroupBy(item => item)
-                    .ToDictionary(item => item.Key, item => item.Count())
+                    .Include(item => item.Node),
+                PathEdges = items
+                    .Select(item => item.PathEdges)
+                    .SelectMany(item => item)
+                    .Include(item => item.Edge)
             };
             // Return the page.
             return Page();

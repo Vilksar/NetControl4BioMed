@@ -13,7 +13,7 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
 
-namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Paths
+namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.ControlPaths.Details.Paths.Details
 {
     [Authorize]
     public class VisualizeModel : PageModel
