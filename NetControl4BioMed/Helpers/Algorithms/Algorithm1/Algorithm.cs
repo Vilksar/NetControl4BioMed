@@ -485,13 +485,13 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
 
         /// <summary>
         /// Represents the Hopcroft-Karp algorithm for maximum matching in a bipartite graph.
-        /// The implementation is a slightly modified version from the one found on https://en.wikipedia.org/wiki/Hopcroft–Karp_algorithm.
         /// </summary>
         /// <param name="leftNodes">Represents the left nodes of the bipartite graph.</param>
         /// <param name="rightNodes">Represents the right nodes of the bipartite graph.</param>
         /// <param name="edges">Represents the edges of the bipartite graph.</param>
         /// <param name="rand">Represents the random variable for choosing randomly a maximum matching.</param>
         /// <returns>Returns the list of edges corresponding to a maximum matching for the bipartite graph.</returns>
+        /// <remarks>The implementation is a slightly modified version from the one found on https://en.wikipedia.org/wiki/Hopcroft–Karp_algorithm, written in C#.</remarks>
         private static List<(string, string)> GetMaximumMatching(List<string> leftNodes, List<string> rightNodes, List<(string, string)> edges, Random rand)
         {
             // The Wikipedia algorithm uses considers the left nodes as U, and the right ones as V. But, as the unmatched nodes are considered, in order, from the left side of the bipartite graph, the obtained matching would not be truly random, especially on the first step. That is why I perform here a simple switch, by inter-changing the lists U and V (left and right side nodes), and using the opposite direction edges, in order to obtained a random maximum matching.

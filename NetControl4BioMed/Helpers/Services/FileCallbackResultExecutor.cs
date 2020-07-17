@@ -11,7 +11,7 @@ namespace NetControl4BioMed.Helpers.Services
     /// <summary>
     /// Represents a FileResultExecutor implementation for the FileCallbackResult.
     /// </summary>
-    /// <remarks>Implementation taken from https://blog.stephencleary.com/2016/11/streaming-zip-on-aspnet-core.html, with small modification.</remarks>
+    /// <remarks>Implementation taken from https://blog.stephencleary.com/2016/11/streaming-zip-on-aspnet-core.html, with small modifications.</remarks>
     public class FileCallbackResultExecutor : FileResultExecutorBase
     {
         /// <summary>

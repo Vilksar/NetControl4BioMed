@@ -252,11 +252,11 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
 
         /// <summary>
         /// Represents the Floyd-Warshall algorithm for finding the shortest path between two nodes in a graph.
-        /// The implementation is the Wikipedia version found on https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm.
         /// </summary>
         /// <param name="edges">The edges of the graph.</param>
         /// <param name="nodes">The nodes of the graph.</param>
         /// <returns>Returns a tuple of two-dimensional arrays that contain the data required to build the shortest path between any two nodes.</returns>
+        /// <remarks>The implementation is the Wikipedia version found on https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm, written in C#.</remarks>
         private static (int[,], int[,]) GetFloydWarshallMatrices(List<(string, string)> edges, List<string> nodes)
         {
             // Define the variables to be used.

@@ -205,7 +205,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                             Id = network.Id,
                             Name = network.Name,
                             Description = network.Description,
-                            Algorithm = network.Algorithm.ToString(),
+                            Algorithm = network.Algorithm.GetDisplayName(),
                             Nodes = _context.NetworkNodes
                                 .Where(item => item.Network == network)
                                 .Where(item => item.Type == NetworkNodeType.None)
@@ -237,7 +237,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                                         {
                                             NodeId = item1.Node.Id,
                                             NodeName = item1.Node.Name,
-                                            Type = item1.Type.ToString()
+                                            Type = item1.Type.GetDisplayName()
                                         }),
                                     Values = item.DatabaseEdgeFieldEdges
                                         .Select(item1 => new
@@ -305,7 +305,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                         var worksheet1Rows = new List<List<string>>
                         {
                             new List<string> { "Internal ID", "Date", "Name", "Description", "Algorithm" },
-                            new List<string> { network.Id, network.DateTimeCreated.ToString(), network.Name, network.Description, network.Algorithm.ToString() }
+                            new List<string> { network.Id, network.DateTimeCreated.ToString(), network.Name, network.Description, network.Algorithm.GetDisplayName() }
                         };
                         // Define the rows in the second sheet.
                         var worksheet2Rows = new List<List<string>>
@@ -333,7 +333,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                                     }),
                                 Types = item.NetworkNodes
                                     .Where(item1 => item1.Network == network)
-                                    .Select(item => item.Type.ToString().ToLower())
+                                    .Select(item => item.Type.GetDisplayName().ToLower())
                             })
                             .AsEnumerable()
                             .Select(item => new List<string> { item.Id, item.Name, string.Join(", ", item.Types) }

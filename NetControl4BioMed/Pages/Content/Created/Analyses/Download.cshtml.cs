@@ -204,7 +204,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                             Id = analysis.Id,
                             Name = analysis.Name,
                             Description = analysis.Description,
-                            Algorithm = analysis.Algorithm.ToString(),
+                            Algorithm = analysis.Algorithm.GetDisplayName(),
                             Nodes = _context.AnalysisNodes
                                 .Where(item => item.Analysis == analysis)
                                 .Where(item => item.Type == AnalysisNodeType.None)
@@ -236,7 +236,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                                         {
                                             NodeId = item1.Node.Id,
                                             NodeName = item1.Node.Name,
-                                            Type = item1.Type.ToString()
+                                            Type = item1.Type.GetDisplayName()
                                         }),
                                     Values = item.DatabaseEdgeFieldEdges
                                         .Select(item1 => new
@@ -304,7 +304,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                         var worksheet1Rows = new List<List<string>>
                         {
                             new List<string> { "Internal ID", "Date started", "Date ended", "Name", "Description", "Algorithm" },
-                            new List<string> { analysis.Id, analysis.DateTimeStarted?.ToString(), analysis.DateTimeEnded?.ToString(), analysis.Name, analysis.Description, analysis.Algorithm.ToString() }
+                            new List<string> { analysis.Id, analysis.DateTimeStarted?.ToString(), analysis.DateTimeEnded?.ToString(), analysis.Name, analysis.Description, analysis.Algorithm.GetDisplayName() }
                         };
                         // Define the rows in the second sheet.
                         var worksheet2Rows = new List<List<string>>
@@ -332,7 +332,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                                     }),
                                 Types = item.AnalysisNodes
                                     .Where(item1 => item1.Analysis == analysis)
-                                    .Select(item => item.Type.ToString().ToLower())
+                                    .Select(item => item.Type.GetDisplayName().ToLower())
                             })
                             .AsEnumerable()
                             .Select(item => new List<string> { item.Id, item.Name, string.Join(", ", item.Types) }
