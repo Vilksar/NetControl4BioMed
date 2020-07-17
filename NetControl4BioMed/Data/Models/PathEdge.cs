@@ -29,5 +29,10 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the edge of the relationship.
         /// </summary>
         public Edge Edge { get; set; }
+
+        /// <summary>
+        /// Gets or sets the index of the relationship.
+        /// </summary>
+        public int Index { get; set; }
     }
 }

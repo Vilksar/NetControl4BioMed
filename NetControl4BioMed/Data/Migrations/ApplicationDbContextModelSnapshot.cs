@@ -803,7 +803,10 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("EdgeId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("PathId", "EdgeId");
+                    b.Property<int>("Index")
+                        .HasColumnType("int");
+
+                    b.HasKey("PathId", "EdgeId", "Index");
 
                     b.HasIndex("EdgeId");
 
@@ -821,7 +824,10 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.HasKey("PathId", "NodeId", "Type");
+                    b.Property<int>("Index")
+                        .HasColumnType("int");
+
+                    b.HasKey("PathId", "NodeId", "Type", "Index");
 
                     b.HasIndex("NodeId");
 

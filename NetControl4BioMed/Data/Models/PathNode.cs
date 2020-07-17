@@ -35,5 +35,10 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the type of the relationship.
         /// </summary>
         public PathNodeType Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the index of the relationship.
+        /// </summary>
+        public int Index { get; set; }
     }
 }

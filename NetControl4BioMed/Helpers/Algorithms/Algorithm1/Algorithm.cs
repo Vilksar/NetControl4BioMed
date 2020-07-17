@@ -323,25 +323,25 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 {
                     // Get the nodes and edges in the path.
                     var pathNodes = item1
-                        .Distinct()
                         .Select(item2 => analysisNodes.FirstOrDefault(item3 => item3.Id == item2))
                         .Where(item2 => item2 != null)
+                        .Reverse()
                         .ToList();
                     var pathEdges = item1
                         .Zip(item1.Skip(1), (item2, item3) => (item3.ToString(), item2.ToString()))
-                        .Distinct()
                         .Select(item2 => analysisEdges.FirstOrDefault(item3 => item3.SourceNodeId == item2.Item1 && item3.TargetNodeId == item2.Item2))
                         .Where(item2 => item2 != null)
                         .Select(item2 => item2.Edge)
+                        .Reverse()
                         .ToList();
                     // Return the path.
                     return new Path
                     {
-                        PathNodes = pathNodes.Select(item2 => new PathNode { NodeId = item2.Id, Node = item2, Type = PathNodeType.None })
-                            .Append(new PathNode { NodeId = pathNodes.First().Id, Node = pathNodes.First(), Type = PathNodeType.Target })
-                            .Append(new PathNode { NodeId = pathNodes.Last().Id, Node = pathNodes.Last(), Type = PathNodeType.Source })
+                        PathNodes = pathNodes.Select((item2, index) => new PathNode { NodeId = item2.Id, Node = item2, Type = PathNodeType.None, Index = index })
+                            .Append(new PathNode { NodeId = pathNodes.First().Id, Node = pathNodes.First(), Type = PathNodeType.Source, Index = -1 })
+                            .Append(new PathNode { NodeId = pathNodes.Last().Id, Node = pathNodes.Last(), Type = PathNodeType.Target, Index = pathNodes.Count() + 1 })
                             .ToList(),
-                        PathEdges = pathEdges.Select(item2 => new PathEdge { EdgeId = item2.Id, Edge = item2 }).ToList()
+                        PathEdges = pathEdges.Select((item2, index) => new PathEdge { EdgeId = item2.Id, Edge = item2, Index = index }).ToList()
                     };
                 }).ToList()
             }).ToList();

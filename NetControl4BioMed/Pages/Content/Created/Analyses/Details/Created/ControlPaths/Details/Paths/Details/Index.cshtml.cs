@@ -93,11 +93,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                 PathNodes = items
                     .Select(item => item.PathNodes)
                     .SelectMany(item => item)
-                    .Include(item => item.Node),
+                    .Include(item => item.Node)
+                    .OrderBy(item => item.Index),
                 PathEdges = items
                     .Select(item => item.PathEdges)
                     .SelectMany(item => item)
                     .Include(item => item.Edge)
+                    .OrderBy(item => item.Index)
             };
             // Return the page.
             return Page();

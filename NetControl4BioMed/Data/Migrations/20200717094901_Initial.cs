@@ -853,11 +853,12 @@ namespace NetControl4BioMed.Data.Migrations
                 columns: table => new
                 {
                     PathId = table.Column<string>(nullable: false),
-                    EdgeId = table.Column<string>(nullable: false)
+                    EdgeId = table.Column<string>(nullable: false),
+                    Index = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PathEdges", x => new { x.PathId, x.EdgeId });
+                    table.PrimaryKey("PK_PathEdges", x => new { x.PathId, x.EdgeId, x.Index });
                     table.ForeignKey(
                         name: "FK_PathEdges_Edges_EdgeId",
                         column: x => x.EdgeId,
@@ -878,11 +879,12 @@ namespace NetControl4BioMed.Data.Migrations
                 {
                     PathId = table.Column<string>(nullable: false),
                     NodeId = table.Column<string>(nullable: false),
-                    Type = table.Column<int>(nullable: false)
+                    Type = table.Column<int>(nullable: false),
+                    Index = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PathNodes", x => new { x.PathId, x.NodeId, x.Type });
+                    table.PrimaryKey("PK_PathNodes", x => new { x.PathId, x.NodeId, x.Type, x.Index });
                     table.ForeignKey(
                         name: "FK_PathNodes_Nodes_NodeId",
                         column: x => x.NodeId,

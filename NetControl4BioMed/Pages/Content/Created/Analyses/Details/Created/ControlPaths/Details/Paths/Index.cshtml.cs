@@ -168,9 +168,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
             // Include the related entities.
             query = query
                 .Include(item => item.PathNodes)
-                    .ThenInclude(item => item.Node)
-                .Include(item => item.PathEdges)
-                    .ThenInclude(item => item.Edge);
+                    .ThenInclude(item => item.Node);
             // Define the view.
             View = new ViewModel
             {

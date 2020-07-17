@@ -563,7 +563,7 @@ namespace NetControl4BioMed.Data
             });
             modelBuilder.Entity<PathEdge>(entity =>
             {
-                entity.HasKey(item => new { item.PathId, item.EdgeId });
+                entity.HasKey(item => new { item.PathId, item.EdgeId, item.Index });
                 entity.HasOne(item => item.Path)
                     .WithMany(item => item.PathEdges)
                     .HasForeignKey(item => item.PathId)
@@ -575,7 +575,7 @@ namespace NetControl4BioMed.Data
             });
             modelBuilder.Entity<PathNode>(entity =>
             {
-                entity.HasKey(item => new { item.PathId, item.NodeId, item.Type });
+                entity.HasKey(item => new { item.PathId, item.NodeId, item.Type, item.Index });
                 entity.HasOne(item => item.Path)
                     .WithMany(item => item.PathNodes)
                     .HasForeignKey(item => item.PathId)
