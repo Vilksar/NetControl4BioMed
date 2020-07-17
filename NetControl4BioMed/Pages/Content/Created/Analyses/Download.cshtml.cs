@@ -153,7 +153,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     foreach (var analysis in View.Items)
                     {
                         // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"{analysis.Name}-{analysis.Id}.txt", CompressionLevel.Fastest).Open();
+                        using var stream = archive.CreateEntry($"Analysis-{analysis.Name.Replace(" ", "-")}-{analysis.Id}.txt", CompressionLevel.Fastest).Open();
                         // Define the stream writer for the file.
                         using var streamWriter = new StreamWriter(stream);
                         // Get the default values.
@@ -197,7 +197,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     foreach (var analysis in View.Items)
                     {
                         // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"{analysis.Name}-{analysis.Id}.json", CompressionLevel.Fastest).Open();
+                        using var stream = archive.CreateEntry($"Analysis-{analysis.Name.Replace(" ", "-")}-{analysis.Id}.json", CompressionLevel.Fastest).Open();
                         // Get the required data.
                         var data = new
                         {
@@ -265,7 +265,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     foreach (var analysis in View.Items)
                     {
                         // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"{analysis.Name}-{analysis.Id}.json", CompressionLevel.Fastest).Open();
+                        using var stream = archive.CreateEntry($"Analysis-{analysis.Name.Replace(" ", "-")}-{analysis.Id}.json", CompressionLevel.Fastest).Open();
                         // Write the data corresponding to the file.
                         await JsonSerializer.SerializeAsync(stream, analysis.GetCytoscapeViewModel(_linkGenerator, _context), jsonSerializerOptions);
                     }
@@ -276,7 +276,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     foreach (var analysis in View.Items)
                     {
                         // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"{analysis.Name}-{analysis.Id}.xlsx", CompressionLevel.Fastest).Open();
+                        using var stream = archive.CreateEntry($"Analysis-{analysis.Name.Replace(" ", "-")}-{analysis.Id}.xlsx", CompressionLevel.Fastest).Open();
                         // Get the required data.
                         var databases = _context.AnalysisDatabases
                             .Where(item => item.Analysis == analysis)

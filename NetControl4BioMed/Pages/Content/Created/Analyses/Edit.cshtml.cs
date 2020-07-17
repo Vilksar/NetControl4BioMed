@@ -76,7 +76,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             // Define the query.
             var query = _context.Analyses
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == Input.Id);
+                .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
