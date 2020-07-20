@@ -261,6 +261,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var nodeCollections = context.NodeCollections
                     .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => batchIds.Contains(item.Id));
+                // Get the related entities to delete.
+                var batchNodeCollectionDatabases = context.NodeCollectionDatabases
+                    .Where(item => nodeCollections.Contains(item.NodeCollection));
+                var batchNodeCollectionNodes = context.NodeCollectionNodes
+                    .Where(item => nodeCollections.Contains(item.NodeCollection));
                 // Save the items to edit.
                 var nodeCollectionsToEdit = new List<NodeCollection>();
                 // Go over each of the valid items.
@@ -325,6 +330,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no node collection nodes found.", showExceptionItem, batchItem);
                     }
+                    // Delete all related entities that appear in the current batch.
+                    IQueryableExtensions.Delete(batchNodeCollectionDatabases.Where(item => item.NodeCollection == nodeCollection), context, token);
+                    IQueryableExtensions.Delete(batchNodeCollectionNodes.Where(item => item.NodeCollection == nodeCollection), context, token);
                     // Update the node collection.
                     nodeCollection.Name = batchItem.Name;
                     nodeCollection.Description = batchItem.Description;

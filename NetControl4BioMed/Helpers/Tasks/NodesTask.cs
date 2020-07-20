@@ -219,12 +219,18 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Distinct();
                 // Get the related entities that appear in the current batch.
                 var batchDatabaseNodeFields = context.DatabaseNodeFields
+                    .Include(item => item.Database)
                     .Where(item => item.Database.DatabaseType.Name != "Generic")
                     .Where(item => batchDatabaseNodeFieldIds.Contains(item.Id));
                 // Get the items corresponding to the current batch.
                 var nodes = context.Nodes
                     .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => batchIds.Contains(item.Id));
+                // Get the related entities to delete.
+                var batchDatabaseNodes = context.DatabaseNodes
+                    .Where(item => nodes.Contains(item.Node));
+                var batchDatabaseNodeFieldNodes = context.DatabaseNodeFieldNodes
+                    .Where(item => nodes.Contains(item.Node));
                 // Save the items to edit.
                 var nodesToEdit = new List<Node>();
                 // Go over each item in the current batch.
@@ -267,6 +273,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no database node field nodes found.", showExceptionItem, batchItem);
                     }
+                    // Delete all related entities that appear in the current batch.
+                    IQueryableExtensions.Delete(batchDatabaseNodes.Where(item => item.Node == node), context, token);
+                    IQueryableExtensions.Delete(batchDatabaseNodeFieldNodes.Where(item => item.Node == node), context, token);
                     // Update the node.
                     node.Name = databaseNodeFieldNodes
                             .FirstOrDefault(item => item.DatabaseNodeField.IsSearchable)?.Value ?? "Unnamed node";

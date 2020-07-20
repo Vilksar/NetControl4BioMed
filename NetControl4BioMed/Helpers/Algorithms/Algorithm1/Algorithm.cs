@@ -246,7 +246,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                     // Reset the cut paths status.
                     pathCutsPerformed = false;
                     // Get the controlling nodes for the path.
-                    var controllingNodes = GetControllingNodes(controlPath).Keys.ToHashSet();
+                    var controllingNodes = GetControllingNodes(controlPath).Keys
+                        .ToHashSet();
                     // Go over each path in the control path.
                     foreach (var key in controlPath.Keys.ToList())
                     {

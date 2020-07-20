@@ -171,7 +171,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no analysis networks provided.", showExceptionItem, batchItem);
                     }
-                    // Get the analysis users.
+                    // Get the analysis networks.
                     var analysisNetworks = batchItem.AnalysisNetworks
                         .Where(item => item.Network != null)
                         .Where(item => !string.IsNullOrEmpty(item.Network.Id))
@@ -191,7 +191,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no analysis networks found.", showExceptionItem, batchItem);
                     }
-                    // Get the analysis databases.
+                    // Get the node analysis databases.
                     var nodeAnalysisDatabases = analysisNetworks
                             .Select(item => item.Network)
                             .Select(item => item.NetworkDatabases)
@@ -233,7 +233,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     // Get the node databases.
                     var nodeDatabases = nodeAnalysisDatabases
-                        .Where(item => item.Type == AnalysisDatabaseType.Node)
                         .Select(item => item.Database);
                     // Get the analysis node collections.
                     var analysisNodeCollections = batchItem.AnalysisNodeCollections != null ?
@@ -590,12 +589,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Get the nodes in the analysis.
                     var sourceNodes = sourceNodesByIdentifier
                         .Concat(sourceNodesByNodeCollection)
-                        .Intersect(nodes)
-                        .Distinct();
+                        .Distinct()
+                        .Intersect(nodes);
                     var targetNodes = targetNodesByIdentifier
                         .Concat(targetNodesByNodeCollection)
-                        .Intersect(nodes)
-                        .Distinct();
+                        .Distinct()
+                        .Intersect(nodes);
                     // Check if there haven't been any target nodes found.
                     if (targetNodes == null || !targetNodes.Any())
                     {

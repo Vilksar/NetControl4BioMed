@@ -484,7 +484,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Get the database type.
                     var databaseType = databaseTypes.First();
                     // Check if the database type and the algorithm don't match.
-                    if (databaseType.Name == "Generic" ^ network.Algorithm == NetworkAlgorithm.None)
+                    if ((databaseType.Name == "Generic") != (network.Algorithm == NetworkAlgorithm.None))
                     {
                         // Update the status of the item.
                         network.Status = NetworkStatus.Error;
@@ -666,10 +666,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Get the node identifiers from the data.
                         var seedNodeIdentifiers = data
                             .Where(item => item.Type == "Seed")
-                            .Where(item => item.Node != null)
                             .Select(item => item.Node)
-                            .Where(item => !string.IsNullOrEmpty(item.Id))
+                            .Where(item => item != null)
                             .Select(item => item.Id)
+                            .Where(item => !string.IsNullOrEmpty(item))
                             .Distinct();
                         // Get the available nodes.
                         var availableNodes = context.Nodes
@@ -699,7 +699,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         var availableEdges = context.Edges
                             .Include(item => item.EdgeNodes)
                                 .ThenInclude(item => item.Node)
-                            .Where(item => item.DatabaseEdges.Any(item1 => edgeDatabaseIds.Contains(item1.Database.Id)));
+                            .Where(item => item.DatabaseEdges.Any(item1 => edgeDatabaseIds.Contains(item1.Database.Id)))
+                            .Where(item => item.EdgeNodes.All(item1 => availableNodes.Contains(item1.Node)));
                         // Check if there haven't been any available edges found.
                         if (availableEdges == null || !availableEdges.Any())
                         {
@@ -756,7 +757,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 currentEdgeList.Add(temporaryList);
                             }
                             // Define a variable to store, at each step, the nodes to keep.
-                            var nodesToKeep = seedNodes.ToList();
+                            var nodesToKeep = seedNodes
+                                .ToList();
                             // Starting from the right, mark all terminal nodes that are not seed nodes for removal.
                             for (int gapIndex = gap; gapIndex >= 0; gapIndex--)
                             {

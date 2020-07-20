@@ -321,6 +321,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var edges = context.Edges
                     .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => batchIds.Contains(item.Id));
+                // Get the related entities to delete.
+                var batchEdgeNodes = context.EdgeNodes
+                    .Where(item => edges.Contains(item.Edge));
+                var batchDatabaseEdges = context.DatabaseEdges
+                    .Where(item => edges.Contains(item.Edge));
+                var batchDatabaseEdgeFieldEdges = context.DatabaseEdgeFieldEdges
+                    .Where(item => edges.Contains(item.Edge));
                 // Save the items to edit.
                 var edgesToEdit = new List<Edge>();
                 // Go over each of the valid items.
@@ -408,6 +415,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no database edges found.", showExceptionItem, batchItem);
                     }
+                    // Delete all related entities that appear in the current batch.
+                    IQueryableExtensions.Delete(batchEdgeNodes.Where(item => item.Edge == edge), context, token);
+                    IQueryableExtensions.Delete(batchDatabaseEdges.Where(item => item.Edge == edge), context, token);
+                    IQueryableExtensions.Delete(batchDatabaseEdgeFieldEdges.Where(item => item.Edge == edge), context, token);
                     // Update the edge.
                     edge.Name = string.Concat(edgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " - ", edgeNodes.First(item => item.Type == EdgeNodeType.Target).Node.Name);
                     edge.Description = batchItem.Description;
@@ -417,7 +428,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         edgeNodes.First(item => item.Type == EdgeNodeType.Target)
                     };
                     edge.DatabaseEdgeFieldEdges = databaseEdgeFieldEdges.ToList();
-                    edge.DatabaseEdges = databaseEdges.ToList().ToList();
+                    edge.DatabaseEdges = databaseEdges.ToList();
                     // Add the edge to the list.
                     edgesToEdit.Add(edge);
                 }

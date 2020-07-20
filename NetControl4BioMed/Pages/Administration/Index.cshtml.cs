@@ -1323,7 +1323,7 @@ namespace NetControl4BioMed.Pages.Administration
                 var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAnalyses(task.Id, CancellationToken.None));
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: A new background task was created to delete {string.Join("and ", deleteItems.Select(item => $"all {item.ToLower()}"))}.";
+            TempData["StatusMessage"] = $"Success: A new background task was created to delete {string.Join(" and ", deleteItems.Select(item => $"all {item.ToLower()}"))}.";
             // Redirect to the page.
             return RedirectToPage();
         }

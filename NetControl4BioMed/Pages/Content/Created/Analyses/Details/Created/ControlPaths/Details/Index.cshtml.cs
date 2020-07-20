@@ -96,6 +96,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                     .SelectMany(item => item)
                     .Where(item => item.Type == AnalysisNodeType.Source)
                     .Select(item => item.Node)
+                    .Distinct()
                     .ToHashSet(),
                 UniqueControlNodes = items
                     .Select(item => item.Paths)
