@@ -218,12 +218,14 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                         }
                         // Update the current targets to the current matched edge source nodes, and the control path.
                         currentTargets = matchedEdges.Select(item => item.Item1).Distinct().ToList();
+                        // Create a temporary dictionary to store, for each target, the corresponding current target.
+                        var currentTargetDictionary = controlPath.ToDictionary(item => item.Key, item => item.Value.Last());
                         // Go over all of the matched edges.
                         foreach (var edge in matchedEdges)
                         {
                             // Get the keys of all paths to update, as the ones starting with the target node of the edge.
-                            var keys = controlPath
-                                .Where(item => item.Value.Last() == edge.Item2)
+                            var keys = currentTargetDictionary
+                                .Where(item => item.Value == edge.Item2)
                                 .Select(item => item.Key);
                             // Go over all of the keys.
                             foreach (var key in keys)
