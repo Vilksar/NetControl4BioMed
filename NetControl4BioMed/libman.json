@@ -3,14 +3,14 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "cytoscape@3.9.4",
+      "library": "cytoscape@3.15.2",
       "destination": "wwwroot/lib/cytoscape/",
       "files": [
         "cytoscape.min.js"
       ]
     },
     {
-      "library": "font-awesome@5.11.2",
+      "library": "font-awesome@5.14.0",
       "destination": "wwwroot/lib/font-awesome/",
       "files": [
         "css/all.min.css",
@@ -18,7 +18,7 @@
       ]
     },
     {
-      "library": "jquery@3.4.1",
+      "library": "jquery@3.5.1",
       "destination": "wwwroot/lib/jquery/",
       "files": [
         "jquery.min.js"
@@ -32,7 +32,7 @@
       ]
     },
     {
-      "library": "jquery-validate@1.19.1",
+      "library": "jquery-validate@1.19.2",
       "destination": "wwwroot/lib/jquery-validate/",
       "files": [
         "jquery.validate.min.js"
@@ -46,7 +46,7 @@
       ]
     },
     {
-      "library": "twitter-bootstrap@4.4.1",
+      "library": "twitter-bootstrap@4.5.0",
       "destination": "wwwroot/lib/twitter-bootstrap/",
       "files": [
         "js/bootstrap.min.js",
@@ -54,7 +54,7 @@
       ]
     },
     {
-      "library": "datatables@1.10.19",
+      "library": "datatables@1.10.21",
       "destination": "wwwroot/lib/datatables/",
       "files": [
         "js/jquery.dataTables.min.js",
