@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Extensions;
 
 namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.ControlPaths.Details.Paths.Details
 {
@@ -85,9 +86,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                     .SelectMany(item => item)
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 ShowVisualization = items
-                    .Select(item => item.ControlPath.Analysis.AnalysisNodes)
-                    .SelectMany(item => item)
-                    .Count(item => item.Type == AnalysisNodeType.None) < 500,
+                    .All(item => item.PathNodes
+                        .Where(item1 => item1.Type == PathNodeType.None)
+                        .Count() < PathExtensions.MaximumSizeForVisualization),
                 Path = items
                     .First(),
                 PathNodes = items

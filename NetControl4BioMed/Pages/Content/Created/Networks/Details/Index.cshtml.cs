@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Extensions;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
 {
@@ -83,6 +84,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
             {
                 Network = items
                     .First(),
+                ShowVisualization = items
+                    .All(item => item.Status == NetworkStatus.Completed && item.NetworkNodes
+                        .Where(item1 => item1.Type == NetworkNodeType.None)
+                        .Count() < NetworkExtensions.MaximumSizeForVisualization),
                 UserCount = items
                     .Select(item => item.NetworkUsers)
                     .SelectMany(item => item)
@@ -108,8 +113,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                     .SelectMany(item => item)
                     .Count()
             };
-            // Check if the visualization should be enabled.
-            View.ShowVisualization = View.Network.Status == NetworkStatus.Completed && View.NodeCount < 500;
             // Return the page.
             return Page();
         }

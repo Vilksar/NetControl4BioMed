@@ -4,9 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
+using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.ViewModels;
 
@@ -15,12 +17,14 @@ namespace NetControl4BioMed.Pages
     [AllowAnonymous]
     public class ContactModel : PageModel
     {
+        private readonly UserManager<User> _userManager;
         private readonly ISendGridEmailSender _emailSender;
         private readonly LinkGenerator _linkGenerator;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public ContactModel(ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public ContactModel(UserManager<User> userManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
+            _userManager = userManager;
             _emailSender = emailSender;
             _linkGenerator = linkGenerator;
             _reCaptchaChecker = reCaptchaChecker;
@@ -46,13 +50,15 @@ namespace NetControl4BioMed.Pages
             public string ReCaptchaToken { get; set; }
         }
 
-        public IActionResult OnGet(string name = null, string email = null, string message = null)
+        public async Task<IActionResult> OnGet(string message = null)
         {
+            // Get the current user.
+            var user = await _userManager.GetUserAsync(User);
             // Define the input.
             Input = new InputModel
             {
-                Name = Uri.UnescapeDataString(name ?? string.Empty),
-                Email = Uri.UnescapeDataString(email ?? string.Empty),
+                Name = Uri.UnescapeDataString(string.Empty),
+                Email = Uri.UnescapeDataString(user?.Email ?? string.Empty),
                 Message = Uri.UnescapeDataString(message ?? string.Empty)
             };
             // Return the page.

@@ -41,7 +41,7 @@ namespace NetControl4BioMed.Pages
             var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
             var statusCodeReExecuteFeature = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
             // Get the error message.
-            var message = $"The request with the ID \"{requestId}\" encountered an error at {DateTime.Now.ToString()}.";
+            var message = $"The request with the ID \"{requestId}\" encountered an {(!string.IsNullOrEmpty(errorCode) ? errorCode : "unidentified")} error at {DateTime.Now.ToString()}.";
             // Check if we had an exception.
             if (exceptionHandlerPathFeature != null)
             {

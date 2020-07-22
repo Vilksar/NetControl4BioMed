@@ -90,6 +90,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
             {
                 Analysis = items
                     .First(),
+                ShowVisualization = items
+                    .All(item => (item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed) && item.AnalysisNodes
+                        .Where(item1 => item1.Type == AnalysisNodeType.None)
+                        .Count() < AnalysisExtensions.MaximumSizeForVisualization),
                 Algorithm1Parameters = null,
                 Algorithm2Parameters = null,
                 UserCount = items
@@ -117,8 +121,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                     .SelectMany(item => item)
                     .Count()
             };
-            // Check if the visualization should be enabled.
-            View.ShowVisualization = (View.Analysis.Status == AnalysisStatus.Stopped || View.Analysis.Status == AnalysisStatus.Completed) && View.NodeCount < 500;
             // Check which algorithm is used and try to deserialize the parameters.
             if (View.Analysis.Algorithm == AnalysisAlgorithm.Algorithm1)
             {

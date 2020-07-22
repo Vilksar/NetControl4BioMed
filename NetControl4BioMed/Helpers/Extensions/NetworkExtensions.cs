@@ -18,6 +18,11 @@ namespace NetControl4BioMed.Helpers.Extensions
     public static class NetworkExtensions
     {
         /// <summary>
+        /// Represents the maximum size for which visualization will be enabled.
+        /// </summary>
+        public readonly static int MaximumSizeForVisualization = 500;
+
+        /// <summary>
         /// Gets the log of the network.
         /// </summary>
         /// <param name="network">The current network.</param>

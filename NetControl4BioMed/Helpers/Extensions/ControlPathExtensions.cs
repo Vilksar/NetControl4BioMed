@@ -16,6 +16,11 @@ namespace NetControl4BioMed.Helpers.Extensions
     public static class ControlPathExtensions
     {
         /// <summary>
+        /// Represents the maximum size for which visualization will be enabled.
+        /// </summary>
+        public readonly static int MaximumSizeForVisualization = 500;
+
+        /// <summary>
         /// Gets the Cytoscape view model corresponding to the provided control path.
         /// </summary>
         /// <param name="controlPath">The current control path.</param>
