@@ -1190,9 +1190,11 @@ namespace NetControl4BioMed.Pages.Administration
             // Check the items to delete.
             if (deleteItems.Contains("Nodes"))
             {
-                // Get the items.
-                var items = _context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
+                // Get the item IDs.
+                var itemIds = _context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Select(item => item.Id)
+                    .ToList();
                 // Define a new background task.
                 var task = new BackgroundTask
                 {
@@ -1201,9 +1203,9 @@ namespace NetControl4BioMed.Pages.Administration
                     IsRecurring = false,
                     Data = JsonSerializer.Serialize(new NodesTask
                     {
-                        Items = items.Select(item => new NodeInputModel
+                        Items = itemIds.Select(item => new NodeInputModel
                         {
-                            Id = item.Id
+                            Id = item
                         })
                     })
                 };
@@ -1217,9 +1219,11 @@ namespace NetControl4BioMed.Pages.Administration
             // Check the items to delete.
             if (deleteItems.Contains("Edges"))
             {
-                // Get the items.
-                var items = _context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
+                // Get the item IDs.
+                var itemIds = _context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Select(item => item.Id)
+                    .ToList();
                 // Define a new background task.
                 var task = new BackgroundTask
                 {
@@ -1228,9 +1232,9 @@ namespace NetControl4BioMed.Pages.Administration
                     IsRecurring = false,
                     Data = JsonSerializer.Serialize(new EdgesTask
                     {
-                        Items = items.Select(item => new EdgeInputModel
+                        Items = itemIds.Select(item => new EdgeInputModel
                         {
-                            Id = item.Id
+                            Id = item
                         })
                     })
                 };
@@ -1244,9 +1248,10 @@ namespace NetControl4BioMed.Pages.Administration
             // Check the items to delete.
             if (deleteItems.Contains("NodeCollections"))
             {
-                // Get the items.
-                var items = _context.NodeCollections
-                    .AsQueryable();
+                // Get the item IDs.
+                var itemIds = _context.NodeCollections
+                    .Select(item => item.Id)
+                    .ToList();
                 // Define a new background task.
                 var task = new BackgroundTask
                 {
@@ -1255,9 +1260,9 @@ namespace NetControl4BioMed.Pages.Administration
                     IsRecurring = false,
                     Data = JsonSerializer.Serialize(new NodeCollectionsTask
                     {
-                        Items = items.Select(item => new NodeCollectionInputModel
+                        Items = itemIds.Select(item => new NodeCollectionInputModel
                         {
-                            Id = item.Id
+                            Id = item
                         })
                     })
                 };
@@ -1271,9 +1276,10 @@ namespace NetControl4BioMed.Pages.Administration
             // Check the items to delete.
             if (deleteItems.Contains("Networks"))
             {
-                // Get the items.
-                var items = _context.Networks
-                    .AsQueryable();
+                // Get the item IDs.
+                var itemIds = _context.Networks
+                    .Select(item => item.Id)
+                    .ToList();
                 // Define a new background task.
                 var task = new BackgroundTask
                 {
@@ -1282,9 +1288,9 @@ namespace NetControl4BioMed.Pages.Administration
                     IsRecurring = false,
                     Data = JsonSerializer.Serialize(new NetworksTask
                     {
-                        Items = items.Select(item => new NetworkInputModel
+                        Items = itemIds.Select(item => new NetworkInputModel
                         {
-                            Id = item.Id
+                            Id = item
                         })
                     })
                 };
@@ -1298,9 +1304,10 @@ namespace NetControl4BioMed.Pages.Administration
             // Check the items to delete.
             if (deleteItems.Contains("Analyses"))
             {
-                // Get the items.
-                var items = _context.Analyses
-                    .AsQueryable();
+                // Get the item IDs.
+                var itemIds = _context.Analyses
+                    .Select(item => item.Id)
+                    .ToList();
                 // Define a new background task.
                 var task = new BackgroundTask
                 {
@@ -1309,9 +1316,9 @@ namespace NetControl4BioMed.Pages.Administration
                     IsRecurring = false,
                     Data = JsonSerializer.Serialize(new AnalysesTask
                     {
-                        Items = items.Select(item => new AnalysisInputModel
+                        Items = itemIds.Select(item => new AnalysisInputModel
                         {
-                            Id = item.Id
+                            Id = item
                         })
                     })
                 };
