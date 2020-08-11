@@ -224,5 +224,55 @@ namespace NetControl4BioMed.Helpers.Interfaces
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
         void StopAnalyses(string id, CancellationToken token);
+
+        /// <summary>
+        /// Deletes all nodes from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        /// <returns></returns>
+        [AutomaticRetry(Attempts = 0)]
+        [DisableConcurrentExecution(86400)]
+        void DeleteAllNodes(string id, CancellationToken token);
+
+        /// <summary>
+        /// Deletes all edges from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        /// <returns></returns>
+        [AutomaticRetry(Attempts = 0)]
+        [DisableConcurrentExecution(86400)]
+        void DeleteAllEdges(string id, CancellationToken token);
+
+        /// <summary>
+        /// Deletes all node collections from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        /// <returns></returns>
+        [AutomaticRetry(Attempts = 0)]
+        [DisableConcurrentExecution(86400)]
+        void DeleteAllNodeCollections(string id, CancellationToken token);
+
+        /// <summary>
+        /// Deletes all networks from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        /// <returns></returns>
+        [AutomaticRetry(Attempts = 0)]
+        [DisableConcurrentExecution(86400)]
+        void DeleteAllNetworks(string id, CancellationToken token);
+
+        /// <summary>
+        /// Deletes all analyses from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        /// <returns></returns>
+        [AutomaticRetry(Attempts = 0)]
+        [DisableConcurrentExecution(86400)]
+        void DeleteAllAnalyses(string id, CancellationToken token);
     }
 }

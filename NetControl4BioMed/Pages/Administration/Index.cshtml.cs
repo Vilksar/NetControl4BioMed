@@ -1172,7 +1172,7 @@ namespace NetControl4BioMed.Pages.Administration
                 return RedirectToPage();
             }
             // Check if the confirmation is not valid.
-            if (deleteConfirmation != $"I confirm that I want to delete the {string.Join(" and ", deleteItems)}!")
+            if (deleteConfirmation != $"I confirm that I want to delete {string.Join(" and ", deleteItems.Select(item => $"all {item}"))}!")
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: The confirmation message was not valid for the selected items.";
@@ -1190,147 +1190,95 @@ namespace NetControl4BioMed.Pages.Administration
             // Check the items to delete.
             if (deleteItems.Contains("Nodes"))
             {
-                // Get the item IDs.
-                var itemIds = _context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Select(item => item.Id)
-                    .ToList();
                 // Define a new background task.
-                var task = new BackgroundTask
+                var backgroundTask = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.Now,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNodes)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllNodes)}",
                     IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new NodesTask
-                    {
-                        Items = itemIds.Select(item => new NodeInputModel
-                        {
-                            Id = item
-                        })
-                    })
+                    Data = JsonSerializer.Serialize(new NodesTask())
                 };
                 // Mark the background task for addition.
-                _context.BackgroundTasks.Add(task);
+                _context.BackgroundTasks.Add(backgroundTask);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNodes(task.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllNodes(backgroundTask.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Edges"))
             {
-                // Get the item IDs.
-                var itemIds = _context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Select(item => item.Id)
-                    .ToList();
                 // Define a new background task.
-                var task = new BackgroundTask
+                var backgroundTask = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.Now,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteEdges)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllEdges)}",
                     IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new EdgesTask
-                    {
-                        Items = itemIds.Select(item => new EdgeInputModel
-                        {
-                            Id = item
-                        })
-                    })
+                    Data = JsonSerializer.Serialize(new EdgesTask())
                 };
                 // Mark the background task for addition.
-                _context.BackgroundTasks.Add(task);
+                _context.BackgroundTasks.Add(backgroundTask);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteEdges(task.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllEdges(backgroundTask.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("NodeCollections"))
             {
-                // Get the item IDs.
-                var itemIds = _context.NodeCollections
-                    .Select(item => item.Id)
-                    .ToList();
                 // Define a new background task.
-                var task = new BackgroundTask
+                var backgroundTask = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.Now,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNodeCollections)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllNodeCollections)}",
                     IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new NodeCollectionsTask
-                    {
-                        Items = itemIds.Select(item => new NodeCollectionInputModel
-                        {
-                            Id = item
-                        })
-                    })
+                    Data = JsonSerializer.Serialize(new NodeCollectionsTask())
                 };
                 // Mark the background task for addition.
-                _context.BackgroundTasks.Add(task);
+                _context.BackgroundTasks.Add(backgroundTask);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNodeCollections(task.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllNodeCollections(backgroundTask.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Networks"))
             {
-                // Get the item IDs.
-                var itemIds = _context.Networks
-                    .Select(item => item.Id)
-                    .ToList();
                 // Define a new background task.
-                var task = new BackgroundTask
+                var backgroundTask = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.Now,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNetworks)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllNetworks)}",
                     IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new NetworksTask
-                    {
-                        Items = itemIds.Select(item => new NetworkInputModel
-                        {
-                            Id = item
-                        })
-                    })
+                    Data = JsonSerializer.Serialize(new NetworksTask())
                 };
                 // Mark the background task for addition.
-                _context.BackgroundTasks.Add(task);
+                _context.BackgroundTasks.Add(backgroundTask);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNetworks(task.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllNetworks(backgroundTask.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Analyses"))
             {
-                // Get the item IDs.
-                var itemIds = _context.Analyses
-                    .Select(item => item.Id)
-                    .ToList();
                 // Define a new background task.
-                var task = new BackgroundTask
+                var backgroundTask = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.Now,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAnalyses)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllAnalyses)}",
                     IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new AnalysesTask
-                    {
-                        Items = itemIds.Select(item => new AnalysisInputModel
-                        {
-                            Id = item
-                        })
-                    })
+                    Data = JsonSerializer.Serialize(new AnalysesTask())
                 };
                 // Mark the background task for addition.
-                _context.BackgroundTasks.Add(task);
+                _context.BackgroundTasks.Add(backgroundTask);
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAnalyses(task.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllAnalyses(backgroundTask.Id, CancellationToken.None));
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: A new background task was created to delete {string.Join(" and ", deleteItems.Select(item => $"all {item.ToLower()}"))}.";
+            TempData["StatusMessage"] = $"Success: A new background task was created to delete {string.Join(" and ", deleteItems.Select(item => $"all {item}"))}.";
             // Redirect to the page.
             return RedirectToPage();
         }

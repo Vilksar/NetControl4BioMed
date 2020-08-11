@@ -48,7 +48,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<NodesTask>(backgroundTask);
+            var task = GetTask<NodesTask>(backgroundTask);
             // Run the task.
             _ = task.Create(_serviceProvider, token).ToList();
             // Complete the task.
@@ -65,7 +65,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<EdgesTask>(backgroundTask);
+            var task = GetTask<EdgesTask>(backgroundTask);
             // Run the task.
             _ = task.Create(_serviceProvider, token).ToList();
             // Complete the task.
@@ -82,7 +82,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<NodeCollectionsTask>(backgroundTask);
+            var task = GetTask<NodeCollectionsTask>(backgroundTask);
             // Run the task.
             _ = task.Create(_serviceProvider, token).ToList();
             // Complete the task.
@@ -99,7 +99,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<NodesTask>(backgroundTask);
+            var task = GetTask<NodesTask>(backgroundTask);
             // Run the task.
             _ = task.Edit(_serviceProvider, token).ToList();
             // Complete the task.
@@ -116,7 +116,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<EdgesTask>(backgroundTask);
+            var task = GetTask<EdgesTask>(backgroundTask);
             // Run the task.
             _ = task.Edit(_serviceProvider, token).ToList();
             // Complete the task.
@@ -133,7 +133,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<NodeCollectionsTask>(backgroundTask);
+            var task = GetTask<NodeCollectionsTask>(backgroundTask);
             // Run the task.
             _ = task.Edit(_serviceProvider, token).ToList();
             // Complete the task.
@@ -150,7 +150,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<UsersTask>(backgroundTask);
+            var task = GetTask<UsersTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -167,7 +167,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<RolesTask>(backgroundTask);
+            var task = GetTask<RolesTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -184,7 +184,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<UserRolesTask>(backgroundTask);
+            var task = GetTask<UserRolesTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -201,7 +201,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<DatabaseUsersTask>(backgroundTask);
+            var task = GetTask<DatabaseUsersTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -218,7 +218,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<DatabaseUserInvitationsTask>(backgroundTask);
+            var task = GetTask<DatabaseUserInvitationsTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -235,7 +235,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<DatabaseTypesTask>(backgroundTask);
+            var task = GetTask<DatabaseTypesTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -252,7 +252,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<DatabasesTask>(backgroundTask);
+            var task = GetTask<DatabasesTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -269,7 +269,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<DatabaseNodeFieldsTask>(backgroundTask);
+            var task = GetTask<DatabaseNodeFieldsTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -286,7 +286,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<DatabaseEdgeFieldsTask>(backgroundTask);
+            var task = GetTask<DatabaseEdgeFieldsTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -303,7 +303,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<NodesTask>(backgroundTask);
+            var task = GetTask<NodesTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -320,7 +320,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<EdgesTask>(backgroundTask);
+            var task = GetTask<EdgesTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -337,7 +337,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<NodeCollectionsTask>(backgroundTask);
+            var task = GetTask<NodeCollectionsTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -354,7 +354,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<NetworksTask>(backgroundTask);
+            var task = GetTask<NetworksTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -371,7 +371,7 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<AnalysesTask>(backgroundTask);
+            var task = GetTask<AnalysesTask>(backgroundTask);
             // Run the task.
             task.Delete(_serviceProvider, token);
             // Complete the task.
@@ -388,9 +388,136 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<AnalysesTask>(backgroundTask);
+            var task = GetTask<AnalysesTask>(backgroundTask);
             // Run the task.
             task.Stop(_serviceProvider, token);
+            // Complete the task.
+            DeleteBackgroundTask(backgroundTask);
+        }
+
+        /// <summary>
+        /// Deletes all nodes from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public void DeleteAllNodes(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<NodesTask>(backgroundTask);
+            // Get all of the item IDs.
+            task.Items = _context.Nodes
+                .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Select(item => item.Id)
+                .ToList()
+                .Select(item => new InputModels.NodeInputModel
+                {
+                    Id = item
+                });
+            // Run the task.
+            task.Delete(_serviceProvider, token);
+            // Complete the task.
+            DeleteBackgroundTask(backgroundTask);
+        }
+
+        /// <summary>
+        /// Deletes all edges from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public void DeleteAllEdges(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<EdgesTask>(backgroundTask);
+            // Get all of the item IDs.
+            task.Items = _context.Edges
+                .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Select(item => item.Id)
+                .ToList()
+                .Select(item => new InputModels.EdgeInputModel
+                {
+                    Id = item
+                });
+            // Run the task.
+            task.Delete(_serviceProvider, token);
+            // Complete the task.
+            DeleteBackgroundTask(backgroundTask);
+        }
+
+        /// <summary>
+        /// Deletes all node collections from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public void DeleteAllNodeCollections(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<NodeCollectionsTask>(backgroundTask);
+            // Get all of the item IDs.
+            task.Items = _context.NodeCollections
+                .Select(item => item.Id)
+                .ToList()
+                .Select(item => new InputModels.NodeCollectionInputModel
+                {
+                    Id = item
+                });
+            // Run the task.
+            task.Delete(_serviceProvider, token);
+            // Complete the task.
+            DeleteBackgroundTask(backgroundTask);
+        }
+
+        /// <summary>
+        /// Deletes all networks from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public void DeleteAllNetworks(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<NetworksTask>(backgroundTask);
+            // Get all of the item IDs.
+            task.Items = _context.Networks
+                .Select(item => item.Id)
+                .ToList()
+                .Select(item => new InputModels.NetworkInputModel
+                {
+                    Id = item
+                });
+            // Run the task.
+            task.Delete(_serviceProvider, token);
+            // Complete the task.
+            DeleteBackgroundTask(backgroundTask);
+        }
+
+        /// <summary>
+        /// Deletes all analyses from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public void DeleteAllAnalyses(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<AnalysesTask>(backgroundTask);
+            // Get all of the item IDs.
+            task.Items = _context.Analyses
+                .Select(item => item.Id)
+                .ToList()
+                .Select(item => new InputModels.AnalysisInputModel
+                {
+                    Id = item
+                });
+            // Run the task.
+            task.Delete(_serviceProvider, token);
             // Complete the task.
             DeleteBackgroundTask(backgroundTask);
         }
@@ -422,7 +549,7 @@ namespace NetControl4BioMed.Helpers.Services
         /// <typeparam name="T">The type of the corresponding task.</typeparam>
         /// <param name="backgroundTask">The current background task.</param>
         /// <returns>The task corresponding to the provided background task.</returns>
-        private T GetBackgroundTask<T>(BackgroundTask backgroundTask)
+        private T GetTask<T>(BackgroundTask backgroundTask)
         {
             // Try to deserialize the task.
             if (!backgroundTask.Data.TryDeserializeJsonObject<T>(out var task) || task == null)
