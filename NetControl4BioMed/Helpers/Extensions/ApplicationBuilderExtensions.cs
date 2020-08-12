@@ -90,18 +90,10 @@ namespace NetControl4BioMed.Helpers.Extensions
                     context.Databases.AddRange(Databases.Seed);
                     // Save the changes.
                     await context.SaveChangesAsync();
-                }
-                // Check if there isn't any entry already defined.
-                if (!context.DatabaseNodeFields.Any())
-                {
                     // Mark the seed data for addition.
                     context.DatabaseNodeFields.AddRange(DatabaseNodeFields.Seed);
                     // Save the changes.
                     await context.SaveChangesAsync();
-                }
-                // Check if there isn't any entry already defined.
-                if (!context.DatabaseEdgeFields.Any())
-                {
                     // Mark the seed data for addition.
                     context.DatabaseEdgeFields.AddRange(DatabaseEdgeFields.Seed);
                     // Save the changes.
