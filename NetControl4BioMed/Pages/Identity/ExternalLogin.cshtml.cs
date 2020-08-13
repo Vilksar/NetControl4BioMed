@@ -223,7 +223,7 @@ namespace NetControl4BioMed.Pages.Identity
             try
             {
                 // Run the task.
-                task.Create(_serviceProvider, CancellationToken.None);
+                _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
             }
             catch (Exception exception)
             {
