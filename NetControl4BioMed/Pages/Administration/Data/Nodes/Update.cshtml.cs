@@ -69,6 +69,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                     new NodeInputModel
                     {
                         Id = "ID",
+                        Name = "Name",
                         Description = "Description",
                         DatabaseNodeFieldNodes = new List<DatabaseNodeFieldNodeInputModel>
                         {
@@ -130,6 +131,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                     new NodeInputModel
                     {
                         Id = "ID",
+                        Name = "Name",
                         Description = "Description",
                         DatabaseNodeFieldNodes = new List<DatabaseNodeFieldNodeInputModel>
                         {

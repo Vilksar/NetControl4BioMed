@@ -13,6 +13,11 @@ namespace NetControl4BioMed.Helpers.InputModels
         public string Id { get; set; }
 
         /// <summary>
+        /// Represents the name of the node.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// Represents the description of the node.
         /// </summary>
         public string Description { get; set; }

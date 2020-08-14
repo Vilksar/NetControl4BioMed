@@ -67,7 +67,7 @@ namespace NetControl4BioMed.Helpers.Exceptions
             if (showExceptionItem)
             {
                 // Update the message.
-                message += (!string.IsNullOrEmpty(message) ? string.Empty : " ") +
+                message += (string.IsNullOrEmpty(message) ? string.Empty : " ") +
                     "The item that triggered the exception will be displayed below." +
                     Environment.NewLine +
                     Environment.NewLine +

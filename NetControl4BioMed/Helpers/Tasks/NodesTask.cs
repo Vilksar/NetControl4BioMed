@@ -133,8 +133,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     var node = new Node
                     {
                         DateTimeCreated = DateTime.Now,
-                        Name = databaseNodeFieldNodes
-                            .FirstOrDefault(item => item.DatabaseNodeField.IsSearchable)?.Value ?? "Unnamed node",
+                        Name = !string.IsNullOrEmpty(batchItem.Name) ? batchItem.Name :
+                            (databaseNodeFieldNodes.FirstOrDefault(item => item.DatabaseNodeField.IsSearchable)?.Value ?? "Unnamed node"),
                         Description = batchItem.Description,
                         DatabaseNodeFieldNodes = databaseNodeFieldNodes.ToList(),
                         DatabaseNodes = databaseNodeFieldNodes
@@ -277,8 +277,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     IQueryableExtensions.Delete(batchDatabaseNodes.Where(item => item.Node == node), context, token);
                     IQueryableExtensions.Delete(batchDatabaseNodeFieldNodes.Where(item => item.Node == node), context, token);
                     // Update the node.
-                    node.Name = databaseNodeFieldNodes
-                            .FirstOrDefault(item => item.DatabaseNodeField.IsSearchable)?.Value ?? "Unnamed node";
+                    node.Name = !string.IsNullOrEmpty(batchItem.Name) ? batchItem.Name :
+                        (databaseNodeFieldNodes.FirstOrDefault(item => item.DatabaseNodeField.IsSearchable)?.Value ?? "Unnamed node");
                     node.Description = batchItem.Description;
                     node.DatabaseNodeFieldNodes = databaseNodeFieldNodes.ToList();
                     node.DatabaseNodes = databaseNodeFieldNodes
