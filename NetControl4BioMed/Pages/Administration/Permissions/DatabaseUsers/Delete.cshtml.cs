@@ -140,7 +140,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
                             Id = item.User.Id
                         }
                     })
-                })
+                }, new JsonSerializerOptions { IgnoreNullValues = true })
             };
             // Mark the task for addition.
             _context.BackgroundTasks.Add(task);

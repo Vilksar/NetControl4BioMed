@@ -1187,6 +1187,11 @@ namespace NetControl4BioMed.Pages.Administration
                 // Redirect to the page.
                 return RedirectToPage();
             }
+            // Define the JSON serializer options.
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                IgnoreNullValues = true
+            };
             // Check the items to delete.
             if (deleteItems.Contains("Nodes"))
             {
@@ -1196,7 +1201,7 @@ namespace NetControl4BioMed.Pages.Administration
                     DateTimeCreated = DateTime.Now,
                     Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllNodes)}",
                     IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new NodesTask())
+                    Data = JsonSerializer.Serialize(new NodesTask(), jsonSerializerOptions)
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(backgroundTask);
@@ -1214,7 +1219,7 @@ namespace NetControl4BioMed.Pages.Administration
                     DateTimeCreated = DateTime.Now,
                     Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllEdges)}",
                     IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new EdgesTask())
+                    Data = JsonSerializer.Serialize(new EdgesTask(), jsonSerializerOptions)
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(backgroundTask);
@@ -1232,7 +1237,7 @@ namespace NetControl4BioMed.Pages.Administration
                     DateTimeCreated = DateTime.Now,
                     Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllNodeCollections)}",
                     IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new NodeCollectionsTask())
+                    Data = JsonSerializer.Serialize(new NodeCollectionsTask(), jsonSerializerOptions)
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(backgroundTask);
@@ -1250,7 +1255,7 @@ namespace NetControl4BioMed.Pages.Administration
                     DateTimeCreated = DateTime.Now,
                     Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllNetworks)}",
                     IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new NetworksTask())
+                    Data = JsonSerializer.Serialize(new NetworksTask(), jsonSerializerOptions)
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(backgroundTask);
@@ -1268,7 +1273,7 @@ namespace NetControl4BioMed.Pages.Administration
                     DateTimeCreated = DateTime.Now,
                     Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllAnalyses)}",
                     IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new AnalysesTask())
+                    Data = JsonSerializer.Serialize(new AnalysesTask(), jsonSerializerOptions)
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(backgroundTask);

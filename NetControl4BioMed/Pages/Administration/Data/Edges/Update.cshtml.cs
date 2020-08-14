@@ -277,7 +277,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                     Data = JsonSerializer.Serialize(new EdgesTask
                     {
                         Items = items
-                    })
+                    }, new JsonSerializerOptions { IgnoreNullValues = true })
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(task);
@@ -310,7 +310,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                     Data = JsonSerializer.Serialize(new EdgesTask
                     {
                         Items = items
-                    })
+                    }, new JsonSerializerOptions { IgnoreNullValues = true })
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(task);
@@ -344,7 +344,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                         {
                             Id = item.Id
                         })
-                    })
+                    }, new JsonSerializerOptions { IgnoreNullValues = true })
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(task);

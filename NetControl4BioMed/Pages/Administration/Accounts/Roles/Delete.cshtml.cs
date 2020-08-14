@@ -137,7 +137,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                     {
                         Id = item.Id
                     })
-                })
+                }, new JsonSerializerOptions { IgnoreNullValues = true })
             };
             // Mark the task for addition.
             _context.BackgroundTasks.Add(task);

@@ -200,7 +200,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                     Data = JsonSerializer.Serialize(new NodesTask
                     {
                         Items = items
-                    })
+                    }, new JsonSerializerOptions { IgnoreNullValues = true })
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(task);
@@ -234,7 +234,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                     Data = JsonSerializer.Serialize(new NodesTask
                     {
                         Items = items
-                    })
+                    }, new JsonSerializerOptions { IgnoreNullValues = true })
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(task);
@@ -269,7 +269,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                         {
                             Id = item.Id
                         })
-                    })
+                    }, new JsonSerializerOptions { IgnoreNullValues = true })
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(task);
