@@ -46,7 +46,7 @@
       ]
     },
     {
-      "library": "twitter-bootstrap@4.5.0",
+      "library": "twitter-bootstrap@4.5.2",
       "destination": "wwwroot/lib/twitter-bootstrap/",
       "files": [
         "js/bootstrap.min.js",
