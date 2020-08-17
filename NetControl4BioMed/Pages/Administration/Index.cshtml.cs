@@ -126,7 +126,15 @@ namespace NetControl4BioMed.Pages.Administration
             _configuration["Data:IssueCount:Duplicate:DatabaseNodeFieldNodes"] = _context.DatabaseNodeFieldNodes
                 .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
                 .Where(item => item.DatabaseNodeField.IsSearchable)
-                .GroupBy(item => item.Value)
+                .GroupBy(item => new { item.DatabaseNodeFieldId, item.Value })
+                .Where(item => item.Count() > 1)
+                .Select(item => item.Key)
+                .Count()
+                .ToString();
+            _configuration["Data:IssueCount:Duplicate:DatabaseEdgeFieldEdges"] = _context.DatabaseEdgeFieldEdges
+                .Where(item => item.DatabaseEdgeField.Database.DatabaseType.Name != "Generic")
+                .Where(item => item.DatabaseEdgeField.IsSearchable)
+                .GroupBy(item => new { item.DatabaseEdgeFieldId, item.Value })
                 .Where(item => item.Count() > 1)
                 .Select(item => item.Key)
                 .Count()
@@ -518,6 +526,7 @@ namespace NetControl4BioMed.Pages.Administration
                 {
                     // Get the required data.
                     var data = _context.Nodes
+                        .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                         .Select(item => new
                         {
                             Id = item.Id,
@@ -556,6 +565,7 @@ namespace NetControl4BioMed.Pages.Administration
                 {
                     // Get the required data.
                     var data = _context.Edges
+                        .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                         .Select(item => new
                         {
                             Id = item.Id,
@@ -655,8 +665,8 @@ namespace NetControl4BioMed.Pages.Administration
                 // Check the items to download.
                 if (downloadItems.Contains("DuplicateDatabaseTypes"))
                 {
-                    // Get the duplicate values.
-                    var values = _context.DatabaseTypes
+                    // Get the duplicate keys.
+                    var keys = _context.DatabaseTypes
                         .Where(item => item.Name != "Generic")
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
@@ -665,24 +675,16 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.DatabaseTypes
                         .Where(item => item.Name != "Generic")
-                        .Where(item => values.Contains(item.Name))
-                        .Select(item => new
-                        {
-                            Id = item.Id,
-                            DateTimeCreated = item.DateTimeCreated,
-                            Name = item.Name,
-                            Description = item.Description,
-                            Databases = item.Databases
-                                .Select(item1 => new
-                                {
-                                    Id = item1.Id,
-                                    Name = item1.Name
-                                })
-                        })
+                        .Where(item => keys.Contains(item.Name))
                         .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
-                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                        .Where(item => item.Count() > 1)
+                        .Select(item => new
+                        {
+                            Key = item.Key,
+                            Values = item.Select(item1 => item1.Id)
+                        });
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-DatabaseTypes.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -691,8 +693,8 @@ namespace NetControl4BioMed.Pages.Administration
                 // Check the items to download.
                 if (downloadItems.Contains("DuplicateDatabases"))
                 {
-                    // Get the duplicate values.
-                    var values = _context.Databases
+                    // Get the duplicate keys.
+                    var keys = _context.Databases
                         .Where(item => item.DatabaseType.Name != "Generic")
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
@@ -701,35 +703,16 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.Databases
                         .Where(item => item.DatabaseType.Name != "Generic")
-                        .Where(item => values.Contains(item.Name))
-                        .Select(item => new
-                        {
-                            Id = item.Id,
-                            DateTimeCreated = item.DateTimeCreated,
-                            Name = item.Name,
-                            Description = item.Description,
-                            DatabaseType = new
-                            {
-                                Id = item.DatabaseType.Id,
-                                Name = item.DatabaseType.Name
-                            },
-                            DatabaseNodeFields = item.DatabaseNodeFields
-                                .Select(item1 => new
-                                {
-                                    Id = item1.Id,
-                                    Name = item1.Name
-                                }),
-                            DatabaseEdgeFields = item.DatabaseEdgeFields
-                                .Select(item1 => new
-                                {
-                                    Id = item1.Id,
-                                    Name = item1.Name
-                                })
-                        })
+                        .Where(item => keys.Contains(item.Name))
                         .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
-                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                        .Where(item => item.Count() > 1)
+                        .Select(item => new
+                        {
+                            Key = item.Key,
+                            Values = item.Select(item1 => item1.Id)
+                        });
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-Databases.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -738,8 +721,8 @@ namespace NetControl4BioMed.Pages.Administration
                 // Check the items to download.
                 if (downloadItems.Contains("DuplicateDatabaseNodeFields"))
                 {
-                    // Get the duplicate values.
-                    var values = _context.DatabaseNodeFields
+                    // Get the duplicate keys.
+                    var keys = _context.DatabaseNodeFields
                         .Where(item => item.Database.DatabaseType.Name != "Generic")
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
@@ -748,32 +731,16 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.DatabaseNodeFields
                         .Where(item => item.Database.DatabaseType.Name != "Generic")
-                        .Where(item => values.Contains(item.Name))
-                        .Select(item => new
-                        {
-                            Id = item.Id,
-                            DateTimeCreated = item.DateTimeCreated,
-                            Name = item.Name,
-                            Description = item.Description,
-                            IsSearchable = item.IsSearchable,
-                            Url = item.Url,
-                            Database = new
-                            {
-                                Id = item.Database.Id,
-                                Name = item.Database.Name
-                            },
-                            DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes
-                                .Select(item1 => new
-                                {
-                                    Id = item1.Node.Id,
-                                    Name = item1.Node.Name,
-                                    Value = item1.Value
-                                })
-                        })
+                        .Where(item => keys.Contains(item.Name))
                         .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
-                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                        .Where(item => item.Count() > 1)
+                        .Select(item => new
+                        {
+                            Key = item.Key,
+                            Values = item.Select(item1 => item1.Id)
+                        });
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-DatabaseNodeFields.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -782,8 +749,8 @@ namespace NetControl4BioMed.Pages.Administration
                 // Check the items to download.
                 if (downloadItems.Contains("DuplicateDatabaseEdgeFields"))
                 {
-                    // Get the duplicate values.
-                    var values = _context.DatabaseEdgeFields
+                    // Get the duplicate keys.
+                    var keys = _context.DatabaseEdgeFields
                         .Where(item => item.Database.DatabaseType.Name != "Generic")
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
@@ -792,31 +759,16 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.DatabaseEdgeFields
                         .Where(item => item.Database.DatabaseType.Name != "Generic")
-                        .Where(item => values.Contains(item.Name))
-                        .Select(item => new
-                        {
-                            Id = item.Id,
-                            DateTimeCreated = item.DateTimeCreated,
-                            Name = item.Name,
-                            Description = item.Description,
-                            Url = item.Url,
-                            Database = new
-                            {
-                                Id = item.Database.Id,
-                                Name = item.Database.Name
-                            },
-                            DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges
-                                .Select(item1 => new
-                                {
-                                    Id = item1.Edge.Id,
-                                    Name = item1.Edge.Name,
-                                    Value = item1.Value
-                                })
-                        })
+                        .Where(item => keys.Contains(item.Name))
                         .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
-                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                        .Where(item => item.Count() > 1)
+                        .Select(item => new
+                        {
+                            Key = item.Key,
+                            Values = item.Select(item1 => item1.Id)
+                        });
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-DatabaseEdgeFields.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -825,47 +777,76 @@ namespace NetControl4BioMed.Pages.Administration
                 // Check the items to download.
                 if (downloadItems.Contains("DuplicateDatabaseNodeFieldNodes"))
                 {
-                    // Get the duplicate values.
-                    var values = _context.DatabaseNodeFieldNodes
+                    // Get the duplicate keys.
+                    var keys = _context.DatabaseNodeFieldNodes
                         .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
                         .Where(item => item.DatabaseNodeField.IsSearchable)
-                        .GroupBy(item => item.Value)
+                        .GroupBy(item => new { DatabaseNodeFieldId = item.DatabaseNodeFieldId, Value = item.Value })
                         .Where(item => item.Count() > 1)
                         .Select(item => item.Key)
                         .ToList();
+                    // Get the duplicate values.
+                    var values = keys
+                        .Select(item => item.Value);
                     // Get the required data.
                     var data = _context.DatabaseNodeFieldNodes
                         .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
                         .Where(item => item.DatabaseNodeField.IsSearchable)
                         .Where(item => values.Contains(item.Value))
-                        .Select(item => new
-                        {
-                            DatabaseNodeField = new
-                            {
-                                Id = item.DatabaseNodeField.Id,
-                                Name = item.DatabaseNodeField.Name
-                            },
-                            Node = new
-                            {
-                                Id = item.Node.Id,
-                                Name = item.Node.Name
-                            },
-                            Value = item.Value
-                        })
                         .AsNoTracking()
                         .AsEnumerable()
-                        .GroupBy(item => item.Value)
-                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                        .Where(item => keys.Any(item1 => item1.DatabaseNodeFieldId == item.DatabaseNodeFieldId && item1.Value == item.Value))
+                        .GroupBy(item => new { item.DatabaseNodeFieldId, item.Value })
+                        .Where(item => item.Count() > 1)
+                        .Select(item => new
+                        {
+                            Key = item.Key,
+                            Values = item.Select(item1 => item1.NodeId)
+                        });
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-DatabaseNodeFieldNodes.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
                     await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
                 }
                 // Check the items to download.
+                if (downloadItems.Contains("DuplicateDatabaseEdgeFieldEdges"))
+                {
+                    // Get the duplicate keys.
+                    var keys = _context.DatabaseEdgeFieldEdges
+                        .Where(item => item.DatabaseEdgeField.Database.DatabaseType.Name != "Generic")
+                        .Where(item => item.DatabaseEdgeField.IsSearchable)
+                        .GroupBy(item => new { DatabaseEdgeFieldId = item.DatabaseEdgeFieldId, Value = item.Value })
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key)
+                        .ToList();
+                    // Get the duplicate values.
+                    var values = keys
+                        .Select(item => item.Value);
+                    // Get the required data.
+                    var data = _context.DatabaseEdgeFieldEdges
+                        .Where(item => item.DatabaseEdgeField.Database.DatabaseType.Name != "Generic")
+                        .Where(item => item.DatabaseEdgeField.IsSearchable)
+                        .Where(item => values.Contains(item.Value))
+                        .AsNoTracking()
+                        .AsEnumerable()
+                        .Where(item => keys.Any(item1 => item1.DatabaseEdgeFieldId == item.DatabaseEdgeFieldId && item1.Value == item.Value))
+                        .GroupBy(item => new { DatabaseEdgeFieldId = item.DatabaseEdgeFieldId, Value = item.Value })
+                        .Where(item => item.Count() > 1)
+                        .Select(item => new
+                        {
+                            Key = item.Key,
+                            Values = item.Select(item1 => item1.EdgeId)
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-DatabaseEdgeFieldEdges.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
                 if (downloadItems.Contains("DuplicateNodes"))
                 {
-                    // Get the duplicate values.
-                    var values = _context.Nodes
+                    // Get the duplicate keys.
+                    var keys = _context.Nodes
                         .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
@@ -874,38 +855,16 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.Nodes
                         .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                        .Where(item => values.Contains(item.Name))
-                        .Select(item => new
-                        {
-                            Id = item.Id,
-                            DateTimeCreated = item.DateTimeCreated,
-                            Name = item.Name,
-                            Description = item.Description,
-                            Databases = item.DatabaseNodes
-                                .Select(item1 => new
-                                {
-                                    Id = item1.Database.Id,
-                                    Name = item1.Database.Name
-                                }),
-                            DatabaseNodeFieldNodes = item.DatabaseNodeFieldNodes
-                                .Select(item1 => new
-                                {
-                                    Id = item1.DatabaseNodeField.Id,
-                                    Name = item1.DatabaseNodeField.Name,
-                                    Value = item1.Value
-                                }),
-                            EdgeNodes = item.EdgeNodes
-                                .Select(item1 => new
-                                {
-                                    Id = item1.Edge.Id,
-                                    Name = item1.Edge.Name,
-                                    Type = item1.Type.ToString()
-                                })
-                        })
+                        .Where(item => keys.Contains(item.Name))
                         .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
-                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                        .Where(item => item.Count() > 1)
+                        .Select(item => new
+                        {
+                            Key = item.Key,
+                            Values = item.Select(item1 => item1.Id)
+                        });
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-Nodes.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -914,8 +873,8 @@ namespace NetControl4BioMed.Pages.Administration
                 // Check the items to download.
                 if (downloadItems.Contains("DuplicateEdges"))
                 {
-                    // Get the duplicate values.
-                    var values = _context.Edges
+                    // Get the duplicate keys.
+                    var keys = _context.Edges
                         .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
@@ -924,38 +883,16 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.Edges
                         .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                        .Where(item => values.Contains(item.Name))
-                        .Select(item => new
-                        {
-                            Id = item.Id,
-                            DateTimeCreated = item.DateTimeCreated,
-                            Name = item.Name,
-                            Description = item.Description,
-                            Databases = item.DatabaseEdges
-                                .Select(item1 => new
-                                {
-                                    Id = item1.Database.Id,
-                                    Name = item1.Database.Name
-                                }),
-                            DatabaseEdgeFieldEdges = item.DatabaseEdgeFieldEdges
-                                .Select(item1 => new
-                                {
-                                    Id = item1.DatabaseEdgeField.Id,
-                                    Name = item1.DatabaseEdgeField.Name,
-                                    Value = item1.Value
-                                }),
-                            EdgeNodes = item.EdgeNodes
-                                .Select(item1 => new
-                                {
-                                    Id = item1.Node.Id,
-                                    Name = item1.Node.Name,
-                                    Type = item1.Type.GetDisplayName()
-                                })
-                        })
+                        .Where(item => keys.Contains(item.Name))
                         .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
-                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                        .Where(item => item.Count() > 1)
+                        .Select(item => new
+                        {
+                            Key = item.Key,
+                            Values = item.Select(item1 => item1.Id)
+                        });
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-Edges.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -964,32 +901,24 @@ namespace NetControl4BioMed.Pages.Administration
                 // Check the items to download.
                 if (downloadItems.Contains("DuplicateNodeCollections"))
                 {
-                    // Get the duplicate values.
-                    var values = _context.NodeCollections
+                    // Get the duplicate keys.
+                    var keys = _context.NodeCollections
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
                         .Select(item => item.Key)
                         .ToList();
                     // Get the required data.
                     var data = _context.NodeCollections
-                        .Where(item => values.Contains(item.Name))
-                        .Select(item => new
-                        {
-                            Id = item.Id,
-                            DateTimeCreated = item.DateTimeCreated,
-                            Name = item.Name,
-                            Description = item.Description,
-                            NodeCollectionNodes = item.NodeCollectionNodes
-                                .Select(item1 => new
-                                {
-                                    Id = item1.Node.Id,
-                                    Name = item1.Node.Name
-                                })
-                        })
+                        .Where(item => keys.Contains(item.Name))
                         .AsNoTracking()
                         .AsEnumerable()
                         .GroupBy(item => item.Name)
-                        .ToDictionary(item => item.Key, item => item.Select(item1 => item1));
+                        .Where(item => item.Count() > 1)
+                        .Select(item => new
+                        {
+                            Key = item.Key,
+                            Values = item.Select(item1 => item1.Id)
+                        });
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-NodeCollections.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
@@ -1001,10 +930,7 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.Nodes
                         .Where(item => !item.DatabaseNodeFieldNodes.Any())
-                        .Select(item => new
-                        {
-                            Id = item.Id
-                        })
+                        .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Nodes.json", CompressionLevel.Fastest).Open();
@@ -1017,10 +943,7 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.Edges
                         .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
-                        .Select(item => new
-                        {
-                            Id = item.Id
-                        })
+                        .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Edges.json", CompressionLevel.Fastest).Open();
@@ -1033,10 +956,7 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.NodeCollections
                         .Where(item => !item.NodeCollectionNodes.Any())
-                        .Select(item => new
-                        {
-                            Id = item.Id
-                        })
+                        .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-NodeCollections.json", CompressionLevel.Fastest).Open();
@@ -1049,10 +969,7 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.Networks
                         .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any())
-                        .Select(item => new
-                        {
-                            Id = item.Id
-                        })
+                        .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Networks.json", CompressionLevel.Fastest).Open();
@@ -1065,10 +982,7 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.Analyses
                         .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any())
-                        .Select(item => new
-                        {
-                            Id = item.Id
-                        })
+                        .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Analyses.json", CompressionLevel.Fastest).Open();
@@ -1081,10 +995,7 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.Nodes
                         .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                        .Select(item => new
-                        {
-                            Id = item.Id
-                        })
+                        .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Nodes.json", CompressionLevel.Fastest).Open();
@@ -1097,10 +1008,7 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.Edges
                         .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                        .Select(item => new
-                        {
-                            Id = item.Id
-                        })
+                        .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Edges.json", CompressionLevel.Fastest).Open();
@@ -1113,10 +1021,7 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.NodeCollections
                         .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                        .Select(item => new
-                        {
-                            Id = item.Id
-                        })
+                        .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-NodeCollections.json", CompressionLevel.Fastest).Open();
@@ -1129,10 +1034,7 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.Networks
                         .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                        .Select(item => new
-                        {
-                            Id = item.Id
-                        })
+                        .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Networks.json", CompressionLevel.Fastest).Open();
@@ -1145,10 +1047,7 @@ namespace NetControl4BioMed.Pages.Administration
                     // Get the required data.
                     var data = _context.Analyses
                         .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                        .Select(item => new
-                        {
-                            Id = item.Id
-                        })
+                        .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Analyses.json", CompressionLevel.Fastest).Open();

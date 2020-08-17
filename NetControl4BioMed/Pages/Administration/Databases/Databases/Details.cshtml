@@ -109,7 +109,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database is currently assigned to @Model.View.UserCount user@(Model.View.UserCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the users</a>, or <a asp-page="/Administration/Permissions/DatabaseUsers/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
+            <span>The database is currently assigned to @Model.View.UserCount user@(Model.View.UserCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the users</a>, or <a asp-page="/Administration/Permissions/DatabaseUsers/Create" asp-route-databaseId="@Model.View.Database.Id" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>
@@ -127,7 +127,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database is currently assigned to @Model.View.UserInvitationCount user invitation@(Model.View.UserInvitationCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the user invitations</a>, or <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
+            <span>The database is currently assigned to @Model.View.UserInvitationCount user invitation@(Model.View.UserInvitationCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the user invitations</a>, or <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Create" asp-route-databaseId="@Model.View.Database.Id" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>
@@ -145,7 +145,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.DatabaseNodeFieldCount database node field@(Model.View.DatabaseNodeFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseNodeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the database node fields</a>, or <a asp-page="/Administration/Databases/DatabaseNodeFields/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
+            <span>The database currently contains @Model.View.DatabaseNodeFieldCount database node field@(Model.View.DatabaseNodeFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseNodeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the database node fields</a>, or <a asp-page="/Administration/Databases/DatabaseNodeFields/Create" asp-route-databaseId="@Model.View.Database.Id" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>
@@ -163,7 +163,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.DatabaseEdgeFieldCount database edge field@(Model.View.DatabaseEdgeFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseEdgeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the database edge fields</a>, or <a asp-page="/Administration/Databases/DatabaseEdgeFields/Create" asp-route-databaseString="@Model.View.Database.Name" class="alert-link">add a new one</a>.</span>
+            <span>The database currently contains @Model.View.DatabaseEdgeFieldCount database edge field@(Model.View.DatabaseEdgeFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseEdgeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the database edge fields</a>, or <a asp-page="/Administration/Databases/DatabaseEdgeFields/Create" asp-route-databaseId="@Model.View.Database.Id" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>

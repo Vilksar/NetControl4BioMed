@@ -545,9 +545,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => item.DatabaseNodes.Any(item1 => nodeDatabaseIds.Contains(item1.Database.Id)));
                     // Get the nodes by identifier.
                     var sourceNodesByIdentifier = availableNodes
-                        .Where(item => sourceNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => sourceNodeIdentifiers.Contains(item1.Value)));
+                        .Where(item => sourceNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.IsSearchable && sourceNodeIdentifiers.Contains(item1.Value)));
                     var targetNodesByIdentifier = availableNodes
-                        .Where(item => targetNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => targetNodeIdentifiers.Contains(item1.Value)));
+                        .Where(item => targetNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.IsSearchable && targetNodeIdentifiers.Contains(item1.Value)));
                     // Get the nodes by node collection.
                     var sourceNodesByNodeCollection = availableNodes
                         .Where(item => item.NodeCollectionNodes.Any(item1 => sourceNodeCollectionIds.Contains(item1.NodeCollection.Id)));

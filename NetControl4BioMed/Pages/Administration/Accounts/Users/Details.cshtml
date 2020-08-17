@@ -73,7 +73,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The user is currently assigned to @Model.View.RoleCount role@(Model.View.RoleCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Accounts/UserRoles/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="alert-link">view the roles</a>, or <a asp-page="/Administration/Accounts/UserRoles/Create" asp-route-userString="@Model.View.User.Email" class="alert-link">add a new one</a>.</span>
+            <span>The user is currently assigned to @Model.View.RoleCount role@(Model.View.RoleCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Accounts/UserRoles/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="alert-link">view the roles</a>, or <a asp-page="/Administration/Accounts/UserRoles/Create" asp-route-userId="@Model.View.User.Id" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>
@@ -91,7 +91,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The user is currently assigned to @Model.View.DatabaseCount database@(Model.View.DatabaseCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="alert-link">view the databases</a>, or <a asp-page="/Administration/Permissions/DatabaseUsers/Create" asp-route-userString="@Model.View.User.Email" class="alert-link">add a new one</a>.</span>
+            <span>The user is currently assigned to @Model.View.DatabaseCount database@(Model.View.DatabaseCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="alert-link">view the databases</a>, or <a asp-page="/Administration/Permissions/DatabaseUsers/Create" asp-route-userId="@Model.View.User.Id" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>

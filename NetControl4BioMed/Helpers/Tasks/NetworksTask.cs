@@ -676,7 +676,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Where(item => item.DatabaseNodes.Any(item1 => nodeDatabaseIds.Contains(item1.Database.Id)));
                         // Get the seed nodes.
                         var seedNodesByIdentifier = availableNodes
-                            .Where(item => seedNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => seedNodeIdentifiers.Contains(item1.Value)));
+                            .Where(item => seedNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.IsSearchable && seedNodeIdentifiers.Contains(item1.Value)));
                         var seedNodesByNodeCollection = availableNodes
                             .Where(item => item.NodeCollectionNodes.Any(item1 => seedNodeCollectionIds.Contains(item1.NodeCollection.Id)));
                         var seedNodes = seedNodesByIdentifier
