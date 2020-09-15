@@ -513,7 +513,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             // Define the new background tasks.
             var generateBackgroundTask = new BackgroundTask
             {
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.GenerateAnalyses)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new AnalysesTask
@@ -526,7 +526,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             };
             var startBackgroundTask = new BackgroundTask
             {
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.StartAnalyses)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new AnalysesTask
@@ -539,7 +539,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             };
             var sendEndedEmailsBackgroundTask = new BackgroundTask
             {
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.SendEndedEmails)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new AnalysesTask

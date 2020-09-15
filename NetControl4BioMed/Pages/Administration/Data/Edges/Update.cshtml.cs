@@ -272,7 +272,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 // Define a new background task.
                 var task = new BackgroundTask
                 {
-                    DateTimeCreated = DateTime.Now,
+                    DateTimeCreated = DateTime.UtcNow,
                     Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.CreateEdges)}",
                     Data = JsonSerializer.Serialize(new EdgesTask
                     {
@@ -305,7 +305,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 // Define a new background task.
                 var task = new BackgroundTask
                 {
-                    DateTimeCreated = DateTime.Now,
+                    DateTimeCreated = DateTime.UtcNow,
                     Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.EditEdges)}",
                     Data = JsonSerializer.Serialize(new EdgesTask
                     {
@@ -336,7 +336,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 // Define a new background task.
                 var task = new BackgroundTask
                 {
-                    DateTimeCreated = DateTime.Now,
+                    DateTimeCreated = DateTime.UtcNow,
                     Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteEdges)}",
                     Data = JsonSerializer.Serialize(new EdgesTask
                     {

@@ -113,7 +113,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new item.
                     var databaseUserInvitation = new DatabaseUserInvitation
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         DatabaseId = database.Id,
                         Database = database,
                         Email = batchItem.Email

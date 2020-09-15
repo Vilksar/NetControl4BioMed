@@ -165,22 +165,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id)
                 .FirstOrDefault();
-            // Check if there was no item found.
-            if (item == null)
-            {
-                // Return an empty result.
-                return new JsonResult(new { });
-            }
             // Return the analysis data.
             return new JsonResult(new
             {
-                Status = item.Status.ToString(),
-                Progress = ((double)item.CurrentIteration * 100 / item.MaximumIterations).ToString("0.00"),
-                ProgressWithoutImprovement = ((double)item.CurrentIterationWithoutImprovement * 100 / item.MaximumIterationsWithoutImprovement).ToString("0.00"),
-                DateTimeCreated = item.DateTimeCreated != null ? item.DateTimeCreated.ToString() : "--/--/---- --:--:--",
-                DateTimeElapsed = item.DateTimeStarted != null ? ((item.DateTimeEnded ?? DateTime.Now) - item.DateTimeStarted).ToString() : "--:--:--.-------",
-                DateTimeStarted = item.DateTimeStarted != null ? item.DateTimeStarted.ToString() : "--/--/---- --:--:--",
-                DateTimeEnded = item.DateTimeEnded != null ? item.DateTimeEnded.ToString() : "--/--/---- --:--:--"
+                Status = item != null ? item.Status.ToString() : string.Empty,
+                Progress = item != null ? ((double)item.CurrentIteration * 100 / item.MaximumIterations).ToString("0.00") : "0.00",
+                ProgressWithoutImprovement = item != null ? ((double)item.CurrentIterationWithoutImprovement * 100 / item.MaximumIterationsWithoutImprovement).ToString("0.00") : "0.00",
+                DateTimeElapsed = item != null && item.DateTimeStarted != null ? ((item.DateTimeEnded ?? DateTime.UtcNow) - item.DateTimeStarted).ToString() : "--:--:--.-------"
             });
         }
     }

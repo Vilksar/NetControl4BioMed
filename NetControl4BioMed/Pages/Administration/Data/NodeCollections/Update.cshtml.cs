@@ -217,7 +217,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 // Define a new background task.
                 var task = new BackgroundTask
                 {
-                    DateTimeCreated = DateTime.Now,
+                    DateTimeCreated = DateTime.UtcNow,
                     Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.CreateNodeCollections)}",
                     Data = JsonSerializer.Serialize(new NodeCollectionsTask
                     {
@@ -250,7 +250,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 // Define a new background task.
                 var task = new BackgroundTask
                 {
-                    DateTimeCreated = DateTime.Now,
+                    DateTimeCreated = DateTime.UtcNow,
                     Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.EditNodeCollections)}",
                     Data = JsonSerializer.Serialize(new NodeCollectionsTask
                     {
@@ -280,7 +280,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 // Define a new background task.
                 var task = new BackgroundTask
                 {
-                    DateTimeCreated = DateTime.Now,
+                    DateTimeCreated = DateTime.UtcNow,
                     Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNodeCollections)}",
                     Data = JsonSerializer.Serialize(new NodeCollectionsTask
                     {

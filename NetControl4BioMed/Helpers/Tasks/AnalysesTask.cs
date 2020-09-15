@@ -153,7 +153,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => batchUsers.Any(item1 => item1.Id == item))
                         .Select(item => new AnalysisUser
                         {
-                            DateTimeCreated = DateTime.Now,
+                            DateTimeCreated = DateTime.UtcNow,
                             UserId = item,
                             User = batchUsers
                                 .FirstOrDefault(item1 => item1.Id == item)
@@ -255,7 +255,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new item.
                     var analysis = new Analysis
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         Name = batchItem.Name,
                         Description = batchItem.Description,
                         Status = AnalysisStatus.Defined,
@@ -712,9 +712,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Update the analysis status.
                         analysis.Status = AnalysisStatus.Error;
                         // Update the start time.
-                        analysis.DateTimeStarted = DateTime.Now;
+                        analysis.DateTimeStarted = DateTime.UtcNow;
                         // Update the end time.
-                        analysis.DateTimeEnded = DateTime.Now;
+                        analysis.DateTimeEnded = DateTime.UtcNow;
                         // Edit the analysis.
                         IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                         // Continue.
@@ -742,9 +742,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 // Update the analysis status.
                                 analysis.Status = AnalysisStatus.Error;
                                 // Update the start time.
-                                analysis.DateTimeStarted = DateTime.Now;
+                                analysis.DateTimeStarted = DateTime.UtcNow;
                                 // Update the end time.
-                                analysis.DateTimeEnded = DateTime.Now;
+                                analysis.DateTimeEnded = DateTime.UtcNow;
                                 // Edit the analysis.
                                 IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                                 // End the switch.
@@ -766,9 +766,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Update the analysis status.
                         analysis.Status = AnalysisStatus.Error;
                         // Update the start time, if needed.
-                        analysis.DateTimeStarted = analysis.DateTimeStarted ?? DateTime.Now;
+                        analysis.DateTimeStarted = analysis.DateTimeStarted ?? DateTime.UtcNow;
                         // Update the end time.
-                        analysis.DateTimeEnded = DateTime.Now;
+                        analysis.DateTimeEnded = DateTime.UtcNow;
                         // Edit the analysis.
                         IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                         // Continue.

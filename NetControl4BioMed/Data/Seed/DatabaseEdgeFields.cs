@@ -21,7 +21,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseEdgeField
             {
                 Id = "295790d1-b331-49ca-af2c-75358a82d6bd",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "Generic Name",
                 Description = "The name of a generic edge.",
                 IsSearchable = true,
@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseEdgeField
             {
                 Id = "3025373a-3e4f-4ff3-ae9c-8004fefe1e5a",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "InnateDB Interaction ID",
                 Description = "The unique identifier of an interaction in the InnateDB database.",
                 IsSearchable = true,
@@ -42,7 +42,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseEdgeField
             {
                 Id = "1ef7f744-1950-4cd8-8f3d-be5e9fc865aa",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "InnateDB Detection Method",
                 Description = "The detection method of an interaction in the InnateDB database.",
                 IsSearchable = false,
@@ -52,7 +52,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseEdgeField
             {
                 Id = "2bbaf190-4163-44ee-b5ad-8857d88fb807",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "InnateDB Type",
                 Description = "The type of an interaction in the InnateDB database.",
                 IsSearchable = false,
@@ -62,7 +62,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseEdgeField
             {
                 Id = "2071289a-9f19-4ccc-8e45-e2910ea148ed",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "InnateDB PubMed ID",
                 Description = "The PubMed identifier of an interaction in the InnateDB database.",
                 IsSearchable = false,
@@ -73,7 +73,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseEdgeField
             {
                 Id = "4f336cea-4a9a-4ec4-92af-30220ae1e4af",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "KEGG Type",
                 Description = "The type of an interaction in the KEGG database.",
                 IsSearchable = false,
@@ -84,7 +84,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseEdgeField
             {
                 Id = "00d28f76-a6ee-4c74-81f6-4fcea29b5784",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "Omnipath Type",
                 Description = "The type of an interaction in the OmniPath database.",
                 IsSearchable = false,
@@ -95,7 +95,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseEdgeField
             {
                 Id = "dc9f99c8-b224-4601-a544-e228a345efd8",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "SIGNOR Interaction ID",
                 Description = "The unique identifier of an interaction in the SIGNOR database.",
                 IsSearchable = true,
@@ -105,7 +105,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseEdgeField
             {
                 Id = "72fc282b-204e-419b-a5eb-f5ca06829032",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "SIGNOR Mechanism",
                 Description = "The mechanism of an interaction in the SIGNOR database.",
                 IsSearchable = false,
@@ -115,7 +115,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseEdgeField
             {
                 Id = "6e61d143-0afe-4077-a975-a789bd49588c",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "SIGNOR Effect",
                 Description = "The effect of an interaction in the SIGNOR database.",
                 IsSearchable = false,
@@ -125,7 +125,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseEdgeField
             {
                 Id = "a1708263-24a2-4bff-b264-e721110b9085",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "SIGNOR PubMed ID",
                 Description = "The PubMed identifier of an interaction in the SIGNOR database.",
                 IsSearchable = false,
@@ -136,7 +136,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseEdgeField
             {
                 Id = "34c047b5-4d95-49f8-a98b-5ca9e1fb77c0",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "STRING Mode",
                 Description = "The mode of an interaction in the STRING database.",
                 IsSearchable = false,

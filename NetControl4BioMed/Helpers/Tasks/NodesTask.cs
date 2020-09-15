@@ -132,7 +132,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new node.
                     var node = new Node
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         Name = !string.IsNullOrEmpty(batchItem.Name) ? batchItem.Name :
                             (databaseNodeFieldNodes.FirstOrDefault(item => item.DatabaseNodeField.IsSearchable)?.Value ?? "Unnamed node"),
                         Description = batchItem.Description,

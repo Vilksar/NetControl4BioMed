@@ -115,7 +115,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new item.
                     var databaseUser = new DatabaseUser
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         DatabaseId = database.Id,
                         Database = database,
                         UserId = user.Id,

@@ -419,7 +419,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 }
             })
             {
-                FileDownloadName = $"NetControl4BioMed-Networks.zip"
+                FileDownloadName = $"NetControl4BioMed-Networks-{DateTime.UtcNow:yyyyMMdd}.zip"
             };
         }
     }

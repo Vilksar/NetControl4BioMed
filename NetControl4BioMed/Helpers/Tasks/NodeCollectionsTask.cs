@@ -165,7 +165,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new node collection.
                     var nodeCollection = new NodeCollection
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         Name = batchItem.Name,
                         Description = batchItem.Description,
                         NodeCollectionDatabases = nodeCollectionDatabases.ToList(),

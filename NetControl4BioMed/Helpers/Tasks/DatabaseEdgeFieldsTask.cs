@@ -126,7 +126,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new item.
                     var databaseEdgeField = new DatabaseEdgeField
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         Name = batchItem.Name,
                         Description = batchItem.Description,
                         Url = batchItem.Url,

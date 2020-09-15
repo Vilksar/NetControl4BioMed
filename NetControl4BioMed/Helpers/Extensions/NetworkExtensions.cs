@@ -27,10 +27,10 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// </summary>
         /// <param name="network">The current network.</param>
         /// <returns>The log of the network.</returns>
-        public static List<string> GetLog(this Network network)
+        public static List<LogEntryViewModel> GetLog(this Network network)
         {
             // Return the list of log entries.
-            return JsonSerializer.Deserialize<List<string>>(network.Log);
+            return JsonSerializer.Deserialize<List<LogEntryViewModel>>(network.Log);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace NetControl4BioMed.Helpers.Extensions
         public static string AppendToLog(this Network network, string message)
         {
             // Return the log entries with the message appended.
-            return JsonSerializer.Serialize(network.GetLog().Append($"{DateTime.Now}: {message}"));
+            return JsonSerializer.Serialize(network.GetLog().Append(new LogEntryViewModel { DateTime = DateTime.UtcNow, Message = message }));
         }
 
         /// <summary>

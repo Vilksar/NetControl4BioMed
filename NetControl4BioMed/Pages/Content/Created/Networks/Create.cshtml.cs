@@ -586,7 +586,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             // Define a new background task.
             var generateBackgroundTask = new BackgroundTask
             {
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.GenerateNetworks)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new NetworksTask

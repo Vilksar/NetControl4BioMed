@@ -21,7 +21,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "f5981a1b-5644-4e5b-ba4d-60db4dcc9d4d",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "Generic Name",
                 Description = "The name of a generic node.",
                 IsSearchable = true,
@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "e34b7069-9615-4542-94ac-307f39e16565",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "DrugBank Drug ID",
                 Description = "The unique identifier of a drug in the DrugBank database.",
                 IsSearchable = false,
@@ -42,7 +42,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "e79c519a-e42a-4733-aafa-f105dde8aab7",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "DrugBank Drug Name",
                 Description = "The name of a drug in the DrugBank database.",
                 IsSearchable = false,
@@ -53,7 +53,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "ae539cf2-305d-442e-94ed-0fed9a391f2f",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "Ensembl ID",
                 Description = "The unique identifier of a gene in the Ensembl database.",
                 IsSearchable = true,
@@ -64,7 +64,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "197aee65-46ae-4782-a58d-7ce04c4d7f12",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "HGNC ID",
                 Description = "The unique identifier of a gene in the HGNC database.",
                 IsSearchable = true,
@@ -74,7 +74,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "27687402-74fa-4b37-a05f-ca4687302228",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "HGNC Symbol",
                 Description = "The symbol of a gene in the HGNC database.",
                 IsSearchable = true,
@@ -84,7 +84,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "46e37350-d022-448d-afe8-52ffe3778a09",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "HGNC Name",
                 Description = "The name of a gene in the HGNC database.",
                 IsSearchable = true,
@@ -94,7 +94,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "49a35149-21a8-4286-a28d-372faeadae43",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "HGNC Alias",
                 Description = "The alias of a gene in the HGNC database.",
                 IsSearchable = false,
@@ -105,7 +105,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "d575fa61-b5fb-405c-82c5-48ca9500f954",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "InnateDB ID",
                 Description = "The unique identifier of a gene in the InnateDB database.",
                 IsSearchable = true,
@@ -116,7 +116,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "e10c5e37-025f-412c-9de1-7e6f8a6552cc",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "KEGG ID",
                 Description = "The unique identifier of a gene in the KEGG database.",
                 IsSearchable = true,
@@ -127,7 +127,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "cb214a7e-4de7-4014-987b-9cb64d0e2012",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "NCBI ID",
                 Description = "The unique identifier of a gene in the NCBI database.",
                 IsSearchable = true,
@@ -138,7 +138,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "c6947ee0-f6cd-4643-85c3-2f87df12e22a",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "UniProt ID",
                 Description = "The unique identifier of a gene in the UniProt database.",
                 IsSearchable = true,
@@ -148,7 +148,7 @@ namespace NetControl4BioMed.Data.Seed
             new DatabaseNodeField
             {
                 Id = "c9123bef-0bd5-4362-9cd7-9a42cad0d959",
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = "UniProt Title",
                 Description = "The title of a gene in the UniProt database.",
                 IsSearchable = true,

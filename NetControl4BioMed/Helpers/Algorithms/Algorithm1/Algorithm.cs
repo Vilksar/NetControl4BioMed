@@ -27,7 +27,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             // Update the analysis status and stats.
             analysis.ControlPaths = new List<ControlPath>();
             analysis.Status = AnalysisStatus.Initializing;
-            analysis.DateTimeStarted = DateTime.Now;
+            analysis.DateTimeStarted = DateTime.UtcNow;
             // Update the analysis.
             IEnumerableExtensions.Edit(analysis.Yield(), context, token);
             // Reload the analysis for a fresh start.
@@ -75,7 +75,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 // Update the analysis status.
                 analysis.Status = AnalysisStatus.Error;
                 // Update the analysis end time.
-                analysis.DateTimeEnded = DateTime.Now;
+                analysis.DateTimeEnded = DateTime.UtcNow;
                 // Update the analysis.
                 IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // End the function.
@@ -89,7 +89,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 // Update the analysis status.
                 analysis.Status = AnalysisStatus.Error;
                 // Update the analysis end time.
-                analysis.DateTimeEnded = DateTime.Now;
+                analysis.DateTimeEnded = DateTime.UtcNow;
                 // Update the analysis.
                 IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // End the function.
@@ -103,7 +103,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 // Update the analysis status.
                 analysis.Status = AnalysisStatus.Error;
                 // Update the analysis end time.
-                analysis.DateTimeEnded = DateTime.Now;
+                analysis.DateTimeEnded = DateTime.UtcNow;
                 // Update the analysis.
                 IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // End the function.
@@ -117,7 +117,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 // Update the analysis status.
                 analysis.Status = AnalysisStatus.Error;
                 // Update the analysis end time.
-                analysis.DateTimeEnded = DateTime.Now;
+                analysis.DateTimeEnded = DateTime.UtcNow;
                 // Update the analysis.
                 IEnumerableExtensions.Edit(analysis.Yield(), context, token);
                 // End the function.
@@ -351,7 +351,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             // Update the analysis.
             analysis.ControlPaths = controlPaths;
             analysis.Status = currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement ? AnalysisStatus.Stopped : AnalysisStatus.Completed;
-            analysis.DateTimeEnded = DateTime.Now;
+            analysis.DateTimeEnded = DateTime.UtcNow;
             analysis.Log = analysis.AppendToLog($"The analysis has ended with the status \"{analysis.Status.GetDisplayName()}\".");
             // Update the analysis.
             IEnumerableExtensions.Edit(analysis.Yield(), context, token);

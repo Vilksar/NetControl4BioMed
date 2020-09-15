@@ -205,7 +205,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new edge.
                     var edge = new Edge
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         Name = string.Concat(edgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " - ", edgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name),
                         Description = batchItem.Description,
                         EdgeNodes = new List<EdgeNode>

@@ -125,7 +125,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             // Define a new task.
             var task = new BackgroundTask
             {
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteDatabaseTypes)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new DatabaseTypesTask

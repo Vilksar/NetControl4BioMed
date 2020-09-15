@@ -138,17 +138,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id)
                 .FirstOrDefault();
-            // Check if there was no item found.
-            if (item == null)
-            {
-                // Return an empty result.
-                return new JsonResult(new { });
-            }
             // Return the analysis data.
             return new JsonResult(new
             {
-                Status = item.Status.ToString(),
-                DateTimeCreated = item.DateTimeCreated != null ? item.DateTimeCreated.ToString() : "--/--/---- --:--:--"
+                Status = item != null ? item.Status.ToString() : string.Empty,
             });
         }
     }

@@ -115,7 +115,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new item.
                     var analysisUser = new AnalysisUser
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         AnalysisId = analysis.Id,
                         Analysis = analysis,
                         UserId = user.Id,

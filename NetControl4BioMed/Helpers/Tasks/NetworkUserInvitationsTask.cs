@@ -113,7 +113,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new item.
                     var networkUserInvitation = new NetworkUserInvitation
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         NetworkId = network.Id,
                         Network = network,
                         Email = batchItem.Email

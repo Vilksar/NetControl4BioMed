@@ -150,7 +150,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
             // Define a new task.
             var task = new BackgroundTask
             {
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteUserRoles)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new UserRolesTask

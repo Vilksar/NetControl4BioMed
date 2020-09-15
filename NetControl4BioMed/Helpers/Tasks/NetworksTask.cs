@@ -141,7 +141,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => batchUsers.Any(item1 => item1.Id == item))
                         .Select(item => new NetworkUser
                         {
-                            DateTimeCreated = DateTime.Now,
+                            DateTimeCreated = DateTime.UtcNow,
                             UserId = item,
                             User = batchUsers
                                 .FirstOrDefault(item1 => item1.Id == item)
@@ -212,7 +212,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new item.
                     var network = new Network
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         Name = batchItem.Name,
                         Description = batchItem.Description,
                         Status = NetworkStatus.Defined,
@@ -545,7 +545,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             {
                                 Node = new Node
                                 {
-                                    DateTimeCreated = DateTime.Now,
+                                    DateTimeCreated = DateTime.UtcNow,
                                     Name = item,
                                     Description = $"This is an automatically generated node for the network \"{network.Id}\".",
                                     DatabaseNodes = network.NetworkDatabases
@@ -580,7 +580,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             {
                                 Edge = new Edge
                                 {
-                                    DateTimeCreated = DateTime.Now,
+                                    DateTimeCreated = DateTime.UtcNow,
                                     Name = $"{item.Item1} - {item.Item2}",
                                     Description = $"This is an automatically generated edge for the network \"{network.Id}\".",
                                     DatabaseEdges = network.NetworkDatabases

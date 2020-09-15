@@ -88,7 +88,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     var role = new Role
                     {
                         Name = batchItem.Name,
-                        DateTimeCreated = DateTime.Now
+                        DateTimeCreated = DateTime.UtcNow
                     };
                     // Check if there is any ID provided.
                     if (!string.IsNullOrEmpty(batchItem.Id))

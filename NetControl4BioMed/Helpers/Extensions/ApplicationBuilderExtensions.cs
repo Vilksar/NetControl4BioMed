@@ -39,7 +39,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 var role = new Role
                 {
                     Name = "Administrator",
-                    DateTimeCreated = DateTime.Now
+                    DateTimeCreated = DateTime.UtcNow
                 };
                 // Save it into the database.
                 await roleManager.CreateAsync(role);
@@ -68,7 +68,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                         UserName = item.Email,
                         Email = item.Email,
                         EmailConfirmed = true,
-                        DateTimeCreated = DateTime.Now
+                        DateTimeCreated = DateTime.UtcNow
                     };
                     // Save it into the database.
                     await userManager.CreateAsync(user, item.Password);

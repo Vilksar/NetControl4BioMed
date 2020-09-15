@@ -113,7 +113,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new item.
                     var analysisUserInvitation = new AnalysisUserInvitation
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         AnalysisId = analysis.Id,
                         Analysis = analysis,
                         Email = batchItem.Email

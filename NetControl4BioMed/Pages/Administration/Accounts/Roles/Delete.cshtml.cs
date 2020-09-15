@@ -128,7 +128,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             // Define a new task.
             var task = new BackgroundTask
             {
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteRoles)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new RolesTask

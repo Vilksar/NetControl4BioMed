@@ -418,7 +418,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 }
             })
             {
-                FileDownloadName = $"NetControl4BioMed-Analyses.zip"
+                FileDownloadName = $"NetControl4BioMed-Analyses-{DateTime.UtcNow:yyyyMMdd}.zip"
             };
         }
     }

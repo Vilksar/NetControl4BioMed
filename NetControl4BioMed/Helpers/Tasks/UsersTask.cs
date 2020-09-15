@@ -92,7 +92,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         UserName = batchItem.Email,
                         Email = batchItem.Email,
-                        DateTimeCreated = DateTime.Now
+                        DateTimeCreated = DateTime.UtcNow
                     };
                     // Check if there is any ID provided.
                     if (!string.IsNullOrEmpty(batchItem.Id))

@@ -109,7 +109,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
             // Define a new task.
             var task = new BackgroundTask
             {
-                DateTimeCreated = DateTime.Now,
+                DateTimeCreated = DateTime.UtcNow,
                 Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAnalyses)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new AnalysesTask

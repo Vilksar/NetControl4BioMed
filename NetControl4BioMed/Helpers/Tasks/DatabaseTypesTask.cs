@@ -94,7 +94,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new item.
                     var databaseType = new DatabaseType
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         Name = batchItem.Name,
                         Description = batchItem.Description
                     };

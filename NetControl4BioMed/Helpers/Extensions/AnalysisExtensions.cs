@@ -26,10 +26,10 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// </summary>
         /// <param name="analysis">The current analysis.</param>
         /// <returns>The log of the analysis.</returns>
-        public static List<string> GetLog(this Analysis analysis)
+        public static List<LogEntryViewModel> GetLog(this Analysis analysis)
         {
             // Return the list of log entries.
-            return JsonSerializer.Deserialize<List<string>>(analysis.Log);
+            return JsonSerializer.Deserialize<List<LogEntryViewModel>>(analysis.Log);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace NetControl4BioMed.Helpers.Extensions
         public static string AppendToLog(this Analysis analysis, string message)
         {
             // Return the log entries with the message appended.
-            return JsonSerializer.Serialize(analysis.GetLog().Append($"{DateTime.Now}: {message}"));
+            return JsonSerializer.Serialize(analysis.GetLog().Append(new LogEntryViewModel { DateTime = DateTime.UtcNow, Message = message }));
         }
 
         /// <summary>

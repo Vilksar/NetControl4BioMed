@@ -115,7 +115,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the new item.
                     var networkUser = new NetworkUser
                     {
-                        DateTimeCreated = DateTime.Now,
+                        DateTimeCreated = DateTime.UtcNow,
                         NetworkId = network.Id,
                         Network = network,
                         UserId = user.Id,
