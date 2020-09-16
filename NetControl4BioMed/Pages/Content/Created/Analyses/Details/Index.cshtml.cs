@@ -40,17 +40,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
 
             public Helpers.Algorithms.Algorithm2.Parameters Algorithm2Parameters { get; set; }
 
-            public int UserCount { get; set; }
-
-            public int UserInvitationCount { get; set; }
-
-            public int DatabaseCount { get; set; }
-
-            public int NodeCount { get; set; }
-
-            public int EdgeCount { get; set; }
-
-            public int NodeCollectionCount { get; set; }
+            public Dictionary<string, int?> ItemCount { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -96,30 +86,15 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                         .Count() < AnalysisExtensions.MaximumSizeForVisualization),
                 Algorithm1Parameters = null,
                 Algorithm2Parameters = null,
-                UserCount = items
-                    .Select(item => item.AnalysisUsers)
-                    .SelectMany(item => item)
-                    .Count(),
-                UserInvitationCount = items
-                    .Select(item => item.AnalysisUserInvitations)
-                    .SelectMany(item => item)
-                    .Count(),
-                DatabaseCount = items
-                    .Select(item => item.AnalysisDatabases)
-                    .SelectMany(item => item)
-                    .Count(),
-                NodeCount = items
-                    .Select(item => item.AnalysisNodes)
-                    .SelectMany(item => item)
-                    .Count(item => item.Type == AnalysisNodeType.None),
-                EdgeCount = items
-                    .Select(item => item.AnalysisEdges)
-                    .SelectMany(item => item)
-                    .Count(),
-                NodeCollectionCount = items
-                    .Select(item => item.AnalysisNodeCollections)
-                    .SelectMany(item => item)
-                    .Count()
+                ItemCount = new Dictionary<string, int?>
+                {
+                    { "Users", items.Select(item => item.AnalysisUsers).SelectMany(item => item).Count() },
+                    { "UserInvitations", items.Select(item => item.AnalysisUserInvitations).SelectMany(item => item).Count() },
+                    { "Databases", items.Select(item => item.AnalysisDatabases).SelectMany(item => item).Count() },
+                    { "Nodes", items.Select(item => item.AnalysisNodes).SelectMany(item => item).Count(item => item.Type == AnalysisNodeType.None) },
+                    { "Edges", items.Select(item => item.AnalysisEdges).SelectMany(item => item).Count() },
+                    { "NodeCollections", items.Select(item => item.AnalysisNodeCollections).SelectMany(item => item).Count() }
+                }
             };
             // Check which algorithm is used and try to deserialize the parameters.
             if (View.Analysis.Algorithm == AnalysisAlgorithm.Algorithm1)

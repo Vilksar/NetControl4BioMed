@@ -34,17 +34,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
 
             public bool ShowVisualization { get; set; }
 
-            public int UserCount { get; set; }
-
-            public int UserInvitationCount { get; set; }
-
-            public int DatabaseCount { get; set; }
-
-            public int NodeCount { get; set; }
-
-            public int EdgeCount { get; set; }
-
-            public int NodeCollectionCount { get; set; }
+            public Dictionary<string, int?> ItemCount { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -88,30 +78,15 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
                     .All(item => item.Status == NetworkStatus.Completed && item.NetworkNodes
                         .Where(item1 => item1.Type == NetworkNodeType.None)
                         .Count() < NetworkExtensions.MaximumSizeForVisualization),
-                UserCount = items
-                    .Select(item => item.NetworkUsers)
-                    .SelectMany(item => item)
-                    .Count(),
-                UserInvitationCount = items
-                    .Select(item => item.NetworkUserInvitations)
-                    .SelectMany(item => item)
-                    .Count(),
-                DatabaseCount = items
-                    .Select(item => item.NetworkDatabases)
-                    .SelectMany(item => item)
-                    .Count(),
-                NodeCount = items
-                    .Select(item => item.NetworkNodes)
-                    .SelectMany(item => item)
-                    .Count(item => item.Type == NetworkNodeType.None),
-                EdgeCount = items
-                    .Select(item => item.NetworkEdges)
-                    .SelectMany(item => item)
-                    .Count(),
-                NodeCollectionCount = items
-                    .Select(item => item.NetworkNodeCollections)
-                    .SelectMany(item => item)
-                    .Count()
+                ItemCount = new Dictionary<string, int?>
+                {
+                    { "Users", items.Select(item => item.NetworkUsers).SelectMany(item => item).Count() },
+                    { "UserInvitations", items.Select(item => item.NetworkUserInvitations).SelectMany(item => item).Count() },
+                    { "Databases", items.Select(item => item.NetworkDatabases).SelectMany(item => item).Count() },
+                    { "Nodes", items.Select(item => item.NetworkNodes).SelectMany(item => item).Count(item => item.Type == NetworkNodeType.None) },
+                    { "Edges", items.Select(item => item.NetworkEdges).SelectMany(item => item).Count() },
+                    { "NodeCollections", items.Select(item => item.NetworkNodeCollections).SelectMany(item => item).Count() }
+                }
             };
             // Return the page.
             return Page();

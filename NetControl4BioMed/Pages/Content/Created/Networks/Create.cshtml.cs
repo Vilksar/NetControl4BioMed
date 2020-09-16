@@ -77,11 +77,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         {
             public bool IsGeneric { get; set; }
 
-            public IQueryable<Database> NodeDatabases { get; set; }
+            public IEnumerable<Database> NodeDatabases { get; set; }
 
-            public IQueryable<Database> EdgeDatabases { get; set; }
+            public IEnumerable<Database> EdgeDatabases { get; set; }
 
-            public IQueryable<NodeCollection> SeedNodeCollections { get; set; }
+            public IEnumerable<NodeCollection> SeedNodeCollections { get; set; }
         }
 
         public class ItemModel

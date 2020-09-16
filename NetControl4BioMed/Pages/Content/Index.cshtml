@@ -4,7 +4,7 @@
     ViewData["Title"] = "Overview";
 }
 
-<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetContentNavigationQuickLinks(Model.View.NetworkCount, Model.View.AnalysisCount)" />
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetContentNavigationQuickLinks(Model.View.ItemCount)" />
 @if (!Model.View.RecentNetworks.Any())
 {
     <div class="card mb-3">

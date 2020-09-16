@@ -44,7 +44,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
 
         public class ViewModel
         {
-            public IQueryable<User> Items { get; set; }
+            public IEnumerable<User> Items { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(IEnumerable<string> ids)

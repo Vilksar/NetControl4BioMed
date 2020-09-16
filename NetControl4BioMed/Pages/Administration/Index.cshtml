@@ -4,7 +4,7 @@
     ViewData["Title"] = "Overview";
 }
 
-<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAdministrationNavigationQuickLinks(Model.View.UserCount, Model.View.RoleCount, Model.View.DatabaseCount, Model.View.NodeCollectionCount, Model.View.NodeCount, Model.View.EdgeCount)" />
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAdministrationNavigationQuickLinks(Model.View.ItemCount)" />
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
@@ -40,30 +40,77 @@
         </div>
     </div>
     <div class="card-body">
-        @foreach (var item in Model.View.IssueCount)
+        @if (!Model.View.IssueDuplicateCount.Any(item => item.Value != 0))
         {
-            @if (!item.Value.Any(item1 => item1.Value != 0))
+            <div class="alert alert-success text-justify text-wrap">
+                <span><i class="fas fa-check-circle"></i></span>
+                <span>There were no duplicate items found in the data.</span>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model.View.IssueDuplicateCount)
             {
-                <div class="alert alert-success text-justify text-wrap">
-                    <span><i class="fas fa-check-circle"></i></span>
-                    <span>There were no @item.Key.ToLower() items found in the data.</span>
-                </div>
-            }
-            else
-            {
-                @foreach (var item1 in item.Value)
+                @if (item.Value != 0)
                 {
-                    @if (item1.Value != 0)
-                    {
-                        <div class="alert alert-warning text-justify text-wrap">
-                            <span><i class="fas fa-exclamation-triangle"></i></span>
-                            <span>There @(item1.Value != 1 ? "are" : "is") @item1.Value @item.Key.ToLower() value@(item1.Value != 1 ? "s" : string.Empty) of type "@item1.Key".</span>
-                        </div>
-                    }
+                    <div class="alert alert-warning text-justify text-wrap">
+                        <span><i class="fas fa-exclamation-triangle"></i></span>
+                        <span>There @(item.Value != 1 ? "are" : "is") @item.Value duplicate value@(item.Value != 1 ? "s" : string.Empty) of type "@item.Key".</span>
+                    </div>
                 }
             }
         }
-        <form method="post" asp-page-handler="ResetIssueCount" class="text-justify">
+        <form method="post" asp-page-handler="ResetIssueDuplicateCount" class="text-justify mb-3">
+            <button type="submit" title="Reset" class="btn btn-success btn-block">
+                <span>Reset</span>
+            </button>
+        </form>
+        @if (!Model.View.IssueOrphanedCount.Any(item => item.Value != 0))
+        {
+            <div class="alert alert-success text-justify text-wrap">
+                <span><i class="fas fa-check-circle"></i></span>
+                <span>There were no orphaned items found in the data.</span>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model.View.IssueOrphanedCount)
+            {
+                @if (item.Value != 0)
+                {
+                    <div class="alert alert-warning text-justify text-wrap">
+                        <span><i class="fas fa-exclamation-triangle"></i></span>
+                        <span>There @(item.Value != 1 ? "are" : "is") @item.Value orphaned value@(item.Value != 1 ? "s" : string.Empty) of type "@item.Key".</span>
+                    </div>
+                }
+            }
+        }
+        <form method="post" asp-page-handler="ResetIssueOrphanedCount" class="text-justify mb-3">
+            <button type="submit" title="Reset" class="btn btn-success btn-block">
+                <span>Reset</span>
+            </button>
+        </form>
+        @if (!Model.View.IssueInconsistentCount.Any(item => item.Value != 0))
+        {
+            <div class="alert alert-success text-justify text-wrap">
+                <span><i class="fas fa-check-circle"></i></span>
+                <span>There were no inconsistent items found in the data.</span>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model.View.IssueInconsistentCount)
+            {
+                @if (item.Value != 0)
+                {
+                    <div class="alert alert-warning text-justify text-wrap">
+                        <span><i class="fas fa-exclamation-triangle"></i></span>
+                        <span>There @(item.Value != 1 ? "are" : "is") @item.Value inconsistent value@(item.Value != 1 ? "s" : string.Empty) of type "@item.Key".</span>
+                    </div>
+                }
+            }
+        }
+        <form method="post" asp-page-handler="ResetIssueInconsistentCount" class="text-justify">
             <button type="submit" title="Reset" class="btn btn-success btn-block">
                 <span>Reset</span>
             </button>

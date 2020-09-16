@@ -29,9 +29,7 @@ namespace NetControl4BioMed.Pages.Content
         {
             public User User { get; set; }
 
-            public int NetworkCount { get; set; }
-
-            public int AnalysisCount { get; set; }
+            public Dictionary<string, int?> ItemCount { get; set; }
 
             public IEnumerable<Network> RecentNetworks { get; set; }
 
@@ -54,10 +52,11 @@ namespace NetControl4BioMed.Pages.Content
             View = new ViewModel
             {
                 User = user,
-                NetworkCount = _context.Networks
-                    .Count(item => item.NetworkUsers.Any(item1 => item1.User == user)),
-                AnalysisCount = _context.Analyses
-                    .Count(item => item.AnalysisUsers.Any(item1 => item1.User == user)),
+                ItemCount = new Dictionary<string, int?>
+                {
+                    { "Networks", _context.Networks.Count(item => item.NetworkUsers.Any(item1 => item1.User == user)) },
+                    { "Analyses", _context.Analyses.Count(item => item.AnalysisUsers.Any(item1 => item1.User == user)) }
+                },
                 RecentNetworks = _context.Networks
                     .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                     .OrderByDescending(item => item.DateTimeCreated)

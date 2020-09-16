@@ -32,7 +32,7 @@
         </div>
     </div>
     <div class="card-body">
-        @if (!Model.View.DatabaseType.Databases.Any())
+        @if (!Model.View.Databases.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
@@ -51,16 +51,12 @@
                             <span>Database</span>
                         </th>
                         <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>Internal</span>
-                        </th>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>External</span>
-                            <span><i class="fas fa-external-link-alt"></i></span>
+                            <span>Links</span>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var database in Model.View.DatabaseType.Databases)
+                    @foreach (var database in Model.View.Databases)
                     {
                         <tr>
                             <td class="text-center text-break">
@@ -73,18 +69,6 @@
                                 <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@database.Id" title="Details">
                                     <span>Details</span>
                                 </a>
-                            </td>
-                            <td class="text-center text-break">
-                                @if (!string.IsNullOrEmpty(database.Url))
-                                {
-                                    <a href="@database.Url" title="Website" target="_blank" rel="nofollow noopener noreferrer">
-                                        <span>Website</span>
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span>-</span>
-                                }
                             </td>
                         </tr>
                     }

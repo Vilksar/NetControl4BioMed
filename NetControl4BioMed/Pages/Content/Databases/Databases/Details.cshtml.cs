@@ -32,6 +32,10 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
 
             public bool IsGeneric { get; set; }
 
+            public IEnumerable<DatabaseNodeField> DatabaseNodeFields { get; set; }
+
+            public IEnumerable<DatabaseEdgeField> DatabaseEdgeFields { get; set; }
+
             public int NodeCount { get; set; }
 
             public int EdgeCount { get; set; }
@@ -77,11 +81,19 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
             {
                 Database = items
                     .Include(item => item.DatabaseType)
-                    .Include(item => item.DatabaseNodeFields)
-                    .Include(item => item.DatabaseEdgeFields)
                     .First(),
                 IsGeneric = items
                     .Any(item => item.DatabaseType.Name == "Generic"),
+                DatabaseNodeFields = items
+                    .Select(item => item.DatabaseNodeFields)
+                    .SelectMany(item => item)
+                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                    .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user)),
+                DatabaseEdgeFields = items
+                    .Select(item => item.DatabaseEdgeFields)
+                    .SelectMany(item => item)
+                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                    .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user)),
                 NodeCount = items
                     .Select(item => item.DatabaseNodes)
                     .SelectMany(item => item)

@@ -83,7 +83,7 @@
         </div>
     </div>
     <div class="card-body">
-        @if (!Model.View.Database.DatabaseNodeFields.Any())
+        @if (!Model.View.DatabaseNodeFields.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
@@ -107,7 +107,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var databaseNodeField in Model.View.Database.DatabaseNodeFields)
+                    @foreach (var databaseNodeField in Model.View.DatabaseNodeFields)
                     {
                         <tr>
                             <td class="text-center text-break">
@@ -140,7 +140,7 @@
         </div>
     </div>
     <div class="card-body">
-        @if (!Model.View.Database.DatabaseEdgeFields.Any())
+        @if (!Model.View.DatabaseEdgeFields.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
@@ -164,7 +164,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var databaseEdgeField in Model.View.Database.DatabaseEdgeFields)
+                    @foreach (var databaseEdgeField in Model.View.DatabaseEdgeFields)
                     {
                         <tr>
                             <td class="text-center text-break">

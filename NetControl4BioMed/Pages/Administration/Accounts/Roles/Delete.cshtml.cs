@@ -44,7 +44,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
 
         public class ViewModel
         {
-            public IQueryable<Role> Items { get; set; }
+            public IEnumerable<Role> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)

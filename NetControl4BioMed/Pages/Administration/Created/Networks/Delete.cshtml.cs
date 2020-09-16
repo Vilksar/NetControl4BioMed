@@ -42,7 +42,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
 
         public class ViewModel
         {
-            public IQueryable<Network> Items { get; set; }
+            public IEnumerable<Network> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)

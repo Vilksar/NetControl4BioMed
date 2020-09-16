@@ -30,13 +30,13 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
         {
             public Node Node { get; set; }
 
-            public IQueryable<DatabaseNode> DatabaseNodes { get; set; }
+            public IEnumerable<DatabaseNode> DatabaseNodes { get; set; }
 
-            public IQueryable<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }
+            public IEnumerable<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }
 
-            public IQueryable<EdgeNode> EdgeNodes { get; set; }
+            public IEnumerable<EdgeNode> EdgeNodes { get; set; }
 
-            public IQueryable<NodeCollectionNode> NodeCollectionNodes { get; set; }
+            public IEnumerable<NodeCollectionNode> NodeCollectionNodes { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)

@@ -41,7 +41,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
 
         public class ViewModel
         {
-            public IQueryable<Analysis> Items { get; set; }
+            public IEnumerable<Analysis> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)

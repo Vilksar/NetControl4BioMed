@@ -30,9 +30,9 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
         {
             public NodeCollection NodeCollection { get; set; }
 
-            public IQueryable<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }
+            public IEnumerable<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }
 
-            public IQueryable<NodeCollectionNode> NodeCollectionNodes { get; set; }
+            public IEnumerable<NodeCollectionNode> NodeCollectionNodes { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)

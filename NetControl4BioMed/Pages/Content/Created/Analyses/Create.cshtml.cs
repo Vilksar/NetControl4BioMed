@@ -95,11 +95,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
         {
             public string Algorithm { get; set; }
 
-            public IQueryable<Network> Networks { get; set; }
+            public IEnumerable<Network> Networks { get; set; }
 
-            public IQueryable<NodeCollection> SourceNodeCollections { get; set; }
+            public IEnumerable<NodeCollection> SourceNodeCollections { get; set; }
 
-            public IQueryable<NodeCollection> TargetNodeCollections { get; set; }
+            public IEnumerable<NodeCollection> TargetNodeCollections { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string databaseTypeId = null, string algorithm = null, string analysisId = null)

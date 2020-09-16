@@ -44,19 +44,13 @@ namespace NetControl4BioMed.Pages.Administration
 
         public class ViewModel
         {
-            public int UserCount { get; set; }
+            public Dictionary<string, int?> ItemCount { get; set; }
 
-            public int RoleCount { get; set; }
+            public Dictionary<string, int?> IssueDuplicateCount { get; set; }
 
-            public int DatabaseCount { get; set; }
+            public Dictionary<string, int?> IssueOrphanedCount { get; set; }
 
-            public int NodeCount { get; set; }
-
-            public int EdgeCount { get; set; }
-
-            public int NodeCollectionCount { get; set; }
-
-            public Dictionary<string, Dictionary<string, int>> IssueCount { get; set; }
+            public Dictionary<string, int?> IssueInconsistentCount { get; set; }
 
             public string AnnouncementMessage { get; set; }
         }
@@ -68,31 +62,84 @@ namespace NetControl4BioMed.Pages.Administration
                 .GetSection("Data")
                 .GetSection("ItemCount")
                 .GetChildren()
-                .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? result : -1);
-            var issueCount = _configuration
+                .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
+            var issueDuplicateCount = _configuration
                 .GetSection("Data")
                 .GetSection("IssueCount")
+                .GetSection("Duplicate")
                 .GetChildren()
-                .Where(item => item.GetChildren().Any())
-                .ToDictionary(item => item.Key, item => item.GetChildren().ToDictionary(item1 => item1.Key, item1 => int.TryParse(item1.Value, out var result) ? result : -1));
+                .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
+            var issueOrphanedCount = _configuration
+                .GetSection("Data")
+                .GetSection("IssueCount")
+                .GetSection("Duplicate")
+                .GetChildren()
+                .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
+            var issueInconsistentCount = _configuration
+                .GetSection("Data")
+                .GetSection("IssueCount")
+                .GetSection("Duplicate")
+                .GetChildren()
+                .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
             var announcementMessage = _configuration["Data:AnnouncementMessage"];
             // Define the view.
             View = new ViewModel
             {
-                UserCount = count.GetValueOrDefault("Users", -1),
-                RoleCount = count.GetValueOrDefault("Roles", -1),
-                DatabaseCount = count.GetValueOrDefault("Databases", -1),
-                NodeCount = count.GetValueOrDefault("Nodes", -1),
-                EdgeCount = count.GetValueOrDefault("Edges", -1),
-                NodeCollectionCount = count.GetValueOrDefault("NodeCollections", -1),
-                IssueCount = issueCount,
+                ItemCount = count,
+                IssueDuplicateCount = issueDuplicateCount,
+                IssueOrphanedCount = issueOrphanedCount,
+                IssueInconsistentCount = issueInconsistentCount,
                 AnnouncementMessage = announcementMessage
             };
             // Return the page.
             return Page();
         }
 
-        public IActionResult OnPostResetIssueCount()
+        public IActionResult OnPostResetItemCount()
+        {
+            // Update the counts.
+            _configuration["Data:ItemCount:Users"] = _context.Users
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:Roles"] = _context.Roles
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:DatabaseTypes"] = _context.DatabaseTypes
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:Databases"] = _context.Databases
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:DatabaseNodeFields"] = _context.DatabaseNodeFields
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:DatabaseEdgeFields"] = _context.DatabaseEdgeFields
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:Nodes"] = _context.Nodes
+                .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:Edges"] = _context.Edges
+                .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:NodeCollections"] = _context.NodeCollections
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:Networks"] = _context.Networks
+                .Count()
+                .ToString();
+            _configuration["Data:ItemCount:Analyses"] = _context.Analyses
+                .Count()
+                .ToString();
+            // Display a message.
+            TempData["StatusMessage"] = "Success: The item count has been successfully updated.";
+            // Redirect to the page.
+            return RedirectToPage();
+        }
+
+        public IActionResult OnPostResetIssueDuplicateCount()
         {
             // Update the duplicate counts.
             _configuration["Data:IssueCount:Duplicate:DatabaseTypes"] = _context.DatabaseTypes
@@ -159,6 +206,14 @@ namespace NetControl4BioMed.Pages.Administration
                 .Select(item => item.Key)
                 .Count()
                 .ToString();
+            // Display a message.
+            TempData["StatusMessage"] = "Success: The duplicate item count has been successfully updated.";
+            // Redirect to the page.
+            return RedirectToPage();
+        }
+
+        public IActionResult OnPostResetIssueOrphanedCount()
+        {
             // Update the orphaned counts.
             _configuration["Data:IssueCount:Orphaned:Nodes"] = _context.Nodes
                 .Where(item => !item.DatabaseNodeFieldNodes.Any())
@@ -180,6 +235,14 @@ namespace NetControl4BioMed.Pages.Administration
                 .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any())
                 .Count()
                 .ToString();
+            // Display a message.
+            TempData["StatusMessage"] = "Success: The orphaned item count has been successfully updated.";
+            // Redirect to the page.
+            return RedirectToPage();
+        }
+
+        public IActionResult OnPostResetIssueInconsistentCount()
+        {
             // Update the inconsistent counts.
             _configuration["Data:IssueCount:Inconsistent:Nodes"] = _context.Nodes
                 .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
@@ -202,51 +265,7 @@ namespace NetControl4BioMed.Pages.Administration
                 .Count()
                 .ToString();
             // Display a message.
-            TempData["StatusMessage"] = "Success: The issue count has been successfully updated.";
-            // Redirect to the page.
-            return RedirectToPage();
-        }
-
-        public IActionResult OnPostResetItemCount()
-        {
-            // Update the counts.
-            _configuration["Data:ItemCount:Users"] = _context.Users
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:Roles"] = _context.Roles
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:DatabaseTypes"] = _context.DatabaseTypes
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:Databases"] = _context.Databases
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:DatabaseNodeFields"] = _context.DatabaseNodeFields
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:DatabaseEdgeFields"] = _context.DatabaseEdgeFields
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:Nodes"] = _context.Nodes
-                .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:Edges"] = _context.Edges
-                .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:NodeCollections"] = _context.NodeCollections
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:Networks"] = _context.Networks
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:Analyses"] = _context.Analyses
-                .Count()
-                .ToString();
-            // Display a message.
-            TempData["StatusMessage"] = "Success: The item count has been successfully updated.";
+            TempData["StatusMessage"] = "Success: The inconsistent item count has been successfully updated.";
             // Redirect to the page.
             return RedirectToPage();
         }

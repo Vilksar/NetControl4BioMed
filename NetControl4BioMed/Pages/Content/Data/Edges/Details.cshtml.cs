@@ -30,11 +30,11 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
         {
             public Edge Edge { get; set; }
 
-            public IQueryable<DatabaseEdge> DatabaseEdges { get; set; }
+            public IEnumerable<DatabaseEdge> DatabaseEdges { get; set; }
 
-            public IQueryable<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }
+            public IEnumerable<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }
 
-            public IQueryable<EdgeNode> EdgeNodes { get; set; }
+            public IEnumerable<EdgeNode> EdgeNodes { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)

@@ -40,7 +40,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets or sets the number of items of the quick link.
         /// </summary>
-        public int ItemCount { get; set; }
+        public int? ItemCount { get; set; }
 
         /// <summary>
         /// Gets or sets the route ID of the quick link.
@@ -322,7 +322,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <param name="nodeCount">The current number of nodes.</param>
         /// <param name="edgeCount">The current number of edges.</param>
         /// <returns>The navigation quick links for the content index page.</returns>
-        public static IEnumerable<NavigationQuickLinkViewModel> GetAdministrationNavigationQuickLinks(int userCount = 0, int roleCount = 0, int databaseCount = 0, int nodeCollectionCount = 0, int nodeCount = 0, int edgeCount = 0)
+        public static IEnumerable<NavigationQuickLinkViewModel> GetAdministrationNavigationQuickLinks(Dictionary<string, int?> count = null)
         {
             // Get the corresponding navigation quick links.
             var administrationUsersNavigationQuickLink = AdministrationUsersNavigationQuickLink;
@@ -332,12 +332,12 @@ namespace NetControl4BioMed.Helpers.ViewModels
             var administrationNodesNavigationQuickLink = AdministrationNodesNavigationQuickLink;
             var administrationEdgesNavigationQuickLink = AdministrationEdgesNavigationQuickLink;
             // Update the count and the route ID.
-            administrationUsersNavigationQuickLink.ItemCount = userCount;
-            administrationRolesNavigationQuickLink.ItemCount = roleCount;
-            administrationDatabasesNavigationQuickLink.ItemCount = databaseCount;
-            administrationNodeCollectionsNavigationQuickLink.ItemCount = nodeCollectionCount;
-            administrationNodesNavigationQuickLink.ItemCount = nodeCount;
-            administrationEdgesNavigationQuickLink.ItemCount = edgeCount;
+            administrationUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
+            administrationRolesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Roles", null);
+            administrationDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
+            administrationNodeCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("NodeCollections", null);
+            administrationNodesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Nodes", null);
+            administrationEdgesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Edges", null);
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
@@ -356,14 +356,14 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <param name="networkCount">The current number of networks.</param>
         /// <param name="analysisCount">The current number of analyses.</param>
         /// <returns>The navigation quick links for the content index page.</returns>
-        public static IEnumerable<NavigationQuickLinkViewModel> GetContentNavigationQuickLinks(int networkCount = 0, int analysisCount = 0)
+        public static IEnumerable<NavigationQuickLinkViewModel> GetContentNavigationQuickLinks(Dictionary<string, int?> count = null)
         {
             // Get the corresponding navigation quick links.
             var contentNetworksNavigationQuickLink = ContentNetworksNavigationQuickLink;
             var contentAnalysesNavigationQuickLink = ContentAnalysesNavigationQuickLink;
             // Update the count and the route ID.
-            contentNetworksNavigationQuickLink.ItemCount = networkCount;
-            contentAnalysesNavigationQuickLink.ItemCount = analysisCount;
+            contentNetworksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
+            contentAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
@@ -383,7 +383,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <param name="edgeCount">The number of network edges.</param>
         /// <param name="nodeCollectionCount">The number of network node collections.</param>
         /// <returns>The navigation quick links for the network index page.</returns>
-        public static IEnumerable<NavigationQuickLinkViewModel> GetNetworkNavigationQuickLinks(string networkId = null, int userCount = 0, int userInvitationCount = 0, int databaseCount = 0, int nodeCount = 0, int edgeCount = 0, int nodeCollectionCount = 0)
+        public static IEnumerable<NavigationQuickLinkViewModel> GetNetworkNavigationQuickLinks(string networkId = null, Dictionary<string, int?> count = null)
         {
             // Check if there is no network ID provided.
             if (string.IsNullOrEmpty(networkId))
@@ -399,17 +399,17 @@ namespace NetControl4BioMed.Helpers.ViewModels
             var networkEdgesNavigationQuickLink = NetworkEdgesNavigationQuickLink;
             var networkNodeCollectionsNavigationQuickLink = NetworkNodeCollectionsNavigationQuickLink;
             // Update the count and the route ID.
-            networkUsersNavigationQuickLink.ItemCount = userCount;
+            networkUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
             networkUsersNavigationQuickLink.RouteId = networkId;
-            networkUserInvitationsNavigationQuickLink.ItemCount = userInvitationCount;
+            networkUserInvitationsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("UserInvitations", null);
             networkUserInvitationsNavigationQuickLink.RouteId = networkId;
-            networkDatabasesNavigationQuickLink.ItemCount = databaseCount;
+            networkDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
             networkDatabasesNavigationQuickLink.RouteId = networkId;
-            networkNodesNavigationQuickLink.ItemCount = nodeCount;
+            networkNodesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Nodes", null);
             networkNodesNavigationQuickLink.RouteId = networkId;
-            networkEdgesNavigationQuickLink.ItemCount = edgeCount;
+            networkEdgesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Edges", null);
             networkEdgesNavigationQuickLink.RouteId = networkId;
-            networkNodeCollectionsNavigationQuickLink.ItemCount = nodeCollectionCount;
+            networkNodeCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("NodeCollections", null);
             networkNodeCollectionsNavigationQuickLink.RouteId = networkId;
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
@@ -434,7 +434,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <param name="edgeCount">The number of analysis edges.</param>
         /// <param name="nodeCollectionCount">The number of analysis node collections.</param>
         /// <returns>The navigation quick links for the analysis index page.</returns>
-        public static IEnumerable<NavigationQuickLinkViewModel> GetAnalysisNavigationQuickLinks(string analysisId = null, int userCount = 0, int userInvitationCount = 0, int databaseCount = 0, int nodeCount = 0, int edgeCount = 0, int nodeCollectionCount = 0)
+        public static IEnumerable<NavigationQuickLinkViewModel> GetAnalysisNavigationQuickLinks(string analysisId = null, Dictionary<string, int?> count = null)
         {
             // Check if there is no analysis ID provided.
             if (string.IsNullOrEmpty(analysisId))
@@ -450,17 +450,17 @@ namespace NetControl4BioMed.Helpers.ViewModels
             var analysisEdgesNavigationQuickLink = AnalysisEdgesNavigationQuickLink;
             var analysisNodeCollectionsNavigationQuickLink = AnalysisNodeCollectionsNavigationQuickLink;
             // Update the count and the route ID.
-            analysisUsersNavigationQuickLink.ItemCount = userCount;
+            analysisUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
             analysisUsersNavigationQuickLink.RouteId = analysisId;
-            analysisUserInvitationsNavigationQuickLink.ItemCount = userInvitationCount;
+            analysisUserInvitationsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("UserInvitations", null);
             analysisUserInvitationsNavigationQuickLink.RouteId = analysisId;
-            analysisDatabasesNavigationQuickLink.ItemCount = databaseCount;
+            analysisDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
             analysisDatabasesNavigationQuickLink.RouteId = analysisId;
-            analysisNodesNavigationQuickLink.ItemCount = nodeCount;
+            analysisNodesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Nodes", null);
             analysisNodesNavigationQuickLink.RouteId = analysisId;
-            analysisEdgesNavigationQuickLink.ItemCount = edgeCount;
+            analysisEdgesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Edges", null);
             analysisEdgesNavigationQuickLink.RouteId = analysisId;
-            analysisNodeCollectionsNavigationQuickLink.ItemCount = nodeCollectionCount;
+            analysisNodeCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("NodeCollections", null);
             analysisNodeCollectionsNavigationQuickLink.RouteId = analysisId;
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>

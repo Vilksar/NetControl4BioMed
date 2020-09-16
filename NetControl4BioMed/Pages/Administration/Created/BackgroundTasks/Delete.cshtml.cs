@@ -41,7 +41,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
 
         public class ViewModel
         {
-            public IQueryable<BackgroundTask> Items { get; set; }
+            public IEnumerable<BackgroundTask> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)

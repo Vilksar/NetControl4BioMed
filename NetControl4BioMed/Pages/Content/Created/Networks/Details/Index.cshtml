@@ -53,7 +53,7 @@
         </div>
     </div>
 }
-<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetNetworkNavigationQuickLinks(Model.View.Network.Id, Model.View.UserCount, Model.View.UserInvitationCount, Model.View.DatabaseCount, Model.View.NodeCount, Model.View.EdgeCount, Model.View.NodeCollectionCount)" />
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetNetworkNavigationQuickLinks(Model.View.Network.Id, Model.View.ItemCount)" />
 @if (Model.View.ShowVisualization)
 {
     <div class="card mb-3">

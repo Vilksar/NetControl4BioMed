@@ -41,7 +41,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
 
         public class ViewModel
         {
-            public IQueryable<Edge> Items { get; set; }
+            public IEnumerable<Edge> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)

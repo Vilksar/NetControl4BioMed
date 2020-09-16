@@ -41,7 +41,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
 
         public class ViewModel
         {
-            public IQueryable<DatabaseEdgeField> Items { get; set; }
+            public IEnumerable<DatabaseEdgeField> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)

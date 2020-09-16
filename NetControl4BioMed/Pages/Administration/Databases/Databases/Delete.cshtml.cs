@@ -41,7 +41,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
 
         public class ViewModel
         {
-            public IQueryable<Database> Items { get; set; }
+            public IEnumerable<Database> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)

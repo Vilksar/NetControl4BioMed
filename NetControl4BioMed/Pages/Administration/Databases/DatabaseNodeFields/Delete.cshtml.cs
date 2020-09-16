@@ -42,7 +42,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
 
         public class ViewModel
         {
-            public IQueryable<DatabaseNodeField> Items { get; set; }
+            public IEnumerable<DatabaseNodeField> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)

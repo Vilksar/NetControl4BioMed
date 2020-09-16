@@ -30,6 +30,8 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseTypes
         {
             public DatabaseType DatabaseType { get; set; }
 
+            public IEnumerable<Database> Databases { get; set; }
+
             public bool IsGeneric { get; set; }
         }
 
@@ -69,10 +71,14 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseTypes
             View = new ViewModel
             {
                 DatabaseType = items
-                    .Include(item => item.Databases)
                     .First(),
                 IsGeneric = items
-                    .Any(item => item.Name == "Generic")
+                    .Any(item => item.Name == "Generic"),
+                Databases = items
+                    .Select(item => item.Databases)
+                    .SelectMany(item => item)
+                    .Where(item => item.DatabaseType.Name != "Generic")
+                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
             };
             // Return the page.
             return Page();
