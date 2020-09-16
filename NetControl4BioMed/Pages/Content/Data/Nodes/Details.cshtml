@@ -51,11 +51,7 @@
                             <span>Database</span>
                         </th>
                         <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>Internal</span>
-                        </th>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>External</span>
-                            <span><i class="fas fa-external-link-alt"></i></span>
+                            <span>Links</span>
                         </th>
                     </tr>
                 </thead>
@@ -73,18 +69,6 @@
                                 <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@databaseNode.Database.Id" title="Details">
                                     <span>Details</span>
                                 </a>
-                            </td>
-                            <td class="text-center text-break">
-                                @if (!string.IsNullOrEmpty(databaseNode.Database.Url))
-                                {
-                                    <a href="@databaseNode.Database.Url" title="Website" target="_blank" rel="nofollow noopener noreferrer">
-                                        <span>Website</span>
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span>-</span>
-                                }
                             </td>
                         </tr>
                     }
