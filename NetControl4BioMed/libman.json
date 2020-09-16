@@ -3,7 +3,7 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "cytoscape@3.15.2",
+      "library": "cytoscape@3.16.0",
       "destination": "wwwroot/lib/cytoscape/",
       "files": [
         "cytoscape.min.js"
