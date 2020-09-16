@@ -72,13 +72,13 @@ namespace NetControl4BioMed.Pages.Administration
             var issueOrphanedCount = _configuration
                 .GetSection("Data")
                 .GetSection("IssueCount")
-                .GetSection("Duplicate")
+                .GetSection("Orphaned")
                 .GetChildren()
                 .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
             var issueInconsistentCount = _configuration
                 .GetSection("Data")
                 .GetSection("IssueCount")
-                .GetSection("Duplicate")
+                .GetSection("Inconsistent")
                 .GetChildren()
                 .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
             var announcementMessage = _configuration["Data:AnnouncementMessage"];
