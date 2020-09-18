@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office.CustomUI;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
@@ -8,6 +9,7 @@ using NetControl4BioMed.Data.Seed;
 using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,8 +34,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The created items.</returns>
-        public IEnumerable<Network> Create(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task CreateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -246,13 +247,27 @@ namespace NetControl4BioMed.Helpers.Tasks
                     networksToAdd.Add(network);
                 }
                 // Create the items.
-                IEnumerableExtensions.Create(networksToAdd, context, token);
-                // Go over each item.
-                foreach (var networkToAdd in networksToAdd)
+                await IEnumerableExtensions.CreateAsync(networksToAdd, serviceProvider, token);
+                // Define the new background task.
+                var backgroundTask = new BackgroundTask
                 {
-                    // Yield return it.
-                    yield return networkToAdd;
-                }
+                    DateTimeCreated = DateTime.UtcNow,
+                    Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.GenerateNetworksAsync)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new NetworksTask
+                    {
+                        Items = networksToAdd.Select(item => new NetworkInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the task for addition.
+                context.BackgroundTasks.Add(backgroundTask);
+                // Save the changes to the database.
+                await context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateNetworksAsync(backgroundTask.Id, CancellationToken.None));
             }
         }
 
@@ -261,8 +276,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The edited items.</returns>
-        public IEnumerable<Network> Edit(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task EditAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -316,13 +330,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     networksToEdit.Add(network);
                 }
                 // Edit the items.
-                IEnumerableExtensions.Edit(networksToEdit, context, token);
-                // Go over each item.
-                foreach (var networkToEdit in networksToEdit)
-                {
-                    // Yield return it.
-                    yield return networkToEdit;
-                }
+                await IEnumerableExtensions.EditAsync(networksToEdit, serviceProvider, token);
             }
         }
 
@@ -331,7 +339,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Delete(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -371,10 +379,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var genericNodes = context.Nodes.Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
                 var genericEdges = context.Edges.Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
                 // Delete the items.
-                IQueryableExtensions.Delete(analyses, context, token);
-                IQueryableExtensions.Delete(networks, context, token);
-                IQueryableExtensions.Delete(genericEdges, context, token);
-                IQueryableExtensions.Delete(genericNodes, context, token);
+                await IQueryableExtensions.DeleteAsync(analyses, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(networks, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(genericEdges, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(genericNodes, serviceProvider, token);
             }
         }
 
@@ -383,7 +391,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Generate(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task GenerateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -441,7 +449,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Add a message to the log.
                     network.Log = network.AppendToLog("The network is now generating.");
                     // Edit the network.
-                    IEnumerableExtensions.Edit(network.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     // Get the related data of the item.
                     var databaseTypes = network.NetworkDatabases
                         .Select(item => item.Database.DatabaseType);
@@ -453,7 +461,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         network.Log = network.AppendToLog("There was an error in retrieving related data from the database.");
                         // Edit the network.
-                        IEnumerableExtensions.Edit(network.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                         // Continue.
                         continue;
                     }
@@ -465,7 +473,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         network.Log = network.AppendToLog("No database types corresponding to the network databases could be found.");
                         // Edit the network.
-                        IEnumerableExtensions.Edit(network.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                         // Continue.
                         continue;
                     }
@@ -477,7 +485,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         network.Log = network.AppendToLog("The database types corresponding to the network databases are different.");
                         // Edit the network.
-                        IEnumerableExtensions.Edit(network.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                         // Continue.
                         continue;
                     }
@@ -491,7 +499,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         network.Log = network.AppendToLog("The database type corresponding to the network databases and the network algorithm don't match.");
                         // Edit the network.
-                        IEnumerableExtensions.Edit(network.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                         // Continue.
                         continue;
                     }
@@ -506,7 +514,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             network.Log = network.AppendToLog("The seed data corresponding to the network could not be deserialized.");
                             // Edit the network.
-                            IEnumerableExtensions.Edit(network.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                             // Continue.
                             continue;
                         }
@@ -530,7 +538,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             network.Log = network.AppendToLog("The seed data corresponding to the network does not contain any valid edges.");
                             // Edit the network.
-                            IEnumerableExtensions.Edit(network.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                             // Continue.
                             continue;
                         }
@@ -637,7 +645,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             network.Log = network.AppendToLog("The seed data corresponding to the network could not be deserialized.");
                             // Edit the network.
-                            IEnumerableExtensions.Edit(network.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                             // Continue.
                             continue;
                         }
@@ -691,7 +699,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             network.Log = network.AppendToLog("No seed nodes could be found with the provided seed data.");
                             // Edit the network.
-                            IEnumerableExtensions.Edit(network.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                             // Continue.
                             continue;
                         }
@@ -709,7 +717,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             network.Log = network.AppendToLog("No available edges could be found in the selected databases.");
                             // Edit the network.
-                            IEnumerableExtensions.Edit(network.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                             // Continue.
                             continue;
                         }
@@ -792,7 +800,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             network.Log = network.AppendToLog("The provided network generation algorithm is invalid.");
                             // Edit the network.
-                            IEnumerableExtensions.Edit(network.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                             // Continue.
                             continue;
                         }
@@ -804,7 +812,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             network.Log = network.AppendToLog("No edges could be found with the provided data using the provided algorithm.");
                             // Edit the network.
-                            IEnumerableExtensions.Edit(network.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                             // Continue.
                             continue;
                         }
@@ -843,7 +851,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Remove the generation data.
                     network.Data = null;
                     // Edit the network.
-                    IEnumerableExtensions.Edit(network.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                 }
             }
         }

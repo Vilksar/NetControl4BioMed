@@ -29,8 +29,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The created items.</returns>
-        public IEnumerable<UserRole> Create(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task CreateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -113,7 +112,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("There was no role found.", showExceptionItem, batchItem);
                     }
                     // Try to add the user to the role.
-                    var result = Task.Run(() => userManager.AddToRoleAsync(user, role.Name)).Result;
+                    var result = await userManager.AddToRoleAsync(user, role.Name);
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
                     {
@@ -137,8 +136,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There was an error in retrieving the user role from the database after it was added.");
                     }
-                    // Yield return the item.
-                    yield return userRole;
                 }
             }
         }
@@ -148,7 +145,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Delete(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -185,20 +182,28 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the items with the provided IDs.
                 var userRoles = context.UserRoles
                     .Where(item => batchIds.Any(item1 => item1.Item1 == item.User.Id && item1.Item2 == item.Role.Id));
+                // Define a variable to store the error messages.
+                var errorMessages = new List<string>();
                 // Go over each item.
                 foreach (var userRole in userRoles.ToList())
                 {
                     // Delete it.
-                    var result = Task.Run(() => userManager.RemoveFromRoleAsync(userRole.User, userRole.Role.Name)).Result;
+                    var result = await userManager.RemoveFromRoleAsync(userRole.User, userRole.Role.Name);
                     // Check if the operation has failed.
                     if (!result.Succeeded)
                     {
                         // Define the exception messages.
                         var messages = result.Errors
                             .Select(item => item.Description);
-                        // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages));
+                        // Add the exception messages to the error messages.
+                        errorMessages.AddRange(messages);
                     }
+                }
+                // Check if there have been any error messages.
+                if (errorMessages.Any())
+                {
+                    // Throw an exception.
+                    throw new TaskException(string.Join(" ", errorMessages));
                 }
             }
         }

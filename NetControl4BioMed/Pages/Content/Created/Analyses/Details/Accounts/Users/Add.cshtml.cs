@@ -202,7 +202,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 try
                 {
                     // Run the task.
-                    _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
+                    await task.CreateAsync(_serviceProvider, CancellationToken.None);
                 }
                 catch (Exception exception)
                 {
@@ -233,7 +233,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 try
                 {
                     // Run the task.
-                    _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
+                    await task.CreateAsync(_serviceProvider, CancellationToken.None);
                 }
                 catch (Exception exception)
                 {

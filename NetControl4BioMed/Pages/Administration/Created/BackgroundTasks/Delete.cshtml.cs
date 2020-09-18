@@ -72,7 +72,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())
@@ -109,7 +109,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
             // Mark the items for removal.
             _context.BackgroundTasks.RemoveRange(View.Items);
             // Save the changes to the database.
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             // Display a message.
             TempData["StatusMessage"] = $"Success: {itemCount} background task{(itemCount != 1 ? "s" : string.Empty)} deleted successfully.";
             // Redirect to the index page.

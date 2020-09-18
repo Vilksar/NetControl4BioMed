@@ -99,7 +99,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(Input.Id))
@@ -159,7 +159,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             try
             {
                 // Run the task.
-                _ = task.Edit(_serviceProvider, CancellationToken.None).ToList();
+                await task.EditAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {

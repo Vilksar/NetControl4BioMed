@@ -218,7 +218,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 var task = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.CreateNodeCollections)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.CreateNodeCollectionsAsync)}",
                     Data = JsonSerializer.Serialize(new NodeCollectionsTask
                     {
                         Items = items
@@ -229,7 +229,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.CreateNodeCollections(task.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.CreateNodeCollectionsAsync(task.Id, CancellationToken.None));
             }
             // Check if the items should be edited.
             else if (Input.Type == "Edit")
@@ -251,7 +251,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 var task = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.EditNodeCollections)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.EditNodeCollectionsAsync)}",
                     Data = JsonSerializer.Serialize(new NodeCollectionsTask
                     {
                         Items = items
@@ -262,7 +262,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.EditNodeCollections(task.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.EditNodeCollectionsAsync(task.Id, CancellationToken.None));
             }
             // Check if the items should be deleted.
             else if (Input.Type == "Delete")
@@ -281,7 +281,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 var task = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNodeCollections)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteNodeCollectionsAsync)}",
                     Data = JsonSerializer.Serialize(new NodeCollectionsTask
                     {
                         Items = nodeCollections.Select(item => new NodeCollectionInputModel
@@ -295,7 +295,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNodeCollections(task.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteNodeCollectionsAsync(task.Id, CancellationToken.None));
             }
             // Check if the type is not valid.
             else

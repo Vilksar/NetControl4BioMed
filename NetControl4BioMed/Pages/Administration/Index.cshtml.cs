@@ -289,11 +289,11 @@ namespace NetControl4BioMed.Pages.Administration
         public async Task<IActionResult> OnPostResetHangfireRecurrentJobsAsync()
         {
             // Define the names of the recurring background tasks.
-            var nameStopAnalyses = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.StopAnalyses)}";
-            var nameAlertUsers = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.AlertUsers)}";
-            var nameDeleteUsers = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteUsers)}";
-            var nameDeleteNetworks = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteNetworks)}";
-            var nameDeleteAnalyses = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteAnalyses)}";
+            var nameStopAnalyses = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.StopAnalysesAsync)}";
+            var nameAlertUsers = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.AlertUsersAsync)}";
+            var nameDeleteUsers = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteUsersAsync)}";
+            var nameDeleteNetworks = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteNetworksAsync)}";
+            var nameDeleteAnalyses = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteAnalysesAsync)}";
             // Delete the existing corresponding recurring jobs.
             RecurringJob.RemoveIfExists(nameStopAnalyses);
             RecurringJob.RemoveIfExists(nameAlertUsers);
@@ -387,11 +387,11 @@ namespace NetControl4BioMed.Pages.Administration
             // Save the changes to the database.
             await _context.SaveChangesAsync();
             // Create the new Hangfire daily recurring jobs.
-            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameStopAnalyses, item => item.StopAnalyses(backgroundTaskStopAnalyses.Id, CancellationToken.None), Cron.Daily());
-            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameAlertUsers, item => item.AlertUsers(backgroundTaskAlertUsers.Id, CancellationToken.None), Cron.Daily());
-            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteUsers, item => item.DeleteUsers(backgroundTaskDeleteUsers.Id, CancellationToken.None), Cron.Daily());
-            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteNetworks, item => item.DeleteNetworks(backgroundTaskDeleteNetworks.Id, CancellationToken.None), Cron.Daily());
-            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteAnalyses, item => item.DeleteAnalyses(backgroundTaskDeleteAnalyses.Id, CancellationToken.None), Cron.Daily());
+            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameStopAnalyses, item => item.StopAnalysesAsync(backgroundTaskStopAnalyses.Id, CancellationToken.None), Cron.Daily());
+            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameAlertUsers, item => item.AlertUsersAsync(backgroundTaskAlertUsers.Id, CancellationToken.None), Cron.Daily());
+            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteUsers, item => item.DeleteUsersAsync(backgroundTaskDeleteUsers.Id, CancellationToken.None), Cron.Daily());
+            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteNetworks, item => item.DeleteNetworksAsync(backgroundTaskDeleteNetworks.Id, CancellationToken.None), Cron.Daily());
+            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteAnalyses, item => item.DeleteAnalysesAsync(backgroundTaskDeleteAnalyses.Id, CancellationToken.None), Cron.Daily());
             // Display a message.
             TempData["StatusMessage"] = "Success: The database recurring jobs have been successfully reset. You can view more details on the Hangfire dashboard.";
             // Redirect to the page.
@@ -1117,7 +1117,7 @@ namespace NetControl4BioMed.Pages.Administration
                 var backgroundTask = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllNodes)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllNodesAsync)}",
                     IsRecurring = false,
                     Data = JsonSerializer.Serialize(new NodesTask(), jsonSerializerOptions)
                 };
@@ -1126,7 +1126,7 @@ namespace NetControl4BioMed.Pages.Administration
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllNodes(backgroundTask.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllNodesAsync(backgroundTask.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Edges"))
@@ -1135,7 +1135,7 @@ namespace NetControl4BioMed.Pages.Administration
                 var backgroundTask = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllEdges)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllEdgesAsync)}",
                     IsRecurring = false,
                     Data = JsonSerializer.Serialize(new EdgesTask(), jsonSerializerOptions)
                 };
@@ -1144,7 +1144,7 @@ namespace NetControl4BioMed.Pages.Administration
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllEdges(backgroundTask.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllEdgesAsync(backgroundTask.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("NodeCollections"))
@@ -1153,7 +1153,7 @@ namespace NetControl4BioMed.Pages.Administration
                 var backgroundTask = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllNodeCollections)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllNodeCollectionsAsync)}",
                     IsRecurring = false,
                     Data = JsonSerializer.Serialize(new NodeCollectionsTask(), jsonSerializerOptions)
                 };
@@ -1162,7 +1162,7 @@ namespace NetControl4BioMed.Pages.Administration
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllNodeCollections(backgroundTask.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllNodeCollectionsAsync(backgroundTask.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Networks"))
@@ -1171,7 +1171,7 @@ namespace NetControl4BioMed.Pages.Administration
                 var backgroundTask = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllNetworks)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllNetworksAsync)}",
                     IsRecurring = false,
                     Data = JsonSerializer.Serialize(new NetworksTask(), jsonSerializerOptions)
                 };
@@ -1180,7 +1180,7 @@ namespace NetControl4BioMed.Pages.Administration
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllNetworks(backgroundTask.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllNetworksAsync(backgroundTask.Id, CancellationToken.None));
             }
             // Check the items to delete.
             if (deleteItems.Contains("Analyses"))
@@ -1189,7 +1189,7 @@ namespace NetControl4BioMed.Pages.Administration
                 var backgroundTask = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllAnalyses)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllAnalysesAsync)}",
                     IsRecurring = false,
                     Data = JsonSerializer.Serialize(new AnalysesTask(), jsonSerializerOptions)
                 };
@@ -1198,7 +1198,7 @@ namespace NetControl4BioMed.Pages.Administration
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllAnalyses(backgroundTask.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllAnalysesAsync(backgroundTask.Id, CancellationToken.None));
             }
             // Display a message.
             TempData["StatusMessage"] = $"Success: A new background task was created to delete {string.Join(" and ", deleteItems.Select(item => $"all {item}"))}.";

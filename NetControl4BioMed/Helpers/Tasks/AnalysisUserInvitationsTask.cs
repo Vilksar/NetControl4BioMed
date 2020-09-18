@@ -29,8 +29,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The created items.</returns>
-        public IEnumerable<AnalysisUserInvitation> Create(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task CreateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -122,13 +121,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     analysisUserInvitationsToAdd.Add(analysisUserInvitation);
                 }
                 // Create the items.
-                IEnumerableExtensions.Create(analysisUserInvitationsToAdd, context, token);
-                // Go over each item.
-                foreach (var analysisUserInvitation in analysisUserInvitationsToAdd)
-                {
-                    // Yield return it.
-                    yield return analysisUserInvitation;
-                }
+                await IEnumerableExtensions.CreateAsync(analysisUserInvitationsToAdd, serviceProvider, token);
             }
         }
 
@@ -137,7 +130,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Delete(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -173,7 +166,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analysisUserInvitations = context.AnalysisUserInvitations
                     .Where(item => batchIds.Any(item1 => item1.Item1 == item.Analysis.Id && item1.Item2 == item.Email));
                 // Delete the items.
-                IQueryableExtensions.Delete(analysisUserInvitations, context, token);
+                await IQueryableExtensions.DeleteAsync(analysisUserInvitations, serviceProvider, token);
             }
         }
     }

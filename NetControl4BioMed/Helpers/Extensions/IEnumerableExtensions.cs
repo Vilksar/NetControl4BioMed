@@ -1,4 +1,5 @@
-﻿using NetControl4BioMed.Data;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NetControl4BioMed.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +19,9 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// </summary>
         /// <typeparam name="T">The type of the items.</typeparam>
         /// <param name="items">The items to be created.</param>
-        /// <param name="context">The application database context.</param>
+        /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public static void Create<T>(IEnumerable<T> items, ApplicationDbContext context, CancellationToken token) where T : class
+        public static async Task CreateAsync<T>(IEnumerable<T> items, IServiceProvider serviceProvider, CancellationToken token) where T : class
         {
             // Check if the items don't exist.
             if (items == null)
@@ -28,6 +29,8 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Throw an exception.
                 throw new ArgumentNullException("There provided items can't be null.");
             }
+            // Use a new context instance.
+            using var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
             // Get the corresponding database set.
             var set = context.Set<T>();
             // Check if the correpsonding set doesn't exist.
@@ -54,7 +57,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Mark the items for addition.
                 set.AddRange(batchItems);
                 // Save the changes to the database.
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
 
@@ -63,9 +66,9 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// </summary>
         /// <typeparam name="T">The type of the items.</typeparam>
         /// <param name="items">The items to be updated.</param>
-        /// <param name="context">The application database context.</param>
+        /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public static void Edit<T>(IEnumerable<T> items, ApplicationDbContext context, CancellationToken token) where T : class
+        public static async Task EditAsync<T>(IEnumerable<T> items, IServiceProvider serviceProvider, CancellationToken token) where T : class
         {
             // Check if the items don't exist.
             if (items == null)
@@ -73,6 +76,8 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Throw an exception.
                 throw new ArgumentNullException("There provided items can't be null.");
             }
+            // Use a new context instance.
+            using var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
             // Get the corresponding database set.
             var set = context.Set<T>();
             // Check if the correpsonding set doesn't exist.
@@ -99,7 +104,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Mark the items for update.
                 set.UpdateRange(batchItems);
                 // Save the changes to the database.
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
 

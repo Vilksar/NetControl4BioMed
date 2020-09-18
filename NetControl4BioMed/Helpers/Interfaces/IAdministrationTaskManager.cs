@@ -20,259 +20,233 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void CreateNodes(string id, CancellationToken token);
+        Task CreateNodesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Creates edges in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void CreateEdges(string id, CancellationToken token);
+        Task CreateEdgesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Creates node collections in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void CreateNodeCollections(string id, CancellationToken token);
+        Task CreateNodeCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Edits nodes in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void EditNodes(string id, CancellationToken token);
+        Task EditNodesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Edits edges in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void EditEdges(string id, CancellationToken token);
+        Task EditEdgesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Edits node collections in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void EditNodeCollections(string id, CancellationToken token);
+        Task EditNodeCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes users from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteUsers(string id, CancellationToken token);
+        Task DeleteUsersAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes roles from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteRoles(string id, CancellationToken token);
+        Task DeleteRolesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes user roles from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteUserRoles(string id, CancellationToken token);
+        Task DeleteUserRolesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes database types from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteDatabaseTypes(string id, CancellationToken token);
+        Task DeleteDatabaseTypesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes databases from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteDatabases(string id, CancellationToken token);
+        Task DeleteDatabasesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes database users from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteDatabaseUsers(string id, CancellationToken token);
+        Task DeleteDatabaseUsersAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes database user invitations from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteDatabaseUserInvitations(string id, CancellationToken token);
+        Task DeleteDatabaseUserInvitationsAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes database node fields from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteDatabaseNodeFields(string id, CancellationToken token);
+        Task DeleteDatabaseNodeFieldsAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes database edge fields from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteDatabaseEdgeFields(string id, CancellationToken token);
+        Task DeleteDatabaseEdgeFieldsAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes nodes from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteNodes(string id, CancellationToken token);
+        Task DeleteNodesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes edges from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteEdges(string id, CancellationToken token);
+        Task DeleteEdgesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes node collections from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteNodeCollections(string id, CancellationToken token);
+        Task DeleteNodeCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes networks from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteNetworks(string id, CancellationToken token);
+        Task DeleteNetworksAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes analyses from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteAnalyses(string id, CancellationToken token);
+        Task DeleteAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Stops analyses in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void StopAnalyses(string id, CancellationToken token);
+        Task StopAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes all nodes from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteAllNodes(string id, CancellationToken token);
+        Task DeleteAllNodesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes all edges from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteAllEdges(string id, CancellationToken token);
+        Task DeleteAllEdgesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes all node collections from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteAllNodeCollections(string id, CancellationToken token);
+        Task DeleteAllNodeCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes all networks from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteAllNetworks(string id, CancellationToken token);
+        Task DeleteAllNetworksAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes all analyses from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
-        void DeleteAllAnalyses(string id, CancellationToken token);
+        Task DeleteAllAnalysesAsync(string id, CancellationToken token);
     }
 }

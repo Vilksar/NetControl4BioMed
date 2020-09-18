@@ -440,6 +440,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             // Define a new task.
             var task = new AnalysesTask
             {
+                Scheme = HttpContext.Request.Scheme,
+                HostValue = HttpContext.Request.Host.Value,
                 Items = new List<AnalysisInputModel>
                 {
                     new AnalysisInputModel
@@ -495,13 +497,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     }
                 }
             };
-            // Define a variable to store the analyses that will be created.
-            var analyses = new List<Analysis>();
             // Try to run the task.
             try
             {
                 // Run the task.
-                analyses.AddRange(task.Create(_serviceProvider, CancellationToken.None).ToList());
+                await task.CreateAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {
@@ -510,58 +510,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 // Redisplay the page.
                 return Page();
             }
-            // Define the new background tasks.
-            var generateBackgroundTask = new BackgroundTask
-            {
-                DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.GenerateAnalyses)}",
-                IsRecurring = false,
-                Data = JsonSerializer.Serialize(new AnalysesTask
-                {
-                    Items = analyses.Select(item => new AnalysisInputModel
-                    {
-                        Id = item.Id
-                    })
-                })
-            };
-            var startBackgroundTask = new BackgroundTask
-            {
-                DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.StartAnalyses)}",
-                IsRecurring = false,
-                Data = JsonSerializer.Serialize(new AnalysesTask
-                {
-                    Items = analyses.Select(item => new AnalysisInputModel
-                    {
-                        Id = item.Id
-                    })
-                })
-            };
-            var sendEndedEmailsBackgroundTask = new BackgroundTask
-            {
-                DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.SendEndedEmails)}",
-                IsRecurring = false,
-                Data = JsonSerializer.Serialize(new AnalysesTask
-                {
-                    Scheme = HttpContext.Request.Scheme,
-                    HostValue = HttpContext.Request.Host.Value,
-                    Items = analyses.Select(item => new AnalysisInputModel
-                    {
-                        Id = item.Id
-                    })
-                })
-            };
-            // Mark the task for addition.
-            _context.BackgroundTasks.Add(generateBackgroundTask);
-            _context.BackgroundTasks.Add(startBackgroundTask);
-            _context.BackgroundTasks.Add(sendEndedEmailsBackgroundTask);
-            // Save the changes to the database.
-            _context.SaveChanges();
-            // Create a new Hangfire background job.
-            var generateJobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateAnalyses(generateBackgroundTask.Id, CancellationToken.None));
-            var startJobId = BackgroundJob.ContinueJobWith<IContentTaskManager>(generateJobId, item => item.StartAnalyses(startBackgroundTask.Id, CancellationToken.None), JobContinuationOptions.OnlyOnSucceededState);
-            var sendEndedEmailsJobId = BackgroundJob.ContinueJobWith<IContentTaskManager>(startJobId, item => item.SendEndedEmails(sendEndedEmailsBackgroundTask.Id, CancellationToken.None), JobContinuationOptions.OnlyOnSucceededState);
             // Display a message.
             TempData["StatusMessage"] = $"Success: 1 analysis of type \"{databaseType.Name}\" with algorithm \"{Input.Algorithm}\" defined successfully and scheduled for generation.";
             // Redirect to the index page.

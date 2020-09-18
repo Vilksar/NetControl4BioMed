@@ -269,8 +269,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             try
             {
                 // Run the tasks.
-                analysisUsersTask.Delete(_serviceProvider, CancellationToken.None);
-                analysisUserInvitationsTask.Delete(_serviceProvider, CancellationToken.None);
+                await analysisUsersTask.DeleteAsync(_serviceProvider, CancellationToken.None);
+                await analysisUserInvitationsTask.DeleteAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {
@@ -297,7 +297,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 try
                 {
                     // Run the tasks.
-                    analysesTask.Delete(_serviceProvider, CancellationToken.None);
+                    await analysesTask.DeleteAsync(_serviceProvider, CancellationToken.None);
                 }
                 catch (Exception exception)
                 {

@@ -568,13 +568,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     }
                 }
             };
-            // Define a variable to store the networks that will be created.
-            var networks = new List<Network>();
             // Try to run the task.
             try
             {
                 // Run the task.
-                networks.AddRange(task.Create(_serviceProvider, CancellationToken.None).ToList());
+                await task.CreateAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {
@@ -583,26 +581,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 // Redisplay the page.
                 return Page();
             }
-            // Define a new background task.
-            var generateBackgroundTask = new BackgroundTask
-            {
-                DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.GenerateNetworks)}",
-                IsRecurring = false,
-                Data = JsonSerializer.Serialize(new NetworksTask
-                {
-                    Items = networks.Select(item => new NetworkInputModel
-                    {
-                        Id = item.Id
-                    })
-                })
-            };
-            // Mark the task for addition.
-            _context.BackgroundTasks.Add(generateBackgroundTask);
-            // Save the changes to the database.
-            _context.SaveChanges();
-            // Create a new Hangfire background job.
-            var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateNetworks(generateBackgroundTask.Id, CancellationToken.None));
             // Display a message.
             TempData["StatusMessage"] = $"Success: 1 network of type \"{databaseType.Name}\" defined successfully and scheduled for generation.";
             // Redirect to the index page.

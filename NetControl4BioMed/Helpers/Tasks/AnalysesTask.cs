@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,7 +45,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public IEnumerable<Analysis> Create(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task CreateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -294,14 +295,60 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Add the new item to the list.
                     analysesToAdd.Add(analysis);
                 }
-                // Edit the items.
-                IEnumerableExtensions.Create(analysesToAdd, context, token);
-                // Go over each item.
-                foreach (var analysisToAdd in analysesToAdd)
+                // Create the items.
+                await IEnumerableExtensions.CreateAsync(analysesToAdd, serviceProvider, token);
+                // Define the new background tasks.
+                var generateBackgroundTask = new BackgroundTask
                 {
-                    // Yield return it.
-                    yield return analysisToAdd;
-                }
+                    DateTimeCreated = DateTime.UtcNow,
+                    Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.GenerateAnalysesAsync)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new AnalysesTask
+                    {
+                        Items = analysesToAdd.Select(item => new AnalysisInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                var startBackgroundTask = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.UtcNow,
+                    Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.StartAnalysesAsync)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new AnalysesTask
+                    {
+                        Items = analysesToAdd.Select(item => new AnalysisInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                var sendEndedEmailsBackgroundTask = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.UtcNow,
+                    Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.SendAnalysesEndedEmailsAsync)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new AnalysesTask
+                    {
+                        Scheme = Scheme,
+                        HostValue = HostValue,
+                        Items = analysesToAdd.Select(item => new AnalysisInputModel
+                        {
+                            Id = item.Id
+                        })
+                    })
+                };
+                // Mark the task for addition.
+                context.BackgroundTasks.Add(generateBackgroundTask);
+                context.BackgroundTasks.Add(startBackgroundTask);
+                context.BackgroundTasks.Add(sendEndedEmailsBackgroundTask);
+                // Save the changes to the database.
+                await context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var generateJobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateAnalysesAsync(generateBackgroundTask.Id, CancellationToken.None));
+                var startJobId = BackgroundJob.ContinueJobWith<IContentTaskManager>(generateJobId, item => item.StartAnalysesAsync(startBackgroundTask.Id, CancellationToken.None), JobContinuationOptions.OnlyOnSucceededState);
+                var sendEndedEmailsJobId = BackgroundJob.ContinueJobWith<IContentTaskManager>(startJobId, item => item.SendAnalysesEndedEmailsAsync(sendEndedEmailsBackgroundTask.Id, CancellationToken.None), JobContinuationOptions.OnlyOnSucceededState);
             }
         }
 
@@ -310,7 +357,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public IEnumerable<Analysis> Edit(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task EditAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -365,13 +412,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     analysesToEdit.Add(analysis);
                 }
                 // Edit the items.
-                IEnumerableExtensions.Edit(analysesToEdit, context, token);
-                // Go over each item.
-                foreach (var analysisToEdit in analysesToEdit)
-                {
-                    // Yield return it.
-                    yield return analysisToEdit;
-                }
+                await IEnumerableExtensions.EditAsync(analysesToEdit, serviceProvider, token);
             }
         }
 
@@ -380,7 +421,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Delete(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -413,7 +454,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analyses = context.Analyses
                     .Where(item => batchIds.Contains(item.Id));
                 // Delete the items.
-                IQueryableExtensions.Delete(analyses, context, token);
+                await IQueryableExtensions.DeleteAsync(analyses, serviceProvider, token);
             }
         }
 
@@ -422,7 +463,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Generate(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task GenerateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -477,7 +518,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Add a message to the log.
                     analysis.Log = analysis.AppendToLog("The analysis is now generating.");
                     // Edit the network.
-                    IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                     // Try to deserialize the data.
                     if (!analysis.Data.TryDeserializeJsonObject<IEnumerable<AnalysisNodeInputModel>>(out var data) || data == null)
                     {
@@ -486,7 +527,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         analysis.Log = analysis.AppendToLog("The source and / or target data corresponding to the analysis could not be deserialized.");
                         // Edit the analysis.
-                        IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         // Continue.
                         continue;
                     }
@@ -564,7 +605,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         analysis.Log = analysis.AppendToLog("No nodes could be found within the provided networks.");
                         // Edit the analysis.
-                        IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         // Continue.
                         continue;
                     }
@@ -582,7 +623,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         analysis.Log = analysis.AppendToLog("No edges could be found within the provided networks.");
                         // Edit the analysis.
-                        IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         // Continue.
                         continue;
                     }
@@ -603,7 +644,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         analysis.Log = analysis.AppendToLog("No target nodes could be found with the provided target data.");
                         // Edit the analysis.
-                        IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         // Continue.
                         continue;
                     }
@@ -650,7 +691,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Remove the generation data.
                     analysis.Data = null;
                     // Edit the analysis.
-                    IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                 }
             }
         }
@@ -660,7 +701,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Start(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task StartAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -707,16 +748,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if the status is not valid.
                     if (analysis.Status != AnalysisStatus.Scheduled)
                     {
-                        // Update the analysis log.
-                        analysis.Log = analysis.AppendToLog("The status of the analysis is not valid in order to be started.");
                         // Update the analysis status.
                         analysis.Status = AnalysisStatus.Error;
+                        // Update the analysis log.
+                        analysis.Log = analysis.AppendToLog("The status of the analysis is not valid in order to be started.");
                         // Update the start time.
                         analysis.DateTimeStarted = DateTime.UtcNow;
                         // Update the end time.
                         analysis.DateTimeEnded = DateTime.UtcNow;
                         // Edit the analysis.
-                        IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         // Continue.
                         continue;
                     }
@@ -728,25 +769,25 @@ namespace NetControl4BioMed.Helpers.Tasks
                         {
                             case AnalysisAlgorithm.Algorithm1:
                                 // Run the algorithm on the analysis.
-                                Algorithms.Algorithm1.Algorithm.Run(analysis, context, token);
+                                await Algorithms.Algorithm1.Algorithm.Run(analysis, serviceProvider, token);
                                 // End the switch.
                                 break;
                             case AnalysisAlgorithm.Algorithm2:
                                 // Run the algorithm on the analysis.
-                                Algorithms.Algorithm2.Algorithm.Run(analysis, context, token);
+                                await Algorithms.Algorithm2.Algorithm.Run(analysis, serviceProvider, token);
                                 // End the switch.
                                 break;
                             default:
-                                // Update the analysis log.
-                                analysis.Log = analysis.AppendToLog("The running algorithm is not valid.");
                                 // Update the analysis status.
                                 analysis.Status = AnalysisStatus.Error;
+                                // Update the analysis log.
+                                analysis.Log = analysis.AppendToLog("The running algorithm is not valid.");
                                 // Update the start time.
                                 analysis.DateTimeStarted = DateTime.UtcNow;
                                 // Update the end time.
                                 analysis.DateTimeEnded = DateTime.UtcNow;
                                 // Edit the analysis.
-                                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                                 // End the switch.
                                 break;
                         }
@@ -761,16 +802,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                         }
                         // Get the error message
                         var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
-                        // Update the analysis log.
-                        analysis.Log = analysis.AppendToLog("An error occured while running the analysis." + message);
                         // Update the analysis status.
                         analysis.Status = AnalysisStatus.Error;
+                        // Update the analysis log.
+                        analysis.Log = analysis.AppendToLog("An error occured while running the analysis." + message);
                         // Update the start time, if needed.
                         analysis.DateTimeStarted = analysis.DateTimeStarted ?? DateTime.UtcNow;
                         // Update the end time.
                         analysis.DateTimeEnded = DateTime.UtcNow;
                         // Edit the analysis.
-                        IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         // Continue.
                         continue;
                     }
@@ -783,7 +824,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Stop(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task StopAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -827,12 +868,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
-                    // Update the log.
-                    analysis.Log = analysis.AppendToLog("The analysis has been scheduled to stop.");
                     // Update the status.
                     analysis.Status = AnalysisStatus.Stopping;
+                    // Update the log.
+                    analysis.Log = analysis.AppendToLog("The analysis has been scheduled to stop.");
                     // Update the items.
-                    IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                 }
             }
         }
@@ -844,7 +885,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void SendEndedEmails(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task SendEndedEmailsAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -900,7 +941,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     foreach (var user in analysis.AnalysisUsers.Select(item => item.User))
                     {
                         // Send an analysis ending e-mail.
-                        Task.Run(() => emailSender.SendAnalysisEndedEmailAsync(new EmailAnalysisEndedViewModel
+                        await emailSender.SendAnalysisEndedEmailAsync(new EmailAnalysisEndedViewModel
                         {
                             Email = user.Email,
                             Id = analysis.Id,
@@ -908,7 +949,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             Status = analysis.Status.GetDisplayName(),
                             Url = linkGenerator.GetUriByPage("/Content/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }, scheme: Scheme, host: host),
                             ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
-                        })).Wait();
+                        });
                     }
                 }
             }

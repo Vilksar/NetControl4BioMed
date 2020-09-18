@@ -133,7 +133,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             var task = new BackgroundTask
             {
                 DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.DeleteNetworks)}",
+                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.DeleteNetworksAsync)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new NetworksTask
                 {
@@ -146,9 +146,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             // Mark the task for addition.
             _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             // Create a new Hangfire background job.
-            var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.DeleteNetworks(task.Id, CancellationToken.None));
+            var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.DeleteNetworksAsync(task.Id, CancellationToken.None));
             // Display a message.
             TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} network{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.

@@ -269,8 +269,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
             try
             {
                 // Run the tasks.
-                networkUsersTask.Delete(_serviceProvider, CancellationToken.None);
-                networkUserInvitationsTask.Delete(_serviceProvider, CancellationToken.None);
+                await networkUsersTask.DeleteAsync(_serviceProvider, CancellationToken.None);
+                await networkUserInvitationsTask.DeleteAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {
@@ -297,7 +297,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
                 try
                 {
                     // Run the tasks.
-                    networksTask.Delete(_serviceProvider, CancellationToken.None);
+                    await networksTask.DeleteAsync(_serviceProvider, CancellationToken.None);
                 }
                 catch (Exception exception)
                 {

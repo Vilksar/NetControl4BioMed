@@ -29,8 +29,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The created items.</returns>
-        public IEnumerable<DatabaseUserInvitation> Create(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task CreateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -122,13 +121,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseUserInvitationsToAdd.Add(databaseUserInvitation);
                 }
                 // Create the items.
-                IEnumerableExtensions.Create(databaseUserInvitationsToAdd, context, token);
-                // Go over each item.
-                foreach (var databaseUserInvitation in databaseUserInvitationsToAdd)
-                {
-                    // Yield return it.
-                    yield return databaseUserInvitation;
-                }
+                await IEnumerableExtensions.CreateAsync(databaseUserInvitationsToAdd, serviceProvider, token);
             }
         }
 
@@ -137,7 +130,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Delete(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -173,7 +166,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var databaseUserInvitations = context.DatabaseUserInvitations
                     .Where(item => batchIds.Any(item1 => item1.Item1 == item.Database.Id && item1.Item2 == item.Email));
                 // Delete the items.
-                IQueryableExtensions.Delete(databaseUserInvitations, context, token);
+                await IQueryableExtensions.DeleteAsync(databaseUserInvitations, serviceProvider, token);
             }
         }
     }

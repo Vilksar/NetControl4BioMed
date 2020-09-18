@@ -73,7 +73,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())
@@ -112,7 +112,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
             var task = new BackgroundTask
             {
                 DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteEdges)}",
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteEdgesAsync)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new EdgesTask
                 {
@@ -125,9 +125,9 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
             // Mark the task for addition.
             _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             // Create a new Hangfire background job.
-            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteEdges(task.Id, CancellationToken.None));
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteEdgesAsync(task.Id, CancellationToken.None));
             // Display a message.
             TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} edge{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.

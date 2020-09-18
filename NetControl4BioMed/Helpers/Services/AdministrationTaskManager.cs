@@ -24,18 +24,12 @@ namespace NetControl4BioMed.Helpers.Services
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
-        /// Represents the application database context.
-        /// </summary>
-        private readonly ApplicationDbContext _context;
-
-        /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
-        public AdministrationTaskManager(IServiceProvider serviceProvider, ApplicationDbContext context)
+        public AdministrationTaskManager(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _context = context;
         }
 
         /// <summary>
@@ -43,16 +37,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void CreateNodes(string id, CancellationToken token)
+        public async Task CreateNodesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<NodesTask>(backgroundTask);
             // Run the task.
-            _ = task.Create(_serviceProvider, token).ToList();
+            await task.CreateAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -60,16 +54,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void CreateEdges(string id, CancellationToken token)
+        public async Task CreateEdgesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<EdgesTask>(backgroundTask);
             // Run the task.
-            _ = task.Create(_serviceProvider, token).ToList();
+            await task.CreateAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -77,16 +71,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void CreateNodeCollections(string id, CancellationToken token)
+        public async Task CreateNodeCollectionsAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<NodeCollectionsTask>(backgroundTask);
             // Run the task.
-            _ = task.Create(_serviceProvider, token).ToList();
+            await task.CreateAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -94,16 +88,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void EditNodes(string id, CancellationToken token)
+        public async Task EditNodesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<NodesTask>(backgroundTask);
             // Run the task.
-            _ = task.Edit(_serviceProvider, token).ToList();
+            await task.EditAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -111,16 +105,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void EditEdges(string id, CancellationToken token)
+        public async Task EditEdgesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<EdgesTask>(backgroundTask);
             // Run the task.
-            _ = task.Edit(_serviceProvider, token).ToList();
+            await task.EditAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -128,16 +122,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void EditNodeCollections(string id, CancellationToken token)
+        public async Task EditNodeCollectionsAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<NodeCollectionsTask>(backgroundTask);
             // Run the task.
-            _ = task.Edit(_serviceProvider, token).ToList();
+            await task.EditAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -145,16 +139,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteUsers(string id, CancellationToken token)
+        public async Task DeleteUsersAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<UsersTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -162,16 +156,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteRoles(string id, CancellationToken token)
+        public async Task DeleteRolesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<RolesTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -179,16 +173,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteUserRoles(string id, CancellationToken token)
+        public async Task DeleteUserRolesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<UserRolesTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -196,16 +190,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteDatabaseUsers(string id, CancellationToken token)
+        public async Task DeleteDatabaseUsersAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<DatabaseUsersTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -213,16 +207,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteDatabaseUserInvitations(string id, CancellationToken token)
+        public async Task DeleteDatabaseUserInvitationsAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<DatabaseUserInvitationsTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -230,16 +224,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteDatabaseTypes(string id, CancellationToken token)
+        public async Task DeleteDatabaseTypesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<DatabaseTypesTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -247,16 +241,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteDatabases(string id, CancellationToken token)
+        public async Task DeleteDatabasesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<DatabasesTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -264,16 +258,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteDatabaseNodeFields(string id, CancellationToken token)
+        public async Task DeleteDatabaseNodeFieldsAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<DatabaseNodeFieldsTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -281,16 +275,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteDatabaseEdgeFields(string id, CancellationToken token)
+        public async Task DeleteDatabaseEdgeFieldsAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<DatabaseEdgeFieldsTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -298,16 +292,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteNodes(string id, CancellationToken token)
+        public async Task DeleteNodesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<NodesTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -315,16 +309,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteEdges(string id, CancellationToken token)
+        public async Task DeleteEdgesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<EdgesTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -332,16 +326,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteNodeCollections(string id, CancellationToken token)
+        public async Task DeleteNodeCollectionsAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<NodeCollectionsTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -349,16 +343,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteNetworks(string id, CancellationToken token)
+        public async Task DeleteNetworksAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<NetworksTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -366,16 +360,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteAnalyses(string id, CancellationToken token)
+        public async Task DeleteAnalysesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<AnalysesTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -383,16 +377,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void StopAnalyses(string id, CancellationToken token)
+        public async Task StopAnalysesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<AnalysesTask>(backgroundTask);
             // Run the task.
-            task.Stop(_serviceProvider, token);
+            await task.StopAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -400,14 +394,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteAllNodes(string id, CancellationToken token)
+        public async Task DeleteAllNodesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
             var task = GetTask<NodesTask>(backgroundTask);
+            // Use a new context instance.
+            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
             // Get all of the item IDs.
-            task.Items = _context.Nodes
+            task.Items = context.Nodes
                 .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                 .Select(item => item.Id)
                 .ToList()
@@ -416,9 +412,9 @@ namespace NetControl4BioMed.Helpers.Services
                     Id = item
                 });
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -426,14 +422,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteAllEdges(string id, CancellationToken token)
+        public async Task DeleteAllEdgesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
             var task = GetTask<EdgesTask>(backgroundTask);
+            // Use a new context instance.
+            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
             // Get all of the item IDs.
-            task.Items = _context.Edges
+            task.Items = context.Edges
                 .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                 .Select(item => item.Id)
                 .ToList()
@@ -442,9 +440,9 @@ namespace NetControl4BioMed.Helpers.Services
                     Id = item
                 });
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -452,14 +450,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteAllNodeCollections(string id, CancellationToken token)
+        public async Task DeleteAllNodeCollectionsAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
             var task = GetTask<NodeCollectionsTask>(backgroundTask);
+            // Use a new context instance.
+            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
             // Get all of the item IDs.
-            task.Items = _context.NodeCollections
+            task.Items = context.NodeCollections
                 .Select(item => item.Id)
                 .ToList()
                 .Select(item => new InputModels.NodeCollectionInputModel
@@ -467,9 +467,9 @@ namespace NetControl4BioMed.Helpers.Services
                     Id = item
                 });
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -477,14 +477,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteAllNetworks(string id, CancellationToken token)
+        public async Task DeleteAllNetworksAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
             var task = GetTask<NetworksTask>(backgroundTask);
+            // Use a new context instance.
+            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
             // Get all of the item IDs.
-            task.Items = _context.Networks
+            task.Items = context.Networks
                 .Select(item => item.Id)
                 .ToList()
                 .Select(item => new InputModels.NetworkInputModel
@@ -492,9 +494,9 @@ namespace NetControl4BioMed.Helpers.Services
                     Id = item
                 });
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -502,14 +504,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteAllAnalyses(string id, CancellationToken token)
+        public async Task DeleteAllAnalysesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
             var task = GetTask<AnalysesTask>(backgroundTask);
+            // Use a new context instance.
+            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
             // Get all of the item IDs.
-            task.Items = _context.Analyses
+            task.Items = context.Analyses
                 .Select(item => item.Id)
                 .ToList()
                 .Select(item => new InputModels.AnalysisInputModel
@@ -517,9 +521,9 @@ namespace NetControl4BioMed.Helpers.Services
                     Id = item
                 });
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTaskAsync(backgroundTask);
         }
 
         /// <summary>
@@ -529,8 +533,10 @@ namespace NetControl4BioMed.Helpers.Services
         /// <returns>The background task corresponding to the provided ID.</returns>
         private BackgroundTask GetBackgroundTask(string id)
         {
+            // Use a new context instance.
+            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
             // Try to get the background task with the provided ID.
-            var backgroundTask = _context.BackgroundTasks
+            var backgroundTask = context.BackgroundTasks
                 .Where(item => item.Id == id)
                 .FirstOrDefault();
             // Check if there was any task found.
@@ -565,12 +571,14 @@ namespace NetControl4BioMed.Helpers.Services
         /// Deletes the provided background task.
         /// </summary>
         /// <param name="backgroundTask">The current background task.</param>
-        private void DeleteBackgroundTask(BackgroundTask backgroundTask)
+        private async Task DeleteBackgroundTaskAsync(BackgroundTask backgroundTask)
         {
+            // Use a new context instance.
+            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
             // Mark the task for deletion.
-            _context.BackgroundTasks.Remove(backgroundTask);
+            context.BackgroundTasks.Remove(backgroundTask);
             // Save the changes.
-            _context.SaveChanges();
+            await context.SaveChangesAsync();
         }
     }
 }

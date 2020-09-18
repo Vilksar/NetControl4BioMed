@@ -31,8 +31,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The created items.</returns>
-        public IEnumerable<User> Create(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task CreateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -112,7 +111,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             throw new TaskException("The provided data couldn't be deserialized.", showExceptionItem, batchItem);
                         }
                         // Try to create the new user.
-                        result = result.Succeeded? Task.Run(() => userManager.CreateAsync(user, password)).Result : result;
+                        result = result.Succeeded? await userManager.CreateAsync(user, password) : result;
                     }
                     else if (batchItem.Type == "External")
                     {
@@ -123,9 +122,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                             throw new TaskException("The provided data couldn't be deserialized.", showExceptionItem, batchItem);
                         }
                         // Try to create the new user.
-                        result = result.Succeeded ? Task.Run(() => userManager.CreateAsync(user)).Result : result;
+                        result = result.Succeeded ? await userManager.CreateAsync(user) : result;
                         // Add the external login.
-                        result = result.Succeeded ? Task.Run(() => userManager.AddLoginAsync(user, info)).Result : result;
+                        result = result.Succeeded ? await userManager.AddLoginAsync(user, info) : result;
                     }
                     else
                     {
@@ -136,9 +135,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.EmailConfirmed)
                     {
                         // Generate the token for e-mail confirmation.
-                        var confirmationToken = Task.Run(() => userManager.GenerateEmailConfirmationTokenAsync(user)).Result;
+                        var confirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
                         // Confirm the e-mail address.
-                        result = result.Succeeded ? Task.Run(() => userManager.ConfirmEmailAsync(user, confirmationToken)).Result : result;
+                        result = result.Succeeded ? await userManager.ConfirmEmailAsync(user, confirmationToken) : result;
                     }
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
@@ -182,15 +181,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                         DateTimeCreated = item.DateTimeCreated
                     });
                     // Create the items.
-                    IEnumerableExtensions.Create(databaseUsers, context, token);
-                    IEnumerableExtensions.Create(networkUsers, context, token);
-                    IEnumerableExtensions.Create(analysisUsers, context, token);
+                    await IEnumerableExtensions.CreateAsync(databaseUsers, serviceProvider, token);
+                    await IEnumerableExtensions.CreateAsync(networkUsers, serviceProvider, token);
+                    await IEnumerableExtensions.CreateAsync(analysisUsers, serviceProvider, token);
                     // Delete the items
-                    IQueryableExtensions.Delete(databaseUserInvitations, context, token);
-                    IQueryableExtensions.Delete(networkUserInvitations, context, token);
-                    IQueryableExtensions.Delete(analysisUserInvitations, context, token);
-                    // Yield return the item.
-                    yield return user;
+                    await IQueryableExtensions.DeleteAsync(databaseUserInvitations, serviceProvider, token);
+                    await IQueryableExtensions.DeleteAsync(networkUserInvitations, serviceProvider, token);
+                    await IQueryableExtensions.DeleteAsync(analysisUserInvitations, serviceProvider, token);
                 }
             }
         }
@@ -200,8 +197,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The edited items.</returns>
-        public IEnumerable<User> Edit(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task EditAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -258,16 +254,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.Email != user.Email)
                     {
                         // Try to update the username.
-                        result = Task.Run(() => userManager.SetUserNameAsync(user, batchItem.Email)).Result;
+                        result = await userManager.SetUserNameAsync(user, batchItem.Email);
                         // Try to update the e-mail.
-                        result = result.Succeeded ? Task.Run(() => userManager.SetEmailAsync(user, batchItem.Email)).Result : result;
+                        result = result.Succeeded ? await userManager.SetEmailAsync(user, batchItem.Email) : result;
                     }
                     // Check if the e-mail should be set as confirmed.
                     if (!user.EmailConfirmed && batchItem.EmailConfirmed)
                     {
                         // Generate the token and try to set it.
-                        var confirmationToken = Task.Run(() => userManager.GenerateEmailConfirmationTokenAsync(user)).Result;
-                        result = result.Succeeded ? Task.Run(() => userManager.ConfirmEmailAsync(user, confirmationToken)).Result : result;
+                        var confirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                        result = result.Succeeded ? await userManager.ConfirmEmailAsync(user, confirmationToken) : result;
                     }
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
@@ -278,8 +274,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                     }
-                    // Yield return the item.
-                    yield return user;
                 }
             }
         }
@@ -289,7 +283,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Delete(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -323,19 +317,21 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the items with the provided IDs.
                 var users = context.Users
                     .Where(item => batchIds.Contains(item.Id));
+                // Define a variable to store the error messages.
+                var errorMessages = new List<string>();
                 // Go over each item.
                 foreach (var user in users.ToList())
                 {
                     // Delete it.
-                    var result = Task.Run(() => userManager.DeleteAsync(user)).Result;
+                    var result = await userManager.DeleteAsync(user);
                     // Check if the operation has failed.
                     if (!result.Succeeded)
                     {
                         // Define the exception messages.
                         var messages = result.Errors
                             .Select(item => item.Description);
-                        // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages));
+                        // Add the exception messages to the error messages.
+                        errorMessages.AddRange(messages);
                     }
                 }
                 // Get the related entities that use the items.
@@ -351,10 +347,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var genericEdges = context.Edges
                     .Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
                 // Delete the items.
-                IQueryableExtensions.Delete(analyses, context, token);
-                IQueryableExtensions.Delete(networks, context, token);
-                IQueryableExtensions.Delete(genericEdges, context, token);
-                IQueryableExtensions.Delete(genericNodes, context, token);
+                await IQueryableExtensions.DeleteAsync(analyses, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(networks, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(genericEdges, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(genericNodes, serviceProvider, token);
+                // Check if there have been any error messages.
+                if (errorMessages.Any())
+                {
+                    // Throw an exception.
+                    throw new TaskException(string.Join(" ", errorMessages));
+                }
             }
         }
     }

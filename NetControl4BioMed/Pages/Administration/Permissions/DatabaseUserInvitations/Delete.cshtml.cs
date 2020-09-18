@@ -79,7 +79,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // Check if there aren't any e-mails or IDs provided.
             if (Input.Emails == null || Input.DatabaseIds == null || !Input.Emails.Any() || !Input.DatabaseIds.Any() || Input.Emails.Count() != Input.DatabaseIds.Count())
@@ -122,7 +122,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
             var task = new BackgroundTask
             {
                 DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteDatabaseUserInvitations)}",
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteDatabaseUserInvitationsAsync)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new DatabaseUserInvitationsTask
                 {
@@ -138,9 +138,9 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
             // Mark the task for addition.
             _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             // Create a new Hangfire background job.
-            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteDatabaseUserInvitations(task.Id, CancellationToken.None));
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteDatabaseUserInvitationsAsync(task.Id, CancellationToken.None));
             // Display a message.
             TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} database user invitation{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.

@@ -61,7 +61,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // Check if there aren't any databases.
             if (!_context.Databases.Any())
@@ -101,7 +101,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
             try
             {
                 // Run the task.
-                _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
+                await task.CreateAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {

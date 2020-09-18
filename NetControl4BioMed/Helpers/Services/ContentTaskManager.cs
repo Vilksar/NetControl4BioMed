@@ -24,18 +24,12 @@ namespace NetControl4BioMed.Helpers.Services
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
-        /// Represents the application database context.
-        /// </summary>
-        private readonly ApplicationDbContext _context;
-
-        /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
-        public ContentTaskManager(IServiceProvider serviceProvider, ApplicationDbContext context)
+        public ContentTaskManager(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _context = context;
         }
 
         /// <summary>
@@ -43,16 +37,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteNetworks(string id, CancellationToken token)
+        public async Task DeleteNetworksAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<NetworksTask>(backgroundTask);
+            var task = GetTask<NetworksTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTask(backgroundTask);
         }
 
         /// <summary>
@@ -60,16 +54,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteAnalyses(string id, CancellationToken token)
+        public async Task DeleteAnalysesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<AnalysesTask>(backgroundTask);
+            var task = GetTask<AnalysesTask>(backgroundTask);
             // Run the task.
-            task.Delete(_serviceProvider, token);
+            await task.DeleteAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTask(backgroundTask);
         }
 
         /// <summary>
@@ -77,16 +71,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void GenerateNetworks(string id, CancellationToken token)
+        public async Task GenerateNetworksAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<NetworksTask>(backgroundTask);
+            var task = GetTask<NetworksTask>(backgroundTask);
             // Run the task.
-            task.Generate(_serviceProvider, token);
+            await task.GenerateAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTask(backgroundTask);
         }
 
         /// <summary>
@@ -94,16 +88,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void GenerateAnalyses(string id, CancellationToken token)
+        public async Task GenerateAnalysesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<AnalysesTask>(backgroundTask);
+            var task = GetTask<AnalysesTask>(backgroundTask);
             // Run the task.
-            task.Generate(_serviceProvider, token);
+            await task.GenerateAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTask(backgroundTask);
         }
 
         /// <summary>
@@ -111,16 +105,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void StartAnalyses(string id, CancellationToken token)
+        public async Task StartAnalysesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<AnalysesTask>(backgroundTask);
+            var task = GetTask<AnalysesTask>(backgroundTask);
             // Run the task.
-            task.Start(_serviceProvider, token);
+            await task.StartAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTask(backgroundTask);
         }
 
         /// <summary>
@@ -128,16 +122,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void StopAnalyses(string id, CancellationToken token)
+        public async Task StopAnalysesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<AnalysesTask>(backgroundTask);
+            var task = GetTask<AnalysesTask>(backgroundTask);
             // Run the task.
-            task.Stop(_serviceProvider, token);
+            await task.StopAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTask(backgroundTask);
         }
 
         /// <summary>
@@ -145,16 +139,16 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void SendEndedEmails(string id, CancellationToken token)
+        public async Task SendAnalysesEndedEmailsAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
-            var task = GetBackgroundTask<AnalysesTask>(backgroundTask);
+            var task = GetTask<AnalysesTask>(backgroundTask);
             // Run the task.
-            task.SendEndedEmails(_serviceProvider, token);
+            await task.SendEndedEmailsAsync(_serviceProvider, token);
             // Complete the task.
-            DeleteBackgroundTask(backgroundTask);
+            await DeleteBackgroundTask(backgroundTask);
         }
 
         /// <summary>
@@ -164,8 +158,10 @@ namespace NetControl4BioMed.Helpers.Services
         /// <returns>The background task corresponding to the provided ID.</returns>
         private BackgroundTask GetBackgroundTask(string id)
         {
+            // Use a new context instance.
+            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
             // Try to get the background task with the provided ID.
-            var backgroundTask = _context.BackgroundTasks
+            var backgroundTask = context.BackgroundTasks
                 .Where(item => item.Id == id)
                 .FirstOrDefault();
             // Check if there was any task found.
@@ -184,7 +180,7 @@ namespace NetControl4BioMed.Helpers.Services
         /// <typeparam name="T">The type of the corresponding task.</typeparam>
         /// <param name="backgroundTask">The current background task.</param>
         /// <returns>The task corresponding to the provided background task.</returns>
-        private T GetBackgroundTask<T>(BackgroundTask backgroundTask)
+        private T GetTask<T>(BackgroundTask backgroundTask)
         {
             // Try to deserialize the task.
             if (!backgroundTask.Data.TryDeserializeJsonObject<T>(out var task) || task == null)
@@ -200,12 +196,14 @@ namespace NetControl4BioMed.Helpers.Services
         /// Deletes the provided background task.
         /// </summary>
         /// <param name="backgroundTask">The current background task.</param>
-        private void DeleteBackgroundTask(BackgroundTask backgroundTask)
+        private async Task DeleteBackgroundTask(BackgroundTask backgroundTask)
         {
+            // Use a new context instance.
+            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
             // Mark the task for deletion.
-            _context.BackgroundTasks.Remove(backgroundTask);
+            context.BackgroundTasks.Remove(backgroundTask);
             // Save the changes.
-            _context.SaveChanges();
+            await context.SaveChangesAsync();
         }
     }
 }

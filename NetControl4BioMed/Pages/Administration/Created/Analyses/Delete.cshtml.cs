@@ -72,7 +72,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())
@@ -110,7 +110,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
             var task = new BackgroundTask
             {
                 DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAnalyses)}",
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAnalysesAsync)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new AnalysesTask
                 {
@@ -123,9 +123,9 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
             // Mark the task for addition.
             _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             // Create a new Hangfire background job.
-            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAnalyses(task.Id, CancellationToken.None));
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAnalysesAsync(task.Id, CancellationToken.None));
             // Display a message.
             TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} analys{(itemCount != 1 ? "e" : "i")}s.";
             // Redirect to the index page.

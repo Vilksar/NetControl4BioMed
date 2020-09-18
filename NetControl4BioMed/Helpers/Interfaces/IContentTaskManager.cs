@@ -19,62 +19,55 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
-        void DeleteNetworks(string id, CancellationToken token);
+        Task DeleteNetworksAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes analyses from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
-        void DeleteAnalyses(string id, CancellationToken token);
+        Task DeleteAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Generates networks.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
-        void GenerateNetworks(string id, CancellationToken token);
+        Task GenerateNetworksAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Generates analyses.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
-        void GenerateAnalyses(string id, CancellationToken token);
+        Task GenerateAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Starts analyses.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
-        void StartAnalyses(string id, CancellationToken token);
+        Task StartAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Stops analyses.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
-        void StopAnalyses(string id, CancellationToken token);
+        Task StopAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Sends ended e-mails to the corresponding analysis users.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns></returns>
         [AutomaticRetry(Attempts = 0)]
-        void SendEndedEmails(string id, CancellationToken token);
+        Task SendAnalysesEndedEmailsAsync(string id, CancellationToken token);
     }
 }

@@ -165,7 +165,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             try
             {
                 // Run the task.
-                _ = task.Edit(_serviceProvider, CancellationToken.None).ToList();
+                await task.EditAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {

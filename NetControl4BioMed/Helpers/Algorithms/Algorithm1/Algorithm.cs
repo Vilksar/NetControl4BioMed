@@ -1,4 +1,5 @@
-﻿using NetControl4BioMed.Data;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
@@ -20,18 +21,20 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// <summary>
         /// Runs the algorithm on the network with the provided details, using the given parameters.
         /// </summary>
-        /// <param name="context">The database context of the analysis.</param>
+        /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="analysis">The analysis which to run using the algorithm.</param>
-        public static void Run(Analysis analysis, ApplicationDbContext context, CancellationToken token)
+        public static async Task Run(Analysis analysis, IServiceProvider serviceProvider, CancellationToken token)
         {
+            // Use a new context instance.
+            using var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
             // Update the analysis status and stats.
             analysis.ControlPaths = new List<ControlPath>();
             analysis.Status = AnalysisStatus.Initializing;
             analysis.DateTimeStarted = DateTime.UtcNow;
             // Update the analysis.
-            IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
             // Reload the analysis for a fresh start.
-            Task.Run(() => context.Entry(analysis).ReloadAsync()).Wait();
+            await context.Entry(analysis).ReloadAsync();
             // Get the nodes, edges, target nodes and source (preferred) nodes.
             var nodes = context.AnalysisNodes
                 .Where(item => item.Analysis == analysis)
@@ -77,7 +80,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.UtcNow;
                 // Update the analysis.
-                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                 // End the function.
                 return;
             }
@@ -91,7 +94,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.UtcNow;
                 // Update the analysis.
-                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                 // End the function.
                 return;
             }
@@ -105,7 +108,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.UtcNow;
                 // Update the analysis.
-                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                 // End the function.
                 return;
             }
@@ -119,7 +122,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.UtcNow;
                 // Update the analysis.
-                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                 // End the function.
                 return;
             }
@@ -142,7 +145,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             analysis.Parameters = JsonSerializer.Serialize(parameters);
             analysis.Status = AnalysisStatus.Ongoing;
             // Update the analysis.
-            IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
             // Run as long as the analysis exists and the final iteration hasn't been reached.
             while (analysis != null && analysis.Status == AnalysisStatus.Ongoing && currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement && !token.IsCancellationRequested)
             {
@@ -153,7 +156,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                 analysis.CurrentIteration = currentIteration;
                 analysis.CurrentIterationWithoutImprovement = currentIterationWithoutImprovement;
                 // Update the analysis.
-                IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                 // Define a variable to store the control paths.
                 var controlPath = new Dictionary<string, List<string>>();
                 // Set up the control path to start from the target nodes.
@@ -288,7 +291,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
                     }
                 }
                 // Reload it for the next iteration.
-                Task.Run(() => context.Entry(analysis).ReloadAsync()).Wait();
+                await context.Entry(analysis).ReloadAsync();
             }
             // Check if the analysis doesn't exist anymore (if it has been deleted).
             if (analysis == null)
@@ -354,7 +357,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
             analysis.DateTimeEnded = DateTime.UtcNow;
             analysis.Log = analysis.AppendToLog($"The analysis has ended with the status \"{analysis.Status.GetDisplayName()}\".");
             // Update the analysis.
-            IEnumerableExtensions.Edit(analysis.Yield(), context, token);
+            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
             // End the function.
             return;
         }
