@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
+namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
 {
     /// <summary>
     /// Represents the model of the parameters used by the algorithm.

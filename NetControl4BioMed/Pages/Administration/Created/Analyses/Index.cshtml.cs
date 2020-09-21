@@ -62,10 +62,10 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                     { "IsNotCompleted", "Is not completed" },
                     { "IsError", "Is error" },
                     { "IsNotError", "Is not error" },
-                    { "UsesAlgorithm1", "Uses the first algorithm" },
-                    { "UsesNotAlgorithm1", "Doesn't use the first algorithm" },
-                    { "UsesAlgorithm2", "Uses the second algorithm" },
-                    { "UsesNotAlgorithm2", "Doesn't use the second algorithm" },
+                    { "UsesGreedyAlgorithm", "Uses the greedy algorithm" },
+                    { "UsesNotGreedyAlgorithm", "Doesn't use the greedy algorithm" },
+                    { "UsesGeneticAlgorithm", "Uses the genetic algorithm" },
+                    { "UsesNotGeneticAlgorithm", "Doesn't use the genetic algorithm" },
                     { "HasAnalysisUsers", "Has analysis users" },
                     { "HasNoAnalysisUsers", "Does not have analysis users" },
                     { "HasAnalysisUserInvitations", "Has analysis user invitations" },
@@ -142,10 +142,10 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 .Where(item => input.Filter.Contains("IsNotCompleted") ? item.Status != AnalysisStatus.Completed : true)
                 .Where(item => input.Filter.Contains("IsError") ? item.Status == AnalysisStatus.Error : true)
                 .Where(item => input.Filter.Contains("IsNotError") ? item.Status != AnalysisStatus.Error : true)
-                .Where(item => input.Filter.Contains("UsesAlgorithm1") ? item.Algorithm == AnalysisAlgorithm.Algorithm1 : true)
-                .Where(item => input.Filter.Contains("UsesNotAlgorithm1") ? item.Algorithm != AnalysisAlgorithm.Algorithm1 : true)
-                .Where(item => input.Filter.Contains("UsesAlgorithm2") ? item.Algorithm == AnalysisAlgorithm.Algorithm2 : true)
-                .Where(item => input.Filter.Contains("UsesNotAlgorithm2") ? item.Algorithm != AnalysisAlgorithm.Algorithm2 : true)
+                .Where(item => input.Filter.Contains("UsesGreedyAlgorithm") ? item.Algorithm == AnalysisAlgorithm.Greedy : true)
+                .Where(item => input.Filter.Contains("UsesNotGreedyAlgorithm") ? item.Algorithm != AnalysisAlgorithm.Greedy : true)
+                .Where(item => input.Filter.Contains("UsesGeneticAlgorithm") ? item.Algorithm == AnalysisAlgorithm.Genetic : true)
+                .Where(item => input.Filter.Contains("UsesNotGeneticAlgorithm") ? item.Algorithm != AnalysisAlgorithm.Genetic : true)
                 .Where(item => input.Filter.Contains("HasAnalysisUsers") ? item.AnalysisUsers.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoAnalysisUsers") ? !item.AnalysisUsers.Any() : true)
                 .Where(item => input.Filter.Contains("HasAnalysisUserInvitations") ? item.AnalysisUserInvitations.Any() : true)

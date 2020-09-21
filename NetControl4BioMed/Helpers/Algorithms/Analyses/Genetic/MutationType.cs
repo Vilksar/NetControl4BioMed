@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
+namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
 {
     /// <summary>
     /// Represents the possible mutation algorithms for an analysis.

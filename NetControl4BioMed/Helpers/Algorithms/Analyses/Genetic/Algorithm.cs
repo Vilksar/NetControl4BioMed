@@ -11,7 +11,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
+namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
 {
     /// <summary>
     /// Defines the algorithm and several functions for it.
@@ -21,22 +21,10 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
         /// <summary>
         /// Runs the algorithm on the network with the provided details, using the given parameters.
         /// </summary>
-        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="context">The application database context.</param>
         /// <param name="analysis">The analysis which to run using the algorithm.</param>
-        public static async Task Run(Analysis analysis, IServiceProvider serviceProvider, CancellationToken token)
+        public static async Task Run(Analysis analysis, ApplicationDbContext context, CancellationToken token)
         {
-            // Create a new scope.
-            using var scope = serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            // Update the analysis status and stats.
-            analysis.ControlPaths = new List<ControlPath>();
-            analysis.Status = AnalysisStatus.Initializing;
-            analysis.DateTimeStarted = DateTime.UtcNow;
-            // Update the analysis.
-            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
-            // Reload the analysis for a fresh start.
-            await context.Entry(analysis).ReloadAsync();
             // Get the nodes, edges, target nodes and source (preferred) nodes.
             var nodes = context.AnalysisNodes
                 .Where(item => item.Analysis == analysis)
@@ -82,7 +70,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.UtcNow;
                 // Update the analysis.
-                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                 // End the function.
                 return;
             }
@@ -96,7 +84,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.UtcNow;
                 // Update the analysis.
-                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                 // End the function.
                 return;
             }
@@ -110,7 +98,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.UtcNow;
                 // Update the analysis.
-                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                 // End the function.
                 return;
             }
@@ -124,7 +112,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 // Update the analysis end time.
                 analysis.DateTimeEnded = DateTime.UtcNow;
                 // Update the analysis.
-                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                 // End the function.
                 return;
             }
@@ -138,8 +126,10 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             var targetAncestors = GetTargetAncestors(powersMatrixA, targets, nodeIndex);
             // Update the analysis status.
             analysis.Status = AnalysisStatus.Ongoing;
+            // Add a message to the log.
+            analysis.Log = analysis.AppendToLog("The analysis is now running.");
             // Update the analysis.
-            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
             // Set up the first iteration.
             var random = new Random(parameters.RandomSeed);
             var currentIteration = analysis.CurrentIteration;
@@ -159,7 +149,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
                 analysis.CurrentIteration = currentIteration;
                 analysis.CurrentIterationWithoutImprovement = currentIterationWithoutImprovement;
                 // Update the analysis.
-                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                 // Move on to the next population.
                 population = new Population(population, nodeIndex, targets, targetAncestors, powersMatrixCA, nodeIsPreferred, parameters, random);
                 // Get the best fitness of the current solution.
@@ -235,13 +225,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm2
             }).ToList();
             // Update the analysis.
             analysis.ControlPaths = controlPaths;
-            analysis.Status = currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement ? AnalysisStatus.Stopped : AnalysisStatus.Completed;
-            analysis.DateTimeEnded = DateTime.UtcNow;
-            analysis.Log = analysis.AppendToLog($"The analysis has ended with the status \"{analysis.Status.GetDisplayName()}\".");
             // Update the analysis.
-            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
-            // End the function.
-            return;
+            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
         }
 
         /// <summary>

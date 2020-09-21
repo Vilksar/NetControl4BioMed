@@ -267,7 +267,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Save the changes to the database.
                 await context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateNetworksAsync(backgroundTask.Id, CancellationToken.None));
+                BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateNetworksAsync(backgroundTask.Id, CancellationToken.None));
             }
         }
 
@@ -422,15 +422,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
                 var networks = context.Networks
-                    .Include(item => item.NetworkDatabases)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseType)
-                    .Include(item => item.NetworkDatabases)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseNodeFields)
-                    .Include(item => item.NetworkDatabases)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseEdgeFields)
                     .Where(item => batchIds.Contains(item.Id));
                 // Go over each item in the current batch.
                 foreach (var batchItem in batchItems)
@@ -444,405 +435,104 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
-                    // Update the status of the item.
-                    network.Status = NetworkStatus.Generating;
-                    // Add a message to the log.
-                    network.Log = network.AppendToLog("The network is now generating.");
-                    // Edit the network.
-                    await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
-                    // Get the related data of the item.
-                    var databaseTypes = network.NetworkDatabases
-                        .Select(item => item.Database.DatabaseType);
-                    // Check if there was any error in retrieving related data from the database.
-                    if (databaseTypes == null)
+                    // Check if the status is not valid.
+                    if (network.Status != NetworkStatus.Defined)
                     {
                         // Update the status of the item.
                         network.Status = NetworkStatus.Error;
                         // Add a message to the log.
-                        network.Log = network.AppendToLog("There was an error in retrieving related data from the database.");
+                        network.Log = network.AppendToLog("The status of the network is not valid in order to be generated.");
                         // Edit the network.
                         await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
                         // Continue.
                         continue;
                     }
-                    // Check if there weren't any database types found.
-                    if (!databaseTypes.Any())
+                    // Try to generate the network.
+                    try
                     {
+                        // Update the status of the item.
+                        network.Status = NetworkStatus.Generating;
+                        // Add a message to the log.
+                        network.Log = network.AppendToLog("The network is now generating.");
+                        // Edit the network.
+                        await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                        // Check the algorithm to generate the network.
+                        switch (network.Algorithm)
+                        {
+                            case NetworkAlgorithm.None:
+                                // Run the algorithm on the network.
+                                await Algorithms.Networks.None.Algorithm.Run(network, context, token);
+                                // End the switch.
+                                break;
+                            case NetworkAlgorithm.Neighbors:
+                                // Run the algorithm on the network.
+                                await Algorithms.Networks.Neighbors.Algorithm.Run(network, context, token);
+                                // End the switch.
+                                break;
+                            case NetworkAlgorithm.Gap0:
+                                // Run the algorithm on the network.
+                                await Algorithms.Networks.Gap.Algorithm.Run(network, 0, context, token);
+                                // End the switch.
+                                break;
+                            case NetworkAlgorithm.Gap1:
+                                // Run the algorithm on the network.
+                                await Algorithms.Networks.Gap.Algorithm.Run(network, 1, context, token);
+                                // End the switch.
+                                break;
+                            case NetworkAlgorithm.Gap2:
+                                // Run the algorithm on the network.
+                                await Algorithms.Networks.Gap.Algorithm.Run(network, 2, context, token);
+                                // End the switch.
+                                break;
+                            case NetworkAlgorithm.Gap3:
+                                // Run the algorithm on the network.
+                                await Algorithms.Networks.Gap.Algorithm.Run(network, 3, context, token);
+                                // End the switch.
+                                break;
+                            case NetworkAlgorithm.Gap4:
+                                // Run the algorithm on the network.
+                                await Algorithms.Networks.Gap.Algorithm.Run(network, 4, context, token);
+                                // End the switch.
+                                break;
+                            default:
+                                // Update the status of the item.
+                                network.Status = NetworkStatus.Error;
+                                // Add a message to the log.
+                                network.Log = network.AppendToLog("The network algorithm is not valid.");
+                                // Edit the network.
+                                await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                                // End the switch.
+                                break;
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        // Reload the network.
+                        await context.Entry(network).ReloadAsync();
+                        // Check if there was no item found.
+                        if (network == null)
+                        {
+                            // Continue.
+                            continue;
+                        }
+                        // Get the error message
+                        var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
                         // Update the status of the item.
                         network.Status = NetworkStatus.Error;
                         // Add a message to the log.
-                        network.Log = network.AppendToLog("No database types corresponding to the network databases could be found.");
+                        network.Log = network.AppendToLog("An error occured while generating the network." + message);
                         // Edit the network.
                         await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
                         // Continue.
                         continue;
                     }
-                    // Check if the database types are different.
-                    if (databaseTypes.Distinct().Count() > 1)
+                    // Reload the network.
+                    await context.Entry(network).ReloadAsync();
+                    // Check if there was no item found.
+                    if (network == null)
                     {
-                        // Update the status of the item.
-                        network.Status = NetworkStatus.Error;
-                        // Add a message to the log.
-                        network.Log = network.AppendToLog("The database types corresponding to the network databases are different.");
-                        // Edit the network.
-                        await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
                         // Continue.
                         continue;
-                    }
-                    // Get the database type.
-                    var databaseType = databaseTypes.First();
-                    // Check if the database type and the algorithm don't match.
-                    if ((databaseType.Name == "Generic") != (network.Algorithm == NetworkAlgorithm.None))
-                    {
-                        // Update the status of the item.
-                        network.Status = NetworkStatus.Error;
-                        // Add a message to the log.
-                        network.Log = network.AppendToLog("The database type corresponding to the network databases and the network algorithm don't match.");
-                        // Edit the network.
-                        await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
-                        // Continue.
-                        continue;
-                    }
-                    // Check the type of the database.
-                    if (databaseType.Name == "Generic")
-                    {
-                        // Try to deserialize the data.
-                        if (!network.Data.TryDeserializeJsonObject<IEnumerable<NetworkEdgeInputModel>>(out var data) || data == null)
-                        {
-                            // Update the status of the item.
-                            network.Status = NetworkStatus.Error;
-                            // Add a message to the log.
-                            network.Log = network.AppendToLog("The seed data corresponding to the network could not be deserialized.");
-                            // Edit the network.
-                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
-                            // Continue.
-                            continue;
-                        }
-                        // Get the seed edges from the data.
-                        var seedEdges = data
-                            .Where(item => item.Edge != null)
-                            .Select(item => item.Edge)
-                            .Where(item => item.EdgeNodes != null)
-                            .Select(item => (item.EdgeNodes.FirstOrDefault(item1 => item1.Type == "Source"), item.EdgeNodes.FirstOrDefault(item1 => item1.Type == "Target")))
-                            .Where(item => item.Item1 != null && item.Item2 != null)
-                            .Select(item => (item.Item1.Node, item.Item2.Node))
-                            .Where(item => item.Item1 != null && item.Item2 != null)
-                            .Select(item => (item.Item1.Id, item.Item2.Id))
-                            .Where(item => !string.IsNullOrEmpty(item.Item1) && !string.IsNullOrEmpty(item.Item2))
-                            .Distinct();
-                        // Check if there haven't been any edges found.
-                        if (seedEdges == null || !seedEdges.Any())
-                        {
-                            // Update the status of the item.
-                            network.Status = NetworkStatus.Error;
-                            // Add a message to the log.
-                            network.Log = network.AppendToLog("The seed data corresponding to the network does not contain any valid edges.");
-                            // Edit the network.
-                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
-                            // Continue.
-                            continue;
-                        }
-                        // Get the seed nodes from the seed edges.
-                        var seedNodes = seedEdges
-                            .Select(item => item.Item1)
-                            .Concat(seedEdges.Select(item => item.Item2))
-                            .Distinct();
-                        // Define the related entities.
-                        network.NetworkNodes = seedNodes
-                            .Select(item => new NetworkNode
-                            {
-                                Node = new Node
-                                {
-                                    DateTimeCreated = DateTime.UtcNow,
-                                    Name = item,
-                                    Description = $"This is an automatically generated node for the network \"{network.Id}\".",
-                                    DatabaseNodes = network.NetworkDatabases
-                                        .Where(item1 => item1.Type == NetworkDatabaseType.Node)
-                                        .Select(item1 => item1.Database)
-                                        .Distinct()
-                                        .Select(item1 => new DatabaseNode
-                                        {
-                                            DatabaseId = item1.Id,
-                                            Database = item1
-                                        })
-                                        .ToList(),
-                                    DatabaseNodeFieldNodes = network.NetworkDatabases
-                                        .Where(item1 => item1.Type == NetworkDatabaseType.Node)
-                                        .Select(item1 => item1.Database)
-                                        .Select(item1 => item1.DatabaseNodeFields)
-                                        .SelectMany(item1 => item1)
-                                        .Distinct()
-                                        .Select(item1 => new DatabaseNodeFieldNode
-                                        {
-                                            DatabaseNodeFieldId = item1.Id,
-                                            DatabaseNodeField = item1,
-                                            Value = item
-                                        })
-                                        .ToList()
-                                },
-                                Type = NetworkNodeType.None
-                            })
-                            .ToList();
-                        network.NetworkEdges = seedEdges
-                            .Select(item => new NetworkEdge
-                            {
-                                Edge = new Edge
-                                {
-                                    DateTimeCreated = DateTime.UtcNow,
-                                    Name = $"{item.Item1} - {item.Item2}",
-                                    Description = $"This is an automatically generated edge for the network \"{network.Id}\".",
-                                    DatabaseEdges = network.NetworkDatabases
-                                        .Where(item1 => item1.Type == NetworkDatabaseType.Edge)
-                                        .Select(item1 => item1.Database)
-                                        .Distinct()
-                                        .Select(item1 => new DatabaseEdge
-                                        {
-                                            DatabaseId = item1.Id,
-                                            Database = item1
-                                        })
-                                        .ToList(),
-                                    DatabaseEdgeFieldEdges = network.NetworkDatabases
-                                        .Where(item1 => item1.Type == NetworkDatabaseType.Edge)
-                                        .Select(item1 => item1.Database)
-                                        .Select(item1 => item1.DatabaseEdgeFields)
-                                        .SelectMany(item1 => item1)
-                                        .Distinct()
-                                        .Select(item1 => new DatabaseEdgeFieldEdge
-                                        {
-                                            DatabaseEdgeFieldId = item1.Id,
-                                            DatabaseEdgeField = item1,
-                                            Value = $"{item.Item1} - {item.Item2}"
-                                        })
-                                        .ToList(),
-                                    EdgeNodes = new List<EdgeNode>
-                                    {
-                                        new EdgeNode
-                                        {
-                                            Node = network.NetworkNodes
-                                                .FirstOrDefault(item1 => item1.Node.Name == item.Item1)?.Node,
-                                            Type = EdgeNodeType.Source
-                                        },
-                                        new EdgeNode
-                                        {
-                                            Node = network.NetworkNodes
-                                                .FirstOrDefault(item1 => item1.Node.Name == item.Item2)?.Node,
-                                            Type = EdgeNodeType.Target
-                                        }
-                                    }
-                                    .Where(item1 => item1.Node != null)
-                                    .ToList()
-                                }
-                            })
-                            .ToList();
-                    }
-                    else
-                    {
-                        // Try to deserialize the data.
-                        if (!network.Data.TryDeserializeJsonObject<IEnumerable<NetworkNodeInputModel>>(out var data) || data == null)
-                        {
-                            // Update the status of the item.
-                            network.Status = NetworkStatus.Error;
-                            // Add a message to the log.
-                            network.Log = network.AppendToLog("The seed data corresponding to the network could not be deserialized.");
-                            // Edit the network.
-                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
-                            // Continue.
-                            continue;
-                        }
-                        // Get the IDs of the required related data.
-                        var nodeDatabaseIds = network.NetworkDatabases != null ?
-                            network.NetworkDatabases
-                                .Where(item => item.Type == NetworkDatabaseType.Node)
-                                .Select(item => item.Database)
-                                .Distinct()
-                                .Select(item => item.Id) :
-                            Enumerable.Empty<string>();
-                        var edgeDatabaseIds = network.NetworkDatabases != null ?
-                            network.NetworkDatabases
-                                .Where(item => item.Type == NetworkDatabaseType.Edge)
-                                .Select(item => item.Database)
-                                .Distinct()
-                                .Select(item => item.Id) :
-                            Enumerable.Empty<string>();
-                        var seedNodeCollectionIds = network.NetworkNodeCollections != null ?
-                            network.NetworkNodeCollections
-                                .Where(item => item.Type == NetworkNodeCollectionType.Seed)
-                                .Select(item => item.NodeCollection)
-                                .Distinct()
-                                .Select(item => item.Id) :
-                            Enumerable.Empty<string>();
-                        // Get the node identifiers from the data.
-                        var seedNodeIdentifiers = data
-                            .Where(item => item.Type == "Seed")
-                            .Select(item => item.Node)
-                            .Where(item => item != null)
-                            .Select(item => item.Id)
-                            .Where(item => !string.IsNullOrEmpty(item))
-                            .Distinct();
-                        // Get the available nodes.
-                        var availableNodes = context.Nodes
-                            .Where(item => item.DatabaseNodes.Any(item1 => nodeDatabaseIds.Contains(item1.Database.Id)));
-                        // Get the seed nodes.
-                        var seedNodesByIdentifier = availableNodes
-                            .Where(item => seedNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.IsSearchable && seedNodeIdentifiers.Contains(item1.Value)));
-                        var seedNodesByNodeCollection = availableNodes
-                            .Where(item => item.NodeCollectionNodes.Any(item1 => seedNodeCollectionIds.Contains(item1.NodeCollection.Id)));
-                        var seedNodes = seedNodesByIdentifier
-                            .Concat(seedNodesByNodeCollection)
-                            .Distinct()
-                            .ToList();
-                        // Check if there haven't been any seed nodes found.
-                        if (seedNodes == null || !seedNodes.Any())
-                        {
-                            // Update the status of the item.
-                            network.Status = NetworkStatus.Error;
-                            // Add a message to the log.
-                            network.Log = network.AppendToLog("No seed nodes could be found with the provided seed data.");
-                            // Edit the network.
-                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
-                            // Continue.
-                            continue;
-                        }
-                        // Get the available edges.
-                        var availableEdges = context.Edges
-                            .Include(item => item.EdgeNodes)
-                                .ThenInclude(item => item.Node)
-                            .Where(item => item.DatabaseEdges.Any(item1 => edgeDatabaseIds.Contains(item1.Database.Id)))
-                            .Where(item => item.EdgeNodes.All(item1 => availableNodes.Contains(item1.Node)));
-                        // Check if there haven't been any available edges found.
-                        if (availableEdges == null || !availableEdges.Any())
-                        {
-                            // Update the status of the item.
-                            network.Status = NetworkStatus.Error;
-                            // Add a message to the log.
-                            network.Log = network.AppendToLog("No available edges could be found in the selected databases.");
-                            // Edit the network.
-                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
-                            // Continue.
-                            continue;
-                        }
-                        // Define the edges of the network.
-                        var edges = new List<Edge>();
-                        // Check which algorithm is selected.
-                        if (network.Algorithm == NetworkAlgorithm.Neighbors)
-                        {
-                            // Get all edges that contain the seed nodes.
-                            var currentEdges = availableEdges
-                                .Where(item => item.EdgeNodes.Any(item1 => seedNodes.Contains(item1.Node)))
-                                .ToList();
-                            // Add the edges to the list.
-                            edges.AddRange(currentEdges);
-                        }
-                        else if (network.Algorithm == NetworkAlgorithm.Gap0 || network.Algorithm == NetworkAlgorithm.Gap1 || network.Algorithm == NetworkAlgorithm.Gap2 || network.Algorithm == NetworkAlgorithm.Gap3 || network.Algorithm == NetworkAlgorithm.Gap4)
-                        {
-                            // Get the gap value.
-                            var gap = network.Algorithm == NetworkAlgorithm.Gap0 ? 0 :
-                                network.Algorithm == NetworkAlgorithm.Gap1 ? 1 :
-                                network.Algorithm == NetworkAlgorithm.Gap2 ? 2 :
-                                network.Algorithm == NetworkAlgorithm.Gap3 ? 3 : 4;
-                            // Define the list to store the edges.
-                            var currentEdgeList = new List<List<Edge>>();
-                            // For "gap" times, for all terminal nodes, add all possible edges.
-                            for (int gapIndex = 0; gapIndex < gap + 1; gapIndex++)
-                            {
-                                // Get the terminal nodes (the seed nodes for the first iteration, the target nodes of all edges in the previous iteration for the subsequent iterations).
-                                var terminalNodes = gapIndex == 0 ?
-                                    seedNodes :
-                                    currentEdgeList
-                                        .Last()
-                                        .Select(item => item.EdgeNodes
-                                            .Where(item => item.Type == EdgeNodeType.Target)
-                                            .Select(item => item.Node))
-                                        .SelectMany(item => item)
-                                        .Distinct()
-                                        .ToList();
-                                // Get all edges that start in the terminal nodes.
-                                var temporaryList = availableEdges
-                                    .Where(item => item.EdgeNodes
-                                        .Any(item1 => item1.Type == EdgeNodeType.Source && terminalNodes.Contains(item1.Node)))
-                                    .ToList();
-                                // Add them to the list.
-                                currentEdgeList.Add(temporaryList);
-                            }
-                            // Define a variable to store, at each step, the nodes to keep.
-                            var nodesToKeep = seedNodes
-                                .ToList();
-                            // Starting from the right, mark all terminal nodes that are not seed nodes for removal.
-                            for (int gapIndex = gap; gapIndex >= 0; gapIndex--)
-                            {
-                                // Remove from the list all edges that do not end in nodes to keep.
-                                currentEdgeList.ElementAt(gapIndex)
-                                    .RemoveAll(item => item.EdgeNodes
-                                        .Any(item1 => item1.Type == EdgeNodeType.Target && !nodesToKeep.Contains(item1.Node)));
-                                // Update the nodes to keep to be the source nodes of the interactions of the current step together with the seed nodes.
-                                nodesToKeep = currentEdgeList
-                                    .ElementAt(gapIndex)
-                                    .Select(item => item.EdgeNodes
-                                        .Where(item1 => item1.Type == EdgeNodeType.Source)
-                                        .Select(item1 => item1.Node))
-                                    .SelectMany(item => item)
-                                    .Concat(seedNodes)
-                                    .Distinct()
-                                    .ToList();
-                            }
-                            // Get the remaining edges.
-                            var currentEdges = currentEdgeList
-                                .SelectMany(item => item)
-                                .Distinct()
-                                .ToList();
-                            // Add all of the remaining edges.
-                            edges.AddRange(currentEdges);
-                        }
-                        else
-                        {
-                            // Update the status of the item.
-                            network.Status = NetworkStatus.Error;
-                            // Add a message to the log.
-                            network.Log = network.AppendToLog("The provided network generation algorithm is invalid.");
-                            // Edit the network.
-                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
-                            // Continue.
-                            continue;
-                        }
-                        // Check if there haven't been any edges found.
-                        if (edges == null || !edges.Any())
-                        {
-                            // Update the status of the item.
-                            network.Status = NetworkStatus.Error;
-                            // Add a message to the log.
-                            network.Log = network.AppendToLog("No edges could be found with the provided data using the provided algorithm.");
-                            // Edit the network.
-                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
-                            // Continue.
-                            continue;
-                        }
-                        // Get all of the nodes used by the found edges.
-                        var nodes = edges
-                            .Select(item => item.EdgeNodes)
-                            .SelectMany(item => item)
-                            .Select(item => item.Node)
-                            .Distinct();
-                        // Define the related entities.
-                        network.NetworkNodes = seedNodes
-                            .Intersect(nodes)
-                            .Select(item => new NetworkNode
-                            {
-                                Node = item,
-                                Type = NetworkNodeType.Seed
-                            })
-                            .Concat(nodes
-                                .Select(item => new NetworkNode
-                                {
-                                    Node = item,
-                                    Type = NetworkNodeType.None
-                                }))
-                            .ToList();
-                        network.NetworkEdges = edges
-                            .Select(item => new NetworkEdge
-                            {
-                                Edge = item
-                            })
-                            .ToList();
                     }
                     // Update the status of the item.
                     network.Status = NetworkStatus.Completed;

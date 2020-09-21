@@ -13,6 +13,7 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using Algorithms = NetControl4BioMed.Helpers.Algorithms;
 
 namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
 {
@@ -36,9 +37,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
 
             public bool ShowVisualization { get; set; }
 
-            public Helpers.Algorithms.Algorithm1.Parameters Algorithm1Parameters { get; set; }
+            public Algorithms.Analyses.Greedy.Parameters GreedyAlgorithmParameters { get; set; }
 
-            public Helpers.Algorithms.Algorithm2.Parameters Algorithm2Parameters { get; set; }
+            public Algorithms.Analyses.Genetic.Parameters GeneticAlgorithmParameters { get; set; }
 
             public Dictionary<string, int?> ItemCount { get; set; }
         }
@@ -84,8 +85,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                     .All(item => (item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed) && item.AnalysisNodes
                         .Where(item1 => item1.Type == AnalysisNodeType.None)
                         .Count() < AnalysisExtensions.MaximumSizeForVisualization),
-                Algorithm1Parameters = null,
-                Algorithm2Parameters = null,
+                GreedyAlgorithmParameters = null,
+                GeneticAlgorithmParameters = null,
                 ItemCount = new Dictionary<string, int?>
                 {
                     { "Users", items.Select(item => item.AnalysisUsers).SelectMany(item => item).Count() },
@@ -97,22 +98,22 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                 }
             };
             // Check which algorithm is used and try to deserialize the parameters.
-            if (View.Analysis.Algorithm == AnalysisAlgorithm.Algorithm1)
+            if (View.Analysis.Algorithm == AnalysisAlgorithm.Greedy)
             {
                 // Try to deserialize the parameters
-                if (View.Analysis.Parameters.TryDeserializeJsonObject<Helpers.Algorithms.Algorithm1.Parameters>(out var parameters))
+                if (View.Analysis.Parameters.TryDeserializeJsonObject<Algorithms.Analyses.Greedy.Parameters>(out var parameters))
                 {
                     // Assign the parameters.
-                    View.Algorithm1Parameters = parameters;
+                    View.GreedyAlgorithmParameters = parameters;
                 }
             }
-            else if (View.Analysis.Algorithm == AnalysisAlgorithm.Algorithm2)
+            else if (View.Analysis.Algorithm == AnalysisAlgorithm.Genetic)
             {
                 // Try to deserialize the parameters
-                if (View.Analysis.Parameters.TryDeserializeJsonObject<Helpers.Algorithms.Algorithm2.Parameters>(out var parameters))
+                if (View.Analysis.Parameters.TryDeserializeJsonObject<Algorithms.Analyses.Genetic.Parameters>(out var parameters))
                 {
                     // Assign the parameters.
-                    View.Algorithm2Parameters = parameters;
+                    View.GeneticAlgorithmParameters = parameters;
                 }
             }
             // Return the page.

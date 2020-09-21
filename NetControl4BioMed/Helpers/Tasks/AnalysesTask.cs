@@ -297,8 +297,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 }
                 // Create the items.
                 await IEnumerableExtensions.CreateAsync(analysesToAdd, context, token);
-                // Define the new background tasks.
-                var generateBackgroundTask = new BackgroundTask
+                // Define the new background task.
+                var backgroundTask = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.UtcNow,
                     Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.GenerateAnalysesAsync)}",
@@ -311,44 +311,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                         })
                     })
                 };
-                var startBackgroundTask = new BackgroundTask
-                {
-                    DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.StartAnalysesAsync)}",
-                    IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new AnalysesTask
-                    {
-                        Items = analysesToAdd.Select(item => new AnalysisInputModel
-                        {
-                            Id = item.Id
-                        })
-                    })
-                };
-                var sendEndedEmailsBackgroundTask = new BackgroundTask
-                {
-                    DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.SendAnalysesEndedEmailsAsync)}",
-                    IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new AnalysesTask
-                    {
-                        Scheme = Scheme,
-                        HostValue = HostValue,
-                        Items = analysesToAdd.Select(item => new AnalysisInputModel
-                        {
-                            Id = item.Id
-                        })
-                    })
-                };
                 // Mark the task for addition.
-                context.BackgroundTasks.Add(generateBackgroundTask);
-                context.BackgroundTasks.Add(startBackgroundTask);
-                context.BackgroundTasks.Add(sendEndedEmailsBackgroundTask);
+                context.BackgroundTasks.Add(backgroundTask);
                 // Save the changes to the database.
                 await context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var generateJobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateAnalysesAsync(generateBackgroundTask.Id, CancellationToken.None));
-                var startJobId = BackgroundJob.ContinueJobWith<IContentTaskManager>(generateJobId, item => item.StartAnalysesAsync(startBackgroundTask.Id, CancellationToken.None), JobContinuationOptions.OnlyOnSucceededState);
-                var sendEndedEmailsJobId = BackgroundJob.ContinueJobWith<IContentTaskManager>(startJobId, item => item.SendAnalysesEndedEmailsAsync(sendEndedEmailsBackgroundTask.Id, CancellationToken.None), JobContinuationOptions.OnlyOnSucceededState);
+                BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateAnalysesAsync(backgroundTask.Id, CancellationToken.None));
             }
         }
 
@@ -513,177 +481,223 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
-                    // Update the status of the item.
-                    analysis.Status = AnalysisStatus.Generating;
-                    // Add a message to the log.
-                    analysis.Log = analysis.AppendToLog("The analysis is now generating.");
-                    // Edit the network.
-                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
-                    // Try to deserialize the data.
-                    if (!analysis.Data.TryDeserializeJsonObject<IEnumerable<AnalysisNodeInputModel>>(out var data) || data == null)
+                    // Check if the status is not valid.
+                    if (analysis.Status != AnalysisStatus.Defined)
                     {
                         // Update the status of the item.
                         analysis.Status = AnalysisStatus.Error;
                         // Add a message to the log.
-                        analysis.Log = analysis.AppendToLog("The source and / or target data corresponding to the analysis could not be deserialized.");
+                        analysis.Log = analysis.AppendToLog("The status of the analysis is not valid in order to be generated.");
+                        // Edit the network.
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                        // Continue.
+                        continue;
+                    }
+                    // Try to generate the network.
+                    try
+                    {
+                        // Update the status of the item.
+                        analysis.Status = AnalysisStatus.Generating;
+                        // Add a message to the log.
+                        analysis.Log = analysis.AppendToLog("The analysis is now generating.");
+                        // Edit the network.
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                        // Try to deserialize the data.
+                        if (!analysis.Data.TryDeserializeJsonObject<IEnumerable<AnalysisNodeInputModel>>(out var data) || data == null)
+                        {
+                            // Update the status of the item.
+                            analysis.Status = AnalysisStatus.Error;
+                            // Add a message to the log.
+                            analysis.Log = analysis.AppendToLog("The source and / or target data corresponding to the analysis could not be deserialized.");
+                            // Edit the analysis.
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            // Continue.
+                            continue;
+                        }
+                        // Get the IDs of the required related data.
+                        var nodeDatabaseIds = analysis.AnalysisDatabases != null ?
+                            analysis.AnalysisDatabases
+                                .Where(item => item.Type == AnalysisDatabaseType.Node)
+                                .Select(item => item.Database)
+                                .Distinct()
+                                .Select(item => item.Id) :
+                            Enumerable.Empty<string>();
+                        var edgeDatabaseIds = analysis.AnalysisDatabases != null ?
+                            analysis.AnalysisDatabases
+                                .Where(item => item.Type == AnalysisDatabaseType.Edge)
+                                .Select(item => item.Database)
+                                .Distinct()
+                                .Select(item => item.Id) :
+                            Enumerable.Empty<string>();
+                        var sourceNodeCollectionIds = analysis.AnalysisNodeCollections != null ?
+                            analysis.AnalysisNodeCollections
+                                .Where(item => item.Type == AnalysisNodeCollectionType.Source)
+                                .Select(item => item.NodeCollection)
+                                .Distinct()
+                                .Select(item => item.Id) :
+                            Enumerable.Empty<string>();
+                        var targetNodeCollectionIds = analysis.AnalysisNodeCollections != null ?
+                            analysis.AnalysisNodeCollections
+                                .Where(item => item.Type == AnalysisNodeCollectionType.Target)
+                                .Select(item => item.NodeCollection)
+                                .Distinct()
+                                .Select(item => item.Id) :
+                            Enumerable.Empty<string>();
+                        var networkIds = analysis.AnalysisNetworks != null ?
+                            analysis.AnalysisNetworks
+                                .Select(item => item.Network)
+                                .Distinct()
+                                .Select(item => item.Id) :
+                            Enumerable.Empty<string>();
+                        // Get the identifiers of the nodes in the provided data.
+                        var sourceNodeIdentifiers = data
+                            .Where(item => item.Type == "Source")
+                            .Where(item => item.Node != null)
+                            .Select(item => item.Node)
+                            .Where(item => !string.IsNullOrEmpty(item.Id))
+                            .Select(item => item.Id)
+                            .Distinct();
+                        var targetNodeIdentifiers = data
+                            .Where(item => item.Type == "Target")
+                            .Where(item => item.Node != null)
+                            .Select(item => item.Node)
+                            .Where(item => !string.IsNullOrEmpty(item.Id))
+                            .Select(item => item.Id)
+                            .Distinct();
+                        // Get the available nodes.
+                        var availableNodes = context.Nodes
+                            .Where(item => item.DatabaseNodes.Any(item1 => nodeDatabaseIds.Contains(item1.Database.Id)));
+                        // Get the nodes by identifier.
+                        var sourceNodesByIdentifier = availableNodes
+                            .Where(item => sourceNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.IsSearchable && sourceNodeIdentifiers.Contains(item1.Value)));
+                        var targetNodesByIdentifier = availableNodes
+                            .Where(item => targetNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.IsSearchable && targetNodeIdentifiers.Contains(item1.Value)));
+                        // Get the nodes by node collection.
+                        var sourceNodesByNodeCollection = availableNodes
+                            .Where(item => item.NodeCollectionNodes.Any(item1 => sourceNodeCollectionIds.Contains(item1.NodeCollection.Id)));
+                        var targetNodesByNodeCollection = availableNodes
+                            .Where(item => item.NodeCollectionNodes.Any(item1 => targetNodeCollectionIds.Contains(item1.NodeCollection.Id)));
+                        // Get the nodes in the analysis.
+                        var nodes = availableNodes
+                            .Where(item => item.NetworkNodes.Any(item1 => networkIds.Contains(item1.Network.Id)));
+                        // Check if there haven't been any nodes found.
+                        if (nodes == null || !nodes.Any())
+                        {
+                            // Update the status of the item.
+                            analysis.Status = AnalysisStatus.Error;
+                            // Add a message to the log.
+                            analysis.Log = analysis.AppendToLog("No nodes could be found within the provided networks.");
+                            // Edit the analysis.
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            // Continue.
+                            continue;
+                        }
+                        // Get the edges in the analysis.
+                        var edges = context.Edges
+                            .Where(item => item.DatabaseEdges.Any(item1 => edgeDatabaseIds.Contains(item1.Database.Id)))
+                            .Where(item => item.NetworkEdges.Any(item1 => networkIds.Contains(item1.Network.Id)));
+                        // Check if there haven't been any edges found.
+                        if (edges == null || !edges.Any())
+                        {
+                            // Update the status of the item.
+                            analysis.Status = AnalysisStatus.Error;
+                            // Add a message to the log.
+                            analysis.Log = analysis.AppendToLog("No edges could be found within the provided networks.");
+                            // Edit the analysis.
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            // Continue.
+                            continue;
+                        }
+                        // Get the nodes in the analysis.
+                        var sourceNodes = sourceNodesByIdentifier
+                            .Concat(sourceNodesByNodeCollection)
+                            .Distinct()
+                            .Intersect(nodes);
+                        var targetNodes = targetNodesByIdentifier
+                            .Concat(targetNodesByNodeCollection)
+                            .Distinct()
+                            .Intersect(nodes);
+                        // Check if there haven't been any target nodes found.
+                        if (targetNodes == null || !targetNodes.Any())
+                        {
+                            // Update the status of the item.
+                            analysis.Status = AnalysisStatus.Error;
+                            // Add a message to the log.
+                            analysis.Log = analysis.AppendToLog("No target nodes could be found with the provided target data.");
+                            // Edit the analysis.
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            // Continue.
+                            continue;
+                        }
+                        // Get the analysis nodes.
+                        var analysisNodes = nodes
+                            .Select(item => new AnalysisNode
+                            {
+                                NodeId = item.Id,
+                                Node = item,
+                                Type = AnalysisNodeType.None
+                            });
+                        var sourceAnalysisNodes = sourceNodes
+                            .Select(item => new AnalysisNode
+                            {
+                                NodeId = item.Id,
+                                Node = item,
+                                Type = AnalysisNodeType.Source
+                            });
+                        var targetAnalysisNodes = targetNodes
+                            .Select(item => new AnalysisNode
+                            {
+                                NodeId = item.Id,
+                                Node = item,
+                                Type = AnalysisNodeType.Target
+                            });
+                        // Get the analysis edges.
+                        var analysisEdges = edges
+                            .Select(item => new AnalysisEdge
+                            {
+                                EdgeId = item.Id,
+                                Edge = item
+                            });
+                        // Define the related entities.
+                        analysis.AnalysisNodes = analysisNodes
+                            .Concat(sourceAnalysisNodes)
+                            .Concat(targetAnalysisNodes)
+                            .ToList();
+                        analysis.AnalysisEdges = analysisEdges
+                            .ToList();
+                        analysis.ControlPaths = new List<ControlPath>();
+                        // Edit the analysis.
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    }
+                    catch (Exception exception)
+                    {
+                        // Reload the analysis.
+                        await context.Entry(analysis).ReloadAsync();
+                        // Check if there was no item found.
+                        if (analysis == null)
+                        {
+                            // Continue.
+                            continue;
+                        }
+                        // Get the error message
+                        var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
+                        // Update the analysis status.
+                        analysis.Status = AnalysisStatus.Error;
+                        // Update the analysis log.
+                        analysis.Log = analysis.AppendToLog("An error occured while generating the analysis." + message);
                         // Edit the analysis.
                         await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                         // Continue.
                         continue;
                     }
-                    // Get the IDs of the required related data.
-                    var nodeDatabaseIds = analysis.AnalysisDatabases != null ?
-                        analysis.AnalysisDatabases
-                            .Where(item => item.Type == AnalysisDatabaseType.Node)
-                            .Select(item => item.Database)
-                            .Distinct()
-                            .Select(item => item.Id) :
-                        Enumerable.Empty<string>();
-                    var edgeDatabaseIds = analysis.AnalysisDatabases != null ?
-                        analysis.AnalysisDatabases
-                            .Where(item => item.Type == AnalysisDatabaseType.Edge)
-                            .Select(item => item.Database)
-                            .Distinct()
-                            .Select(item => item.Id) :
-                        Enumerable.Empty<string>();
-                    var sourceNodeCollectionIds = analysis.AnalysisNodeCollections != null ?
-                        analysis.AnalysisNodeCollections
-                            .Where(item => item.Type == AnalysisNodeCollectionType.Source)
-                            .Select(item => item.NodeCollection)
-                            .Distinct()
-                            .Select(item => item.Id) :
-                        Enumerable.Empty<string>();
-                    var targetNodeCollectionIds = analysis.AnalysisNodeCollections != null ?
-                        analysis.AnalysisNodeCollections
-                            .Where(item => item.Type == AnalysisNodeCollectionType.Target)
-                            .Select(item => item.NodeCollection)
-                            .Distinct()
-                            .Select(item => item.Id) :
-                        Enumerable.Empty<string>();
-                    var networkIds = analysis.AnalysisNetworks != null ?
-                        analysis.AnalysisNetworks
-                            .Select(item => item.Network)
-                            .Distinct()
-                            .Select(item => item.Id) :
-                        Enumerable.Empty<string>();
-                    // Get the identifiers of the nodes in the provided data.
-                    var sourceNodeIdentifiers = data
-                        .Where(item => item.Type == "Source")
-                        .Where(item => item.Node != null)
-                        .Select(item => item.Node)
-                        .Where(item => !string.IsNullOrEmpty(item.Id))
-                        .Select(item => item.Id)
-                        .Distinct();
-                    var targetNodeIdentifiers = data
-                        .Where(item => item.Type == "Target")
-                        .Where(item => item.Node != null)
-                        .Select(item => item.Node)
-                        .Where(item => !string.IsNullOrEmpty(item.Id))
-                        .Select(item => item.Id)
-                        .Distinct();
-                    // Get the available nodes.
-                    var availableNodes = context.Nodes
-                        .Where(item => item.DatabaseNodes.Any(item1 => nodeDatabaseIds.Contains(item1.Database.Id)));
-                    // Get the nodes by identifier.
-                    var sourceNodesByIdentifier = availableNodes
-                        .Where(item => sourceNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.IsSearchable && sourceNodeIdentifiers.Contains(item1.Value)));
-                    var targetNodesByIdentifier = availableNodes
-                        .Where(item => targetNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.IsSearchable && targetNodeIdentifiers.Contains(item1.Value)));
-                    // Get the nodes by node collection.
-                    var sourceNodesByNodeCollection = availableNodes
-                        .Where(item => item.NodeCollectionNodes.Any(item1 => sourceNodeCollectionIds.Contains(item1.NodeCollection.Id)));
-                    var targetNodesByNodeCollection = availableNodes
-                        .Where(item => item.NodeCollectionNodes.Any(item1 => targetNodeCollectionIds.Contains(item1.NodeCollection.Id)));
-                    // Get the nodes in the analysis.
-                    var nodes = availableNodes
-                        .Where(item => item.NetworkNodes.Any(item1 => networkIds.Contains(item1.Network.Id)));
-                    // Check if there haven't been any nodes found.
-                    if (nodes == null || !nodes.Any())
+                    // Reload the analysis.
+                    await context.Entry(analysis).ReloadAsync();
+                    // Check if there was no item found.
+                    if (analysis == null)
                     {
-                        // Update the status of the item.
-                        analysis.Status = AnalysisStatus.Error;
-                        // Add a message to the log.
-                        analysis.Log = analysis.AppendToLog("No nodes could be found within the provided networks.");
-                        // Edit the analysis.
-                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                         // Continue.
                         continue;
                     }
-                    // Get the available edges.
-                    var availableEdges = context.Edges
-                        .Where(item => item.DatabaseEdges.Any(item1 => edgeDatabaseIds.Contains(item1.Database.Id)));
-                    // Get the edges in the analysis.
-                    var edges = availableEdges
-                        .Where(item => item.NetworkEdges.Any(item1 => networkIds.Contains(item1.Network.Id)));
-                    // Check if there haven't been any edges found.
-                    if (edges == null || !edges.Any())
-                    {
-                        // Update the status of the item.
-                        analysis.Status = AnalysisStatus.Error;
-                        // Add a message to the log.
-                        analysis.Log = analysis.AppendToLog("No edges could be found within the provided networks.");
-                        // Edit the analysis.
-                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
-                        // Continue.
-                        continue;
-                    }
-                    // Get the nodes in the analysis.
-                    var sourceNodes = sourceNodesByIdentifier
-                        .Concat(sourceNodesByNodeCollection)
-                        .Distinct()
-                        .Intersect(nodes);
-                    var targetNodes = targetNodesByIdentifier
-                        .Concat(targetNodesByNodeCollection)
-                        .Distinct()
-                        .Intersect(nodes);
-                    // Check if there haven't been any target nodes found.
-                    if (targetNodes == null || !targetNodes.Any())
-                    {
-                        // Update the status of the item.
-                        analysis.Status = AnalysisStatus.Error;
-                        // Add a message to the log.
-                        analysis.Log = analysis.AppendToLog("No target nodes could be found with the provided target data.");
-                        // Edit the analysis.
-                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
-                        // Continue.
-                        continue;
-                    }
-                    // Get the analysis nodes.
-                    var analysisNodes = nodes
-                        .Select(item => new AnalysisNode
-                        {
-                            NodeId = item.Id,
-                            Node = item,
-                            Type = AnalysisNodeType.None
-                        });
-                    var sourceAnalysisNodes = sourceNodes
-                        .Select(item => new AnalysisNode
-                        {
-                            NodeId = item.Id,
-                            Node = item,
-                            Type = AnalysisNodeType.Source
-                        });
-                    var targetAnalysisNodes = targetNodes
-                        .Select(item => new AnalysisNode
-                        {
-                            NodeId = item.Id,
-                            Node = item,
-                            Type = AnalysisNodeType.Target
-                        });
-                    // Get the analysis edges.
-                    var analysisEdges = edges
-                        .Select(item => new AnalysisEdge
-                        {
-                            EdgeId = item.Id,
-                            Edge = item
-                        });
-                    // Define the related entities.
-                    analysis.AnalysisNodes = analysisNodes
-                        .Concat(sourceAnalysisNodes)
-                        .Concat(targetAnalysisNodes)
-                        .ToList();
-                    analysis.AnalysisEdges = analysisEdges
-                        .ToList();
                     // Update the status of the item.
                     analysis.Status = AnalysisStatus.Scheduled;
                     // Add a message to the log.
@@ -692,6 +706,26 @@ namespace NetControl4BioMed.Helpers.Tasks
                     analysis.Data = null;
                     // Edit the analysis.
                     await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    // Define the new background task.
+                    var backgroundTask = new BackgroundTask
+                    {
+                        DateTimeCreated = DateTime.UtcNow,
+                        Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.StartAnalysesAsync)}",
+                        IsRecurring = false,
+                        Data = JsonSerializer.Serialize(new AnalysesTask
+                        {
+                            Items = analysis.Yield().Select(item => new AnalysisInputModel
+                            {
+                                Id = item.Id
+                            })
+                        })
+                    };
+                    // Mark the task for addition.
+                    context.BackgroundTasks.Add(backgroundTask);
+                    // Save the changes to the database.
+                    await context.SaveChangesAsync();
+                    // Create a new Hangfire background job.
+                    BackgroundJob.Enqueue<IContentTaskManager>(item => item.StartAnalysesAsync(backgroundTask.Id, CancellationToken.None));
                 }
             }
         }
@@ -764,24 +798,32 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Try to run the analysis.
                     try
                     {
+                        // Update the status of the item.
+                        analysis.Status = AnalysisStatus.Initializing;
+                        // Add a message to the log.
+                        analysis.Log = analysis.AppendToLog("The analysis is now initializing.");
+                        // Update the start time of the item.
+                        analysis.DateTimeStarted = DateTime.UtcNow;
+                        // Edit the analysis.
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                         // Check the algorithm to run the analysis.
                         switch (analysis.Algorithm)
                         {
-                            case AnalysisAlgorithm.Algorithm1:
+                            case AnalysisAlgorithm.Greedy:
                                 // Run the algorithm on the analysis.
-                                await Algorithms.Algorithm1.Algorithm.Run(analysis, serviceProvider, token);
+                                await Algorithms.Analyses.Greedy.Algorithm.Run(analysis, context, token);
                                 // End the switch.
                                 break;
-                            case AnalysisAlgorithm.Algorithm2:
+                            case AnalysisAlgorithm.Genetic:
                                 // Run the algorithm on the analysis.
-                                await Algorithms.Algorithm2.Algorithm.Run(analysis, serviceProvider, token);
+                                await Algorithms.Analyses.Genetic.Algorithm.Run(analysis, context, token);
                                 // End the switch.
                                 break;
                             default:
                                 // Update the analysis status.
                                 analysis.Status = AnalysisStatus.Error;
                                 // Update the analysis log.
-                                analysis.Log = analysis.AppendToLog("The running algorithm is not valid.");
+                                analysis.Log = analysis.AppendToLog("The analysis algorithm is not valid.");
                                 // Update the start time.
                                 analysis.DateTimeStarted = DateTime.UtcNow;
                                 // Update the end time.
@@ -794,6 +836,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     catch (Exception exception)
                     {
+                        // Reload the analysis.
+                        await context.Entry(analysis).ReloadAsync();
                         // Check if there was no item found.
                         if (analysis == null)
                         {
@@ -815,6 +859,44 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
+                    // Reload the analysis.
+                    await context.Entry(analysis).ReloadAsync();
+                    // Check if there was no item found.
+                    if (analysis == null)
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Update the status of the item.
+                    analysis.Status = analysis.CurrentIteration < analysis.MaximumIterations && analysis.CurrentIterationWithoutImprovement < analysis.MaximumIterationsWithoutImprovement ? AnalysisStatus.Stopped : AnalysisStatus.Completed;
+                    // Update the end time of the item.
+                    analysis.DateTimeEnded = DateTime.UtcNow;
+                    // Add a message to the log.
+                    analysis.Log = analysis.AppendToLog($"The analysis has ended with the status \"{analysis.Status.GetDisplayName()}\".");
+                    // Edit the analysis.
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    // Define the new background task.
+                    var backgroundTask = new BackgroundTask
+                    {
+                        DateTimeCreated = DateTime.UtcNow,
+                        Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.SendAnalysesEndedEmailsAsync)}",
+                        IsRecurring = false,
+                        Data = JsonSerializer.Serialize(new AnalysesTask
+                        {
+                            Scheme = Scheme,
+                            HostValue = HostValue,
+                            Items = analysis.Yield().Select(item => new AnalysisInputModel
+                            {
+                                Id = item.Id
+                            })
+                        })
+                    };
+                    // Mark the task for addition.
+                    context.BackgroundTasks.Add(backgroundTask);
+                    // Save the changes to the database.
+                    await context.SaveChangesAsync();
+                    // Create a new Hangfire background job.
+                    BackgroundJob.Enqueue<IContentTaskManager>(item => item.SendAnalysesEndedEmailsAsync(backgroundTask.Id, CancellationToken.None));
                 }
             }
         }

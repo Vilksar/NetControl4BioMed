@@ -6,11 +6,11 @@
     ViewData["Title"] = "Visualize path";
 }
 
-@if (Model.View.Analysis.Algorithm == AnalysisAlgorithm.Algorithm2)
+@if (Model.View.Analysis.Algorithm == AnalysisAlgorithm.Genetic)
 {
     <div class="alert alert-warning text-justify text-wrap">
         <span><i class="fas fa-exclamation-circle"></i></span>
-        <span>The algorithm "@AnalysisAlgorithm.Algorithm2.GetDisplayName()" returns only control nodes, and not control paths. Thus, all displayed paths are the shortest paths between a control node and its corresponding controlled target nodes, instead of the actual control path.</span>
+        <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control nodes, and not control paths. Thus, all displayed paths are the shortest paths between a control node and its corresponding controlled target nodes, instead of the actual control path.</span>
     </div>
 }
 <div class="cytoscape-area d-flex flex-column">
