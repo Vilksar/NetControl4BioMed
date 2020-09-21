@@ -113,8 +113,10 @@ namespace NetControl4BioMed.Helpers.Services
         /// <returns>The background task corresponding to the provided ID.</returns>
         private BackgroundTask GetBackgroundTask(string id)
         {
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
             // Use a new context instance.
-            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Try to get the background task with the provided ID.
             var backgroundTask = context.BackgroundTasks
                 .Where(item => item.Id == id)

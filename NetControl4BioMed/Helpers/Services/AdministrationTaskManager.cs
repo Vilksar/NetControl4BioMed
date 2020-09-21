@@ -400,8 +400,10 @@ namespace NetControl4BioMed.Helpers.Services
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
             var task = GetTask<NodesTask>(backgroundTask);
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
             // Use a new context instance.
-            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get all of the item IDs.
             task.Items = context.Nodes
                 .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
@@ -428,8 +430,10 @@ namespace NetControl4BioMed.Helpers.Services
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
             var task = GetTask<EdgesTask>(backgroundTask);
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
             // Use a new context instance.
-            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get all of the item IDs.
             task.Items = context.Edges
                 .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
@@ -456,8 +460,10 @@ namespace NetControl4BioMed.Helpers.Services
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
             var task = GetTask<NodeCollectionsTask>(backgroundTask);
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
             // Use a new context instance.
-            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get all of the item IDs.
             task.Items = context.NodeCollections
                 .Select(item => item.Id)
@@ -483,8 +489,10 @@ namespace NetControl4BioMed.Helpers.Services
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
             var task = GetTask<NetworksTask>(backgroundTask);
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
             // Use a new context instance.
-            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get all of the item IDs.
             task.Items = context.Networks
                 .Select(item => item.Id)
@@ -510,8 +518,10 @@ namespace NetControl4BioMed.Helpers.Services
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
             var task = GetTask<AnalysesTask>(backgroundTask);
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
             // Use a new context instance.
-            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get all of the item IDs.
             task.Items = context.Analyses
                 .Select(item => item.Id)
@@ -533,8 +543,10 @@ namespace NetControl4BioMed.Helpers.Services
         /// <returns>The background task corresponding to the provided ID.</returns>
         private BackgroundTask GetBackgroundTask(string id)
         {
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
             // Use a new context instance.
-            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Try to get the background task with the provided ID.
             var backgroundTask = context.BackgroundTasks
                 .Where(item => item.Id == id)
@@ -573,8 +585,10 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="backgroundTask">The current background task.</param>
         private async Task DeleteBackgroundTaskAsync(BackgroundTask backgroundTask)
         {
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
             // Use a new context instance.
-            using var context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Mark the task for deletion.
             context.BackgroundTasks.Remove(backgroundTask);
             // Save the changes.

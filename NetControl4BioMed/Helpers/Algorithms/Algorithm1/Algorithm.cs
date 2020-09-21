@@ -25,8 +25,10 @@ namespace NetControl4BioMed.Helpers.Algorithms.Algorithm1
         /// <param name="analysis">The analysis which to run using the algorithm.</param>
         public static async Task Run(Analysis analysis, IServiceProvider serviceProvider, CancellationToken token)
         {
+            // Create a new scope.
+            using var scope = serviceProvider.CreateScope();
             // Use a new context instance.
-            using var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Update the analysis status and stats.
             analysis.ControlPaths = new List<ControlPath>();
             analysis.Status = AnalysisStatus.Initializing;

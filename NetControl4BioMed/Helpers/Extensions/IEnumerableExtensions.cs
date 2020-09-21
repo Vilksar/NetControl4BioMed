@@ -29,8 +29,10 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Throw an exception.
                 throw new ArgumentNullException("There provided items can't be null.");
             }
+            // Create a new scope.
+            using var scope = serviceProvider.CreateScope();
             // Use a new context instance.
-            using var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get the corresponding database set.
             var set = context.Set<T>();
             // Check if the correpsonding set doesn't exist.
@@ -76,8 +78,10 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Throw an exception.
                 throw new ArgumentNullException("There provided items can't be null.");
             }
+            // Create a new scope.
+            using var scope = serviceProvider.CreateScope();
             // Use a new context instance.
-            using var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get the corresponding database set.
             var set = context.Set<T>();
             // Check if the correpsonding set doesn't exist.
