@@ -143,7 +143,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databasesToAdd.Add(database);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(databasesToAdd, serviceProvider, token);
+                await IEnumerableExtensions.CreateAsync(databasesToAdd, context, token);
             }
         }
 
@@ -225,7 +225,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databasesToEdit.Add(database);
                 }
                 // Edit the items.
-                await IEnumerableExtensions.EditAsync(databasesToEdit, serviceProvider, token);
+                await IEnumerableExtensions.EditAsync(databasesToEdit, context, token);
             }
         }
 
@@ -282,14 +282,14 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisDatabases.Any(item1 => databases.Contains(item1.Database)));
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(networks, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(nodeCollections, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(edges, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(nodes, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(databaseEdgeFields, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(databaseNodeFields, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(databases, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(analyses, context, token);
+                await IQueryableExtensions.DeleteAsync(networks, context, token);
+                await IQueryableExtensions.DeleteAsync(nodeCollections, context, token);
+                await IQueryableExtensions.DeleteAsync(edges, context, token);
+                await IQueryableExtensions.DeleteAsync(nodes, context, token);
+                await IQueryableExtensions.DeleteAsync(databaseEdgeFields, context, token);
+                await IQueryableExtensions.DeleteAsync(databaseNodeFields, context, token);
+                await IQueryableExtensions.DeleteAsync(databases, context, token);
             }
         }
     }

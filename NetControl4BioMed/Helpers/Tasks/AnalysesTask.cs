@@ -296,7 +296,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     analysesToAdd.Add(analysis);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(analysesToAdd, serviceProvider, token);
+                await IEnumerableExtensions.CreateAsync(analysesToAdd, context, token);
                 // Define the new background tasks.
                 var generateBackgroundTask = new BackgroundTask
                 {
@@ -412,7 +412,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     analysesToEdit.Add(analysis);
                 }
                 // Edit the items.
-                await IEnumerableExtensions.EditAsync(analysesToEdit, serviceProvider, token);
+                await IEnumerableExtensions.EditAsync(analysesToEdit, context, token);
             }
         }
 
@@ -454,7 +454,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analyses = context.Analyses
                     .Where(item => batchIds.Contains(item.Id));
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(analyses, context, token);
             }
         }
 
@@ -518,7 +518,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Add a message to the log.
                     analysis.Log = analysis.AppendToLog("The analysis is now generating.");
                     // Edit the network.
-                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                     // Try to deserialize the data.
                     if (!analysis.Data.TryDeserializeJsonObject<IEnumerable<AnalysisNodeInputModel>>(out var data) || data == null)
                     {
@@ -527,7 +527,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         analysis.Log = analysis.AppendToLog("The source and / or target data corresponding to the analysis could not be deserialized.");
                         // Edit the analysis.
-                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                         // Continue.
                         continue;
                     }
@@ -605,7 +605,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         analysis.Log = analysis.AppendToLog("No nodes could be found within the provided networks.");
                         // Edit the analysis.
-                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                         // Continue.
                         continue;
                     }
@@ -623,7 +623,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         analysis.Log = analysis.AppendToLog("No edges could be found within the provided networks.");
                         // Edit the analysis.
-                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                         // Continue.
                         continue;
                     }
@@ -644,7 +644,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         analysis.Log = analysis.AppendToLog("No target nodes could be found with the provided target data.");
                         // Edit the analysis.
-                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                         // Continue.
                         continue;
                     }
@@ -691,7 +691,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Remove the generation data.
                     analysis.Data = null;
                     // Edit the analysis.
-                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                 }
             }
         }
@@ -757,7 +757,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Update the end time.
                         analysis.DateTimeEnded = DateTime.UtcNow;
                         // Edit the analysis.
-                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                         // Continue.
                         continue;
                     }
@@ -787,7 +787,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 // Update the end time.
                                 analysis.DateTimeEnded = DateTime.UtcNow;
                                 // Edit the analysis.
-                                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                                 // End the switch.
                                 break;
                         }
@@ -811,7 +811,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Update the end time.
                         analysis.DateTimeEnded = DateTime.UtcNow;
                         // Edit the analysis.
-                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                         // Continue.
                         continue;
                     }
@@ -873,7 +873,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Update the log.
                     analysis.Log = analysis.AppendToLog("The analysis has been scheduled to stop.");
                     // Update the items.
-                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                 }
             }
         }

@@ -225,7 +225,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     edgesToAdd.Add(edge);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(edgesToAdd, serviceProvider, token);
+                await IEnumerableExtensions.CreateAsync(edgesToAdd, context, token);
             }
         }
 
@@ -408,9 +408,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("There were no database edges found.", showExceptionItem, batchItem);
                     }
                     // Delete all related entities that appear in the current batch.
-                    await IQueryableExtensions.DeleteAsync(batchEdgeNodes.Where(item => item.Edge == edge), serviceProvider, token);
-                    await IQueryableExtensions.DeleteAsync(batchDatabaseEdges.Where(item => item.Edge == edge), serviceProvider, token);
-                    await IQueryableExtensions.DeleteAsync(batchDatabaseEdgeFieldEdges.Where(item => item.Edge == edge), serviceProvider, token);
+                    await IQueryableExtensions.DeleteAsync(batchEdgeNodes.Where(item => item.Edge == edge), context, token);
+                    await IQueryableExtensions.DeleteAsync(batchDatabaseEdges.Where(item => item.Edge == edge), context, token);
+                    await IQueryableExtensions.DeleteAsync(batchDatabaseEdgeFieldEdges.Where(item => item.Edge == edge), context, token);
                     // Update the edge.
                     edge.Name = string.Concat(edgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " - ", edgeNodes.First(item => item.Type == EdgeNodeType.Target).Node.Name);
                     edge.Description = batchItem.Description;
@@ -430,10 +430,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisEdges.Any(item1 => edgesToEdit.Contains(item1.Edge)));
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(networks, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(analyses, context, token);
+                await IQueryableExtensions.DeleteAsync(networks, context, token);
                 // Update the items.
-                await IEnumerableExtensions.EditAsync(edgesToEdit, serviceProvider, token);
+                await IEnumerableExtensions.EditAsync(edgesToEdit, context, token);
             }
         }
 
@@ -480,9 +480,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(networks, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(edges, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(analyses, context, token);
+                await IQueryableExtensions.DeleteAsync(networks, context, token);
+                await IQueryableExtensions.DeleteAsync(edges, context, token);
             }
         }
     }

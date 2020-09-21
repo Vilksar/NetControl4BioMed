@@ -121,7 +121,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseUserInvitationsToAdd.Add(databaseUserInvitation);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(databaseUserInvitationsToAdd, serviceProvider, token);
+                await IEnumerableExtensions.CreateAsync(databaseUserInvitationsToAdd, context, token);
             }
         }
 
@@ -166,7 +166,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var databaseUserInvitations = context.DatabaseUserInvitations
                     .Where(item => batchIds.Any(item1 => item1.Item1 == item.Database.Id && item1.Item2 == item.Email));
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(databaseUserInvitations, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(databaseUserInvitations, context, token);
             }
         }
     }

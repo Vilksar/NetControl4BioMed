@@ -124,7 +124,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     analysisUsersToAdd.Add(analysisUser);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(analysisUsersToAdd, serviceProvider, token);
+                await IEnumerableExtensions.CreateAsync(analysisUsersToAdd, context, token);
             }
         }
 
@@ -169,7 +169,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analysisUsers = context.AnalysisUsers
                     .Where(item => batchIds.Any(item1 => item1.Item1 == item.Analysis.Id && item1.Item2 == item.User.Id));
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analysisUsers, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(analysisUsers, context, token);
             }
         }
     }

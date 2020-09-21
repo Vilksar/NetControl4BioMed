@@ -143,7 +143,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseEdgeFieldsToAdd.Add(databaseEdgeField);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(databaseEdgeFieldsToAdd, serviceProvider, token);
+                await IEnumerableExtensions.CreateAsync(databaseEdgeFieldsToAdd, context, token);
             }
         }
 
@@ -226,7 +226,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseEdgeFieldsToEdit.Add(databaseEdgeField);
                 }
                 // Edit the items.
-                await IEnumerableExtensions.EditAsync(databaseEdgeFieldsToEdit, serviceProvider, token);
+                await IEnumerableExtensions.EditAsync(databaseEdgeFieldsToEdit, context, token);
             }
         }
 
@@ -275,10 +275,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(networks, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(edges, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(databaseEdgeFields, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(analyses, context, token);
+                await IQueryableExtensions.DeleteAsync(networks, context, token);
+                await IQueryableExtensions.DeleteAsync(edges, context, token);
+                await IQueryableExtensions.DeleteAsync(databaseEdgeFields, context, token);
             }
         }
     }

@@ -181,13 +181,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                         DateTimeCreated = item.DateTimeCreated
                     });
                     // Create the items.
-                    await IEnumerableExtensions.CreateAsync(databaseUsers, serviceProvider, token);
-                    await IEnumerableExtensions.CreateAsync(networkUsers, serviceProvider, token);
-                    await IEnumerableExtensions.CreateAsync(analysisUsers, serviceProvider, token);
+                    await IEnumerableExtensions.CreateAsync(databaseUsers, context, token);
+                    await IEnumerableExtensions.CreateAsync(networkUsers, context, token);
+                    await IEnumerableExtensions.CreateAsync(analysisUsers, context, token);
                     // Delete the items
-                    await IQueryableExtensions.DeleteAsync(databaseUserInvitations, serviceProvider, token);
-                    await IQueryableExtensions.DeleteAsync(networkUserInvitations, serviceProvider, token);
-                    await IQueryableExtensions.DeleteAsync(analysisUserInvitations, serviceProvider, token);
+                    await IQueryableExtensions.DeleteAsync(databaseUserInvitations, context, token);
+                    await IQueryableExtensions.DeleteAsync(networkUserInvitations, context, token);
+                    await IQueryableExtensions.DeleteAsync(analysisUserInvitations, context, token);
                 }
             }
         }
@@ -347,10 +347,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var genericEdges = context.Edges
                     .Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(networks, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(genericEdges, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(genericNodes, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(analyses, context, token);
+                await IQueryableExtensions.DeleteAsync(networks, context, token);
+                await IQueryableExtensions.DeleteAsync(genericEdges, context, token);
+                await IQueryableExtensions.DeleteAsync(genericNodes, context, token);
                 // Check if there have been any error messages.
                 if (errorMessages.Any())
                 {

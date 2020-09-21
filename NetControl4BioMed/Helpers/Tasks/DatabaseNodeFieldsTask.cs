@@ -143,7 +143,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseNodeFieldsToAdd.Add(databaseNodeField);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(databaseNodeFieldsToAdd, serviceProvider, token);
+                await IEnumerableExtensions.CreateAsync(databaseNodeFieldsToAdd, context, token);
             }
         }
 
@@ -226,7 +226,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseNodeFieldsToEdit.Add(databaseNodeField);
                 }
                 // Edit the items.
-                await IEnumerableExtensions.EditAsync(databaseNodeFieldsToEdit, serviceProvider, token);
+                await IEnumerableExtensions.EditAsync(databaseNodeFieldsToEdit, context, token);
             }
         }
 
@@ -279,12 +279,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisNodes.Any(item1 => nodes.Contains(item1.Node)));
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(networks, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(nodeCollections, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(edges, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(nodes, serviceProvider, token);
-                await IQueryableExtensions.DeleteAsync(databaseNodeFields, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(analyses, context, token);
+                await IQueryableExtensions.DeleteAsync(networks, context, token);
+                await IQueryableExtensions.DeleteAsync(nodeCollections, context, token);
+                await IQueryableExtensions.DeleteAsync(edges, context, token);
+                await IQueryableExtensions.DeleteAsync(nodes, context, token);
+                await IQueryableExtensions.DeleteAsync(databaseNodeFields, context, token);
             }
         }
     }

@@ -124,7 +124,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseUsersToAdd.Add(databaseUser);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(databaseUsersToAdd, serviceProvider, token);
+                await IEnumerableExtensions.CreateAsync(databaseUsersToAdd, context, token);
             }
         }
 
@@ -169,7 +169,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var databaseUsers = context.DatabaseUsers
                     .Where(item => batchIds.Any(item1 => item1.Item1 == item.Database.Id && item1.Item2 == item.User.Id));
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(databaseUsers, serviceProvider, token);
+                await IQueryableExtensions.DeleteAsync(databaseUsers, context, token);
             }
         }
     }
