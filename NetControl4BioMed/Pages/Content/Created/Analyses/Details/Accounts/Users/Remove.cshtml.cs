@@ -312,7 +312,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {itemCount.ToString()} user{(itemCount != 1 ? "s" : string.Empty)} removed successfully.";
+            TempData["StatusMessage"] = $"Success: {itemCount} user{(itemCount != 1 ? "s" : string.Empty)} removed successfully.";
             // Check if the current user was selected.
             if (View.IsCurrentUserSelected)
             {

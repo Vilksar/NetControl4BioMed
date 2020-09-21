@@ -305,6 +305,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     IsRecurring = false,
                     Data = JsonSerializer.Serialize(new AnalysesTask
                     {
+                        Scheme = Scheme,
+                        HostValue = HostValue,
                         Items = analysesToAdd.Select(item => new AnalysisInputModel
                         {
                             Id = item.Id
@@ -714,6 +716,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         IsRecurring = false,
                         Data = JsonSerializer.Serialize(new AnalysesTask
                         {
+                            Scheme = Scheme,
+                            HostValue = HostValue,
                             Items = analysis.Yield().Select(item => new AnalysisInputModel
                             {
                                 Id = item.Id
