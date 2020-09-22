@@ -78,7 +78,7 @@
         @if (Model.View.Analysis.Algorithm == AnalysisAlgorithm.Genetic)
         {
             <div class="alert alert-warning text-justify text-wrap">
-                <span><i class="fas fa-exclamation-circle"></i></span>
+                <span><i class="fas fa-exclamation-triangle"></i></span>
                 <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control nodes, and not control paths. Thus, while the returned set of control nodes does indeed control the entire set of target nodes, the actual number of controlled nodes might differ.</span>
             </div>
         }

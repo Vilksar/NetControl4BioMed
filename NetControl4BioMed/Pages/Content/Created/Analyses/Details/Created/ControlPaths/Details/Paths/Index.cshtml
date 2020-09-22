@@ -9,7 +9,7 @@
 @if (Model.View.Analysis.Algorithm == AnalysisAlgorithm.Genetic)
 {
     <div class="alert alert-warning text-justify text-wrap">
-        <span><i class="fas fa-exclamation-circle"></i></span>
+        <span><i class="fas fa-exclamation-triangle"></i></span>
         <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control nodes, and not control paths. Thus, all displayed path lengths correspond to the shortest paths between a control node and its corresponding controlled target nodes, instead of the actual control path.</span>
     </div>
 }
