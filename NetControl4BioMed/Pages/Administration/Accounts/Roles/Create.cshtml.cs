@@ -42,7 +42,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
@@ -67,7 +67,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             try
             {
                 // Run the task.
-                _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
+                await task.CreateAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {

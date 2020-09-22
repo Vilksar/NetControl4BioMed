@@ -28,8 +28,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The created items.</returns>
-        public IEnumerable<Role> Create(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task CreateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -97,7 +96,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         role.Id = batchItem.Id;
                     }
                     // Try to create the new role.
-                    var result = Task.Run(() => roleManager.CreateAsync(role)).Result;
+                    var result = await roleManager.CreateAsync(role);
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
                     {
@@ -107,8 +106,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                     }
-                    // Yield return the item.
-                    yield return role;
                 }
             }
         }
@@ -118,8 +115,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The edited items.</returns>
-        public IEnumerable<Role> Edit(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task EditAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -176,7 +172,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (batchItem.Name != role.Name)
                     {
                         // Try to set the new role name.
-                        result = Task.Run(() => roleManager.SetRoleNameAsync(role, batchItem.Name)).Result;
+                        result = await roleManager.SetRoleNameAsync(role, batchItem.Name);
                     }
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
@@ -187,8 +183,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                     }
-                    // Yield return the item.
-                    yield return role;
                 }
             }
         }
@@ -198,7 +192,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Delete(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -232,20 +226,28 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the items with the provided IDs.
                 var roles = context.Roles
                     .Where(item => batchIds.Contains(item.Id));
+                // Define a variable to store the error messages.
+                var errorMessages = new List<string>();
                 // Go over each item.
                 foreach (var role in roles.ToList())
                 {
                     // Delete it.
-                    var result = Task.Run(() => roleManager.DeleteAsync(role)).Result;
+                    var result = await roleManager.DeleteAsync(role);
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
                     {
                         // Define the exception messages.
                         var messages = result.Errors
                             .Select(item => item.Description);
-                        // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages));
+                        // Add the exception messages to the error messages.
+                        errorMessages.AddRange(messages);
                     }
+                }
+                // Check if there have been any error messages.
+                if (errorMessages.Any())
+                {
+                    // Throw an exception.
+                    throw new TaskException(string.Join(" ", errorMessages));
                 }
             }
         }

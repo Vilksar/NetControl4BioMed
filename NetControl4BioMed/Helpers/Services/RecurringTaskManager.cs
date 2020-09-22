@@ -23,18 +23,12 @@ namespace NetControl4BioMed.Helpers.Services
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
-        /// Represents the application database context.
-        /// </summary>
-        private readonly ApplicationDbContext _context;
-
-        /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
-        public RecurringTaskManager(IServiceProvider serviceProvider, ApplicationDbContext context)
+        public RecurringTaskManager(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _context = context;
         }
 
         /// <summary>
@@ -42,14 +36,14 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void StopAnalyses(string id, CancellationToken token)
+        public async Task StopAnalysesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
-            task.StopAnalyses(_serviceProvider, token);
+            await task.StopAnalysesAsync(_serviceProvider, token);
         }
 
         /// <summary>
@@ -57,14 +51,14 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void AlertUsers(string id, CancellationToken token)
+        public async Task AlertUsersAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
-            task.AlertUsers(_serviceProvider, token);
+            await task.AlertUsersAsync(_serviceProvider, token);
         }
 
         /// <summary>
@@ -72,14 +66,14 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteUsers(string id, CancellationToken token)
+        public async Task DeleteUsersAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
             // Get the task corresponding to the background task.
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
-            task.DeleteUsers(_serviceProvider, token);
+            await task.DeleteUsersAsync(_serviceProvider, token);
         }
 
         /// <summary>
@@ -87,14 +81,14 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteNetworks(string id, CancellationToken token)
+        public async Task DeleteNetworksAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
-            task.DeleteNetworks(_serviceProvider, token);
+            await task.DeleteNetworksAsync(_serviceProvider, token);
         }
 
         /// <summary>
@@ -102,14 +96,14 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteAnalyses(string id, CancellationToken token)
+        public async Task DeleteAnalysesAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
-            task.DeleteAnalyses(_serviceProvider, token);
+            await task.DeleteAnalysesAsync(_serviceProvider, token);
         }
 
         /// <summary>
@@ -119,8 +113,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <returns>The background task corresponding to the provided ID.</returns>
         private BackgroundTask GetBackgroundTask(string id)
         {
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Try to get the background task with the provided ID.
-            var backgroundTask = _context.BackgroundTasks
+            var backgroundTask = context.BackgroundTasks
                 .Where(item => item.Id == id)
                 .FirstOrDefault();
             // Check if there was any task found.

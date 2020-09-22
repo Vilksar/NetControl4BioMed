@@ -269,8 +269,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             try
             {
                 // Run the tasks.
-                analysisUsersTask.Delete(_serviceProvider, CancellationToken.None);
-                analysisUserInvitationsTask.Delete(_serviceProvider, CancellationToken.None);
+                await analysisUsersTask.DeleteAsync(_serviceProvider, CancellationToken.None);
+                await analysisUserInvitationsTask.DeleteAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {
@@ -297,7 +297,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 try
                 {
                     // Run the tasks.
-                    analysesTask.Delete(_serviceProvider, CancellationToken.None);
+                    await analysesTask.DeleteAsync(_serviceProvider, CancellationToken.None);
                 }
                 catch (Exception exception)
                 {
@@ -312,7 +312,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {itemCount.ToString()} user{(itemCount != 1 ? "s" : string.Empty)} removed successfully.";
+            TempData["StatusMessage"] = $"Success: {itemCount} user{(itemCount != 1 ? "s" : string.Empty)} removed successfully.";
             // Check if the current user was selected.
             if (View.IsCurrentUserSelected)
             {

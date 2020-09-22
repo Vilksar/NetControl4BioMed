@@ -136,7 +136,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.PersonalData
             try
             {
                 // Run the task.
-                task.Delete(_serviceProvider, CancellationToken.None);
+                await task.DeleteAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {

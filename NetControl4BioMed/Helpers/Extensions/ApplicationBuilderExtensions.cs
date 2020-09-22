@@ -24,14 +24,12 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <returns></returns>
         public static async Task<IApplicationBuilder> SeedDatabaseAsync(this IApplicationBuilder app, IConfiguration configuration)
         {
-            // Create the scope for the application.
-            using var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
-            // Get the service provider.
-            var serviceProvider = serviceScope.ServiceProvider;
+            // Create a new scope for the application.
+            using var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
             // Get the required services.
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
-            var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Check if the administrator role doesn't already exist.
             if (!await roleManager.RoleExistsAsync("Administrator"))
             {

@@ -29,8 +29,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The created items.</returns>
-        public IEnumerable<DatabaseType> Create(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task CreateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -108,13 +107,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseTypesToAdd.Add(databaseType);
                 }
                 // Create the items.
-                IEnumerableExtensions.Create(databaseTypesToAdd, context, token);
-                // Go over each item.
-                foreach (var databaseType in databaseTypesToAdd)
-                {
-                    // Yield return it.
-                    yield return databaseType;
-                }
+                await IEnumerableExtensions.CreateAsync(databaseTypesToAdd, context, token);
             }
         }
 
@@ -123,8 +116,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The edited items.</returns>
-        public IEnumerable<DatabaseType> Edit(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task EditAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -194,13 +186,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseTypesToEdit.Add(databaseType);
                 }
                 // Edit the items.
-                IEnumerableExtensions.Edit(databaseTypesToEdit, context, token);
-                // Go over each item.
-                foreach (var databaseType in databaseTypesToEdit)
-                {
-                    // Yield return it.
-                    yield return databaseType;
-                }
+                await IEnumerableExtensions.EditAsync(databaseTypesToEdit, context, token);
             }
         }
 
@@ -209,7 +195,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Delete(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -259,15 +245,15 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisDatabases.Any(item1 => databaseTypes.Contains(item1.Database.DatabaseType)));
                 // Delete the items.
-                IQueryableExtensions.Delete(analyses, context, token);
-                IQueryableExtensions.Delete(networks, context, token);
-                IQueryableExtensions.Delete(nodeCollections, context, token);
-                IQueryableExtensions.Delete(edges, context, token);
-                IQueryableExtensions.Delete(nodes, context, token);
-                IQueryableExtensions.Delete(databaseEdgeFields, context, token);
-                IQueryableExtensions.Delete(databaseNodeFields, context, token);
-                IQueryableExtensions.Delete(databases, context, token);
-                IQueryableExtensions.Delete(databaseTypes, context, token);
+                await IQueryableExtensions.DeleteAsync(analyses, context, token);
+                await IQueryableExtensions.DeleteAsync(networks, context, token);
+                await IQueryableExtensions.DeleteAsync(nodeCollections, context, token);
+                await IQueryableExtensions.DeleteAsync(edges, context, token);
+                await IQueryableExtensions.DeleteAsync(nodes, context, token);
+                await IQueryableExtensions.DeleteAsync(databaseEdgeFields, context, token);
+                await IQueryableExtensions.DeleteAsync(databaseNodeFields, context, token);
+                await IQueryableExtensions.DeleteAsync(databases, context, token);
+                await IQueryableExtensions.DeleteAsync(databaseTypes, context, token);
             }
         }
     }

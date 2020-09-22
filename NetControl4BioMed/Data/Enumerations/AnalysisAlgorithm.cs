@@ -12,15 +12,15 @@ namespace NetControl4BioMed.Data.Enumerations
     public enum AnalysisAlgorithm
     {
         /// <summary>
-        /// Represents the first algorithm (greedy).
+        /// Represents the greedy algorithm.
         /// </summary>
-        [Display(Name = "Greedy algorithm", Description = "A greedy algorithm.")]
-        Algorithm1,
+        [Display(Name = "Greedy", Description = "The analysis runs using a greedy algorithm.")]
+        Greedy,
 
         /// <summary>
-        /// Represents the second algorithm (genetic).
+        /// Represents the genetic algorithm.
         /// </summary>
-        [Display(Name = "Genetic algorithm", Description = "A genetic algorithm.")]
-        Algorithm2
+        [Display(Name = "Genetic", Description = "The analysis runs using a genetic algorithm.")]
+        Genetic
     }
 }

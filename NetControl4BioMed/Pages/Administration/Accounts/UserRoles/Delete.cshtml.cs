@@ -151,7 +151,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
             var task = new BackgroundTask
             {
                 DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteUserRoles)}",
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteUserRolesAsync)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new UserRolesTask
                 {
@@ -171,9 +171,9 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
             // Mark the task for addition.
             _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             // Create a new Hangfire background job.
-            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteUserRoles(task.Id, CancellationToken.None));
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteUserRolesAsync(task.Id, CancellationToken.None));
             // Check if the current user is selected.
             if (View.IsCurrentUserSelected)
             {

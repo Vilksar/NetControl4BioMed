@@ -1,4 +1,5 @@
-﻿using NetControl4BioMed.Data;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NetControl4BioMed.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <param name="items">The items to be created.</param>
         /// <param name="context">The application database context.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public static void Create<T>(IEnumerable<T> items, ApplicationDbContext context, CancellationToken token) where T : class
+        public static async Task CreateAsync<T>(IEnumerable<T> items, ApplicationDbContext context, CancellationToken token) where T : class
         {
             // Check if the items don't exist.
             if (items == null)
@@ -54,7 +55,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Mark the items for addition.
                 set.AddRange(batchItems);
                 // Save the changes to the database.
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
 
@@ -65,7 +66,7 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <param name="items">The items to be updated.</param>
         /// <param name="context">The application database context.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public static void Edit<T>(IEnumerable<T> items, ApplicationDbContext context, CancellationToken token) where T : class
+        public static async Task EditAsync<T>(IEnumerable<T> items, ApplicationDbContext context, CancellationToken token) where T : class
         {
             // Check if the items don't exist.
             if (items == null)
@@ -99,7 +100,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Mark the items for update.
                 set.UpdateRange(batchItems);
                 // Save the changes to the database.
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
 

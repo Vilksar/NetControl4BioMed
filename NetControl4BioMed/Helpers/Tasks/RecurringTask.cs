@@ -51,7 +51,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void StopAnalyses(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task StopAnalysesAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Create a new scope.
             using var scope = serviceProvider.CreateScope();
@@ -73,7 +73,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     })
             };
             // Run the task.
-            task.Stop(serviceProvider, token);
+            await task.StopAsync(serviceProvider, token);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void AlertUsers(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task AlertUsersAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Create a new scope.
             using var scope = serviceProvider.CreateScope();
@@ -127,7 +127,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             foreach (var user in users)
             {
                 // Send an alert delete e-mail.
-                Task.Run(() => emailSender.SendAlertDeleteEmailAsync(new EmailAlertDeleteViewModel
+                await emailSender.SendAlertDeleteEmailAsync(new EmailAlertDeleteViewModel
                 {
                     Email = user.Email,
                     DateTime = DateTime.Today + TimeSpan.FromDays(DaysBeforeDelete - DaysBeforeAlert),
@@ -150,7 +150,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             Url = linkGenerator.GetUriByPage("/Content/Created/Analyses/Details/Index", handler: null, values: new { id = item.Id }, scheme: Scheme, host: host)
                         }),
                     ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
-                })).Wait();
+                });
             }
         }
 
@@ -159,7 +159,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteUsers(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteUsersAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Create a new scope.
             using var scope = serviceProvider.CreateScope();
@@ -181,7 +181,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     })
             };
             // Run the task.
-            task.Delete(serviceProvider, token);
+            await task.DeleteAsync(serviceProvider, token);
         }
 
         /// <summary>
@@ -189,7 +189,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteNetworks(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteNetworksAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Create a new scope.
             using var scope = serviceProvider.CreateScope();
@@ -210,7 +210,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     })
             };
             // Run the task.
-            task.Delete(serviceProvider, token);
+            await task.DeleteAsync(serviceProvider, token);
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void DeleteAnalyses(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteAnalysesAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Create a new scope.
             using var scope = serviceProvider.CreateScope();
@@ -240,7 +240,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     })
             };
             // Run the task.
-            task.Delete(serviceProvider, token);
+            await task.DeleteAsync(serviceProvider, token);
         }
     }
 }

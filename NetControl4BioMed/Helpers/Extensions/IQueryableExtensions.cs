@@ -1,4 +1,5 @@
-﻿using NetControl4BioMed.Data;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NetControl4BioMed.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,13 +21,13 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <param name="items">The items to be updated.</param>
         /// <param name="context">The application database context.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public static void Delete<T>(IQueryable<T> items, ApplicationDbContext context, CancellationToken token) where T : class
+        public static async Task DeleteAsync<T>(IQueryable<T> items, ApplicationDbContext context, CancellationToken token) where T : class
         {
             // Check if the items don't exist.
             if (items == null)
             {
                 // Throw an exception.
-                throw new ArgumentNullException("There provided items can't be null.");
+                throw new ArgumentNullException("The provided items can't be null.");
             }
             // Get the corresponding database set.
             var set = context.Set<T>();
@@ -53,7 +54,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Mark the items for deletion.
                 set.RemoveRange(batchItems);
                 // Save the changes to the database.
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
     }

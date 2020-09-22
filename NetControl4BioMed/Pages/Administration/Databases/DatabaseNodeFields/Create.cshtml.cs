@@ -72,7 +72,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // Check if there aren't any non-generic databases.
             if (!_context.Databases.Any(item => item.DatabaseType.Name != "Generic"))
@@ -112,7 +112,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
             try
             {
                 // Run the task.
-                _ = task.Create(_serviceProvider, CancellationToken.None).ToList();
+                await task.CreateAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {

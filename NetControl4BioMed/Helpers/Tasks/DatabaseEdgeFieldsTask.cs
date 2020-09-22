@@ -29,8 +29,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The created items.</returns>
-        public IEnumerable<DatabaseEdgeField> Create(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task CreateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -144,13 +143,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseEdgeFieldsToAdd.Add(databaseEdgeField);
                 }
                 // Create the items.
-                IEnumerableExtensions.Create(databaseEdgeFieldsToAdd, context, token);
-                // Go over each item.
-                foreach (var databaseEdgeField in databaseEdgeFieldsToAdd)
-                {
-                    // Yield return it.
-                    yield return databaseEdgeField;
-                }
+                await IEnumerableExtensions.CreateAsync(databaseEdgeFieldsToAdd, context, token);
             }
         }
 
@@ -159,8 +152,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The edited items.</returns>
-        public IEnumerable<DatabaseEdgeField> Edit(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task EditAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -234,13 +226,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseEdgeFieldsToEdit.Add(databaseEdgeField);
                 }
                 // Edit the items.
-                IEnumerableExtensions.Edit(databaseEdgeFieldsToEdit, context, token);
-                // Go over each item.
-                foreach (var databaseEdgeField in databaseEdgeFieldsToEdit)
-                {
-                    // Yield return it.
-                    yield return databaseEdgeField;
-                }
+                await IEnumerableExtensions.EditAsync(databaseEdgeFieldsToEdit, context, token);
             }
         }
 
@@ -249,7 +235,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Delete(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -289,10 +275,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analyses = context.Analyses
                     .Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
                 // Delete the items.
-                IQueryableExtensions.Delete(analyses, context, token);
-                IQueryableExtensions.Delete(networks, context, token);
-                IQueryableExtensions.Delete(edges, context, token);
-                IQueryableExtensions.Delete(databaseEdgeFields, context, token);
+                await IQueryableExtensions.DeleteAsync(analyses, context, token);
+                await IQueryableExtensions.DeleteAsync(networks, context, token);
+                await IQueryableExtensions.DeleteAsync(edges, context, token);
+                await IQueryableExtensions.DeleteAsync(databaseEdgeFields, context, token);
             }
         }
     }

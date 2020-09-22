@@ -29,8 +29,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>The created items.</returns>
-        public IEnumerable<NetworkUser> Create(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task CreateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -125,13 +124,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     networkUsersToAdd.Add(networkUser);
                 }
                 // Create the items.
-                IEnumerableExtensions.Create(networkUsersToAdd, context, token);
-                // Go over each item.
-                foreach (var networkUser in networkUsersToAdd)
-                {
-                    // Yield return it.
-                    yield return networkUser;
-                }
+                await IEnumerableExtensions.CreateAsync(networkUsersToAdd, context, token);
             }
         }
 
@@ -140,7 +133,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public void Delete(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -176,7 +169,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var networkUsers = context.NetworkUsers
                     .Where(item => batchIds.Any(item1 => item1.Item1 == item.Network.Id && item1.Item2 == item.User.Id));
                 // Delete the items.
-                IQueryableExtensions.Delete(networkUsers, context, token);
+                await IQueryableExtensions.DeleteAsync(networkUsers, context, token);
             }
         }
     }

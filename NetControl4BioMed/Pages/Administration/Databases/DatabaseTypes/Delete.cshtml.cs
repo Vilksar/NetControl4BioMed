@@ -80,7 +80,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())
@@ -126,7 +126,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             var task = new BackgroundTask
             {
                 DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteDatabaseTypes)}",
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteDatabaseTypesAsync)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new DatabaseTypesTask
                 {
@@ -139,9 +139,9 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             // Mark the task for addition.
             _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             // Create a new Hangfire background job.
-            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteDatabaseTypes(task.Id, CancellationToken.None));
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteDatabaseTypesAsync(task.Id, CancellationToken.None));
             // Display a message.
             TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} database type{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.

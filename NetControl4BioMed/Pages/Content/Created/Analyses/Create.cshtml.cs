@@ -18,9 +18,8 @@ using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
-using NetControl4BioMed.Helpers.Services;
 using NetControl4BioMed.Helpers.Tasks;
-using NetControl4BioMed.Helpers.ViewModels;
+using Algorithms = NetControl4BioMed.Helpers.Algorithms;
 
 namespace NetControl4BioMed.Pages.Content.Created.Analyses
 {
@@ -76,9 +75,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             [Required(ErrorMessage = "This field is required.")]
             public int MaximumIterationsWithoutImprovement { get; set; }
 
-            public Helpers.Algorithms.Algorithm1.Parameters Algorithm1Parameters { get; set; }
+            public Algorithms.Analyses.Greedy.Parameters GreedyAlgorithmParameters { get; set; }
 
-            public Helpers.Algorithms.Algorithm2.Parameters Algorithm2Parameters { get; set; }
+            public Algorithms.Analyses.Genetic.Parameters GeneticAlgorithmParameters { get; set; }
 
             public IEnumerable<string> NetworkIds { get; set; }
 
@@ -202,8 +201,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                         TargetData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                         MaximumIterations = 100,
                         MaximumIterationsWithoutImprovement = 25,
-                        Algorithm1Parameters = View.Algorithm == AnalysisAlgorithm.Algorithm1.ToString() ? new Helpers.Algorithms.Algorithm1.Parameters() : null,
-                        Algorithm2Parameters = View.Algorithm == AnalysisAlgorithm.Algorithm2.ToString() ? new Helpers.Algorithms.Algorithm2.Parameters() : null,
+                        GreedyAlgorithmParameters = View.Algorithm == AnalysisAlgorithm.Greedy.ToString() ? new Algorithms.Analyses.Greedy.Parameters() : null,
+                        GeneticAlgorithmParameters = View.Algorithm == AnalysisAlgorithm.Genetic.ToString() ? new Algorithms.Analyses.Genetic.Parameters() : null,
                         NetworkIds = Enumerable.Empty<string>(),
                         SourceNodeCollectionIds = Enumerable.Empty<string>(),
                         TargetNodeCollectionIds = Enumerable.Empty<string>()
@@ -236,8 +235,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                         MaximumIterationsWithoutImprovement = analyses
                             .Select(item => item.MaximumIterationsWithoutImprovement)
                             .FirstOrDefault(),
-                        Algorithm1Parameters = algorithm == AnalysisAlgorithm.Algorithm1.ToString() ? JsonSerializer.Deserialize<Helpers.Algorithms.Algorithm1.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : null,
-                        Algorithm2Parameters = algorithm == AnalysisAlgorithm.Algorithm2.ToString() ? JsonSerializer.Deserialize<Helpers.Algorithms.Algorithm2.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : null,
+                        GreedyAlgorithmParameters = algorithm == AnalysisAlgorithm.Greedy.ToString() ? JsonSerializer.Deserialize<Algorithms.Analyses.Greedy.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : null,
+                        GeneticAlgorithmParameters = algorithm == AnalysisAlgorithm.Genetic.ToString() ? JsonSerializer.Deserialize<Algorithms.Analyses.Genetic.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : null,
                         NetworkIds = analyses
                             .Select(item => item.AnalysisNetworks)
                             .SelectMany(item => item)
@@ -356,7 +355,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 return Page();
             }
             // Check if the parameters match the given algorithm.
-            if ((Input.Algorithm == AnalysisAlgorithm.Algorithm1.ToString() && Input.Algorithm1Parameters == null) || (Input.Algorithm == AnalysisAlgorithm.Algorithm2.ToString() && Input.Algorithm2Parameters == null))
+            if ((Input.Algorithm == AnalysisAlgorithm.Greedy.ToString() && Input.GreedyAlgorithmParameters == null) || (Input.Algorithm == AnalysisAlgorithm.Genetic.ToString() && Input.GeneticAlgorithmParameters == null))
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The parameter values are not valid for the chosen algorithm.");
@@ -440,6 +439,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             // Define a new task.
             var task = new AnalysesTask
             {
+                Scheme = HttpContext.Request.Scheme,
+                HostValue = HttpContext.Request.Host.Value,
                 Items = new List<AnalysisInputModel>
                 {
                     new AnalysisInputModel
@@ -450,8 +451,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                         MaximumIterations = Input.MaximumIterations,
                         MaximumIterationsWithoutImprovement = Input.MaximumIterationsWithoutImprovement,
                         Algorithm = Input.Algorithm,
-                        Parameters = Input.Algorithm == AnalysisAlgorithm.Algorithm1.ToString() ? JsonSerializer.Serialize(Input.Algorithm1Parameters, new JsonSerializerOptions { IgnoreReadOnlyProperties = true }) :
-                            Input.Algorithm == AnalysisAlgorithm.Algorithm2.ToString() ? JsonSerializer.Serialize(Input.Algorithm2Parameters, new JsonSerializerOptions { IgnoreReadOnlyProperties = true }) :
+                        Parameters = Input.Algorithm == AnalysisAlgorithm.Greedy.ToString() ? JsonSerializer.Serialize(Input.GreedyAlgorithmParameters, new JsonSerializerOptions { IgnoreReadOnlyProperties = true }) :
+                            Input.Algorithm == AnalysisAlgorithm.Genetic.ToString() ? JsonSerializer.Serialize(Input.GeneticAlgorithmParameters, new JsonSerializerOptions { IgnoreReadOnlyProperties = true }) :
                             null,
                         AnalysisUsers = new List<AnalysisUserInputModel>
                         {
@@ -495,13 +496,11 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     }
                 }
             };
-            // Define a variable to store the analyses that will be created.
-            var analyses = new List<Analysis>();
             // Try to run the task.
             try
             {
                 // Run the task.
-                analyses.AddRange(task.Create(_serviceProvider, CancellationToken.None).ToList());
+                await task.CreateAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {
@@ -510,58 +509,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 // Redisplay the page.
                 return Page();
             }
-            // Define the new background tasks.
-            var generateBackgroundTask = new BackgroundTask
-            {
-                DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.GenerateAnalyses)}",
-                IsRecurring = false,
-                Data = JsonSerializer.Serialize(new AnalysesTask
-                {
-                    Items = analyses.Select(item => new AnalysisInputModel
-                    {
-                        Id = item.Id
-                    })
-                })
-            };
-            var startBackgroundTask = new BackgroundTask
-            {
-                DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.StartAnalyses)}",
-                IsRecurring = false,
-                Data = JsonSerializer.Serialize(new AnalysesTask
-                {
-                    Items = analyses.Select(item => new AnalysisInputModel
-                    {
-                        Id = item.Id
-                    })
-                })
-            };
-            var sendEndedEmailsBackgroundTask = new BackgroundTask
-            {
-                DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.SendEndedEmails)}",
-                IsRecurring = false,
-                Data = JsonSerializer.Serialize(new AnalysesTask
-                {
-                    Scheme = HttpContext.Request.Scheme,
-                    HostValue = HttpContext.Request.Host.Value,
-                    Items = analyses.Select(item => new AnalysisInputModel
-                    {
-                        Id = item.Id
-                    })
-                })
-            };
-            // Mark the task for addition.
-            _context.BackgroundTasks.Add(generateBackgroundTask);
-            _context.BackgroundTasks.Add(startBackgroundTask);
-            _context.BackgroundTasks.Add(sendEndedEmailsBackgroundTask);
-            // Save the changes to the database.
-            _context.SaveChanges();
-            // Create a new Hangfire background job.
-            var generateJobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateAnalyses(generateBackgroundTask.Id, CancellationToken.None));
-            var startJobId = BackgroundJob.ContinueJobWith<IContentTaskManager>(generateJobId, item => item.StartAnalyses(startBackgroundTask.Id, CancellationToken.None), JobContinuationOptions.OnlyOnSucceededState);
-            var sendEndedEmailsJobId = BackgroundJob.ContinueJobWith<IContentTaskManager>(startJobId, item => item.SendEndedEmails(sendEndedEmailsBackgroundTask.Id, CancellationToken.None), JobContinuationOptions.OnlyOnSucceededState);
             // Display a message.
             TempData["StatusMessage"] = $"Success: 1 analysis of type \"{databaseType.Name}\" with algorithm \"{Input.Algorithm}\" defined successfully and scheduled for generation.";
             // Redirect to the index page.

@@ -83,7 +83,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())
@@ -129,7 +129,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             var task = new BackgroundTask
             {
                 DateTimeCreated = DateTime.UtcNow,
-                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteRoles)}",
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteRolesAsync)}",
                 IsRecurring = false,
                 Data = JsonSerializer.Serialize(new RolesTask
                 {
@@ -142,9 +142,9 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             // Mark the task for addition.
             _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             // Create a new Hangfire background job.
-            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteRoles(task.Id, CancellationToken.None));
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteRolesAsync(task.Id, CancellationToken.None));
             // Display a message.
             TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} role{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.

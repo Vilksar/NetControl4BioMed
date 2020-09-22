@@ -273,7 +273,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 var task = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.CreateEdges)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.CreateEdgesAsync)}",
                     Data = JsonSerializer.Serialize(new EdgesTask
                     {
                         Items = items
@@ -284,7 +284,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.CreateEdges(task.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.CreateEdgesAsync(task.Id, CancellationToken.None));
             }
             // Check if the items should be edited.
             else if (Input.Type == "Edit")
@@ -306,7 +306,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 var task = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.EditEdges)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.EditEdgesAsync)}",
                     Data = JsonSerializer.Serialize(new EdgesTask
                     {
                         Items = items
@@ -317,7 +317,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.EditEdges(task.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.EditEdgesAsync(task.Id, CancellationToken.None));
             }
             // Check if the items should be deleted.
             else if (Input.Type == "Delete")
@@ -337,7 +337,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 var task = new BackgroundTask
                 {
                     DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteEdges)}",
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteEdgesAsync)}",
                     Data = JsonSerializer.Serialize(new EdgesTask
                     {
                         Items = edges.Select(item => new EdgeInputModel
@@ -351,7 +351,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Edges
                 // Save the changes to the database.
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteEdges(task.Id, CancellationToken.None));
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteEdgesAsync(task.Id, CancellationToken.None));
             }
             // Check if the type is not valid.
             else
