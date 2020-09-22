@@ -25,8 +25,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
         /// <param name="analysis">The analysis which to run using the algorithm.</param>
         public static async Task Run(Analysis analysis, ApplicationDbContext context, CancellationToken token)
         {
-            // Reload the analysis for a fresh start.
-            await context.Entry(analysis).ReloadAsync();
             // Get the nodes, edges, target nodes and source (preferred) nodes.
             var nodes = context.AnalysisNodes
                 .Where(item => item.Analysis == analysis)
@@ -285,7 +283,9 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                     }
                 }
                 // Reload it for the next iteration.
-                await context.Entry(analysis).ReloadAsync();
+                analysis = context.Analyses
+                    .Where(item => item.Id == analysis.Id)
+                    .FirstOrDefault();
             }
             // Check if the analysis doesn't exist anymore (if it has been deleted).
             if (analysis == null)

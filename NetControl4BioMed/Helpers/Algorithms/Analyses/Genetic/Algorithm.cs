@@ -162,8 +162,10 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
                     // Reset the number of iterations.
                     currentIterationWithoutImprovement = 0;
                 }
-                // And reload it for the next iteration.
-                await context.Entry(analysis).ReloadAsync();
+                // Reload it for the next iteration.
+                analysis = context.Analyses
+                    .Where(item => item.Id == analysis.Id)
+                    .FirstOrDefault();
             }
             // Check if the analysis doesn't exist anymore (if it has been deleted).
             if (analysis == null)

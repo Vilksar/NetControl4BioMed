@@ -674,7 +674,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                     catch (Exception exception)
                     {
                         // Reload the analysis.
-                        await context.Entry(analysis).ReloadAsync();
+                        analysis = context.Analyses
+                            .Where(item => item.Id == analysis.Id)
+                            .FirstOrDefault();
                         // Check if there was no item found.
                         if (analysis == null)
                         {
@@ -693,7 +695,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Reload the analysis.
-                    await context.Entry(analysis).ReloadAsync();
+                    analysis = context.Analyses
+                        .Where(item => item.Id == analysis.Id)
+                        .FirstOrDefault();
                     // Check if there was no item found.
                     if (analysis == null)
                     {
@@ -841,7 +845,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                     catch (Exception exception)
                     {
                         // Reload the analysis.
-                        await context.Entry(analysis).ReloadAsync();
+                        analysis = context.Analyses
+                            .Where(item => item.Id == analysis.Id)
+                            .FirstOrDefault();
                         // Check if there was no item found.
                         if (analysis == null)
                         {
@@ -864,7 +870,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Reload the analysis.
-                    await context.Entry(analysis).ReloadAsync();
+                    analysis = context.Analyses
+                        .Where(item => item.Id == analysis.Id)
+                        .FirstOrDefault();
                     // Check if there was no item found.
                     if (analysis == null)
                     {

@@ -36,7 +36,7 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <summary>
         /// Appends to the list a new entry to the log of the network and returns the updated list.
         /// </summary>
-        /// <param name="analysis">The current network.</param>
+        /// <param name="network">The current network.</param>
         /// <param name="message">The message to add as a new entry to the network log.</param>
         /// <returns>The updated log of the network.</returns>
         public static string AppendToLog(this Network network, string message)

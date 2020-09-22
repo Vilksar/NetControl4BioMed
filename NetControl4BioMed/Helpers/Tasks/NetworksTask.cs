@@ -508,7 +508,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                     catch (Exception exception)
                     {
                         // Reload the network.
-                        await context.Entry(network).ReloadAsync();
+                        network = context.Networks
+                            .Where(item => item.Id == network.Id)
+                            .FirstOrDefault();
                         // Check if there was no item found.
                         if (network == null)
                         {
@@ -527,7 +529,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Reload the network.
-                    await context.Entry(network).ReloadAsync();
+                    network = context.Networks
+                        .Where(item => item.Id == network.Id)
+                        .FirstOrDefault();
                     // Check if there was no item found.
                     if (network == null)
                     {
