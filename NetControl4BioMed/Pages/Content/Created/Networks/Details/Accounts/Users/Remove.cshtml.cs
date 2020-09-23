@@ -95,29 +95,30 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
             View = new ViewModel
             {
                 Network = items
-                    .Include(item => item.NetworkUsers)
-                        .ThenInclude(item => item.User)
-                    .Include(item => item.NetworkUserInvitations)
                     .First()
             };
-            // Get the items for the view.
-            var items1 = View.Network.NetworkUsers
-                .Where(item => emails.Contains(item.User.Email))
+            // Get all of the network users and network user invitations.
+            var networkUsers = _context.NetworkUsers
+                .Where(item => item.Network == View.Network)
+                .Where(item => Input.Emails.Contains(item.User.Email))
+                .AsEnumerable();
+            var networkUserInvitations = _context.NetworkUserInvitations
+                .Where(item => item.Network == View.Network)
+                .Where(item => Input.Emails.Contains(item.Email))
+                .AsEnumerable();
+            // Define the view items.
+            View.Items = networkUsers
                 .Select(item => new ItemModel
                 {
                     Email = item.User.Email,
                     DateTimeCreated = item.DateTimeCreated
-                });
-            var items2 = View.Network.NetworkUserInvitations
-                .Where(item => emails.Contains(item.Email))
-                .Select(item => new ItemModel
-                {
-                    Email = item.Email,
-                    DateTimeCreated = item.DateTimeCreated
-                });
-            // Define the view items.
-            View.Items = items1
-                .Concat(items2);
+                })
+                .Concat(networkUserInvitations
+                    .Select(item => new ItemModel
+                    {
+                        Email = item.Email,
+                        DateTimeCreated = item.DateTimeCreated
+                    }));
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
             {
@@ -127,8 +128,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
                 return RedirectToPage("/Content/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
             }
             // Define the view status of the selected items.
-            View.IsCurrentUserSelected = View.Items.Any(item => item.Email == user.Email);
-            View.AreAllUsersSelected = !View.Network.NetworkUsers.Select(item => item.User.Email).Except(View.Items.Select(item => item.Email)).Any();
+            View.IsCurrentUserSelected = View.Items
+                .Any(item => item.Email == user.Email);
+            View.AreAllUsersSelected = !_context.NetworkUsers
+                .Where(item => item.Network == View.Network)
+                .Select(item => item.User.Email)
+                .AsEnumerable()
+                .Except(View.Items.Select(item => item.Email))
+                .Any();
             // Check if there aren't any emails provided.
             if (emails == null || !emails.Any())
             {
@@ -182,29 +189,30 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
             View = new ViewModel
             {
                 Network = items
-                    .Include(item => item.NetworkUsers)
-                        .ThenInclude(item => item.User)
-                    .Include(item => item.NetworkUserInvitations)
                     .First()
             };
-            // Get the items for the view.
-            var items1 = View.Network.NetworkUsers
+            // Get all of the network users and network user invitations.
+            var networkUsers = _context.NetworkUsers
+                .Where(item => item.Network == View.Network)
                 .Where(item => Input.Emails.Contains(item.User.Email))
+                .AsEnumerable();
+            var networkUserInvitations = _context.NetworkUserInvitations
+                .Where(item => item.Network == View.Network)
+                .Where(item => Input.Emails.Contains(item.Email))
+                .AsEnumerable();
+            // Define the view items.
+            View.Items = networkUsers
                 .Select(item => new ItemModel
                 {
                     Email = item.User.Email,
                     DateTimeCreated = item.DateTimeCreated
-                });
-            var items2 = View.Network.NetworkUserInvitations
-                .Where(item => Input.Emails.Contains(item.Email))
-                .Select(item => new ItemModel
-                {
-                    Email = item.Email,
-                    DateTimeCreated = item.DateTimeCreated
-                });
-            // Define the view items.
-            View.Items = items1
-                .Concat(items2);
+                })
+                .Concat(networkUserInvitations
+                    .Select(item => new ItemModel
+                    {
+                        Email = item.Email,
+                        DateTimeCreated = item.DateTimeCreated
+                    }));
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
             {
@@ -214,8 +222,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
                 return RedirectToPage("/Content/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
             }
             // Define the status of the selected items.
-            View.IsCurrentUserSelected = View.Items.Any(item => item.Email == user.Email);
-            View.AreAllUsersSelected = !View.Network.NetworkUsers.Select(item => item.User.Email).Except(View.Items.Select(item => item.Email)).Any();
+            View.IsCurrentUserSelected = View.Items
+                .Any(item => item.Email == user.Email);
+            View.AreAllUsersSelected = !_context.NetworkUsers
+                .Where(item => item.Network == View.Network)
+                .Select(item => item.User.Email)
+                .AsEnumerable()
+                .Except(View.Items.Select(item => item.Email))
+                .Any();
             // Check if there aren't any emails provided.
             if (Input.Emails == null || !Input.Emails.Any())
             {
@@ -232,11 +246,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
                 // Redisplay the page.
                 return Page();
             }
-            // Get all of the network users and network user invitations.
-            var networkUsers = View.Network.NetworkUsers
-                .Where(item => Input.Emails.Contains(item.User.Email));
-            var networkUserInvitations = View.Network.NetworkUserInvitations
-                .Where(item => Input.Emails.Contains(item.Email));
             // Save the number of items found.
             var itemCount = networkUsers.Count() + networkUserInvitations.Count();
             // Define the new tasks.

@@ -95,29 +95,30 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             View = new ViewModel
             {
                 Analysis = items
-                    .Include(item => item.AnalysisUsers)
-                        .ThenInclude(item => item.User)
-                    .Include(item => item.AnalysisUserInvitations)
                     .First()
             };
-            // Get the items for the view.
-            var items1 = View.Analysis.AnalysisUsers
-                .Where(item => emails.Contains(item.User.Email))
+            // Get all of the network users and network user invitations.
+            var analysisUsers = _context.AnalysisUsers
+                .Where(item => item.Analysis == View.Analysis)
+                .Where(item => Input.Emails.Contains(item.User.Email))
+                .AsEnumerable();
+            var analysisUserInvitations = _context.AnalysisUserInvitations
+                .Where(item => item.Analysis == View.Analysis)
+                .Where(item => Input.Emails.Contains(item.Email))
+                .AsEnumerable();
+            // Define the view items.
+            View.Items = analysisUsers
                 .Select(item => new ItemModel
                 {
                     Email = item.User.Email,
                     DateTimeCreated = item.DateTimeCreated
-                });
-            var items2 = View.Analysis.AnalysisUserInvitations
-                .Where(item => emails.Contains(item.Email))
-                .Select(item => new ItemModel
-                {
-                    Email = item.Email,
-                    DateTimeCreated = item.DateTimeCreated
-                });
-            // Define the view items.
-            View.Items = items1
-                .Concat(items2);
+                })
+                .Concat(analysisUserInvitations
+                    .Select(item => new ItemModel
+                    {
+                        Email = item.Email,
+                        DateTimeCreated = item.DateTimeCreated
+                    }));
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
             {
@@ -127,8 +128,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 return RedirectToPage("/Content/Created/Analyses/Details/Accounts/Users/Index", new { id = View.Analysis.Id });
             }
             // Define the view status of the selected items.
-            View.IsCurrentUserSelected = View.Items.Any(item => item.Email == user.Email);
-            View.AreAllUsersSelected = !View.Analysis.AnalysisUsers.Select(item => item.User.Email).Except(View.Items.Select(item => item.Email)).Any();
+            View.IsCurrentUserSelected = View.Items
+                .Any(item => item.Email == user.Email);
+            View.AreAllUsersSelected = !_context.AnalysisUsers
+                .Where(item => item.Analysis == View.Analysis)
+                .Select(item => item.User.Email)
+                .AsEnumerable()
+                .Except(View.Items.Select(item => item.Email))
+                .Any();
             // Check if there aren't any emails provided.
             if (emails == null || !emails.Any())
             {
@@ -182,29 +189,30 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             View = new ViewModel
             {
                 Analysis = items
-                    .Include(item => item.AnalysisUsers)
-                        .ThenInclude(item => item.User)
-                    .Include(item => item.AnalysisUserInvitations)
                     .First()
             };
-            // Get the items for the view.
-            var items1 = View.Analysis.AnalysisUsers
+            // Get all of the network users and network user invitations.
+            var analysisUsers = _context.AnalysisUsers
+                .Where(item => item.Analysis == View.Analysis)
                 .Where(item => Input.Emails.Contains(item.User.Email))
+                .AsEnumerable();
+            var analysisUserInvitations = _context.AnalysisUserInvitations
+                .Where(item => item.Analysis == View.Analysis)
+                .Where(item => Input.Emails.Contains(item.Email))
+                .AsEnumerable();
+            // Define the view items.
+            View.Items = analysisUsers
                 .Select(item => new ItemModel
                 {
                     Email = item.User.Email,
                     DateTimeCreated = item.DateTimeCreated
-                });
-            var items2 = View.Analysis.AnalysisUserInvitations
-                .Where(item => Input.Emails.Contains(item.Email))
-                .Select(item => new ItemModel
-                {
-                    Email = item.Email,
-                    DateTimeCreated = item.DateTimeCreated
-                });
-            // Define the view items.
-            View.Items = items1
-                .Concat(items2);
+                })
+                .Concat(analysisUserInvitations
+                    .Select(item => new ItemModel
+                    {
+                        Email = item.Email,
+                        DateTimeCreated = item.DateTimeCreated
+                    }));
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
             {
@@ -214,8 +222,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 return RedirectToPage("/Content/Created/Analyses/Details/Accounts/Users/Index", new { id = View.Analysis.Id });
             }
             // Define the status of the selected items.
-            View.IsCurrentUserSelected = View.Items.Any(item => item.Email == user.Email);
-            View.AreAllUsersSelected = !View.Analysis.AnalysisUsers.Select(item => item.User.Email).Except(View.Items.Select(item => item.Email)).Any();
+            View.IsCurrentUserSelected = View.Items
+                .Any(item => item.Email == user.Email);
+            View.AreAllUsersSelected = !_context.AnalysisUsers
+                .Where(item => item.Analysis == View.Analysis)
+                .Select(item => item.User.Email)
+                .AsEnumerable()
+                .Except(View.Items.Select(item => item.Email))
+                .Any();
             // Check if there aren't any emails provided.
             if (Input.Emails == null || !Input.Emails.Any())
             {
@@ -232,11 +246,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 // Redisplay the page.
                 return Page();
             }
-            // Get all of the analysis users and analysis user invitations.
-            var analysisUsers = View.Analysis.AnalysisUsers
-                .Where(item => Input.Emails.Contains(item.User.Email));
-            var analysisUserInvitations = View.Analysis.AnalysisUserInvitations
-                .Where(item => Input.Emails.Contains(item.Email));
             // Save the number of items found.
             var itemCount = analysisUsers.Count() + analysisUserInvitations.Count();
             // Define the new tasks.
