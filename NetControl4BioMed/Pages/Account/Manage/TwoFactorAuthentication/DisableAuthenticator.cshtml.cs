@@ -11,11 +11,11 @@ using NetControl4BioMed.Data.Models;
 namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
 {
     [Authorize]
-    public class DisableModel : PageModel
+    public class DisableAuthenticatorModel : PageModel
     {
         private readonly UserManager<User> _userManager;
 
-        public DisableModel(UserManager<User> userManager)
+        public DisableAuthenticatorModel(UserManager<User> userManager)
         {
             _userManager = userManager;
         }

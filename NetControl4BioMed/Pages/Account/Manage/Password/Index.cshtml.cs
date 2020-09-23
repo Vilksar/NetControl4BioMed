@@ -58,6 +58,8 @@ namespace NetControl4BioMed.Pages.Account.Manage.Password
 
         public class ViewModel
         {
+            public bool IsGuest { get; set; }
+
             public bool HasPassword { get; set; }
         }
 
@@ -76,6 +78,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.Password
             // Define the view.
             View = new ViewModel
             {
+                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 HasPassword = await _userManager.HasPasswordAsync(user)
             };
             // Return the page.
@@ -97,8 +100,17 @@ namespace NetControl4BioMed.Pages.Account.Manage.Password
             // Define the view.
             View = new ViewModel
             {
+                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 HasPassword = await _userManager.HasPasswordAsync(user)
             };
+            // Check if the user has a guest account.
+            if (View.IsGuest)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The password can't be changed for a guest account.");
+                // Return the page.
+                return Page();
+            }
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
             {

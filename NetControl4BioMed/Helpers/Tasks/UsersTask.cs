@@ -102,7 +102,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define a new identity result.
                     var result = IdentityResult.Success;
                     // Check the type of the item.
-                    if (batchItem.Type == "Password")
+                    if (batchItem.Type == "None")
+                    {
+                        // Try to create the new user.
+                        result = result.Succeeded ? await userManager.CreateAsync(user) : result;
+                    }
+                    else if (batchItem.Type == "Password")
                     {
                         // Try to get the passsord from the data.
                         if (!batchItem.Data.TryDeserializeJsonObject<string>(out var password))

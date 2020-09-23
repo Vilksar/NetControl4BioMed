@@ -16,36 +16,46 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>There are several steps to be performed in order to use an authenticator app.</span>
-        </div>
-        <div class="text-justify">
-            <div class="mb-2">
-                <span>Download a two-factor authenticator app like Microsoft Authenticator for <a href="https://go.microsoft.com/fwlink/?Linkid=825072" target="_blank" rel="nofollow noopener noreferrer">Android</a> <span><i class="fas fa-external-link-alt"></i></span> and <a href="https://go.microsoft.com/fwlink/?Linkid=825073" target="_blank" rel="nofollow noopener noreferrer">iOS</a> <span><i class="fas fa-external-link-alt"></i></span>, or Google Authenticator for <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en" target="_blank" rel="nofollow noopener noreferrer">Android</a> <span><i class="fas fa-external-link-alt"></i></span> and <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" target="_blank" rel="nofollow noopener noreferrer">iOS</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
+        @if (Model.View.IsGuest)
+        {
+            <div class="alert alert-danger text-justify text-wrap mb-0">
+                <span><i class="fas fa-exclamation-circle"></i></span>
+                <span>The two-factor authentication settings can't be changed for a guest account.</span>
             </div>
-            <div class="mb-2">
-                <span>Scan the QR Code or enter the key <code>@Model.View.SharedKey</code> into your two-factor authenticator app. Spaces and casing do not matter.</span>
+        }
+        else
+        {
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are several steps to be performed in order to use an authenticator app.</span>
             </div>
-            <div class="text-center my-3">
-                <div class="qr-code" data-uri="@Html.Raw(Model.View.AuthenticatorUri)"></div>
+            <div class="text-justify">
+                <div class="mb-2">
+                    <span>Download a two-factor authenticator app like Microsoft Authenticator for <a href="https://go.microsoft.com/fwlink/?Linkid=825072" target="_blank" rel="nofollow noopener noreferrer">Android</a> <span><i class="fas fa-external-link-alt"></i></span> and <a href="https://go.microsoft.com/fwlink/?Linkid=825073" target="_blank" rel="nofollow noopener noreferrer">iOS</a> <span><i class="fas fa-external-link-alt"></i></span>, or Google Authenticator for <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en" target="_blank" rel="nofollow noopener noreferrer">Android</a> <span><i class="fas fa-external-link-alt"></i></span> and <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" target="_blank" rel="nofollow noopener noreferrer">iOS</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
+                </div>
+                <div class="mb-2">
+                    <span>Scan the QR Code or enter the key <code>@Model.View.SharedKey</code> into your two-factor authenticator app. Spaces and casing do not matter.</span>
+                </div>
+                <div class="text-center my-3">
+                    <div class="qr-code" data-uri="@Html.Raw(Model.View.AuthenticatorUri)"></div>
+                </div>
+                <div class="mb-2">
+                    <span>Once you have scanned the QR code or input the key above, your two-factor authentication app will provide you with a unique code. Enter the code in the confirmation box below.</span>
+                </div>
             </div>
-            <div class="mb-2">
-                <span>Once you have scanned the QR code or input the key above, your two-factor authentication app will provide you with a unique code. Enter the code in the confirmation box below.</span>
-            </div>
-        </div>
-        <form method="post" class="text-justify">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-            <div class="form-group">
-                <label asp-for="Input.Code" class="font-weight-bold">Verification code</label>
-                <input asp-for="Input.Code" class="form-control" autocomplete="off" />
-                <span asp-description-for="Input.Code" class="text-muted small">The verification code given by your authenticator app.</span>
-                <span asp-validation-for="Input.Code" class="text-danger small"></span>
-            </div>
-            <button type="submit" title="Verify" class="btn btn-block btn-success">
-                <span>Verify</span>
-            </button>
-        </form>
+            <form method="post" class="text-justify">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+                <div class="form-group">
+                    <label asp-for="Input.Code" class="font-weight-bold">Verification code</label>
+                    <input asp-for="Input.Code" class="form-control" autocomplete="off" />
+                    <span asp-description-for="Input.Code" class="text-muted small">The verification code given by your authenticator app.</span>
+                    <span asp-validation-for="Input.Code" class="text-danger small"></span>
+                </div>
+                <button type="submit" title="Verify" class="btn btn-block btn-success">
+                    <span>Verify</span>
+                </button>
+            </form>
+        }
     </div>
 </div>
 

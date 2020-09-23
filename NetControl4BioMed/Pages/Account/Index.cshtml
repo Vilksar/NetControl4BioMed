@@ -6,7 +6,7 @@
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetUserNavigationTitleCard(Model.View.User)" />
 <div class="card mb-3">
-    <div class="card-body text-center small">
+    <div class="card-body text-center small utc-date" data-date="@Model.View.User.DateTimeCreated.ToString("u")">
         @if (Model.View.User.EmailConfirmed)
         {
             <span class="text-success" title="E-mail confirmed"><i class="fas fa-check-circle"></i></span>
@@ -15,9 +15,36 @@
         {
             <span class="text-danger" title="E-mail not confirmed"><i class="fas fa-times-circle"></i></span>
         }
-        <span title="@Model.View.User.DateTimeCreated.ToString()">Account created on @Model.View.User.DateTimeCreated.ToLongDateString() at @Model.View.User.DateTimeCreated.ToShortTimeString()</span>
+        <span>Account created on <span class="utc-date-date" title="@Model.View.User.DateTimeCreated.ToShortDateString()">@Model.View.User.DateTimeCreated.ToShortDateString()</span> at <span class="utc-date-time" title="@Model.View.User.DateTimeCreated.ToShortTimeString()">@Model.View.User.DateTimeCreated.ToShortTimeString()</span></span>
     </div>
 </div>
+@if (Model.View.IsGuest)
+{
+    var dateTimeToDelete = Model.View.User.DateTimeCreated.AddDays(2).Date;
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-user"></i></span>
+                </div>
+                <div>
+                    <span>Account</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger text-justify text-wrap utc-date" data-date="@dateTimeToDelete.ToString("u")">
+                <span><i class="fas fa-exclamation-circle"></i></span>
+                <span class="font-weight-bold">You are logged in with a guest account.</span>
+                <span>The account and all of the associated data will be deleted automatically when you log out, close the browser, or on <span class="utc-date-date" title="@dateTimeToDelete.ToShortDateString()">@dateTimeToDelete.ToShortDateString()</span> at <span class="utc-date-time" title="@dateTimeToDelete.ToShortTimeString()">@dateTimeToDelete.ToShortTimeString()</span>.</span>
+            </div>
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>Most account management options are unavailable for guest accounts. You can access the <a asp-page="/Account/Manage/Profile/Index" class="alert-link">Profile</a> page if you would like to change the account type.</span>
+            </div>
+        </div>
+    </div>
+}
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">

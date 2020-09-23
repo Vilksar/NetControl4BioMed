@@ -42,6 +42,18 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Save it into the database.
                 await roleManager.CreateAsync(role);
             }
+            // Check if the guest role doesn't already exist.
+            if (!await roleManager.RoleExistsAsync("Guest"))
+            {
+                // Define a new guest role.
+                var role = new Role
+                {
+                    Name = "Guest",
+                    DateTimeCreated = DateTime.UtcNow
+                };
+                // Save it into the database.
+                await roleManager.CreateAsync(role);
+            }
             // Check if administrator users don't already exist.
             if (!(await userManager.GetUsersInRoleAsync("Administrator")).Any())
             {

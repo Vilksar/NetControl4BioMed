@@ -40,6 +40,8 @@ namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
 
         public class ViewModel
         {
+            public bool IsGuest { get; set; }
+
             public string SharedKey { get; set; }
 
             public string AuthenticatorUri { get; set; }
@@ -70,6 +72,8 @@ namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
             // Load the key and URI to be encoded into the QR for the current user.
             View = new ViewModel
             {
+                // Check if the current user has a guest account.
+                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 // Format the key into an easier-to-read form, by adding a space after every fourth character.
                 SharedKey = Regex.Replace(unformattedKey, ".{4}(?!$)", "$0-"),
                 // Generate the URI to be included into the QR code.
@@ -104,11 +108,21 @@ namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
             // Load the key and URI to be encoded into the QR for the current user.
             View = new ViewModel
             {
+                // Check if the current user has a guest account.
+                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 // Format the key into an easier-to-read form, by adding a space after every fourth character.
                 SharedKey = Regex.Replace(unformattedKey, ".{4}(?!$)", "$0-"),
                 // Generate the URI to be included into the QR code.
                 AuthenticatorUri = $"otpauth://totp/{_urlEncoder.Encode("NetControl4BioMed")}:{_urlEncoder.Encode(user.Email)}?secret={unformattedKey}&issuer={_urlEncoder.Encode("NetControl4BioMed")}&digits=6"
             };
+            // Check if the user has a guest account.
+            if (View.IsGuest)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The two-factor authentication settings can't be changed for a guest account.");
+                // Return the page.
+                return Page();
+            }
             // Check if the provided model is not valid.
             if (!ModelState.IsValid)
             {

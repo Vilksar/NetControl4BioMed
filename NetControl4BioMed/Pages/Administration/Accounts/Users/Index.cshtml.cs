@@ -46,7 +46,9 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                     { "HasEmailConfirmed", "Has e-mail confirmed" },
                     { "HasNoEmailConfirmed", "Does not have e-mail confirmed" },
                     { "IsAdministrator", "Is administrator" },
-                    { "IsNotAdministrator", "Is not administrator" }
+                    { "IsNotAdministrator", "Is not administrator" },
+                    { "IsGuest", "Is guest" },
+                    { "IsNotGuest", "Is not guest" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -82,8 +84,10 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 .Where(item => input.Filter.Contains("HasNoRoles") ? !item.UserRoles.Any() : true)
                 .Where(item => input.Filter.Contains("HasEmailConfirmed") ? item.EmailConfirmed : true)
                 .Where(item => input.Filter.Contains("HasNoEmailConfirmed") ? !item.EmailConfirmed : true)
-                .Where(item => input.Filter.Contains("IsAdministrator") ? item.UserRoles.Any(ur => ur.Role.Name == "Administrator") : true)
-                .Where(item => input.Filter.Contains("IsNotAdministrator") ? !item.UserRoles.Any(ur => ur.Role.Name == "Administrator") : true);
+                .Where(item => input.Filter.Contains("IsAdministrator") ? item.UserRoles.Any(item1 => item1.Role.Name == "Administrator") : true)
+                .Where(item => input.Filter.Contains("IsNotAdministrator") ? !item.UserRoles.Any(item1 => item1.Role.Name == "Administrator") : true)
+                .Where(item => input.Filter.Contains("IsGuest") ? item.UserRoles.Any(item1 => item1.Role.Name == "Guest") : true)
+                .Where(item => input.Filter.Contains("IsNotGuest") ? !item.UserRoles.Any(item1 => item1.Role.Name == "Guest") : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
