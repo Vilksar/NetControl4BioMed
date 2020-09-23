@@ -77,7 +77,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
             {
                 Analysis = items
                     .First(),
-                CytoscapeJson = JsonSerializer.Serialize(items.First().GetCytoscapeViewModel(_linkGenerator, _context), new JsonSerializerOptions { IgnoreNullValues = true })
+                CytoscapeJson = JsonSerializer.Serialize(items.First().GetCytoscapeViewModel(HttpContext, _linkGenerator, _context), new JsonSerializerOptions { IgnoreNullValues = true })
             };
             // Return the page.
             return Page();

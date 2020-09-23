@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
@@ -50,14 +51,15 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <param name="analysis">The current analysis.</param>
         /// <param name="linkGenerator">The link generator.</param>
         /// <returns>The Cytoscape view model corresponding to the provided network.</returns>
-        public static CytoscapeViewModel GetCytoscapeViewModel(this Analysis analysis, LinkGenerator linkGenerator, ApplicationDbContext context)
+        public static CytoscapeViewModel GetCytoscapeViewModel(this Analysis analysis, HttpContext httpContext, LinkGenerator linkGenerator, ApplicationDbContext context)
         {
             // Get the default values.
             var emptyEnumerable = Enumerable.Empty<string>();
             var interactionType = context.AnalysisDatabases
-                .Select(item => item.Database.DatabaseType.Name.ToLower())
+                .Where(item => item.Analysis == analysis)
+                .Select(item => item.Database.DatabaseType.Name)
                 .FirstOrDefault();
-            var isGeneric = interactionType == "generic";
+            var isGeneric = interactionType == "Generic";
             // Return the view model.
             return new CytoscapeViewModel
             {
@@ -85,7 +87,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                             {
                                 Id = item.Id,
                                 Name = item.Name,
-                                Href = isGeneric ? string.Empty : linkGenerator.GetPathByPage(page: "/Content/Data/Nodes/Details", values: new { id = item.Id }),
+                                Href = isGeneric ? string.Empty : linkGenerator.GetUriByPage(httpContext, "/Content/Data/Nodes/Details", handler: null, values: new { id = item.Id }),
                                 Alias = item.Alias
                             },
                             Classes = item.Classes

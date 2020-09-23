@@ -75,7 +75,7 @@ namespace NetControl4BioMed.Pages.Identity
             if (user != null)
             {
                 // Redirect to the return URL.
-                return RedirectToPage(View.ReturnUrl);
+                return LocalRedirect(View.ReturnUrl);
             }
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);

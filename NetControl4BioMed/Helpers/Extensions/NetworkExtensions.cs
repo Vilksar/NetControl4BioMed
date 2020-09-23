@@ -51,14 +51,15 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <param name="network">The current network.</param>
         /// <param name="linkGenerator">The link generator.</param>
         /// <returns>The Cytoscape view model corresponding to the provided network.</returns>
-        public static CytoscapeViewModel GetCytoscapeViewModel(this Network network, LinkGenerator linkGenerator, ApplicationDbContext context)
+        public static CytoscapeViewModel GetCytoscapeViewModel(this Network network, HttpContext httpContext, LinkGenerator linkGenerator, ApplicationDbContext context)
         {
             // Get the default values.
             var emptyEnumerable = Enumerable.Empty<string>();
             var interactionType = context.NetworkDatabases
-                .Select(item => item.Database.DatabaseType.Name.ToLower())
+                .Where(item => item.Network == network)
+                .Select(item => item.Database.DatabaseType.Name)
                 .FirstOrDefault();
-            var isGeneric = interactionType == "generic";
+            var isGeneric = interactionType == "Generic";
             // Return the view model.
             return new CytoscapeViewModel
             {
@@ -86,7 +87,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                             {
                                 Id = item.Id,
                                 Name = item.Name,
-                                Href = isGeneric ? string.Empty : linkGenerator.GetPathByPage(page: "/Content/Data/Nodes/Details", values: new { id = item.Id }),
+                                Href = isGeneric ? string.Empty : linkGenerator.GetUriByPage(httpContext, "/Content/Data/Nodes/Details", handler: null, values: new { id = item.Id }),
                                 Alias = item.Alias
                             },
                             Classes = item.Classes

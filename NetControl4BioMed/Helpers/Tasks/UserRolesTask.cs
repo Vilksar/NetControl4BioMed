@@ -116,16 +116,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if any of the operations has failed.
                     if (!result.Succeeded)
                     {
-                        // Define the exception message.
-                        var message = string.Empty;
-                        // Go over each of the encountered errors.
-                        foreach (var error in result.Errors)
-                        {
-                            // Add the error to the message.
-                            message += error.Description;
-                        }
+                        // Define the exception messages.
+                        var messages = result.Errors
+                            .Select(item => item.Description);
                         // Throw an exception.
-                        throw new DbUpdateException(message);
+                        throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                     }
                     // Get the item.
                     var userRole = context.UserRoles

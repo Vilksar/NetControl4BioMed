@@ -72,7 +72,7 @@ namespace NetControl4BioMed.Pages.Identity
             // Define the variables for the view.
             View = new ViewModel
             {
-                ReturnUrl = returnUrl ?? Url.Content("~/")
+                ReturnUrl = returnUrl ?? _linkGenerator.GetPathByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Return the page.
             return Page();
@@ -83,7 +83,7 @@ namespace NetControl4BioMed.Pages.Identity
             // Define the variables for the view.
             View = new ViewModel
             {
-                ReturnUrl = returnUrl ?? Url.Content("~/")
+                ReturnUrl = returnUrl ?? _linkGenerator.GetPathByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))

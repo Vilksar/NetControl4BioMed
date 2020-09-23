@@ -268,7 +268,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                         // Create a new entry in the archive and open it.
                         using var stream = archive.CreateEntry($"Network-{network.Name.Replace(" ", "-")}-{network.Id}.json", CompressionLevel.Fastest).Open();
                         // Write the data corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, network.GetCytoscapeViewModel(_linkGenerator, _context), jsonSerializerOptions);
+                        await JsonSerializer.SerializeAsync(stream, network.GetCytoscapeViewModel(HttpContext, _linkGenerator, _context), jsonSerializerOptions);
                     }
                 }
                 else if (Input.FileFormat == "Excel")

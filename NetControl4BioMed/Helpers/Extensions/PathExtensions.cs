@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
@@ -26,7 +27,7 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <param name="path">The current path.</param>
         /// <param name="linkGenerator">Represents the link generator.</param>
         /// <returns>Returns the Cytoscape view model corresponding to the provided path.</returns>
-        public static CytoscapeViewModel GetCytoscapeViewModel(this Path path, LinkGenerator linkGenerator, ApplicationDbContext context)
+        public static CytoscapeViewModel GetCytoscapeViewModel(this Path path, HttpContext httpContext, LinkGenerator linkGenerator, ApplicationDbContext context)
         {
             // Get the default values.
             var emptyEnumerable = Enumerable.Empty<string>();
@@ -34,9 +35,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                 .Where(item => item == path)
                 .Select(item => item.ControlPath.Analysis.AnalysisDatabases)
                 .SelectMany(item => item)
-                .Select(item => item.Database.DatabaseType.Name.ToLower())
+                .Select(item => item.Database.DatabaseType.Name)
                 .FirstOrDefault();
-            var isGeneric = interactionType == "generic";
+            var isGeneric = interactionType == "Generic";
             var controlClasses = new List<string> { "control" };
             // Get the control data.
             var analysis = context.Paths
@@ -85,7 +86,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                             {
                                 Id = item.Id,
                                 Name = item.Name,
-                                Href = isGeneric ? string.Empty : linkGenerator.GetPathByPage(page: "/Content/Data/Nodes/Details", values: new { id = item.Id }),
+                                Href = isGeneric ? string.Empty : linkGenerator.GetUriByPage(httpContext, "/Content/Data/Nodes/Details", handler: null, values: new { id = item.Id }),
                                 Alias = item.Alias
                             },
                             Classes = item.Classes

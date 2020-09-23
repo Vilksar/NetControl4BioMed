@@ -70,7 +70,7 @@ namespace NetControl4BioMed.Pages.Identity
             View = new ViewModel
             {
                 LoginProvider = provider,
-                ReturnUrl = returnUrl ?? _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
+                ReturnUrl = returnUrl ?? _linkGenerator.GetPathByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Check if there isn't any external provider given.
             if (string.IsNullOrEmpty(provider))
@@ -112,7 +112,7 @@ namespace NetControl4BioMed.Pages.Identity
             View = new ViewModel
             {
                 LoginProvider = info.LoginProvider,
-                ReturnUrl = returnUrl ?? _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
+                ReturnUrl = returnUrl ?? _linkGenerator.GetPathByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Get the ID of the user trying to log in.
             var userId = info.Principal != null ? info.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value : string.Empty;
@@ -196,7 +196,7 @@ namespace NetControl4BioMed.Pages.Identity
             View = new ViewModel
             {
                 LoginProvider = info.LoginProvider,
-                ReturnUrl = returnUrl ?? _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
+                ReturnUrl = returnUrl ?? _linkGenerator.GetPathByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Check if the provided model is not valid.
             if (!ModelState.IsValid)

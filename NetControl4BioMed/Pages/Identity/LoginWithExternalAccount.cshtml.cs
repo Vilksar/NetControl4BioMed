@@ -41,7 +41,7 @@ namespace NetControl4BioMed.Pages.Identity
             View = new ViewModel
             {
                 ExternalLogins = await _signInManager.GetExternalAuthenticationSchemesAsync(),
-                ReturnUrl = returnUrl ?? _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
+                ReturnUrl = returnUrl ?? _linkGenerator.GetPathByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
@@ -49,7 +49,7 @@ namespace NetControl4BioMed.Pages.Identity
             if (user != null)
             {
                 // Redirect to the return URL.
-                return RedirectToPage(View.ReturnUrl);
+                return LocalRedirect(View.ReturnUrl);
             }
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);

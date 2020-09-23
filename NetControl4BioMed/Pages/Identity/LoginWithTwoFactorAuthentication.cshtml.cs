@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Routing;
 using NetControl4BioMed.Data.Models;
 
 namespace NetControl4BioMed.Pages.Identity
@@ -15,10 +16,12 @@ namespace NetControl4BioMed.Pages.Identity
     public class LoginWithTwoFactorAuthenticationModel : PageModel
     {
         private readonly SignInManager<User> _signInManager;
+        private readonly LinkGenerator _linkGenerator;
 
-        public LoginWithTwoFactorAuthenticationModel(SignInManager<User> signInManager)
+        public LoginWithTwoFactorAuthenticationModel(SignInManager<User> signInManager, LinkGenerator linkGenerator)
         {
             _signInManager = signInManager;
+            _linkGenerator = linkGenerator;
         }
 
         [BindProperty]
@@ -49,7 +52,7 @@ namespace NetControl4BioMed.Pages.Identity
             View = new ViewModel
             {
                 RememberMe = rememberMe,
-                ReturnUrl = returnUrl ?? Url.Content("~/")
+                ReturnUrl = returnUrl ?? _linkGenerator.GetPathByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Ensure that the user has gone through the username and password screen first.
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
@@ -71,7 +74,7 @@ namespace NetControl4BioMed.Pages.Identity
             View = new ViewModel
             {
                 RememberMe = rememberMe,
-                ReturnUrl = returnUrl ?? Url.Content("~/")
+                ReturnUrl = returnUrl ?? _linkGenerator.GetPathByPage(HttpContext, "/Index", handler: null, values: null)
             };
             // Ensure that the user has gone through the username and password screen first.
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();

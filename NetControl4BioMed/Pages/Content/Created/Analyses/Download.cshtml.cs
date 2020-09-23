@@ -267,7 +267,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                         // Create a new entry in the archive and open it.
                         using var stream = archive.CreateEntry($"Analysis-{analysis.Name.Replace(" ", "-")}-{analysis.Id}.json", CompressionLevel.Fastest).Open();
                         // Write the data corresponding to the file.
-                        await JsonSerializer.SerializeAsync(stream, analysis.GetCytoscapeViewModel(_linkGenerator, _context), jsonSerializerOptions);
+                        await JsonSerializer.SerializeAsync(stream, analysis.GetCytoscapeViewModel(HttpContext, _linkGenerator, _context), jsonSerializerOptions);
                     }
                 }
                 else if (Input.FileFormat == "Excel")
