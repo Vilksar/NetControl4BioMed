@@ -32,21 +32,6 @@ namespace NetControl4BioMed.Helpers.Tasks
         public string HostValue { get; set; }
 
         /// <summary>
-        /// Gets or sets the number of days before items will be automatically stopped.
-        /// </summary>
-        public int DaysBeforeStop { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of days before an alert on items close to deletion will be automatically sent.
-        /// </summary>
-        public int DaysBeforeAlert { get; set; }
-
-        /// <summary>
-        /// Gets or sets the number of days before items will be automatically deleted.
-        /// </summary>
-        public int DaysBeforeDelete { get; set; }
-
-        /// <summary>
         /// Stops the long-running analyses.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
@@ -58,7 +43,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             // Use a new context instance.
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the limit date.
-            var limitDate = DateTime.Today - TimeSpan.FromDays(DaysBeforeStop);
+            var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeStop);
             // Get the items to stop.
             var items = context.Analyses
                 .Where(item => item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing)
@@ -94,8 +79,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             // Define the host.
             var host = new HostString(HostValue);
             // Define the limit dates.
-            var limitDateStart = DateTime.Today - TimeSpan.FromDays(DaysBeforeAlert + 1);
-            var limitDateEnd = DateTime.Today - TimeSpan.FromDays(DaysBeforeAlert);
+            var limitDateStart = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeAlert + 1);
+            var limitDateEnd = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeAlert);
             // Get the networks and analyses.
             var networks = context.Networks
                 .Where(item => limitDateStart < item.DateTimeCreated && item.DateTimeCreated < limitDateEnd);
@@ -130,7 +115,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 await emailSender.SendAlertDeleteEmailAsync(new EmailAlertDeleteViewModel
                 {
                     Email = user.Email,
-                    DateTime = DateTime.Today + TimeSpan.FromDays(DaysBeforeDelete - DaysBeforeAlert),
+                    DateTime = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete - ApplicationDbContext.DaysBeforeAlert),
                     NetworkItems = user.NetworkUsers
                         .Select(item => item.Network)
                         .Where(item => networks.Contains(item))
@@ -159,17 +144,47 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public async Task DeleteUsersAsync(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task DeleteUnconfirmedUsersAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Create a new scope.
             using var scope = serviceProvider.CreateScope();
             // Use a new context instance.
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the limit date.
-            var limitDate = DateTime.Today - TimeSpan.FromDays(DaysBeforeDelete);
+            var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
             // Get the items to stop.
             var items = context.Users
                 .Where(item => !item.EmailConfirmed)
+                .Where(item => item.DateTimeCreated < limitDate);
+            // Define a new task.
+            var task = new UsersTask
+            {
+                Items = items
+                    .Select(item => new UserInputModel
+                    {
+                        Id = item.Id
+                    })
+            };
+            // Run the task.
+            await task.DeleteAsync(serviceProvider, token);
+        }
+
+        /// <summary>
+        /// Deletes the guest users.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task DeleteGuestUsersAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Create a new scope.
+            using var scope = serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Define the limit date.
+            var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeGuestDelete);
+            // Get the items to stop.
+            var items = context.Users
+                .Where(item => item.UserRoles.Any(item1 => item1.Role.Name == "Guest"))
                 .Where(item => item.DateTimeCreated < limitDate);
             // Define a new task.
             var task = new UsersTask
@@ -196,7 +211,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             // Use a new context instance.
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the limit date.
-            var limitDate = DateTime.Today - TimeSpan.FromDays(DaysBeforeDelete);
+            var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
             // Get the items to delete.
             var items = context.Networks
                 .Where(item => item.DateTimeCreated < limitDate);
@@ -225,7 +240,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             // Use a new context instance.
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the limit date.
-            var limitDate = DateTime.Today - TimeSpan.FromDays(DaysBeforeDelete);
+            var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
             // Get the items to delete.
             var items = context.Analyses
                 .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)

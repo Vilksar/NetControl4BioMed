@@ -316,10 +316,7 @@ namespace NetControl4BioMed.Pages.Administration
                 Data = JsonSerializer.Serialize(new RecurringTask
                 {
                     Scheme = HttpContext.Request.Scheme,
-                    HostValue = HttpContext.Request.Host.Value,
-                    DaysBeforeStop = ApplicationDbContext.DaysBeforeStop,
-                    DaysBeforeAlert = ApplicationDbContext.DaysBeforeAlert,
-                    DaysBeforeDelete = ApplicationDbContext.DaysBeforeDelete
+                    HostValue = HttpContext.Request.Host.Value
                 })
             };
             var backgroundTaskAlertUsers = new BackgroundTask
@@ -330,10 +327,7 @@ namespace NetControl4BioMed.Pages.Administration
                 Data = JsonSerializer.Serialize(new RecurringTask
                 {
                     Scheme = HttpContext.Request.Scheme,
-                    HostValue = HttpContext.Request.Host.Value,
-                    DaysBeforeStop = ApplicationDbContext.DaysBeforeStop,
-                    DaysBeforeAlert = ApplicationDbContext.DaysBeforeAlert,
-                    DaysBeforeDelete = ApplicationDbContext.DaysBeforeDelete
+                    HostValue = HttpContext.Request.Host.Value
                 })
             };
             var backgroundTaskDeleteUsers = new BackgroundTask
@@ -344,10 +338,7 @@ namespace NetControl4BioMed.Pages.Administration
                 Data = JsonSerializer.Serialize(new RecurringTask
                 {
                     Scheme = HttpContext.Request.Scheme,
-                    HostValue = HttpContext.Request.Host.Value,
-                    DaysBeforeStop = ApplicationDbContext.DaysBeforeStop,
-                    DaysBeforeAlert = ApplicationDbContext.DaysBeforeAlert,
-                    DaysBeforeDelete = ApplicationDbContext.DaysBeforeDelete
+                    HostValue = HttpContext.Request.Host.Value
                 })
             };
             var backgroundTaskDeleteNetworks = new BackgroundTask
@@ -358,10 +349,7 @@ namespace NetControl4BioMed.Pages.Administration
                 Data = JsonSerializer.Serialize(new RecurringTask
                 {
                     Scheme = HttpContext.Request.Scheme,
-                    HostValue = HttpContext.Request.Host.Value,
-                    DaysBeforeStop = ApplicationDbContext.DaysBeforeStop,
-                    DaysBeforeAlert = ApplicationDbContext.DaysBeforeAlert,
-                    DaysBeforeDelete = ApplicationDbContext.DaysBeforeDelete
+                    HostValue = HttpContext.Request.Host.Value
                 })
             };
             var backgroundTaskDeleteAnalyses = new BackgroundTask
@@ -372,10 +360,7 @@ namespace NetControl4BioMed.Pages.Administration
                 Data = JsonSerializer.Serialize(new RecurringTask
                 {
                     Scheme = HttpContext.Request.Scheme,
-                    HostValue = HttpContext.Request.Host.Value,
-                    DaysBeforeStop = ApplicationDbContext.DaysBeforeStop,
-                    DaysBeforeAlert = ApplicationDbContext.DaysBeforeAlert,
-                    DaysBeforeDelete = ApplicationDbContext.DaysBeforeDelete
+                    HostValue = HttpContext.Request.Host.Value
                 })
             };
             // Mark the background tasks for addition.

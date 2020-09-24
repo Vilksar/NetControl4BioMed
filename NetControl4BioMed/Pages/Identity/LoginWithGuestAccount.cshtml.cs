@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
+using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
@@ -163,7 +164,7 @@ namespace NetControl4BioMed.Pages.Identity
                 return Page();
             }
             // Log in the guest user.
-            await _signInManager.SignInAsync(user, new AuthenticationProperties { IsPersistent = false, ExpiresUtc = DateTime.UtcNow.AddDays(1) });
+            await _signInManager.SignInAsync(user, new AuthenticationProperties { IsPersistent = true, ExpiresUtc = DateTime.UtcNow.AddDays(ApplicationDbContext.DaysBeforeGuestDelete) });
             // Display a message to the user.
             TempData["StatusMessage"] = "Success: You have successfully logged in with a guest account. Please note that the account and all of the associated data will be deleted automatically when you log out, close the browser, or within 24 to 48 hours.";
             // Redirect to the return URL.

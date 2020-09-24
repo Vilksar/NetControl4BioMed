@@ -60,7 +60,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
             if (!await _userManager.GetTwoFactorEnabledAsync(user))
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: Can't generate recovery codes, becuase you don't have two-factor authentication enabled.";
+                TempData["StatusMessage"] = "Error: The recovery codes can't be generated, as two-factor authentication is not currently enabled.";
                 // Redirect to the two-factor authentication page.
                 return RedirectToPage("/Account/Manage/TwoFactorAuthentication/Index");
             }
