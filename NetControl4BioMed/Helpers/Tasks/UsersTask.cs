@@ -255,17 +255,17 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     // Define a new identity result.
                     var result = IdentityResult.Success;
-                    // Check if the e-mail is different from the current username.
-                    if (batchItem.Email != user.UserName)
-                    {
-                        // Try to update the username.
-                        result = result.Succeeded ? await userManager.SetUserNameAsync(user, batchItem.Email) : result;
-                    }
                     // Check if the e-mail is different from the current e-mail.
                     if (batchItem.Email != user.Email)
                     {
                         // Try to update the e-mail.
                         result = result.Succeeded ? await userManager.SetEmailAsync(user, batchItem.Email) : result;
+                    }
+                    // Check if the e-mail is different from the current username.
+                    if (batchItem.Email != user.UserName)
+                    {
+                        // Try to update the username.
+                        result = result.Succeeded ? await userManager.SetUserNameAsync(user, batchItem.Email) : result;
                     }
                     // Check if the e-mail should be set as confirmed.
                     if (!user.EmailConfirmed && batchItem.EmailConfirmed)

@@ -123,6 +123,14 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
             // Check if the e-mail is different than the current one.
             if (Input.Email != user.Email)
             {
+                // Check if an account with the new e-mail address already exists.
+                if (await _userManager.FindByEmailAsync(Input.Email) != null)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, "An account with the new e-mail address already exists.");
+                    // Return the page.
+                    return Page();
+                }
                 // Generate an e-mail change code.
                 var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.Email);
                 // Create the callback URL to be encoded in the change email.

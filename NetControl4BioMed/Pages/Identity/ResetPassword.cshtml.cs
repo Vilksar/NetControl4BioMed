@@ -51,7 +51,7 @@ namespace NetControl4BioMed.Pages.Identity
         public IActionResult OnGet(string email = null, string code = null)
         {
             // Check if there is no code provided.
-            if (string.IsNullOrEmpty(View.Code))
+            if (string.IsNullOrEmpty(code))
             {
                 // Display an error.
                 TempData["StatusMessage"] = "Error: A unique code is needed in order to reset the password.";
@@ -75,7 +75,7 @@ namespace NetControl4BioMed.Pages.Identity
         public async Task<IActionResult> OnPostAsync(string code = null)
         {
             // Check if there is no code provided.
-            if (string.IsNullOrEmpty(View.Code))
+            if (string.IsNullOrEmpty(code))
             {
                 // Display an error.
                 TempData["StatusMessage"] = "Error: A unique code is needed in order to reset the password.";
@@ -87,15 +87,23 @@ namespace NetControl4BioMed.Pages.Identity
             {
                 Code = code
             };
+            // Check if the provided model is not valid.
+            if (!ModelState.IsValid)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "An error was encountered. Please check again the input fields.");
+                // Return the page.
+                return Page();
+            }
             // Try to get the user with the provided e-mail.
             var user = await _userManager.FindByEmailAsync(Input.Email);
             // Check if there wasn't any user found.
             if (user == null)
             {
-                // Display a message.
-                TempData["StatusMessage"] = "Success: The provided e-mail address is not associated with any user.";
-                // Redirect to the login page.
-                return RedirectToPage("/Identity/Login");
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The provided e-mail address is not associated with any user.");
+                // Return the page.
+                return Page();
             }
             // Try to reset the password.
             var result = await _userManager.ResetPasswordAsync(user, View.Code, Input.Password);

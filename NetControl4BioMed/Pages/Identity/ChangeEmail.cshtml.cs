@@ -87,17 +87,15 @@ namespace NetControl4BioMed.Pages.Identity
                 // Run the task.
                 await usersTask.EditAsync(_serviceProvider, CancellationToken.None);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, exception.Message);
-                // Redisplay the page.
-                return Page();
+                // Display an error.
+                TempData["StatusMessage"] = "Error: There was an error with setting the new e-mail address.";
+                // Redirect to the home page.
+                return RedirectToPage("/Index");
             }
-            // Define a variable to store if the user has a guest account.
-            var isGuest = await _userManager.IsInRoleAsync(user, "Guest");
             // Check if the user has a guest account.
-            if (isGuest)
+            if (await _userManager.IsInRoleAsync(user, "Guest"))
             {
                 // Define a new task.
                 var userRolesTask = new UserRolesTask
@@ -130,6 +128,8 @@ namespace NetControl4BioMed.Pages.Identity
                     // Redirect to the home page.
                     return RedirectToPage("/Index");
                 }
+                // Re-sign in the user to update the changes.
+                await _signInManager.RefreshSignInAsync(user);
                 // Generate the password reset code for the user.
                 var passwordResetCode = await _userManager.GeneratePasswordResetTokenAsync(user);
                 // Display a message to the user.
@@ -140,7 +140,7 @@ namespace NetControl4BioMed.Pages.Identity
             // Define a new view model for the e-mail.
             var emailChangedEmailViewModel = new EmailEmailChangedViewModel
             {
-                OldEmail = isGuest ? user.Email : oldEmail,
+                OldEmail = oldEmail,
                 NewEmail = user.Email,
                 Url = _linkGenerator.GetUriByPage(HttpContext, "/Account/Index", handler: null, values: null),
                 ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
