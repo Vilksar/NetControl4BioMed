@@ -174,9 +174,20 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => item.User != null && !string.IsNullOrEmpty(item.User.Id))
                     .Where(item => item.Role != null && !string.IsNullOrEmpty(item.Role.Id))
                     .Select(item => (item.User.Id, item.Role.Id));
+                // Get the IDs of all individual items.
+                var batchIdsUserIds = batchIds
+                    .Select(item => item.Item1);
+                var batchIdsRoleIds = batchIds
+                    .Select(item => item.Item2);
                 // Get the items with the provided IDs.
                 var userRoles = context.UserRoles
-                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.User.Id && item1.Item2 == item.Role.Id));
+                    .Include(item => item.User)
+                    .Include(item => item.Role)
+                    .Where(item => batchIdsUserIds.Contains(item.User.Id))
+                    .Where(item => batchIdsRoleIds.Contains(item.Role.Id))
+                    .AsEnumerable()
+                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.User.Id && item1.Item2 == item.Role.Id))
+                    .AsQueryable();
                 // Define a variable to store the error messages.
                 var errorMessages = new List<string>();
                 // Go over each item.

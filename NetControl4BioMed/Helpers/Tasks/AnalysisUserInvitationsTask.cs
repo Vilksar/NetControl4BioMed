@@ -162,9 +162,19 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => item.Analysis != null && !string.IsNullOrEmpty(item.Analysis.Id))
                     .Where(item => !string.IsNullOrEmpty(item.Email))
                     .Select(item => (item.Analysis.Id, item.Email));
+                // Get the IDs of all individual items.
+                var batchIdsAnalysisIds = batchIds
+                    .Select(item => item.Item1);
+                var batchIdsEmails = batchIds
+                    .Select(item => item.Email);
                 // Get the items with the provided IDs.
                 var analysisUserInvitations = context.AnalysisUserInvitations
-                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.Analysis.Id && item1.Item2 == item.Email));
+                    .Include(item => item.Analysis)
+                    .Where(item => batchIdsAnalysisIds.Contains(item.Analysis.Id))
+                    .Where(item => batchIdsEmails.Contains(item.Email))
+                    .AsEnumerable()
+                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.Analysis.Id && item1.Item2 == item.Email))
+                    .AsQueryable();
                 // Delete the items.
                 await IQueryableExtensions.DeleteAsync(analysisUserInvitations, context, token);
             }

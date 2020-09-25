@@ -165,9 +165,20 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => item.Database != null && !string.IsNullOrEmpty(item.Database.Id))
                     .Where(item => item.User != null && !string.IsNullOrEmpty(item.User.Id))
                     .Select(item => (item.Database.Id, item.User.Id));
+                // Get the IDs of all individual items.
+                var batchIdsDatabaseIds = batchIds
+                    .Select(item => item.Item1);
+                var batchIdsUserIds = batchIds
+                    .Select(item => item.Item2);
                 // Get the items with the provided IDs.
                 var databaseUsers = context.DatabaseUsers
-                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.Database.Id && item1.Item2 == item.User.Id));
+                    .Include(item => item.Database)
+                    .Include(item => item.User)
+                    .Where(item => batchIdsDatabaseIds.Contains(item.Database.Id))
+                    .Where(item => batchIdsUserIds.Contains(item.User.Id))
+                    .AsEnumerable()
+                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.Database.Id && item1.Item2 == item.User.Id))
+                    .AsQueryable();
                 // Delete the items.
                 await IQueryableExtensions.DeleteAsync(databaseUsers, context, token);
             }
