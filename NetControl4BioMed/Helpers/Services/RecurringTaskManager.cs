@@ -73,7 +73,9 @@ namespace NetControl4BioMed.Helpers.Services
             // Get the task corresponding to the background task.
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
-            await task.DeleteUsersAsync(_serviceProvider, token);
+            await task.DeleteGuestUsersAsync(_serviceProvider, token);
+            // Run the task.
+            await task.DeleteUnconfirmedUsersAsync(_serviceProvider, token);
         }
 
         /// <summary>

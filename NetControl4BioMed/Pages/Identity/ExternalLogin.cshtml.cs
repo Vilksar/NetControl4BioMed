@@ -233,7 +233,7 @@ namespace NetControl4BioMed.Pages.Identity
                 return Page();
             }
             // Get the new user.
-            var user = await _userManager.FindByNameAsync(Input.Email);
+            var user = await _userManager.FindByEmailAsync(Input.Email);
             // Check if there wasn't any user found.
             if (user == null)
             {
@@ -255,10 +255,8 @@ namespace NetControl4BioMed.Pages.Identity
             };
             // Send the confirmation e-mail for the user.
             await _emailSender.SendEmailConfirmationEmailAsync(emailViewModel);
-            // Sign in the user.
-            await _signInManager.SignInAsync(user, false);
             // Display a message to the user.
-            TempData["StatusMessage"] = $"Success: The account has been created successfully. Please check the e-mail address associated with your {View.LoginProvider} account for instructions on confirming your e-mail.";
+            TempData["StatusMessage"] = $"Success: The account has been created successfully. Please check the indicated e-mail address for instructions on confirming your e-mail.";
             // Redirect to the return URL.
             return LocalRedirect(View.ReturnUrl);
         }

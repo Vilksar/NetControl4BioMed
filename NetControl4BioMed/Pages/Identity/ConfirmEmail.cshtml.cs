@@ -22,7 +22,7 @@ namespace NetControl4BioMed.Pages.Identity
 
         public async Task<IActionResult> OnGetAsync(string userId, string code)
         {
-            // Check if the user ID and the code are provided.
+            // Check if the user ID and code aren't provided.
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(code))
             {
                 // Display an error.

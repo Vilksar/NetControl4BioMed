@@ -102,7 +102,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define a new identity result.
                     var result = IdentityResult.Success;
                     // Check the type of the item.
-                    if (batchItem.Type == "Password")
+                    if (batchItem.Type == "None")
+                    {
+                        // Try to create the new user.
+                        result = result.Succeeded ? await userManager.CreateAsync(user) : result;
+                    }
+                    else if (batchItem.Type == "Password")
                     {
                         // Try to get the passsord from the data.
                         if (!batchItem.Data.TryDeserializeJsonObject<string>(out var password))
@@ -250,13 +255,17 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     // Define a new identity result.
                     var result = IdentityResult.Success;
-                    // Check if the e-mail is different from the current one.
+                    // Check if the e-mail is different from the current e-mail.
                     if (batchItem.Email != user.Email)
                     {
-                        // Try to update the username.
-                        result = await userManager.SetUserNameAsync(user, batchItem.Email);
                         // Try to update the e-mail.
                         result = result.Succeeded ? await userManager.SetEmailAsync(user, batchItem.Email) : result;
+                    }
+                    // Check if the e-mail is different from the current username.
+                    if (batchItem.Email != user.UserName)
+                    {
+                        // Try to update the username.
+                        result = result.Succeeded ? await userManager.SetUserNameAsync(user, batchItem.Email) : result;
                     }
                     // Check if the e-mail should be set as confirmed.
                     if (!user.EmailConfirmed && batchItem.EmailConfirmed)
@@ -274,6 +283,71 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                     }
+                    // Get the databases, networks and analyses to which the user already has access.
+                    var databaseUserInvitations = context.DatabaseUserInvitations
+                        .Where(item => item.Email == user.Email);
+                    var networkUserInvitations = context.NetworkUserInvitations
+                        .Where(item => item.Email == user.Email);
+                    var analysisUserInvitations = context.AnalysisUserInvitations
+                        .Where(item => item.Email == user.Email);
+                    // Get the IDs of all the databases, networks and analyses to assign to the user.
+                    var databaseIds = databaseUserInvitations
+                        .Select(item => item.Database.Id)
+                        .Except(context.DatabaseUsers
+                            .Where(item => item.User == user)
+                            .Select(item => item.Database.Id))
+                        .AsEnumerable();
+                    var networkIds = networkUserInvitations
+                        .Select(item => item.Network.Id)
+                        .Except(context.NetworkUsers
+                            .Where(item => item.User == user)
+                            .Select(item => item.Network.Id))
+                        .AsEnumerable();
+                    var analysisIds = analysisUserInvitations
+                        .Select(item => item.Analysis.Id)
+                        .Except(context.AnalysisUsers
+                            .Where(item => item.User == user)
+                            .Select(item => item.Analysis.Id))
+                        .AsEnumerable();
+                    // Create, for each, a corresponding user entry.
+                    var databaseUsers = databaseUserInvitations
+                        .Where(item => databaseIds.Contains(item.Database.Id))
+                        .Select(item => new DatabaseUser
+                        {
+                            DatabaseId = item.Database.Id,
+                            Database = item.Database,
+                            UserId = user.Id,
+                            User = user,
+                            DateTimeCreated = item.DateTimeCreated
+                        });
+                    var networkUsers = networkUserInvitations
+                        .Where(item => networkIds.Contains(item.Network.Id))
+                        .Select(item => new NetworkUser
+                        {
+                            NetworkId = item.NetworkId,
+                            Network = item.Network,
+                            UserId = user.Id,
+                            User = user,
+                            DateTimeCreated = item.DateTimeCreated
+                        });
+                    var analysisUsers = analysisUserInvitations
+                        .Where(item => analysisIds.Contains(item.Analysis.Id))
+                        .Select(item => new AnalysisUser
+                        {
+                            AnalysisId = item.AnalysisId,
+                            Analysis = item.Analysis,
+                            UserId = user.Id,
+                            User = user,
+                            DateTimeCreated = item.DateTimeCreated
+                        });
+                    // Create the items.
+                    await IEnumerableExtensions.CreateAsync(databaseUsers, context, token);
+                    await IEnumerableExtensions.CreateAsync(networkUsers, context, token);
+                    await IEnumerableExtensions.CreateAsync(analysisUsers, context, token);
+                    // Delete the items
+                    await IQueryableExtensions.DeleteAsync(databaseUserInvitations, context, token);
+                    await IQueryableExtensions.DeleteAsync(networkUserInvitations, context, token);
+                    await IQueryableExtensions.DeleteAsync(analysisUserInvitations, context, token);
                 }
             }
         }

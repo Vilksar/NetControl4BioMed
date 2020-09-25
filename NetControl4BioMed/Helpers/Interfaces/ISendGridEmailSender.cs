@@ -19,10 +19,16 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task SendEmailConfirmationEmailAsync(EmailEmailConfirmationViewModel viewModel);
 
         /// <summary>
-        /// Sends an e-mail with a notification that the user password has changed.
+        /// Sends an e-mail with instructions on changing the user e-mail.
         /// </summary>
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
-        Task SendPasswordChangedEmailAsync(EmailPasswordChangedViewModel viewModel);
+        Task SendEmailChangeEmailAsync(EmailEmailChangeViewModel viewModel);
+
+        /// <summary>
+        /// Sends an e-mail with instructions on resetting the user password.
+        /// </summary>
+        /// <param name="viewModel">Represents the view model of the e-mail.</param>
+        Task SendPasswordResetEmailAsync(EmailPasswordResetViewModel viewModel);
 
         /// <summary>
         /// Sends an e-mail with a notification that the user e-mail has changed.
@@ -31,10 +37,10 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task SendEmailChangedEmailAsync(EmailEmailChangedViewModel viewModel);
 
         /// <summary>
-        /// Sends an e-mail with instructions on resetting the user password.
+        /// Sends an e-mail with a notification that the user password has changed.
         /// </summary>
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
-        Task SendPasswordResetEmailAsync(EmailPasswordResetViewModel viewModel);
+        Task SendPasswordChangedEmailAsync(EmailPasswordChangedViewModel viewModel);
 
         /// <summary>
         /// Sends a contact e-mail to the administrator users specified in the configuration file.

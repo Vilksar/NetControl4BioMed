@@ -138,12 +138,14 @@ namespace NetControl4BioMed.Pages.Account.Manage.PersonalData
                 // Run the task.
                 await task.DeleteAsync(_serviceProvider, CancellationToken.None);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, exception.Message);
-                // Redisplay the page.
-                return Page();
+                // Log out the user.
+                await _signInManager.SignOutAsync();
+                // Display a message to the user.
+                TempData["StatusMessage"] = $"Error: There was an error removing some of the data associated with your account.";
+                // Redirect to the home page.
+                return RedirectToPage("/Index");
             }
             // Sign out the user.
             await _signInManager.SignOutAsync();

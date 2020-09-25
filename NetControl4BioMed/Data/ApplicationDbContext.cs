@@ -35,6 +35,11 @@ namespace NetControl4BioMed.Data
         public static int DaysBeforeDelete { get; } = 31;
 
         /// <summary>
+        /// Gets or sets the number of days before guest user-created database items will be automatically deleted.
+        /// </summary>
+        public static int DaysBeforeGuestDelete { get; } = 1;
+
+        /// <summary>
         /// Gets or sets the database table containing the analyses.
         /// </summary>
         public DbSet<Analysis> Analyses { get; set; }

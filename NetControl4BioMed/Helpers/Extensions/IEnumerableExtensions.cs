@@ -105,6 +105,19 @@ namespace NetControl4BioMed.Helpers.Extensions
         }
 
         /// <summary>
+        /// Gets a random element from an IEnumerable.
+        /// </summary>
+        /// <typeparam name="T">The type of the item.</typeparam>
+        /// <param name="items">The item to return.</param>
+        /// <param name="random">The current random variable.</param>
+        /// <returns>A random element.</returns>
+        public static T GetRandomElement<T>(this IEnumerable<T> items, Random random)
+        {
+            // Return a random item in the list.
+            return items.ElementAt(random.Next(items.Count()));
+        }
+
+        /// <summary>
         /// Yield returns the provided item as an enumerable.
         /// </summary>
         /// <typeparam name="T">The type of the item.</typeparam>

@@ -26,6 +26,8 @@ namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
 
         public class ViewModel
         {
+            public bool IsGuest { get; set; }
+
             public bool HasAuthenticator { get; set; }
 
             public int RecoveryCodesLeft { get; set; }
@@ -50,6 +52,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
             // Define the variables to return to the view.
             View = new ViewModel
             {
+                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
                 Is2faEnabled = await _userManager.GetTwoFactorEnabledAsync(user),
                 IsMachineRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user),
@@ -74,6 +77,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
             // Define the variables to return to the view.
             View = new ViewModel
             {
+                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
                 Is2faEnabled = await _userManager.GetTwoFactorEnabledAsync(user),
                 IsMachineRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user),
@@ -82,7 +86,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
             // Ask the two-factor authenticator to forget the current client.
             await _signInManager.ForgetTwoFactorClientAsync();
             // Display a message.
-            TempData["StatusMessage"] = "Success: The current browser has been forgotten. When you login again from this browser you will be prompted for your two-factor authenticator code.";
+            TempData["StatusMessage"] = "Success: The current browser has been forgotten. When you log in again from this browser you will be prompted for your two-factor authenticator code.";
             // Redirect to page.
             return RedirectToPage();
         }
