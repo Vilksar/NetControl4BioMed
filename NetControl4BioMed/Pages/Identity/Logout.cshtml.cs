@@ -55,12 +55,12 @@ namespace NetControl4BioMed.Pages.Identity
                     // Run the task.
                     await task.DeleteAsync(_serviceProvider, CancellationToken.None);
                 }
-                catch (Exception exception)
+                catch (Exception)
                 {
                     // Log out the user.
                     await _signInManager.SignOutAsync();
                     // Display a message to the user.
-                    TempData["StatusMessage"] = $"Error: There was an error removing some of the data associated with your guest account. {exception.Message}";
+                    TempData["StatusMessage"] = $"Error: There was an error removing some of the data associated with your guest account.";
                     // Redirect to the home page.
                     return RedirectToPage("/Index");
                 }

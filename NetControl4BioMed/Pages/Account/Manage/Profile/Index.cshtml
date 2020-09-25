@@ -16,6 +16,14 @@
         </div>
     </div>
     <div class="card-body">
+        @if (Model.View.IsGuest)
+        {
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span class="font-weight-bold">You are logged in with a guest account.</span>
+                <span>You can change the current guest account to a regular account by filling in your e-mail address and pressing the button below. You will receive an e-mail with a confirmation link. Upon the confirmation of the e-mail address, the guest account will automatically change to a regular account, and you will be able to reset the password and log in using your e-mail address. All of the data currently available on the guest account will also be available after the change.</span>
+            </div>
+        }
         <form method="post" class="text-justify">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
             <div class="form-group">
@@ -23,12 +31,6 @@
                 <input asp-for="Input.Email" class="form-control" />
                 <span asp-description-for="Input.Email" class="text-muted small">The e-mail address associated with your account.</span>
                 <span asp-validation-for="Input.Email" class="text-danger small"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.PhoneNumber" class="font-weight-bold">Phone number</label>
-                <input asp-for="Input.PhoneNumber" class="form-control" />
-                <span asp-description-for="Input.PhoneNumber" class="text-muted small">The phone number associated with your account.</span>
-                <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
             </div>
             <div class="form-group" hidden>
                 <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
@@ -43,7 +45,8 @@
             {
                 <div class="alert alert-danger text-justify text-wrap mt-3">
                     <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span><span class="font-weight-bold">Your e-mail address is not cofirmed. This might prevent you from logging in.</span> Please click the button below to receive an e-mail containing instructions on confirming it.</span>
+                    <span class="font-weight-bold">Your e-mail address is not cofirmed. This might prevent you from logging in.</span>
+                    <span>Please click the button below to receive an e-mail containing instructions on confirming it.</span>
                 </div>
                 <button type="submit" asp-page-handler="SendVerificationEmail" title="Send verification e-mail" class="btn btn-block btn-danger">
                     <span>Send verification e-mail</span>

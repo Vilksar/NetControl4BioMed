@@ -133,6 +133,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Users
                 {
                     new UserInputModel
                     {
+                        Id = Input.Id,
                         Email = Input.Email,
                         EmailConfirmed = Input.EmailConfirmed
                     }

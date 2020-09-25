@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Encodings.Web;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -10,7 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Account.Manage.Profile
@@ -18,14 +21,16 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
     [Authorize]
     public class IndexModel : PageModel
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ISendGridEmailSender _emailSender;
         private readonly LinkGenerator _linkGenerator;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public IndexModel(UserManager<User> userManager, SignInManager<User> signInManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public IndexModel(IServiceProvider serviceProvider, UserManager<User> userManager, SignInManager<User> signInManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
+            _serviceProvider = serviceProvider;
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
@@ -42,9 +47,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
             [Required(ErrorMessage = "This field is required.")]
             public string Email { get; set; }
 
-            [DataType(DataType.PhoneNumber)]
-            public string PhoneNumber { get; set; }
-
             public string ReCaptchaToken { get; set; }
         }
 
@@ -52,6 +54,8 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
 
         public class ViewModel
         {
+            public bool IsGuest { get; set; }
+
             public bool IsEmailConfirmed { get; set; }
         }
 
@@ -70,13 +74,13 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
             // Define the variables for the view.
             View = new ViewModel
             {
+                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 IsEmailConfirmed = user.EmailConfirmed
             };
             // Define the input.
             Input = new InputModel
             {
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber
+                Email = user.Email
             };
             // Return the page.
             return Page();
@@ -97,6 +101,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
             // Define the variables to return to the view.
             View = new ViewModel
             {
+                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 IsEmailConfirmed = user.EmailConfirmed
             };
             // Check if the reCaptcha is valid.
@@ -115,103 +120,32 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
                 // Return the page.
                 return Page();
             }
-            // Store the current user e-mail.
-            var oldEmail = user.Email;
-            // Store the status message to be displayed to the user.
-            var statusMessage = "Success:";
             // Check if the e-mail is different than the current one.
-            if (Input.Email != oldEmail)
+            if (Input.Email != user.Email)
             {
-                // Try to update the username.
-                var result = await _userManager.SetUserNameAsync(user, Input.Email);
-                // Check if the update was not successful.
-                if (!result.Succeeded)
-                {
-                    // Go over the encountered errors
-                    foreach (var error in result.Errors)
-                    {
-                        // and add them to the model
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    // Return the page.
-                    return Page();
-                }
-                // Try to update the e-mail.
-                result = await _userManager.SetEmailAsync(user, Input.Email);
-                // Check if the update was not successful.
-                if (!result.Succeeded)
-                {
-                    // Go over the encountered errors
-                    foreach (var error in result.Errors)
-                    {
-                        // and add them to the model
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    // Return the page.
-                    return Page();
-                }
-                // Check if the update was not successful.
-                if (!result.Succeeded)
-                {
-                    // Go over the encountered errors
-                    foreach (var error in result.Errors)
-                    {
-                        // and add them to the model
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    // Return the page.
-                    return Page();
-                }
+                // Generate an e-mail change code.
+                var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.Email);
+                // Create the callback URL to be encoded in the change email.
+                var callbackUrl = _linkGenerator.GetUriByPage(HttpContext, "/Identity/ChangeEmail", handler: null, values: new { userId = user.Id, email = Input.Email, code = code });
+                // Check if the user has a guest account.
+                var isGuest = await _userManager.IsInRoleAsync(user, "Guest");
                 // Define a new view model for the e-mail.
-                var emailChangedEmailViewModel = new EmailEmailChangedViewModel
+                var emailChangeEmailViewModel = new EmailEmailChangeViewModel
                 {
-                    OldEmail = oldEmail,
-                    NewEmail = user.Email,
-                    Url = _linkGenerator.GetUriByPage(HttpContext, "/Account/Index", handler: null, values: null),
-                    ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
-                };
-                // Send the e-mail changed e-mail to the user.
-                await _emailSender.SendEmailChangedEmailAsync(emailChangedEmailViewModel);
-                // Generate an e-mail confirmation code.
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                // Create the callback URL to be encoded in the confirmation email.
-                var callbackUrl = _linkGenerator.GetUriByPage(HttpContext, "/Identity/ConfirmEmail", handler: null, values: new { userId = user.Id, code = code });
-                // Define a new view model for the e-mail.
-                var emailConfirmationEmailViewModel = new EmailEmailConfirmationViewModel
-                {
-                    Email = user.Email,
+                    OldEmail = isGuest? Input.Email : user.Email,
+                    NewEmail = Input.Email,
                     Url = callbackUrl,
                     ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
                 };
-                // Send the confirmation e-mail for the user.
-                await _emailSender.SendEmailConfirmationEmailAsync(emailConfirmationEmailViewModel);
-                // Display a message to the user.
-                statusMessage = $"{statusMessage} The e-mail has been successfully updated. A confirmation e-mail was sent to the new address. Please follow the instructions there in order to confirm it. If you log out, you might not be able to log in before you confirm it.";
+                // Send the e-mail change e-mail to the user.
+                await _emailSender.SendEmailChangeEmailAsync(emailChangeEmailViewModel);
+                // Display a message.
+                TempData["StatusMessage"] = $"Success: An e-mail has been sent to {(isGuest ? "the specified" : "your current")} e-mail address. Please follow the instructions there in order to change the e-mail address associated with the account.";
+                // Redirect to page.
+                return RedirectToPage();
             }
-            // Check if the phone number is different than the current one.
-            if (Input.PhoneNumber != user.PhoneNumber)
-            {
-                // Try to update the phone number.
-                var result = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                // Check if the update was not successful.
-                if (!result.Succeeded)
-                {
-                    // Go over the encountered errors
-                    foreach (var error in result.Errors)
-                    {
-                        // and add them to the model
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    // Return the page.
-                    return Page();
-                }
-                // Display a message to the user.
-                statusMessage = $"{statusMessage} The phone number has been successfully updated.";
-            }
-            // Re-sign in the user to update the changes.
-            await _signInManager.RefreshSignInAsync(user);
             // Display a message.
-            TempData["StatusMessage"] = statusMessage == "Success:" ? "Success: All details were already up to date." : statusMessage;
+            TempData["StatusMessage"] = "Success: All details were already up to date.";
             // Redirect to page.
             return RedirectToPage();
         }
@@ -231,6 +165,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
             // Define the variables to return to the view.
             View = new ViewModel
             {
+                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 IsEmailConfirmed = user.EmailConfirmed
             };
             // Check if the reCaptcha is valid.

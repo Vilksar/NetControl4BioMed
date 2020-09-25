@@ -22,14 +22,16 @@ namespace NetControl4BioMed.Pages.Identity
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly SignInManager<User> _signInManager;
         private readonly LinkGenerator _linkGenerator;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public LoginWithGuestAccountModel(IServiceProvider serviceProvider, UserManager<User> userManager, SignInManager<User> signInManager, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public LoginWithGuestAccountModel(IServiceProvider serviceProvider, UserManager<User> userManager, RoleManager<Role> roleManager, SignInManager<User> signInManager, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
             _serviceProvider = serviceProvider;
             _userManager = userManager;
+            _roleManager = roleManager;
             _signInManager = signInManager;
             _linkGenerator = linkGenerator;
             _reCaptchaChecker = reCaptchaChecker;
@@ -105,7 +107,7 @@ namespace NetControl4BioMed.Pages.Identity
                 guestUserIndex++;
             }
             // Define a new task.
-            var task = new UsersTask
+            var usersTask = new UsersTask
             {
                 Items = new List<UserInputModel>
                 {
@@ -113,17 +115,7 @@ namespace NetControl4BioMed.Pages.Identity
                     {
                         Email = getGuestEmail(guestUserIndex),
                         Type = "None",
-                        EmailConfirmed = true,
-                        UserRoles = new List<UserRoleInputModel>
-                        {
-                            new UserRoleInputModel
-                            {
-                                Role = new RoleInputModel
-                                {
-                                    Name = "Guest"
-                                }
-                            }
-                        }
+                        EmailConfirmed = true
                     }
                 }
             };
@@ -131,7 +123,7 @@ namespace NetControl4BioMed.Pages.Identity
             try
             {
                 // Run the task.
-                await task.CreateAsync(_serviceProvider, CancellationToken.None);
+                await usersTask.CreateAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {
@@ -150,16 +142,34 @@ namespace NetControl4BioMed.Pages.Identity
                 // Redisplay the page.
                 return Page();
             }
-            // Try to add the user to the guest role.
-            var result = await _userManager.AddToRoleAsync(user, "Guest");
-            // Check if the operation has failed.
-            if (!result.Succeeded)
+            // Define a new task.
+            var userRolesTask = new UserRolesTask
             {
-                // Get the error messages.
-                var messages = result.Errors
-                    .Select(item => item.Description);
+                Items = new List<UserRoleInputModel>
+                {
+                    new UserRoleInputModel
+                    {
+                        User = new UserInputModel
+                        {
+                            Id = user.Id
+                        },
+                        Role = new RoleInputModel
+                        {
+                            Id = (await _roleManager.FindByNameAsync("Guest")).Id
+                        }
+                    }
+                }
+            };
+            // Try to run the task.
+            try
+            {
+                // Run the task.
+                await userRolesTask.CreateAsync(_serviceProvider, CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, string.Join(" ", messages));
+                ModelState.AddModelError(string.Empty, exception.Message);
                 // Redisplay the page.
                 return Page();
             }
