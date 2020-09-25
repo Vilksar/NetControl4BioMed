@@ -48,13 +48,8 @@ namespace NetControl4BioMed.Pages.Identity
             public string Code { get; set; }
         }
 
-        public IActionResult OnGet(string code = null)
+        public IActionResult OnGet(string email = null, string code = null)
         {
-            // Define the variables to return to the view.
-            View = new ViewModel
-            {
-                Code = code
-            };
             // Check if there is no code provided.
             if (string.IsNullOrEmpty(View.Code))
             {
@@ -63,17 +58,22 @@ namespace NetControl4BioMed.Pages.Identity
                 // Redirect to the login page.
                 return RedirectToPage("/Identity/Login");
             }
+            // Define the variables to return to the view.
+            View = new ViewModel
+            {
+                Code = code
+            };
+            // Define the input.
+            Input = new InputModel
+            {
+                Email = email
+            };
             // Return the page.
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(string code = null)
         {
-            // Define the variables to return to the view.
-            View = new ViewModel
-            {
-                Code = code
-            };
             // Check if there is no code provided.
             if (string.IsNullOrEmpty(View.Code))
             {
@@ -82,6 +82,11 @@ namespace NetControl4BioMed.Pages.Identity
                 // Redirect to the login page.
                 return RedirectToPage("/Identity/Login");
             }
+            // Define the variables to return to the view.
+            View = new ViewModel
+            {
+                Code = code
+            };
             // Try to get the user with the provided e-mail.
             var user = await _userManager.FindByEmailAsync(Input.Email);
             // Check if there wasn't any user found.

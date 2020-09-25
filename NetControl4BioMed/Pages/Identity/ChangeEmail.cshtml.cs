@@ -42,7 +42,7 @@ namespace NetControl4BioMed.Pages.Identity
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(code))
             {
                 // Display an error.
-                TempData["StatusMessage"] = "Error: The confirmation link is not valid. Please try to paste it manually into the browser address bar.";
+                TempData["StatusMessage"] = "Error: The confirmation link is not valid. Please try to paste the link manually into the browser address bar.";
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }
@@ -64,7 +64,7 @@ namespace NetControl4BioMed.Pages.Identity
             if (!result.Succeeded)
             {
                 // Display an error.
-                TempData["StatusMessage"] = "Error: The confirmation code in the link is not valid. Please try to paste the link manually into the browser address bar.";
+                TempData["StatusMessage"] = "Error: The e-mail or the confirmation code in the link are not valid. Please try to paste the link manually into the browser address bar.";
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }
@@ -94,8 +94,10 @@ namespace NetControl4BioMed.Pages.Identity
                 // Redisplay the page.
                 return Page();
             }
+            // Define a variable to store if the user has a guest account.
+            var isGuest = await _userManager.IsInRoleAsync(user, "Guest");
             // Check if the user has a guest account.
-            if (await _userManager.IsInRoleAsync(user, "Guest"))
+            if (isGuest)
             {
                 // Define a new task.
                 var userRolesTask = new UserRolesTask
@@ -128,11 +130,17 @@ namespace NetControl4BioMed.Pages.Identity
                     // Redirect to the home page.
                     return RedirectToPage("/Index");
                 }
+                // Generate the password reset code for the user.
+                var passwordResetCode = await _userManager.GeneratePasswordResetTokenAsync(user);
+                // Display a message to the user.
+                TempData["StatusMessage"] = "Success: Thank you for confirming your e-mail. You can now set up a password for the application. This step can also be completed later.";
+                // Redirect to the login page.
+                return RedirectToPage("/Identity/ResetPassword", new { email = user.Email, code = passwordResetCode });
             }
             // Define a new view model for the e-mail.
             var emailChangedEmailViewModel = new EmailEmailChangedViewModel
             {
-                OldEmail = oldEmail,
+                OldEmail = isGuest ? user.Email : oldEmail,
                 NewEmail = user.Email,
                 Url = _linkGenerator.GetUriByPage(HttpContext, "/Account/Index", handler: null, values: null),
                 ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
