@@ -176,7 +176,7 @@ namespace NetControl4BioMed.Pages.Identity
             // Log in the guest user.
             await _signInManager.SignInAsync(user, new AuthenticationProperties { IsPersistent = true, ExpiresUtc = DateTime.UtcNow.AddDays(ApplicationDbContext.DaysBeforeGuestDelete) });
             // Display a message to the user.
-            TempData["StatusMessage"] = "Success: You have successfully logged in with a guest account. Please note that the account and all of the associated data will be deleted automatically when you log out, close the browser, or within 24 to 48 hours.";
+            TempData["StatusMessage"] = "Success: You have successfully logged in with a guest account. Please note that the account and all of the associated data will be deleted automatically when you log out or within 24 to 48 hours.";
             // Redirect to the return URL.
             return LocalRedirect(View.ReturnUrl);
         }

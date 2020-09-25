@@ -56,6 +56,14 @@ namespace NetControl4BioMed.Pages.Identity
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }
+            // Check if an account with the new e-mail address already exists.
+            if (await _userManager.FindByEmailAsync(email) != null)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "An account with the new e-mail address already exists.");
+                // Return the page.
+                return Page();
+            }
             // Get the current e-mail of the user.
             var oldEmail = user.Email;
             // Try to change the e-mail using the provided code.

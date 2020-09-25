@@ -86,7 +86,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
             // Ask the two-factor authenticator to forget the current client.
             await _signInManager.ForgetTwoFactorClientAsync();
             // Display a message.
-            TempData["StatusMessage"] = "Success: The current browser has been forgotten. When you login again from this browser you will be prompted for your two-factor authenticator code.";
+            TempData["StatusMessage"] = "Success: The current browser has been forgotten. When you log in again from this browser you will be prompted for your two-factor authenticator code.";
             // Redirect to page.
             return RedirectToPage();
         }
