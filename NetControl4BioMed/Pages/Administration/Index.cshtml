@@ -4,30 +4,7 @@
     ViewData["Title"] = "Overview";
 }
 
-<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAdministrationNavigationQuickLinks(Model.View.ItemCount)" />
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-list"></i></span>
-            </div>
-            <div>
-                <span>Items</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-success text-justify text-wrap">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>You can reset the item count by clicking on the button below.</span>
-        </div>
-        <form method="post" asp-page-handler="ResetItemCount" class="text-justify">
-            <button type="submit" title="Reset" class="btn btn-success btn-block">
-                <span>Reset</span>
-            </button>
-        </form>
-    </div>
-</div>
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAdministrationNavigationQuickLinks(Model.View.AllItemCount)" />
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
@@ -40,7 +17,7 @@
         </div>
     </div>
     <div class="card-body">
-        @if (!Model.View.IssueDuplicateCount.Any(item => item.Value != 0))
+        @if (!Model.View.DuplicateItemCount.Any(item => item.Value != 0))
         {
             <div class="alert alert-success text-justify text-wrap">
                 <span><i class="fas fa-check-circle"></i></span>
@@ -49,7 +26,7 @@
         }
         else
         {
-            @foreach (var item in Model.View.IssueDuplicateCount)
+            @foreach (var item in Model.View.DuplicateItemCount)
             {
                 @if (item.Value != 0)
                 {
@@ -60,12 +37,7 @@
                 }
             }
         }
-        <form method="post" asp-page-handler="ResetIssueDuplicateCount" class="text-justify mb-3">
-            <button type="submit" title="Reset" class="btn btn-success btn-block">
-                <span>Reset</span>
-            </button>
-        </form>
-        @if (!Model.View.IssueOrphanedCount.Any(item => item.Value != 0))
+        @if (!Model.View.OrphanedItemCount.Any(item => item.Value != 0))
         {
             <div class="alert alert-success text-justify text-wrap">
                 <span><i class="fas fa-check-circle"></i></span>
@@ -74,7 +46,7 @@
         }
         else
         {
-            @foreach (var item in Model.View.IssueOrphanedCount)
+            @foreach (var item in Model.View.OrphanedItemCount)
             {
                 @if (item.Value != 0)
                 {
@@ -85,36 +57,26 @@
                 }
             }
         }
-        <form method="post" asp-page-handler="ResetIssueOrphanedCount" class="text-justify mb-3">
-            <button type="submit" title="Reset" class="btn btn-success btn-block">
-                <span>Reset</span>
-            </button>
-        </form>
-        @if (!Model.View.IssueInconsistentCount.Any(item => item.Value != 0))
+        @if (!Model.View.InconsistentItemCount.Any(item => item.Value != 0))
         {
-            <div class="alert alert-success text-justify text-wrap">
+            <div class="alert alert-success text-justify text-wrap mb-0">
                 <span><i class="fas fa-check-circle"></i></span>
                 <span>There were no inconsistent items found in the data.</span>
             </div>
         }
         else
         {
-            @foreach (var item in Model.View.IssueInconsistentCount)
+            @foreach (var item in Model.View.InconsistentItemCount)
             {
                 @if (item.Value != 0)
                 {
-                    <div class="alert alert-warning text-justify text-wrap">
+                    <div class="alert alert-warning text-justify text-wrap mb-0">
                         <span><i class="fas fa-exclamation-triangle"></i></span>
                         <span>There @(item.Value != 1 ? "are" : "is") @item.Value inconsistent value@(item.Value != 1 ? "s" : string.Empty) of type "@item.Key".</span>
                     </div>
                 }
             }
         }
-        <form method="post" asp-page-handler="ResetIssueInconsistentCount" class="text-justify">
-            <button type="submit" title="Reset" class="btn btn-success btn-block">
-                <span>Reset</span>
-            </button>
-        </form>
     </div>
 </div>
 <div class="card mb-3">

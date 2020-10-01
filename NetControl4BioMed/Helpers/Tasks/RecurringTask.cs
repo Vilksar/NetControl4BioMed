@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace NetControl4BioMed.Helpers.Tasks
 {
     /// <summary>
-    /// Implements a recurring task database.
+    /// Implements recurring tasks.
     /// </summary>
     public class RecurringTask
     {
@@ -32,7 +32,282 @@ namespace NetControl4BioMed.Helpers.Tasks
         public string HostValue { get; set; }
 
         /// <summary>
-        /// Stops the long-running analyses.
+        /// Counts the items in the database.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task<Dictionary<string, int>> CountAllItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Create a new scope.
+            using var scope = serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Define the dictionary to return.
+            var dictionary = new Dictionary<string, int>
+            {
+                {
+                    "Users",
+                    await context.Users
+                        .CountAsync()
+                },
+                {
+                    "Roles",
+                    await context.Roles
+                        .CountAsync()
+                },
+                {
+                    "DatabaseTypes",
+                    await context.DatabaseTypes
+                        .CountAsync()
+                },
+                {
+                    "Databases",
+                    await context.Databases
+                        .CountAsync()
+                },
+                {
+                    "DatabaseNodeFields",
+                    await context.DatabaseNodeFields
+                        .CountAsync()
+                },
+                {
+                    "DatabaseEdgeFields",
+                    await context.DatabaseEdgeFields
+                        .CountAsync()
+                },
+                {
+                    "Nodes",
+                    await context.Nodes
+                        .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .CountAsync()
+                },
+                {
+                    "Edges",
+                    await context.Edges
+                        .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .CountAsync()
+                },
+                {
+                    "NodeCollections",
+                    await context.NodeCollections
+                        .CountAsync()
+                },
+                {
+                    "Networks",
+                    await context.Networks
+                        .CountAsync()
+                },
+                {
+                    "Analyses",
+                    await context.Analyses
+                        .CountAsync()
+                }
+            };
+            // Return the dictionary.
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Counts the duplicate items in the database.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task<Dictionary<string, int>> CountDuplicateItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Create a new scope.
+            using var scope = serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Define the dictionary to return.
+            var dictionary = new Dictionary<string, int>
+            {
+                {
+                    "DatabaseTypes",
+                    await context.DatabaseTypes
+                        .Where(item => item.Name != "Generic")
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key)
+                        .CountAsync()
+                },
+                {
+                    "Databases",
+                    await context.Databases
+                        .Where(item => item.DatabaseType.Name != "Generic")
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key)
+                        .CountAsync()
+                },
+                {
+                    "DatabaseNodeFields",
+                    await context.DatabaseNodeFields
+                        .Where(item => item.Database.DatabaseType.Name != "Generic")
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key)
+                        .CountAsync()
+                },
+                {
+                    "DatabaseEdgeFields",
+                    await context.DatabaseEdgeFields
+                        .Where(item => item.Database.DatabaseType.Name != "Generic")
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key)
+                        .CountAsync()
+                },
+                {
+                    "DatabaseNodeFieldNodes",
+                    await context.DatabaseNodeFieldNodes
+                        .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
+                        .Where(item => item.DatabaseNodeField.IsSearchable)
+                        .GroupBy(item => new { item.DatabaseNodeFieldId, item.Value })
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key)
+                        .CountAsync()
+                },
+                {
+                    "DatabaseEdgeFieldEdges",
+                    await context.DatabaseEdgeFieldEdges
+                        .Where(item => item.DatabaseEdgeField.Database.DatabaseType.Name != "Generic")
+                        .Where(item => item.DatabaseEdgeField.IsSearchable)
+                        .GroupBy(item => new { item.DatabaseEdgeFieldId, item.Value })
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key)
+                        .CountAsync()
+                },
+                {
+                    "Nodes",
+                    await context.Nodes
+                        .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key)
+                        .CountAsync()
+                },
+                {
+                    "Edges",
+                    await context.Edges
+                        .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key)
+                        .CountAsync()
+                },
+                {
+                    "NodeCollections",
+                    await context.NodeCollections
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key)
+                        .CountAsync()
+                }
+            };
+            // Return the dictionary.
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Counts the orphaned items in the database.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task<Dictionary<string, int>> CountOrphanedItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Create a new scope.
+            using var scope = serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Define the dictionary to return.
+            var dictionary = new Dictionary<string, int>
+            {
+                {
+                    "Nodes",
+                    await context.Nodes
+                        .Where(item => !item.DatabaseNodeFieldNodes.Any())
+                        .CountAsync()
+                },
+                {
+                    "Edges",
+                    await context.Edges
+                        .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
+                        .CountAsync()
+                },
+                {
+                    "NodeCollections",
+                    await context.NodeCollections
+                        .Where(item => !item.NodeCollectionNodes.Any())
+                        .CountAsync()
+                },
+                {
+                    "Networks",
+                    await context.Networks
+                        .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any())
+                        .CountAsync()
+                },
+                {
+                    "Analyses",
+                    await context.Analyses
+                        .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any())
+                        .CountAsync()
+                }
+            };
+            // Return the dictionary.
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Counts the inconsistent items in the database.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task<Dictionary<string, int>> CountInconsistentItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Create a new scope.
+            using var scope = serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Define the dictionary to return.
+            var dictionary = new Dictionary<string, int>
+            {
+                {
+                    "Nodes",
+                    await context.Nodes
+                        .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                        .CountAsync()
+                },
+                {
+                    "Edges",
+                    await context.Edges
+                        .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                        .CountAsync()
+                },
+                {
+                    "NodeCollections",
+                    await context.NodeCollections
+                        .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                        .CountAsync()
+                },
+                {
+                    "Networks",
+                    await context.Networks
+                        .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                        .CountAsync()
+                },
+                {
+                    "Analyses",
+                    await context.Analyses
+                        .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                        .CountAsync()
+                }
+            };
+            // Return the dictionary.
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Stops the long-running analyses in the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
@@ -62,7 +337,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
-        /// Alerts on deleting the long-standing items.
+        /// Alerts the users before deleting the long-standing networks and analyses from the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
@@ -140,7 +415,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
-        /// Deletes the unconfirmed users.
+        /// Deletes the long-standing unconfirmed users from the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
@@ -170,7 +445,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
-        /// Deletes the guest users.
+        /// Deletes the long-standing guest users from the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
@@ -200,7 +475,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
-        /// Deletes the long-standing networks.
+        /// Deletes the long-standing networks from the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
@@ -229,7 +504,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
-        /// Deletes the long-standing analyses.
+        /// Deletes the long-standing analyses from the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>

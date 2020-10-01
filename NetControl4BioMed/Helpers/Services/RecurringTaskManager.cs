@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
@@ -32,7 +33,107 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
-        /// Stops analyses in the database.
+        /// Counts the items in the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task CountAllItemsAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<RecurringTask>(backgroundTask);
+            // Run the task.
+            var dictionary = await task.CountAllItemsAsync(_serviceProvider, token);
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new configuration instance.
+            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            // Go over each entry in the dictionary.
+            foreach (var entry in dictionary)
+            {
+                // Update the counts.
+                configuration[$"Data:ItemCount:All:{entry.Key}"] = entry.Value.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Counts the duplicate items in the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task CountDuplicateItemsAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<RecurringTask>(backgroundTask);
+            // Run the task.
+            var dictionary = await task.CountDuplicateItemsAsync(_serviceProvider, token);
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new configuration instance.
+            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            // Go over each entry in the dictionary.
+            foreach (var entry in dictionary)
+            {
+                // Update the counts.
+                configuration[$"Data:ItemCount:Duplicate:{entry.Key}"] = entry.Value.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Counts the orphaned items in the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task CountOrphanedItemsAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<RecurringTask>(backgroundTask);
+            // Run the task.
+            var dictionary = await task.CountOrphanedItemsAsync(_serviceProvider, token);
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new configuration instance.
+            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            // Go over each entry in the dictionary.
+            foreach (var entry in dictionary)
+            {
+                // Update the counts.
+                configuration[$"Data:ItemCount:Orphaned:{entry.Key}"] = entry.Value.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Counts the inconsistent items in the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task CountInconsistentItemsAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<RecurringTask>(backgroundTask);
+            // Run the task.
+            var dictionary = await task.CountInconsistentItemsAsync(_serviceProvider, token);
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new configuration instance.
+            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            // Go over each entry in the dictionary.
+            foreach (var entry in dictionary)
+            {
+                // Update the counts.
+                configuration[$"Data:ItemCount:Inconsistent:{entry.Key}"] = entry.Value.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Stops the long-running analyses in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
@@ -47,7 +148,7 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
-        /// Alerts users before deleting.
+        /// Alerts the users before deleting the long-standing networks and analyses from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
@@ -62,11 +163,26 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
-        /// Deletes users from the database.
+        /// Deletes the long-standing unconfirmed users from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public async Task DeleteUsersAsync(string id, CancellationToken token)
+        public async Task DeleteUnconfirmedUsersAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<RecurringTask>(backgroundTask);
+            // Run the task.
+            await task.DeleteUnconfirmedUsersAsync(_serviceProvider, token);
+        }
+
+        /// <summary>
+        /// Deletes the long-standing guest users from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task DeleteGuestUsersAsync(string id, CancellationToken token)
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
@@ -74,12 +190,10 @@ namespace NetControl4BioMed.Helpers.Services
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
             await task.DeleteGuestUsersAsync(_serviceProvider, token);
-            // Run the task.
-            await task.DeleteUnconfirmedUsersAsync(_serviceProvider, token);
         }
 
         /// <summary>
-        /// Deletes networks from the database.
+        /// Deletes the long-standing networks from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
@@ -94,7 +208,7 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
-        /// Deletes analyses from the database.
+        /// Deletes the long-standing analyses from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>

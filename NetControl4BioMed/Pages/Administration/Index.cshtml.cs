@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
+using Hangfire.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -44,13 +45,13 @@ namespace NetControl4BioMed.Pages.Administration
 
         public class ViewModel
         {
-            public Dictionary<string, int?> ItemCount { get; set; }
+            public Dictionary<string, int?> AllItemCount { get; set; }
 
-            public Dictionary<string, int?> IssueDuplicateCount { get; set; }
+            public Dictionary<string, int?> DuplicateItemCount { get; set; }
 
-            public Dictionary<string, int?> IssueOrphanedCount { get; set; }
+            public Dictionary<string, int?> OrphanedItemCount { get; set; }
 
-            public Dictionary<string, int?> IssueInconsistentCount { get; set; }
+            public Dictionary<string, int?> InconsistentItemCount { get; set; }
 
             public string AnnouncementMessage { get; set; }
         }
@@ -58,26 +59,27 @@ namespace NetControl4BioMed.Pages.Administration
         public IActionResult OnGet()
         {
             // Get the data from configuration.
-            var count = _configuration
+            var allItemCount = _configuration
                 .GetSection("Data")
                 .GetSection("ItemCount")
+                .GetSection("All")
                 .GetChildren()
                 .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
-            var issueDuplicateCount = _configuration
+            var duplicateItemCount = _configuration
                 .GetSection("Data")
-                .GetSection("IssueCount")
+                .GetSection("ItemCount")
                 .GetSection("Duplicate")
                 .GetChildren()
                 .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
-            var issueOrphanedCount = _configuration
+            var orphanedItemCount = _configuration
                 .GetSection("Data")
-                .GetSection("IssueCount")
+                .GetSection("ItemCount")
                 .GetSection("Orphaned")
                 .GetChildren()
                 .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
-            var issueInconsistentCount = _configuration
+            var inconsistentItemCount = _configuration
                 .GetSection("Data")
-                .GetSection("IssueCount")
+                .GetSection("ItemCount")
                 .GetSection("Inconsistent")
                 .GetChildren()
                 .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
@@ -85,189 +87,14 @@ namespace NetControl4BioMed.Pages.Administration
             // Define the view.
             View = new ViewModel
             {
-                ItemCount = count,
-                IssueDuplicateCount = issueDuplicateCount,
-                IssueOrphanedCount = issueOrphanedCount,
-                IssueInconsistentCount = issueInconsistentCount,
+                AllItemCount = allItemCount,
+                DuplicateItemCount = duplicateItemCount,
+                OrphanedItemCount = orphanedItemCount,
+                InconsistentItemCount = inconsistentItemCount,
                 AnnouncementMessage = announcementMessage
             };
             // Return the page.
             return Page();
-        }
-
-        public IActionResult OnPostResetItemCount()
-        {
-            // Update the counts.
-            _configuration["Data:ItemCount:Users"] = _context.Users
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:Roles"] = _context.Roles
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:DatabaseTypes"] = _context.DatabaseTypes
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:Databases"] = _context.Databases
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:DatabaseNodeFields"] = _context.DatabaseNodeFields
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:DatabaseEdgeFields"] = _context.DatabaseEdgeFields
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:Nodes"] = _context.Nodes
-                .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:Edges"] = _context.Edges
-                .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:NodeCollections"] = _context.NodeCollections
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:Networks"] = _context.Networks
-                .Count()
-                .ToString();
-            _configuration["Data:ItemCount:Analyses"] = _context.Analyses
-                .Count()
-                .ToString();
-            // Display a message.
-            TempData["StatusMessage"] = "Success: The item count has been successfully updated.";
-            // Redirect to the page.
-            return RedirectToPage();
-        }
-
-        public IActionResult OnPostResetIssueDuplicateCount()
-        {
-            // Update the duplicate counts.
-            _configuration["Data:IssueCount:Duplicate:DatabaseTypes"] = _context.DatabaseTypes
-                .Where(item => item.Name != "Generic")
-                .GroupBy(item => item.Name)
-                .Where(item => item.Count() > 1)
-                .Select(item => item.Key)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Duplicate:Databases"] = _context.Databases
-                .Where(item => item.DatabaseType.Name != "Generic")
-                .GroupBy(item => item.Name)
-                .Where(item => item.Count() > 1)
-                .Select(item => item.Key)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Duplicate:DatabaseNodeFields"] = _context.DatabaseNodeFields
-                .Where(item => item.Database.DatabaseType.Name != "Generic")
-                .GroupBy(item => item.Name)
-                .Where(item => item.Count() > 1)
-                .Select(item => item.Key)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Duplicate:DatabaseEdgeFields"] = _context.DatabaseEdgeFields
-                .Where(item => item.Database.DatabaseType.Name != "Generic")
-                .GroupBy(item => item.Name)
-                .Where(item => item.Count() > 1)
-                .Select(item => item.Key)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Duplicate:DatabaseNodeFieldNodes"] = _context.DatabaseNodeFieldNodes
-                .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
-                .Where(item => item.DatabaseNodeField.IsSearchable)
-                .GroupBy(item => new { item.DatabaseNodeFieldId, item.Value })
-                .Where(item => item.Count() > 1)
-                .Select(item => item.Key)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Duplicate:DatabaseEdgeFieldEdges"] = _context.DatabaseEdgeFieldEdges
-                .Where(item => item.DatabaseEdgeField.Database.DatabaseType.Name != "Generic")
-                .Where(item => item.DatabaseEdgeField.IsSearchable)
-                .GroupBy(item => new { item.DatabaseEdgeFieldId, item.Value })
-                .Where(item => item.Count() > 1)
-                .Select(item => item.Key)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Duplicate:Nodes"] = _context.Nodes
-                .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                .GroupBy(item => item.Name)
-                .Where(item => item.Count() > 1)
-                .Select(item => item.Key)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Duplicate:Edges"] = _context.Edges
-                .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                .GroupBy(item => item.Name)
-                .Where(item => item.Count() > 1)
-                .Select(item => item.Key)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Duplicate:NodeCollections"] = _context.NodeCollections
-                .GroupBy(item => item.Name)
-                .Where(item => item.Count() > 1)
-                .Select(item => item.Key)
-                .Count()
-                .ToString();
-            // Display a message.
-            TempData["StatusMessage"] = "Success: The duplicate item count has been successfully updated.";
-            // Redirect to the page.
-            return RedirectToPage();
-        }
-
-        public IActionResult OnPostResetIssueOrphanedCount()
-        {
-            // Update the orphaned counts.
-            _configuration["Data:IssueCount:Orphaned:Nodes"] = _context.Nodes
-                .Where(item => !item.DatabaseNodeFieldNodes.Any())
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Orphaned:Edges"] = _context.Edges
-                .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Orphaned:NodeCollections"] = _context.NodeCollections
-                .Where(item => !item.NodeCollectionNodes.Any())
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Orphaned:Networks"] = _context.Networks
-                .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any())
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Orphaned:Analyses"] = _context.Analyses
-                .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any())
-                .Count()
-                .ToString();
-            // Display a message.
-            TempData["StatusMessage"] = "Success: The orphaned item count has been successfully updated.";
-            // Redirect to the page.
-            return RedirectToPage();
-        }
-
-        public IActionResult OnPostResetIssueInconsistentCount()
-        {
-            // Update the inconsistent counts.
-            _configuration["Data:IssueCount:Inconsistent:Nodes"] = _context.Nodes
-                .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Inconsistent:Edges"] = _context.Edges
-                .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Inconsistent:NodeCollections"] = _context.NodeCollections
-                .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Inconsistent:Networks"] = _context.Networks
-                .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                .Count()
-                .ToString();
-            _configuration["Data:IssueCount:Inconsistent:Analyses"] = _context.Analyses
-                .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                .Count()
-                .ToString();
-            // Display a message.
-            TempData["StatusMessage"] = "Success: The inconsistent item count has been successfully updated.";
-            // Redirect to the page.
-            return RedirectToPage();
         }
 
         public IActionResult OnPostHangfire()
@@ -288,95 +115,57 @@ namespace NetControl4BioMed.Pages.Administration
 
         public async Task<IActionResult> OnPostResetHangfireRecurrentJobsAsync()
         {
-            // Define the names of the recurring background tasks.
-            var nameStopAnalyses = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.StopAnalysesAsync)}";
-            var nameAlertUsers = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.AlertUsersAsync)}";
-            var nameDeleteUsers = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteUsersAsync)}";
-            var nameDeleteNetworks = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteNetworksAsync)}";
-            var nameDeleteAnalyses = $"{nameof(IRecurringTaskManager)}.{nameof(IRecurringTaskManager.DeleteAnalysesAsync)}";
-            // Delete the existing corresponding recurring jobs.
-            RecurringJob.RemoveIfExists(nameStopAnalyses);
-            RecurringJob.RemoveIfExists(nameAlertUsers);
-            RecurringJob.RemoveIfExists(nameDeleteUsers);
-            RecurringJob.RemoveIfExists(nameDeleteNetworks);
-            RecurringJob.RemoveIfExists(nameDeleteAnalyses);
-            // Get the existing background tasks.
-            var backgroundTasks = _context.BackgroundTasks
-                .Where(item => item.Name == nameStopAnalyses || item.Name == nameAlertUsers || item.Name == nameDeleteUsers || item.Name == nameDeleteNetworks || item.Name == nameDeleteAnalyses);
-            // Mark the existing background tasks for deletion.
-            _context.BackgroundTasks.RemoveRange(backgroundTasks);
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
-            // Define the new background tasks.
-            var backgroundTaskStopAnalyses = new BackgroundTask
+            // Get the list of names of the recurring tasks.
+            var taskNames = new List<string>
             {
-                DateTimeCreated = DateTime.UtcNow,
-                Name = nameStopAnalyses,
-                IsRecurring = true,
-                Data = JsonSerializer.Serialize(new RecurringTask
-                {
-                    Scheme = HttpContext.Request.Scheme,
-                    HostValue = HttpContext.Request.Host.Value
-                })
+                nameof(IRecurringTaskManager.CountAllItemsAsync),
+                nameof(IRecurringTaskManager.CountDuplicateItemsAsync),
+                nameof(IRecurringTaskManager.CountOrphanedItemsAsync),
+                nameof(IRecurringTaskManager.CountInconsistentItemsAsync),
+                nameof(IRecurringTaskManager.StopAnalysesAsync),
+                nameof(IRecurringTaskManager.AlertUsersAsync),
+                nameof(IRecurringTaskManager.DeleteUnconfirmedUsersAsync),
+                nameof(IRecurringTaskManager.DeleteGuestUsersAsync),
+                nameof(IRecurringTaskManager.DeleteNetworksAsync),
+                nameof(IRecurringTaskManager.DeleteAnalysesAsync)
             };
-            var backgroundTaskAlertUsers = new BackgroundTask
+            // Define a new recurring job manager.
+            var recurringJobManager = new RecurringJobManager();
+            // Go over each task name.
+            foreach (var taskName in taskNames)
             {
-                DateTimeCreated = DateTime.UtcNow,
-                Name = nameAlertUsers,
-                IsRecurring = true,
-                Data = JsonSerializer.Serialize(new RecurringTask
+                // Get the corresponding background tasks name.
+                var backgroundTaskName = $"{nameof(IRecurringTaskManager)}.{taskName}";
+                // Get the existing background tasks.
+                var backgroundTasks = _context.BackgroundTasks
+                    .Where(item => item.Name == backgroundTaskName);
+                // Mark the existing background tasks for deletion.
+                _context.BackgroundTasks.RemoveRange(backgroundTasks);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Delete the existing corresponding recurring job.
+                recurringJobManager.RemoveIfExists(backgroundTaskName);
+                // Define the new background task.
+                var backgroundTask = new BackgroundTask
                 {
-                    Scheme = HttpContext.Request.Scheme,
-                    HostValue = HttpContext.Request.Host.Value
-                })
-            };
-            var backgroundTaskDeleteUsers = new BackgroundTask
-            {
-                DateTimeCreated = DateTime.UtcNow,
-                Name = nameDeleteUsers,
-                IsRecurring = true,
-                Data = JsonSerializer.Serialize(new RecurringTask
-                {
-                    Scheme = HttpContext.Request.Scheme,
-                    HostValue = HttpContext.Request.Host.Value
-                })
-            };
-            var backgroundTaskDeleteNetworks = new BackgroundTask
-            {
-                DateTimeCreated = DateTime.UtcNow,
-                Name = nameDeleteNetworks,
-                IsRecurring = true,
-                Data = JsonSerializer.Serialize(new RecurringTask
-                {
-                    Scheme = HttpContext.Request.Scheme,
-                    HostValue = HttpContext.Request.Host.Value
-                })
-            };
-            var backgroundTaskDeleteAnalyses = new BackgroundTask
-            {
-                DateTimeCreated = DateTime.UtcNow,
-                Name = nameDeleteAnalyses,
-                IsRecurring = true,
-                Data = JsonSerializer.Serialize(new RecurringTask
-                {
-                    Scheme = HttpContext.Request.Scheme,
-                    HostValue = HttpContext.Request.Host.Value
-                })
-            };
-            // Mark the background tasks for addition.
-            _context.BackgroundTasks.Add(backgroundTaskStopAnalyses);
-            _context.BackgroundTasks.Add(backgroundTaskAlertUsers);
-            _context.BackgroundTasks.Add(backgroundTaskDeleteUsers);
-            _context.BackgroundTasks.Add(backgroundTaskDeleteNetworks);
-            _context.BackgroundTasks.Add(backgroundTaskDeleteAnalyses);
-            // Save the changes to the database.
-            await _context.SaveChangesAsync();
-            // Create the new Hangfire daily recurring jobs.
-            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameStopAnalyses, item => item.StopAnalysesAsync(backgroundTaskStopAnalyses.Id, CancellationToken.None), Cron.Daily());
-            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameAlertUsers, item => item.AlertUsersAsync(backgroundTaskAlertUsers.Id, CancellationToken.None), Cron.Daily());
-            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteUsers, item => item.DeleteUsersAsync(backgroundTaskDeleteUsers.Id, CancellationToken.None), Cron.Daily());
-            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteNetworks, item => item.DeleteNetworksAsync(backgroundTaskDeleteNetworks.Id, CancellationToken.None), Cron.Daily());
-            RecurringJob.AddOrUpdate<IRecurringTaskManager>(nameDeleteAnalyses, item => item.DeleteAnalysesAsync(backgroundTaskDeleteAnalyses.Id, CancellationToken.None), Cron.Daily());
+                    DateTimeCreated = DateTime.UtcNow,
+                    Name = backgroundTaskName,
+                    IsRecurring = true,
+                    Data = JsonSerializer.Serialize(new RecurringTask
+                    {
+                        Scheme = HttpContext.Request.Scheme,
+                        HostValue = HttpContext.Request.Host.Value
+                    })
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(backgroundTask);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Define the new recurring job.
+                var job = new Job(typeof(IRecurringTaskManager), typeof(IRecurringTaskManager).GetMethod(taskName), new object[] { backgroundTask.Id, CancellationToken.None });
+                // Create the new Hangfire recurring job.
+                recurringJobManager.AddOrUpdate(backgroundTaskName, job, Cron.Daily());
+            }
             // Display a message.
             TempData["StatusMessage"] = "Success: The database recurring jobs have been successfully reset. You can view more details on the Hangfire dashboard.";
             // Redirect to the page.
