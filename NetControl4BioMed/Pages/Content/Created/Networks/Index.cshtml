@@ -15,7 +15,7 @@
                 <select name="databaseTypeId" class="custom-select">
                     @foreach (var item in Model.View.DatabaseTypes)
                     {
-                        <option value="@item.Id" title="@item.Description">@item.Name</option>
+                        <option selected="@(item.Name == "PPI" ? "selected" : null)" value="@item.Id" title="@item.Description">@item.Name</option>
                     }
                 </select>
                 <div class="input-group-append">

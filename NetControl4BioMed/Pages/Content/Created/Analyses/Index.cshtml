@@ -15,11 +15,11 @@
                 <select name="databaseTypeId" class="custom-select">
                     @foreach (var item in Model.View.DatabaseTypes)
                     {
-                        <option value="@item.Id" title="@item.Description">@item.Name</option>
+                        <option selected="@(item.Name == "PPI" ? "selected" : null)" value="@item.Id" title="@item.Description">@item.Name</option>
                     }
                 </select>
                 <select name="algorithm" class="custom-select">
-                    @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
+                    @foreach (var item in Enum.GetValues(typeof(AnalysisAlgorithm)).Cast<AnalysisAlgorithm>())
                     {
                         <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
                     }

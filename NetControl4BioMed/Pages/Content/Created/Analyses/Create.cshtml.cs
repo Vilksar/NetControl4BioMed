@@ -172,6 +172,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             {
                 Algorithm = algorithm,
                 Networks = _context.Networks
+                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                     .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
                 SourceNodeCollections = _context.NodeCollections
@@ -309,7 +310,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 Algorithm = Input.Algorithm,
                 Networks = _context.Networks
                     .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
+                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user)),
                 SourceNodeCollections = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
