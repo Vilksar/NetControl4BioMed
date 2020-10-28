@@ -24,6 +24,7 @@ using Algorithms = NetControl4BioMed.Helpers.Algorithms;
 namespace NetControl4BioMed.Pages.Content.Created.Analyses
 {
     [Authorize]
+    [RequestFormLimits(ValueLengthLimit = 16 * 1024 * 1024)]
     public class CreateModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
