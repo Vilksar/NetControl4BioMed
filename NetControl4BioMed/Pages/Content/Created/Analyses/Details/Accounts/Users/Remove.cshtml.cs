@@ -99,12 +99,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             };
             // Get all of the network users and network user invitations.
             var analysisUsers = _context.AnalysisUsers
+                .Include(item => item.User)
                 .Where(item => item.Analysis == View.Analysis)
-                .Where(item => Input.Emails.Contains(item.User.Email))
+                .Where(item => emails.Contains(item.User.Email))
                 .AsEnumerable();
             var analysisUserInvitations = _context.AnalysisUserInvitations
                 .Where(item => item.Analysis == View.Analysis)
-                .Where(item => Input.Emails.Contains(item.Email))
+                .Where(item => emails.Contains(item.Email))
                 .AsEnumerable();
             // Define the view items.
             View.Items = analysisUsers
@@ -193,6 +194,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             };
             // Get all of the network users and network user invitations.
             var analysisUsers = _context.AnalysisUsers
+                .Include(item => item.User)
                 .Where(item => item.Analysis == View.Analysis)
                 .Where(item => Input.Emails.Contains(item.User.Email))
                 .AsEnumerable();

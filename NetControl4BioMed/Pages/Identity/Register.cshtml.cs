@@ -128,7 +128,7 @@ namespace NetControl4BioMed.Pages.Identity
                 return Page();
             }
             // Get the new user.
-            var user = await _userManager.FindByNameAsync(Input.Email);
+            var user = await _userManager.FindByEmailAsync(Input.Email);
             // Check if there wasn't any user found.
             if (user == null)
             {

@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -1002,6 +1003,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 using var scope = serviceProvider.CreateScope();
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Use a new user manager instance.
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 // Use a new e-mail sender instance.
                 var emailSender = scope.ServiceProvider.GetRequiredService<ISendGridEmailSender>();
                 // Use a new link generator instance.
@@ -1032,7 +1035,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the HTTP context host.
                     var host = new HostString(HostValue);
                     // Go over each registered user in the analysis.
-                    foreach (var user in analysis.AnalysisUsers.Select(item => item.User))
+                    foreach (var user in analysis.AnalysisUsers.Select(item => item.User).Except(await userManager.GetUsersInRoleAsync("Guest")))
                     {
                         // Send an analysis ending e-mail.
                         await emailSender.SendAnalysisEndedEmailAsync(new EmailAnalysisEndedViewModel
