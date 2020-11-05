@@ -178,21 +178,6 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
-        /// Deletes the long-standing guest users from the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        public async Task DeleteGuestUsersAsync(string id, CancellationToken token)
-        {
-            // Get the background task with the provided ID.
-            var backgroundTask = GetBackgroundTask(id);
-            // Get the task corresponding to the background task.
-            var task = GetTask<RecurringTask>(backgroundTask);
-            // Run the task.
-            await task.DeleteGuestUsersAsync(_serviceProvider, token);
-        }
-
-        /// <summary>
         /// Deletes the long-standing networks from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>

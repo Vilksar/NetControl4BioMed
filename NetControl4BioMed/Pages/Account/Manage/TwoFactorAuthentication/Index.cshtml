@@ -98,34 +98,24 @@
         </div>
     </div>
     <div class="card-body">
-        @if (Model.View.IsGuest)
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>Click one of the buttons below to manage your two-factor authenticator app.</span>
+        </div>
+        @if (!Model.View.HasAuthenticator)
         {
-            <div class="alert alert-danger text-justify text-wrap mb-0">
-                <span><i class="fas fa-exclamation-circle"></i></span>
-                <span>The two-factor authentication settings can't be changed for a guest account.</span>
-            </div>
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-success">
+                <span>Add authenticator app</span>
+            </a>
         }
         else
         {
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>Click one of the buttons below to manage your two-factor authenticator app.</span>
-            </div>
-            @if (!Model.View.HasAuthenticator)
-            {
-                <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-success">
-                    <span>Add authenticator app</span>
-                </a>
-            }
-            else
-            {
-                <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-success">
-                    <span>Setup authenticator app</span>
-                </a>
-                <a asp-page="/Account/Manage/TwoFactorAuthentication/ResetAuthenticator" class="btn btn-block btn-danger">
-                    <span>Reset authenticator app</span>
-                </a>
-            }
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-success">
+                <span>Setup authenticator app</span>
+            </a>
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/ResetAuthenticator" class="btn btn-block btn-danger">
+                <span>Reset authenticator app</span>
+            </a>
         }
     </div>
 </div>

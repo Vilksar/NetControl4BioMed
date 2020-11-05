@@ -79,14 +79,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Roles/Index");
             }
-            // Check if the guest role is among the items to be deleted.
-            if (View.Items.Any(item => item.Name == "Guest"))
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: The \"Guest\" role can't be deleted.";
-                // Redirect to the index page.
-                return RedirectToPage("/Administration/Accounts/Roles/Index");
-            }
             // Return the page.
             return Page();
         }
@@ -120,14 +112,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: The \"Administrator\" role can't be deleted.";
-                // Redirect to the index page.
-                return RedirectToPage("/Administration/Accounts/Roles/Index");
-            }
-            // Check if the guest role is among the items to be deleted.
-            if (View.Items.Any(item => item.Name == "Guest"))
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: The \"Guest\" role can't be deleted.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Roles/Index");
             }

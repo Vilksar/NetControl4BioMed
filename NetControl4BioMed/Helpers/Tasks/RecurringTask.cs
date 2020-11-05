@@ -445,36 +445,6 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
-        /// Deletes the long-standing guest users from the database.
-        /// </summary>
-        /// <param name="serviceProvider">The application service provider.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        public async Task DeleteGuestUsersAsync(IServiceProvider serviceProvider, CancellationToken token)
-        {
-            // Create a new scope.
-            using var scope = serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            // Define the limit date.
-            var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeGuestDelete);
-            // Get the items to stop.
-            var items = context.Users
-                .Where(item => item.UserRoles.Any(item1 => item1.Role.Name == "Guest"))
-                .Where(item => item.DateTimeCreated < limitDate);
-            // Define a new task.
-            var task = new UsersTask
-            {
-                Items = items
-                    .Select(item => new UserInputModel
-                    {
-                        Id = item.Id
-                    })
-            };
-            // Run the task.
-            await task.DeleteAsync(serviceProvider, token);
-        }
-
-        /// <summary>
         /// Deletes the long-standing networks from the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>

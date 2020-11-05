@@ -1035,7 +1035,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Define the HTTP context host.
                     var host = new HostString(HostValue);
                     // Go over each registered user in the analysis.
-                    foreach (var user in analysis.AnalysisUsers.Select(item => item.User).Except(await userManager.GetUsersInRoleAsync("Guest")))
+                    foreach (var user in analysis.AnalysisUsers.Select(item => item.User))
                     {
                         // Send an analysis ending e-mail.
                         await emailSender.SendAnalysisEndedEmailAsync(new EmailAnalysisEndedViewModel

@@ -243,36 +243,28 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                     return Page();
                 }
             }
-            // Check if the user that added was not a guest user.
-            if (!await _userManager.IsInRoleAsync(user, "Guest"))
+            // Define the view model for the e-mail.
+            var emailAddedToAnalysisViewModel = new EmailAddedToAnalysisViewModel
             {
-                // Define the view model for the e-mails.
-                var emailAddedToAnalysisViewModel = new EmailAddedToAnalysisViewModel
-                {
-                    Email = user.Email,
-                    Name = View.Analysis.Name,
-                    Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = View.Analysis.Id }),
-                    AddedEmail = Input.Email,
-                    ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
-                };
-                // Send the defined e-mails.
-                await _emailSender.SendAddedToAnalysisEmailAsync(emailAddedToAnalysisViewModel);
-            }
-            // Check if the user to add is a guest user.
-            if (userToAdd != null && !await _userManager.IsInRoleAsync(userToAdd, "Guest"))
+                Email = user.Email,
+                Name = View.Analysis.Name,
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = View.Analysis.Id }),
+                AddedEmail = Input.Email,
+                ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
+            };
+            // Send the defined e-mails.
+            await _emailSender.SendAddedToAnalysisEmailAsync(emailAddedToAnalysisViewModel);
+            // Define the view model for the e-mail.
+            var emailWasAddedToAnalysisViewModel = new EmailWasAddedToAnalysisViewModel
             {
-                // Define the view model for the e-mails.
-                var emailWasAddedToAnalysisViewModel = new EmailWasAddedToAnalysisViewModel
-                {
-                    Email = Input.Email,
-                    Name = View.Analysis.Name,
-                    Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = View.Analysis.Id }),
-                    AddedByEmail = user.Email,
-                    ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
-                };
-                // Send the defined e-mails.
-                await _emailSender.SendWasAddedToAnalysisEmailAsync(emailWasAddedToAnalysisViewModel);
-            }
+                Email = Input.Email,
+                Name = View.Analysis.Name,
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = View.Analysis.Id }),
+                AddedByEmail = user.Email,
+                ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
+            };
+            // Send the defined e-mails.
+            await _emailSender.SendWasAddedToAnalysisEmailAsync(emailWasAddedToAnalysisViewModel);
             // Display a message to the user.
             TempData["StatusMessage"] = "Success: 1 user added successfully to the analysis.";
             // Redirect to the users page.

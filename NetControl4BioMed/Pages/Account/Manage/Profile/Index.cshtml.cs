@@ -54,8 +54,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
 
         public class ViewModel
         {
-            public bool IsGuest { get; set; }
-
             public bool IsEmailConfirmed { get; set; }
         }
 
@@ -74,7 +72,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
             // Define the variables for the view.
             View = new ViewModel
             {
-                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 IsEmailConfirmed = user.EmailConfirmed
             };
             // Define the input.
@@ -101,7 +98,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
             // Define the variables to return to the view.
             View = new ViewModel
             {
-                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 IsEmailConfirmed = user.EmailConfirmed
             };
             // Check if the reCaptcha is valid.
@@ -135,12 +131,10 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
                 var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.Email);
                 // Create the callback URL to be encoded in the change email.
                 var callbackUrl = _linkGenerator.GetUriByPage(HttpContext, "/Identity/ChangeEmail", handler: null, values: new { userId = user.Id, email = Input.Email, code = code });
-                // Check if the user has a guest account.
-                var isGuest = await _userManager.IsInRoleAsync(user, "Guest");
                 // Define a new view model for the e-mail.
                 var emailChangeEmailViewModel = new EmailEmailChangeViewModel
                 {
-                    OldEmail = isGuest? Input.Email : user.Email,
+                    OldEmail = user.Email,
                     NewEmail = Input.Email,
                     Url = callbackUrl,
                     ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
@@ -148,7 +142,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
                 // Send the e-mail change e-mail to the user.
                 await _emailSender.SendEmailChangeEmailAsync(emailChangeEmailViewModel);
                 // Display a message.
-                TempData["StatusMessage"] = $"Success: An e-mail has been sent to {(isGuest ? "the specified" : "your current")} e-mail address. Please follow the instructions there in order to change the e-mail address associated with the account.";
+                TempData["StatusMessage"] = $"Success: An e-mail has been sent to your current e-mail address. Please follow the instructions there in order to change the e-mail address associated with the account.";
                 // Redirect to page.
                 return RedirectToPage();
             }
@@ -173,7 +167,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
             // Define the variables to return to the view.
             View = new ViewModel
             {
-                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 IsEmailConfirmed = user.EmailConfirmed
             };
             // Check if the reCaptcha is valid.

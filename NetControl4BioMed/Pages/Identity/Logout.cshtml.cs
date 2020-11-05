@@ -35,36 +35,6 @@ namespace NetControl4BioMed.Pages.Identity
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user has a guest account.
-            if (user != null && await _userManager.IsInRoleAsync(user, "Guest"))
-            {
-                // Define a new task.
-                var task = new UsersTask
-                {
-                    Items = new List<UserInputModel>
-                {
-                    new UserInputModel
-                    {
-                        Id = user.Id
-                    }
-                }
-                };
-                // Try to run the task.
-                try
-                {
-                    // Run the task.
-                    await task.DeleteAsync(_serviceProvider, CancellationToken.None);
-                }
-                catch (Exception)
-                {
-                    // Log out the user.
-                    await _signInManager.SignOutAsync();
-                    // Display a message to the user.
-                    TempData["StatusMessage"] = $"Error: There was an error removing some of the data associated with your guest account.";
-                    // Redirect to the home page.
-                    return RedirectToPage("/Index");
-                }
-            }
             // Log out the user.
             await _signInManager.SignOutAsync();
             // Display a message to the user.

@@ -243,35 +243,28 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts.User
                     return Page();
                 }
             }
-            // Check if the user that added was not a guest user.
-            if (!await _userManager.IsInRoleAsync(user, "Guest"))
+            // Define the view model for the e-mail.
+            var emailAddedToNetworkViewModel = new EmailAddedToNetworkViewModel
             {
-                // Define the view model for the e-mails.
-                var emailAddedToNetworkViewModel = new EmailAddedToNetworkViewModel
-                {
-                    Email = user.Email,
-                    Name = View.Network.Name,
-                    Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Networks/Details/Index", handler: null, values: new { id = View.Network.Id }),
-                    AddedEmail = Input.Email,
-                    ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
-                };
-                // Send the defined e-mails.
-                await _emailSender.SendAddedToNetworkEmailAsync(emailAddedToNetworkViewModel);
-            }
-            // Check if the user to add is a guest user.
-            if (userToAdd != null && !await _userManager.IsInRoleAsync(userToAdd, "Guest"))
+                Email = user.Email,
+                Name = View.Network.Name,
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Networks/Details/Index", handler: null, values: new { id = View.Network.Id }),
+                AddedEmail = Input.Email,
+                ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
+            };
+            // Send the defined e-mails.
+            await _emailSender.SendAddedToNetworkEmailAsync(emailAddedToNetworkViewModel);
+            // Define the view model for the e-mail.
+            var emailWasAddedToNetworkViewModel = new EmailWasAddedToNetworkViewModel
             {
-                var emailWasAddedToNetworkViewModel = new EmailWasAddedToNetworkViewModel
-                {
-                    Email = Input.Email,
-                    Name = View.Network.Name,
-                    Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Networks/Details/Index", handler: null, values: new { id = View.Network.Id }),
-                    AddedByEmail = user.Email,
-                    ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
-                };
-                // Send the defined e-mails.
-                await _emailSender.SendWasAddedToNetworkEmailAsync(emailWasAddedToNetworkViewModel);
-            }
+                Email = Input.Email,
+                Name = View.Network.Name,
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Networks/Details/Index", handler: null, values: new { id = View.Network.Id }),
+                AddedByEmail = user.Email,
+                ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
+            };
+            // Send the defined e-mails.
+            await _emailSender.SendWasAddedToNetworkEmailAsync(emailWasAddedToNetworkViewModel);
             // Display a message to the user.
             TempData["StatusMessage"] = "Success: 1 user added successfully to the network.";
             // Redirect to the users page.

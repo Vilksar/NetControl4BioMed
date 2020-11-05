@@ -79,15 +79,6 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task DeleteUnconfirmedUsersAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Deletes the long-standing guest users from the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        [AutomaticRetry(Attempts = 0)]
-        [DisableConcurrentExecution(86400)]
-        Task DeleteGuestUsersAsync(string id, CancellationToken token);
-
-        /// <summary>
         /// Deletes the long-standing networks from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>

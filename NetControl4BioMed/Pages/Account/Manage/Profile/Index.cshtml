@@ -16,14 +16,6 @@
         </div>
     </div>
     <div class="card-body">
-        @if (Model.View.IsGuest)
-        {
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span class="font-weight-bold">You are logged in with a guest account.</span>
-                <span>You can change the current guest account to a regular account by filling in your e-mail address and pressing the button below. You will receive an e-mail with a confirmation link. Upon the confirmation of the e-mail address, the guest account will automatically change to a regular account, and you will be able to reset the password and log in using your e-mail address. All of the data currently available on the guest account will also be available after the change.</span>
-            </div>
-        }
         <form method="post" class="text-justify">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
             <div class="form-group">
