@@ -208,26 +208,22 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                             var matchingEdges = GetMaximumMatching(leftNodes, rightNodes, currentEdges, random);
                             // Add the matched edges to the list.
                             matchedEdges.AddRange(matchingEdges);
+                            // Update the remaining nodes after the matching.
                             availableNodes.RemoveAll(item => matchingEdges.Any(item1 => item1.Item1 == item));
                             unmatchedNodes.RemoveAll(item => matchingEdges.Any(item1 => item1.Item2 == item));
                         }
                         // Update the current targets to the current matched edge source nodes, and the control path.
-                        currentTargets = matchedEdges.Select(item => item.Item1).Distinct().ToList();
-                        // Create a temporary dictionary to store, for each target, the corresponding current target.
-                        var currentTargetDictionary = controlPath.ToDictionary(item => item.Key, item => item.Value.Last());
-                        // Go over all of the matched edges.
-                        foreach (var edge in matchedEdges)
+                        currentTargets = matchedEdges.Select(item => item.Item1).ToList();
+                        // Get the dictionary which stores, for each target, the corresponding new matched target to add to the path.
+                        var currentTargetDictionary = controlPath
+                            .Where(item => item.Value.Count() == currentPathLength + 1)
+                            .ToDictionary(item => item.Key, item => matchedEdges.Where(item1 => item1.Item2 == item.Value.Last()).Select(item1 => item1.Item1).FirstOrDefault())
+                            .Where(item => item.Value != null);
+                        // Go over all entries in dictionary.
+                        foreach (var entry in currentTargetDictionary)
                         {
-                            // Get the keys of all paths to update, as the ones starting with the target node of the edge.
-                            var keys = currentTargetDictionary
-                                .Where(item => item.Value == edge.Item2)
-                                .Select(item => item.Key);
-                            // Go over all of the keys.
-                            foreach (var key in keys)
-                            {
-                                // Add the source node of the edge to the corresponding path.
-                                controlPath[key].Add(edge.Item1);
-                            }
+                            // Update the control path with the first node of the corresponding matched edge.
+                            controlPath[entry.Key].Add(entry.Value);
                         }
                         // Update the current path length.
                         currentPathLength++;
