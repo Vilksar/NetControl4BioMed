@@ -103,11 +103,11 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="alert alert-primary text-justify text-wrap">
+            <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
                 <span>As the network corresponding to the analysis is relatively small, you can click the button below to visualize it in browser.</span>
             </div>
-            <a asp-page="/Content/Created/Analyses/Details/Visualize" asp-route-id="@Model.View.Analysis.Id" class="btn btn-primary btn-block">
+            <a asp-page="/Content/Created/Analyses/Details/Visualize" asp-route-id="@Model.View.Analysis.Id" class="btn btn-info btn-block">
                 <span>Visualize</span>
             </a>
         </div>
@@ -125,7 +125,7 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="alert alert-primary text-justify text-wrap">
+        <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
             <span>The status and the current progress of the analysis are displayed below.</span>
         </div>
@@ -169,7 +169,7 @@
             <div class="col-lg-6 order-1 order-lg-2">
                 <input asp-for="View.Analysis.MaximumIterations" class="form-control" disabled />
             </div>
-            <div class="col-lg-6 order-1 order-lg-3 mb-3">
+            <div class="col-lg-6 order-1 order-lg-3">
                 <span asp-description-for="View.Analysis.MaximumIterations" class="text-muted small">The maximum number of iterations for which the analysis to run.</span>
                 <span asp-validation-for="View.Analysis.MaximumIterations" class="text-danger small"></span>
             </div>
@@ -179,7 +179,7 @@
             <div class="col-lg-6 order-2 order-lg-2">
                 <input asp-for="View.Analysis.MaximumIterationsWithoutImprovement" class="form-control" disabled />
             </div>
-            <div class="col-lg-6 order-2 order-lg-3 mb-3">
+            <div class="col-lg-6 order-2 order-lg-3">
                 <span asp-description-for="View.Analysis.MaximumIterationsWithoutImprovement" class="text-muted small">The maximum number of iterations without improvement in the size of the best solution for which the analysis to run.</span>
                 <span asp-validation-for="View.Analysis.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
             </div>
@@ -198,20 +198,26 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="alert alert-primary text-justify text-wrap">
+        <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
             <span>The parameters used by the algorithm corresponding to the analysis are displayed below.</span>
         </div>
-        <div class="form-group">
-            <label asp-for="View.Analysis.Algorithm" class="font-weight-bold">Algorithm</label>
-            <select asp-for="View.Analysis.Algorithm" class="custom-select" title="@Model.View.Analysis.Algorithm.GetDisplayDescription()" disabled>
-                @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
-                {
-                    <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
-                }
-            </select>
-            <span asp-description-for="View.Analysis.Algorithm" class="text-muted small">The algorithm used by the analysis.</span>
-            <span asp-validation-for="View.Analysis.Algorithm" class="text-danger small"></span>
+        <div class="row">
+            <div class="col-lg-12 order-3 order-lg-1 align-self-center">
+                <label asp-for="View.Analysis.Algorithm" class="font-weight-bold">Algorithm</label>
+            </div>
+            <div class="col-lg-12 order-3 order-lg-2">
+                <select asp-for="View.Analysis.Algorithm" class="custom-select" title="@Model.View.Analysis.Algorithm.GetDisplayDescription()" disabled>
+                    @foreach (var item in Enum.GetValues(typeof(AnalysisAlgorithm)).Cast<AnalysisAlgorithm>())
+                    {
+                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                    }
+                </select>
+            </div>
+            <div class="col-lg-12 order-4 order-lg-3 mb-3">
+                <span asp-description-for="View.Analysis.Algorithm" class="text-muted small">The algorithm used by the analysis.</span>
+                <span asp-validation-for="View.Analysis.Algorithm" class="text-danger small"></span>
+            </div>
         </div>
         @if (Model.View.GreedyAlgorithmParameters != null)
         {
@@ -292,7 +298,7 @@
                     <div class="col-lg-12 order-3 order-lg-2">
                         <select id="heuristics-group-current" class="custom-select heuristics-group-current" size="10" title="Heuristics" disabled></select>
                     </div>
-                    <div class="col-lg-12 order-4 order-lg-3 mb-3">
+                    <div class="col-lg-12 order-4 order-lg-3">
                         <span description-for="heuristics-group-current" class="text-muted small">The search heuristics for the algorithm.</span>
                         <span validation-for="heuristics-group-current" class="text-danger small"></span>
                     </div>
@@ -389,7 +395,7 @@
                         }
                     </select>
                 </div>
-                <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                <div class="col-lg-6 order-1 order-lg-3">
                     <span asp-description-for="View.GeneticAlgorithmParameters.CrossoverType" class="text-muted small">The crossover algorithm to be used.</span>
                     <span asp-validation-for="View.GeneticAlgorithmParameters.CrossoverType" class="text-danger small"></span>
                 </div>
@@ -404,11 +410,46 @@
                         }
                     </select>
                 </div>
-                <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                <div class="col-lg-6 order-2 order-lg-3">
                     <span asp-description-for="View.GeneticAlgorithmParameters.MutationType" class="text-muted small">The mutation algorithm to be used.</span>
                     <span asp-validation-for="View.GeneticAlgorithmParameters.MutationType" class="text-danger small"></span>
                 </div>
             </div>
+        }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-list"></i></span>
+            </div>
+            <div>
+                <span>Log</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The log messages of the analysis are displayed below.</span>
+        </div>
+        @if (Model.View.Analysis.Log.TryDeserializeJsonObject<IEnumerable<NetControl4BioMed.Helpers.ViewModels.LogEntryViewModel>>(out var logEntries))
+        {
+            <ul class="mb-0">
+                @foreach (var logEntry in logEntries)
+                {
+                    <li class="utc-date" data-date="@logEntry.DateTime.ToString("u")">
+                        <div>
+                            <span class="utc-date-date" title="@logEntry.DateTime.ToShortDateString()">@logEntry.DateTime.ToShortDateString()</span>
+                            <span class="utc-date-time" title="@logEntry.DateTime.ToShortTimeString()">@logEntry.DateTime.ToShortTimeString()</span>
+                        </div>
+                        <div>
+                            <span>@logEntry.Message</span>
+                        </div>
+                    </li>
+                }
+            </ul>
         }
     </div>
 </div>
@@ -431,7 +472,6 @@
                 <span>The analysis will be stopped automatically on @((Model.View.Analysis.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeStop)).ToLongDateString()), if it will not have ended by then. Alternatively, you can press the button below to stop it now.</span>
             </div>
             <a asp-page="/Content/Created/Analyses/Stop" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Stop">
-                <span><i class="fas fa-stop"></i></span>
                 <span>Stop</span>
             </a>
         </div>
@@ -454,39 +494,7 @@
             <span>The analysis will be deleted automatically on @((Model.View.Analysis.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()). Alternatively, you can press the button below to delete it now.</span>
         </div>
         <a asp-page="/Content/Created/Analyses/Delete" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Delete">
-            <span><i class="fas fa-trash"></i></span>
             <span>Delete</span>
         </a>
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-list"></i></span>
-            </div>
-            <div>
-                <span>Log</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        @if (Model.View.Analysis.Log.TryDeserializeJsonObject<IEnumerable<NetControl4BioMed.Helpers.ViewModels.LogEntryViewModel>>(out var logEntries))
-        {
-            <ul class="mb-0">
-                @foreach (var logEntry in logEntries)
-                {
-                    <li class="utc-date" data-date="@logEntry.DateTime.ToString("u")">
-                        <div>
-                            <span class="utc-date-date" title="@logEntry.DateTime.ToShortDateString()">@logEntry.DateTime.ToShortDateString()</span>
-                            <span class="utc-date-time" title="@logEntry.DateTime.ToShortTimeString()">@logEntry.DateTime.ToShortTimeString()</span>
-                        </div>
-                        <div>
-                            <span>@logEntry.Message</span>
-                        </div>
-                    </li>
-                }
-            </ul>
-        }
     </div>
 </div>

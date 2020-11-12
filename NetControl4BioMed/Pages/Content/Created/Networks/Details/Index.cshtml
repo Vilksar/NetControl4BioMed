@@ -69,11 +69,11 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="alert alert-primary text-justify text-wrap">
+            <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
                 <span>As the network is relatively small, you can click the button below to visualize it in browser.</span>
             </div>
-            <a asp-page="/Content/Created/Networks/Details/Visualize" asp-route-id="@Model.View.Network.Id" class="btn btn-primary btn-block">
+            <a asp-page="/Content/Created/Networks/Details/Visualize" asp-route-id="@Model.View.Network.Id" class="btn btn-info btn-block">
                 <span>Visualize</span>
             </a>
         </div>
@@ -91,17 +91,62 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="form-group">
-            <label asp-for="View.Network.Algorithm" class="font-weight-bold">Algorithm</label>
-            <select asp-for="View.Network.Algorithm" class="custom-select" title="@Model.View.Network.Algorithm.GetDisplayDescription()" disabled>
-                @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.NetworkAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.NetworkAlgorithm>())
-                {
-                    <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
-                }
-            </select>
-            <span asp-description-for="View.Network.Algorithm" class="text-muted small">The algorithm used in generating the network.</span>
-            <span asp-validation-for="View.Network.Algorithm" class="text-danger small"></span>
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The parameters used by the algorithm corresponding to the network are displayed below.</span>
         </div>
+        <div class="row">
+            <div class="col-lg-12 order-3 order-lg-1 align-self-center">
+                <label asp-for="View.Network.Algorithm" class="font-weight-bold">Algorithm</label>
+            </div>
+            <div class="col-lg-12 order-3 order-lg-2">
+                <select asp-for="View.Network.Algorithm" class="custom-select" title="@Model.View.Network.Algorithm.GetDisplayDescription()" disabled>
+                    @foreach (var item in Enum.GetValues(typeof(NetworkAlgorithm)).Cast<NetworkAlgorithm>())
+                    {
+                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                    }
+                </select>
+            </div>
+            <div class="col-lg-12 order-4 order-lg-3">
+                <span asp-description-for="View.Network.Algorithm" class="text-muted small">The algorithm used in generating the network.</span>
+                <span asp-validation-for="View.Network.Algorithm" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-list"></i></span>
+            </div>
+            <div>
+                <span>Log</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The log messages of the network are displayed below.</span>
+        </div>
+        @if (Model.View.Network.Log.TryDeserializeJsonObject<IEnumerable<NetControl4BioMed.Helpers.ViewModels.LogEntryViewModel>>(out var logEntries))
+        {
+            <ul class="mb-0">
+                @foreach (var logEntry in logEntries)
+                {
+                    <li class="utc-date" data-date="@logEntry.DateTime.ToString("u")">
+                        <div>
+                            <span class="utc-date-date" title="@logEntry.DateTime.ToShortDateString()">@logEntry.DateTime.ToShortDateString()</span>
+                            <span class="utc-date-time" title="@logEntry.DateTime.ToShortTimeString()">@logEntry.DateTime.ToShortTimeString()</span>
+                        </div>
+                        <div>
+                            <span>@logEntry.Message</span>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
     </div>
 </div>
 <div class="card mb-3">
@@ -121,39 +166,7 @@
             <span>The network will be deleted automatically on @((Model.View.Network.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()). Alternatively, you can press the button below to delete it.</span>
         </div>
         <a asp-page="/Content/Created/Networks/Delete" asp-route-ids="@Model.View.Network.Id" class="btn btn-danger btn-block" title="Delete">
-            <span><i class="fas fa-trash"></i></span>
             <span>Delete</span>
         </a>
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-list"></i></span>
-            </div>
-            <div>
-                <span>Log</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        @if (Model.View.Network.Log.TryDeserializeJsonObject<IEnumerable<NetControl4BioMed.Helpers.ViewModels.LogEntryViewModel>>(out var logEntries))
-        {
-            <ul class="mb-0">
-                @foreach (var logEntry in logEntries)
-                {
-                    <li class="utc-date" data-date="@logEntry.DateTime.ToString("u")">
-                        <div>
-                            <span class="utc-date-date" title="@logEntry.DateTime.ToShortDateString()">@logEntry.DateTime.ToShortDateString()</span>
-                            <span class="utc-date-time" title="@logEntry.DateTime.ToShortTimeString()">@logEntry.DateTime.ToShortTimeString()</span>
-                        </div>
-                        <div>
-                            <span>@logEntry.Message</span>
-                        </div>
-                    </li>
-                }
-            </ul>
-        }
     </div>
 </div>

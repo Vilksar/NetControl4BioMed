@@ -392,34 +392,34 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 networkId = string.Empty;
             }
             // Get the corresponding navigation quick links.
-            var networkUsersNavigationQuickLink = NetworkUsersNavigationQuickLink;
-            var networkUserInvitationsNavigationQuickLink = NetworkUserInvitationsNavigationQuickLink;
-            var networkDatabasesNavigationQuickLink = NetworkDatabasesNavigationQuickLink;
             var networkNodesNavigationQuickLink = NetworkNodesNavigationQuickLink;
             var networkEdgesNavigationQuickLink = NetworkEdgesNavigationQuickLink;
+            var networkDatabasesNavigationQuickLink = NetworkDatabasesNavigationQuickLink;
             var networkNodeCollectionsNavigationQuickLink = NetworkNodeCollectionsNavigationQuickLink;
+            var networkUsersNavigationQuickLink = NetworkUsersNavigationQuickLink;
+            var networkUserInvitationsNavigationQuickLink = NetworkUserInvitationsNavigationQuickLink;
             // Update the count and the route ID.
-            networkUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
-            networkUsersNavigationQuickLink.RouteId = networkId;
-            networkUserInvitationsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("UserInvitations", null);
-            networkUserInvitationsNavigationQuickLink.RouteId = networkId;
-            networkDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
-            networkDatabasesNavigationQuickLink.RouteId = networkId;
             networkNodesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Nodes", null);
             networkNodesNavigationQuickLink.RouteId = networkId;
             networkEdgesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Edges", null);
             networkEdgesNavigationQuickLink.RouteId = networkId;
+            networkDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
+            networkDatabasesNavigationQuickLink.RouteId = networkId;
             networkNodeCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("NodeCollections", null);
             networkNodeCollectionsNavigationQuickLink.RouteId = networkId;
+            networkUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
+            networkUsersNavigationQuickLink.RouteId = networkId;
+            networkUserInvitationsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("UserInvitations", null);
+            networkUserInvitationsNavigationQuickLink.RouteId = networkId;
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
-                networkUsersNavigationQuickLink,
-                networkUserInvitationsNavigationQuickLink,
-                networkDatabasesNavigationQuickLink,
                 networkNodesNavigationQuickLink,
                 networkEdgesNavigationQuickLink,
-                networkNodeCollectionsNavigationQuickLink
+                networkDatabasesNavigationQuickLink,
+                networkNodeCollectionsNavigationQuickLink,
+                networkUsersNavigationQuickLink,
+                networkUserInvitationsNavigationQuickLink
             };
         }
 
@@ -443,34 +443,34 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 analysisId = string.Empty;
             }
             // Get the corresponding navigation quick links.
-            var analysisUsersNavigationQuickLink = AnalysisUsersNavigationQuickLink;
-            var analysisUserInvitationsNavigationQuickLink = AnalysisUserInvitationsNavigationQuickLink;
-            var analysisDatabasesNavigationQuickLink = AnalysisDatabasesNavigationQuickLink;
             var analysisNodesNavigationQuickLink = AnalysisNodesNavigationQuickLink;
             var analysisEdgesNavigationQuickLink = AnalysisEdgesNavigationQuickLink;
+            var analysisDatabasesNavigationQuickLink = AnalysisDatabasesNavigationQuickLink;
             var analysisNodeCollectionsNavigationQuickLink = AnalysisNodeCollectionsNavigationQuickLink;
+            var analysisUsersNavigationQuickLink = AnalysisUsersNavigationQuickLink;
+            var analysisUserInvitationsNavigationQuickLink = AnalysisUserInvitationsNavigationQuickLink;
             // Update the count and the route ID.
-            analysisUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
-            analysisUsersNavigationQuickLink.RouteId = analysisId;
-            analysisUserInvitationsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("UserInvitations", null);
-            analysisUserInvitationsNavigationQuickLink.RouteId = analysisId;
-            analysisDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
-            analysisDatabasesNavigationQuickLink.RouteId = analysisId;
             analysisNodesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Nodes", null);
             analysisNodesNavigationQuickLink.RouteId = analysisId;
             analysisEdgesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Edges", null);
             analysisEdgesNavigationQuickLink.RouteId = analysisId;
+            analysisDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
+            analysisDatabasesNavigationQuickLink.RouteId = analysisId;
             analysisNodeCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("NodeCollections", null);
             analysisNodeCollectionsNavigationQuickLink.RouteId = analysisId;
+            analysisUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
+            analysisUsersNavigationQuickLink.RouteId = analysisId;
+            analysisUserInvitationsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("UserInvitations", null);
+            analysisUserInvitationsNavigationQuickLink.RouteId = analysisId;
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
-                analysisUsersNavigationQuickLink,
-                analysisUserInvitationsNavigationQuickLink,
-                analysisDatabasesNavigationQuickLink,
                 analysisNodesNavigationQuickLink,
                 analysisEdgesNavigationQuickLink,
-                analysisNodeCollectionsNavigationQuickLink
+                analysisDatabasesNavigationQuickLink,
+                analysisNodeCollectionsNavigationQuickLink,
+                analysisUsersNavigationQuickLink,
+                analysisUserInvitationsNavigationQuickLink
             };
         }
     }
