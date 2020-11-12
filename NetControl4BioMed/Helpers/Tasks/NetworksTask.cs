@@ -1,5 +1,8 @@
 ﻿using DocumentFormat.OpenXml.Office.CustomUI;
 using Hangfire;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
@@ -10,6 +13,7 @@ using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +32,16 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<NetworkInputModel> Items { get; set; }
+
+        /// <summary>
+        /// Gets or sets the HTTP context scheme.
+        /// </summary>
+        public string Scheme { get; set; }
+
+        /// <summary>
+        /// Gets or sets the HTTP context host value.
+        /// </summary>
+        public string HostValue { get; set; }
 
         /// <summary>
         /// Creates the items in the database.
@@ -233,6 +247,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         // Get the exception message.
                         var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
+                        // Throw a new exception.
                         throw new TaskException("The algorithm couldn't be determined from the provided string." + message, showExceptionItem, batchItem);
                     }
                     // Append a message to the log.
@@ -256,6 +271,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     IsRecurring = false,
                     Data = JsonSerializer.Serialize(new NetworksTask
                     {
+                        Scheme = Scheme,
+                        HostValue = HostValue,
                         Items = networksToAdd.Select(item => new NetworkInputModel
                         {
                             Id = item.Id
@@ -546,6 +563,105 @@ namespace NetControl4BioMed.Helpers.Tasks
                     network.Data = null;
                     // Edit the network.
                     await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                    // Define the new background task.
+                    var backgroundTask = new BackgroundTask
+                    {
+                        DateTimeCreated = DateTime.UtcNow,
+                        Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.SendNetworksEndedEmailsAsync)}",
+                        IsRecurring = false,
+                        Data = JsonSerializer.Serialize(new NetworksTask
+                        {
+                            Scheme = Scheme,
+                            HostValue = HostValue,
+                            Items = network.Yield().Select(item => new NetworkInputModel
+                            {
+                                Id = item.Id
+                            })
+                        })
+                    };
+                    // Mark the task for addition.
+                    context.BackgroundTasks.Add(backgroundTask);
+                    // Save the changes to the database.
+                    await context.SaveChangesAsync();
+                    // Create a new Hangfire background job.
+                    BackgroundJob.Enqueue<IContentTaskManager>(item => item.SendNetworksEndedEmailsAsync(backgroundTask.Id, CancellationToken.None));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sends the e-mails to the corresponding users once the items have ended.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task SendEndedEmailsAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Check if there weren't any valid items found.
+            if (Items == null)
+            {
+                // Throw an exception.
+                throw new TaskException("No valid items could be found with the provided data.");
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (var index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Create a new scope.
+                using var scope = serviceProvider.CreateScope();
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Use a new user manager instance.
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                // Use a new e-mail sender instance.
+                var emailSender = scope.ServiceProvider.GetRequiredService<ISendGridEmailSender>();
+                // Use a new link generator instance.
+                var linkGenerator = scope.ServiceProvider.GetRequiredService<LinkGenerator>();
+                // Get the items in the current batch.
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
+                // Get the items with the provided IDs.
+                var networks = context.Networks
+                    .Include(item => item.NetworkUsers)
+                        .ThenInclude(item => item.User)
+                    .Where(item => batchIds.Contains(item.Id));
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
+                {
+                    // Get the corresponding item.
+                    var network = networks
+                        .FirstOrDefault(item => item.Id == batchItem.Id);
+                    // Check if there was no item found.
+                    if (network == null)
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Define the HTTP context host.
+                    var host = new HostString(HostValue);
+                    // Go over each registered user in the analysis.
+                    foreach (var user in network.NetworkUsers.Select(item => item.User))
+                    {
+                        // Send an analysis ending e-mail.
+                        await emailSender.SendNetworkEndedEmailAsync(new EmailNetworkEndedViewModel
+                        {
+                            Email = user.Email,
+                            Id = network.Id,
+                            Name = network.Name,
+                            Status = network.Status.GetDisplayName(),
+                            Url = linkGenerator.GetUriByPage("/Content/Created/Networks/Details/Index", handler: null, values: new { id = network.Id }, scheme: Scheme, host: host),
+                            ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
+                        });
+                    }
                 }
             }
         }

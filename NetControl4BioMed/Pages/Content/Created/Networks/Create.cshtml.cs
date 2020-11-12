@@ -518,6 +518,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             // Define a new task.
             var task = new NetworksTask
             {
+                Scheme = HttpContext.Request.Scheme,
+                HostValue = HttpContext.Request.Host.Value,
                 Items = new List<NetworkInputModel>
                 {
                     new NetworkInputModel

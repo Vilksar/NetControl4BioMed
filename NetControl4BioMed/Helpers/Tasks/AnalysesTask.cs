@@ -283,6 +283,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         // Get the exception message.
                         var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
+                        // Throw a new exception.
                         throw new TaskException("The algorithm couldn't be determined from the provided string." + message, showExceptionItem, batchItem);
                     }
                     // Append a message to the log.
@@ -972,8 +973,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 }
             }
         }
-
-
 
         /// <summary>
         /// Sends the e-mails to the corresponding users once the items have ended.

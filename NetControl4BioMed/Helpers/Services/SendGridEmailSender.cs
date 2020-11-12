@@ -221,7 +221,25 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
-        /// Sends an e-mail with a notification that a generic analysis has ended.
+        /// Sends an e-mail with a notification that a network has ended.
+        /// </summary>
+        /// <param name="viewModel">Represents the view model of the e-mail.</param>
+        public async Task SendNetworkEndedEmailAsync(EmailNetworkEndedViewModel viewModel)
+        {
+            // Define the variables for the e-mail.
+            var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
+            var client = new SendGridClient(apiKey);
+            var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
+            var to = new EmailAddress(viewModel.Email, viewModel.Email);
+            var subject = "NetControl4BioMed - A network has ended";
+            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailNetworkEndedPartial", viewModel);
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
+            // Send the e-mail.
+            await client.SendEmailAsync(msg);
+        }
+
+        /// <summary>
+        /// Sends an e-mail with a notification that an analysis has ended.
         /// </summary>
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendAnalysisEndedEmailAsync(EmailAnalysisEndedViewModel viewModel)
