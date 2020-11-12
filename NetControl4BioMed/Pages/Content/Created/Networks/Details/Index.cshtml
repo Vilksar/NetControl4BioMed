@@ -1,5 +1,6 @@
 ﻿@page
 @model IndexModel
+@using NetControl4BioMed.Data
 @using NetControl4BioMed.Data.Enumerations
 @using Helpers.Extensions
 @{
@@ -7,6 +8,26 @@
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetNetworkNavigationTitleCard(Model.View.Network)" />
+<div class="row align-items-center">
+    <div class="col-lg-4 mb-3">
+        <a asp-page="/Content/Created/Networks/Create" asp-route-databaseTypeId="@Model.View.DatabaseTypeId" asp-route-networkId="@Model.View.Network.Id" class="btn btn-dark btn-block" title="Copy">
+            <span><i class="fas fa-copy"></i></span>
+            <span>Copy</span>
+        </a>
+    </div>
+    <div class="col-lg-4 mb-3">
+        <a asp-page="/Content/Created/Networks/Edit" asp-route-id="@Model.View.Network.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+        </a>
+    </div>
+    <div class="col-lg-4 mb-3">
+        <a asp-page="/Content/Created/Networks/Download" asp-route-ids="@Model.View.Network.Id" class="btn btn-primary btn-block" title="Download">
+            <span><i class="fas fa-download"></i></span>
+            <span>Download</span>
+        </a>
+    </div>
+</div>
 <div class="card mb-3" title="Status">
     <div class="card-body text-center">
         <partial name="_NetworkStatusPartial" model="@Model.View.Network.Status" />
@@ -23,26 +44,6 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<div class="row align-items-center">
-    <div class="col-lg-4 mb-3">
-        <a asp-page="/Content/Created/Networks/Edit" asp-route-id="@Model.View.Network.Id" class="btn btn-warning btn-block" title="Edit">
-            <span><i class="fas fa-pencil-alt"></i></span>
-            <span>Edit</span>
-        </a>
-    </div>
-    <div class="col-lg-4 mb-3">
-        <a asp-page="/Content/Created/Networks/Download" asp-route-ids="@Model.View.Network.Id" class="btn btn-primary btn-block" title="Download">
-            <span><i class="fas fa-download"></i></span>
-            <span>Download</span>
-        </a>
-    </div>
-    <div class="col-lg-4 mb-3">
-        <a asp-page="/Content/Created/Networks/Delete" asp-route-ids="@Model.View.Network.Id" class="btn btn-danger btn-block" title="Delete">
-            <span><i class="fas fa-trash"></i></span>
-            <span>Delete</span>
-        </a>
     </div>
 </div>
 @if (!string.IsNullOrEmpty(Model.View.Network.Description))
@@ -101,6 +102,28 @@
             <span asp-description-for="View.Network.Algorithm" class="text-muted small">The algorithm used in generating the network.</span>
             <span asp-validation-for="View.Network.Algorithm" class="text-danger small"></span>
         </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-trash"></i></span>
+            </div>
+            <div>
+                <span>Delete</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger text-justify text-wrap">
+            <span><i class="fas fa-exclamation-circle"></i></span>
+            <span>The network will be deleted automatically on @((Model.View.Network.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()). Alternatively, you can press the button below to delete it.</span>
+        </div>
+        <a asp-page="/Content/Created/Networks/Delete" asp-route-ids="@Model.View.Network.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
     </div>
 </div>
 <div class="card mb-3">

@@ -32,6 +32,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
         {
             public Network Network { get; set; }
 
+            public string DatabaseTypeId { get; set; }
+
             public bool ShowVisualization { get; set; }
 
             public Dictionary<string, int?> ItemCount { get; set; }
@@ -74,6 +76,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details
             {
                 Network = items
                     .First(),
+                DatabaseTypeId = items
+                    .Select(item => item.NetworkDatabases)
+                    .SelectMany(item => item)
+                    .Select(item => item.Database.DatabaseType.Id)
+                    .Distinct()
+                    .FirstOrDefault(),
                 ShowVisualization = items
                     .All(item => item.Status == NetworkStatus.Completed && item.NetworkNodes
                         .Where(item1 => item1.Type == NetworkNodeType.None)

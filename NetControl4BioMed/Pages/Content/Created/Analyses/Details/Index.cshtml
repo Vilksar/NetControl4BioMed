@@ -1,5 +1,6 @@
 ﻿@page
 @model IndexModel
+@using NetControl4BioMed.Data
 @using NetControl4BioMed.Data.Enumerations
 @using Helpers.Extensions
 @{
@@ -7,6 +8,26 @@
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetAnalysisNavigationTitleCard(Model.View.Analysis)" />
+<div class="row align-items-center">
+    <div class="col-lg-4 mb-3">
+        <a asp-page="/Content/Created/Analyses/Create" asp-route-databaseTypeId="@Model.View.DatabaseTypeId" asp-route-algorithm="@Model.View.Analysis.Algorithm.ToString()" asp-route-analysisId="@Model.View.Analysis.Id" class="btn btn-dark btn-block" title="Copy">
+            <span><i class="fas fa-copy"></i></span>
+            <span>Copy</span>
+        </a>
+    </div>
+    <div class="col-lg-4 mb-3">
+        <a asp-page="/Content/Created/Analyses/Edit" asp-route-id="@Model.View.Analysis.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+        </a>
+    </div>
+    <div class="col-lg-4 mb-3">
+        <a asp-page="/Content/Created/Analyses/Download" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-primary btn-block" title="Download">
+            <span><i class="fas fa-download"></i></span>
+            <span>Download</span>
+        </a>
+    </div>
+</div>
 <div class="card mb-3" title="Status">
     <div class="card-body text-center">
         <partial name="_AnalysisStatusPartial" model="@Model.View.Analysis.Status" />
@@ -57,35 +78,6 @@
                 }
             </div>
         </div>
-    </div>
-</div>
-<div class="row align-items-center">
-    <div class="col-lg mb-3">
-        <a asp-page="/Content/Created/Analyses/Edit" asp-route-id="@Model.View.Analysis.Id" class="btn btn-warning btn-block" title="Edit">
-            <span><i class="fas fa-pencil-alt"></i></span>
-            <span>Edit</span>
-        </a>
-    </div>
-    <div class="col-lg mb-3">
-        <a asp-page="/Content/Created/Analyses/Download" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-primary btn-block" title="Download">
-            <span><i class="fas fa-download"></i></span>
-            <span>Download</span>
-        </a>
-    </div>
-    @if (Model.View.Analysis.Status == AnalysisStatus.Ongoing)
-    {
-        <div class="col-lg mb-3">
-            <a asp-page="/Content/Created/Analyses/Stop" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-secondary btn-block" title="Stop">
-                <span><i class="fas fa-stop"></i></span>
-                <span>Stop</span>
-            </a>
-        </div>
-    }
-    <div class="col-lg mb-3">
-        <a asp-page="/Content/Created/Analyses/Delete" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Delete">
-            <span><i class="fas fa-trash"></i></span>
-            <span>Delete</span>
-        </a>
     </div>
 </div>
 @if (!string.IsNullOrEmpty(Model.View.Analysis.Description))
@@ -418,6 +410,53 @@
                 </div>
             </div>
         }
+    </div>
+</div>
+@if (Model.View.Analysis.Status == AnalysisStatus.Ongoing)
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-stop"></i></span>
+                </div>
+                <div>
+                    <span>Stop</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger text-justify text-wrap">
+                <span><i class="fas fa-exclamation-circle"></i></span>
+                <span>The analysis will be stopped automatically on @((Model.View.Analysis.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeStop)).ToLongDateString()), if it will not have ended by then. Alternatively, you can press the button below to stop it now.</span>
+            </div>
+            <a asp-page="/Content/Created/Analyses/Stop" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Stop">
+                <span><i class="fas fa-stop"></i></span>
+                <span>Stop</span>
+            </a>
+        </div>
+    </div>
+}
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-trash"></i></span>
+            </div>
+            <div>
+                <span>Delete</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger text-justify text-wrap">
+            <span><i class="fas fa-exclamation-circle"></i></span>
+            <span>The analysis will be deleted automatically on @((Model.View.Analysis.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()). Alternatively, you can press the button below to delete it now.</span>
+        </div>
+        <a asp-page="/Content/Created/Analyses/Delete" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
     </div>
 </div>
 <div class="card mb-3">
