@@ -27,6 +27,11 @@ namespace NetControl4BioMed.Helpers.Tasks
     public class AnalysesTask
     {
         /// <summary>
+        /// Gets the maximum number of retries for a task.
+        /// </summary>
+        private static int NumberOfRetries { get; } = 2;
+
+        /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
         public IEnumerable<AnalysisInputModel> Items { get; set; }
@@ -461,7 +466,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
-                    .Take(ApplicationDbContext.BatchSize);
+                    .Take(ApplicationDbContext.BatchSize)
+                    .ToList();
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
@@ -473,9 +479,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Include(item => item.AnalysisNetworks)
                         .ThenInclude(item => item.Network)
                     .Where(item => batchIds.Contains(item.Id));
+                // Define the current retry.
+                var currentRetry = 0;
                 // Go over each item in the current batch.
-                foreach (var batchItem in batchItems)
+                for (var batchItemIndex = 0; batchItemIndex < batchItems.Count(); batchItemIndex++)
                 {
+                    // Get the corresponding batch item.
+                    var batchItem = batchItems[batchItemIndex];
                     // Get the corresponding item.
                     var analysis = analyses
                         .FirstOrDefault(item => item.Id == batchItem.Id);
@@ -497,7 +507,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
-                    // Try to generate the network.
+                    // Try to generate the analysis.
                     try
                     {
                         // Update the status of the item.
@@ -685,17 +695,33 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Continue.
                             continue;
                         }
-                        // Get the error message
-                        var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
+                        // Update the status of the item.
+                        analysis.Status = AnalysisStatus.Defined;
+                        // Add a message to the log.
+                        analysis.AppendToLog($"The retry number {currentRetry} ended with an error. {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
+                        // Edit the analysis.
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                        // Check if the task should be executed again.
+                        if (currentRetry < NumberOfRetries)
+                        {
+                            // Increase the current retry.
+                            currentRetry += 1;
+                            // Repeat the loop for the current batch item.
+                            batchItemIndex += -1;
+                            // Continue.
+                            continue;
+                        }
                         // Update the analysis status.
                         analysis.Status = AnalysisStatus.Error;
                         // Update the analysis log.
-                        analysis.Log = analysis.AppendToLog("An error occured while generating the analysis." + message);
+                        analysis.Log = analysis.AppendToLog("One or more errors occured while generating the analysis.");
                         // Edit the analysis.
                         await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                         // Continue.
                         continue;
                     }
+                    // Reset the current retry.
+                    currentRetry = 0;
                     // Reload the analysis.
                     analysis = context.Analyses
                         .Where(item => item.Id == analysis.Id)
@@ -771,15 +797,20 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
-                    .Take(ApplicationDbContext.BatchSize);
+                    .Take(ApplicationDbContext.BatchSize)
+                    .ToList();
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
                 var analyses = context.Analyses
                     .Where(item => batchIds.Contains(item.Id));
+                // Define the current retry.
+                var currentRetry = 0;
                 // Go over each item in the current batch.
-                foreach (var batchItem in batchItems)
+                for (var batchItemIndex = 0; batchItemIndex < batchItems.Count(); batchItemIndex++)
                 {
+                    // Get the corresponding batch item.
+                    var batchItem = batchItems[batchItemIndex];
                     // Get the corresponding item.
                     var analysis = analyses
                         .FirstOrDefault(item => item.Id == batchItem.Id);
@@ -856,12 +887,26 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Continue.
                             continue;
                         }
-                        // Get the error message
-                        var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
+                        // Update the status of the item.
+                        analysis.Status = AnalysisStatus.Defined;
+                        // Add a message to the log.
+                        analysis.AppendToLog($"The retry number {currentRetry} ended with an error. {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
+                        // Edit the analysis.
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                        // Check if the task should be executed again.
+                        if (currentRetry < NumberOfRetries)
+                        {
+                            // Increase the current retry.
+                            currentRetry += 1;
+                            // Repeat the loop for the current batch item.
+                            batchItemIndex += -1;
+                            // Continue.
+                            continue;
+                        }
                         // Update the analysis status.
                         analysis.Status = AnalysisStatus.Error;
                         // Update the analysis log.
-                        analysis.Log = analysis.AppendToLog("An error occured while running the analysis." + message);
+                        analysis.Log = analysis.AppendToLog("One or more errors occured while generating the analysis.");
                         // Update the start time, if needed.
                         analysis.DateTimeStarted = analysis.DateTimeStarted ?? DateTime.UtcNow;
                         // Update the end time.
@@ -871,6 +916,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
+                    // Reset the current retry.
+                    currentRetry = 0;
                     // Reload the analysis.
                     analysis = context.Analyses
                         .Where(item => item.Id == analysis.Id)

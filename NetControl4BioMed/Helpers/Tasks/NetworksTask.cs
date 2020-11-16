@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office.CustomUI;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
@@ -8,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Data.Seed;
 using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
@@ -28,6 +26,11 @@ namespace NetControl4BioMed.Helpers.Tasks
     /// </summary>
     public class NetworksTask
     {
+        /// <summary>
+        /// Gets the maximum number of retries for a task.
+        /// </summary>
+        private static int NumberOfRetries { get; } = 2;
+
         /// <summary>
         /// Gets or sets the items to be updated.
         /// </summary>
@@ -247,7 +250,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         // Get the exception message.
                         var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
-                        // Throw a new exception.
+                        // Throw an exception.
                         throw new TaskException("The algorithm couldn't be determined from the provided string." + message, showExceptionItem, batchItem);
                     }
                     // Append a message to the log.
@@ -434,15 +437,20 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
-                    .Take(ApplicationDbContext.BatchSize);
+                    .Take(ApplicationDbContext.BatchSize)
+                    .ToList();
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
                 var networks = context.Networks
                     .Where(item => batchIds.Contains(item.Id));
+                // Define the current retry.
+                var currentRetry = 0;
                 // Go over each item in the current batch.
-                foreach (var batchItem in batchItems)
+                for (var batchItemIndex = 0; batchItemIndex < batchItems.Count(); batchItemIndex++)
                 {
+                    // Get the corresponding batch item.
+                    var batchItem = batchItems[batchItemIndex];
                     // Get the corresponding item.
                     var network = networks
                         .FirstOrDefault(item => item.Id == batchItem.Id);
@@ -455,6 +463,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if the status is not valid.
                     if (network.Status != NetworkStatus.Defined)
                     {
+                        // Check 
                         // Update the status of the item.
                         network.Status = NetworkStatus.Error;
                         // Add a message to the log.
@@ -534,17 +543,33 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Continue.
                             continue;
                         }
-                        // Get the error message
-                        var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
+                        // Update the status of the item.
+                        network.Status = NetworkStatus.Defined;
+                        // Add a message to the log.
+                        network.AppendToLog($"The retry number {currentRetry} ended with an error. {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
+                        // Edit the network.
+                        await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                        // Check if the task should be executed again.
+                        if (currentRetry < NumberOfRetries)
+                        {
+                            // Increase the current retry.
+                            currentRetry += 1;
+                            // Repeat the loop for the current batch item.
+                            batchItemIndex += -1;
+                            // Continue.
+                            continue;
+                        }
                         // Update the status of the item.
                         network.Status = NetworkStatus.Error;
                         // Add a message to the log.
-                        network.Log = network.AppendToLog("An error occured while generating the network." + message);
+                        network.Log = network.AppendToLog("One or more errors occured while generating the network.");
                         // Edit the network.
                         await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
                         // Continue.
                         continue;
                     }
+                    // Reset the current retry.
+                    currentRetry = 0;
                     // Reload the network.
                     network = context.Networks
                         .Where(item => item.Id == network.Id)
