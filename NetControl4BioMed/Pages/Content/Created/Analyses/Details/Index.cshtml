@@ -108,6 +108,7 @@
                 <span>As the network corresponding to the analysis is relatively small, you can click the button below to visualize it in browser.</span>
             </div>
             <a asp-page="/Content/Created/Analyses/Details/Visualize" asp-route-id="@Model.View.Analysis.Id" class="btn btn-info btn-block">
+                <span><i class="fas fa-eye"></i></span>
                 <span>Visualize</span>
             </a>
         </div>
@@ -472,6 +473,7 @@
                 <span>The analysis will be stopped automatically on @((Model.View.Analysis.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeStop)).ToLongDateString()), if it will not have ended by then. Alternatively, you can press the button below to stop it now.</span>
             </div>
             <a asp-page="/Content/Created/Analyses/Stop" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Stop">
+                <span><i class="fas fa-stop"></i></span>
                 <span>Stop</span>
             </a>
         </div>
@@ -494,6 +496,7 @@
             <span>The analysis will be deleted automatically on @((Model.View.Analysis.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()). Alternatively, you can press the button below to delete it now.</span>
         </div>
         <a asp-page="/Content/Created/Analyses/Delete" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
             <span>Delete</span>
         </a>
     </div>

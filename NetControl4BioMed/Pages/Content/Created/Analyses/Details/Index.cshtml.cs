@@ -97,12 +97,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details
                 GeneticAlgorithmParameters = null,
                 ItemCount = new Dictionary<string, int?>
                 {
-                    { "Users", items.Select(item => item.AnalysisUsers).SelectMany(item => item).Count() },
-                    { "UserInvitations", items.Select(item => item.AnalysisUserInvitations).SelectMany(item => item).Count() },
-                    { "Databases", items.Select(item => item.AnalysisDatabases).SelectMany(item => item).Count() },
                     { "Nodes", items.Select(item => item.AnalysisNodes).SelectMany(item => item).Count(item => item.Type == AnalysisNodeType.None) },
                     { "Edges", items.Select(item => item.AnalysisEdges).SelectMany(item => item).Count() },
-                    { "NodeCollections", items.Select(item => item.AnalysisNodeCollections).SelectMany(item => item).Count() }
+                    { "Databases", items.Select(item => item.AnalysisDatabases).SelectMany(item => item).Count() },
+                    { "NodeCollections", items.Select(item => item.AnalysisNodeCollections).SelectMany(item => item).Count() },
+                    { "Users", items.Select(item => item.AnalysisUsers).SelectMany(item => item).Count() + items.Select(item => item.AnalysisUserInvitations).SelectMany(item => item).Count() },
+                    { "Networks", items.Select(item => item.AnalysisNetworks).SelectMany(item => item).Count() }
                 }
             };
             // Check which algorithm is used and try to deserialize the parameters.
