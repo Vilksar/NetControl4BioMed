@@ -177,16 +177,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the navigation breadcrumb for the administration created background tasks index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel AdministrationCreatedBackgroundTasksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Networks",
-            Title = "Networks",
-            Link = "/Administration/Created/BackgroundTasks/Index"
-        };
-
-        /// <summary>
         /// Gets the navigation breadcrumb for the administration created networks index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel AdministrationCreatedNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
@@ -284,6 +274,36 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "DatabaseTypes",
             Title = "Database types",
             Link = "/Administration/Databases/DatabaseTypes/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the administration created index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AdministrationOtherNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Other",
+            Title = "Other",
+            Link = "/Administration/Other/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the administration other background tasks index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AdministrationOtherBackgroundTasksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "BackgroundTasks",
+            Title = "Background tasks",
+            Link = "/Administration/Other/BackgroundTasks/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the administration other samples index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AdministrationOtherSamplesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Samples",
+            Title = "Samples",
+            Link = "/Administration/Other/Samples/Index"
         };
 
         /// <summary>
@@ -524,6 +544,26 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "DatabaseTypes",
             Title = "Database types",
             Link = "/Content/Databases/DatabaseTypes/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content other index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentOtherNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Other",
+            Title = "Other",
+            Link = "/Content/Other/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content other samples index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentOtherSamplesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Samples",
+            Title = "Samples",
+            Link = "/Content/Other/Samples/Index"
         };
 
         /// <summary>

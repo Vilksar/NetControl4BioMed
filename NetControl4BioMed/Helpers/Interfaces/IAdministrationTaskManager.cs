@@ -178,6 +178,15 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task DeleteNodeCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
+        /// Deletes samples from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        [AutomaticRetry(Attempts = 0)]
+        [DisableConcurrentExecution(86400)]
+        Task DeleteSamplesAsync(string id, CancellationToken token);
+
+        /// <summary>
         /// Deletes networks from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>

@@ -215,6 +215,11 @@ namespace NetControl4BioMed.Data
         public DbSet<PathNode> PathNodes { get; set; }
 
         /// <summary>
+        /// Gets or sets the database table containing the samples.
+        /// </summary>
+        public DbSet<Sample> Samples { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the database context.
         /// </summary>
         /// <param name="options">Represents the options for the database context.</param>
@@ -584,6 +589,11 @@ namespace NetControl4BioMed.Data
                     .WithMany(item => item.PathNodes)
                     .HasForeignKey(item => item.NodeId)
                     .IsRequired();
+            });
+            modelBuilder.Entity<Sample>(entity =>
+            {
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
             });
             modelBuilder.Entity<UserRole>(entity =>
             {
