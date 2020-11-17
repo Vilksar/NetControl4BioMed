@@ -37,7 +37,7 @@
             </div>
         </div>
     </div>
-    <div class="card-body">
+    <div class="card-body copy-group">
         @if (string.IsNullOrEmpty(Model.View.Sample.Data))
         {
             <div class="alert alert-danger text-justify text-wrap mb-0">
@@ -49,17 +49,17 @@
         {
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The sample data is displayed below, you can click the buttons below to download it or to copy it automatically to the clipboard.</span>
+                <span>The sample data is displayed below, you can click the buttons below to automatically select all (and then copy it directly to the clipboard) or to download it.</span>
             </div>
             <div class="form-group">
                 <label asp-for="View.Sample.Data" class="font-weight-bold">Data</label>
-                <textarea asp-for="View.Sample.Data" class="form-control" rows="5" readonly></textarea>
+                <textarea asp-for="View.Sample.Data" class="form-control copy-group-data" rows="5" readonly></textarea>
                 <span asp-description-for="View.Sample.Data" class="text-muted small">The data of the sample.</span>
                 <span asp-validation-for="View.Sample.Data" class="text-danger small"></span>
             </div>
-            <button type="button" class="btn btn-info btn-block mb-3" title="Copy">
-                <span><i class="fas fa-copy"></i></span>
-                <span>Copy</span>
+            <button type="button" class="btn btn-info btn-block mb-3 copy-group-button" title="Copy">
+                <span><i class="fas fa-i-cursor"></i></span>
+                <span>Select all</span>
             </button>
             <a asp-page="/Content/Other/Samples/Download" asp-route-ids="@Model.View.Sample.Id" class="btn btn-primary btn-block" title="Download">
                 <span><i class="fas fa-download"></i></span>

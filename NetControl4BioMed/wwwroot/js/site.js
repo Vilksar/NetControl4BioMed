@@ -424,6 +424,17 @@ $(window).on('load', () => {
         })();
     }
 
+    // Check if there is a copy group on the page.
+    if ($('.copy-group').length !== 0) {
+        // Add a listener for clicking the button.
+        $('.copy-group-button').on('click', (event) => {
+            // Get the actual group which was clicked.
+            const groupElement = $(event.target).closest('.copy-group');
+            // Select all of the corresponding data.
+            $(groupElement).find('.copy-group-data').first().select();
+        });
+    }
+
     // Check if there is a Cytoscape area on the page.
     if ($('.cytoscape-area').length !== 0) {
         // Get the Cytoscape configuration JSON.
@@ -444,7 +455,7 @@ $(window).on('load', () => {
             }
         });
         // Hide the loading message.
-        $(".cytoscape-loading").prop("hidden", true);
+        $('.cytoscape-loading').prop('hidden', true);
     }
 
     // Check if there is a refreshable item on the page.
@@ -452,9 +463,9 @@ $(window).on('load', () => {
         // Define a function to refresh the details.
         const refresh = (element) => {
             // Get the ID of the item.
-            const id = $(element).data("id");
+            const id = $(element).data('id');
             // Get the status of the item.
-            const status = $(element).data("status");
+            const status = $(element).data('status');
             // Get the data for the item with the provided ID.
             const ajaxCall = $.ajax({
                 url: `${window.location.pathname}?handler=Refresh&id=${id}`,
@@ -495,12 +506,12 @@ $(window).on('load', () => {
         // Define a function to update an element containing a UTC date.
         const updateDate = (element) => {
             // Get the date in UTC format.
-            const date = new Date($(element).data("date"));
+            const date = new Date($(element).data('date'));
             // Update the UTC date to the local date.
-            $(element).find(".utc-date-date").attr("title", date.toLocaleDateString());
-            $(element).find(".utc-date-date").text(date.toLocaleDateString());
-            $(element).find(".utc-date-time").attr("title", date.toLocaleTimeString());
-            $(element).find(".utc-date-time").text(date.toLocaleTimeString());
+            $(element).find('.utc-date-date').attr('title', date.toLocaleDateString());
+            $(element).find('.utc-date-date').text(date.toLocaleDateString());
+            $(element).find('.utc-date-time').attr('title', date.toLocaleTimeString());
+            $(element).find('.utc-date-time').text(date.toLocaleTimeString());
         };
         // Execute the function on page load.
         (() => {
