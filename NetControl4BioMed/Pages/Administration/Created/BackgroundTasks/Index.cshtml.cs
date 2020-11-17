@@ -50,7 +50,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
                     { "Id", "ID" },
                     { "DateTimeCreated", "Date created" },
                     { "Name", "Name" },
-                    { "DataLength", "Length of the data" }
+                    { "DataLength", "Data length" }
                 }
             };
         }
