@@ -11,7 +11,6 @@ namespace NetControl4BioMed.Helpers.Interfaces
     /// <summary>
     /// Provides an abstraction for the content task manager.
     /// </summary>
-    [AutomaticRetry(Attempts = 0)]
     public interface IContentTaskManager
     {
         /// <summary>
@@ -19,7 +18,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        [AutomaticRetry(Attempts = 0)]
+        [AutomaticRetry(Attempts = 2)]
         Task DeleteNetworksAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -27,7 +26,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        [AutomaticRetry(Attempts = 0)]
+        [AutomaticRetry(Attempts = 2)]
         Task DeleteAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
