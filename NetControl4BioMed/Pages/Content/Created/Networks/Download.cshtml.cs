@@ -21,6 +21,7 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Services;
 using NetControl4BioMed.Helpers.ViewModels;
 
@@ -32,12 +33,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly LinkGenerator _linkGenerator;
+        private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public DownloadModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator)
+        public DownloadModel(UserManager<User> userManager, ApplicationDbContext context, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
             _userManager = userManager;
             _context = context;
             _linkGenerator = linkGenerator;
+            _reCaptchaChecker = reCaptchaChecker;
         }
 
         [BindProperty]
@@ -49,6 +52,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             [Required(ErrorMessage = "This field is required.")]
             [RegularExpression("Text|Json|CytoscapeJson|Excel", ErrorMessage = "The value is not valid.")]
             public string FileFormat { get; set; }
+
+            public string ReCaptchaToken { get; set; }
 
             public IEnumerable<string> Ids { get; set; }
         }
@@ -64,14 +69,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there aren't any IDs provided.
             if (ids == null || !ids.Any())
             {
@@ -84,7 +81,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             View = new ViewModel
             {
                 Items = _context.Networks
-                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                     .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -103,14 +100,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())
             {
@@ -123,7 +112,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             View = new ViewModel
             {
                 Items = _context.Networks
-                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                     .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -133,6 +122,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 TempData["StatusMessage"] = "Error: No networks have been found with the provided IDs, or you don't have access to them.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
+            }
+            // Check if the reCaptcha is valid.
+            if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The reCaptcha verification failed.");
+                // Return the page.
+                return Page();
             }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)

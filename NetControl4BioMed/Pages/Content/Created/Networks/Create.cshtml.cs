@@ -22,7 +22,6 @@ using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks
 {
-    [Authorize]
     [RequestFormLimits(ValueLengthLimit = 16 * 1024 * 1024)]
     public class CreateModel : PageModel
     {
@@ -57,6 +56,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
+            public bool IsPublic { get; set; }
+
+            [DataType(DataType.Text)]
+            [Required(ErrorMessage = "This field is required.")]
             public string Algorithm { get; set; }
 
             [DataType(DataType.MultilineText)]
@@ -76,6 +79,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
 
         public class ViewModel
         {
+            public bool IsUserAuthenticated { get; set; }
+
             public bool IsGeneric { get; set; }
 
             public IEnumerable<Database> NodeDatabases { get; set; }
@@ -96,14 +101,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there wasn't any database type ID provided.
             if (string.IsNullOrEmpty(databaseTypeId))
             {
@@ -127,7 +124,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             var isGeneric = databaseType.Name == "Generic";
             // Try to get the network with the provided ID.
             var networks = _context.Networks
-                .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == networkId);
             // Check if there wasn't any network found.
             var networksFound = networks != null && networks.Any();
@@ -142,6 +139,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             // Define the view.
             View = new ViewModel
             {
+                IsUserAuthenticated = user != null,
                 IsGeneric = isGeneric,
                 NodeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
@@ -177,6 +175,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 case (false, false):
                     Input = new InputModel
                     {
+                        IsPublic = !View.IsUserAuthenticated,
                         DatabaseTypeId = databaseType.Id,
                         SeedData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                         NodeDatabaseIds = Enumerable.Empty<string>(),
@@ -186,6 +185,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 case (false, true):
                     Input = new InputModel
                     {
+                        IsPublic = !View.IsUserAuthenticated,
                         DatabaseTypeId = databaseType.Id,
                         SeedData = JsonSerializer.Serialize(Enumerable.Empty<ItemModel>()),
                         NodeDatabaseIds = View.NodeDatabases.Select(item => item.Id),
@@ -195,20 +195,21 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 case (true, false):
                     Input = new InputModel
                     {
+                        IsPublic = networks
+                            .Select(item => item.IsPublic)
+                            .FirstOrDefault(),
                         DatabaseTypeId = databaseType.Id,
                         Name = networks
-                                .Select(item => item.Name)
-                                .FirstOrDefault(),
+                            .Select(item => item.Name)
+                            .FirstOrDefault(),
                         Description = networks
-                                .Select(item => item.Description)
-                                .FirstOrDefault(),
+                            .Select(item => item.Description)
+                            .FirstOrDefault(),
                         Algorithm = networks
-                                .Select(item => item.Algorithm)
-                                .FirstOrDefault()
-                                .ToString(),
+                            .Select(item => item.Algorithm)
+                            .FirstOrDefault()
+                            .ToString(),
                         SeedData = JsonSerializer.Serialize(networks
-                            .Include(item => item.NetworkNodes)
-                                .ThenInclude(item => item.Node)
                             .Select(item => item.NetworkNodes)
                             .SelectMany(item => item)
                             .Where(item => item.Type == NetworkNodeType.Seed)
@@ -236,22 +237,21 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 case (true, true):
                     Input = new InputModel
                     {
+                        IsPublic = networks
+                            .Select(item => item.IsPublic)
+                            .FirstOrDefault(),
                         DatabaseTypeId = databaseType.Id,
                         Name = networks
-                                .Select(item => item.Name)
-                                .FirstOrDefault(),
+                            .Select(item => item.Name)
+                            .FirstOrDefault(),
                         Description = networks
-                                .Select(item => item.Description)
-                                .FirstOrDefault(),
+                            .Select(item => item.Description)
+                            .FirstOrDefault(),
                         Algorithm = networks
-                                .Select(item => item.Algorithm)
-                                .FirstOrDefault()
-                                .ToString(),
+                            .Select(item => item.Algorithm)
+                            .FirstOrDefault()
+                            .ToString(),
                         SeedData = JsonSerializer.Serialize(networks
-                            .Include(item => item.NetworkEdges)
-                                .ThenInclude(item => item.Edge)
-                                    .ThenInclude(item => item.EdgeNodes)
-                                        .ThenInclude(item => item.Node)
                             .Select(item => item.NetworkEdges)
                             .SelectMany(item => item)
                             .Select(item => new ItemModel
@@ -296,14 +296,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there isn't any database type ID provided or if the database type ID couldn't be inferred.
             if (string.IsNullOrEmpty(Input.DatabaseTypeId))
             {
@@ -327,6 +319,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             // Define the view.
             View = new ViewModel
             {
+                IsUserAuthenticated = user != null,
                 IsGeneric = isGeneric,
                 NodeDatabases = _context.Databases
                     .Where(item => item.DatabaseType == databaseType)
@@ -369,6 +362,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "An error has been encountered. Please check again the input fields.");
+                // Redisplay the page.
+                return Page();
+            }
+            // Check if the public availability isn't valid.
+            if (!View.IsUserAuthenticated && !Input.IsPublic)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "You are not logged in, so the network must be set as public.");
                 // Redisplay the page.
                 return Page();
             }
@@ -526,6 +527,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     {
                         Name = Input.Name,
                         Description = Input.Description,
+                        IsPublic = Input.IsPublic,
                         Algorithm = Input.Algorithm,
                         Data = data,
                         NetworkDatabases = nodeDatabases
@@ -548,16 +550,18 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                                     },
                                     Type = "Edge"
                                 })),
-                        NetworkUsers = new List<NetworkUserInputModel>
-                        {
-                            new NetworkUserInputModel
+                        NetworkUsers = View.IsUserAuthenticated ?
+                            new List<NetworkUserInputModel>
                             {
-                                User = new UserInputModel
+                                new NetworkUserInputModel
                                 {
-                                    Id = user.Id
+                                    User = new UserInputModel
+                                    {
+                                        Id = user.Id
+                                    }
                                 }
-                            }
-                        },
+                            } :
+                            new List<NetworkUserInputModel>(),
                         NetworkNodeCollections = seedNodeCollections
                             .Select(item => item.Id)
                             .Select(item => new NetworkNodeCollectionInputModel
@@ -571,11 +575,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     }
                 }
             };
+            // Define the IDs of the created items.
+            var ids = Enumerable.Empty<string>();
             // Try to run the task.
             try
             {
                 // Run the task.
-                await task.CreateAsync(_serviceProvider, CancellationToken.None);
+                ids = await task.CreateAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {
@@ -586,6 +592,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             }
             // Display a message.
             TempData["StatusMessage"] = $"Success: 1 network of type \"{databaseType.Name}\" defined successfully and scheduled for generation.";
+            // Check if there wasn't any ID returned.
+            if (ids != null && ids.Any())
+            {
+                // Redirect to the index page.
+                return RedirectToPage("/Content/Created/Networks/Details/Index", new { id = ids.First() });
+            }
             // Redirect to the index page.
             return RedirectToPage("/Content/Created/Networks/Index");
         }

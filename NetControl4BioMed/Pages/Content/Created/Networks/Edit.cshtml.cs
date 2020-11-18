@@ -11,22 +11,24 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks
 {
-    [Authorize]
     public class EditModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public EditModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context)
+        public EditModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
         {
             _serviceProvider = serviceProvider;
             _userManager = userManager;
             _context = context;
+            _reCaptchaChecker = reCaptchaChecker;
         }
 
         [BindProperty]
@@ -44,12 +46,20 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
 
             [DataType(DataType.MultilineText)]
             public string Description { get; set; }
+
+            [DataType(DataType.Text)]
+            [Required(ErrorMessage = "This field is required.")]
+            public bool IsPublic { get; set; }
+
+            public string ReCaptchaToken { get; set; }
         }
 
         public ViewModel View { get; set; }
 
         public class ViewModel
         {
+            public bool IsUserAuthenticated { get; set; }
+
             public Network Network { get; set; }
         }
 
@@ -57,14 +67,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(id))
             {
@@ -75,11 +77,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             }
             // Define the query.
             var query = _context.Networks
-                .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
+                IsUserAuthenticated = user != null,
                 Network = query
                     .FirstOrDefault()
             };
@@ -96,7 +99,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             {
                 Id = View.Network.Id,
                 Name = View.Network.Name,
-                Description = View.Network.Description
+                Description = View.Network.Description,
+                IsPublic = View.Network.IsPublic
             };
             // Return the page.
             return Page();
@@ -106,14 +110,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(Input.Id))
             {
@@ -124,11 +120,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             }
             // Define the query.
             var query = _context.Networks
-                .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel
             {
+                IsUserAuthenticated = user != null,
                 Network = query
                     .FirstOrDefault()
             };
@@ -140,11 +137,27 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
             }
+            // Check if the reCaptcha is valid.
+            if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The reCaptcha verification failed.");
+                // Return the page.
+                return Page();
+            }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "An error has been encountered. Please check again the input fields.");
+                // Redisplay the page.
+                return Page();
+            }
+            // Check if the public availability isn't valid.
+            if (!View.IsUserAuthenticated && !Input.IsPublic)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "You are not logged in, so the network must be set as public.");
                 // Redisplay the page.
                 return Page();
             }
@@ -157,7 +170,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     {
                         Id = Input.Id,
                         Name = Input.Name,
-                        Description = Input.Description
+                        Description = Input.Description,
+                        IsPublic = Input.IsPublic
                     }
                 }
             };
@@ -177,7 +191,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             // Display a message.
             TempData["StatusMessage"] = "Success: 1 network updated successfully.";
             // Redirect to the index page.
-            return RedirectToPage("/Content/Created/Networks/Index");
+            return RedirectToPage("/Content/Created/Networks/Details/Index", new { id = View.Network.Id });
         }
     }
 }

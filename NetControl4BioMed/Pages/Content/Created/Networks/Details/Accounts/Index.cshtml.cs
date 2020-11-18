@@ -12,7 +12,6 @@ using NetControl4BioMed.Data.Models;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts
 {
-    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
@@ -35,14 +34,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(id))
             {
@@ -53,7 +44,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Accounts
             }
             // Get the item with the provided ID.
             var items = _context.Networks
-                .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
             if (items == null || !items.Any())

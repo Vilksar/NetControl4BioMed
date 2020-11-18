@@ -18,16 +18,17 @@ using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks
 {
-    [Authorize]
     public class DeleteModel : PageModel
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public DeleteModel(UserManager<User> userManager, ApplicationDbContext context)
+        public DeleteModel(UserManager<User> userManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
         {
             _userManager = userManager;
             _context = context;
+            _reCaptchaChecker = reCaptchaChecker;
         }
 
         [BindProperty]
@@ -36,6 +37,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         public class InputModel
         {
             public IEnumerable<string> Ids { get; set; }
+
+            public string ReCaptchaToken { get; set; }
         }
 
         public ViewModel View { get; set; }
@@ -49,14 +52,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there aren't any IDs provided.
             if (ids == null || !ids.Any())
             {
@@ -69,7 +64,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             View = new ViewModel
             {
                 Items = _context.Networks
-                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                     .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -88,14 +83,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there aren't any IDs provided.
             if (Input.Ids == null || !Input.Ids.Any())
             {
@@ -108,7 +95,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             View = new ViewModel
             {
                 Items = _context.Networks
-                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                     .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -118,6 +105,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 TempData["StatusMessage"] = "Error: No networks have been found with the provided IDs, or you don't have access to them.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Index");
+            }
+            // Check if the reCaptcha is valid.
+            if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The reCaptcha verification failed.");
+                // Return the page.
+                return Page();
             }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
