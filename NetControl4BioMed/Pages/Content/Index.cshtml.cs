@@ -47,7 +47,7 @@ namespace NetControl4BioMed.Pages.Content
 
         public class ViewModel
         {
-            public bool UserIsAuthenticated { get; set; }
+            public bool IsUserAuthenticated { get; set; }
 
             public Dictionary<string, int?> ItemCount { get; set; }
 
@@ -63,27 +63,28 @@ namespace NetControl4BioMed.Pages.Content
             // Define the view.
             View = new ViewModel
             {
-                UserIsAuthenticated = user != null,
-                ItemCount = user != null ?
-                    new Dictionary<string, int?>
-                    {
-                        { "Networks", _context.Networks.Count(item => item.NetworkUsers.Any(item1 => item1.User == user)) },
-                        { "Analyses", _context.Analyses.Count(item => item.AnalysisUsers.Any(item1 => item1.User == user)) }
-                    } :
-                    null,
-                RecentNetworks = user != null ?
-                    _context.Networks
-                        .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                        .OrderByDescending(item => item.DateTimeCreated)
-                        .Take(5) :
-                    null,
-                RecentAnalyses = user != null ?
-                    _context.Analyses
-                        .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                        .OrderByDescending(item => item.DateTimeStarted)
-                        .Take(5) :
-                    null,
+                IsUserAuthenticated = user != null,
+                ItemCount = new Dictionary<string, int?>(),
+                RecentNetworks = Enumerable.Empty<Network>(),
+                RecentAnalyses = Enumerable.Empty<Analysis>()
             };
+            // Check if the user is authenticated.
+            if (View.IsUserAuthenticated)
+            {
+                // Update the view.
+                View.ItemCount["Networks"] = _context.Networks
+                    .Count(item => item.NetworkUsers.Any(item1 => item1.User == user));
+                View.ItemCount["Analyses"] = _context.Analyses
+                    .Count(item => item.AnalysisUsers.Any(item1 => item1.User == user));
+                View.RecentNetworks = _context.Networks
+                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                    .OrderByDescending(item => item.DateTimeCreated)
+                    .Take(5);
+                View.RecentAnalyses = _context.Analyses
+                    .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
+                    .OrderByDescending(item => item.DateTimeStarted)
+                    .Take(5);
+            }
             // Return the page.
             return Page();
         }
@@ -95,27 +96,28 @@ namespace NetControl4BioMed.Pages.Content
             // Define the view.
             View = new ViewModel
             {
-                UserIsAuthenticated = user != null,
-                ItemCount = user != null ?
-                    new Dictionary<string, int?>
-                    {
-                        { "Networks", _context.Networks.Count(item => item.NetworkUsers.Any(item1 => item1.User == user)) },
-                        { "Analyses", _context.Analyses.Count(item => item.AnalysisUsers.Any(item1 => item1.User == user)) }
-                    } :
-                    null,
-                RecentNetworks = user != null ?
-                    _context.Networks
-                        .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                        .OrderByDescending(item => item.DateTimeCreated)
-                        .Take(5) :
-                    null,
-                RecentAnalyses = user != null ?
-                    _context.Analyses
-                        .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                        .OrderByDescending(item => item.DateTimeStarted)
-                        .Take(5) :
-                    null,
+                IsUserAuthenticated = user != null,
+                ItemCount = new Dictionary<string, int?>(),
+                RecentNetworks = Enumerable.Empty<Network>(),
+                RecentAnalyses = Enumerable.Empty<Analysis>()
             };
+            // Check if the user is authenticated.
+            if (View.IsUserAuthenticated)
+            {
+                // Update the view.
+                View.ItemCount["Networks"] = _context.Networks
+                    .Count(item => item.NetworkUsers.Any(item1 => item1.User == user));
+                View.ItemCount["Analyses"] = _context.Analyses
+                    .Count(item => item.AnalysisUsers.Any(item1 => item1.User == user));
+                View.RecentNetworks = _context.Networks
+                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                    .OrderByDescending(item => item.DateTimeCreated)
+                    .Take(5);
+                View.RecentAnalyses = _context.Analyses
+                    .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
+                    .OrderByDescending(item => item.DateTimeStarted)
+                    .Take(5);
+            }
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
             {

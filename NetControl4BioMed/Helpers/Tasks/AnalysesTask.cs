@@ -51,7 +51,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public async Task CreateAsync(IServiceProvider serviceProvider, CancellationToken token)
+        public async Task<IEnumerable<string>> CreateAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Check if there weren't any valid items found.
             if (Items == null)
@@ -63,6 +63,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Save the IDs of the created items.
+            var ids = Enumerable.Empty<string>();
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
@@ -146,10 +148,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Check if there are no analysis users provided.
-                    if (batchItem.AnalysisUsers == null || !batchItem.AnalysisUsers.Any())
+                    if (batchItem.IsPublic && (batchItem.AnalysisUsers == null || !batchItem.AnalysisUsers.Any()))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no analysis users provided.", showExceptionItem, batchItem);
+                        throw new TaskException("There were no analysis users provided and the analysis is not public.", showExceptionItem, batchItem);
                     }
                     // Get the analysis users.
                     var analysisUsers = batchItem.AnalysisUsers
@@ -170,7 +172,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (!batchItem.IsPublic && (analysisUsers == null || !analysisUsers.Any()))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no analysis users found, so the analysis must be public.", showExceptionItem, batchItem);
+                        throw new TaskException("There were no analysis users found and the analysis is not public.", showExceptionItem, batchItem);
                     }
                     // Check if there are no analysis networks provided.
                     if (batchItem.AnalysisNetworks == null || !batchItem.AnalysisNetworks.Any())
@@ -305,6 +307,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 }
                 // Create the items.
                 await IEnumerableExtensions.CreateAsync(analysesToAdd, context, token);
+                // Add the IDs of the created items to the list.
+                ids = ids.Concat(analysesToAdd.Select(item => item.Id));
                 // Define the new background task.
                 var backgroundTask = new BackgroundTask
                 {
@@ -328,6 +332,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Create a new Hangfire background job.
                 BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateAnalysesAsync(backgroundTask.Id, CancellationToken.None));
             }
+            // Return the IDs of the created items.
+            return ids;
         }
 
         /// <summary>

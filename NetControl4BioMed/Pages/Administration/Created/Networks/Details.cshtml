@@ -51,6 +51,12 @@
                 <span asp-validation-for="View.Network.Description" class="text-danger small"></span>
             </div>
             <div class="form-group">
+                <label asp-for="View.Network.IsPublic" class="font-weight-bold">Set the network as public?</label>
+                <input asp-for="View.Network.IsPublic" type="text" class="form-control" readonly />
+                <span asp-description-for="View.Network.IsPublic" class="text-muted small">The public availability of the network.</span>
+                <span asp-validation-for="View.Network.IsPublic" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="View.Network.Algorithm" class="font-weight-bold">Algorithm</label>
                 <input asp-for="View.Network.Algorithm" class="form-control" readonly />
                 <span asp-description-for="View.Network.Algorithm" class="text-muted small">The algorithm used to generate the network.</span>
