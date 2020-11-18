@@ -256,5 +256,14 @@ namespace NetControl4BioMed.Helpers.Interfaces
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         Task DeleteAllAnalysesAsync(string id, CancellationToken token);
+
+        /// <summary>
+        /// Deletes all samples from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        [AutomaticRetry(Attempts = 2)]
+        [DisableConcurrentExecution(86400)]
+        Task DeleteAllSamplesAsync(string id, CancellationToken token);
     }
 }
