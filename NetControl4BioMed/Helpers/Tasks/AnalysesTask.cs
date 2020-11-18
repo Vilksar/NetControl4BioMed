@@ -167,10 +167,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                         })
                         .Where(item => item.User != null);
                     // Check if there were no analysis users found.
-                    if (analysisUsers == null || !analysisUsers.Any())
+                    if (!batchItem.IsPublic && (analysisUsers == null || !analysisUsers.Any()))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no analysis users found.", showExceptionItem, batchItem);
+                        throw new TaskException("There were no analysis users found, so the analysis must be public.", showExceptionItem, batchItem);
                     }
                     // Check if there are no analysis networks provided.
                     if (batchItem.AnalysisNetworks == null || !batchItem.AnalysisNetworks.Any())
@@ -265,6 +265,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         DateTimeCreated = DateTime.UtcNow,
                         Name = batchItem.Name,
                         Description = batchItem.Description,
+                        IsPublic = batchItem.IsPublic,
                         Status = AnalysisStatus.Defined,
                         Log = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                         Data = batchItem.Data,
@@ -342,6 +343,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -365,6 +368,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
                 var analyses = context.Analyses
+                    .Include(item => item.AnalysisUsers)
                     .Where(item => batchIds.Contains(item.Id));
                 // Save the items to add.
                 var analysesToEdit = new List<Analysis>();
@@ -380,9 +384,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
+                    // Check if there were no analysis users found.
+                    if (!batchItem.IsPublic && (analysis.AnalysisUsers == null || !analysis.AnalysisUsers.Any()))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no analysis users found, so the analysis must be public.", showExceptionItem, batchItem);
+                    }
                     // Update the data.
                     analysis.Name = batchItem.Name;
                     analysis.Description = batchItem.Description;
+                    analysis.IsPublic = batchItem.IsPublic;
                     // Append a message to the log.
                     analysis.Log = analysis.AppendToLog("The analysis details have been updated.");
                     // Add the item to the list.

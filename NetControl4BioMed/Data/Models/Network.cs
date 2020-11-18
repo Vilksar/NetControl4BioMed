@@ -32,6 +32,11 @@ namespace NetControl4BioMed.Data.Models
         public string Description { get; set; }
 
         /// <summary>
+        /// Gets or sets the public availability of the network.
+        /// </summary>
+        public bool IsPublic { get; set; }
+
+        /// <summary>
         /// Gets or sets the status the network.
         /// </summary>
         public NetworkStatus Status { get; set; }

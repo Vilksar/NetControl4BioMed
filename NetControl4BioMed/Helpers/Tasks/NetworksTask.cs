@@ -166,10 +166,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                         })
                         .Where(item => item.User != null);
                     // Check if there were no network users found.
-                    if (networkUsers == null || !networkUsers.Any())
+                    if (!batchItem.IsPublic && (networkUsers == null || !networkUsers.Any()))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no network users found.", showExceptionItem, batchItem);
+                        throw new TaskException("There were no network users found, so the network must be public.", showExceptionItem, batchItem);
                     }
                     // Check if there are no network databases provided.
                     if (batchItem.NetworkDatabases == null || !batchItem.NetworkDatabases.Any())
@@ -233,6 +233,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         DateTimeCreated = DateTime.UtcNow,
                         Name = batchItem.Name,
                         Description = batchItem.Description,
+                        IsPublic = batchItem.IsPublic,
                         Status = NetworkStatus.Defined,
                         Log = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                         Data = batchItem.Data,
@@ -304,6 +305,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -327,6 +330,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems.Select(item => item.Id);
                 // Get the items with the provided IDs.
                 var networks = context.Networks
+                    .Include(item => item.NetworkUsers)
                     .Where(item => batchIds.Contains(item.Id));
                 // Save the items to add.
                 var networksToEdit = new List<Network>();
@@ -341,9 +345,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
+                    // Check if there were no network users found.
+                    if (!batchItem.IsPublic && (network.NetworkUsers == null || !network.NetworkUsers.Any()))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no network users found, so the network must be public.", showExceptionItem, batchItem);
+                    }
                     // Update the data.
                     network.Name = batchItem.Name;
                     network.Description = batchItem.Description;
+                    network.IsPublic = batchItem.IsPublic;
                     // Append a message to the log.
                     network.Log = network.AppendToLog("The network details have been updated.");
                     // Add the item to the list.
