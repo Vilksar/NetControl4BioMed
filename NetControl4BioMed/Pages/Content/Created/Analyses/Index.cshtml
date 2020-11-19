@@ -53,7 +53,14 @@
             </button>
         </div>
     </div>
-    @if (!Model.View.Search.Items.Any())
+    @if (!Model.View.IsUserAuthenticated)
+    {
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>There are no analyses available, as you are not logged in.</span>
+        </div>
+    }
+    else if (!Model.View.Search.Items.Any())
     {
         <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
