@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Common;
+using Hangfire.Storage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -115,6 +116,23 @@ namespace NetControl4BioMed.Pages.Administration
 
         public async Task<IActionResult> OnPostResetHangfireRecurrentJobsAsync()
         {
+            // Use a new connection to the job storage.
+            using (var connection = JobStorage.Current.GetConnection())
+            {
+                // Go over each recurring job in the storage.
+                foreach (var recurringJob in StorageConnectionExtensions.GetRecurringJobs(connection))
+                {
+                    // Delete the recurring job.
+                    RecurringJob.RemoveIfExists(recurringJob.Id);
+                }
+            }
+            // Get the existing recurring background tasks.
+            var backgroundTasks = _context.BackgroundTasks
+                .Where(item => item.IsRecurring);
+            // Mark the existing background tasks for deletion.
+            _context.BackgroundTasks.RemoveRange(backgroundTasks);
+            // Save the changes to the database.
+            await _context.SaveChangesAsync();
             // Get the list of names of the recurring tasks.
             var taskNames = new List<string>
             {
@@ -135,13 +153,6 @@ namespace NetControl4BioMed.Pages.Administration
             {
                 // Get the corresponding background tasks name.
                 var backgroundTaskName = $"{nameof(IRecurringTaskManager)}.{taskName}";
-                // Get the existing background tasks.
-                var backgroundTasks = _context.BackgroundTasks
-                    .Where(item => item.Name == backgroundTaskName);
-                // Mark the existing background tasks for deletion.
-                _context.BackgroundTasks.RemoveRange(backgroundTasks);
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
                 // Delete the existing corresponding recurring job.
                 recurringJobManager.RemoveIfExists(backgroundTaskName);
                 // Define the new background task.

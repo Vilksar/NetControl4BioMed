@@ -243,13 +243,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                 {
                     "Networks",
                     await context.Networks
-                        .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any() || !item.NetworkUsers.Any())
+                        .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any())
                         .CountAsync()
                 },
                 {
                     "Analyses",
                     await context.Analyses
-                        .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any() || !item.AnalysisUsers.Any())
+                        .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any())
                         .CountAsync()
                 }
             };

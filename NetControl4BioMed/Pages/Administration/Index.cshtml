@@ -145,8 +145,20 @@
     <div class="card-body">
         <div class="alert alert-warning text-justify text-wrap">
             <span><i class="fas fa-exclamation-triangle"></i></span>
-            <span>You can (re)set all of the Hangfire recurrent jobs by clicking on the button below. They are scheduled to run every day at midnight. The jobs are unset by default. The recurring jobs are:</span>
+            <span>You can (re)set all of the Hangfire recurrent jobs by clicking on the button below. They are scheduled to run every day at midnight (UTC). The jobs are unset by default. The recurring jobs are:</span>
             <ul class="mt-1 mb-0">
+                <li>
+                    <span><span class="font-weight-bold">Count all items</span>, which counts all corresponding items in the database and updates the current page.</span>
+                </li>
+                <li>
+                    <span><span class="font-weight-bold">Count duplicate items</span>, which counts the corresponding duplicate items in the database and updates the current page.</span>
+                </li>
+                <li>
+                    <span><span class="font-weight-bold">Count orphaned items</span>, which counts the corresponding orphaned items in the database and updates the current page.</span>
+                </li>
+                <li>
+                    <span><span class="font-weight-bold">Count inconsistent items</span>, which counts the corresponding inconsistent items in the database and updates the current page.</span>
+                </li>
                 <li>
                     <span><span class="font-weight-bold">Stop analyses</span>, which stops all analyses created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeStop days before the current date.</span>
                 </li>
@@ -154,7 +166,7 @@
                     <span><span class="font-weight-bold">Alert users</span>, which sends an e-mail to all users which have access to a network or to an analysis created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeAlert days before the current date, and scheduled to be automatically deleted in @(NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete - NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeAlert) days.</span>
                 </li>
                 <li>
-                    <span><span class="font-weight-bold">Delete users</span>, which deletes all users with accounts created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete days before the current date, but with still unconfirmed e-mails.</span>
+                    <span><span class="font-weight-bold">Delete unconfirmed users</span>, which deletes all users with accounts created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete days before the current date, but with still unconfirmed e-mails.</span>
                 </li>
                 <li>
                     <span><span class="font-weight-bold">Delete networks</span>, which deletes all networks created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete days before the current date.</span>
