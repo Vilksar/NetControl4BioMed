@@ -131,6 +131,32 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
+        /// Gets the nodes navigation quick link for the administration index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel AdministrationNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Networks",
+            Title = "Network",
+            Color = "secondary",
+            Icon = "fa-share-alt",
+            Width = 6,
+            Link = "/Administration/Created/Networks/Index"
+        };
+
+        /// <summary>
+        /// Gets the edges navigation quick link for the administration index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel AdministrationAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Analyses",
+            Title = "Analysis",
+            Color = "secondary",
+            Icon = "fa-desktop",
+            Width = 6,
+            Link = "/Administration/Created/Analyses/Index"
+        };
+
+        /// <summary>
         /// Gets the networks navigation quick link for the content index page.
         /// </summary>
         public static NavigationQuickLinkViewModel ContentNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
@@ -326,6 +352,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
             var administrationNodeCollectionsNavigationQuickLink = AdministrationNodeCollectionsNavigationQuickLink;
             var administrationNodesNavigationQuickLink = AdministrationNodesNavigationQuickLink;
             var administrationEdgesNavigationQuickLink = AdministrationEdgesNavigationQuickLink;
+            var administrationNetworksNavigationQuickLink = AdministrationNetworksNavigationQuickLink;
+            var administrationAnalysesNavigationQuickLink = AdministrationAnalysesNavigationQuickLink;
             // Update the count and the route ID.
             administrationUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
             administrationRolesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Roles", null);
@@ -333,6 +361,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
             administrationNodeCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("NodeCollections", null);
             administrationNodesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Nodes", null);
             administrationEdgesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Edges", null);
+            administrationNetworksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
+            administrationAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
@@ -341,7 +371,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 administrationDatabasesNavigationQuickLink,
                 administrationNodeCollectionsNavigationQuickLink,
                 administrationNodesNavigationQuickLink,
-                administrationEdgesNavigationQuickLink
+                administrationEdgesNavigationQuickLink,
+                administrationNetworksNavigationQuickLink,
+                administrationAnalysesNavigationQuickLink
             };
         }
 
