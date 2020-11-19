@@ -25,18 +25,9 @@
                 <div class="my-3">
                     <div class="row">
                         <div class="col-md-6 my-2 my-md-0">
-                            @if (!User.Identity.IsAuthenticated)
-                            {
-                                <a asp-page="/Identity/Login" class="btn btn-success btn-block">
-                                    <span>Get started</span>
-                                </a>
-                            }
-                            else
-                            {
-                                <a asp-page="/Content/Index" class="btn btn-primary btn-block">
-                                    <span>Get started</span>
-                                </a>
-                            }
+                            <a asp-page="/Content/Index" class="btn btn-success btn-block">
+                                <span>Get started</span>
+                            </a>
                         </div>
                         <div class="col-md-6 my-2 my-md-0">
                             <a asp-page="/About" class="btn btn-outline-dark btn-block">

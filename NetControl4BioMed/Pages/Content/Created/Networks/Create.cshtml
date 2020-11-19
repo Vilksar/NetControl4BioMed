@@ -41,6 +41,15 @@
                 <span asp-description-for="Input.Description" class="text-muted small">The description of the new network.</span>
                 <span asp-validation-for="Input.Description" class="text-danger small"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="Input.IsPublic" class="font-weight-bold">Set the network as public?</label>
+                <select asp-for="Input.IsPublic" class="custom-select form-control">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+                <span asp-description-for="Input.IsPublic" class="text-muted small">The public availability of the network. If public, anyone that has its ID or URL can access it.</span>
+                <span asp-validation-for="Input.IsPublic" class="text-danger small"></span>
+            </div>
             <div class="form-group" hidden="@(Model.View.IsGeneric ? "hidden" : null)">
                 <label asp-for="Input.Algorithm" class="font-weight-bold">Algorithm</label>
                 <select asp-for="Input.Algorithm" class="custom-select">
@@ -367,6 +376,7 @@
         <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
     </div>
     <button type="submit" class="btn btn-block btn-success" title="Create">
+        <span><i class="fas fa-plus"></i></span>
         <span>Create</span>
     </button>
 </form>

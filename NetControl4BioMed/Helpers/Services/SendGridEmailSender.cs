@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,11 @@ namespace NetControl4BioMed.Helpers.Services
     public class SendGridEmailSender : ISendGridEmailSender
     {
         /// <summary>
+        /// Represents the web host environment.
+        /// </summary>
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        /// <summary>
         /// Represents the configuration.
         /// </summary>
         private readonly IConfiguration _configuration;
@@ -34,8 +40,9 @@ namespace NetControl4BioMed.Helpers.Services
         /// </summary>
         /// <param name="configuration">Represents the application configuration options.</param>
         /// <param name="renderer">Represents the partial view renderer.</param>
-        public SendGridEmailSender(IConfiguration configuration, IPartialViewRenderer renderer)
+        public SendGridEmailSender(IWebHostEnvironment webHostEnvironment, IConfiguration configuration, IPartialViewRenderer renderer)
         {
+            _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
             _renderer = renderer;
         }
@@ -46,6 +53,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendEmailConfirmationEmailAsync(EmailEmailConfirmationViewModel viewModel)
         {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
             // Define the variables for the e-mail.
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
@@ -64,6 +77,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendEmailChangeEmailAsync(EmailEmailChangeViewModel viewModel)
         {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
             // Define the variables for the e-mail.
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
@@ -82,6 +101,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendPasswordResetEmailAsync(EmailPasswordResetViewModel viewModel)
         {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
             // Define the variables for the e-mail.
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
@@ -100,6 +125,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendEmailChangedEmailAsync(EmailEmailChangedViewModel viewModel)
         {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
             // Define the variables for the e-mail.
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
@@ -118,6 +149,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendPasswordChangedEmailAsync(EmailPasswordChangedViewModel viewModel)
         {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
             // Define the variables for the e-mail.
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
@@ -136,6 +173,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendContactEmailAsync(EmailContactViewModel viewModel)
         {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
             // Define the variables for the e-mail.
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
@@ -154,6 +197,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendAddedToNetworkEmailAsync(EmailAddedToNetworkViewModel viewModel)
         {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
             // Define the variables for the e-mail.
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
@@ -172,6 +221,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendWasAddedToNetworkEmailAsync(EmailWasAddedToNetworkViewModel viewModel)
         {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
             // Define the variables for the e-mail.
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
@@ -190,6 +245,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendAddedToAnalysisEmailAsync(EmailAddedToAnalysisViewModel viewModel)
         {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
             // Define the variables for the e-mail.
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
@@ -208,6 +269,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendWasAddedToAnalysisEmailAsync(EmailWasAddedToAnalysisViewModel viewModel)
         {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
             // Define the variables for the e-mail.
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
@@ -221,11 +288,41 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
-        /// Sends an e-mail with a notification that a generic analysis has ended.
+        /// Sends an e-mail with a notification that a network has ended.
+        /// </summary>
+        /// <param name="viewModel">Represents the view model of the e-mail.</param>
+        public async Task SendNetworkEndedEmailAsync(EmailNetworkEndedViewModel viewModel)
+        {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
+            // Define the variables for the e-mail.
+            var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
+            var client = new SendGridClient(apiKey);
+            var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
+            var to = new EmailAddress(viewModel.Email, viewModel.Email);
+            var subject = "NetControl4BioMed - A network has ended";
+            var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailNetworkEndedPartial", viewModel);
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
+            // Send the e-mail.
+            await client.SendEmailAsync(msg);
+        }
+
+        /// <summary>
+        /// Sends an e-mail with a notification that an analysis has ended.
         /// </summary>
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendAnalysisEndedEmailAsync(EmailAnalysisEndedViewModel viewModel)
         {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
             // Define the variables for the e-mail.
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
@@ -244,6 +341,12 @@ namespace NetControl4BioMed.Helpers.Services
         /// <param name="viewModel">Represents the view model of the e-mail.</param>
         public async Task SendAlertDeleteEmailAsync(EmailAlertDeleteViewModel viewModel)
         {
+            // Check the web host environment.
+            if (_webHostEnvironment.EnvironmentName != "Production")
+            {
+                // Return.
+                return;
+            }
             // Define the variables for the e-mail.
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);

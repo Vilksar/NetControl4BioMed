@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,22 +13,24 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.Users
 {
-    [Authorize]
     public class RemoveModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public RemoveModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context)
+        public RemoveModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
         {
             _serviceProvider = serviceProvider;
             _userManager = userManager;
             _context = context;
+            _reCaptchaChecker = reCaptchaChecker;
         }
 
         [BindProperty]
@@ -37,6 +41,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             public string Id { get; set; }
 
             public IEnumerable<string> Emails { get; set; }
+
+            public string ReCaptchaToken { get; set; }
         }
 
         public ViewModel View { get; set; }
@@ -63,14 +69,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(id))
             {
@@ -81,7 +79,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             }
             // Get the items with the provided ID.
             var items = _context.Analyses
-                .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
+                .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there were no items found.
             if (items == null || !items.Any())
@@ -97,6 +95,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 Analysis = items
                     .First()
             };
+            // Check if the user does not exist.
+            if (user == null)
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: You need to be logged in to remove a user from the analysis.";
+                // Redirect to the index page.
+                return RedirectToPage("/Content/Created/Analyses/Details/Accounts/Users/Index", new { id = View.Analysis.Id });
+            }
             // Get all of the network users and network user invitations.
             var analysisUsers = _context.AnalysisUsers
                 .Include(item => item.User)
@@ -158,14 +164,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(Input.Id))
             {
@@ -176,7 +174,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
             }
             // Get the items with the provided ID.
             var items = _context.Analyses
-                .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
+                .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == Input.Id);
             // Check if there were no items found.
             if (items == null || !items.Any())
@@ -192,6 +190,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 Analysis = items
                     .First()
             };
+            // Check if the user does not exist.
+            if (user == null)
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: You need to be logged in to remove a user from the analysis.";
+                // Redirect to the index page.
+                return RedirectToPage("/Content/Created/Analyses/Details/Accounts/Users/Index", new { id = View.Analysis.Id });
+            }
             // Get all of the network users and network user invitations.
             var analysisUsers = _context.AnalysisUsers
                 .Include(item => item.User)
@@ -239,6 +245,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 TempData["StatusMessage"] = "Error: No or invalid emails have been provided.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Details/Accounts/Users/Index", new { id = View.Analysis.Id });
+            }
+            // Check if the reCaptcha is valid.
+            if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The reCaptcha verification failed.");
+                // Return the page.
+                return Page();
             }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
@@ -291,41 +305,40 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Accounts.User
                 return Page();
             }
             // Check if all of the users have been selected.
-            if (View.AreAllUsersSelected)
+            if (View.AreAllUsersSelected && !View.Analysis.IsPublic)
             {
                 // Define a new task.
-                var analysesTask = new AnalysesTask
+                var task = new BackgroundTask
                 {
-                    Items = new List<AnalysisInputModel>
+                    DateTimeCreated = DateTime.UtcNow,
+                    Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.DeleteAnalysesAsync)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new AnalysesTask
                     {
-                        new AnalysisInputModel
+                        Items = new List<AnalysisInputModel>
                         {
-                            Id = View.Analysis.Id
+                            new AnalysisInputModel
+                            {
+                                Id = View.Analysis.Id
+                            }
                         }
-                    }
+                    })
                 };
-                // Try to run the task.
-                try
-                {
-                    // Run the tasks.
-                    await analysesTask.DeleteAsync(_serviceProvider, CancellationToken.None);
-                }
-                catch (Exception exception)
-                {
-                    // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, exception.Message);
-                    // Redisplay the page.
-                    return Page();
-                }
+                // Mark the task for addition.
+                _context.BackgroundTasks.Add(task);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IContentTaskManager>(item => item.DeleteAnalysesAsync(task.Id, CancellationToken.None));
                 // Display a message.
-                TempData["StatusMessage"] = $"Success: 1 analysis deleted successfully.";
+                TempData["StatusMessage"] = $"Success: A new background job was created to delete 1 analysis.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");
             }
             // Display a message.
             TempData["StatusMessage"] = $"Success: {itemCount} user{(itemCount != 1 ? "s" : string.Empty)} removed successfully.";
             // Check if the current user was selected.
-            if (View.IsCurrentUserSelected)
+            if (View.IsCurrentUserSelected && !View.Analysis.IsPublic)
             {
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Analyses/Index");

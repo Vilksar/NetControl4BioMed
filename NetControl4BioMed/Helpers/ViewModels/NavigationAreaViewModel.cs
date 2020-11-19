@@ -391,15 +391,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "BackgroundTasks",
-                            Title = "Background tasks",
-                            Description = string.Empty,
-                            Icon = "fa-tasks",
-                            Color = "light",
-                            Link = "/Administration/Created/BackgroundTasks/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
                             Id = "Networks",
                             Title = "Networks",
                             Description = string.Empty,
@@ -415,6 +406,36 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Icon = "fa-desktop",
                             Color = "light",
                             Link = "/Administration/Created/Analyses/Index"
+                        }
+                    }
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Other",
+                    Title = "Other",
+                    Description = string.Empty,
+                    Icon = "fa-ellipsis-h",
+                    Color = "primary",
+                    Link = "/Administration/Other/Index",
+                    NavigationPages = new List<NavigationPageViewModel>
+                    {
+                        new NavigationPageViewModel
+                        {
+                            Id = "BackgroundTasks",
+                            Title = "Background tasks",
+                            Description = string.Empty,
+                            Icon = "fa-tasks",
+                            Color = "light",
+                            Link = "/Administration/Other/BackgroundTasks/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "Samples",
+                            Title = "Samples",
+                            Description = string.Empty,
+                            Icon = "fa-paste",
+                            Color = "light",
+                            Link = "/Administration/Other/Samples/Index"
                         }
                     }
                 }
@@ -556,6 +577,27 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Icon = "fa-desktop",
                             Color = "light",
                             Link = "/Content/Created/Analyses/Index"
+                        }
+                    }
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Other",
+                    Title = "Other",
+                    Description = string.Empty,
+                    Icon = "fa-ellipsis-h",
+                    Color = "success",
+                    Link = "/Content/Other/Index",
+                    NavigationPages = new List<NavigationPageViewModel>
+                    {
+                        new NavigationPageViewModel
+                        {
+                            Id = "Samples",
+                            Title = "Samples",
+                            Description = string.Empty,
+                            Icon = "fa-paste",
+                            Color = "light",
+                            Link = "/Content/Other/Samples/Index"
                         }
                     }
                 }

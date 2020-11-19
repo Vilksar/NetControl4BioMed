@@ -15,7 +15,7 @@ using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Tasks;
 
-namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
+namespace NetControl4BioMed.Pages.Administration.Other.Samples
 {
     [Authorize(Roles = "Administrator")]
     public class DeleteModel : PageModel
@@ -41,7 +41,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
 
         public class ViewModel
         {
-            public IEnumerable<BackgroundTask> Items { get; set; }
+            public IEnumerable<Sample> Items { get; set; }
         }
 
         public IActionResult OnGet(IEnumerable<string> ids)
@@ -52,12 +52,12 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Created/BackgroundTasks/Index");
+                return RedirectToPage("/Administration/Other/Samples/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.BackgroundTasks
+                Items = _context.Samples
                     .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -66,7 +66,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No items have been found with the provided IDs.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Created/BackgroundTasks/Index");
+                return RedirectToPage("/Administration/Other/Samples/Index");
             }
             // Return the page.
             return Page();
@@ -80,12 +80,12 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Created/BackgroundTasks/Index");
+                return RedirectToPage("/Administration/Other/Samples/Index");
             }
             // Define the view.
             View = new ViewModel
             {
-                Items = _context.BackgroundTasks
+                Items = _context.Samples
                     .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -94,7 +94,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No items have been found with the provided IDs.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Created/BackgroundTasks/Index");
+                return RedirectToPage("/Administration/Other/Samples/Index");
             }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
@@ -106,14 +106,30 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
             }
             // Save the number of items found.
             var itemCount = View.Items.Count();
-            // Mark the items for removal.
-            _context.BackgroundTasks.RemoveRange(View.Items);
+            // Define a new task.
+            var task = new BackgroundTask
+            {
+                DateTimeCreated = DateTime.UtcNow,
+                Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteSamplesAsync)}",
+                IsRecurring = false,
+                Data = JsonSerializer.Serialize(new SamplesTask
+                {
+                    Items = View.Items.Select(item => new SampleInputModel
+                    {
+                        Id = item.Id
+                    })
+                }, new JsonSerializerOptions { IgnoreNullValues = true })
+            };
+            // Mark the task for addition.
+            _context.BackgroundTasks.Add(task);
             // Save the changes to the database.
             await _context.SaveChangesAsync();
+            // Create a new Hangfire background job.
+            var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteSamplesAsync(task.Id, CancellationToken.None));
             // Display a message.
-            TempData["StatusMessage"] = $"Success: {itemCount} background task{(itemCount != 1 ? "s" : string.Empty)} deleted successfully.";
+            TempData["StatusMessage"] = $"Success: A new background job was created to delete {itemCount} sample{(itemCount != 1 ? "s" : string.Empty)}.";
             // Redirect to the index page.
-            return RedirectToPage("/Administration/Created/BackgroundTasks/Index");
+            return RedirectToPage("/Administration/Other/Samples/Index");
         }
     }
 }

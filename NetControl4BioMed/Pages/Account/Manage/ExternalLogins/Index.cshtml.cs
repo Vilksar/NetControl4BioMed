@@ -27,8 +27,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.ExternalLogins
 
         public class ViewModel
         {
-            public bool IsGuest { get; set; }
-
             public IEnumerable<UserLoginInfo> CurrentLogins { get; set; }
 
             public IEnumerable<AuthenticationScheme> OtherLogins { get; set; }
@@ -51,7 +49,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.ExternalLogins
             // Define the variables for the view.
             View = new ViewModel
             {
-                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 CurrentLogins = await _userManager.GetLoginsAsync(user)
             };
             // Get the other available external logins that are not assigned to the user.
@@ -78,7 +75,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.ExternalLogins
             // Define the variables for the view.
             View = new ViewModel
             {
-                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 CurrentLogins = await _userManager.GetLoginsAsync(user)
             };
             // Get the other available external logins that are not assigned to the user.
@@ -123,7 +119,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.ExternalLogins
             // Define the variables for the view.
             View = new ViewModel
             {
-                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 CurrentLogins = await _userManager.GetLoginsAsync(user)
             };
             // Get the other available external logins that are not assigned to the user.
@@ -131,14 +126,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.ExternalLogins
                 .Where(auth => View.CurrentLogins.All(cl => !string.Equals(cl, auth)));
             // If there is only one external login and there is no local account, then hide the "Remove" button.
             View.ShowRemoveButton = await _userManager.HasPasswordAsync(user) || View.CurrentLogins.Count() > 1;
-            // Check if the user has a guest account.
-            if (View.IsGuest)
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The external logins can't be changed for a guest account.");
-                // Return the page.
-                return Page();
-            }
             // Clear the existing external cookie to ensure a clean login process.
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
             // Request a redirect to the external login provider to link a login for the current user
@@ -164,7 +151,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.ExternalLogins
             // Define the variables to return to the view.
             View = new ViewModel
             {
-                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 CurrentLogins = await _userManager.GetLoginsAsync(user)
             };
             // Other available external logins that are not assigned to the user.

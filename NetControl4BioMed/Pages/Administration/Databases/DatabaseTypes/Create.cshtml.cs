@@ -35,7 +35,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseTypes
             public string Name { get; set; }
 
             [DataType(DataType.MultilineText)]
-            [Required(ErrorMessage = "This field is required.")]
             public string Description { get; set; }
         }
 

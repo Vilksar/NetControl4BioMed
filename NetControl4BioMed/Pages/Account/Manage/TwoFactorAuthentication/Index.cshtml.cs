@@ -26,8 +26,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
 
         public class ViewModel
         {
-            public bool IsGuest { get; set; }
-
             public bool HasAuthenticator { get; set; }
 
             public int RecoveryCodesLeft { get; set; }
@@ -52,7 +50,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
             // Define the variables to return to the view.
             View = new ViewModel
             {
-                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
                 Is2faEnabled = await _userManager.GetTwoFactorEnabledAsync(user),
                 IsMachineRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user),
@@ -77,7 +74,6 @@ namespace NetControl4BioMed.Pages.Account.Manage.TwoFactorAuthentication
             // Define the variables to return to the view.
             View = new ViewModel
             {
-                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
                 Is2faEnabled = await _userManager.GetTwoFactorEnabledAsync(user),
                 IsMachineRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user),

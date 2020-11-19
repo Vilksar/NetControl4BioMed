@@ -42,6 +42,11 @@ namespace NetControl4BioMed.Data.Models
         public string Description { get; set; }
 
         /// <summary>
+        /// Gets or sets the public availability of the analysis.
+        /// </summary>
+        public bool IsPublic { get; set; }
+
+        /// <summary>
         /// Gets or sets the current status of the analysis.
         /// </summary>
         public AnalysisStatus Status { get; set; }

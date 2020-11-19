@@ -339,6 +339,23 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
+        /// Deletes samples from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task DeleteSamplesAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<SamplesTask>(backgroundTask);
+            // Run the task.
+            await task.DeleteAsync(_serviceProvider, token);
+            // Complete the task.
+            await DeleteBackgroundTaskAsync(backgroundTask);
+        }
+
+        /// <summary>
         /// Deletes networks from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
@@ -527,6 +544,35 @@ namespace NetControl4BioMed.Helpers.Services
                 .Select(item => item.Id)
                 .ToList()
                 .Select(item => new InputModels.AnalysisInputModel
+                {
+                    Id = item
+                });
+            // Run the task.
+            await task.DeleteAsync(_serviceProvider, token);
+            // Complete the task.
+            await DeleteBackgroundTaskAsync(backgroundTask);
+        }
+
+        /// <summary>
+        /// Deletes all samples from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task DeleteAllSamplesAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<SamplesTask>(backgroundTask);
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Get all of the item IDs.
+            task.Items = context.Samples
+                .Select(item => item.Id)
+                .ToList()
+                .Select(item => new InputModels.SampleInputModel
                 {
                     Id = item
                 });

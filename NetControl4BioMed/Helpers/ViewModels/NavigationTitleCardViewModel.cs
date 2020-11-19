@@ -104,6 +104,15 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
+        /// Gets the navigation title card for the sample details page.
+        /// </summary>
+        public static NavigationTitleCardViewModel SampleNavigationTitleCard { get; } = new NavigationTitleCardViewModel
+        {
+            Id = "Sample",
+            Icon = "fa-paste"
+        };
+
+        /// <summary>
         /// Gets the navigation title card for the network details page.
         /// </summary>
         public static NavigationTitleCardViewModel NetworkNavigationTitleCard { get; } = new NavigationTitleCardViewModel
@@ -245,6 +254,22 @@ namespace NetControl4BioMed.Helpers.ViewModels
             // Update the title and subtitle.
             navigationTitleCard.Title = nodeCollection.Name;
             navigationTitleCard.Subtitle = nodeCollection.Id;
+            // Return the navigation title card.
+            return navigationTitleCard;
+        }
+
+        /// <summary>
+        /// Gets the updated navigation title card for the sample details page.
+        /// </summary>
+        /// <param name="nodeCollection">Represents the current sample.</param>
+        /// <returns>The navigation title card for the sample details page.</returns>
+        public static NavigationTitleCardViewModel GetSampleNavigationTitleCard(Sample sample)
+        {
+            // Get the corresponding navigation title card.
+            var navigationTitleCard = SampleNavigationTitleCard;
+            // Update the title and subtitle.
+            navigationTitleCard.Title = sample.Name;
+            navigationTitleCard.Subtitle = sample.Id;
             // Return the navigation title card.
             return navigationTitleCard;
         }

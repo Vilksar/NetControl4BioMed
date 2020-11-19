@@ -23,7 +23,6 @@ using Algorithms = NetControl4BioMed.Helpers.Algorithms;
 
 namespace NetControl4BioMed.Pages.Content.Created.Analyses
 {
-    [Authorize]
     [RequestFormLimits(ValueLengthLimit = 16 * 1024 * 1024)]
     public class CreateModel : PageModel
     {
@@ -58,7 +57,15 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
+            public bool IsPublic { get; set; }
+
+            [DataType(DataType.Text)]
+            [Required(ErrorMessage = "This field is required.")]
             public string Algorithm { get; set; }
+
+            [DataType(DataType.MultilineText)]
+            [Required(ErrorMessage = "This field is required.")]
+            public string NetworkData { get; set; }
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
@@ -93,6 +100,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
 
         public class ViewModel
         {
+            public bool IsUserAuthenticated { get; set; }
+
             public string Algorithm { get; set; }
 
             public IEnumerable<Network> Networks { get; set; }
@@ -106,14 +115,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there wasn't any database type ID provided.
             if (string.IsNullOrEmpty(databaseTypeId))
             {
@@ -156,7 +157,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             }
             // Try to get the analysis with the provided ID.
             var analyses = _context.Analyses
-                .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
+                .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == analysisId);
             // Check if there wasn't any analysis found.
             var analysesFound = analyses != null && analyses.Any();
@@ -171,11 +172,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             // Define the view.
             View = new ViewModel
             {
+                IsUserAuthenticated = user != null,
                 Algorithm = algorithm,
-                Networks = _context.Networks
-                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
+                Networks = Enumerable.Empty<Network>(),
                 SourceNodeCollections = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
@@ -183,13 +182,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
             };
-            // Check if there weren't any networks available.
-            if (!View.Networks.Any())
+            // Check if the user is authenticated.
+            if (View.IsUserAuthenticated)
             {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: A new analysis can't be created, as there are no networks available.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/Created/Analyses/Index");
+                // Update the view.
+                View.Networks = _context.Networks
+                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
+                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)));
             }
             // Define the input.
             switch (analysesFound)
@@ -197,8 +197,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 case false:
                     Input = new InputModel
                     {
+                        IsPublic = !View.IsUserAuthenticated,
                         DatabaseTypeId = databaseType.Id,
                         Algorithm = View.Algorithm.ToString(),
+                        NetworkData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                         SourceData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                         TargetData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                         MaximumIterations = 100,
@@ -213,6 +215,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 case true:
                     Input = new InputModel
                     {
+                        IsPublic = analyses
+                            .Select(item => item.IsPublic)
+                            .FirstOrDefault(),
                         DatabaseTypeId = databaseType.Id,
                         Name = analyses
                             .Select(item => item.Name)
@@ -221,6 +226,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                             .Select(item => item.Description)
                             .FirstOrDefault(),
                         Algorithm = algorithm,
+                        NetworkData = JsonSerializer.Serialize(analyses
+                            .Select(item => item.AnalysisNetworks)
+                            .SelectMany(item => item)
+                            .Select(item => item.Network)
+                            .Where(item => item.IsPublic)
+                            .Except(View.Networks)
+                            .Select(item => item.Id)),
                         SourceData = JsonSerializer.Serialize(analyses
                             .Select(item => item.AnalysisNodes)
                             .SelectMany(item => item)
@@ -271,14 +283,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there isn't any database type ID provided.
             if (string.IsNullOrEmpty(Input.DatabaseTypeId))
             {
@@ -308,11 +312,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             // Define the view.
             View = new ViewModel
             {
+                IsUserAuthenticated = user != null,
                 Algorithm = Input.Algorithm,
-                Networks = _context.Networks
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user)),
+                Networks = Enumerable.Empty<Network>(),
                 SourceNodeCollections = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
@@ -320,13 +322,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
             };
-            // Check if there weren't any networks available.
-            if (!View.Networks.Any())
+            // Check if the user is authenticated.
+            if (View.IsUserAuthenticated)
             {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: A new analysis can't be created, as there are no networks available.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/Created/Analyses/Index");
+                // Update the view.
+                View.Networks = _context.Networks
+                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
+                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)));
             }
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
@@ -341,6 +344,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "An error has been encountered. Please check again the input fields.");
+                // Redisplay the page.
+                return Page();
+            }
+            // Check if the public availability isn't valid.
+            if (!View.IsUserAuthenticated && !Input.IsPublic)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "You are not logged in, so the analysis must be set as public.");
                 // Redisplay the page.
                 return Page();
             }
@@ -365,24 +376,27 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 // Redisplay the page.
                 return Page();
             }
-            // Get the provided network IDs.
-            var networkIds = Input.NetworkIds ?? Enumerable.Empty<string>();
-            // Check if there weren't any network IDs provided.
-            if (!networkIds.Any())
+            // Try to deserialize the network data.
+            if (!Input.NetworkData.TryDeserializeJsonObject<IEnumerable<string>>(out var networkItems) || networkItems == null)
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "At least one network must be selected.");
+                ModelState.AddModelError(string.Empty, "The provided network data could not be deserialized.");
                 // Redisplay the page.
                 return Page();
             }
+            // Get the provided network IDs.
+            var networkIds = (Input.NetworkIds ?? Enumerable.Empty<string>()).Concat(networkItems);
             // Try to get the networks with the provided IDs.
-            var networks = View.Networks
+            var networks = _context.Networks
+                .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
+                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
+                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                 .Where(item => networkIds.Contains(item.Id));
             // Check if there weren't any networks found.
             if (!networks.Any())
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No networks could be found with the provided IDs.");
+                ModelState.AddModelError(string.Empty, "No network data has been provided or no networks could be found with the provided IDs.");
                 // Redisplay the page.
                 return Page();
             }
@@ -416,7 +430,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             if (!targetItems.Any() && !targetNodeCollections.Any())
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No target data has been provided.");
+                ModelState.AddModelError(string.Empty, "No target data has been provided or no target node collections could be found with the provided IDs.");
                 // Redisplay the page.
                 return Page();
             }
@@ -450,6 +464,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     {
                         Name = Input.Name,
                         Description = Input.Description,
+                        IsPublic = Input.IsPublic,
                         Data = data,
                         MaximumIterations = Input.MaximumIterations,
                         MaximumIterationsWithoutImprovement = Input.MaximumIterationsWithoutImprovement,
@@ -457,16 +472,18 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                         Parameters = Input.Algorithm == AnalysisAlgorithm.Greedy.ToString() ? JsonSerializer.Serialize(Input.GreedyAlgorithmParameters, new JsonSerializerOptions { IgnoreReadOnlyProperties = true }) :
                             Input.Algorithm == AnalysisAlgorithm.Genetic.ToString() ? JsonSerializer.Serialize(Input.GeneticAlgorithmParameters, new JsonSerializerOptions { IgnoreReadOnlyProperties = true }) :
                             null,
-                        AnalysisUsers = new List<AnalysisUserInputModel>
-                        {
-                            new AnalysisUserInputModel
+                        AnalysisUsers = View.IsUserAuthenticated ?
+                            new List<AnalysisUserInputModel>
                             {
-                                User = new UserInputModel
+                                new AnalysisUserInputModel
                                 {
-                                    Id = user.Id
+                                    User = new UserInputModel
+                                    {
+                                        Id = user.Id
+                                    }
                                 }
-                            }
-                        },
+                            } :
+                            new List<AnalysisUserInputModel>(),
                         AnalysisNodeCollections = sourceNodeCollections
                             .Select(item => item.Id)
                             .Select(item => new AnalysisNodeCollectionInputModel
@@ -499,11 +516,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     }
                 }
             };
+            // Define the IDs of the created items.
+            var ids = Enumerable.Empty<string>();
             // Try to run the task.
             try
             {
                 // Run the task.
-                await task.CreateAsync(_serviceProvider, CancellationToken.None);
+                ids = await task.CreateAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {
@@ -511,6 +530,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 ModelState.AddModelError(string.Empty, exception.Message);
                 // Redisplay the page.
                 return Page();
+            }
+            // Check if there wasn't any ID returned.
+            if (ids != null && ids.Any())
+            {
+                // Display a message.
+                TempData["StatusMessage"] = $"Success: 1 analysis of type \"{databaseType.Name}\" with algorithm \"{Input.Algorithm}\" defined successfully with the ID \"{ids.First()}\" and scheduled for generation.";
+                // Redirect to the index page.
+                return RedirectToPage("/Content/Created/Analyses/Details/Index", new { id = ids.First() });
             }
             // Display a message.
             TempData["StatusMessage"] = $"Success: 1 analysis of type \"{databaseType.Name}\" with algorithm \"{Input.Algorithm}\" defined successfully and scheduled for generation.";

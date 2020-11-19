@@ -85,14 +85,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Roles/Index");
             }
-            // Check if the role is the guest role.
-            if (View.Role.Name == "Guest")
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: The \"Guest\" role can't be edited.";
-                // Redirect to the index page.
-                return RedirectToPage("/Administration/Accounts/Roles/Index");
-            }
             // Define the input.
             Input = new InputModel
             {
@@ -135,14 +127,6 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.Roles
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: The \"Administrator\" role can't be edited.";
-                // Redirect to the index page.
-                return RedirectToPage("/Administration/Accounts/Roles/Index");
-            }
-            // Check if the role is the guest role.
-            if (View.Role.Name == "Guest")
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: The \"Guest\" role can't be edited.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Accounts/Roles/Index");
             }

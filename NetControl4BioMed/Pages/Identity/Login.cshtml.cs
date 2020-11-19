@@ -162,6 +162,8 @@ namespace NetControl4BioMed.Pages.Identity
                 // Return the page.
                 return Page();
             }
+            // Display an error.
+            TempData["StatusMessage"] = "Success: You are now logged in!";
             // Redirect to the return URL.
             return LocalRedirect(View.ReturnUrl);
         }

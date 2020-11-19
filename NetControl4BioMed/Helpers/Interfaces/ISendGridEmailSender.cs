@@ -73,6 +73,12 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task SendWasAddedToAnalysisEmailAsync(EmailWasAddedToAnalysisViewModel viewModel);
 
         /// <summary>
+        /// Sends an e-mail with a notification that a network has ended.
+        /// </summary>
+        /// <param name="viewModel">Represents the view model of the e-mail.</param>
+        Task SendNetworkEndedEmailAsync(EmailNetworkEndedViewModel viewModel);
+
+        /// <summary>
         /// Sends an e-mail with a notification that an analysis has ended.
         /// </summary>
         /// <param name="viewModel">Represents the view model of the e-mail.</param>

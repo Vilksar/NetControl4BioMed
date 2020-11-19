@@ -1,5 +1,6 @@
 ﻿@page
 @model IndexModel
+@using NetControl4BioMed.Data
 @using NetControl4BioMed.Data.Enumerations
 @using Helpers.Extensions
 @{
@@ -7,6 +8,43 @@
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetAnalysisNavigationTitleCard(Model.View.Analysis)" />
+@if (Model.View.Analysis.IsPublic)
+{
+    <div class="alert alert-info text-justify text-wrap">
+        <span><i class="fas fa-info-circle"></i></span>
+        <span>The analysis is public. You can share the analysis ID (<span class="font-weight-bold">@Model.View.Analysis.Id</span>) or the current URL with other users. <span class="font-weight-bold">Anyone with the ID or the URL can access the analysis!</span></span>
+    </div>
+    @if (!Model.View.IsUserAuthenticated)
+    {
+        <div class="alert alert-warning text-justify text-wrap">
+            <span><i class="fas fa-exclamation-triangle"></i></span>
+            <span><span class="font-weight-bold">If you close this page without saving the analysis ID or the current URL, you have no way of returning to it!</span> Alternatively, you can log in and assign the analysis to your account.</span>
+        </div>
+    }
+}
+<div class="row align-items-center">
+    @if (Model.View.ShowVisualization)
+    {
+        <div class="col-lg mb-3">
+            <a asp-page="/Content/Created/Analyses/Create" asp-route-databaseTypeId="@Model.View.DatabaseTypeId" asp-route-algorithm="@Model.View.Analysis.Algorithm.ToString()" asp-route-analysisId="@Model.View.Analysis.Id" class="btn btn-dark btn-block" title="Copy">
+                <span><i class="fas fa-copy"></i></span>
+                <span>Copy</span>
+            </a>
+        </div>
+    }
+    <div class="col-lg mb-3">
+        <a asp-page="/Content/Created/Analyses/Edit" asp-route-id="@Model.View.Analysis.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+        </a>
+    </div>
+    <div class="col-lg mb-3">
+        <a asp-page="/Content/Created/Analyses/Download" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-primary btn-block" title="Download">
+            <span><i class="fas fa-download"></i></span>
+            <span>Download</span>
+        </a>
+    </div>
+</div>
 <div class="card mb-3" title="Status">
     <div class="card-body text-center">
         <partial name="_AnalysisStatusPartial" model="@Model.View.Analysis.Status" />
@@ -59,35 +97,6 @@
         </div>
     </div>
 </div>
-<div class="row align-items-center">
-    <div class="col-lg mb-3">
-        <a asp-page="/Content/Created/Analyses/Edit" asp-route-id="@Model.View.Analysis.Id" class="btn btn-warning btn-block" title="Edit">
-            <span><i class="fas fa-pencil-alt"></i></span>
-            <span>Edit</span>
-        </a>
-    </div>
-    <div class="col-lg mb-3">
-        <a asp-page="/Content/Created/Analyses/Download" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-primary btn-block" title="Download">
-            <span><i class="fas fa-download"></i></span>
-            <span>Download</span>
-        </a>
-    </div>
-    @if (Model.View.Analysis.Status == AnalysisStatus.Ongoing)
-    {
-        <div class="col-lg mb-3">
-            <a asp-page="/Content/Created/Analyses/Stop" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-secondary btn-block" title="Stop">
-                <span><i class="fas fa-stop"></i></span>
-                <span>Stop</span>
-            </a>
-        </div>
-    }
-    <div class="col-lg mb-3">
-        <a asp-page="/Content/Created/Analyses/Delete" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Delete">
-            <span><i class="fas fa-trash"></i></span>
-            <span>Delete</span>
-        </a>
-    </div>
-</div>
 @if (!string.IsNullOrEmpty(Model.View.Analysis.Description))
 {
     <div class="card mb-3">
@@ -111,11 +120,12 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="alert alert-primary text-justify text-wrap">
+            <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
                 <span>As the network corresponding to the analysis is relatively small, you can click the button below to visualize it in browser.</span>
             </div>
-            <a asp-page="/Content/Created/Analyses/Details/Visualize" asp-route-id="@Model.View.Analysis.Id" class="btn btn-primary btn-block">
+            <a asp-page="/Content/Created/Analyses/Details/Visualize" asp-route-id="@Model.View.Analysis.Id" class="btn btn-info btn-block">
+                <span><i class="fas fa-eye"></i></span>
                 <span>Visualize</span>
             </a>
         </div>
@@ -133,7 +143,7 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="alert alert-primary text-justify text-wrap">
+        <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
             <span>The status and the current progress of the analysis are displayed below.</span>
         </div>
@@ -177,7 +187,7 @@
             <div class="col-lg-6 order-1 order-lg-2">
                 <input asp-for="View.Analysis.MaximumIterations" class="form-control" disabled />
             </div>
-            <div class="col-lg-6 order-1 order-lg-3 mb-3">
+            <div class="col-lg-6 order-1 order-lg-3">
                 <span asp-description-for="View.Analysis.MaximumIterations" class="text-muted small">The maximum number of iterations for which the analysis to run.</span>
                 <span asp-validation-for="View.Analysis.MaximumIterations" class="text-danger small"></span>
             </div>
@@ -187,7 +197,7 @@
             <div class="col-lg-6 order-2 order-lg-2">
                 <input asp-for="View.Analysis.MaximumIterationsWithoutImprovement" class="form-control" disabled />
             </div>
-            <div class="col-lg-6 order-2 order-lg-3 mb-3">
+            <div class="col-lg-6 order-2 order-lg-3">
                 <span asp-description-for="View.Analysis.MaximumIterationsWithoutImprovement" class="text-muted small">The maximum number of iterations without improvement in the size of the best solution for which the analysis to run.</span>
                 <span asp-validation-for="View.Analysis.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
             </div>
@@ -206,20 +216,26 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="alert alert-primary text-justify text-wrap">
+        <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
             <span>The parameters used by the algorithm corresponding to the analysis are displayed below.</span>
         </div>
-        <div class="form-group">
-            <label asp-for="View.Analysis.Algorithm" class="font-weight-bold">Algorithm</label>
-            <select asp-for="View.Analysis.Algorithm" class="custom-select" title="@Model.View.Analysis.Algorithm.GetDisplayDescription()" disabled>
-                @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
-                {
-                    <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
-                }
-            </select>
-            <span asp-description-for="View.Analysis.Algorithm" class="text-muted small">The algorithm used by the analysis.</span>
-            <span asp-validation-for="View.Analysis.Algorithm" class="text-danger small"></span>
+        <div class="row">
+            <div class="col-lg-12 order-3 order-lg-1 align-self-center">
+                <label asp-for="View.Analysis.Algorithm" class="font-weight-bold">Algorithm</label>
+            </div>
+            <div class="col-lg-12 order-3 order-lg-2">
+                <select asp-for="View.Analysis.Algorithm" class="custom-select" title="@Model.View.Analysis.Algorithm.GetDisplayDescription()" disabled>
+                    @foreach (var item in Enum.GetValues(typeof(AnalysisAlgorithm)).Cast<AnalysisAlgorithm>())
+                    {
+                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                    }
+                </select>
+            </div>
+            <div class="col-lg-12 order-4 order-lg-3 mb-3">
+                <span asp-description-for="View.Analysis.Algorithm" class="text-muted small">The algorithm used by the analysis.</span>
+                <span asp-validation-for="View.Analysis.Algorithm" class="text-danger small"></span>
+            </div>
         </div>
         @if (Model.View.GreedyAlgorithmParameters != null)
         {
@@ -300,7 +316,7 @@
                     <div class="col-lg-12 order-3 order-lg-2">
                         <select id="heuristics-group-current" class="custom-select heuristics-group-current" size="10" title="Heuristics" disabled></select>
                     </div>
-                    <div class="col-lg-12 order-4 order-lg-3 mb-3">
+                    <div class="col-lg-12 order-4 order-lg-3">
                         <span description-for="heuristics-group-current" class="text-muted small">The search heuristics for the algorithm.</span>
                         <span validation-for="heuristics-group-current" class="text-danger small"></span>
                     </div>
@@ -397,7 +413,7 @@
                         }
                     </select>
                 </div>
-                <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                <div class="col-lg-6 order-1 order-lg-3">
                     <span asp-description-for="View.GeneticAlgorithmParameters.CrossoverType" class="text-muted small">The crossover algorithm to be used.</span>
                     <span asp-validation-for="View.GeneticAlgorithmParameters.CrossoverType" class="text-danger small"></span>
                 </div>
@@ -412,7 +428,7 @@
                         }
                     </select>
                 </div>
-                <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                <div class="col-lg-6 order-2 order-lg-3">
                     <span asp-description-for="View.GeneticAlgorithmParameters.MutationType" class="text-muted small">The mutation algorithm to be used.</span>
                     <span asp-validation-for="View.GeneticAlgorithmParameters.MutationType" class="text-danger small"></span>
                 </div>
@@ -432,6 +448,10 @@
         </div>
     </div>
     <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The log messages of the analysis are displayed below.</span>
+        </div>
         @if (Model.View.Analysis.Log.TryDeserializeJsonObject<IEnumerable<NetControl4BioMed.Helpers.ViewModels.LogEntryViewModel>>(out var logEntries))
         {
             <ul class="mb-0">
@@ -449,5 +469,52 @@
                 }
             </ul>
         }
+    </div>
+</div>
+@if (Model.View.Analysis.Status == AnalysisStatus.Ongoing)
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-stop"></i></span>
+                </div>
+                <div>
+                    <span>Stop</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger text-justify text-wrap">
+                <span><i class="fas fa-exclamation-circle"></i></span>
+                <span>The analysis will be stopped automatically on @((Model.View.Analysis.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeStop)).ToLongDateString()), if it will not have ended by then. Alternatively, you can press the button below to stop it now.</span>
+            </div>
+            <a asp-page="/Content/Created/Analyses/Stop" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Stop">
+                <span><i class="fas fa-stop"></i></span>
+                <span>Stop</span>
+            </a>
+        </div>
+    </div>
+}
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-trash"></i></span>
+            </div>
+            <div>
+                <span>Delete</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger text-justify text-wrap">
+            <span><i class="fas fa-exclamation-circle"></i></span>
+            <span>The analysis will be deleted automatically on @((Model.View.Analysis.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()). Alternatively, you can press the button below to delete it now.</span>
+        </div>
+        <a asp-page="/Content/Created/Analyses/Delete" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
     </div>
 </div>

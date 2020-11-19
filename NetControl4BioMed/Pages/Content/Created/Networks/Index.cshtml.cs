@@ -15,7 +15,6 @@ using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Content.Created.Networks
 {
-    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly UserManager<User> _userManager;
@@ -33,6 +32,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
 
         public class ViewModel
         {
+            public bool IsUserAuthenticated { get; set; }
+
             public IEnumerable<DatabaseType> DatabaseTypes { get; set; }
 
             public SearchViewModel<Network> Search { get; set; }
@@ -102,14 +103,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Define the search input.
             var input = new SearchInputViewModel(ViewModel.SearchOptions, null, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
             // Check if any of the provided variables was null before the reassignment.
@@ -237,6 +230,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             // Define the view.
             View = new ViewModel
             {
+                IsUserAuthenticated = user != null,
                 DatabaseTypes = _context.DatabaseTypes.AsEnumerable(),
                 Search = new SearchViewModel<Network>(_linkGenerator, HttpContext, input, query)
             };
@@ -248,12 +242,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Return an empty result.
-                return new JsonResult(new { });
-            }
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(id))
             {
@@ -265,16 +253,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id)
                 .FirstOrDefault();
-            // Check if there was no item found.
-            if (item == null)
-            {
-                // Return an empty result.
-                return new JsonResult(new { });
-            }
             // Return the analysis data.
             return new JsonResult(new
             {
-                Status = item.Status.ToString()
+                Status = item != null ? item.Status.ToString() : string.Empty
             });
         }
     }

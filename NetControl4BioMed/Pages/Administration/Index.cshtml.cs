@@ -125,7 +125,6 @@ namespace NetControl4BioMed.Pages.Administration
                 nameof(IRecurringTaskManager.StopAnalysesAsync),
                 nameof(IRecurringTaskManager.AlertUsersAsync),
                 nameof(IRecurringTaskManager.DeleteUnconfirmedUsersAsync),
-                nameof(IRecurringTaskManager.DeleteGuestUsersAsync),
                 nameof(IRecurringTaskManager.DeleteNetworksAsync),
                 nameof(IRecurringTaskManager.DeleteAnalysesAsync)
             };
@@ -452,6 +451,26 @@ namespace NetControl4BioMed.Pages.Administration
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-All-Analyses.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("AllSamples"))
+                {
+                    // Get the required data.
+                    var data = _context.Samples
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description,
+                            Type = item.Type.GetDisplayName(),
+                            Data = item.Data
+                        })
+                        .AsNoTracking();
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-All-Samples.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
                     await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
                 }
@@ -973,6 +992,24 @@ namespace NetControl4BioMed.Pages.Administration
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
                 var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllAnalysesAsync(backgroundTask.Id, CancellationToken.None));
+            }
+            // Check the items to delete.
+            if (deleteItems.Contains("Samples"))
+            {
+                // Define a new background task.
+                var backgroundTask = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.UtcNow,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllSamplesAsync)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new AnalysesTask(), jsonSerializerOptions)
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(backgroundTask);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllSamplesAsync(backgroundTask.Id, CancellationToken.None));
             }
             // Display a message.
             TempData["StatusMessage"] = $"Success: A new background task was created to delete {string.Join(" and ", deleteItems.Select(item => $"all {item}"))}.";

@@ -9,7 +9,7 @@
 <form method="get" class="text-justify">
     <div class="row align-items-center">
         <div class="col-lg-12 mb-3">
-            <button type="submit" asp-page="/Administration/Created/BackgroundTasks/Delete" class="btn btn-danger btn-block item-group-button" title="Delete" disabled>
+            <button type="submit" asp-page="/Administration/Other/BackgroundTasks/Delete" class="btn btn-danger btn-block item-group-button" title="Delete" disabled>
                 <span><i class="fas fa-trash"></i></span>
                 <span>Delete selected items</span>
             </button>
@@ -72,10 +72,10 @@
                             <span title="@item.IsRecurring.ToString()">@item.IsRecurring.ToString()</span>
                         </td>
                         <td class="text-center text-break">
-                            <a asp-page="/Administration/Created/BackgroundTasks/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                            <a asp-page="/Administration/Other/BackgroundTasks/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
                                 <span><i class="fas fa-info-circle"></i></span>
                             </a>
-                            <a asp-page="/Administration/Created/BackgroundTasks/Delete" asp-route-ids="@item.Id" class="btn btn-danger m-1" title="Delete">
+                            <a asp-page="/Administration/Other/BackgroundTasks/Delete" asp-route-ids="@item.Id" class="btn btn-danger m-1" title="Delete">
                                 <span><i class="fas fa-trash"></i></span>
                             </a>
                         </td>

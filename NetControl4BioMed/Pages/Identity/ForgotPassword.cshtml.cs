@@ -70,7 +70,7 @@ namespace NetControl4BioMed.Pages.Identity
             // Get the user with the provided e-mail.
             var user = await _userManager.FindByEmailAsync(Input.Email);
             // Check if there wasn't any user found.
-            if (user == null || await _userManager.IsInRoleAsync(user, "Guest"))
+            if (user == null)
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: The provided e-mail address is not associated with any user.";

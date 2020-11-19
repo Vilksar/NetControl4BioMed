@@ -11,7 +11,6 @@ using NetControl4BioMed.Data.Models;
 
 namespace NetControl4BioMed.Pages.Content.Data
 {
-    [Authorize]
     public class IndexModel : PageModel
     {
         public IActionResult OnGet()

@@ -71,30 +71,20 @@
             </div>
         </div>
         <div class="card-body">
-            @if (Model.View.IsGuest)
-            {
-                <div class="alert alert-danger text-justify text-wrap mb-0">
-                    <span><i class="fas fa-exclamation-circle"></i></span>
-                    <span>The external logins can't be changed for a guest account.</span>
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-info text-justify text-wrap">
-                    <span><i class="fas fa-info-circle"></i></span>
-                    <span>Click one of the buttons below in order to add a service to log in.</span>
-                </div>
-                <form method="post" asp-page-handler="LinkLogin" class="text-justify">
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-                    @foreach (var provider in Model.View.OtherLogins)
-                    {
-                        <button type="submit" title="Log in using your @provider.DisplayName account" class="btn btn-block btn-primary" name="provider" value="@provider.Name">
-                            <span><i class="fab fa-@provider.DisplayName.ToLower()"></i></span>
-                            <span>@provider.DisplayName</span>
-                        </button>
-                    }
-                </form>
-            }
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>Click one of the buttons below in order to add a service to log in.</span>
+            </div>
+            <form method="post" asp-page-handler="LinkLogin" class="text-justify">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+                @foreach (var provider in Model.View.OtherLogins)
+                {
+                    <button type="submit" title="Log in using your @provider.DisplayName account" class="btn btn-block btn-primary" name="provider" value="@provider.Name">
+                        <span><i class="fab fa-@provider.DisplayName.ToLower()"></i></span>
+                        <span>@provider.DisplayName</span>
+                    </button>
+                }
+            </form>
         </div>
     </div>
 }

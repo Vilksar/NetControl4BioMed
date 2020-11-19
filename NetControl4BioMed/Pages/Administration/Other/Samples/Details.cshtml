@@ -1,0 +1,80 @@
+﻿@page
+@model DetailsModel
+@using NetControl4BioMed.Data.Enumerations
+@using Helpers.Extensions
+@{
+    ViewData["Title"] = "Sample details";
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Other/Samples/Edit" asp-route-id="@Model.View.Sample.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Other/Samples/Delete" asp-route-ids="@Model.View.Sample.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div>
+                <span>Details</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label asp-for="View.Sample.Id" class="font-weight-bold">ID</label>
+                <input asp-for="View.Sample.Id" class="form-control" readonly />
+                <span asp-description-for="View.Sample.Id" class="text-muted small">The ID of the sample.</span>
+                <span asp-validation-for="View.Sample.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.DateTimeCreated" class="font-weight-bold">Date</label>
+                <input asp-for="View.Sample.DateTimeCreated" class="form-control" readonly />
+                <span asp-description-for="View.Sample.DateTimeCreated" class="text-muted small">The date and time when the sample was created.</span>
+                <span asp-validation-for="View.Sample.DateTimeCreated" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.Name" class="font-weight-bold">Name</label>
+                <input asp-for="View.Sample.Name" class="form-control" readonly />
+                <span asp-description-for="View.Sample.Name" class="text-muted small">The name of the sample.</span>
+                <span asp-validation-for="View.Sample.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="View.Sample.Description" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.Description" class="text-muted small">The description of the sample.</span>
+                <span asp-validation-for="View.Sample.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.Type" class="font-weight-bold">Type</label>
+                <select asp-for="View.Sample.Type" class="custom-select form-control" disabled>
+                    @foreach (var item in Enum.GetValues(typeof(SampleType)).Cast<SampleType>())
+                    {
+                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                    }
+                </select>
+                <span asp-description-for="View.Sample.Type" class="text-muted small">The type of the sample.</span>
+                <span asp-validation-for="View.Sample.Type" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.Data" class="font-weight-bold">Data</label>
+                <textarea asp-for="View.Sample.Data" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.Data" class="text-muted small">The data of the sample.</span>
+                <span asp-validation-for="View.Sample.Data" class="text-danger small"></span>
+            </div>
+        </form>
+    </div>
+</div>

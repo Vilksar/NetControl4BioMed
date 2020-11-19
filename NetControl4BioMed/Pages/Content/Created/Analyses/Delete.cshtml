@@ -9,6 +9,12 @@
     <span>The following @Model.View.Items.Count() analys@(Model.View.Items.Count() != 1 ? "e" : "i")s will be deleted, together with all of the associated data. <span class="font-weight-bold">This action can't be reversed!</span></span>
 </div>
 <form method="post" class="text-justify">
+    <div class="form-group" hidden>
+        <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+        <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+        <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+        <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+    </div>
     <button type="submit" class="btn btn-danger btn-block item-group-button mb-3" title="Delete">
         <span><i class="fas fa-trash"></i></span>
         <span>Delete</span>
@@ -80,3 +86,8 @@
         </div>
     }
 </form>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+    <partial name="_ScriptsReCaptchaPartial" />
+}

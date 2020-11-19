@@ -30,8 +30,6 @@ namespace NetControl4BioMed.Pages.Account
         {
             public User User { get; set; }
 
-            public bool IsGuest { get; set; }
-
             public string AnnouncementMessage { get; set; }
         }
 
@@ -51,7 +49,6 @@ namespace NetControl4BioMed.Pages.Account
             View = new ViewModel
             {
                 User = user,
-                IsGuest = await _userManager.IsInRoleAsync(user, "Guest"),
                 AnnouncementMessage = _configuration["Data:AnnouncementMessage"]
             };
             // Return the page.

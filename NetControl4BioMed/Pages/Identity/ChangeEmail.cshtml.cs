@@ -102,49 +102,6 @@ namespace NetControl4BioMed.Pages.Identity
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }
-            // Check if the user has a guest account.
-            if (await _userManager.IsInRoleAsync(user, "Guest"))
-            {
-                // Define a new task.
-                var userRolesTask = new UserRolesTask
-                {
-                    Items = new List<UserRoleInputModel>
-                        {
-                            new UserRoleInputModel
-                            {
-                                User = new UserInputModel
-                                {
-                                    Id = user.Id
-                                },
-                                Role = new RoleInputModel
-                                {
-                                    Id = (await _roleManager.FindByNameAsync("Guest")).Id
-                                }
-                            }
-                        }
-                };
-                // Try to run the task.
-                try
-                {
-                    // Run the task.
-                    await userRolesTask.DeleteAsync(_serviceProvider, CancellationToken.None);
-                }
-                catch (Exception)
-                {
-                    // Display an error.
-                    TempData["StatusMessage"] = "Error: There was an error with switching from a guest account to a regular account.";
-                    // Redirect to the home page.
-                    return RedirectToPage("/Index");
-                }
-                // Re-sign in the user to update the changes.
-                await _signInManager.RefreshSignInAsync(user);
-                // Generate the password reset code for the user.
-                var passwordResetCode = await _userManager.GeneratePasswordResetTokenAsync(user);
-                // Display a message to the user.
-                TempData["StatusMessage"] = "Success: Thank you for confirming your e-mail. You can now set up a password for the application. This step can also be completed later.";
-                // Redirect to the login page.
-                return RedirectToPage("/Identity/ResetPassword", new { email = user.Email, code = passwordResetCode });
-            }
             // Define a new view model for the e-mail.
             var emailChangedEmailViewModel = new EmailEmailChangedViewModel
             {

@@ -11,7 +11,7 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
 
-namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
+namespace NetControl4BioMed.Pages.Administration.Other.Samples
 {
     [Authorize(Roles = "Administrator")]
     public class DetailsModel : PageModel
@@ -27,7 +27,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
 
         public class ViewModel
         {
-            public BackgroundTask BackgroundTask { get; set; }
+            public Sample Sample { get; set; }
         }
 
         public IActionResult OnGet(string id)
@@ -38,24 +38,24 @@ namespace NetControl4BioMed.Pages.Administration.Created.BackgroundTasks
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No ID has been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Created/BackgroundTasks/Index");
+                return RedirectToPage("/Administration/Other/Samples/Index");
             }
             // Define the query.
-            var query = _context.BackgroundTasks
+            var query = _context.Samples
                 .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
             {
-                BackgroundTask = query
+                Sample = query
                     .FirstOrDefault()
             };
             // Check if there was no item found.
-            if (View.BackgroundTask == null)
+            if (View.Sample == null)
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No item has been found with the provided ID.";
                 // Redirect to the index page.
-                return RedirectToPage("/Administration/Created/BackgroundTasks/Index");
+                return RedirectToPage("/Administration/Other/Samples/Index");
             }
             // Return the page.
             return Page();

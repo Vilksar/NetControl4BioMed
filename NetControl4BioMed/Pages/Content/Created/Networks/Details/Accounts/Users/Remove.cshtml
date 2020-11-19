@@ -8,18 +8,18 @@
     <span><i class="fas fa-exclamation-circle"></i></span>
     <span>The following @Model.View.Items.Count() user@(Model.View.Items.Count() != 1 ? "s" : string.Empty) will be removed from the network. <span class="font-weight-bold">They can be added again at a later time by any user that still has access to the network!</span></span>
 </div>
-@if (Model.View.IsCurrentUserSelected)
+@if (Model.View.IsCurrentUserSelected && !Model.View.Network.IsPublic)
 {
     <div class="alert alert-danger text-justify text-wrap">
         <span><i class="fas fa-exclamation-circle"></i></span>
-        <span><span class="font-weight-bold">If you proceed, you will lose access to the network!</span> If you would like to access the network again at a later time, you will have to be added again by any user that still has access to it.</span>
+        <span><span class="font-weight-bold">As the network is not public, if you proceed you will lose access to it!</span> If you would like to access the network again at a later time, you will have to be added again by any user that still has access to it.</span>
     </div>
 }
-@if (Model.View.AreAllUsersSelected)
+@if (Model.View.AreAllUsersSelected && !Model.View.Network.IsPublic)
 {
     <div class="alert alert-danger text-justify text-wrap">
         <span><i class="fas fa-exclamation-circle"></i></span>
-        <span>If you proceed, all registered users that have access to the network will be removed from it. <span class="font-weight-bold">This will delete the network, together with all of the associated data. This action can't be reversed.</span></span>
+        <span>If you proceed, all registered users that have access to the network will be removed from it. <span class="font-weight-bold">As the network is not public, this will delete it, together with all of the associated data. This action can't be reversed.</span></span>
     </div>
 }
 <form method="post" class="text-justify">
@@ -29,6 +29,12 @@
         <input asp-for="Input.Id" class="form-control" readonly />
         <span asp-description-for="Input.Id" class="text-muted small">The ID of the current network.</span>
         <span asp-validation-for="Input.Id" class="text-danger small"></span>
+    </div>
+    <div class="form-group" hidden>
+        <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+        <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+        <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+        <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
     </div>
     <button type="submit" class="btn btn-danger btn-block item-group-button mb-3" title="Delete">
         <span><i class="fas fa-trash"></i></span>
@@ -93,3 +99,8 @@
         </div>
     }
 </form>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+    <partial name="_ScriptsReCaptchaPartial" />
+}

@@ -23,6 +23,11 @@ namespace NetControl4BioMed.Helpers.InputModels
         public string Description { get; set; }
 
         /// <summary>
+        /// Represents the public availability status of the analysis.
+        /// </summary>
+        public bool IsPublic { get; set; }
+
+        /// <summary>
         /// Represents the algorithm of the analysis.
         /// </summary>
         public string Algorithm { get; set; }

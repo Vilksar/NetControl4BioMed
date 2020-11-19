@@ -35,11 +35,6 @@ namespace NetControl4BioMed.Data
         public static int DaysBeforeDelete { get; } = 31;
 
         /// <summary>
-        /// Gets or sets the number of days before guest user-created database items will be automatically deleted.
-        /// </summary>
-        public static int DaysBeforeGuestDelete { get; } = 1;
-
-        /// <summary>
         /// Gets or sets the database table containing the analyses.
         /// </summary>
         public DbSet<Analysis> Analyses { get; set; }
@@ -218,6 +213,11 @@ namespace NetControl4BioMed.Data
         /// Gets or sets the database table containing the one-to-one relationship between paths and nodes.
         /// </summary>
         public DbSet<PathNode> PathNodes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the database table containing the samples.
+        /// </summary>
+        public DbSet<Sample> Samples { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the database context.
@@ -589,6 +589,11 @@ namespace NetControl4BioMed.Data
                     .WithMany(item => item.PathNodes)
                     .HasForeignKey(item => item.NodeId)
                     .IsRequired();
+            });
+            modelBuilder.Entity<Sample>(entity =>
+            {
+                entity.Property(item => item.Id)
+                    .ValueGeneratedOnAdd();
             });
             modelBuilder.Entity<UserRole>(entity =>
             {

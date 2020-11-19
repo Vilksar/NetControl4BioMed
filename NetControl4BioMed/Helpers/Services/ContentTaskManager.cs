@@ -135,6 +135,23 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
+        /// Sends ended e-mails to the corresponding network users.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task SendNetworksEndedEmailsAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<NetworksTask>(backgroundTask);
+            // Run the task.
+            await task.SendEndedEmailsAsync(_serviceProvider, token);
+            // Complete the task.
+            await DeleteBackgroundTask(backgroundTask);
+        }
+
+        /// <summary>
         /// Sends ended e-mails to the corresponding analysis users.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>

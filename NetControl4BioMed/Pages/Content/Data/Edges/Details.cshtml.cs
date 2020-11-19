@@ -12,7 +12,6 @@ using NetControl4BioMed.Data.Models;
 
 namespace NetControl4BioMed.Pages.Content.Data.Edges
 {
-    [Authorize]
     public class DetailsModel : PageModel
     {
         private readonly UserManager<User> _userManager;
@@ -41,14 +40,6 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if the user does not exist.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the home page.
-                return RedirectToPage("/Index");
-            }
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(id))
             {
