@@ -250,7 +250,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             }
             // Get the item with the provided ID.
             var item = _context.Networks
-                .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
+                .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id)
                 .FirstOrDefault();
             // Return the analysis data.
