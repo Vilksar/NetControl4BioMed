@@ -4,6 +4,13 @@
     ViewData["Title"] = "Network users";
 }
 
+@if (Model.View.Network.IsPublic)
+{
+    <div class="alert alert-info text-justify text-wrap">
+        <span><i class="fas fa-info-circle"></i></span>
+        <span>As the network is public, in addition to the users listed below, anyone that has its ID or URL can access it.</span>
+    </div>
+}
 <partial name="_SearchInputPartial" model="Model.View.Search.Input" />
 <partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
 <form method="get" class="text-justify">
@@ -15,7 +22,7 @@
     </div>
     <div class="row align-items-center">
         <div class="col-lg-6 mb-3">
-            <a asp-page="/Content/Created/Networks/Details/Accounts/Users/Add" asp-route-id="@Model.View.Network.Id" class="btn btn-success btn-block" title="Add">
+            <a asp-page="/Content/Created/Networks/Details/Accounts/Users/Add" asp-route-id="@Model.View.Network.Id" class="btn btn-success btn-block @(Model.View.IsUserAuthenticated ? string.Empty : "disabled")" title="Add">
                 <span><i class="fas fa-user-plus"></i></span>
                 <span>Add a new user</span>
             </a>
@@ -27,7 +34,14 @@
             </button>
         </div>
     </div>
-    @if (!Model.View.Search.Items.Any())
+    @if (!Model.View.IsUserAuthenticated)
+    {
+        <div class="alert alert-warning text-justify text-wrap">
+            <span><i class="fas fa-exclamation-triangle"></i></span>
+            <span>For security reasons, you can't view the users with access to the network if you are not logged in.</span>
+        </div>
+    }
+    else if (!Model.View.Search.Items.Any())
     {
         <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
