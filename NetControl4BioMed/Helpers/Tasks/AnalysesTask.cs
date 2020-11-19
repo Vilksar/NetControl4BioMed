@@ -148,7 +148,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Check if there are no analysis users provided.
-                    if (batchItem.IsPublic && (batchItem.AnalysisUsers == null || !batchItem.AnalysisUsers.Any()))
+                    if (!batchItem.IsPublic && (batchItem.AnalysisUsers == null || !batchItem.AnalysisUsers.Any()))
                     {
                         // Throw an exception.
                         throw new TaskException("There were no analysis users provided and the analysis is not public.", showExceptionItem, batchItem);

@@ -150,6 +150,9 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Contr
                     .Select(item => item.Node)
                     .ToHashSet(),
                 Items = items
+                    .Include(item => item.Paths)
+                        .ThenInclude(item => item.PathNodes)
+                            .ThenInclude(item => item.Node)
             };
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))

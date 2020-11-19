@@ -590,14 +590,16 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 // Redisplay the page.
                 return Page();
             }
-            // Display a message.
-            TempData["StatusMessage"] = $"Success: 1 network of type \"{databaseType.Name}\" defined successfully and scheduled for generation.";
             // Check if there wasn't any ID returned.
             if (ids != null && ids.Any())
             {
+                // Display a message.
+                TempData["StatusMessage"] = $"Success: 1 network of type \"{databaseType.Name}\" defined successfully with the ID \"{ids.First()}\" and scheduled for generation.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/Created/Networks/Details/Index", new { id = ids.First() });
             }
+            // Display a message.
+            TempData["StatusMessage"] = $"Success: 1 network of type \"{databaseType.Name}\" defined successfully and scheduled for generation.";
             // Redirect to the index page.
             return RedirectToPage("/Content/Created/Networks/Index");
         }
