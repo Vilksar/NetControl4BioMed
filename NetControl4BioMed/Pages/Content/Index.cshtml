@@ -19,7 +19,7 @@
     <div class="card-body">
         <div class="alert alert-primary text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>If you have the ID of a network or analysis, you can input it below to look it up. You need to have access to it, or it needs to be public in order to be able to see it.</span>
+            <span>If you have the ID of a network or analysis, you can input it below to look it up. You need to have access to it, or it needs to be public, in order to be able to see it.</span>
         </div>
         <form method="post" class="text-justify">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
@@ -51,118 +51,162 @@
         </form>
     </div>
 </div>
-@if (!Model.View.IsUserAuthenticated)
-{
-    <div class="alert alert-info text-justify text-wrap">
-        <span><i class="fas fa-info-circle"></i></span>
-        <span>There are no recent networks available, as you are not logged in.</span>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-share-alt"></i></span>
+            </div>
+            <div>
+                <span>Recent networks</span>
+            </div>
+        </div>
     </div>
-}
-else if (!Model.View.RecentNetworks.Any())
-{
-    <div class="alert alert-info text-justify text-wrap">
-        <span><i class="fas fa-info-circle"></i></span>
-        <span>There are no recent networks.</span>
+    <div class="card-body">
+        @if (!Model.View.IsUserAuthenticated)
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no recent networks available, as you are not logged in.</span>
+            </div>
+        }
+        else if (!Model.View.RecentNetworks.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no recent networks.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-hover table-bordered mb-0" data-paging="false" data-info="false" data-searching="false">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Name</span>
+                        </th>
+                        <th class="d-none d-lg-table-cell text-center text-break">
+                            <span>Nodes</span>
+                        </th>
+                        <th class="d-none d-lg-table-cell text-center text-break">
+                            <span>Edges</span>
+                        </th>
+                        <th class="text-center text-break">
+                            <span>Status</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var (item, index) in Model.View.RecentNetworks.Select((item, index) => (item, index + 1)))
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span>@index</span>
+                            </td>
+                            <td class="text-left text-break">
+                                <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                                <br />
+                                <span title="@item.Id" class="small text-muted">@item.Id</span>
+                            </td>
+                            <td class="d-none d-lg-table-cell text-center text-break">
+                                <span title="@item.NodeCount">@item.NodeCount</span>
+                            </td>
+                            <td class="d-none d-lg-table-cell text-center text-break">
+                                <span title="@item.EdgeCount">@item.EdgeCount</span>
+                            </td>
+                            <td class="text-center text-break">
+                                <partial name="_NetworkStatusPartial" model="@item.Status" />
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Content/Created/Networks/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                                    <span><i class="fas fa-info-circle"></i></span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
     </div>
-}
-else
-{
-    <table class="table table-bordered mb-3">
-        <thead class="thead-light">
-            <tr>
-                <th class="text-center text-break">
-                    <span>#</span>
-                </th>
-                <th class="text-left text-break">
-                    <span>Recent network</span>
-                </th>
-                <th class="text-left text-break">
-                    <span>ID</span>
-                </th>
-                <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                    <span>Links</span>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var (item, index) in Model.View.RecentNetworks.Select((item, index) => (item, index + 1)))
-            {
-                <tr>
-                    <td class="text-center text-break">
-                        <span>@index</span>
-                    </td>
-                    <td class="text-left text-break">
-                        <span title="@item.Name" class="font-weight-bold">@item.Name</span>
-                    </td>
-                    <td class="text-left text-break">
-                        <span title="@item.Id" class="small text-muted">@item.Id</span>
-                    </td>
-                    <td class="text-center text-break">
-                        <a asp-page="/Content/Created/Networks/Details/Index" asp-route-id="@item.Id" title="Details">
-                            <span>Details</span>
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-@if (!Model.View.IsUserAuthenticated)
-{
-    <div class="alert alert-info text-justify text-wrap">
-        <span><i class="fas fa-info-circle"></i></span>
-        <span>There are no recent analyses available, as you are not logged in.</span>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-desktop"></i></span>
+            </div>
+            <div>
+                <span>Recent analyses</span>
+            </div>
+        </div>
     </div>
-}
-else if (!Model.View.RecentAnalyses.Any())
-{
-    <div class="alert alert-info text-justify text-wrap">
-        <span><i class="fas fa-info-circle"></i></span>
-        <span>There are no recent analyses.</span>
+    <div class="card-body">
+        @if (!Model.View.IsUserAuthenticated)
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no recent analyses available, as you are not logged in.</span>
+            </div>
+        }
+        else if (!Model.View.RecentAnalyses.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no recent analyses.</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-hover table-bordered mb-0" data-paging="false" data-info="false" data-searching="false">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Name</span>
+                        </th>
+                        <th class="d-none d-lg-table-cell text-center text-break">
+                            <span>Status</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var (item, index) in Model.View.RecentAnalyses.Select((item, index) => (item, index + 1)))
+                    {
+                        <tr>
+                            <td class="text-center text-break">
+                                <span>@index</span>
+                            </td>
+                            <td class="text-left text-break">
+                                <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                                <br />
+                                <span title="@item.Id" class="small text-muted">@item.Id</span>
+                            </td>
+                            <td class="d-none d-lg-table-cell text-center text-break">
+                                <partial name="_AnalysisStatusPartial" model="@item.Status" />
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/Content/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                                    <span><i class="fas fa-info-circle"></i></span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
     </div>
-}
-else
-{
-    <table class="table table-bordered mb-3">
-        <thead class="thead-light">
-            <tr>
-                <th class="text-center text-break">
-                    <span>#</span>
-                </th>
-                <th class="text-left text-break">
-                    <span>Recent analysis</span>
-                </th>
-                <th class="text-left text-break">
-                    <span>ID</span>
-                </th>
-                <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                    <span>Links</span>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var (item, index) in Model.View.RecentAnalyses.Select((item, index) => (item, index + 1)))
-            {
-                <tr>
-                    <td class="text-center text-break">
-                        <span>@index</span>
-                    </td>
-                    <td class="text-left text-break">
-                        <span title="@item.Name" class="font-weight-bold">@item.Name</span>
-                    </td>
-                    <td class="text-left text-break">
-                        <span title="@item.Id" class="small text-muted">@item.Id</span>
-                    </td>
-                    <td class="text-center text-break">
-                        <a asp-page="/Content/Created/Analyses/Details/Index" asp-route-id="@item.Id" title="Details">
-                            <span>Details</span>
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+</div>
 
 @section Scripts {
     <partial name="_ScriptsValidationPartial" />

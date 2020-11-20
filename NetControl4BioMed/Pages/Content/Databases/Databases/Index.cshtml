@@ -24,8 +24,11 @@ else
                 <th class="text-left text-break">
                     <span>Name</span>
                 </th>
-                <th class="text-left text-break">
-                    <span>ID</span>
+                <th class="text-center text-break">
+                    <span>Nodes</span>
+                </th>
+                <th class="text-center text-break">
+                    <span>Edges</span>
                 </th>
                 <th class="text-center text-break" data-orderable="false" data-searchable="false">
                     <span>Links</span>
@@ -35,22 +38,33 @@ else
         <tbody>
             @foreach (var (item, index) in Model.View.Search.Items.Select((item, index) => (item, index)))
             {
-                <tr>
-                    <td class="text-center text-break">
-                        <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
-                    </td>
-                    <td class="text-left text-break">
-                        <span title="@item.Name" class="font-weight-bold">@item.Name</span>
-                    </td>
-                    <td class="text-left text-break">
-                        <span title="@item.Id" class="small text-muted">@item.Id</span>
-                    </td>
-                    <td class="text-center text-break">
-                        <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@item.Id" title="Details">
-                            <span>Details</span>
+            <tr>
+                <td class="text-center text-break">
+                    <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
+                </td>
+                <td class="text-left text-break">
+                    <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                    <br />
+                    <span title="@item.Id" class="small text-muted">@item.Id</span>
+                </td>
+                <td class="text-center text-break">
+                    <span title="@item.DatabaseNodeCount">@item.DatabaseNodeCount</span>
+                </td>
+                <td class="text-center text-break">
+                    <span title="@item.DatabaseEdgeCount">@item.DatabaseEdgeCount</span>
+                </td>
+                <td class="text-center text-break">
+                    <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                        <span><i class="fas fa-info-circle"></i></span>
+                    </a>
+                    @if (!string.IsNullOrEmpty(item.Url))
+                    {
+                        <a href="@item.Url" target="_blank" rel="nofollow noopener noreferrer" class="btn btn-primary my-1 mr-1" title="Website">
+                            <span><i class="fas fa-external-link-alt"></i></span>
                         </a>
-                    </td>
-                </tr>
+                    }
+                </td>
+            </tr>
             }
         </tbody>
     </table>

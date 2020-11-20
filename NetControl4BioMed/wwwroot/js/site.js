@@ -142,8 +142,8 @@ $(window).on('load', () => {
             const lineSeparator = $(groupElement).find('.file-group-line-separator').first().val();
             // Get the type of the file group.
             const type = $(groupElement).data('type');
-            // Check if we have nodes.
-            if (type === 'nodes') {
+            // Check if we have simple items.
+            if (type === 'items') {
                 // Split the text into different lines.
                 const rows = $(groupElement).find('.file-group-text').first().val().split(new RegExp(lineSeparator)).filter((element) => {
                     // Select only the non empty elements.

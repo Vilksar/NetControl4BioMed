@@ -88,7 +88,7 @@
                         <span>Progress</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                        <span>Actions</span>
+                        <span>Links</span>
                     </th>
                 </tr>
             </thead>
@@ -104,31 +104,31 @@
                         </td>
                         <td class="text-left text-break">
                             <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                            <br />
+                            <span title="@item.Id" class="small text-muted">@item.Id</span>
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break">
                             <partial name="_AnalysisStatusPartial" model="@item.Status" />
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break">
-                            <span class="item-refresh-item" data-type="progress"></span>
-                            <span>%</span>
-                            <span>/</span>
-                            <span class="item-refresh-item" data-type="progressWithoutImprovement"></span>
-                            <span>%</span>
+                            <span><span class="item-refresh-item" data-type="progress"></span>%</span>
+                            <br />
+                            <span><span class="item-refresh-item" data-type="progressWithoutImprovement"></span>%</span>
                         </td>
                         <td class="text-center text-break">
-                            <a asp-page="/Content/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="btn btn-info my-1 mr-1" title="Details">
+                            <a asp-page="/Content/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
                                 <span><i class="fas fa-info-circle"></i></span>
                             </a>
-                            <a asp-page="/Content/Created/Analyses/Download" asp-route-ids="@item.Id" class="btn btn-primary my-1 mr-1" title="Download">
+                            <a asp-page="/Content/Created/Analyses/Download" asp-route-ids="@item.Id" class="btn btn-primary m-1" title="Download">
                                 <span><i class="fas fa-download"></i></span>
                             </a>
                             @if (item.Status == AnalysisStatus.Ongoing)
                             {
-                                <a asp-page="/Content/Created/Analyses/Stop" asp-route-ids="@item.Id" class="btn btn-secondary my-1 mr-1" title="Stop">
+                                <a asp-page="/Content/Created/Analyses/Stop" asp-route-ids="@item.Id" class="btn btn-secondary m-1" title="Stop">
                                     <span><i class="fas fa-stop"></i></span>
                                 </a>
                             }
-                            <a asp-page="/Content/Created/Analyses/Delete" asp-route-ids="@item.Id" class="btn btn-danger my-1" title="Delete">
+                            <a asp-page="/Content/Created/Analyses/Delete" asp-route-ids="@item.Id" class="btn btn-danger mx-1" title="Delete">
                                 <span><i class="fas fa-trash"></i></span>
                             </a>
                         </td>

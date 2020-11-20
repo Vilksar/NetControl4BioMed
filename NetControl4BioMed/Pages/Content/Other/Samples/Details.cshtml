@@ -1,6 +1,5 @@
 ﻿@page
 @model DetailsModel
-@using Helpers.Extensions
 @{
     ViewData["Title"] = "Sample details";
 }
@@ -15,8 +14,7 @@
 }
 <div class="card mb-3" title="Type">
     <div class="card-body text-center">
-        <span><i class="fas fa-clipboard-list"></i></span>
-        <span title="@Model.View.Sample.Type.GetDisplayDescription()">@Model.View.Sample.Type.GetDisplayName()</span>
+        <partial name="_SampleTypePartial" model="@Model.View.Sample.Type" />
     </div>
 </div>
 @if (!string.IsNullOrEmpty(Model.View.Sample.Description))

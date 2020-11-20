@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Interfaces;
+using NetworkItemModel = NetControl4BioMed.Pages.Content.Created.Networks.IndexModel.ItemModel;
+using AnalysisItemModel = NetControl4BioMed.Pages.Content.Created.Analyses.IndexModel.ItemModel;
 
 namespace NetControl4BioMed.Pages.Content
 {
@@ -51,9 +53,9 @@ namespace NetControl4BioMed.Pages.Content
 
             public Dictionary<string, int?> ItemCount { get; set; }
 
-            public IEnumerable<Network> RecentNetworks { get; set; }
+            public IEnumerable<NetworkItemModel> RecentNetworks { get; set; }
 
-            public IEnumerable<Analysis> RecentAnalyses { get; set; }
+            public IEnumerable<AnalysisItemModel> RecentAnalyses { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -65,8 +67,8 @@ namespace NetControl4BioMed.Pages.Content
             {
                 IsUserAuthenticated = user != null,
                 ItemCount = new Dictionary<string, int?>(),
-                RecentNetworks = Enumerable.Empty<Network>(),
-                RecentAnalyses = Enumerable.Empty<Analysis>()
+                RecentNetworks = Enumerable.Empty<NetworkItemModel>(),
+                RecentAnalyses = Enumerable.Empty<AnalysisItemModel>()
             };
             // Check if the user is authenticated.
             if (View.IsUserAuthenticated)
@@ -79,11 +81,25 @@ namespace NetControl4BioMed.Pages.Content
                 View.RecentNetworks = _context.Networks
                     .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                     .OrderByDescending(item => item.DateTimeCreated)
-                    .Take(5);
+                    .Take(5)
+                    .Select(item => new NetworkItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Status = item.Status,
+                        NodeCount = item.NetworkNodes.Count(),
+                        EdgeCount = item.NetworkEdges.Count()
+                    });
                 View.RecentAnalyses = _context.Analyses
                     .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
                     .OrderByDescending(item => item.DateTimeStarted)
-                    .Take(5);
+                    .Take(5)
+                    .Select(item => new AnalysisItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Status = item.Status
+                    });
             }
             // Return the page.
             return Page();
@@ -98,8 +114,8 @@ namespace NetControl4BioMed.Pages.Content
             {
                 IsUserAuthenticated = user != null,
                 ItemCount = new Dictionary<string, int?>(),
-                RecentNetworks = Enumerable.Empty<Network>(),
-                RecentAnalyses = Enumerable.Empty<Analysis>()
+                RecentNetworks = Enumerable.Empty<NetworkItemModel>(),
+                RecentAnalyses = Enumerable.Empty<AnalysisItemModel>()
             };
             // Check if the user is authenticated.
             if (View.IsUserAuthenticated)
@@ -112,11 +128,25 @@ namespace NetControl4BioMed.Pages.Content
                 View.RecentNetworks = _context.Networks
                     .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                     .OrderByDescending(item => item.DateTimeCreated)
-                    .Take(5);
+                    .Take(5)
+                    .Select(item => new NetworkItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Status = item.Status,
+                        NodeCount = item.NetworkNodes.Count(),
+                        EdgeCount = item.NetworkEdges.Count()
+                    });
                 View.RecentAnalyses = _context.Analyses
                     .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
                     .OrderByDescending(item => item.DateTimeStarted)
-                    .Take(5);
+                    .Take(5)
+                    .Select(item => new AnalysisItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Status = item.Status
+                    });
             }
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))

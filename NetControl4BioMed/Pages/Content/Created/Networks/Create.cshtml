@@ -193,7 +193,7 @@
             <div class="card-body">
                 <div class="alert alert-info text-justify text-wrap">
                     <span><i class="fas fa-info-circle"></i></span>
-                    <span>This section contains the data to be used in generating the new network. Namely, the edges of the new network should be defined here.</span>
+                    <span>This section contains the data to be used in generating the new network. Namely, the edges of the new network should be defined here. You can find possible input samples <a asp-page="/Content/Other/Samples/Index" asp-route-filter="ContainsSeedEdges" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 </div>
                 <div class="file-group" data-type="edges">
                     <div class="form-group" hidden>
@@ -266,9 +266,9 @@
             <div class="card-body">
                 <div class="alert alert-info text-justify text-wrap">
                     <span><i class="fas fa-info-circle"></i></span>
-                    <span>This section contains the data to be used in generating the new network. Namely, the seed nodes used to generate the new network should be defined here.</span>
+                    <span>This section contains the data to be used in generating the new network. Namely, the seed nodes used to generate the new network should be defined here. You can find possible input samples <a asp-page="/Content/Other/Samples/Index" asp-route-filter="ContainsSeedNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 </div>
-                <div class="file-group" data-type="nodes">
+                <div class="file-group" data-type="items">
                     <div class="form-group" hidden>
                         <label asp-for="Input.SeedData" class="font-weight-bold">Data</label>
                         <textarea asp-for="Input.SeedData" class="form-control file-group-input"></textarea>

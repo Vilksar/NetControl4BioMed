@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseEdgeFields
 
         public class ViewModel
         {
-            public SearchViewModel<DatabaseEdgeField> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -57,6 +57,15 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseEdgeFields
                     { "DatabaseEdgeFieldEdgeCount", "Number of edges" }
                 }
             };
+        }
+
+        public class ItemModel
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
+
+            public int DatabaseEdgeFieldEdgeCount { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -123,7 +132,13 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseEdgeFields
             // Define the view.
             View = new ViewModel
             {
-                Search = new SearchViewModel<DatabaseEdgeField>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query
+                    .Select(item => new ItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        DatabaseEdgeFieldEdgeCount = item.DatabaseEdgeFieldEdges.Count()
+                    }))
             };
             // Return the page.
             return Page();

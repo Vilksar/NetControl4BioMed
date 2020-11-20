@@ -1,6 +1,5 @@
 ﻿@page
 @model IndexModel
-@using Helpers.Extensions
 @{
     ViewData["Title"] = "Samples";
 }
@@ -41,7 +40,7 @@
                         <span>Type</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                        <span>Actions</span>
+                        <span>Links</span>
                     </th>
                 </tr>
             </thead>
@@ -57,15 +56,17 @@
                         </td>
                         <td class="text-left text-break">
                             <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                            <br />
+                            <span title="@item.Id" class="small text-muted">@item.Id</span>
                         </td>
                         <td class="text-center text-break">
-                            <span title="@item.Type.GetDisplayDescription()">@item.Type.GetDisplayName()</span>
+                            <partial name="_SampleTypePartial" model="@item.Type" />
                         </td>
                         <td class="text-center text-break">
-                            <a asp-page="/Content/Other/Samples/Details" asp-route-id="@item.Id" class="btn btn-info my-1 mr-1" title="Details">
+                            <a asp-page="/Content/Other/Samples/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
                                 <span><i class="fas fa-info-circle"></i></span>
                             </a>
-                            <a asp-page="/Content/Other/Samples/Download" asp-route-ids="@item.Id" class="btn btn-primary my-1 mr-1" title="Download">
+                            <a asp-page="/Content/Other/Samples/Download" asp-route-ids="@item.Id" class="btn btn-primary m-1" title="Download">
                                 <span><i class="fas fa-download"></i></span>
                             </a>
                         </td>

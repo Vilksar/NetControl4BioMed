@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Content.Other.Samples
 
         public class ViewModel
         {
-            public SearchViewModel<Sample> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -52,9 +52,7 @@ namespace NetControl4BioMed.Pages.Content.Other.Samples
                     { "ContainsSourceNodes", "Contains source nodes" },
                     { "ContainsNotSourceNodes", "Does not contain source nodes" },
                     { "ContainsTargetNodes", "Contains target nodes" },
-                    { "ContainsNotTargetNodes", "Does not contain target nodes" },
-                    { "HasData", "Has data" },
-                    { "HasNoData", "Has no data" }
+                    { "ContainsNotTargetNodes", "Does not contain target nodes" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -65,6 +63,15 @@ namespace NetControl4BioMed.Pages.Content.Other.Samples
                     { "DataLength", "Data length" }
                 }
             };
+        }
+
+        public class ItemModel
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
+
+            public SampleType Type { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -98,9 +105,7 @@ namespace NetControl4BioMed.Pages.Content.Other.Samples
                 .Where(item => input.Filter.Contains("ContainsSourceNodes") ? item.Type == SampleType.SourceNodes : true)
                 .Where(item => input.Filter.Contains("ContainsNotSourceNodes") ? item.Type != SampleType.SourceNodes : true)
                 .Where(item => input.Filter.Contains("ContainsTargetNodes") ? item.Type == SampleType.TargetNodes : true)
-                .Where(item => input.Filter.Contains("ContainsNotTargetNodes") ? item.Type != SampleType.TargetNodes : true)
-                .Where(item => input.Filter.Contains("HasData") ? string.IsNullOrEmpty(item.Data) : true)
-                .Where(item => input.Filter.Contains("HasNoData") ? !string.IsNullOrEmpty(item.Data) : true);
+                .Where(item => input.Filter.Contains("ContainsNotTargetNodes") ? item.Type != SampleType.TargetNodes : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -140,7 +145,13 @@ namespace NetControl4BioMed.Pages.Content.Other.Samples
             // Define the view.
             View = new ViewModel
             {
-                Search = new SearchViewModel<Sample>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query
+                    .Select(item => new ItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Type = item.Type
+                    }))
             };
             // Return the page.
             return Page();

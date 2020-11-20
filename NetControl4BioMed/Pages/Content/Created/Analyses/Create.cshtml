@@ -79,7 +79,7 @@
                 <span><i class="fas fa-info-circle"></i></span>
                 <span>This section contains the network data to be used by the new analysis. Namely, the IDs of the networks used by the new analysis should be defined here.</span>
             </div>
-            <div class="file-group" data-type="nodes">
+            <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
                     <label asp-for="Input.NetworkData" class="font-weight-bold">Networks</label>
                     <textarea asp-for="Input.NetworkData" class="form-control file-group-input"></textarea>
@@ -193,9 +193,9 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the source data to be used by the new analysis. Namely, the source (preferred) nodes used by the new analysis should be defined here.</span>
+                <span>This section contains the source data to be used by the new analysis. Namely, the source (preferred) nodes used by the new analysis should be defined here. You can find possible input samples <a asp-page="/Content/Other/Samples/Index" asp-route-filter="ContainsSourceNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
             </div>
-            <div class="file-group" data-type="nodes">
+            <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
                     <label asp-for="Input.SourceData" class="font-weight-bold">Source nodes</label>
                     <textarea asp-for="Input.SourceData" class="form-control file-group-input"></textarea>
@@ -309,9 +309,9 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the target data to be used by the new analysis. Namely, the target nodes used by the new analysis should be defined here.</span>
+                <span>This section contains the target data to be used by the new analysis. Namely, the target nodes used by the new analysis should be defined here. You can find possible input samples <a asp-page="/Content/Other/Samples/Index" asp-route-filter="ContainsTargetNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
             </div>
-            <div class="file-group" data-type="nodes">
+            <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
                     <label asp-for="Input.TargetData" class="font-weight-bold">Source nodes</label>
                     <textarea asp-for="Input.TargetData" class="form-control file-group-input"></textarea>
