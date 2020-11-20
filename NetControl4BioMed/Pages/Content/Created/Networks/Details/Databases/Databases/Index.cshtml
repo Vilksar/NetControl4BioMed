@@ -24,15 +24,12 @@ else
                 <th class="text-left text-break">
                     <span>Name</span>
                 </th>
-                <th class="text-left text-break">
+                <th class="d-none d-lg-table-cell text-center text-break">
                     <span>Type</span>
                 </th>
-                @if (!Model.View.IsGeneric)
-                {
-                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                        <span>Links</span>
-                    </th>
-                }
+                <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                    <span>Links</span>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -43,19 +40,24 @@ else
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
                     </td>
                     <td class="text-left text-break">
-                        <span title="@item.Database.Name" class="font-weight-bold">@item.Database.Name</span>
+                        <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                        <br />
+                        <span title="@item.Id" class="small text-muted">@item.Id</span>
                     </td>
-                    <td class="text-left text-break">
-                        <span title="@item.Type.ToString()" class="">@item.Type.ToString()</span>
+                    <td class="d-none d-lg-table-cell text-center text-break">
+                        <partial name="_NetworkDatabaseTypePartial" model="@item.Type" />
                     </td>
-                    @if (!Model.View.IsGeneric)
-                    {
-                        <td class="text-center text-break">
-                            <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@item.Database.Id" title="Details">
-                                <span>Details</span>
+                    <td class="text-center text-break">
+                        <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@item.Id" class="btn btn-info m-1 @(Model.View.IsGeneric ? "disabled" : string.Empty)" title="Details">
+                            <span><i class="fas fa-info-circle"></i></span>
+                        </a>
+                        @if (!string.IsNullOrEmpty(item.Url))
+                        {
+                            <a href="@item.Url" target="_blank" rel="nofollow noopener noreferrer" class="btn btn-primary my-1 mr-1" title="Website">
+                                <span><i class="fas fa-external-link-alt"></i></span>
                             </a>
-                        </td>
-                    }
+                        }
+                    </td>
                 </tr>
             }
         </tbody>
