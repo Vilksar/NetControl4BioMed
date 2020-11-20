@@ -9,52 +9,6 @@
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
-                <span><i class="fas fa-binoculars"></i></span>
-            </div>
-            <div>
-                <span>Look up</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-primary text-justify text-wrap">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>If you have the ID of a network or analysis, you can input it below to look it up. You need to have access to it, or it needs to be public, in order to be able to see it.</span>
-        </div>
-        <form method="post" class="text-justify">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-            <div class="form-group">
-                <label asp-for="Input.Type" class="font-weight-bold">Type</label>
-                <select asp-for="Input.Type" class="custom-select form-control">
-                    <option value="Networks">Network</option>
-                    <option value="Analyses">Analysis</option>
-                </select>
-                <span asp-description-for="Input.Type" class="text-muted small">The type of the item to look up.</span>
-                <span asp-validation-for="Input.Type" class="text-danger small"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.Id" class="font-weight-bold">ID</label>
-                <input asp-for="Input.Id" class="form-control" />
-                <span asp-description-for="Input.Id" class="text-muted small">The ID of the item to look up.</span>
-                <span asp-validation-for="Input.Id" class="text-danger small"></span>
-            </div>
-            <div class="form-group" hidden>
-                <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
-                <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
-                <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
-                <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
-            </div>
-            <button type="submit" title="Look up" class="btn btn-block btn-primary">
-                <span><i class="fas fa-binoculars"></i></span>
-                <span>Look up</span>
-            </button>
-        </form>
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
                 <span><i class="fas fa-share-alt"></i></span>
             </div>
             <div>
@@ -79,6 +33,10 @@
         }
         else
         {
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>These are the most recently created networks to which you have access.</span>
+            </div>
             <table class="table table-hover table-bordered mb-0" data-paging="false" data-info="false" data-searching="false">
                 <thead class="thead-light">
                     <tr>
@@ -163,6 +121,10 @@
         }
         else
         {
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>These are the most recently created analyses to which you have access.</span>
+            </div>
             <table class="table table-hover table-bordered mb-0" data-paging="false" data-info="false" data-searching="false">
                 <thead class="thead-light">
                     <tr>
@@ -205,6 +167,52 @@
                 </tbody>
             </table>
         }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-binoculars"></i></span>
+            </div>
+            <div>
+                <span>Look up</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-primary text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>If you have the ID of a network or analysis, you can input it below to look it up. You need to have access to it, or it needs to be public, in order to be able to see it.</span>
+        </div>
+        <form method="post" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label asp-for="Input.Type" class="font-weight-bold">Type</label>
+                <select asp-for="Input.Type" class="custom-select form-control">
+                    <option value="Networks">Network</option>
+                    <option value="Analyses">Analysis</option>
+                </select>
+                <span asp-description-for="Input.Type" class="text-muted small">The type of the item to look up.</span>
+                <span asp-validation-for="Input.Type" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Id" class="font-weight-bold">ID</label>
+                <input asp-for="Input.Id" class="form-control" />
+                <span asp-description-for="Input.Id" class="text-muted small">The ID of the item to look up.</span>
+                <span asp-validation-for="Input.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+                <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+                <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+                <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+            </div>
+            <button type="submit" title="Look up" class="btn btn-block btn-primary">
+                <span><i class="fas fa-binoculars"></i></span>
+                <span>Look up</span>
+            </button>
+        </form>
     </div>
 </div>
 

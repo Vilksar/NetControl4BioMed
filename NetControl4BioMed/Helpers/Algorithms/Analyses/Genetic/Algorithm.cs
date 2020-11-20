@@ -219,7 +219,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
                     {
                         PathNodes = pathNodes.Select((item2, index) => new PathNode { NodeId = item2.Id, Node = item2, Type = PathNodeType.None, Index = index })
                             .Append(new PathNode { NodeId = pathNodes.First().Id, Node = pathNodes.First(), Type = PathNodeType.Source, Index = -1 })
-                            .Append(new PathNode { NodeId = pathNodes.Last().Id, Node = pathNodes.Last(), Type = PathNodeType.Target, Index = pathNodes.Count() + 1 })
+                            .Append(new PathNode { NodeId = pathNodes.Last().Id, Node = pathNodes.Last(), Type = PathNodeType.Target, Index = pathNodes.Count() })
                             .ToList(),
                         PathEdges = pathEdges.Select((item2, index) => new PathEdge { EdgeId = item2.Id, Edge = item2, Index = index }).ToList()
                     };

@@ -121,9 +121,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Created.Analy
                 default:
                     break;
             }
-            // Include the related entities.
-            query = query
-                .Include(item => item.Analysis);
             // Define the view.
             View = new ViewModel
             {
