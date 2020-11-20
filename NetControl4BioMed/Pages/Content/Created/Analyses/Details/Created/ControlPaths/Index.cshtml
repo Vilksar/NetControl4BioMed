@@ -34,10 +34,7 @@
                             <label for="select" class="custom-control-label"></label>
                         </div>
                     </th>
-                    <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
-                        <span>#</span>
-                    </th>
-                    <th class="text-center text-break">
+                    <th class="text-left text-break">
                         <span>Control nodes</span>
                     </th>
                     @if (Model.View.SourceNodes.Any())
@@ -52,7 +49,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var (item, index) in Model.View.Search.Items.Select((item, index) => (item, index)))
+                @foreach (var item in Model.View.Search.Items)
                 {
                     var controlNodes = item.Paths
                         .Select(item1 => item1.PathNodes)
@@ -60,6 +57,8 @@
                         .Where(item => item.Type == PathNodeType.Source)
                         .Select(item => item.Node)
                         .Distinct();
+                    var controlSourceNodeCount = controlNodes
+                        .Where(item => Model.View.SourceNodes.Contains(item)).Count();
                     <tr class="item-group-item">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
@@ -67,21 +66,20 @@
                                 <label for="checkbox-@item.Id" class="custom-control-label"></label>
                             </div>
                         </td>
-                        <td class="text-center text-break">
-                            <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
-                        </td>
-                        <td class="text-center text-break">
-                            <span>@controlNodes.Count()</span>
+                        <td class="text-left text-break">
+                            <span title="@controlNodes.Count()" class="font-weight-bold">@controlNodes.Count()</span>
+                            <br />
+                            <span title="@item.Id" class="small text-muted">@item.Id</span>
                         </td>
                         @if (Model.View.SourceNodes.Any())
                         {
                             <td class="d-none d-lg-table-cell text-center text-break">
-                                <span>@controlNodes.Where(item => Model.View.SourceNodes.Contains(item)).Count()</span>
+                                <span title="@controlSourceNodeCount">@controlSourceNodeCount</span>
                             </td>
                         }
                         <td class="text-center text-break">
-                            <a asp-page="/Content/Created/Analyses/Details/Created/ControlPaths/Details/Index" asp-route-id="@item.Id" title="Details">
-                                <span>Details</span>
+                            <a asp-page="/Content/Created/Analyses/Details/Created/ControlPaths/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                                <span><i class="fas fa-info-circle"></i></span>
                             </a>
                         </td>
                     </tr>

@@ -47,25 +47,37 @@ else
         <tbody>
             @foreach (var (item, index) in Model.View.Search.Items.Select((item, index) => (item, index)))
             {
-                var sourceNode = item.PathNodes.Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Source).Select(item => item.Node.Name).First();
-                var targetNode = item.PathNodes.Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Target).Select(item => item.Node.Name).First();
-                var pathLength = item.PathNodes.Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.None).Count() - 1;
+                var sourceNode = item.PathNodes
+                    .Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Source)
+                    .Select(item => item.Node)
+                    .First();
+                var targetNode = item.PathNodes
+                    .Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Target)
+                    .Select(item => item.Node)
+                    .First();
+                var pathLength = item.PathNodes
+                    .Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.None)
+                    .Count() - 1;
                 <tr>
                     <td class="text-center text-break">
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
                     </td>
                     <td class="text-left text-break">
-                        <span title="@sourceNode">@sourceNode</span>
+                        <span title="@sourceNode.Name" class="font-weight-bold">@sourceNode.Name</span>
+                        <br />
+                        <span title="@sourceNode.Id" class="small text-muted">@sourceNode.Id</span>
                     </td>
                     <td class="text-left text-break">
-                        <span title="@targetNode">@targetNode</span>
+                        <span title="@targetNode.Name" class="font-weight-bold">@targetNode.Name</span>
+                        <br />
+                        <span title="@targetNode.Id" class="small text-muted">@targetNode.Id</span>
                     </td>
                     <td class="d-none d-lg-table-cell text-center text-break">
-                        <span>@pathLength</span>
+                        <span title="@pathLength">@pathLength</span>
                     </td>
                     <td class="text-center text-break">
-                        <a asp-page="/Content/Created/Analyses/Details/Created/ControlPaths/Details/Paths/Details/Index" asp-route-id="@item.Id" title="Details">
-                            <span>Details</span>
+                        <a asp-page="/Content/Created/Analyses/Details/Created/ControlPaths/Details/Paths/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                            <span><i class="fas fa-info-circle"></i></span>
                         </a>
                     </td>
                 </tr>

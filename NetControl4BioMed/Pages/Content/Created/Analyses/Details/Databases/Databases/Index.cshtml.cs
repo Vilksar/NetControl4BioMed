@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
+using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
 
@@ -35,7 +36,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Databases.Dat
 
             public bool IsGeneric { get; set; }
 
-            public SearchViewModel<AnalysisDatabase> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -54,6 +55,17 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Databases.Dat
                     { "Name", "Name" }
                 }
             };
+        }
+
+        public class ItemModel
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
+
+            public string Url { get; set; }
+
+            public AnalysisDatabaseType Type { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -128,7 +140,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Databases.Dat
                     .Select(item => item.AnalysisDatabases)
                     .SelectMany(item => item)
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                Search = new SearchViewModel<AnalysisDatabase>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query
+                    .Select(item => new ItemModel
+                    {
+                        Id = item.Database.Id,
+                        Name = item.Database.Name,
+                        Url = item.Database.Url,
+                        Type = item.Type
+                    }))
             };
             // Return the page.
             return Page();

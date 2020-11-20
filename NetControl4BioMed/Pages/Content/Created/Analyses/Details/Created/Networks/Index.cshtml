@@ -37,11 +37,13 @@ else
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
                     </td>
                     <td class="text-left text-break">
-                        <span title="@item.Network.Name" class="font-weight-bold">@item.Network.Name</span>
+                        <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                        <br />
+                        <span title="@item.Id" class="small text-muted">@item.Id</span>
                     </td>
                     <td class="text-center text-break">
-                        <a asp-page="/Content/Created/Networks/Details/Index" asp-route-id="@item.Network.Id" title="Details">
-                            <span>Details</span>
+                        <a asp-page="/Content/Created/Networks/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                            <span><i class="fas fa-info-circle"></i></span>
                         </a>
                     </td>
                 </tr>

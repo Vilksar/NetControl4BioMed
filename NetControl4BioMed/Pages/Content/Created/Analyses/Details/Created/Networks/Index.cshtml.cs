@@ -33,7 +33,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Netwo
         {
             public Analysis Analysis { get; set; }
 
-            public SearchViewModel<AnalysisNetwork> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -52,6 +52,13 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Netwo
                     { "Name", "Name" }
                 }
             };
+        }
+
+        public class ItemModel
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -114,15 +121,17 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Created.Netwo
                 default:
                     break;
             }
-            // Include the related entities.
-            query = query
-                .Include(item => item.Network);
             // Define the view.
             View = new ViewModel
             {
                 Analysis = items
                     .First(),
-                Search = new SearchViewModel<AnalysisNetwork>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query
+                    .Select(item => new ItemModel
+                    {
+                        Id = item.Network.Id,
+                        Name = item.Network.Name
+                    }))
             };
             // Return the page.
             return Page();

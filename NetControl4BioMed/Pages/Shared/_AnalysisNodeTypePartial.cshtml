@@ -1,0 +1,21 @@
+﻿@model AnalysisNodeType
+@using NetControl4BioMed.Data.Enumerations
+@using Helpers.Extensions
+
+<div class="text-uppercase">
+    @switch (Model)
+    {
+        case AnalysisNodeType.None:
+            <span style="color: lightgray;"><i class="fas fa-circle"></i></span>
+            break;
+        case AnalysisNodeType.Source:
+            <span style="color: lightpink;"><i class="fas fa-circle"></i></span>
+            break;
+        case AnalysisNodeType.Target:
+            <span style="color: cornflowerblue;"><i class="fas fa-circle"></i></span>
+            break;
+        default:
+            break;
+    }
+    <span title="@Model.GetDisplayDescription()">@Model.GetDisplayName()</span>
+</div>

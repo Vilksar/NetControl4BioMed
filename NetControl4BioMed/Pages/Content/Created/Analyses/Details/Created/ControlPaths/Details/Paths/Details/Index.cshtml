@@ -32,6 +32,7 @@
                 <span>As the network corresponding to the path is relatively small, you can click the button below to visualize it in browser.</span>
             </div>
             <a asp-page="/Content/Created/Analyses/Details/Created/ControlPaths/Details/Paths/Details/Visualize" asp-route-id="@Model.View.Path.Id" class="btn btn-primary btn-block">
+                <span><i class="fas fa-eye"></i></span>
                 <span>Visualize</span>
             </a>
         </div>
@@ -68,12 +69,9 @@
                     <th class="d-none d-lg-table-cell text-center text-break">
                         <span>Type</span>
                     </th>
-                    @if (!Model.View.IsGeneric)
-                    {
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>Links</span>
-                        </th>
-                    }
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <span>Links</span>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -90,16 +88,20 @@
                             <span title="@pathNode.Index" class="font-weight-bold">@pathNode.Index</span>
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break">
-                            <span title="@pathNode.Type.ToString()">@pathNode.Type.ToString()</span>
+                            <partial name="_PathNodeTypePartial" model="pathNode.Type" />
                         </td>
-                        @if (!Model.View.IsGeneric)
-                        {
-                            <td class="text-center text-break">
+                        <td class="text-center text-break">
+                            @if (!Model.View.IsGeneric)
+                            {
                                 <a asp-page="/Content/Data/Nodes/Details" asp-route-id="@pathNode.Node.Id" title="Details">
                                     <span>Details</span>
                                 </a>
-                            </td>
-                        }
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -134,12 +136,9 @@
                     <th class="text-center text-break" hidden>
                         <span>Index</span>
                     </th>
-                    @if (!Model.View.IsGeneric)
-                    {
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>Links</span>
-                        </th>
-                    }
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <span>Links</span>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -155,14 +154,18 @@
                         <td class="text-center text-break" hidden>
                             <span title="@pathEdge.Index">@pathEdge.Index</span>
                         </td>
-                        @if (!Model.View.IsGeneric)
-                        {
-                            <td class="text-center text-break">
+                        <td class="text-center text-break">
+                            @if (!Model.View.IsGeneric)
+                            {
                                 <a asp-page="/Content/Data/Edges/Details" asp-route-id="@pathEdge.Edge.Id" title="Details">
                                     <span>Details</span>
                                 </a>
-                            </td>
-                        }
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>
