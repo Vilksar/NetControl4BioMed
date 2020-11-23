@@ -47,12 +47,6 @@
                             <span>Name</span>
                         </th>
                         <th class="d-none d-lg-table-cell text-center text-break">
-                            <span>Nodes</span>
-                        </th>
-                        <th class="d-none d-lg-table-cell text-center text-break">
-                            <span>Edges</span>
-                        </th>
-                        <th class="d-none d-lg-table-cell text-center text-break">
                             <span>Status</span>
                         </th>
                         <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -71,12 +65,6 @@
                                 <span title="@item.Name" class="font-weight-bold">@item.Name</span>
                                 <br />
                                 <span title="@item.Id" class="small text-muted">@item.Id</span>
-                            </td>
-                            <td class="d-none d-lg-table-cell text-center text-break">
-                                <span title="@item.NodeCount">@item.NodeCount</span>
-                            </td>
-                            <td class="d-none d-lg-table-cell text-center text-break">
-                                <span title="@item.EdgeCount">@item.EdgeCount</span>
                             </td>
                             <td class="d-none d-lg-table-cell text-center text-break">
                                 <partial name="_NetworkStatusPartial" model="@item.Status" />

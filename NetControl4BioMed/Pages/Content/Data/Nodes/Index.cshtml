@@ -24,9 +24,6 @@ else
                 <th class="text-left text-break">
                     <span>Name</span>
                 </th>
-                <th class="d-none d-lg-table-cell text-center text-break">
-                    <span>Values</span>
-                </th>
                 <th class="text-center text-break" data-orderable="false" data-searchable="false">
                     <span>Links</span>
                 </th>
@@ -43,9 +40,6 @@ else
                         <span title="@item.Name" class="font-weight-bold">@item.Name</span>
                         <br />
                         <span title="@item.Id" class="small text-muted">@item.Id</span>
-                    </td>
-                    <td class="d-none d-lg-table-cell text-center text-break">
-                        <span title="@item.DatabaseNodeFieldNodeCount">@item.DatabaseNodeFieldNodeCount</span>
                     </td>
                     <td class="text-center text-break">
                         <a asp-page="/Content/Data/Nodes/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">

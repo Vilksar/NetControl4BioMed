@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
 
         public class ViewModel
         {
-            public SearchViewModel<ItemModel> Search { get; set; }
+            public SearchViewModel<DatabaseNodeField> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -57,15 +57,6 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
                     { "DatabaseNodeFieldNodeCount", "Number of nodes" }
                 }
             };
-        }
-
-        public class ItemModel
-        {
-            public string Id { get; set; }
-
-            public string Name { get; set; }
-
-            public int DatabaseNodeFieldNodeCount { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -132,13 +123,7 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
             // Define the view.
             View = new ViewModel
             {
-                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query
-                    .Select(item => new ItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name,
-                        DatabaseNodeFieldNodeCount = item.DatabaseNodeFieldNodes.Count()
-                    }))
+                Search = new SearchViewModel<DatabaseNodeField>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.
             return Page();

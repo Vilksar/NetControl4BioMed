@@ -40,15 +40,15 @@ else
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
                     </td>
                     <td class="text-left text-break">
-                        <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                        <span title="@item.NodeCollection.Name" class="font-weight-bold">@item.NodeCollection.Name</span>
                         <br />
-                        <span title="@item.Id" class="small text-muted">@item.Id</span>
+                        <span title="@item.NodeCollection.Id" class="small text-muted">@item.NodeCollection.Id</span>
                     </td>
                     <td class="d-none d-lg-table-cell text-center text-break">
                         <partial name="_NetworkNodeCollectionTypePartial" model="@item.Type" />
                     </td>
                     <td class="text-center text-break">
-                        <a asp-page="/Content/Data/NodeCollections/Details" asp-route-id="@item.Id" class="btn btn-info m-1 @(Model.View.IsGeneric ? "disabled" : string.Empty)" title="Details">
+                        <a asp-page="/Content/Data/NodeCollections/Details" asp-route-id="@item.NodeCollection.Id" class="btn btn-info m-1 @(Model.View.IsGeneric ? "disabled" : string.Empty)" title="Details">
                             <span><i class="fas fa-info-circle"></i></span>
                         </a>
                     </td>

@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
 
         public class ViewModel
         {
-            public SearchViewModel<ItemModel> Search { get; set; }
+            public SearchViewModel<NodeCollection> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -55,15 +55,6 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
                     { "NodeCollectionNodeCount", "Number of nodes" }
                 }
             };
-        }
-
-        public class ItemModel
-        {
-            public string Id { get; set; }
-
-            public string Name { get; set; }
-
-            public int NodeCollectionNodeCount { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -124,13 +115,7 @@ namespace NetControl4BioMed.Pages.Content.Data.NodeCollections
             // Define the view.
             View = new ViewModel
             {
-                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query
-                    .Select(item => new ItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name,
-                        NodeCollectionNodeCount = item.NodeCollectionNodes.Count()
-                    }))
+                Search = new SearchViewModel<NodeCollection>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.
             return Page();

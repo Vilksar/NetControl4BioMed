@@ -36,7 +36,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Data.NodeColl
 
             public bool IsGeneric { get; set; }
 
-            public SearchViewModel<ItemModel> Search { get; set; }
+            public SearchViewModel<AnalysisNodeCollection> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -60,15 +60,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Data.NodeColl
                     { "Type", "Type" }
                 }
             };
-        }
-
-        public class ItemModel
-        {
-            public string Id { get; set; }
-
-            public string Name { get; set; }
-
-            public AnalysisNodeCollectionType Type { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -155,13 +146,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses.Details.Data.NodeColl
                     .Select(item => item.AnalysisDatabases)
                     .SelectMany(item => item)
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query
-                    .Select(item => new ItemModel
-                    {
-                        Id = item.NodeCollection.Id,
-                        Name = item.NodeCollection.Name,
-                        Type = item.Type
-                    }))
+                Search = new SearchViewModel<AnalysisNodeCollection>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.
             return Page();

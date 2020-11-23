@@ -37,12 +37,12 @@ else
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
                     </td>
                     <td class="text-left text-break">
-                        <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                        <span title="@item.Edge.Name" class="font-weight-bold">@item.Edge.Name</span>
                         <br />
-                        <span title="@item.Id" class="small text-muted">@item.Id</span>
+                        <span title="@item.Edge.Id" class="small text-muted">@item.Edge.Id</span>
                     </td>
                     <td class="text-center text-break">
-                        <a asp-page="/Content/Data/Edges/Details" asp-route-id="@item.Id" class="btn btn-info m-1 @(Model.View.IsGeneric ? "disabled" : string.Empty)" title="Details">
+                        <a asp-page="/Content/Data/Edges/Details" asp-route-id="@item.Edge.Id" class="btn btn-info m-1 @(Model.View.IsGeneric ? "disabled" : string.Empty)" title="Details">
                             <span><i class="fas fa-info-circle"></i></span>
                         </a>
                     </td>

@@ -36,7 +36,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
 
             public IEnumerable<DatabaseType> DatabaseTypes { get; set; }
 
-            public SearchViewModel<ItemModel> Search { get; set; }
+            public SearchViewModel<Analysis> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -98,15 +98,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     { "AnalysisNetworkCount", "Number of networks" }
                 }
             };
-        }
-
-        public class ItemModel
-        {
-            public string Id { get; set; }
-
-            public string Name { get; set; }
-
-            public AnalysisStatus Status { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -258,13 +249,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             {
                 IsUserAuthenticated = user != null,
                 DatabaseTypes = _context.DatabaseTypes.AsEnumerable(),
-                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query
-                    .Select(item => new ItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name,
-                        Status = item.Status
-                    }))
+                Search = new SearchViewModel<Analysis>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.
             return Page();

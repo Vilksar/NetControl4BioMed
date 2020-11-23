@@ -40,20 +40,20 @@ else
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
                     </td>
                     <td class="text-left text-break">
-                        <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                        <span title="@item.Database.Name" class="font-weight-bold">@item.Database.Name</span>
                         <br />
-                        <span title="@item.Id" class="small text-muted">@item.Id</span>
+                        <span title="@item.Database.Id" class="small text-muted">@item.Database.Id</span>
                     </td>
                     <td class="d-none d-lg-table-cell text-center text-break">
                         <partial name="_NetworkDatabaseTypePartial" model="@item.Type" />
                     </td>
                     <td class="text-center text-break">
-                        <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@item.Id" class="btn btn-info m-1 @(Model.View.IsGeneric ? "disabled" : string.Empty)" title="Details">
+                        <a asp-page="/Content/Databases/Databases/Details" asp-route-id="@item.Database.Id" class="btn btn-info m-1 @(Model.View.IsGeneric ? "disabled" : string.Empty)" title="Details">
                             <span><i class="fas fa-info-circle"></i></span>
                         </a>
-                        @if (!string.IsNullOrEmpty(item.Url))
+                        @if (!string.IsNullOrEmpty(item.Database.Url))
                         {
-                            <a href="@item.Url" target="_blank" rel="nofollow noopener noreferrer" class="btn btn-primary my-1 mr-1" title="Website">
+                            <a href="@item.Database.Url" target="_blank" rel="nofollow noopener noreferrer" class="btn btn-primary my-1 mr-1" title="Website">
                                 <span><i class="fas fa-external-link-alt"></i></span>
                             </a>
                         }

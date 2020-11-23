@@ -36,7 +36,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.Nodes
 
             public bool IsGeneric { get; set; }
 
-            public SearchViewModel<ItemModel> Search { get; set; }
+            public SearchViewModel<NetworkNode> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -61,15 +61,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.Nodes
                     { "Type", "Type" }
                 }
             };
-        }
-
-        public class ItemModel
-        {
-            public string Id { get; set; }
-
-            public string Name { get; set; }
-
-            public NetworkNodeType Type { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -157,13 +148,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks.Details.Data.Nodes
                     .Select(item => item.NetworkDatabases)
                     .SelectMany(item => item)
                     .Any(item => item.Database.DatabaseType.Name == "Generic"),
-                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query
-                    .Select(item => new ItemModel
-                    {
-                        Id = item.Node.Id,
-                        Name = item.Node.Name,
-                        Type = item.Type
-                    }))
+                Search = new SearchViewModel<NetworkNode>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.
             return Page();
