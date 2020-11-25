@@ -97,6 +97,14 @@ namespace NetControl4BioMed.Helpers.Extensions
                     // Save the changes.
                     await context.SaveChangesAsync();
                 }
+                // Check if there isn't any entry already defined.
+                if (!context.Samples.Any())
+                {
+                    // Mark the seed data for addition.
+                    context.Samples.AddRange(Samples.Seed);
+                    // Save the changes.
+                    await context.SaveChangesAsync();
+                }
             }
             // Return the application.
             return app;

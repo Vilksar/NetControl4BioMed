@@ -245,8 +245,8 @@ $(window).on('load', () => {
                     // Return from the function.
                     return;
                 }
-                // Check if we have nodes.
-                if (type === 'nodes') {
+                // Check if we have simple items.
+                if (type === 'items') {
                     // Go over all of the elements.
                     data = data.filter((element) => {
                         // Keep only the ones which are of the proper type.
