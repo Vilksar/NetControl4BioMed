@@ -6,6 +6,7 @@
     ViewData["Title"] = "Analysis control path details";
 }
 
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetControlPathNavigationTitleCard(Model.View.ControlPath)" />
 <div class="row align-items-center">
     <div class="col-lg mb-3">
         <a asp-page="/Content/Created/Analyses/Details/Created/ControlPaths/Download" asp-route-ids="@Model.View.ControlPath.Id" class="btn btn-primary btn-block" title="Download">

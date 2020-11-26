@@ -31,6 +31,7 @@
                 <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
             </div>
             <button type="submit" title="Update" class="btn btn-block btn-success">
+                <span><i class="fas fa-user-edit"></i></span>
                 <span>Update</span>
             </button>
             @if (!Model.View.IsEmailConfirmed)
@@ -41,6 +42,7 @@
                     <span>Please click the button below to receive an e-mail containing instructions on confirming it.</span>
                 </div>
                 <button type="submit" asp-page-handler="SendVerificationEmail" title="Send verification e-mail" class="btn btn-block btn-danger">
+                    <span><i class="fas fa-envelope"></i></span>
                     <span>Send verification e-mail</span>
                 </button>
             }

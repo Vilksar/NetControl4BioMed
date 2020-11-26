@@ -131,6 +131,15 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
+        /// Gets the navigation title card for the control path details page.
+        /// </summary>
+        public static NavigationTitleCardViewModel ControlPathNavigationTitleCard { get; } = new NavigationTitleCardViewModel
+        {
+            Id = "ControlPath",
+            Icon = "fa-gamepad"
+        };
+
+        /// <summary>
         /// Gets the updated navigation title card for the user details page.
         /// </summary>
         /// <param name="user">Represents the current user.</param>
@@ -302,6 +311,22 @@ namespace NetControl4BioMed.Helpers.ViewModels
             // Update the title and subtitle.
             navigationTitleCard.Title = analysis.Name;
             navigationTitleCard.Subtitle = analysis.Id;
+            // Return the navigation title card.
+            return navigationTitleCard;
+        }
+
+        /// <summary>
+        /// Gets the updated navigation title card for the analysis details page.
+        /// </summary>
+        /// <param name="analysis">Represents the current analysis.</param>
+        /// <returns>The navigation title card for the analysis page.</returns>
+        public static NavigationTitleCardViewModel GetControlPathNavigationTitleCard(ControlPath controlPath)
+        {
+            // Get the corresponding navigation title card.
+            var navigationTitleCard = ControlPathNavigationTitleCard;
+            // Update the title and subtitle.
+            navigationTitleCard.Title = "Control path";
+            navigationTitleCard.Subtitle = controlPath.Id;
             // Return the navigation title card.
             return navigationTitleCard;
         }

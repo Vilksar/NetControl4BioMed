@@ -72,15 +72,18 @@
             {
                 <form method="post" class="text-justify">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-                    <button type="submit" title="Forget this browser" class="btn btn-block btn-primary">
+                    <button type="submit" title="Forget this browser" class="btn btn-block btn-danger">
+                        <span><i class="fas fa-times"></i></span>
                         <span>Forget this browser</span>
                     </button>
                 </form>
             }
             <a asp-page="/Account/Manage/TwoFactorAuthentication/DisableAuthenticator" class="btn btn-block btn-danger">
+                <span><i class="fas fa-minus"></i></span>
                 <span>Disable two-factor authentication</span>
             </a>
             <a asp-page="/Account/Manage/TwoFactorAuthentication/GenerateRecoveryCodes" class="btn btn-block btn-warning">
+                <span><i class="fas fa-key"></i></span>
                 <span>Reset recovery codes</span>
             </a>
         </div>
@@ -105,15 +108,18 @@
         @if (!Model.View.HasAuthenticator)
         {
             <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-success">
+                <span><i class="fas fa-plus"></i></span>
                 <span>Add authenticator app</span>
             </a>
         }
         else
         {
-            <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-success">
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-primary">
+                <span><i class="fas fa-cog"></i></span>
                 <span>Setup authenticator app</span>
             </a>
             <a asp-page="/Account/Manage/TwoFactorAuthentication/ResetAuthenticator" class="btn btn-block btn-danger">
+                <span><i class="fas fa-sync"></i></span>
                 <span>Reset authenticator app</span>
             </a>
         }

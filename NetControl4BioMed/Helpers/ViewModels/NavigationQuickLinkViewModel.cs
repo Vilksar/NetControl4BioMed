@@ -253,7 +253,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel NetworkAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Analyses",
-            Title = "Analyses",
+            Title = "Analysis",
             Color = "primary",
             Icon = "fa-desktop",
             Width = 6,
@@ -331,7 +331,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AnalysisNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Networks",
-            Title = "Networks",
+            Title = "Network",
             Color = "primary",
             Icon = "fa-share-alt",
             Width = 6,

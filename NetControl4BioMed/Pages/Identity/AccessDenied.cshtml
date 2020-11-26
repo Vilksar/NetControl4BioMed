@@ -25,6 +25,7 @@
                                 <form asp-page="/Logout" method="post" class="text-justify">
                                     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
                                     <button type="submit" title="Log out" class="btn btn-danger btn-block">
+                                        <span><i class="fas fa-sign-out-alt"></i></span>
                                         <span>Log out</span>
                                     </button>
                                 </form>
@@ -32,12 +33,14 @@
                             else
                             {
                                 <a asp-page="/Index" class="btn btn-danger btn-block" title="Log in">
+                                    <span><i class="fas fa-sign-in-alt"></i></span>
                                     <span>Log in</span>
                                 </a>
                             }
                         </div>
                         <div class="col-lg-6 my-2 my-lg-0">
                             <a asp-page="/Index" class="btn btn-outline-dark btn-block" title="Home">
+                                <span><i class="fas fa-home"></i></span>
                                 <span>Home</span>
                             </a>
                         </div>
