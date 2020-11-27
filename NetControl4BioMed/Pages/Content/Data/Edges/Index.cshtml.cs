@@ -44,7 +44,7 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
                     { "SourceNode", "Source node" },
                     { "TargetNode", "Target node" },
                     { "Databases", "Databases" },
-                    { "DatabasesEdgeFields", "DatabaseEdgeFields" },
+                    { "DatabasesEdgeFields", "Database edge fields" },
                     { "Values", "Values" }
                 },
                 Filter = new Dictionary<string, string>
@@ -77,8 +77,10 @@ namespace NetControl4BioMed.Pages.Content.Data.Edges
             // Start with all of the items in the non-generic databases.
             var query = _context.Edges
                 .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                .Where(item => item.EdgeNodes.All(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))));
+                .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)));
+            // Keep only the edges with all nodes non-generic and to which the user has access. This part of the query should be combined with the previous one, but it has been separated and commented out for performance reasons.
+            /* query = query
+                .Where(item => item.EdgeNodes.All(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user)))); */
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
