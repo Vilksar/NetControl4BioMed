@@ -46,7 +46,7 @@ namespace NetControl4BioMed.Pages
             if (exceptionHandlerPathFeature != null)
             {
                 // Append the path and the error to the message.
-                message += $" The request tried to access the page {exceptionHandlerPathFeature?.Path} and returned the error {exceptionHandlerPathFeature?.Error?.Message}.";
+                message += $" The request tried to access the page {exceptionHandlerPathFeature?.Path} and returned the error \"{exceptionHandlerPathFeature?.Error?.Message}\".";
             }
             // Check if we had a status code re-execution.
             if (statusCodeReExecuteFeature != null)

@@ -223,7 +223,11 @@ namespace NetControl4BioMed.Data
         /// Initializes a new instance of the database context.
         /// </summary>
         /// <param name="options">Represents the options for the database context.</param>
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+            // Increase the timeout for the database commands.
+            Database.SetCommandTimeout(60);
+        }
 
         /// <summary>
         /// Configures code-first the database entities and relationships between them.
