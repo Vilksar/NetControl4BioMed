@@ -12,7 +12,6 @@ using NetControl4BioMed.Data.Models;
 
 namespace NetControl4BioMed.Pages.Content.Data.Nodes
 {
-    [Authorize]
     public class DetailsModel : PageModel
     {
         private readonly UserManager<User> _userManager;
