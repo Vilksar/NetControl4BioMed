@@ -58,21 +58,25 @@ namespace NetControl4BioMed.Helpers.Tasks
                 {
                     "DatabaseTypes",
                     await context.DatabaseTypes
+                        .Where(item => item.Name != "Generic")
                         .CountAsync()
                 },
                 {
                     "Databases",
                     await context.Databases
+                        .Where(item => item.DatabaseType.Name != "Generic")
                         .CountAsync()
                 },
                 {
                     "DatabaseNodeFields",
                     await context.DatabaseNodeFields
+                        .Where(item => item.Database.DatabaseType.Name != "Generic")
                         .CountAsync()
                 },
                 {
                     "DatabaseEdgeFields",
                     await context.DatabaseEdgeFields
+                        .Where(item => item.Database.DatabaseType.Name != "Generic")
                         .CountAsync()
                 },
                 {
@@ -90,6 +94,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 {
                     "NodeCollections",
                     await context.NodeCollections
+                        .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                         .CountAsync()
                 },
                 {
@@ -198,6 +203,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 {
                     "NodeCollections",
                     await context.NodeCollections
+                        .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                         .GroupBy(item => item.Name)
                         .Where(item => item.Count() > 1)
                         .Select(item => item.Key)

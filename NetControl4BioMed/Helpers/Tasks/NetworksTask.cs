@@ -472,7 +472,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Check if the status is not valid.
                     if (network.Status != NetworkStatus.Defined)
                     {
-                        // Check 
                         // Update the status of the item.
                         network.Status = NetworkStatus.Error;
                         // Add a message to the log.
@@ -555,7 +554,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Update the status of the item.
                         network.Status = NetworkStatus.Defined;
                         // Add a message to the log.
-                        network.AppendToLog($"The retry number {currentRetry} ended with an error. {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
+                        network.Log = network.AppendToLog($"The try number {currentRetry + 1} ({NumberOfRetries - currentRetry} tr{(NumberOfRetries - currentRetry != 1 ? "ies" : "y")} remaining) ended with an error. {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
                         // Edit the network.
                         await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
                         // Check if the task should be executed again.
