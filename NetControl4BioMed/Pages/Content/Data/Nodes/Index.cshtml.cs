@@ -40,18 +40,24 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
                 {
                     { "Id", "ID" },
                     { "Name", "Name" },
-                    { "Description", "Description" },
-                    { "Databases", "Databases" },
-                    { "DatabaseNodeFields", "Node fields" },
-                    { "Values", "Values" }
+                    { "Description", "Description" }
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "HasEdgeNodes", "Has edge nodes" },
+                    { "HasNoEdgeNodes", "Does not have edge nodes" },
+                    { "HasNodeCollectionNodes", "Has node collection nodes" },
+                    { "HasNoNodeCollectionNodes", "Does not have node collection nodes" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
-                    { "Name", "Name" }
+                    { "DateTimeCreated", "Date created" },
+                    { "Name", "Name" },
+                    { "DatabaseNodeCount", "Number of database nodes" },
+                    { "DatabaseNodeFieldNodeCount", "Number of database node field nodes" },
+                    { "EdgeNodeCount", "Number of edge nodes" },
+                    { "NodeCollectionNodeCount", "Number of node collection nodes" }
                 }
             };
         }
@@ -77,10 +83,13 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
                 .Where(item => !input.SearchIn.Any() ||
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Databases") && item.DatabaseNodes.Where(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Database.Id.Contains(input.SearchString) || item1.Database.Name.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("DatabaseNodeFields") && item.DatabaseNodes.Where(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Database.DatabaseNodeFields.Any(item2 => item2.Id.Contains(input.SearchString) || item2.Name.Contains(input.SearchString))) ||
-                    input.SearchIn.Contains("Values") && item.DatabaseNodeFieldNodes.Where(item1 => item1.DatabaseNodeField.Database.IsPublic || item1.DatabaseNodeField.Database.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.DatabaseNodeField.IsSearchable && item1.Value.Contains(input.SearchString)));
+                    input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString));
+            // Select the results matching the filter parameter.
+            query = query
+                .Where(item => input.Filter.Contains("HasEdgeNodes") ? item.EdgeNodes.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoEdgeNodes") ? !item.EdgeNodes.Any() : true)
+                .Where(item => input.Filter.Contains("HasNodeCollectionNodes") ? item.NodeCollectionNodes.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoNodeCollectionNodes") ? !item.NodeCollectionNodes.Any() : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -90,11 +99,41 @@ namespace NetControl4BioMed.Pages.Content.Data.Nodes
                 case var sort when sort == ("Id", "Descending"):
                     query = query.OrderByDescending(item => item.Id);
                     break;
+                case var sort when sort == ("DateTimeCreated", "Ascending"):
+                    query = query.OrderBy(item => item.DateTimeCreated);
+                    break;
+                case var sort when sort == ("DateTimeCreated", "Descending"):
+                    query = query.OrderByDescending(item => item.DateTimeCreated);
+                    break;
                 case var sort when sort == ("Name", "Ascending"):
                     query = query.OrderBy(item => item.Name);
                     break;
                 case var sort when sort == ("Name", "Descending"):
                     query = query.OrderByDescending(item => item.Name);
+                    break;
+                case var sort when sort == ("DatabaseNodeCount", "Ascending"):
+                    query = query.OrderBy(item => item.DatabaseNodes.Count());
+                    break;
+                case var sort when sort == ("DatabaseNodeCount", "Descending"):
+                    query = query.OrderByDescending(item => item.DatabaseNodes.Count());
+                    break;
+                case var sort when sort == ("DatabaseNodeFieldNodeCount", "Ascending"):
+                    query = query.OrderBy(item => item.DatabaseNodeFieldNodes.Count());
+                    break;
+                case var sort when sort == ("DatabaseNodeFieldNodeCount", "Descending"):
+                    query = query.OrderByDescending(item => item.DatabaseNodeFieldNodes.Count());
+                    break;
+                case var sort when sort == ("EdgeNodeCount", "Ascending"):
+                    query = query.OrderBy(item => item.EdgeNodes.Count());
+                    break;
+                case var sort when sort == ("EdgeNodeCount", "Descending"):
+                    query = query.OrderByDescending(item => item.EdgeNodes.Count());
+                    break;
+                case var sort when sort == ("NodeCollectionNodeCount", "Ascending"):
+                    query = query.OrderBy(item => item.NodeCollectionNodes.Count());
+                    break;
+                case var sort when sort == ("NodeCollectionNodeCount", "Descending"):
+                    query = query.OrderByDescending(item => item.NodeCollectionNodes.Count());
                     break;
                 default:
                     break;

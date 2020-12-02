@@ -36,35 +36,21 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseEdgeField
             {
                 SearchIn = new Dictionary<string, string>
                 {
-                    { "DatabaseId", "Database ID" },
-                    { "DatabaseName", "Database name" },
                     { "DatabaseEdgeFieldId", "Database edge field ID" },
                     { "DatabaseEdgeFieldName", "Database edge field name" },
                     { "EdgeId", "Edge ID" },
                     { "EdgeName", "Edge name" },
-                    { "SourceNodeId", "Source node ID" },
-                    { "SourceNodeName", "Source node name" },
-                    { "TargetNodeId", "Target node ID" },
-                    { "TargetNodeName", "Target node name" },
                     { "Value", "Value" }
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "IsDatabasePublic", "Database is public" },
-                    { "IsNotDatabasePublic", "Database is not public" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
-                    { "DatabaseId", "Database ID" },
-                    { "DatabaseName", "Database name" },
                     { "DatabaseEdgeFieldId", "Database edge field ID" },
                     { "DatabaseEdgeFieldName", "Database edge field name" },
                     { "EdgeId", "Edge ID" },
                     { "EdgeName", "EdgeName" },
-                    { "SourceNodeId", "Source node ID" },
-                    { "SourceNodeName", "Source node name" },
-                    { "TargetNodeId", "Target node ID" },
-                    { "TargetNodeName", "Target node name" },
                     { "Value", "Value" }
                 }
             };
@@ -86,36 +72,14 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseEdgeField
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
-                    input.SearchIn.Contains("DatabaseId") && item.DatabaseEdgeField.Database.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("DatabaseName") && item.DatabaseEdgeField.Database.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseEdgeFieldId") && item.DatabaseEdgeField.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseEdgeFieldName") && item.DatabaseEdgeField.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("EdgeId") && item.Edge.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("EdgeName") && item.Edge.Name.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("SourceNodeId") && item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("SourceNodeName") && item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Name.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("TargetNodeId") && item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("TargetNodeName") && item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Value") && item.Value.Contains(input.SearchString));
-            // Select the results matching the filter parameter.
-            query = query
-                .Where(item => input.Filter.Contains("IsDatabasePublic") ? item.DatabaseEdgeField.Database.IsPublic : true)
-                .Where(item => input.Filter.Contains("IsNotDatabasePublic") ? !item.DatabaseEdgeField.Database.IsPublic : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
-                case var sort when sort == ("DatabaseId", "Ascending"):
-                    query = query.OrderBy(item => item.DatabaseEdgeField.Database.Id);
-                    break;
-                case var sort when sort == ("DatabaseId", "Descending"):
-                    query = query.OrderByDescending(item => item.DatabaseEdgeField.Database.Id);
-                    break;
-                case var sort when sort == ("DatabaseName", "Ascending"):
-                    query = query.OrderBy(item => item.DatabaseEdgeField.Database.Name);
-                    break;
-                case var sort when sort == ("DatabaseName", "Descending"):
-                    query = query.OrderByDescending(item => item.DatabaseEdgeField.Database.Name);
-                    break;
                 case var sort when sort == ("DatabaseEdgeFieldId", "Ascending"):
                     query = query.OrderBy(item => item.DatabaseEdgeField.Id);
                     break;
@@ -140,30 +104,6 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseEdgeField
                 case var sort when sort == ("EdgeName", "Descending"):
                     query = query.OrderByDescending(item => item.Edge.Name);
                     break;
-                case var sort when sort == ("SourceNodeId", "Ascending"):
-                    query = query.OrderBy(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Id);
-                    break;
-                case var sort when sort == ("SourceNodeId", "Descending"):
-                    query = query.OrderByDescending(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Id);
-                    break;
-                case var sort when sort == ("SourceNodeName", "Ascending"):
-                    query = query.OrderBy(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Name);
-                    break;
-                case var sort when sort == ("SourceNodeName", "Descending"):
-                    query = query.OrderByDescending(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Source).Node.Name);
-                    break;
-                case var sort when sort == ("TargetNodeId", "Ascending"):
-                    query = query.OrderBy(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Id);
-                    break;
-                case var sort when sort == ("TargetNodeId", "Descending"):
-                    query = query.OrderByDescending(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Id);
-                    break;
-                case var sort when sort == ("TargetNodeName", "Ascending"):
-                    query = query.OrderBy(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name);
-                    break;
-                case var sort when sort == ("TargetNodeName", "Descending"):
-                    query = query.OrderByDescending(item => item.Edge.EdgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name);
-                    break;
                 case var sort when sort == ("Value", "Ascending"):
                     query = query.OrderBy(item => item.Value);
                     break;
@@ -175,8 +115,8 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseEdgeField
             }
             // Include the related entitites.
             query = query
-                .Include(item => item.Edge)
-                .Include(item => item.DatabaseEdgeField);
+                .Include(item => item.DatabaseEdgeField)
+                .Include(item => item.Edge);
             // Define the view.
             View = new ViewModel
             {

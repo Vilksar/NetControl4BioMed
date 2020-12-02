@@ -41,20 +41,25 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
                     { "Id", "ID" },
                     { "Name", "Name" },
                     { "Description", "Description" },
+                    { "Url", "URL" },
                     { "DatabaseId", "Database ID" },
-                    { "DatabaseName", "Database name" },
-                    { "DatabaseNodeFieldNodes", "Nodes" }
+                    { "DatabaseName", "Database name" }
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsSearchable", "Is searchable" },
+                    { "IsNotSearchable", "Is not searchable" },
+                    { "HasDatabaseNodeFieldNodes", "Has database node field nodes" },
+                    { "HasNoDatabaseNodeFieldNodes", "Does not have database node field nodes" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
+                    { "DateTimeCreated", "Date created" },
                     { "Name", "Name" },
-                    { "DatabaseId", "Database ID" },
-                    { "DatabaseName", "Database name" },
-                    { "DatabaseNodeFieldNodeCount", "Number of nodes" }
+                    { "DatabaseId", "Database type ID" },
+                    { "DatabaseName", "Database type name" },
+                    { "DatabaseNodeFieldNodeCount", "Number of database node field nodes" }
                 }
             };
         }
@@ -81,9 +86,15 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
+                    input.SearchIn.Contains("Url") && item.Url.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseId") && item.Database.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("DatabaseName") && item.Database.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("DatabaseNodeFieldNodes") && item.DatabaseNodeFieldNodes.Any(item1 => item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Where(item2 => item2.DatabaseNodeField.Database.IsPublic || item2.DatabaseNodeField.Database.DatabaseUsers.Any(item3 => item3.User == user)).Any(item2 => item2.DatabaseNodeField.IsSearchable && item2.Value.Contains(input.SearchString))));
+                    input.SearchIn.Contains("DatabaseName") && item.Database.Name.Contains(input.SearchString));
+            // Select the results matching the filter parameter.
+            query = query
+                .Where(item => input.Filter.Contains("IsSearchable") ? item.IsSearchable : true)
+                .Where(item => input.Filter.Contains("IsNotSearchable") ? !item.IsSearchable : true)
+                .Where(item => input.Filter.Contains("HasDatabaseNodeFieldNodes") ? item.DatabaseNodeFieldNodes.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseNodeFieldNodes") ? !item.DatabaseNodeFieldNodes.Any() : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -92,6 +103,12 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseNodeFields
                     break;
                 case var sort when sort == ("Id", "Descending"):
                     query = query.OrderByDescending(item => item.Id);
+                    break;
+                case var sort when sort == ("DateTimeCreated", "Ascending"):
+                    query = query.OrderBy(item => item.DateTimeCreated);
+                    break;
+                case var sort when sort == ("DateTimeCreated", "Descending"):
+                    query = query.OrderByDescending(item => item.DateTimeCreated);
                     break;
                 case var sort when sort == ("Name", "Ascending"):
                     query = query.OrderBy(item => item.Name);

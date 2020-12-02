@@ -42,18 +42,13 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseNodes
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "IsDatabasePublic", "Database is public" },
-                    { "IsNotDatabasePublic", "Database is not public" },
-                    { "HasNodeDatabaseNodeFieldNodes", "Node has database node field nodes" },
-                    { "HasNoNodeDatabaseNodeFieldNodes", "Node doesn't have database node field nodes" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
                     { "DatabaseId", "Database ID" },
                     { "DatabaseName", "Database name" },
                     { "NodeId", "Node ID" },
-                    { "NodeName", "NodeName" },
-                    { "DatabaseNodeFieldNodeCount", "Number of database node field nodes" }
+                    { "NodeName", "NodeName" }
                 }
             };
         }
@@ -78,12 +73,6 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseNodes
                     input.SearchIn.Contains("DatabaseName") && item.Database.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("NodeId") && item.Node.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("NodeName") && item.Node.Name.Contains(input.SearchString));
-            // Select the results matching the filter parameter.
-            query = query
-                .Where(item => input.Filter.Contains("IsDatabasePublic") ? item.Database.IsPublic : true)
-                .Where(item => input.Filter.Contains("IsNotDatabasePublic") ? !item.Database.IsPublic : true)
-                .Where(item => input.Filter.Contains("HasNodeDatabaseNodeFieldNodes") ? item.Node.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.Database == item.Database) : true)
-                .Where(item => input.Filter.Contains("HasNoNodeDatabaseNodeFieldNodes") ? !item.Node.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.Database == item.Database) : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -110,12 +99,6 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseNodes
                     break;
                 case var sort when sort == ("NodeName", "Descending"):
                     query = query.OrderByDescending(item => item.Node.Name);
-                    break;
-                case var sort when sort == ("DatabaseNodeFieldNodeCount", "Ascending"):
-                    query = query.OrderBy(item => item.Node.DatabaseNodeFieldNodes.Count(item1 => item1.DatabaseNodeField.Database == item.Database));
-                    break;
-                case var sort when sort == ("DatabaseNodeFieldNodeCount", "Descending"):
-                    query = query.OrderByDescending(item => item.Node.DatabaseNodeFieldNodes.Count(item1 => item1.DatabaseNodeField.Database == item.Database));
                     break;
                 default:
                     break;

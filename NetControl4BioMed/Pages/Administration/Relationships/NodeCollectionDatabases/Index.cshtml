@@ -55,10 +55,10 @@
                             </div>
                         </td>
                         <td class="text-left text-break">
-                            <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@item.Database.Id" class="btn btn-outline-dark" title="@item.Database.Name">@item.Database.Name</a>
+                            <a asp-page="/Administration/Data/NodeCollections/Details" asp-route-id="@item.NodeCollection.Id" class="btn btn-outline-dark" title="@item.NodeCollection.Name">@item.NodeCollection.Name</a>
                         </td>
                         <td class="text-left text-break">
-                            <a asp-page="/Administration/Data/NodeCollections/Details" asp-route-id="@item.NodeCollection.Id" class="btn btn-outline-dark" title="@item.NodeCollection.Name">@item.NodeCollection.Name</a>
+                            <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@item.Database.Id" class="btn btn-outline-dark" title="@item.Database.Name">@item.Database.Name</a>
                         </td>
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Data/NodeCollections/Update" asp-route-type="Edit" asp-route-ids="@item.NodeCollection.Id" class="btn btn-warning m-1" title="Edit">

@@ -41,32 +41,33 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
                     { "Id", "ID" },
                     { "Name", "Name" },
                     { "Description", "Description" },
-                    { "DatabaseTypeId", "Type ID" },
-                    { "DatabaseTypeName", "Type name" },
-                    { "DatabaseNodeFields", "Node fields" },
-                    { "DatabaseEdgeFields", "Edge fields" },
-                    { "DatabaseNodes", "Nodes" },
-                    { "DatabaseEdges", "Edges" },
-                    { "NodeCollectionDatabases", "Node collections" }
+                    { "Url", "URL" }
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "HasNodes", "Has nodes" },
-                    { "HasNoNodes", "Does not have nodes" },
-                    { "HasEdges", "Has edges" },
-                    { "HasNoEdges", "Does not have edges" }
+                    { "HasDatabaseNodeFields", "Has database node fields" },
+                    { "HasNoDatabaseNodeFields", "Does not have database node fields" },
+                    { "HasDatabaseEdgeFields", "Has database edge fields" },
+                    { "HasNoDatabaseEdgeFields", "Does not have database edge fields" },
+                    { "HasDatabaseNodes", "Has database nodes" },
+                    { "HasNoDatabaseNodes", "Does not have database nodes" },
+                    { "HasDatabaseEdges", "Has database edges" },
+                    { "HasNoDatabaseEdges", "Does not have database edges" },
+                    { "HasNodeCollectionDatabases", "Has node collection databases" },
+                    { "HasNoNodeCollectionDatabases", "Does not have node collection databases" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
+                    { "DateTimeCreated", "Date created" },
                     { "Name", "Name" },
-                    { "DatabaseTypeId", "Type ID" },
-                    { "DatabaseTypeName", "Type name" },
-                    { "DatabaseNodeFieldCount", "Number of node fields" },
-                    { "DatabaseEdgeFieldCount", "Number of edge fields" },
-                    { "DatabaseNodeCount", "Number of nodes" },
-                    { "DatabaseEdgeCount", "Number of edges" },
-                    { "NodeCollectionDatabaseCount", "Number of node collections" }
+                    { "DatabaseTypeId", "Database type ID" },
+                    { "DatabaseTypeName", "Database type name" },
+                    { "DatabaseNodeFieldCount", "Number of database node fields" },
+                    { "DatabaseEdgeFieldCount", "Number of database edge fields" },
+                    { "DatabaseNodeCount", "Number of database nodes" },
+                    { "DatabaseEdgeCount", "Number of database edges" },
+                    { "NodeCollectionDatabaseCount", "Number of node collection databases" }
                 }
             };
         }
@@ -93,20 +94,19 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("DatabaseTypeId") && item.DatabaseType.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("DatabaseTypeName") && item.DatabaseType.Name.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("DatabaseNodeFields") && item.DatabaseNodeFields.Any(item1 => item1.Id.Contains(input.SearchString) || item1.Name.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("DatabaseEdgeFields") && item.DatabaseEdgeFields.Any(item1 => item1.Id.Contains(input.SearchString) || item1.Name.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("DatabaseNodes") && item.DatabaseNodes.Any(item1 => item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("DatabaseEdges") && item.DatabaseEdges.Any(item1 => item1.Edge.Id.Contains(input.SearchString) || item1.Edge.Name.Contains(input.SearchString) || item1.Edge.EdgeNodes.Any(item2 => item2.Node.Id.Contains(input.SearchString) || item2.Node.Name.Contains(input.SearchString))) ||
-                    input.SearchIn.Contains("NodeCollectionDatabases") && item.NodeCollectionDatabases.Any(item1 => item1.NodeCollection.Id.Contains(input.SearchString) || item1.NodeCollection.Name.Contains(input.SearchString)));
-
+                    input.SearchIn.Contains("Url") && item.Url.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
-                .Where(item => input.Filter.Contains("HasNodes") ? item.DatabaseNodes.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoNodes") ? !item.DatabaseNodes.Any() : true)
-                .Where(item => input.Filter.Contains("HasEdges") ? item.DatabaseEdges.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoEdges") ? !item.DatabaseEdges.Any() : true);
+                .Where(item => input.Filter.Contains("HasDatabaseNodeFields") ? item.DatabaseNodeFields.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseNodeFields") ? !item.DatabaseNodeFields.Any() : true)
+                .Where(item => input.Filter.Contains("HasDatabaseEdgeFields") ? item.DatabaseEdgeFields.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseEdgeFields") ? !item.DatabaseEdgeFields.Any() : true)
+                .Where(item => input.Filter.Contains("HasDatabaseNodes") ? item.DatabaseNodes.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseNodes") ? !item.DatabaseNodes.Any() : true)
+                .Where(item => input.Filter.Contains("HasDatabaseEdges") ? item.DatabaseEdges.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseEdges") ? !item.DatabaseEdges.Any() : true)
+                .Where(item => input.Filter.Contains("HasNodeCollectionDatabases") ? !item.NodeCollectionDatabases.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoNodeCollectionDatabases") ? !item.NodeCollectionDatabases.Any() : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -115,6 +115,12 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
                     break;
                 case var sort when sort == ("Id", "Descending"):
                     query = query.OrderByDescending(item => item.Id);
+                    break;
+                case var sort when sort == ("DateTimeCreated", "Ascending"):
+                    query = query.OrderBy(item => item.DateTimeCreated);
+                    break;
+                case var sort when sort == ("DateTimeCreated", "Descending"):
+                    query = query.OrderByDescending(item => item.DateTimeCreated);
                     break;
                 case var sort when sort == ("Name", "Ascending"):
                     query = query.OrderBy(item => item.Name);
@@ -133,6 +139,18 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
                     break;
                 case var sort when sort == ("DatabaseTypeName", "Descending"):
                     query = query.OrderByDescending(item => item.DatabaseType.Name);
+                    break;
+                case var sort when sort == ("DatabaseUserCount", "Ascending"):
+                    query = query.OrderBy(item => item.DatabaseUsers.Count());
+                    break;
+                case var sort when sort == ("DatabaseUserCount", "Descending"):
+                    query = query.OrderByDescending(item => item.DatabaseUsers.Count());
+                    break;
+                case var sort when sort == ("DatabaseUserInvitationCount", "Ascending"):
+                    query = query.OrderBy(item => item.DatabaseUserInvitations.Count());
+                    break;
+                case var sort when sort == ("DatabaseUserInvitationCount", "Descending"):
+                    query = query.OrderByDescending(item => item.DatabaseUserInvitations.Count());
                     break;
                 case var sort when sort == ("DatabaseNodeFieldCount", "Ascending"):
                     query = query.OrderBy(item => item.DatabaseNodeFields.Count());
@@ -159,7 +177,7 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
                     query = query.OrderByDescending(item => item.DatabaseEdges.Count());
                     break;
                 case var sort when sort == ("NodeCollectionDatabaseCount", "Ascending"):
-                    query = query.OrderBy(item => item.DatabaseNodeFields.Count());
+                    query = query.OrderBy(item => item.NodeCollectionDatabases.Count());
                     break;
                 case var sort when sort == ("NodeCollectionDatabaseCount", "Descending"):
                     query = query.OrderByDescending(item => item.NodeCollectionDatabases.Count());

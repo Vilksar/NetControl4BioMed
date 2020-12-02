@@ -48,7 +48,7 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.NodeCollectionNod
                     { "NodeCollectionId", "Node collection ID" },
                     { "NodeCollectionName", "Node collection name" },
                     { "NodeId", "Node ID" },
-                    { "NodeName", "NodeName" }
+                    { "NodeName", "Node name" }
                 }
             };
         }

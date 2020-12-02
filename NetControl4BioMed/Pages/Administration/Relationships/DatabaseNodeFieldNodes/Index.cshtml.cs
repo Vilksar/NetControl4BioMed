@@ -35,8 +35,6 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseNodeField
             {
                 SearchIn = new Dictionary<string, string>
                 {
-                    { "DatabaseId", "Database ID" },
-                    { "DatabaseName", "Database name" },
                     { "DatabaseNodeFieldId", "Database node field ID" },
                     { "DatabaseNodeFieldName", "Database node field name" },
                     { "NodeId", "Node ID" },
@@ -45,15 +43,9 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseNodeField
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "IsDatabasePublic", "Database is public" },
-                    { "IsNotDatabasePublic", "Database is not public" },
-                    { "IsDatabaseNodeFieldSearchable", "Database node field is searchable" },
-                    { "IsNotDatabaseNodeFieldSearchable", "Database node field is not searchable" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
-                    { "DatabaseId", "Database ID" },
-                    { "DatabaseName", "Database name" },
                     { "DatabaseNodeFieldId", "Database node field ID" },
                     { "DatabaseNodeFieldName", "Database node field name" },
                     { "NodeId", "Node ID" },
@@ -79,34 +71,14 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseNodeField
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
-                    input.SearchIn.Contains("DatabaseId") && item.DatabaseNodeField.Database.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("DatabaseName") && item.DatabaseNodeField.Database.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseNodeFieldId") && item.DatabaseNodeField.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseNodeFieldName") && item.DatabaseNodeField.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("NodeId") && item.Node.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("NodeName") && item.Node.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Value") && item.Value.Contains(input.SearchString));
-            // Select the results matching the filter parameter.
-            query = query
-                .Where(item => input.Filter.Contains("IsDatabasePublic") ? item.DatabaseNodeField.Database.IsPublic : true)
-                .Where(item => input.Filter.Contains("IsNotDatabasePublic") ? !item.DatabaseNodeField.Database.IsPublic : true)
-                .Where(item => input.Filter.Contains("IsDatabaseNodeFieldSearchable") ? item.DatabaseNodeField.IsSearchable : true)
-                .Where(item => input.Filter.Contains("IsNotDatabaseNodeFieldSearchable") ? !item.DatabaseNodeField.IsSearchable : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
-                case var sort when sort == ("DatabaseId", "Ascending"):
-                    query = query.OrderBy(item => item.DatabaseNodeField.Database.Id);
-                    break;
-                case var sort when sort == ("DatabaseId", "Descending"):
-                    query = query.OrderByDescending(item => item.DatabaseNodeField.Database.Id);
-                    break;
-                case var sort when sort == ("DatabaseName", "Ascending"):
-                    query = query.OrderBy(item => item.DatabaseNodeField.Database.Name);
-                    break;
-                case var sort when sort == ("DatabaseName", "Descending"):
-                    query = query.OrderByDescending(item => item.DatabaseNodeField.Database.Name);
-                    break;
                 case var sort when sort == ("DatabaseNodeFieldId", "Ascending"):
                     query = query.OrderBy(item => item.DatabaseNodeField.Id);
                     break;
@@ -142,8 +114,8 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.DatabaseNodeField
             }
             // Include the related entitites.
             query = query
-                .Include(item => item.Node)
-                .Include(item => item.DatabaseNodeField);
+                .Include(item => item.DatabaseNodeField)
+                .Include(item => item.Node);
             // Define the view.
             View = new ViewModel
             {

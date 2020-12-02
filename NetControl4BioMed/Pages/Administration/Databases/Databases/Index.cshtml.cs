@@ -38,13 +38,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     { "Id", "ID" },
                     { "Name", "Name" },
                     { "Description", "Description" },
-                    { "Url", "URL" },
-                    { "DatabaseTypeId", "Database type ID" },
-                    { "DatabaseTypeName", "Database type name" },
-                    { "NetworkId", "Network ID" },
-                    { "NetworkName", "Network name" },
-                    { "AnalysisId", "Analysis ID" },
-                    { "AnalysisName", "Analysis name" }
+                    { "Url", "URL" }
                 },
                 Filter = new Dictionary<string, string>
                 {
@@ -108,13 +102,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Url") && item.Url.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("DatabaseTypeId") && item.DatabaseType.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("DatabaseTypeName") && item.DatabaseType.Name.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("NetworkId") && item.NetworkDatabases.Any(item1 => item1.Network.Id.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("NetworkName") && item.NetworkDatabases.Any(item1 => item1.Network.Name.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("AnalysisId") && item.AnalysisDatabases.Any(item1 => item1.Analysis.Id.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("AnalysisName") && item.AnalysisDatabases.Any(item1 => item1.Analysis.Name.Contains(input.SearchString)));
+                    input.SearchIn.Contains("Url") && item.Url.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
                 .Where(item => input.Filter.Contains("IsPublic") ? item.IsPublic : true)

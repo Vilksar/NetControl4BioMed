@@ -40,15 +40,17 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseTypes
                 {
                     { "Id", "ID" },
                     { "Name", "Name" },
-                    { "Description", "Description" },
-                    { "Databases", "Databases" }
+                    { "Description", "Description" }
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "HasDatabases", "Has databases" },
+                    { "HasNoDatabases", "Does not have databases" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
+                    { "DateTimeCreated", "Date created" },
                     { "Name", "Name" },
                     { "DatabaseCount", "Number of databases" }
                 }
@@ -75,8 +77,11 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseTypes
                 .Where(item => !input.SearchIn.Any() ||
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("Databases") && item.Databases.Where(item1 => item1.IsPublic || item1.DatabaseUsers.Any(item2 => item2.User == user)).Any(item1 => item1.Id.Contains(input.SearchString) || item1.Name.Contains(input.SearchString)));
+                    input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString));
+            // Select the results matching the filter parameter.
+            query = query
+                .Where(item => input.Filter.Contains("HasDatabases") ? item.Databases.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabases") ? !item.Databases.Any() : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -93,10 +98,10 @@ namespace NetControl4BioMed.Pages.Content.Databases.DatabaseTypes
                     query = query.OrderByDescending(item => item.Name);
                     break;
                 case var sort when sort == ("DatabaseCount", "Ascending"):
-                    query = query.OrderBy(item => item.Databases.Where(item1 => item1.IsPublic || item1.DatabaseUsers.Any(item2 => item2.User == user)).Count());
+                    query = query.OrderBy(item => item.Databases.Count(item1 => item1.IsPublic || item1.DatabaseUsers.Any(item2 => item2.User == user)));
                     break;
                 case var sort when sort == ("DatabaseCount", "Descending"):
-                    query = query.OrderByDescending(item => item.Databases.Where(item1 => item1.IsPublic || item1.DatabaseUsers.Any(item2 => item2.User == user)).Count());
+                    query = query.OrderByDescending(item => item.Databases.Count(item1 => item1.IsPublic || item1.DatabaseUsers.Any(item2 => item2.User == user)));
                     break;
                 default:
                     break;

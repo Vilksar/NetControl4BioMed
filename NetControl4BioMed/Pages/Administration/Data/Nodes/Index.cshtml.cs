@@ -48,14 +48,14 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                     { "HasNoDatabaseNodeFieldNodes", "Does not have database node field nodes" },
                     { "HasEdgeNodes", "Has edge nodes" },
                     { "HasNoEdgeNodes", "Does not have edge nodes" },
+                    { "HasNodeCollectionNodes", "Has node collection nodes" },
+                    { "HasNoNodeCollectionNodes", "Does not have node collection nodes" },
                     { "HasNetworkNodes", "Has network nodes" },
                     { "HasNoNetworkNodes", "Does not have network nodes" },
                     { "HasAnalysisNodes", "Has analysis nodes" },
                     { "HasNoAnalysisNodes", "Does not have analysis nodes" },
                     { "HasPathNodes", "Has path nodes" },
-                    { "HasNoPathNodes", "Does not have path nodes" },
-                    { "HasNodeCollectionNodes", "Has node collection nodes" },
-                    { "HasNoNodeCollectionNodes", "Does not have node collection nodes" }
+                    { "HasNoPathNodes", "Does not have path nodes" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -65,10 +65,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                     { "DatabaseNodeCount", "Number of database nodes" },
                     { "DatabaseNodeFieldNodeCount", "Number of database node field nodes" },
                     { "EdgeNodeCount", "Number of edge nodes" },
+                    { "NodeCollectionNodeCount", "Number of node collection nodes" },
                     { "NetworkNodeCount", "Number of network nodes" },
                     { "AnalysisNodeCount", "Number of analysis nodes" },
-                    { "PathNodeCount", "Number of path nodes" },
-                    { "NodeCollectionNodeCount", "Number of node collection nodes" }
+                    { "PathNodeCount", "Number of path nodes" }
                 }
             };
         }
@@ -100,14 +100,14 @@ namespace NetControl4BioMed.Pages.Administration.Data.Nodes
                 .Where(item => input.Filter.Contains("HasNoDatabaseNodeFieldNodes") ? !item.DatabaseNodeFieldNodes.Any() : true)
                 .Where(item => input.Filter.Contains("HasEdgeNodes") ? item.EdgeNodes.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoEdgeNodes") ? !item.EdgeNodes.Any() : true)
+                .Where(item => input.Filter.Contains("HasNodeCollectionNodes") ? item.NodeCollectionNodes.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoNodeCollectionNodes") ? !item.NodeCollectionNodes.Any() : true)
                 .Where(item => input.Filter.Contains("HasNetworkNodes") ? item.NetworkNodes.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoNetworkNodes") ? !item.NetworkNodes.Any() : true)
                 .Where(item => input.Filter.Contains("HasAnalysisNodes") ? item.AnalysisNodes.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoAnalysisNodes") ? !item.AnalysisNodes.Any() : true)
                 .Where(item => input.Filter.Contains("HasPathNodes") ? item.PathNodes.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoPathNodes") ? !item.PathNodes.Any() : true)
-                .Where(item => input.Filter.Contains("HasNodeCollectionNodes") ? item.NodeCollectionNodes.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoNodeCollectionNodes") ? !item.NodeCollectionNodes.Any() : true);
+                .Where(item => input.Filter.Contains("HasNoPathNodes") ? !item.PathNodes.Any() : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
+using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
 
@@ -42,13 +43,18 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.EdgeNodes
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsSource", "Is source" },
+                    { "IsNotSource", "Is not source" },
+                    { "IsTarget", "Is target" },
+                    { "IsNotTarget", "Is not target" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
                     { "EdgeId", "Edge ID" },
                     { "EdgeName", "Edge name" },
                     { "NodeId", "Node ID" },
-                    { "NodeName", "NodeName" }
+                    { "NodeName", "NodeName" },
+                    { "Type", "Type" }
                 }
             };
         }
@@ -76,7 +82,10 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.EdgeNodes
                     input.SearchIn.Contains("NodeName") && item.Node.Name.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
-                .Where(item => true);
+                .Where(item => input.Filter.Contains("IsSource") ? item.Type == EdgeNodeType.Source : true)
+                .Where(item => input.Filter.Contains("IsNotSource") ? item.Type != EdgeNodeType.Source : true)
+                .Where(item => input.Filter.Contains("IsTarget") ? item.Type == EdgeNodeType.Target : true)
+                .Where(item => input.Filter.Contains("IsNotTarget") ? item.Type != EdgeNodeType.Target : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -103,6 +112,12 @@ namespace NetControl4BioMed.Pages.Administration.Relationships.EdgeNodes
                     break;
                 case var sort when sort == ("NodeName", "Descending"):
                     query = query.OrderByDescending(item => item.Node.Name);
+                    break;
+                case var sort when sort == ("Type", "Ascending"):
+                    query = query.OrderBy(item => item.Type);
+                    break;
+                case var sort when sort == ("Type", "Descending"):
+                    query = query.OrderByDescending(item => item.Type);
                     break;
                 default:
                     break;
