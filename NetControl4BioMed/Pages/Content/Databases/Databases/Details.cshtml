@@ -201,7 +201,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The database currently contains @Model.View.NodeCount node@(Model.View.NodeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Data/Nodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="alert-link">view the nodes</a>.</span>
+                <span>The database currently contains @Model.View.NodeCount node@(Model.View.NodeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Relationships/DatabaseNodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the nodes</a>.</span>
             </div>
         </div>
     </div>
@@ -219,7 +219,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The database currently contains @Model.View.EdgeCount edge@(Model.View.EdgeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Data/Edges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="alert-link">view the edges</a>.</span>
+                <span>The database currently contains @Model.View.EdgeCount edge@(Model.View.EdgeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Relationships/DatabaseEdges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the edges</a>.</span>
             </div>
         </div>
     </div>
@@ -237,7 +237,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The database currently contains @Model.View.NodeCollectionCount node collection@(Model.View.NodeCollectionCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Data/NodeCollections/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="Databases" class="alert-link">view the node collections</a>.</span>
+                <span>The database currently contains @Model.View.NodeCollectionCount node collection@(Model.View.NodeCollectionCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Relationships/NodeCollectionDatabases/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the node collections</a>.</span>
             </div>
         </div>
     </div>

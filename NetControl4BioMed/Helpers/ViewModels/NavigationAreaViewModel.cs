@@ -325,21 +325,21 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "DatabaseEdges",
-                            Title = "Database edges",
-                            Description = string.Empty,
-                            Icon = "fa-arrow-right",
-                            Color = "light",
-                            Link = "/Administration/Relationships/DatabaseEdges/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
                             Id = "DatabaseNodeFieldNodes",
                             Title = "Database node field nodes",
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
                             Link = "/Administration/Relationships/DatabaseNodeFieldNodes/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "DatabaseEdges",
+                            Title = "Database edges",
+                            Description = string.Empty,
+                            Icon = "fa-arrow-right",
+                            Color = "light",
+                            Link = "/Administration/Relationships/DatabaseEdges/Index"
                         },
                         new NavigationPageViewModel
                         {
@@ -547,6 +547,81 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Icon = "fa-folder",
                             Color = "light",
                             Link = "/Content/Data/NodeCollections/Index"
+                        }
+                    }
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Relationships",
+                    Title = "Relationships",
+                    Description = string.Empty,
+                    Icon = "fa-heart",
+                    Color = "success",
+                    Link = "/Content/Relationships/Index",
+                    NavigationPages = new List<NavigationPageViewModel>
+                    {
+                        new NavigationPageViewModel
+                        {
+                            Id = "DatabaseNodes",
+                            Title = "Database nodes",
+                            Description = string.Empty,
+                            Icon = "fa-circle",
+                            Color = "light",
+                            Link = "/Content/Relationships/DatabaseNodes/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "DatabaseNodeFieldNodes",
+                            Title = "Database node field nodes",
+                            Description = string.Empty,
+                            Icon = "fa-circle",
+                            Color = "light",
+                            Link = "/Content/Relationships/DatabaseNodeFieldNodes/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "DatabaseEdges",
+                            Title = "Database edges",
+                            Description = string.Empty,
+                            Icon = "fa-arrow-right",
+                            Color = "light",
+                            Link = "/Content/Relationships/DatabaseEdges/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "DatabaseEdgeFieldEdges",
+                            Title = "Database edge field edges",
+                            Description = string.Empty,
+                            Icon = "fa-arrow-right",
+                            Color = "light",
+                            Link = "/Content/Relationships/DatabaseEdgeFieldEdges/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "EdgeNodes",
+                            Title = "Edge nodes",
+                            Description = string.Empty,
+                            Icon = "fa-arrow-circle-right",
+                            Color = "light",
+                            Link = "/Content/Relationships/EdgeNodes/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "NodeCollectionDatabases",
+                            Title = "Node collection databases",
+                            Description = string.Empty,
+                            Icon = "fa-folder",
+                            Color = "light",
+                            Link = "/Content/Relationships/NodeCollectionDatabases/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "NodeCollectionNodes",
+                            Title = "Node collection nodes",
+                            Description = string.Empty,
+                            Icon = "fa-folder",
+                            Color = "light",
+                            Link = "/Content/Relationships/NodeCollectionNodes/Index"
                         }
                     }
                 },

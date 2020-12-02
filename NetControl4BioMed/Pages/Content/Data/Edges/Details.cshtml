@@ -41,6 +41,10 @@
         }
         else
         {
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>The edge is currently assigned to @Model.View.DatabaseEdges.Count() database@(Model.View.DatabaseEdges.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Relationships/DatabaseEdges/Index" asp-route-searchString="@Model.View.Edge.Id" asp-route-searchIn="EdgeId" class="alert-link">view the databases</a>.</span>
+            </div>
             <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
                 <thead class="thead-light">
                     <tr>
@@ -98,6 +102,10 @@
         }
         else
         {
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>The edge is currently assigned to @Model.View.DatabaseEdgeFieldEdges.Count() field@(Model.View.DatabaseEdgeFieldEdges.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Relationships/DatabaseEdgeFieldEdges/Index" asp-route-searchString="@Model.View.Edge.Id" asp-route-searchIn="EdgeId" class="alert-link">view the fields</a>.</span>
+            </div>
             <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
                 <thead class="thead-light">
                     <tr>
@@ -177,6 +185,10 @@
         }
         else
         {
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>The edge is currently assigned to @Model.View.EdgeNodes.Count() edge@(Model.View.EdgeNodes.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Relationships/EdgeNodes/Index" asp-route-searchString="@Model.View.Edge.Id" asp-route-searchIn="EdgeId" class="alert-link">view the nodes</a>.</span>
+            </div>
             <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
                 <thead class="thead-light">
                     <tr>

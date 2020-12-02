@@ -567,6 +567,86 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
+        /// Gets the navigation breadcrumb for the content relationships index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentRelationshipsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Relationships",
+            Title = "Relationships",
+            Link = "/Content/Relationships/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content relationships database edge field edges index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentRelationshipsDatabaseEdgeFieldEdgesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "DatabaseEdgeFieldEdges",
+            Title = "Database edge field edges",
+            Link = "/Content/Relationships/DatabaseEdgeFieldEdges/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content relationships database edges index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentRelationshipsDatabaseEdgesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "DatabaseEdges",
+            Title = "Database edges",
+            Link = "/Content/Relationships/DatabaseEdges/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content relationships database node field nodes index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentRelationshipsDatabaseNodeFieldNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "DatabaseNodeFieldNodes",
+            Title = "Database node field nodes",
+            Link = "/Content/Relationships/DatabaseNodeFieldNodes/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content relationships database nodes index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentRelationshipsDatabaseNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "DatabaseNodes",
+            Title = "Database nodes",
+            Link = "/Content/Relationships/DatabaseNodes/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content relationships edge nodes index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentRelationshipsEdgeNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "EdgeNodes",
+            Title = "Edge nodes",
+            Link = "/Content/Relationships/EdgeNodes/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content relationships node collection databases index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentRelationshipsNodeCollectionDatabasesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "NodeCollectionDatabases",
+            Title = "Node collection databases",
+            Link = "/Content/Relationships/NodeCollectionDatabases/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content relationships node collection nodes index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentRelationshipsNodeCollectionNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "NodeCollectionNodes",
+            Title = "Node collection nodes",
+            Link = "/Content/Relationships/NodeCollectionNodes/Index"
+        };
+
+        /// <summary>
         /// Gets the navigation breadcrumb for the network details index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel NetworkDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel

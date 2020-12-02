@@ -1,0 +1,18 @@
+﻿@model EdgeNodeType
+@using NetControl4BioMed.Data.Enumerations
+@using Helpers.Extensions
+
+<div class="text-uppercase">
+    @switch (Model)
+    {
+        case EdgeNodeType.Source:
+            <span style="color: lightpink;"><i class="fas fa-circle"></i></span>
+            break;
+        case EdgeNodeType.Target:
+            <span style="color: cornflowerblue;"><i class="fas fa-circle"></i></span>
+            break;
+        default:
+            break;
+    }
+    <span title="@Model.GetDisplayDescription()">@Model.GetDisplayName()</span>
+</div>
