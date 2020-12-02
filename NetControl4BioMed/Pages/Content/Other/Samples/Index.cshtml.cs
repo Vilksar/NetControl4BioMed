@@ -45,14 +45,14 @@ namespace NetControl4BioMed.Pages.Content.Other.Samples
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "ContainsSeedNodes", "Contains seed nodes" },
-                    { "ContainsNotSeedNodes", "Does not contain seed nodes" },
-                    { "ContainsSeedEdges", "Contains seed edges" },
-                    { "ContainsNotSeedEdges", "Does not contain seed edges" },
-                    { "ContainsSourceNodes", "Contains source nodes" },
-                    { "ContainsNotSourceNodes", "Does not contain source nodes" },
-                    { "ContainsTargetNodes", "Contains target nodes" },
-                    { "ContainsNotTargetNodes", "Does not contain target nodes" }
+                    { "HasSeedNodes", "Has seed nodes" },
+                    { "HasNoSeedNodes", "Does not have seed nodes" },
+                    { "HasSeedEdges", "Has seed edges" },
+                    { "HasNoSeedEdges", "Does not have seed edges" },
+                    { "HasSourceNodes", "Has source nodes" },
+                    { "HasNoSourceNodes", "Does not have source nodes" },
+                    { "HasTargetNodes", "Has target nodes" },
+                    { "HasNoTargetNodes", "Does not have target nodes" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -89,14 +89,14 @@ namespace NetControl4BioMed.Pages.Content.Other.Samples
                     input.SearchIn.Contains("Data") && item.Data.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
-                .Where(item => input.Filter.Contains("ContainsSeedNodes") ? item.Type == SampleType.SeedNodes : true)
-                .Where(item => input.Filter.Contains("ContainsNotSeedNodes") ? item.Type != SampleType.SeedNodes : true)
-                .Where(item => input.Filter.Contains("ContainsSeedEdges") ? item.Type == SampleType.SeedEdges : true)
-                .Where(item => input.Filter.Contains("ContainsNotSeedEdges") ? item.Type != SampleType.SeedEdges : true)
-                .Where(item => input.Filter.Contains("ContainsSourceNodes") ? item.Type == SampleType.SourceNodes : true)
-                .Where(item => input.Filter.Contains("ContainsNotSourceNodes") ? item.Type != SampleType.SourceNodes : true)
-                .Where(item => input.Filter.Contains("ContainsTargetNodes") ? item.Type == SampleType.TargetNodes : true)
-                .Where(item => input.Filter.Contains("ContainsNotTargetNodes") ? item.Type != SampleType.TargetNodes : true);
+                .Where(item => input.Filter.Contains("HasSeedNodes") ? item.Type == SampleType.SeedNodes : true)
+                .Where(item => input.Filter.Contains("HasNoSeedNodes") ? item.Type != SampleType.SeedNodes : true)
+                .Where(item => input.Filter.Contains("HasSeedEdges") ? item.Type == SampleType.SeedEdges : true)
+                .Where(item => input.Filter.Contains("HasNoSeedEdges") ? item.Type != SampleType.SeedEdges : true)
+                .Where(item => input.Filter.Contains("HasSourceNodes") ? item.Type == SampleType.SourceNodes : true)
+                .Where(item => input.Filter.Contains("HasNoSourceNodes") ? item.Type != SampleType.SourceNodes : true)
+                .Where(item => input.Filter.Contains("HasTargetNodes") ? item.Type == SampleType.TargetNodes : true)
+                .Where(item => input.Filter.Contains("HasNoTargetNodes") ? item.Type != SampleType.TargetNodes : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {

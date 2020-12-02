@@ -51,6 +51,10 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "HasNodes", "Has nodes" },
+                    { "HasNoNodes", "Does not have nodes" },
+                    { "HasEdges", "Has edges" },
+                    { "HasNoEdges", "Does not have edges" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -96,6 +100,13 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
                     input.SearchIn.Contains("DatabaseNodes") && item.DatabaseNodes.Any(item1 => item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("DatabaseEdges") && item.DatabaseEdges.Any(item1 => item1.Edge.Id.Contains(input.SearchString) || item1.Edge.Name.Contains(input.SearchString) || item1.Edge.EdgeNodes.Any(item2 => item2.Node.Id.Contains(input.SearchString) || item2.Node.Name.Contains(input.SearchString))) ||
                     input.SearchIn.Contains("NodeCollectionDatabases") && item.NodeCollectionDatabases.Any(item1 => item1.NodeCollection.Id.Contains(input.SearchString) || item1.NodeCollection.Name.Contains(input.SearchString)));
+
+            // Select the results matching the filter parameter.
+            query = query
+                .Where(item => input.Filter.Contains("HasNodes") ? item.DatabaseNodes.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoNodes") ? !item.DatabaseNodes.Any() : true)
+                .Where(item => input.Filter.Contains("HasEdges") ? item.DatabaseEdges.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoEdges") ? !item.DatabaseEdges.Any() : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {

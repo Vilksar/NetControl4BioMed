@@ -73,7 +73,15 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
+            public string SourceNodeCollectionData { get; set; }
+
+            [DataType(DataType.MultilineText)]
+            [Required(ErrorMessage = "This field is required.")]
             public string TargetData { get; set; }
+
+            [DataType(DataType.MultilineText)]
+            [Required(ErrorMessage = "This field is required.")]
+            public string TargetNodeCollectionData { get; set; }
 
             [Range(0, 10000, ErrorMessage = "The value must be a positive integer lower than 10000.")]
             [Required(ErrorMessage = "This field is required.")]
@@ -87,12 +95,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
 
             public Algorithms.Analyses.Genetic.Parameters GeneticAlgorithmParameters { get; set; }
 
-            public IEnumerable<string> NetworkIds { get; set; }
-
-            public IEnumerable<string> SourceNodeCollectionIds { get; set; }
-
-            public IEnumerable<string> TargetNodeCollectionIds { get; set; }
-
+            [DataType(DataType.Text)]
+            [Required(ErrorMessage = "This field is required.")]
             public string ReCaptchaToken { get; set; }
         }
 
@@ -197,33 +201,32 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 case false:
                     Input = new InputModel
                     {
-                        IsPublic = !View.IsUserAuthenticated,
                         DatabaseTypeId = databaseType.Id,
-                        Algorithm = View.Algorithm.ToString(),
+                        IsPublic = !View.IsUserAuthenticated,
+                        Algorithm = View.Algorithm,
                         NetworkData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                         SourceData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
+                        SourceNodeCollectionData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                         TargetData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
+                        TargetNodeCollectionData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                         MaximumIterations = 100,
                         MaximumIterationsWithoutImprovement = 25,
                         GreedyAlgorithmParameters = View.Algorithm == AnalysisAlgorithm.Greedy.ToString() ? new Algorithms.Analyses.Greedy.Parameters() : null,
-                        GeneticAlgorithmParameters = View.Algorithm == AnalysisAlgorithm.Genetic.ToString() ? new Algorithms.Analyses.Genetic.Parameters() : null,
-                        NetworkIds = Enumerable.Empty<string>(),
-                        SourceNodeCollectionIds = Enumerable.Empty<string>(),
-                        TargetNodeCollectionIds = Enumerable.Empty<string>()
+                        GeneticAlgorithmParameters = View.Algorithm == AnalysisAlgorithm.Genetic.ToString() ? new Algorithms.Analyses.Genetic.Parameters() : null
                     };
                     break;
                 case true:
                     Input = new InputModel
                     {
-                        IsPublic = analyses
-                            .Select(item => item.IsPublic)
-                            .FirstOrDefault(),
                         DatabaseTypeId = databaseType.Id,
                         Name = analyses
                             .Select(item => item.Name)
                             .FirstOrDefault(),
                         Description = analyses
                             .Select(item => item.Description)
+                            .FirstOrDefault(),
+                        IsPublic = analyses
+                            .Select(item => item.IsPublic)
                             .FirstOrDefault(),
                         Algorithm = algorithm,
                         NetworkData = JsonSerializer.Serialize(analyses
@@ -238,11 +241,25 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                             .SelectMany(item => item)
                             .Where(item => item.Type == AnalysisNodeType.Source)
                             .Select(item => item.Node.Name)),
+                        SourceNodeCollectionData = JsonSerializer.Serialize(analyses
+                            .Select(item => item.AnalysisNodeCollections)
+                            .SelectMany(item => item)
+                            .Where(item => item.Type == AnalysisNodeCollectionType.Source)
+                            .Select(item => item.NodeCollection)
+                            .Intersect(View.SourceNodeCollections)
+                            .Select(item => item.Id)),
                         TargetData = JsonSerializer.Serialize(analyses
                             .Select(item => item.AnalysisNodes)
                             .SelectMany(item => item)
                             .Where(item => item.Type == AnalysisNodeType.Target)
                             .Select(item => item.Node.Name)),
+                        TargetNodeCollectionData = JsonSerializer.Serialize(analyses
+                            .Select(item => item.AnalysisNodeCollections)
+                            .SelectMany(item => item)
+                            .Where(item => item.Type == AnalysisNodeCollectionType.Target)
+                            .Select(item => item.NodeCollection)
+                            .Intersect(View.TargetNodeCollections)
+                            .Select(item => item.Id)),
                         MaximumIterations = analyses
                             .Select(item => item.MaximumIterations)
                             .FirstOrDefault(),
@@ -250,27 +267,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                             .Select(item => item.MaximumIterationsWithoutImprovement)
                             .FirstOrDefault(),
                         GreedyAlgorithmParameters = algorithm == AnalysisAlgorithm.Greedy.ToString() ? JsonSerializer.Deserialize<Algorithms.Analyses.Greedy.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : null,
-                        GeneticAlgorithmParameters = algorithm == AnalysisAlgorithm.Genetic.ToString() ? JsonSerializer.Deserialize<Algorithms.Analyses.Genetic.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : null,
-                        NetworkIds = analyses
-                            .Select(item => item.AnalysisNetworks)
-                            .SelectMany(item => item)
-                            .Select(item => item.Network)
-                            .Intersect(View.Networks)
-                            .Select(item => item.Id),
-                        SourceNodeCollectionIds = analyses
-                            .Select(item => item.AnalysisNodeCollections)
-                            .SelectMany(item => item)
-                            .Where(item => item.Type == AnalysisNodeCollectionType.Source)
-                            .Select(item => item.NodeCollection)
-                            .Intersect(View.SourceNodeCollections)
-                            .Select(item => item.Id),
-                        TargetNodeCollectionIds = analyses
-                            .Select(item => item.AnalysisNodeCollections)
-                            .SelectMany(item => item)
-                            .Where(item => item.Type == AnalysisNodeCollectionType.Target)
-                            .Select(item => item.NodeCollection)
-                            .Intersect(View.TargetNodeCollections)
-                            .Select(item => item.Id)
+                        GeneticAlgorithmParameters = algorithm == AnalysisAlgorithm.Genetic.ToString() ? JsonSerializer.Deserialize<Algorithms.Analyses.Genetic.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : null
                     };
                     break;
                 default:
@@ -377,15 +374,21 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 return Page();
             }
             // Try to deserialize the network data.
-            if (!Input.NetworkData.TryDeserializeJsonObject<IEnumerable<string>>(out var networkItems) || networkItems == null)
+            if (!Input.NetworkData.TryDeserializeJsonObject<IEnumerable<string>>(out var networkIds) || networkIds == null)
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The provided network data could not be deserialized.");
                 // Redisplay the page.
                 return Page();
             }
-            // Get the provided network IDs.
-            var networkIds = (Input.NetworkIds ?? Enumerable.Empty<string>()).Concat(networkItems);
+            // Check if there weren't any network IDs provided.
+            if (!networkIds.Any())
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "At least one network ID must be specified.");
+                // Redisplay the page.
+                return Page();
+            }
             // Try to get the networks with the provided IDs.
             var networks = _context.Networks
                 .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
@@ -396,7 +399,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             if (!networks.Any())
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No network data has been provided or no networks could be found with the provided IDs.");
+                ModelState.AddModelError(string.Empty, "No networks could be found with the provided IDs.");
                 // Redisplay the page.
                 return Page();
             }
@@ -408,12 +411,18 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 // Redisplay the page.
                 return Page();
             }
-            // Get the provided source node collection IDs.
-            var sourceNodeCollectionIds = Input.SourceNodeCollectionIds ?? Enumerable.Empty<string>();
+            // Try to deserialize the source node collection data.
+            if (!Input.SourceNodeCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out var sourceNodeCollectionIds) || sourceNodeCollectionIds == null)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The provided source node collection data could not be deserialized.");
+                // Redisplay the page.
+                return Page();
+            }
             // Try to get the source node collections with the provided IDs.
             var sourceNodeCollections = View.SourceNodeCollections
                 .Where(item => sourceNodeCollectionIds.Contains(item.Id));
-            // Try to deserialize the seed data.
+            // Try to deserialize the target data.
             if (!Input.TargetData.TryDeserializeJsonObject<IEnumerable<string>>(out var targetItems) || targetItems == null)
             {
                 // Add an error to the model.
@@ -421,8 +430,14 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 // Redisplay the page.
                 return Page();
             }
-            // Get the provided target node collection IDs.
-            var targetNodeCollectionIds = Input.TargetNodeCollectionIds ?? Enumerable.Empty<string>();
+            // Try to deserialize the target node collection data.
+            if (!Input.TargetNodeCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out var targetNodeCollectionIds) || targetNodeCollectionIds == null)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "The provided target node collection data could not be deserialized.");
+                // Redisplay the page.
+                return Page();
+            }
             // Try to get the target node collections with the provided IDs.
             var targetNodeCollections = View.TargetNodeCollections
                 .Where(item => targetNodeCollectionIds.Contains(item.Id));

@@ -70,14 +70,14 @@
                     <span><i class="fas fa-share-alt"></i></span>
                 </div>
                 <div>
-                    <span>Network data</span>
+                    <span>Networks</span>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the network data to be used by the new analysis. Namely, the IDs of the networks used by the new analysis should be defined here.</span>
+                <span>This section contains the network data to be used by the new analysis (namely, the IDs of the networks should be provided). You need to have access to the corresponding networks!</span>
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
@@ -89,16 +89,16 @@
                 <div class="form-group">
                     <div class="row align-items-center mb-2">
                         <div class="col-lg-4">
-                            <label for="data-textarea" class="font-weight-bold mb-0">Data</label>
+                            <label for="data-textarea-network" class="font-weight-bold mb-0">Data</label>
                             <span class="badge badge-dark file-group-count">0</span>
                         </div>
                         <div class="col-lg-8">
                             <div class="row align-items-center">
                                 <div class="col-6 col-form-label-sm text-right">
-                                    <label for="data-line-separator" class="font-weight-normal mb-0">Line separator:</label>
+                                    <label for="data-line-separator-network" class="font-weight-normal mb-0">Line separator:</label>
                                 </div>
                                 <div class="col-6 text-left">
-                                    <select id="data-line-separator" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                    <select id="data-line-separator-network" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
                                         <option value=",">comma (",")</option>
                                         <option value=";">semicolon (";")</option>
                                         <option value="\t">tab ("\t")</option>
@@ -109,7 +109,7 @@
                             </div>
                         </div>
                     </div>
-                    <textarea id="data-textarea" class="form-control file-group-text mb-2"></textarea>
+                    <textarea id="data-textarea-network" class="form-control file-group-text mb-2"></textarea>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
@@ -119,66 +119,6 @@
             </div>
         </div>
     </div>
-    @if (Model.View.Networks.Any())
-    {
-        <div class="card mb-3">
-            <div class="card-header font-weight-bold">
-                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                    <div>
-                        <span><i class="fas fa-share-alt"></i></span>
-                    </div>
-                    <div>
-                        <span>Networks</span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info text-justify text-wrap">
-                    <span><i class="fas fa-info-circle"></i></span>
-                    <span>This section contains the networks used by the new analysis. This section complements the network data, and provides an easier selection of available networks. Selecting a network is equivalent to adding its ID to the network data. The analysis will use the set union of the networks selected here, and the networks with the IDs specified above.</span>
-                </div>
-                <table class="table table-hover table-bordered table-datatable item-group" data-order="[[1]]">
-                    <thead class="thead-light">
-                        <tr>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" id="checkbox-network-select" class="custom-control-input item-group-select" title="Select" />
-                                    <label for="checkbox-network-select" class="custom-control-label"></label>
-                                </div>
-                            </th>
-                            <th class="text-left text-break">
-                                <span>Network</span>
-                            </th>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                                <span>Links</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var network in Model.View.Networks)
-                        {
-                            <tr class="item-group-item">
-                                <td class="text-center text-break">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="checkbox-network-@network.Id" name="Input.NetworkIds" value="@network.Id" class="custom-control-input item-group-item-checkbox" title="Select" checked="@(Model.Input.NetworkIds != null && Model.Input.NetworkIds.Contains(network.Id) ? "checked" : null)" />
-                                        <label for="checkbox-network-@network.Id" class="custom-control-label"></label>
-                                    </div>
-                                </td>
-                                <td class="text-left text-break">
-                                    <span title="@network.Name" class="font-weight-bold">@network.Name</span>
-                                </td>
-                                <td class="text-center text-break">
-                                    <a asp-page="/Content/Created/Networks/Details/Index" asp-route-id="@network.Id" title="Details">
-                                        <span>Details</span>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    }
     <div class="card mb-3">
         <div class="card-header font-weight-bold">
             <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
@@ -193,7 +133,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the source data to be used by the new analysis. Namely, the source (preferred) nodes used by the new analysis should be defined here. You can find possible input samples <a asp-page="/Content/Other/Samples/Index" asp-route-filter="ContainsSourceNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                <span>This section contains the source data to be used by the new analysis (namely, the identifiers of the source nodes should be provided). You can find possible input samples <a asp-page="/Content/Other/Samples/Index" asp-route-filter="HasSourceNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
@@ -205,16 +145,16 @@
                 <div class="form-group">
                     <div class="row align-items-center mb-2">
                         <div class="col-lg-4">
-                            <label for="data-textarea" class="font-weight-bold mb-0">Data</label>
+                            <label for="data-textarea-source" class="font-weight-bold mb-0">Data</label>
                             <span class="badge badge-dark file-group-count">0</span>
                         </div>
                         <div class="col-lg-8">
                             <div class="row align-items-center">
                                 <div class="col-6 col-form-label-sm text-right">
-                                    <label for="data-line-separator" class="font-weight-normal mb-0">Line separator:</label>
+                                    <label for="data-line-separator-source" class="font-weight-normal mb-0">Line separator:</label>
                                 </div>
                                 <div class="col-6 text-left">
-                                    <select id="data-line-separator" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                    <select id="data-line-separator-source" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
                                         <option value=",">comma (",")</option>
                                         <option value=";">semicolon (";")</option>
                                         <option value="\t">tab ("\t")</option>
@@ -225,7 +165,7 @@
                             </div>
                         </div>
                     </div>
-                    <textarea id="data-textarea" class="form-control file-group-text mb-2"></textarea>
+                    <textarea id="data-textarea-source" class="form-control file-group-text mb-2"></textarea>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
@@ -235,66 +175,62 @@
             </div>
         </div>
     </div>
-    @if (Model.View.SourceNodeCollections.Any())
-    {
-        <div class="card mb-3">
-            <div class="card-header font-weight-bold">
-                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                    <div>
-                        <span><i class="fas fa-folder"></i></span>
-                    </div>
-                    <div>
-                        <span>Source node collections</span>
-                    </div>
+    <div class="card mb-3" hidden="@(!Model.View.SourceNodeCollections.Any() ? "hidden" : null)">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-folder"></i></span>
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info text-justify text-wrap">
-                    <span><i class="fas fa-info-circle"></i></span>
-                    <span>This section contains the node collections which can be used as additional source nodes by the new analysis.</span>
+                <div>
+                    <span>Source node collections</span>
                 </div>
-                <table class="table table-hover table-bordered table-datatable item-group" data-order="[[1]]">
-                    <thead class="thead-light">
-                        <tr>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" id="checkbox-source-node-collection-select" class="custom-control-input item-group-select" title="Select" />
-                                    <label for="checkbox-source-node-collection-select" class="custom-control-label"></label>
-                                </div>
-                            </th>
-                            <th class="text-left text-break">
-                                <span>Node collection</span>
-                            </th>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                                <span>Links</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var nodeCollection in Model.View.SourceNodeCollections)
-                        {
-                            <tr class="item-group-item">
-                                <td class="text-center text-break">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="checkbox-source-node-collection-@nodeCollection.Id" name="Input.SourceNodeCollectionIds" value="@nodeCollection.Id" class="custom-control-input item-group-item-checkbox" title="Select" checked="@(Model.Input.SourceNodeCollectionIds != null && Model.Input.SourceNodeCollectionIds.Contains(nodeCollection.Id) ? "checked" : null)" />
-                                        <label for="checkbox-source-node-collection-@nodeCollection.Id" class="custom-control-label"></label>
-                                    </div>
-                                </td>
-                                <td class="text-left text-break">
-                                    <span title="@nodeCollection.Name" class="font-weight-bold">@nodeCollection.Name</span>
-                                </td>
-                                <td class="text-center text-break">
-                                    <a asp-page="/Content/Data/NodeCollections/Details" asp-route-id="@nodeCollection.Id" title="Details">
-                                        <span>Details</span>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
             </div>
         </div>
-    }
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the node collections which can be used as additional source nodes to be used by the new analysis (namely, the IDs of the node collections should be provided). You can find the available node collections <a asp-page="/Content/Data/NodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+            </div>
+            <div class="file-group" data-type="items">
+                <div class="form-group" hidden>
+                    <label asp-for="Input.SourceNodeCollectionData" class="font-weight-bold">Source node collection IDs</label>
+                    <textarea asp-for="Input.SourceNodeCollectionData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.SourceNodeCollectionData" class="text-muted small">The IDs of the source node collections to be used by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.SourceNodeCollectionData" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <div class="row align-items-center mb-2">
+                        <div class="col-lg-4">
+                            <label for="data-textarea-source-node-collection" class="font-weight-bold mb-0">Data</label>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row align-items-center">
+                                <div class="col-6 col-form-label-sm text-right">
+                                    <label for="data-line-separator-source-node-collection" class="font-weight-normal mb-0">Line separator:</label>
+                                </div>
+                                <div class="col-6 text-left">
+                                    <select id="data-line-separator-source-node-collection" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                        <option value=",">comma (",")</option>
+                                        <option value=";">semicolon (";")</option>
+                                        <option value="\t">tab ("\t")</option>
+                                        <option value="\s">space (" ")</option>
+                                        <option value="\n" selected>new line ("\n")</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="data-textarea-source-node-collection" class="form-control file-group-text mb-2"></textarea>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input file-group-file-upload" />
+                        <label class="custom-file-label file-group-file-label">Choose file</label>
+                    </div>
+                    <span class="text-muted small">The IDs of the source node collections of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="card mb-3">
         <div class="card-header font-weight-bold">
             <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
@@ -309,11 +245,11 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the target data to be used by the new analysis. Namely, the target nodes used by the new analysis should be defined here. You can find possible input samples <a asp-page="/Content/Other/Samples/Index" asp-route-filter="ContainsTargetNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                <span>This section contains the target data to be used by the new analysis (namely, the identifiers of the target nodes should be provided). You can find possible input samples <a asp-page="/Content/Other/Samples/Index" asp-route-filter="ContainsTargetNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
-                    <label asp-for="Input.TargetData" class="font-weight-bold">Source nodes</label>
+                    <label asp-for="Input.TargetData" class="font-weight-bold">Target nodes</label>
                     <textarea asp-for="Input.TargetData" class="form-control file-group-input"></textarea>
                     <span asp-description-for="Input.TargetData" class="text-muted small">The nodes to be used as target nodes by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
                     <span asp-validation-for="Input.TargetData" class="text-danger small"></span>
@@ -321,16 +257,16 @@
                 <div class="form-group">
                     <div class="row align-items-center mb-2">
                         <div class="col-lg-4">
-                            <label for="data-textarea" class="font-weight-bold mb-0">Data</label>
+                            <label for="data-textarea-target" class="font-weight-bold mb-0">Data</label>
                             <span class="badge badge-dark file-group-count">0</span>
                         </div>
                         <div class="col-lg-8">
                             <div class="row align-items-center">
                                 <div class="col-6 col-form-label-sm text-right">
-                                    <label for="data-line-separator" class="font-weight-normal mb-0">Line separator:</label>
+                                    <label for="data-line-separator-target" class="font-weight-normal mb-0">Line separator:</label>
                                 </div>
                                 <div class="col-6 text-left">
-                                    <select id="data-line-separator" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                    <select id="data-line-separator-target" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
                                         <option value=",">comma (",")</option>
                                         <option value=";">semicolon (";")</option>
                                         <option value="\t">tab ("\t")</option>
@@ -341,7 +277,7 @@
                             </div>
                         </div>
                     </div>
-                    <textarea id="data-textarea" class="form-control file-group-text mb-2"></textarea>
+                    <textarea id="data-textarea-target" class="form-control file-group-text mb-2"></textarea>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
@@ -351,66 +287,62 @@
             </div>
         </div>
     </div>
-    @if (Model.View.TargetNodeCollections.Any())
-    {
-        <div class="card mb-3">
-            <div class="card-header font-weight-bold">
-                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                    <div>
-                        <span><i class="fas fa-folder"></i></span>
-                    </div>
-                    <div>
-                        <span>Target node collections</span>
-                    </div>
+    <div class="card mb-3" hidden="@(!Model.View.TargetNodeCollections.Any() ? "hidden" : null)">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-folder"></i></span>
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info text-justify text-wrap">
-                    <span><i class="fas fa-info-circle"></i></span>
-                    <span>This section contains the node collections which can be used as additional target nodes by the new analysis.</span>
+                <div>
+                    <span>Target node collections</span>
                 </div>
-                <table class="table table-hover table-bordered table-datatable item-group" data-order="[[1]]">
-                    <thead class="thead-light">
-                        <tr>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" id="checkbox-target-node-collection-select" class="custom-control-input item-group-select" title="Select" />
-                                    <label for="checkbox-target-node-collection-select" class="custom-control-label"></label>
-                                </div>
-                            </th>
-                            <th class="text-left text-break">
-                                <span>Node collection</span>
-                            </th>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                                <span>Links</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var nodeCollection in Model.View.TargetNodeCollections)
-                        {
-                            <tr class="item-group-item">
-                                <td class="text-center text-break">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="checkbox-target-node-collection-@nodeCollection.Id" name="Input.TargetNodeCollectionIds" value="@nodeCollection.Id" class="custom-control-input item-group-item-checkbox" title="Select" checked="@(Model.Input.TargetNodeCollectionIds != null && Model.Input.TargetNodeCollectionIds.Contains(nodeCollection.Id) ? "checked" : null)" />
-                                        <label for="checkbox-target-node-collection-@nodeCollection.Id" class="custom-control-label"></label>
-                                    </div>
-                                </td>
-                                <td class="text-left text-break">
-                                    <span title="@nodeCollection.Name" class="font-weight-bold">@nodeCollection.Name</span>
-                                </td>
-                                <td class="text-center text-break">
-                                    <a asp-page="/Content/Data/NodeCollections/Details" asp-route-id="@nodeCollection.Id" title="Details">
-                                        <span>Details</span>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
             </div>
         </div>
-    }
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the node collections which can be used as additional target nodes to be used by the new analysis (namely, the IDs of the node collections should be provided). You can find the available node collections <a asp-page="/Content/Data/NodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+            </div>
+            <div class="file-group" data-type="items">
+                <div class="form-group" hidden>
+                    <label asp-for="Input.TargetNodeCollectionData" class="font-weight-bold">Target node collection IDs</label>
+                    <textarea asp-for="Input.TargetNodeCollectionData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.TargetNodeCollectionData" class="text-muted small">The IDs of the target node collections to be used by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.TargetNodeCollectionData" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <div class="row align-items-center mb-2">
+                        <div class="col-lg-4">
+                            <label for="data-textarea-target-node-collection" class="font-weight-bold mb-0">Data</label>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row align-items-center">
+                                <div class="col-6 col-form-label-sm text-right">
+                                    <label for="data-line-separator-target-node-collection" class="font-weight-normal mb-0">Line separator:</label>
+                                </div>
+                                <div class="col-6 text-left">
+                                    <select id="data-line-separator-target-node-collection" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                        <option value=",">comma (",")</option>
+                                        <option value=";">semicolon (";")</option>
+                                        <option value="\t">tab ("\t")</option>
+                                        <option value="\s">space (" ")</option>
+                                        <option value="\n" selected>new line ("\n")</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="data-textarea-target-node-collection" class="form-control file-group-text mb-2"></textarea>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input file-group-file-upload" />
+                        <label class="custom-file-label file-group-file-label">Choose file</label>
+                    </div>
+                    <span class="text-muted small">The IDs of the target node collections of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="card mb-3">
         <div class="card-header font-weight-bold">
             <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">

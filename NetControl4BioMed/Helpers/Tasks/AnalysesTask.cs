@@ -715,7 +715,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Update the status of the item.
                         analysis.Status = AnalysisStatus.Defined;
                         // Add a message to the log.
-                        analysis.Log = analysis.AppendToLog($"The try number {currentRetry + 1} ({NumberOfRetries - currentRetry} tr{(NumberOfRetries - currentRetry != 1 ? "ies" : "y")} remaining) ended with an error. {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
+                        analysis.Log = analysis.AppendToLog($"The try number {currentRetry + 1} ended with an error ({NumberOfRetries - currentRetry} tr{(NumberOfRetries - currentRetry != 1 ? "ies" : "y")} remaining). {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
                         // Edit the analysis.
                         await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                         // Check if the task should be executed again.
@@ -907,7 +907,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Update the status of the item.
                         analysis.Status = AnalysisStatus.Defined;
                         // Add a message to the log.
-                        analysis.Log = analysis.AppendToLog($"The try number {currentRetry + 1} ({NumberOfRetries - currentRetry} tr{(NumberOfRetries - currentRetry != 1 ? "ies" : "y")} remaining) ended with an error. {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
+                        analysis.Log = analysis.AppendToLog($"The try number {currentRetry + 1} ended with an error ({NumberOfRetries - currentRetry} tr{(NumberOfRetries - currentRetry != 1 ? "ies" : "y")} remaining). {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
                         // Edit the analysis.
                         await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
                         // Check if the task should be executed again.
