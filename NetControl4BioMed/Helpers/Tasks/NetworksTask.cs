@@ -439,10 +439,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -450,9 +446,18 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .ToList();
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
-                // Get the items with the provided IDs.
-                var networks = context.Networks
-                    .Where(item => batchIds.Contains(item.Id));
+                // Define the batch items.
+                var batchNetworks = new List<Network>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    batchNetworks = context.Networks
+                        .Where(item => batchIds.Contains(item.Id))
+                        .ToList();
+                }
                 // Define the current retry.
                 var currentRetry = 0;
                 // Go over each item in the current batch.
@@ -461,102 +466,152 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Get the corresponding batch item.
                     var batchItem = batchItems[batchItemIndex];
                     // Get the corresponding item.
-                    var network = networks
+                    var batchNetwork = batchNetworks
                         .FirstOrDefault(item => item.Id == batchItem.Id);
                     // Check if there was no item found.
-                    if (network == null)
+                    if (batchNetwork == null)
                     {
                         // Continue.
                         continue;
                     }
                     // Check if the status is not valid.
-                    if (network.Status != NetworkStatus.Defined)
+                    if (batchNetwork.Status != NetworkStatus.Defined)
                     {
-                        // Update the status of the item.
-                        network.Status = NetworkStatus.Error;
-                        // Add a message to the log.
-                        network.Log = network.AppendToLog("The status of the network is not valid in order to be generated.");
-                        // Edit the network.
-                        await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                        // Use a new scope.
+                        using (var scope = serviceProvider.CreateScope())
+                        {
+                            // Use a new context instance.
+                            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                            // Reload the network.
+                            var network = context.Networks
+                                .FirstOrDefault(item => item.Id == batchNetwork.Id);
+                            // Check if there was no item found.
+                            if (network == null)
+                            {
+                                // Continue.
+                                continue;
+                            }
+                            // Update the status of the item.
+                            network.Status = NetworkStatus.Error;
+                            // Add a message to the log.
+                            network.Log = network.AppendToLog("The status of the network is not valid in order to be generated.");
+                            // Edit the network.
+                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                        }
                         // Continue.
                         continue;
                     }
                     // Try to generate the network.
                     try
                     {
-                        // Update the status of the item.
-                        network.Status = NetworkStatus.Generating;
-                        // Add a message to the log.
-                        network.Log = network.AppendToLog("The network is now generating.");
-                        // Edit the network.
-                        await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                        // Use a new scope.
+                        using (var scope = serviceProvider.CreateScope())
+                        {
+                            // Use a new context instance.
+                            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                            // Reload the network.
+                            var network = context.Networks
+                                .FirstOrDefault(item => item.Id == batchNetwork.Id);
+                            // Check if there was no item found.
+                            if (network == null)
+                            {
+                                // Continue.
+                                continue;
+                            }
+                            // Update the status of the item.
+                            network.Status = NetworkStatus.Generating;
+                            // Add a message to the log.
+                            network.Log = network.AppendToLog("The network is now generating.");
+                            // Edit the network.
+                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                        }
                         // Check the algorithm to generate the network.
-                        switch (network.Algorithm)
+                        switch (batchNetwork.Algorithm)
                         {
                             case NetworkAlgorithm.None:
                                 // Run the algorithm on the network.
-                                await Algorithms.Networks.None.Algorithm.Run(network, context, token);
+                                await Algorithms.Networks.None.Algorithm.Run(batchNetwork.Id, serviceProvider, token);
                                 // End the switch.
                                 break;
                             case NetworkAlgorithm.Neighbors:
                                 // Run the algorithm on the network.
-                                await Algorithms.Networks.Neighbors.Algorithm.Run(network, context, token);
+                                await Algorithms.Networks.Neighbors.Algorithm.Run(batchNetwork.Id, serviceProvider, token);
                                 // End the switch.
                                 break;
                             case NetworkAlgorithm.Gap0:
                                 // Run the algorithm on the network.
-                                await Algorithms.Networks.Gap.Algorithm.Run(network, 0, context, token);
+                                await Algorithms.Networks.Gap.Algorithm.Run(batchNetwork.Id, 0, serviceProvider, token);
                                 // End the switch.
                                 break;
                             case NetworkAlgorithm.Gap1:
                                 // Run the algorithm on the network.
-                                await Algorithms.Networks.Gap.Algorithm.Run(network, 1, context, token);
+                                await Algorithms.Networks.Gap.Algorithm.Run(batchNetwork.Id, 1, serviceProvider, token);
                                 // End the switch.
                                 break;
                             case NetworkAlgorithm.Gap2:
                                 // Run the algorithm on the network.
-                                await Algorithms.Networks.Gap.Algorithm.Run(network, 2, context, token);
+                                await Algorithms.Networks.Gap.Algorithm.Run(batchNetwork.Id, 2, serviceProvider, token);
                                 // End the switch.
                                 break;
                             case NetworkAlgorithm.Gap3:
                                 // Run the algorithm on the network.
-                                await Algorithms.Networks.Gap.Algorithm.Run(network, 3, context, token);
+                                await Algorithms.Networks.Gap.Algorithm.Run(batchNetwork.Id, 3, serviceProvider, token);
                                 // End the switch.
                                 break;
                             case NetworkAlgorithm.Gap4:
                                 // Run the algorithm on the network.
-                                await Algorithms.Networks.Gap.Algorithm.Run(network, 4, context, token);
+                                await Algorithms.Networks.Gap.Algorithm.Run(batchNetwork.Id, 4, serviceProvider, token);
                                 // End the switch.
                                 break;
                             default:
-                                // Update the status of the item.
-                                network.Status = NetworkStatus.Error;
-                                // Add a message to the log.
-                                network.Log = network.AppendToLog("The network algorithm is not valid.");
-                                // Edit the network.
-                                await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                                // Use a new scope.
+                                using (var scope = serviceProvider.CreateScope())
+                                {
+                                    // Use a new context instance.
+                                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                                    // Reload the network.
+                                    var network = context.Networks
+                                        .FirstOrDefault(item => item.Id == batchNetwork.Id);
+                                    // Check if there was no item found.
+                                    if (network == null)
+                                    {
+                                        // Continue.
+                                        continue;
+                                    }
+                                    // Update the status of the item.
+                                    network.Status = NetworkStatus.Error;
+                                    // Add a message to the log.
+                                    network.Log = network.AppendToLog("The network algorithm is not valid.");
+                                    // Edit the network.
+                                    await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                                }
                                 // End the switch.
                                 break;
                         }
                     }
                     catch (Exception exception)
                     {
-                        // Reload the network.
-                        network = context.Networks
-                            .Where(item => item.Id == network.Id)
-                            .FirstOrDefault();
-                        // Check if there was no item found.
-                        if (network == null)
+                        // Use a new scope.
+                        using (var scope = serviceProvider.CreateScope())
                         {
-                            // Continue.
-                            continue;
+                            // Use a new context instance.
+                            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                            // Reload the network.
+                            var network = context.Networks
+                                .FirstOrDefault(item => item.Id == batchNetwork.Id);
+                            // Check if there was no item found.
+                            if (network == null)
+                            {
+                                // Continue.
+                                continue;
+                            }
+                            // Update the status of the item.
+                            network.Status = NetworkStatus.Defined;
+                            // Add a message to the log.
+                            network.Log = network.AppendToLog($"The try number {currentRetry + 1} ended with an error ({NumberOfRetries - currentRetry} tr{(NumberOfRetries - currentRetry != 1 ? "ies" : "y")} remaining). {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
+                            // Edit the network.
+                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
                         }
-                        // Update the status of the item.
-                        network.Status = NetworkStatus.Defined;
-                        // Add a message to the log.
-                        network.Log = network.AppendToLog($"The try number {currentRetry + 1} ended with an error ({NumberOfRetries - currentRetry} tr{(NumberOfRetries - currentRetry != 1 ? "ies" : "y")} remaining). {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
-                        // Edit the network.
-                        await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
                         // Check if the task should be executed again.
                         if (currentRetry < NumberOfRetries)
                         {
@@ -567,57 +622,83 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Continue.
                             continue;
                         }
-                        // Update the status of the item.
-                        network.Status = NetworkStatus.Error;
-                        // Add a message to the log.
-                        network.Log = network.AppendToLog("One or more errors occured while generating the network.");
-                        // Edit the network.
-                        await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                        // Use a new scope.
+                        using (var scope = serviceProvider.CreateScope())
+                        {
+                            // Use a new context instance.
+                            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                            // Reload the network.
+                            var network = context.Networks
+                                .FirstOrDefault(item => item.Id == batchNetwork.Id);
+                            // Check if there was no item found.
+                            if (network == null)
+                            {
+                                // Continue.
+                                continue;
+                            }
+                            // Update the status of the item.
+                            network.Status = NetworkStatus.Error;
+                            // Add a message to the log.
+                            network.Log = network.AppendToLog("One or more errors occured while generating the network.");
+                            // Edit the network.
+                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                        }
                         // Continue.
                         continue;
                     }
                     // Reset the current retry.
                     currentRetry = 0;
-                    // Reload the network.
-                    network = context.Networks
-                        .Where(item => item.Id == network.Id)
-                        .FirstOrDefault();
-                    // Check if there was no item found.
-                    if (network == null)
+                    // Use a new scope.
+                    using (var scope = serviceProvider.CreateScope())
                     {
-                        // Continue.
-                        continue;
-                    }
-                    // Update the status of the item.
-                    network.Status = NetworkStatus.Completed;
-                    // Add a message to the log.
-                    network.Log = network.AppendToLog("The network has been successfully generated.");
-                    // Remove the generation data.
-                    network.Data = null;
-                    // Edit the network.
-                    await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
-                    // Define the new background task.
-                    var backgroundTask = new BackgroundTask
-                    {
-                        DateTimeCreated = DateTime.UtcNow,
-                        Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.SendNetworksEndedEmailsAsync)}",
-                        IsRecurring = false,
-                        Data = JsonSerializer.Serialize(new NetworksTask
+                        // Use a new context instance.
+                        using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                        // Reload the network.
+                        var network = context.Networks
+                            .FirstOrDefault(item => item.Id == batchNetwork.Id);
+                        // Check if there was no item found.
+                        if (network == null)
                         {
-                            Scheme = Scheme,
-                            HostValue = HostValue,
-                            Items = network.Yield().Select(item => new NetworkInputModel
+                            // Continue.
+                            continue;
+                        }
+                        // Update the status of the item.
+                        network.Status = NetworkStatus.Completed;
+                        // Add a message to the log.
+                        network.Log = network.AppendToLog("The network has been successfully generated.");
+                        // Remove the generation data.
+                        network.Data = null;
+                        // Edit the network.
+                        await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                    }
+                    // Use a new scope.
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        // Use a new context instance.
+                        using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                        // Define the new background task.
+                        var backgroundTask = new BackgroundTask
+                        {
+                            DateTimeCreated = DateTime.UtcNow,
+                            Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.SendNetworksEndedEmailsAsync)}",
+                            IsRecurring = false,
+                            Data = JsonSerializer.Serialize(new NetworksTask
                             {
-                                Id = item.Id
+                                Scheme = Scheme,
+                                HostValue = HostValue,
+                                Items = batchNetwork.Yield().Select(item => new NetworkInputModel
+                                {
+                                    Id = item.Id
+                                })
                             })
-                        })
-                    };
-                    // Mark the task for addition.
-                    context.BackgroundTasks.Add(backgroundTask);
-                    // Save the changes to the database.
-                    await context.SaveChangesAsync();
-                    // Create a new Hangfire background job.
-                    BackgroundJob.Enqueue<IContentTaskManager>(item => item.SendNetworksEndedEmailsAsync(backgroundTask.Id, CancellationToken.None));
+                        };
+                        // Mark the task for addition.
+                        context.BackgroundTasks.Add(backgroundTask);
+                        // Save the changes to the database.
+                        await context.SaveChangesAsync();
+                        // Create a new Hangfire background job.
+                        BackgroundJob.Enqueue<IContentTaskManager>(item => item.SendNetworksEndedEmailsAsync(backgroundTask.Id, CancellationToken.None));
+                    }
                 }
             }
         }
