@@ -43,7 +43,7 @@
         {
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The node is currently assigned to @Model.View.DatabaseNodes.Count() database@(Model.View.DatabaseNodeFieldNodes.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Relationships/DatabaseNodes/Index" asp-route-searchString="@Model.View.Node.Id" asp-route-searchIn="NodeId" class="alert-link">view the databases</a>.</span>
+                <span>The node is currently assigned to @Model.View.DatabaseNodes.Count() database@(Model.View.DatabaseNodes.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Content/Relationships/DatabaseNodes/Index" asp-route-searchString="@Model.View.Node.Id" asp-route-searchIn="NodeId" class="alert-link">view the databases</a>.</span>
             </div>
             <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
                 <thead class="thead-light">

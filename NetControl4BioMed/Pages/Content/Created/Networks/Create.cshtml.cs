@@ -459,7 +459,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 return Page();
             }
             // Try to deserialize the seed node collection data.
-            if (!Input.NodeDatabaseData.TryDeserializeJsonObject<IEnumerable<string>>(out var seedNodeCollectionIds) || seedNodeCollectionIds == null)
+            if (!Input.SeedNodeCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out var seedNodeCollectionIds) || seedNodeCollectionIds == null)
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The provided seed node collection data could not be deserialized.");
