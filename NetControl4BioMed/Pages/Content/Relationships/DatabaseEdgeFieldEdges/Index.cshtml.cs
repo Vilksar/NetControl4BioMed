@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Content.Relationships.DatabaseEdgeFieldEdges
 
         public class ViewModel
         {
-            public SearchViewModel<DatabaseEdgeFieldEdge> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -58,6 +58,19 @@ namespace NetControl4BioMed.Pages.Content.Relationships.DatabaseEdgeFieldEdges
             };
         }
 
+        public class ItemModel
+        {
+            public string DatabaseEdgeFieldId { get; set; }
+
+            public string DatabaseEdgeFieldName { get; set; }
+
+            public string EdgeId { get; set; }
+
+            public string EdgeName { get; set; }
+
+            public string Value { get; set; }
+        }
+
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
         {
             // Get the current user.
@@ -73,7 +86,8 @@ namespace NetControl4BioMed.Pages.Content.Relationships.DatabaseEdgeFieldEdges
             // Start with all of the items in the database.
             var query = _context.DatabaseEdgeFieldEdges
                 .Where(item => item.DatabaseEdgeField.Database.DatabaseType.Name != "Generic" && (item.DatabaseEdgeField.Database.IsPublic || item.DatabaseEdgeField.Database.DatabaseUsers.Any(item1 => item1.User == user)))
-                .Where(item => !item.Edge.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item.Edge.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)) && item.Edge.EdgeNodes.All(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))));
+                // The following parts cause the database request to time out. Ideally, they should also be included.
+                .Where(item => !item.Edge.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item.Edge.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)) /* && item.Edge.EdgeNodes.All(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))) */);
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
@@ -118,14 +132,17 @@ namespace NetControl4BioMed.Pages.Content.Relationships.DatabaseEdgeFieldEdges
                 default:
                     break;
             }
-            // Include the related entitites.
-            query = query
-                .Include(item => item.DatabaseEdgeField)
-                .Include(item => item.Edge);
             // Define the view.
             View = new ViewModel
             {
-                Search = new SearchViewModel<DatabaseEdgeFieldEdge>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.Select(item => new ItemModel
+                {
+                    DatabaseEdgeFieldId = item.DatabaseEdgeField.Id,
+                    DatabaseEdgeFieldName = item.DatabaseEdgeField.Name,
+                    EdgeId = item.Edge.Id,
+                    EdgeName = item.Edge.Name,
+                    Value = item.Value
+                }))
             };
             // Return the page.
             return Page();

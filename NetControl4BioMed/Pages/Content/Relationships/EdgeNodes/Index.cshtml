@@ -40,10 +40,10 @@ else
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
                     </td>
                     <td class="text-left text-break">
-                        <a asp-page="/Content/Data/Edges/Details" asp-route-id="@item.Edge.Id" class="btn btn-outline-dark" title="@item.Edge.Name">@item.Edge.Name</a>
+                        <a asp-page="/Content/Data/Edges/Details" asp-route-id="@item.EdgeId" class="btn btn-outline-dark" title="@item.EdgeName">@item.EdgeName</a>
                     </td>
                     <td class="text-left text-break">
-                        <a asp-page="/Content/Data/Nodes/Details" asp-route-id="@item.Node.Id" class="btn btn-outline-dark" title="@item.Node.Name">@item.Node.Name</a>
+                        <a asp-page="/Content/Data/Nodes/Details" asp-route-id="@item.NodeId" class="btn btn-outline-dark" title="@item.NodeName">@item.NodeName</a>
                     </td>
                     <td class="text-center text-break">
                         <partial name="_EdgeNodeTypePartial" model="@item.Type" />

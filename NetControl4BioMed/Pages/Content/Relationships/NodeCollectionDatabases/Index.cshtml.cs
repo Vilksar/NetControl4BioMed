@@ -31,7 +31,7 @@ namespace NetControl4BioMed.Pages.Content.Relationships.NodeCollectionDatabases
 
         public class ViewModel
         {
-            public SearchViewModel<NodeCollectionDatabase> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -55,6 +55,17 @@ namespace NetControl4BioMed.Pages.Content.Relationships.NodeCollectionDatabases
             };
         }
 
+        public class ItemModel
+        {
+            public string NodeCollectionId { get; set; }
+
+            public string NodeCollectionName { get; set; }
+
+            public string DatabaseId { get; set; }
+
+            public string DatabaseName { get; set; }
+        }
+
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
         {
             // Get the current user.
@@ -69,7 +80,8 @@ namespace NetControl4BioMed.Pages.Content.Relationships.NodeCollectionDatabases
             }
             // Start with all of the items in the non-generic databases.
             var query = _context.NodeCollectionDatabases
-                .Where(item => !item.NodeCollection.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item.NodeCollection.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)) && item.NodeCollection.NodeCollectionNodes.Any(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
+                // The following parts cause the database request to time out. Ideally, they should also be included.
+                .Where(item => !item.NodeCollection.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item.NodeCollection.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)) /* && item.NodeCollection.NodeCollectionNodes.Any(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))) */)
                 .Where(item => item.Database.DatabaseType.Name != "Generic" && (item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user)));
             // Select the results matching the search string.
             query = query
@@ -108,14 +120,16 @@ namespace NetControl4BioMed.Pages.Content.Relationships.NodeCollectionDatabases
                 default:
                     break;
             }
-            // Include the related entitites.
-            query = query
-                .Include(item => item.NodeCollection)
-                .Include(item => item.Database);
             // Define the view.
             View = new ViewModel
             {
-                Search = new SearchViewModel<NodeCollectionDatabase>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.Select(item => new ItemModel
+                {
+                    NodeCollectionId = item.NodeCollection.Id,
+                    NodeCollectionName = item.NodeCollection.Name,
+                    DatabaseId = item.Database.Id,
+                    DatabaseName = item.Database.Name
+                }))
             };
             // Return the page.
             return Page();

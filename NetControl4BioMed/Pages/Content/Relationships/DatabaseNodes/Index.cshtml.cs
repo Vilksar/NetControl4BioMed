@@ -31,7 +31,7 @@ namespace NetControl4BioMed.Pages.Content.Relationships.DatabaseNodes
 
         public class ViewModel
         {
-            public SearchViewModel<DatabaseNode> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -53,6 +53,17 @@ namespace NetControl4BioMed.Pages.Content.Relationships.DatabaseNodes
                     { "NodeName", "NodeName" }
                 }
             };
+        }
+
+        public class ItemModel
+        {
+            public string DatabaseId { get; set; }
+
+            public string DatabaseName { get; set; }
+
+            public string NodeId { get; set; }
+
+            public string NodeName { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -108,14 +119,16 @@ namespace NetControl4BioMed.Pages.Content.Relationships.DatabaseNodes
                 default:
                     break;
             }
-            // Include the related entitites.
-            query = query
-                .Include(item => item.Database)
-                .Include(item => item.Node);
             // Define the view.
             View = new ViewModel
             {
-                Search = new SearchViewModel<DatabaseNode>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.Select(item => new ItemModel
+                {
+                    DatabaseId = item.Database.Id,
+                    DatabaseName = item.Database.Name,
+                    NodeId = item.Node.Id,
+                    NodeName = item.Node.Name
+                }))
             };
             // Return the page.
             return Page();

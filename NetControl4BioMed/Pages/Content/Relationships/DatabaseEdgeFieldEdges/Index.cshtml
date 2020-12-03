@@ -40,10 +40,10 @@ else
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
                     </td>
                     <td class="text-left text-break">
-                        <a asp-page="/Content/Databases/DatabaseEdgeFields/Details" asp-route-id="@item.DatabaseEdgeField.Id" class="btn btn-outline-dark" title="@item.DatabaseEdgeField.Name">@item.DatabaseEdgeField.Name</a>
+                        <a asp-page="/Content/Databases/DatabaseEdgeFields/Details" asp-route-id="@item.DatabaseEdgeFieldId" class="btn btn-outline-dark" title="@item.DatabaseEdgeFieldName">@item.DatabaseEdgeFieldName</a>
                     </td>
                     <td class="text-left text-break">
-                        <a asp-page="/Content/Data/Edges/Details" asp-route-id="@item.Edge.Id" class="btn btn-outline-dark" title="@item.Edge.Name">@item.Edge.Name</a>
+                        <a asp-page="/Content/Data/Edges/Details" asp-route-id="@item.EdgeId" class="btn btn-outline-dark" title="@item.EdgeName">@item.EdgeName</a>
                     </td>
                     <td class="text-center text-break">
                         <span title="@item.Value">@item.Value</span>

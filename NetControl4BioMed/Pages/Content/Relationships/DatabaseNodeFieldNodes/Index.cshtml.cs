@@ -31,7 +31,7 @@ namespace NetControl4BioMed.Pages.Content.Relationships.DatabaseNodeFieldNodes
 
         public class ViewModel
         {
-            public SearchViewModel<DatabaseNodeFieldNode> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -55,6 +55,19 @@ namespace NetControl4BioMed.Pages.Content.Relationships.DatabaseNodeFieldNodes
                     { "Value", "Value" }
                 }
             };
+        }
+
+        public class ItemModel
+        {
+            public string DatabaseNodeFieldId { get; set; }
+
+            public string DatabaseNodeFieldName { get; set; }
+
+            public string NodeId { get; set; }
+
+            public string NodeName { get; set; }
+
+            public string Value { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -117,14 +130,17 @@ namespace NetControl4BioMed.Pages.Content.Relationships.DatabaseNodeFieldNodes
                 default:
                     break;
             }
-            // Include the related entitites.
-            query = query
-                .Include(item => item.DatabaseNodeField)
-                .Include(item => item.Node);
             // Define the view.
             View = new ViewModel
             {
-                Search = new SearchViewModel<DatabaseNodeFieldNode>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.Select(item => new ItemModel
+                {
+                    DatabaseNodeFieldId = item.DatabaseNodeField.Id,
+                    DatabaseNodeFieldName = item.DatabaseNodeField.Name,
+                    NodeId = item.Node.Id,
+                    NodeName = item.Node.Name,
+                    Value = item.Value
+                }))
             };
             // Return the page.
             return Page();
