@@ -28,11 +28,11 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.None
         public static async Task Run(string networkId, IServiceProvider serviceProvider, CancellationToken token)
         {
             // Define the required data.
-            var data = Enumerable.Empty<NetworkEdgeInputModel>();
-            var nodeDatabases = Enumerable.Empty<Database>();
-            var edgeDatabases = Enumerable.Empty<Database>();
-            var databaseNodeFields = Enumerable.Empty<DatabaseNodeField>();
-            var databaseEdgeFields = Enumerable.Empty<DatabaseEdgeField>();
+            var data = new List<NetworkEdgeInputModel>();
+            var nodeDatabaseIds = new List<string>();
+            var edgeDatabaseIds = new List<string>();
+            var databaseNodeFieldIds = new List<string>();
+            var databaseEdgeFieldIds = new List<string>();
             // Use a new scope.
             using (var scope = serviceProvider.CreateScope())
             {
@@ -100,7 +100,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.None
                     return;
                 }
                 // Try to deserialize the data.
-                if (!network.Data.TryDeserializeJsonObject<IEnumerable<NetworkEdgeInputModel>>(out data) || data == null)
+                if (!network.Data.TryDeserializeJsonObject<List<NetworkEdgeInputModel>>(out data) || data == null)
                 {
                     // Update the status of the item.
                     network.Status = NetworkStatus.Error;
@@ -112,34 +112,38 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.None
                     return;
                 }
                 // Get the related entities.
-                nodeDatabases = context.NetworkDatabases
+                nodeDatabaseIds = context.NetworkDatabases
                     .Where(item => item.Network == network)
-                    .Where(item1 => item1.Type == NetworkDatabaseType.Node)
-                    .Select(item1 => item1.Database)
+                    .Where(item => item.Type == NetworkDatabaseType.Node)
+                    .Select(item => item.Database)
                     .Distinct()
-                    .AsEnumerable();
-                edgeDatabases = context.NetworkDatabases
+                    .Select(item => item.Id)
+                    .ToList();
+                edgeDatabaseIds = context.NetworkDatabases
                     .Where(item => item.Network == network)
-                    .Where(item1 => item1.Type == NetworkDatabaseType.Edge)
-                    .Select(item1 => item1.Database)
+                    .Where(item => item.Type == NetworkDatabaseType.Edge)
+                    .Select(item => item.Database)
                     .Distinct()
-                    .AsEnumerable();
-                databaseNodeFields = context.NetworkDatabases
+                    .Select(item => item.Id)
+                    .ToList();
+                databaseNodeFieldIds = context.NetworkDatabases
                     .Where(item => item.Network == network)
                     .Where(item1 => item1.Type == NetworkDatabaseType.Node)
                     .Select(item1 => item1.Database)
                     .Select(item1 => item1.DatabaseNodeFields)
                     .SelectMany(item1 => item1)
                     .Distinct()
-                    .AsEnumerable();
-                databaseEdgeFields = context.NetworkDatabases
+                    .Select(item => item.Id)
+                    .ToList();
+                databaseEdgeFieldIds = context.NetworkDatabases
                     .Where(item => item.Network == network)
-                    .Where(item1 => item1.Type == NetworkDatabaseType.Edge)
-                    .Select(item1 => item1.Database)
-                    .Select(item1 => item1.DatabaseEdgeFields)
-                    .SelectMany(item1 => item1)
+                    .Where(item => item.Type == NetworkDatabaseType.Edge)
+                    .Select(item => item.Database)
+                    .Select(item => item.DatabaseEdgeFields)
+                    .SelectMany(item => item)
                     .Distinct()
-                    .AsEnumerable();
+                    .Select(item => item.Id)
+                    .ToList();
             }
             // Get the seed edges from the data.
             var seedEdges = data
@@ -194,18 +198,16 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.None
                         DateTimeCreated = DateTime.UtcNow,
                         Name = item,
                         Description = $"This is an automatically generated node for the network \"{networkId}\".",
-                        DatabaseNodes = nodeDatabases
+                        DatabaseNodes = nodeDatabaseIds
                             .Select(item1 => new DatabaseNode
                             {
-                                DatabaseId = item1.Id,
-                                Database = item1
+                                DatabaseId = item1,
                             })
                             .ToList(),
-                        DatabaseNodeFieldNodes = databaseNodeFields
+                        DatabaseNodeFieldNodes = databaseNodeFieldIds
                             .Select(item1 => new DatabaseNodeFieldNode
                             {
-                                DatabaseNodeFieldId = item1.Id,
-                                DatabaseNodeField = item1,
+                                DatabaseNodeFieldId = item1,
                                 Value = item
                             })
                             .ToList()
@@ -221,18 +223,16 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.None
                         DateTimeCreated = DateTime.UtcNow,
                         Name = $"{item.Item1} - {item.Item2}",
                         Description = $"This is an automatically generated edge for the network \"{networkId}\".",
-                        DatabaseEdges = edgeDatabases
+                        DatabaseEdges = edgeDatabaseIds
                             .Select(item1 => new DatabaseEdge
                             {
-                                DatabaseId = item1.Id,
-                                Database = item1
+                                DatabaseId = item1,
                             })
                             .ToList(),
-                        DatabaseEdgeFieldEdges = databaseEdgeFields
+                        DatabaseEdgeFieldEdges = databaseEdgeFieldIds
                             .Select(item1 => new DatabaseEdgeFieldEdge
                             {
-                                DatabaseEdgeFieldId = item1.Id,
-                                DatabaseEdgeField = item1,
+                                DatabaseEdgeFieldId = item1,
                                 Value = $"{item.Item1} - {item.Item2}"
                             })
                             .ToList(),
