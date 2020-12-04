@@ -19,102 +19,143 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
     public static class Algorithm
     {
         /// <summary>
-        /// Runs the algorithm on the network with the provided details, using the given parameters.
+        /// Runs the algorithm on the analysis with the provided details, using the given parameters.
         /// </summary>
-        /// <param name="context">The application database context.</param>
-        /// <param name="analysis">The analysis which to run using the algorithm.</param>
-        public static async Task Run(Analysis analysis, ApplicationDbContext context, CancellationToken token)
+        /// <param name="analysisId">The ID of the analysis which to run using the algorithm.</param>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        /// <returns></returns>
+        public static async Task Run(string analysisId, IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Get the nodes, edges, target nodes and source (preferred) nodes.
-            var nodes = context.AnalysisNodes
-                .Where(item => item.Analysis == analysis)
-                .Where(item => item.Type == AnalysisNodeType.None)
-                .Select(item => item.Node.Id)
-                .ToList();
-            var edges = context.AnalysisEdges
-                .Where(item => item.Analysis == analysis)
-                .Select(item => item.Edge)
-                .Select(item => new
+            // Define the required data.
+            var analysisNodeIds = new List<string>();
+            var analysisEdgeIds = new List<(string, string, string)>();
+            var nodes = new List<string>();
+            var edges = new List<(string, string)>();
+            var sources = new List<string>();
+            var targets = new List<string>();
+            var parameters = new Parameters();
+            var currentIteration = 0;
+            var currentIterationWithoutImprovement = 0;
+            var maximumIterations = 100;
+            var maximumIterationsWithoutImprovement = 25;
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Reload the network.
+                var analysis = context.Analyses
+                    .FirstOrDefault(item => item.Id == analysisId);
+                // Check if there was no item found.
+                if (analysis == null)
                 {
-                    SourceNodeId = item.EdgeNodes
-                        .Where(item1 => item1.Type == EdgeNodeType.Source)
-                        .Select(item1 => item1.Node.Id)
-                        .FirstOrDefault(),
-                    TargetNodeId = item.EdgeNodes
-                        .Where(item1 => item1.Type == EdgeNodeType.Target)
-                        .Select(item1 => item1.Node.Id)
-                        .FirstOrDefault()
-                })
-                .Where(item => !string.IsNullOrEmpty(item.SourceNodeId) && !string.IsNullOrEmpty(item.TargetNodeId))
-                .AsEnumerable()
-                .Select(item => (item.SourceNodeId, item.TargetNodeId))
-                .Distinct()
-                .ToList();
-            var sources = context.AnalysisNodes
-                .Where(item => item.Analysis == analysis)
-                .Where(item => item.Type == AnalysisNodeType.Source)
-                .Select(item => item.Node.Id)
-                .ToList();
-            var targets = context.AnalysisNodes
-                .Where(item => item.Analysis == analysis)
-                .Where(item => item.Type == AnalysisNodeType.Target)
-                .Select(item => item.Node.Id)
-                .ToList();
-            // Check if there is any node in an edge that does not appear in the list of nodes.
-            if (edges.Select(item => item.Item1).Concat(edges.Select(item => item.Item2)).Except(nodes).Any())
-            {
-                // Update the analysis with an error message.
-                analysis.Log = analysis.AppendToLog("There are edges which contain unknown nodes.");
-                // Update the analysis status.
-                analysis.Status = AnalysisStatus.Error;
-                // Update the analysis end time.
-                analysis.DateTimeEnded = DateTime.UtcNow;
-                // Update the analysis.
-                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
-                // End the function.
-                return;
-            }
-            // Check if there is any target node that does not appear in the list of nodes.
-            if (targets.Except(nodes).Any())
-            {
-                // Update the analysis with an error message.
-                analysis.Log = analysis.AppendToLog("There are unknown target nodes.");
-                // Update the analysis status.
-                analysis.Status = AnalysisStatus.Error;
-                // Update the analysis end time.
-                analysis.DateTimeEnded = DateTime.UtcNow;
-                // Update the analysis.
-                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
-                // End the function.
-                return;
-            }
-            // Check if there is any source node that does not appear in the list of nodes.
-            if (sources.Except(nodes).Any())
-            {
-                // Update the analysis with an error message.
-                analysis.Log = analysis.AppendToLog("There are unknown source nodes.");
-                // Update the analysis status.
-                analysis.Status = AnalysisStatus.Error;
-                // Update the analysis end time.
-                analysis.DateTimeEnded = DateTime.UtcNow;
-                // Update the analysis.
-                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
-                // End the function.
-                return;
-            }
-            // Try to get the parameters for the algorithm.
-            if (!analysis.Parameters.TryDeserializeJsonObject<Parameters>(out var parameters))
-            {
-                // Update the analysis with an error message.
-                analysis.Log = analysis.AppendToLog("The parameters are not valid for the algorithm.");
-                // Update the analysis status.
-                analysis.Status = AnalysisStatus.Error;
-                // Update the analysis end time.
-                analysis.DateTimeEnded = DateTime.UtcNow;
-                // Update the analysis.
-                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
-                // End the function.
-                return;
+                    // Return.
+                    return;
+                }
+                // Get the required data.
+                analysisNodeIds = context.AnalysisNodes
+                    .Where(item => item.Analysis == analysis)
+                    .Where(item => item.Type == AnalysisNodeType.None)
+                    .Select(item => item.Node.Id)
+                    .ToList();
+                analysisEdgeIds = context.AnalysisEdges
+                    .Where(item => item.Analysis == analysis)
+                    .Select(item => item.Edge)
+                    .Select(item => new
+                    {
+                        Edge = item.Id,
+                        SourceNodeId = item.EdgeNodes
+                            .Where(item1 => item1.Type == EdgeNodeType.Source)
+                            .Select(item1 => item1.Node.Id)
+                            .FirstOrDefault(),
+                        TargetNodeId = item.EdgeNodes
+                            .Where(item1 => item1.Type == EdgeNodeType.Target)
+                            .Select(item1 => item1.Node.Id)
+                            .FirstOrDefault()
+                    })
+                    .Where(item => !string.IsNullOrEmpty(item.SourceNodeId) && !string.IsNullOrEmpty(item.TargetNodeId))
+                    .AsEnumerable()
+                    .Select(item => (item.SourceNodeId, item.TargetNodeId, item.Edge))
+                    .Distinct()
+                    .ToList();
+                // Get the nodes, edges, target nodes and source (preferred) nodes.
+                nodes = analysisNodeIds
+                    .ToList();
+                edges = analysisEdgeIds
+                    .Select(item => (item.Item1, item.Item2))
+                    .ToList();
+                sources = context.AnalysisNodes
+                    .Where(item => item.Analysis == analysis)
+                    .Where(item => item.Type == AnalysisNodeType.Source)
+                    .Select(item => item.Node.Id)
+                    .ToList();
+                targets = context.AnalysisNodes
+                    .Where(item => item.Analysis == analysis)
+                    .Where(item => item.Type == AnalysisNodeType.Target)
+                    .Select(item => item.Node.Id)
+                    .ToList();
+                // Check if there is any node in an edge that does not appear in the list of nodes.
+                if (edges.Select(item => item.Item1).Concat(edges.Select(item => item.Item2)).Distinct().Except(nodes).Any())
+                {
+                    // Update the analysis with an error message.
+                    analysis.Log = analysis.AppendToLog("There are edges which contain unknown nodes.");
+                    // Update the analysis status.
+                    analysis.Status = AnalysisStatus.Error;
+                    // Update the analysis end time.
+                    analysis.DateTimeEnded = DateTime.UtcNow;
+                    // Update the analysis.
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    // End the function.
+                    return;
+                }
+                // Check if there is any target node that does not appear in the list of nodes.
+                if (targets.Except(nodes).Any())
+                {
+                    // Update the analysis with an error message.
+                    analysis.Log = analysis.AppendToLog("There are unknown target nodes.");
+                    // Update the analysis status.
+                    analysis.Status = AnalysisStatus.Error;
+                    // Update the analysis end time.
+                    analysis.DateTimeEnded = DateTime.UtcNow;
+                    // Update the analysis.
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    // End the function.
+                    return;
+                }
+                // Check if there is any source node that does not appear in the list of nodes.
+                if (sources.Except(nodes).Any())
+                {
+                    // Update the analysis with an error message.
+                    analysis.Log = analysis.AppendToLog("There are unknown source nodes.");
+                    // Update the analysis status.
+                    analysis.Status = AnalysisStatus.Error;
+                    // Update the analysis end time.
+                    analysis.DateTimeEnded = DateTime.UtcNow;
+                    // Update the analysis.
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    // End the function.
+                    return;
+                }
+                // Try to get the parameters for the algorithm.
+                if (!analysis.Parameters.TryDeserializeJsonObject<Parameters>(out parameters))
+                {
+                    // Update the analysis with an error message.
+                    analysis.Log = analysis.AppendToLog("The parameters are not valid for the algorithm.");
+                    // Update the analysis status.
+                    analysis.Status = AnalysisStatus.Error;
+                    // Update the analysis end time.
+                    analysis.DateTimeEnded = DateTime.UtcNow;
+                    // Update the analysis.
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    // End the function.
+                    return;
+                }
+                // Set up the first iteration.
+                currentIteration = analysis.CurrentIteration;
+                currentIterationWithoutImprovement = analysis.CurrentIterationWithoutImprovement;
+                maximumIterations = analysis.MaximumIterations;
+                maximumIterationsWithoutImprovement = analysis.MaximumIterationsWithoutImprovement;
             }
             // Get the additional needed variables.
             var nodeIndex = nodes.Select((item, index) => (item, index)).ToDictionary(item => item.item, item => item.index);
@@ -124,111 +165,139 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
             var powersMatrixA = GetPowersMatrixA(matrixA, parameters.MaximumPathLength);
             var powersMatrixCA = GetPowersMatrixCA(matrixC, powersMatrixA);
             var targetAncestors = GetTargetAncestors(powersMatrixA, targets, nodeIndex);
-            // Update the analysis status.
-            analysis.Status = AnalysisStatus.Ongoing;
-            // Add a message to the log.
-            analysis.Log = analysis.AppendToLog("The analysis is now running.");
-            // Update the analysis.
-            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
-            // Set up the first iteration.
-            var random = new Random(parameters.RandomSeed);
-            var currentIteration = analysis.CurrentIteration;
-            var currentIterationWithoutImprovement = analysis.CurrentIterationWithoutImprovement;
-            var maximumIterations = analysis.MaximumIterations;
-            var maximumIterationsWithoutImprovement = analysis.MaximumIterationsWithoutImprovement;
-            var bestSolutionSize = 0.0;
-            // Initialize a new population.
-            var population = new Population(nodeIndex, targets, targetAncestors, powersMatrixCA, nodeIsPreferred, parameters, random);
-            // Run as long as the analysis exists and the final iteration hasn't been reached.
-            while (analysis != null && analysis.Status == AnalysisStatus.Ongoing && currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement && !token.IsCancellationRequested)
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
             {
-                // Move on to the next iterations.
-                currentIteration += 1;
-                currentIterationWithoutImprovement += 1;
-                // Update the iteration count.
-                analysis.CurrentIteration = currentIteration;
-                analysis.CurrentIterationWithoutImprovement = currentIterationWithoutImprovement;
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Reload the network.
+                var analysis = context.Analyses
+                    .FirstOrDefault(item => item.Id == analysisId);
+                // Check if there was no item found.
+                if (analysis == null)
+                {
+                    // Return.
+                    return;
+                }
+                // Update the analysis status.
+                analysis.Status = AnalysisStatus.Ongoing;
+                // Add a message to the log.
+                analysis.Log = analysis.AppendToLog("The analysis is now running.");
                 // Update the analysis.
                 await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
-                // Move on to the next population.
-                population = new Population(population, nodeIndex, targets, targetAncestors, powersMatrixCA, nodeIsPreferred, parameters, random);
-                // Get the best fitness of the current solution.
-                var currentSolutionSize = population.GetFitnessList().Max();
-                // Check if the current solution is better than the previously obtained best solutions.
-                if (bestSolutionSize < currentSolutionSize)
-                {
-                    // Update the best solution.
-                    bestSolutionSize = currentSolutionSize;
-                    // Reset the number of iterations.
-                    currentIterationWithoutImprovement = 0;
-                }
-                // Reload it for the next iteration.
-                analysis = context.Analyses
-                    .Where(item => item.Id == analysis.Id)
-                    .FirstOrDefault();
             }
-            // Check if the analysis doesn't exist anymore (if it has been deleted).
-            if (analysis == null)
+            // Define the required data.
+            var analysisStillExists = true;
+            var analysisStatus = AnalysisStatus.Ongoing;
+            var controlPaths = new List<ControlPath>();
+            // Use a new timer to display the progress.
+            using (new Timer(async (state) =>
             {
-                // End the function.
-                return;
-            }
-            // Get the required data.
-            var analysisNodes = context.AnalysisNodes
-                .Where(item => item.Analysis == analysis)
-                .Where(item => item.Type == AnalysisNodeType.None)
-                .Select(item => item.Node)
-                .ToList();
-            var analysisEdges = context.AnalysisEdges
-                .Where(item => item.Analysis == analysis)
-                .Select(item => item.Edge)
-                .Select(item => new
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    Edge = item,
-                    SourceNodeId = item.EdgeNodes
-                        .Where(item1 => item1.Type == EdgeNodeType.Source)
-                        .Select(item1 => item1.Node.Id)
-                        .FirstOrDefault(),
-                    TargetNodeId = item.EdgeNodes
-                        .Where(item1 => item1.Type == EdgeNodeType.Target)
-                        .Select(item1 => item1.Node.Id)
-                        .FirstOrDefault()
-                })
-                .Where(item => !string.IsNullOrEmpty(item.SourceNodeId) && !string.IsNullOrEmpty(item.TargetNodeId))
-                .ToList();
-            // Get the control paths.
-            var controlPaths = population.GetControlPaths(nodeIndex, nodes, edges).Select(item => new ControlPath
-            {
-                Paths = item.Values.Select(item1 =>
-                {
-                    // Get the nodes and edges in the path.
-                    var pathNodes = item1
-                        .Select(item2 => analysisNodes.FirstOrDefault(item3 => item3.Id == item2))
-                        .Where(item2 => item2 != null)
-                        .Reverse()
-                        .ToList();
-                    var pathEdges = item1
-                        .Zip(item1.Skip(1), (item2, item3) => (item3.ToString(), item2.ToString()))
-                        .Select(item2 => analysisEdges.FirstOrDefault(item3 => item3.SourceNodeId == item2.Item1 && item3.TargetNodeId == item2.Item2))
-                        .Where(item2 => item2 != null)
-                        .Select(item2 => item2.Edge)
-                        .Reverse()
-                        .ToList();
-                    // Return the path.
-                    return new Path
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Reload the network.
+                    var analysis = context.Analyses
+                        .FirstOrDefault(item => item.Id == analysisId);
+                    // Update the loop variables.
+                    analysisStillExists = analysis != null;
+                    // Check if there was no item found.
+                    if (analysis == null)
                     {
-                        PathNodes = pathNodes.Select((item2, index) => new PathNode { NodeId = item2.Id, Node = item2, Type = PathNodeType.None, Index = index })
-                            .Append(new PathNode { NodeId = pathNodes.First().Id, Node = pathNodes.First(), Type = PathNodeType.Source, Index = -1 })
-                            .Append(new PathNode { NodeId = pathNodes.Last().Id, Node = pathNodes.Last(), Type = PathNodeType.Target, Index = pathNodes.Count() })
-                            .ToList(),
-                        PathEdges = pathEdges.Select((item2, index) => new PathEdge { EdgeId = item2.Id, Edge = item2, Index = index }).ToList()
-                    };
-                }).ToList()
-            }).ToList();
-            // Update the analysis.
-            analysis.ControlPaths = controlPaths;
-            // Update the analysis.
-            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                        // Return.
+                        return;
+                    }
+                    // Update the loop variables.
+                    analysisStatus = analysis.Status;
+                    // Update the iteration count.
+                    analysis.CurrentIteration = currentIteration;
+                    analysis.CurrentIterationWithoutImprovement = currentIterationWithoutImprovement;
+                    // Update the analysis.
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                }
+            }, null, TimeSpan.FromSeconds(0.0), TimeSpan.FromSeconds(30.0)))
+            {
+                // Set up the first iteration.
+                var random = new Random(parameters.RandomSeed);
+                var bestSolutionSize = 0.0;
+                // Initialize a new population.
+                var population = new Population(nodeIndex, targets, targetAncestors, powersMatrixCA, nodeIsPreferred, parameters, random);
+                // Run as long as the analysis exists and the final iteration hasn't been reached.
+                while (analysisStillExists && analysisStatus == AnalysisStatus.Ongoing && currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement && !token.IsCancellationRequested)
+                {
+                    // Move on to the next iterations.
+                    currentIteration += 1;
+                    currentIterationWithoutImprovement += 1;
+                    // Move on to the next population.
+                    population = new Population(population, nodeIndex, targets, targetAncestors, powersMatrixCA, nodeIsPreferred, parameters, random);
+                    // Get the best fitness of the current solution.
+                    var currentSolutionSize = population.GetFitnessList().Max();
+                    // Check if the current solution is better than the previously obtained best solutions.
+                    if (bestSolutionSize < currentSolutionSize)
+                    {
+                        // Update the best solution.
+                        bestSolutionSize = currentSolutionSize;
+                        // Reset the number of iterations.
+                        currentIterationWithoutImprovement = 0;
+                    }
+                }
+                // Get the control paths.
+                controlPaths = population.GetControlPaths(nodeIndex, nodes, edges).Select(item => new ControlPath
+                {
+                    Paths = item.Values.Select(item1 =>
+                    {
+                        // Get the nodes and edges in the path.
+                        var pathNodes = item1
+                            .Select(item2 => analysisNodeIds.FirstOrDefault(item3 => item3 == item2))
+                            .Where(item2 => item2 != null)
+                            .Reverse()
+                            .ToList();
+                        var pathEdges = item1
+                            .Zip(item1.Skip(1), (item2, item3) => (item3.ToString(), item2.ToString()))
+                            .Select(item2 => analysisEdgeIds.FirstOrDefault(item3 => item3.Item1 == item2.Item1 && item3.Item2 == item2.Item2))
+                            .Select(item2 => item2.Item3)
+                            .Where(item2 => !string.IsNullOrEmpty(item2))
+                            .Reverse()
+                            .ToList();
+                        // Return the path.
+                        return new Path
+                        {
+                            PathNodes = pathNodes.Select((item2, index) => new PathNode { NodeId = item2, Type = PathNodeType.None, Index = index })
+                                .Append(new PathNode { NodeId = pathNodes.First(), Type = PathNodeType.Source, Index = -1 })
+                                .Append(new PathNode { NodeId = pathNodes.Last(), Type = PathNodeType.Target, Index = pathNodes.Count() })
+                                .ToList(),
+                            PathEdges = pathEdges.Select((item2, index) => new PathEdge { EdgeId = item2, Index = index }).ToList()
+                        };
+                    }).ToList()
+                }).ToList();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Reload the network.
+                var analysis = context.Analyses
+                    .FirstOrDefault(item => item.Id == analysisId);
+                // Update the loop variables.
+                analysisStillExists = analysis != null;
+                // Check if there was no item found.
+                if (analysis == null)
+                {
+                    // Return.
+                    return;
+                }
+                // Update the analysis.
+                analysis.CurrentIteration = currentIteration;
+                analysis.CurrentIterationWithoutImprovement = currentIterationWithoutImprovement;
+                analysis.ControlPaths = controlPaths;
+                // Update the analysis.
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+            }
+            // End the function.
+            return;
         }
 
         /// <summary>

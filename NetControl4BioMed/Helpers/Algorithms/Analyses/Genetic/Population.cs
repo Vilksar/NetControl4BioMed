@@ -15,7 +15,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
         /// <summary>
         /// Represents the maximum number of parallel operations.
         /// </summary>
-        private static readonly int DegreeOfParallelism = (int)Math.Floor((double)(Environment.ProcessorCount - 1) / 2) + 1;
+        private static readonly int DegreeOfParallelism = (int)Math.Floor((double)(Environment.ProcessorCount - 1) / 4) + 1;
 
         /// <summary>
         /// Represents the chromosomes in the population.
