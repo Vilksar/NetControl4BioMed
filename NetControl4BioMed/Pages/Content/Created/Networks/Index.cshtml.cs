@@ -36,7 +36,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
 
             public IEnumerable<DatabaseType> DatabaseTypes { get; set; }
 
-            public SearchViewModel<Network> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -45,11 +45,20 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     { "Id", "ID" },
                     { "Name", "Name" },
                     { "Description", "Description" },
-                    { "NetworkDatabases", "Databases" },
-                    { "NetworkNodes", "Nodes" },
-                    { "NetworkEdges", "Edges" },
-                    { "NetworkNodeCollections", "Node collections" },
-                    { "AnalysisNetworks", "Analyses" }
+                    { "UserId", "User ID" },
+                    { "UserEmail", "User e-mail" },
+                    { "DatabaseTypeId", "Database type ID" },
+                    { "DatabaseTypeName", "Database type name" },
+                    { "DatabaseId", "Database ID" },
+                    { "DatabaseName", "Database name" },
+                    { "NodeId", "Node ID" },
+                    { "NodeName", "Node name" },
+                    { "EdgeId", "Edge ID" },
+                    { "EdgeName", "Edge name" },
+                    { "NodeCollectionId", "Node collection ID" },
+                    { "NodeCollectionName", "Node collection name" },
+                    { "AnalysisId", "Analysis ID" },
+                    { "AnalysisName", "Analysis name" }
                 },
                 Filter = new Dictionary<string, string>
                 {
@@ -75,12 +84,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     { "UsesNotAlgorithmGap3", "Was not generated using \"Gap 3\" algorithm" },
                     { "UsesAlgorithmGap4", "Was generated using \"Gap 4\" algorithm" },
                     { "UsesNotAlgorithmGap4", "Was not generated using \"Gap 4\" algorithm" },
-                    { "HasNetworkUserInvitations", "Has user invitations" },
-                    { "HasNoNetworkUserInvitations", "Does not have user invitations" },
-                    { "HasAnalysisNetworks", "Is used by analyses" },
-                    { "HasNoAnalysisNetworks", "Is not used by any analyses" },
-                    { "HasNetworkNodeCollections", "Uses node collections" },
-                    { "HasNoNetworkNodeCollections", "Does not use node collections" }
+                    { "HasAnalysisNetworks", "Has analyses" },
+                    { "HasNoAnalysisNetworks", "Does not have analyses" },
+                    { "HasNetworkNodeCollections", "Has node collections" },
+                    { "HasNoNetworkNodeCollections", "Does not have node collections" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -89,7 +96,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     { "Name", "Name" },
                     { "Status", "Status" },
                     { "NetworkUserCount", "Number of users" },
-                    { "NetworkUserInvitationCount", "Number of user invitations" },
                     { "NetworkDatabaseCount", "Number of databases" },
                     { "NetworkNodeCount", "Number of nodes" },
                     { "NetworkEdgeCount", "Number of edges" },
@@ -97,6 +103,15 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     { "AnalysisNetworkCount", "Number of analyses" }
                 }
             };
+        }
+
+        public class ItemModel
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
+
+            public NetworkStatus Status { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -120,11 +135,20 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("NetworkDatabases") && item.NetworkDatabases.Any(item1 => item1.Database.Id.Contains(input.SearchString) || item1.Database.Name.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("NetworkNodes") && item.NetworkNodes.Where(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))).Any(item1 => item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Where(item2 => item2.DatabaseNodeField.Database.IsPublic || item2.DatabaseNodeField.Database.DatabaseUsers.Any(item3 => item3.User == user)).Any(item2 => item2.DatabaseNodeField.IsSearchable && item2.Value.Contains(input.SearchString))) ||
-                    input.SearchIn.Contains("NetworkEdges") && item.NetworkEdges.Where(item1 => item1.Edge.DatabaseEdges.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))).Any(item1 => item1.Edge.Id.Contains(input.SearchString) || item1.Edge.Name.Contains(input.SearchString) || item1.Edge.EdgeNodes.Where(item2 => item2.Node.DatabaseNodeFieldNodes.Any(item3 => item3.DatabaseNodeField.Database.IsPublic || item3.DatabaseNodeField.Database.DatabaseUsers.Any(item4 => item4.User == user))).Any(item2 => item2.Node.Id.Contains(input.SearchString) || item2.Node.Name.Contains(input.SearchString) || item2.Node.DatabaseNodeFieldNodes.Where(item3 => item3.DatabaseNodeField.Database.IsPublic || item3.DatabaseNodeField.Database.DatabaseUsers.Any(item4 => item4.User == user)).Any(item3 => item3.DatabaseNodeField.IsSearchable && item3.Value.Contains(input.SearchString)))) ||
-                    input.SearchIn.Contains("NetworkNodeCollections") && item.NetworkNodeCollections.Any(item1 => item1.NodeCollection.Id.Contains(input.SearchString) || item1.NodeCollection.Name.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("AnalysisNetworks") && item.AnalysisNetworks.Any(item1 => item1.Analysis.Id.Contains(input.SearchString) || item1.Analysis.Name.Contains(input.SearchString)));
+                    input.SearchIn.Contains("UserId") && item.NetworkUsers.Any(item1 => item1.User.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("UserEmail") && (item.NetworkUsers.Any(item1 => item1.User.Email.Contains(input.SearchString)) || item.NetworkUserInvitations.Any(item1 => item1.Email.Contains(input.SearchString))) ||
+                    input.SearchIn.Contains("DatabaseTypeId") && item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("DatabaseTypeName") && item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("DatabaseId") && item.NetworkDatabases.Any(item1 => item1.Database.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("DatabaseName") && item.NetworkDatabases.Any(item1 => item1.Database.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeId") && item.NetworkNodes.Any(item1 => item1.Node.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeName") && item.NetworkNodes.Any(item1 => item1.Node.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("EdgeId") && item.NetworkEdges.Any(item1 => item1.Edge.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("EdgeName") && item.NetworkEdges.Any(item1 => item1.Edge.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeCollectionId") && item.NetworkNodeCollections.Any(item1 => item1.NodeCollection.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeCollectionName") && item.NetworkNodeCollections.Any(item1 => item1.NodeCollection.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("AnalysisId") && item.AnalysisNetworks.Any(item1 => item1.Analysis.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("AnalysisName") && item.AnalysisNetworks.Any(item1 => item1.Analysis.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
                 .Where(item => input.Filter.Contains("IsError") ? item.Status == NetworkStatus.Error : true)
@@ -149,8 +173,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                 .Where(item => input.Filter.Contains("UsesNotAlgorithmGap3") ? item.Algorithm != NetworkAlgorithm.Gap3 : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmGap4") ? item.Algorithm == NetworkAlgorithm.Gap4 : true)
                 .Where(item => input.Filter.Contains("UsesNotAlgorithmGap4") ? item.Algorithm != NetworkAlgorithm.Gap4 : true)
-                .Where(item => input.Filter.Contains("HasNetworkUserInvitations") ? item.NetworkUserInvitations.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoNetworkUserInvitations") ? !item.NetworkUserInvitations.Any() : true)
                 .Where(item => input.Filter.Contains("HasAnalysisNetworks") ? item.AnalysisNetworks.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoAnalysisNetworks") ? !item.AnalysisNetworks.Any() : true)
                 .Where(item => input.Filter.Contains("HasNetworkNodeCollections") ? item.NetworkNodeCollections.Any() : true)
@@ -183,16 +205,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
                     query = query.OrderByDescending(item => item.Status);
                     break;
                 case var sort when sort == ("NetworkUserCount", "Ascending"):
-                    query = query.OrderBy(item => item.NetworkUsers.Count());
+                    query = query.OrderBy(item => item.NetworkUsers.Count() + item.NetworkUserInvitations.Count());
                     break;
                 case var sort when sort == ("NetworkUserCount", "Descending"):
-                    query = query.OrderByDescending(item => item.NetworkUsers.Count());
-                    break;
-                case var sort when sort == ("NetworkUserInvitationCount", "Ascending"):
-                    query = query.OrderBy(item => item.NetworkUserInvitations.Count());
-                    break;
-                case var sort when sort == ("NetworkUserInvitationCount", "Descending"):
-                    query = query.OrderByDescending(item => item.NetworkUserInvitations.Count());
+                    query = query.OrderByDescending(item => item.NetworkUsers.Count() + item.NetworkUserInvitations.Count());
                     break;
                 case var sort when sort == ("NetworkDatabaseCount", "Ascending"):
                     query = query.OrderBy(item => item.NetworkDatabases.Count());
@@ -232,7 +248,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Networks
             {
                 IsUserAuthenticated = user != null,
                 DatabaseTypes = _context.DatabaseTypes.AsEnumerable(),
-                Search = new SearchViewModel<Network>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.Select(item => new ItemModel
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Status = item.Status
+                }))
             };
             // Return the page.
             return Page();

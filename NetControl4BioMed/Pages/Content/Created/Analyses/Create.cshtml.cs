@@ -108,8 +108,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
 
             public string Algorithm { get; set; }
 
-            public IEnumerable<Network> Networks { get; set; }
-
             public IEnumerable<NodeCollection> SourceNodeCollections { get; set; }
 
             public IEnumerable<NodeCollection> TargetNodeCollections { get; set; }
@@ -178,7 +176,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             {
                 IsUserAuthenticated = user != null,
                 Algorithm = algorithm,
-                Networks = Enumerable.Empty<Network>(),
                 SourceNodeCollections = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
@@ -186,15 +183,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
             };
-            // Check if the user is authenticated.
-            if (View.IsUserAuthenticated)
-            {
-                // Update the view.
-                View.Networks = _context.Networks
-                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)));
-            }
             // Define the input.
             switch (analysesFound)
             {
@@ -233,8 +221,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                             .Select(item => item.AnalysisNetworks)
                             .SelectMany(item => item)
                             .Select(item => item.Network)
-                            .Where(item => item.IsPublic)
-                            .Except(View.Networks)
+                            .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                             .Select(item => item.Id)),
                         SourceData = JsonSerializer.Serialize(analyses
                             .Select(item => item.AnalysisNodes)
@@ -311,7 +298,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             {
                 IsUserAuthenticated = user != null,
                 Algorithm = Input.Algorithm,
-                Networks = Enumerable.Empty<Network>(),
                 SourceNodeCollections = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
@@ -319,15 +305,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
             };
-            // Check if the user is authenticated.
-            if (View.IsUserAuthenticated)
-            {
-                // Update the view.
-                View.Networks = _context.Networks
-                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)));
-            }
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
             {

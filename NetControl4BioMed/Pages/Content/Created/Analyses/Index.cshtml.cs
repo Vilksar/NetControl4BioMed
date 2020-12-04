@@ -36,7 +36,7 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
 
             public IEnumerable<DatabaseType> DatabaseTypes { get; set; }
 
-            public SearchViewModel<Analysis> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -45,11 +45,20 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     { "Id", "ID" },
                     { "Name", "Name" },
                     { "Description", "Description" },
-                    { "AnalysisDatabases", "Databases" },
-                    { "AnalysisNodes", "Nodes" },
-                    { "AnalysisEdges", "Edges" },
-                    { "AnalysisNodeCollections", "Node collections" },
-                    { "AnalysisNetworks", "Networks" }
+                    { "UserId", "User ID" },
+                    { "UserEmail", "User e-mail" },
+                    { "DatabaseTypeId", "Database type ID" },
+                    { "DatabaseTypeName", "Database type name" },
+                    { "DatabaseId", "Database ID" },
+                    { "DatabaseName", "Database name" },
+                    { "NodeId", "Node ID" },
+                    { "NodeName", "Node name" },
+                    { "EdgeId", "Edge ID" },
+                    { "EdgeName", "Edge name" },
+                    { "NodeCollectionId", "Node collection ID" },
+                    { "NodeCollectionName", "Node collection name" },
+                    { "NetworkId", "Network ID" },
+                    { "NetworkName", "Network name" }
                 },
                 Filter = new Dictionary<string, string>
                 {
@@ -75,10 +84,8 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     { "UsesNotGreedyAlgorithm", "Doesn't use the greedy algorithm" },
                     { "UsesGeneticAlgorithm", "Uses the genetic algorithm" },
                     { "UsesNotGeneticAlgorithm", "Doesn't use the genetic algorithm" },
-                    { "HasAnalysisUserInvitations", "Has user invitations" },
-                    { "HasNoAnalysisUserInvitations", "Does not have user invitations" },
-                    { "HasAnalysisNodeCollections", "Uses node collections" },
-                    { "HasNoAnalysisNodeCollections", "Does not use node collections" }
+                    { "HasAnalysisNodeCollections", "Has node collections" },
+                    { "HasNoAnalysisNodeCollections", "Does not have node collections" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -90,7 +97,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     { "CurrentIteration", "Current iteration" },
                     { "CurrentIterationWithoutImprovement", "Current iteration without improvement" },
                     { "AnalysisUserCount", "Number of users" },
-                    { "AnalysisUserInvitationCount", "Number of user invitations" },
                     { "AnalysisDatabaseCount", "Number of databases" },
                     { "AnalysisNodeCount", "Number of nodes" },
                     { "AnalysisEdgeCount", "Number of edges" },
@@ -98,6 +104,15 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     { "AnalysisNetworkCount", "Number of networks" }
                 }
             };
+        }
+
+        public class ItemModel
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
+
+            public AnalysisStatus Status { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -121,11 +136,20 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("AnalysisDatabases") && item.AnalysisDatabases.Any(item1 => item1.Database.Id.Contains(input.SearchString) || item1.Database.Name.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("AnalysisNodes") && item.AnalysisNodes.Where(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))).Any(item1 => item1.Node.Id.Contains(input.SearchString) || item1.Node.Name.Contains(input.SearchString) || item1.Node.DatabaseNodeFieldNodes.Where(item2 => item2.DatabaseNodeField.Database.IsPublic || item2.DatabaseNodeField.Database.DatabaseUsers.Any(item3 => item3.User == user)).Any(item2 => item2.DatabaseNodeField.IsSearchable && item2.Value.Contains(input.SearchString))) ||
-                    input.SearchIn.Contains("AnalysisEdges") && item.AnalysisEdges.Where(item1 => item1.Edge.DatabaseEdges.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))).Any(item1 => item1.Edge.Id.Contains(input.SearchString) || item1.Edge.Name.Contains(input.SearchString) || item1.Edge.EdgeNodes.Where(item2 => item2.Node.DatabaseNodeFieldNodes.Any(item3 => item3.DatabaseNodeField.Database.IsPublic || item3.DatabaseNodeField.Database.DatabaseUsers.Any(item4 => item4.User == user))).Any(item2 => item2.Node.Id.Contains(input.SearchString) || item2.Node.Name.Contains(input.SearchString) || item2.Node.DatabaseNodeFieldNodes.Where(item3 => item3.DatabaseNodeField.Database.IsPublic || item3.DatabaseNodeField.Database.DatabaseUsers.Any(item4 => item4.User == user)).Any(item3 => item3.DatabaseNodeField.IsSearchable && item3.Value.Contains(input.SearchString)))) ||
-                    input.SearchIn.Contains("AnalysisNodeCollections") && item.AnalysisNodeCollections.Any(item1 => item1.NodeCollection.Id.Contains(input.SearchString) || item1.NodeCollection.Name.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("AnalysisNetworks") && item.AnalysisNetworks.Any(item1 => item1.Network.Id.Contains(input.SearchString) || item1.Network.Name.Contains(input.SearchString)));
+                    input.SearchIn.Contains("UserId") && item.AnalysisUsers.Any(item1 => item1.User.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("UserEmail") && (item.AnalysisUsers.Any(item1 => item1.User.Email.Contains(input.SearchString)) || item.AnalysisUserInvitations.Any(item1 => item1.Email.Contains(input.SearchString))) ||
+                    input.SearchIn.Contains("DatabaseTypeId") && item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("DatabaseTypeName") && item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("DatabaseId") && item.AnalysisDatabases.Any(item1 => item1.Database.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("DatabaseName") && item.AnalysisDatabases.Any(item1 => item1.Database.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeId") && item.AnalysisNodes.Any(item1 => item1.Node.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeName") && item.AnalysisNodes.Any(item1 => item1.Node.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("EdgeId") && item.AnalysisEdges.Any(item1 => item1.Edge.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("EdgeName") && item.AnalysisEdges.Any(item1 => item1.Edge.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeCollectionId") && item.AnalysisNodeCollections.Any(item1 => item1.NodeCollection.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NodeCollectionName") && item.AnalysisNodeCollections.Any(item1 => item1.NodeCollection.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NetworkId") && item.AnalysisNetworks.Any(item1 => item1.Network.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("NetworkName") && item.AnalysisNetworks.Any(item1 => item1.Network.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
                 .Where(item => input.Filter.Contains("IsError") ? item.Status == AnalysisStatus.Error : true)
@@ -150,8 +174,6 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                 .Where(item => input.Filter.Contains("UsesNotGreedyAlgorithm") ? item.Algorithm != AnalysisAlgorithm.Greedy : true)
                 .Where(item => input.Filter.Contains("UsesGeneticAlgorithm") ? item.Algorithm == AnalysisAlgorithm.Genetic : true)
                 .Where(item => input.Filter.Contains("UsesNotGeneticAlgorithm") ? item.Algorithm != AnalysisAlgorithm.Genetic : true)
-                .Where(item => input.Filter.Contains("HasAnalysisUserInvitations") ? item.AnalysisUserInvitations.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoAnalysisUserInvitations") ? !item.AnalysisUserInvitations.Any() : true)
                 .Where(item => input.Filter.Contains("HasAnalysisNodeCollections") ? item.AnalysisNodeCollections.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoAnalysisNodeCollections") ? !item.AnalysisNodeCollections.Any() : true);
             // Sort it according to the parameters.
@@ -200,16 +222,10 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
                     query = query.OrderByDescending(item => item.Status);
                     break;
                 case var sort when sort == ("AnalysisUserCount", "Ascending"):
-                    query = query.OrderBy(item => item.AnalysisUsers.Count());
+                    query = query.OrderBy(item => item.AnalysisUsers.Count() + item.AnalysisUserInvitations.Count());
                     break;
                 case var sort when sort == ("AnalysisUserCount", "Descending"):
-                    query = query.OrderByDescending(item => item.AnalysisUsers.Count());
-                    break;
-                case var sort when sort == ("AnalysisUserInvitationCount", "Ascending"):
-                    query = query.OrderBy(item => item.AnalysisUserInvitations.Count());
-                    break;
-                case var sort when sort == ("AnalysisUserInvitationCount", "Descending"):
-                    query = query.OrderByDescending(item => item.AnalysisUserInvitations.Count());
+                    query = query.OrderByDescending(item => item.AnalysisUsers.Count() + item.AnalysisUserInvitations.Count());
                     break;
                 case var sort when sort == ("AnalysisDatabaseCount", "Ascending"):
                     query = query.OrderBy(item => item.AnalysisDatabases.Count());
@@ -249,7 +265,12 @@ namespace NetControl4BioMed.Pages.Content.Created.Analyses
             {
                 IsUserAuthenticated = user != null,
                 DatabaseTypes = _context.DatabaseTypes.AsEnumerable(),
-                Search = new SearchViewModel<Analysis>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.Select(item => new ItemModel
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Status = item.Status
+                }))
             };
             // Return the page.
             return Page();

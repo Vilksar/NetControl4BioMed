@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
 
         public class ViewModel
         {
-            public SearchViewModel<Database> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -70,6 +70,15 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
                     { "NodeCollectionDatabaseCount", "Number of node collection databases" }
                 }
             };
+        }
+
+        public class ItemModel
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
+
+            public string Url { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -188,7 +197,12 @@ namespace NetControl4BioMed.Pages.Content.Databases.Databases
             // Define the view.
             View = new ViewModel
             {
-                Search = new SearchViewModel<Database>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.Select(item => new ItemModel
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Url = item.Url
+                }))
             };
             // Return the page.
             return Page();

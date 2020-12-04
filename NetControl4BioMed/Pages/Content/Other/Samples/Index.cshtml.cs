@@ -32,7 +32,7 @@ namespace NetControl4BioMed.Pages.Content.Other.Samples
 
         public class ViewModel
         {
-            public SearchViewModel<Sample> Search { get; set; }
+            public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
             {
@@ -63,6 +63,15 @@ namespace NetControl4BioMed.Pages.Content.Other.Samples
                     { "DataLength", "Data length" }
                 }
             };
+        }
+
+        public class ItemModel
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
+
+            public SampleType Type { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
@@ -136,7 +145,12 @@ namespace NetControl4BioMed.Pages.Content.Other.Samples
             // Define the view.
             View = new ViewModel
             {
-                Search = new SearchViewModel<Sample>(_linkGenerator, HttpContext, input, query)
+                Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.Select(item => new ItemModel
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Type = item.Type
+                }))
             };
             // Return the page.
             return Page();

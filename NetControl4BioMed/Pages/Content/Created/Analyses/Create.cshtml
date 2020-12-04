@@ -78,6 +78,10 @@
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
                 <span>This section contains the network data to be used by the new analysis (namely, the IDs of the networks should be provided). You need to have access to the corresponding networks!</span>
+                @if (Model.View.IsUserAuthenticated)
+                {
+                    <span>You can find the available networks associated with your account <a asp-page="/Content/Created/Networks/Index" asp-route-searchString="@Model.Input.DatabaseTypeId" asp-route-searchIn="DatabaseTypeId" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                }
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
