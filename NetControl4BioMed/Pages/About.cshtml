@@ -109,7 +109,7 @@
                     <span>For a generic network:</span>
                 </div>
                 <div class="mb-1">
-                    <span>The only input that is required is the list of edges in the network. Each edge should contain exactly two nodes, separated by an "in-line separator" (by default, ";"). Two consecutive edges should be separated by a "line separator" (by default, "new line"). Both separators can be configured, and the number of provided edges will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/Other/Samples/Index" asp-route-filter="ContainsSeedEdges" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    <span>The only input that is required is the list of edges in the network. Each edge should contain exactly two nodes, separated by an "in-line separator" (by default, ";"). Two consecutive edges should be separated by a "line separator" (by default, "new line"). Both separators can be configured, and the number of provided edges will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/Other/Samples/Index" asp-route-filter="HasSeedEdges" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 </div>
                 <div class="mb-1 text-center">
                     <figure class="figure">
@@ -123,7 +123,7 @@
                     <span>For a PPI network:</span>
                 </div>
                 <div class="mb-1">
-                    <span>The main input that is required is the list of seed nodes (which are, in this case, protein identifiers) around which to build the network. Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/Other/Samples/Index" asp-route-filter="ContainsSeedNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    <span>The main input that is required is the list of seed nodes (which are, in this case, protein identifiers) around which to build the network. Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/Other/Samples/Index" asp-route-filter="HasSeedNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 </div>
                 <div class="mb-1 text-center">
                     <figure class="figure">
@@ -132,30 +132,48 @@
                     </figure>
                 </div>
                 <div class="mb-1">
-                    <span>Additionally (or as an alternative to providing them manually), you can also select one or more node collections whose nodes will be used as additional seed nodes.</span>
+                    <span>Additionally (or as an alternative to providing them manually), you can also specify the ID of one or more node collections whose nodes will be used as additional seed nodes.</span>
                 </div>
                 <div class="mb-1 text-center">
                     <figure class="figure">
-                        <img src="~/img/screenshots/network-seed-node-collections.png" class="figure-img border p-2 m-2 rounded" />
-                        <figcaption class="figure-caption">Choosing (or not) additional seed data for the PPI network.</figcaption>
+                        <img src="~/img/screenshots/network-seed-node-collections-list.png" class="figure-img border p-2 m-2 rounded" />
+                        <figcaption class="figure-caption">Choosing from the available additional seed data for the PPI network.</figcaption>
+                    </figure>
+                </div>
+                <div class="mb-1 text-center">
+                    <figure class="figure">
+                        <img src="~/img/screenshots/network-seed-node-collections-ids.png" class="figure-img border p-2 m-2 rounded" />
+                        <figcaption class="figure-caption">Inputting the additional seed data for the PPI network.</figcaption>
                     </figure>
                 </div>
                 <div class="mb-1">
-                    <span>You also need to choose the databases to be used. The protein identifiers (for example, "EGFR" or "ENSG00000146648") that you will provide will be looked up in the specified node databases (for example, for the two provided identifiers to be found, you would need to select the "HGNC" and "Ensembl" databases). If you are not sure, you can just select all of the available databases, although this will increase the time it takes to generate the network.</span>
+                    <span>You also need to choose the databases to be used. The protein identifiers (for example, "EGFR" or "ENSG00000146648") that you will provide will be looked up in the specified node databases (for example, for the two provided identifiers to be found, you would need to specify the IDs of the "HGNC" and "Ensembl" databases). If you are not sure, you can just specify the IDs of all of the available databases, although this will increase the time it takes to generate the network. The available databases can be found <a asp-page="/Content/Databases/Databases/Index" asp-route-filter="HasDatabaseNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 </div>
                 <div class="mb-1 text-center">
                     <figure class="figure">
-                        <img src="~/img/screenshots/network-node-databases.png" class="figure-img border p-2 m-2 rounded" />
-                        <figcaption class="figure-caption">Choosing the node databases for the PPI network.</figcaption>
+                        <img src="~/img/screenshots/network-node-databases-list.png" class="figure-img border p-2 m-2 rounded" />
+                        <figcaption class="figure-caption">Choosing from the available node databases for the PPI network.</figcaption>
+                    </figure>
+                </div>
+                <div class="mb-1 text-center">
+                    <figure class="figure">
+                        <img src="~/img/screenshots/network-node-databases-ids.png" class="figure-img border p-2 m-2 rounded" />
+                        <figcaption class="figure-caption">Inputting the node databases for the PPI network.</figcaption>
                     </figure>
                 </div>
                 <div class="mb-1">
-                    <span>Once the corresponding proteins will have been found, the interactions between them will be looked up in the specified edge databases (an edge may appear in one or more of the databases).</span>
+                    <span>Once the corresponding proteins will have been found, the interactions between them will be looked up in the specified edge databases (an edge may appear in one or more of the databases). The available databases can be found <a asp-page="/Content/Databases/Databases/Index" asp-route-filter="HasDatabaseEdges" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 </div>
                 <div class="mb-1 text-center">
                     <figure class="figure">
-                        <img src="~/img/screenshots/network-edge-databases.png" class="figure-img border p-2 m-2 rounded" />
-                        <figcaption class="figure-caption">Choosing the edge databases for the PPI network.</figcaption>
+                        <img src="~/img/screenshots/network-edge-databases-list.png" class="figure-img border p-2 m-2 rounded" />
+                        <figcaption class="figure-caption">Choosing from the available edge databases for the PPI network.</figcaption>
+                    </figure>
+                </div>
+                <div class="mb-1 text-center">
+                    <figure class="figure">
+                        <img src="~/img/screenshots/network-edge-databases-ids.png" class="figure-img border p-2 m-2 rounded" />
+                        <figcaption class="figure-caption">Inputting the edge databases for the PPI network.</figcaption>
                     </figure>
                 </div>
                 <div class="mb-1">
@@ -258,7 +276,7 @@
             </figure>
         </div>
         <div class="mb-1">
-            <span>Firstly, you need to provide the unique identifiers of the networks which will be used by the analysis. If more than one network is provided, then a combined network will be generated, containing every edge of each network (however, in the case of generic networks, each is a separate entity, so the combined network will just contain separate connected components). You need to have access to the specified networks, in order to use them in an analysis.</span>
+            <span>Firstly, you need to provide the unique identifiers of the networks which will be used by the analysis. If more than one network is provided, then a combined network will be generated, containing every edge of each network (however, in the case of generic networks, each is a separate entity, so the combined network will just contain separate connected components). You need to have access to the specified networks, in order to use them in an analysis. If you are logged in, a list of networks to which you are assigned will also be provided.</span>
         </div>
         <div class="mb-1 text-center">
             <figure class="figure">
@@ -267,16 +285,7 @@
             </figure>
         </div>
         <div class="mb-1">
-            <span>Additionally (or as an alternative to providing them manually), if you are logged in, a list of networks to which you are assigned will also be provided.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/analysis-networks.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Choosing (or not) additional network data for the analysis.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>Optionally, you can provide a set of source nodes to be used by the analysis. The source nodes represents nodes which you would prefer to have as control nodes returned by the analysis (for example, nodes corresponding to drug-targettable proteins). Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/Other/Samples/Index" asp-route-filter="ContainsSourceNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+            <span>Optionally, you can provide a set of source nodes to be used by the analysis. The source nodes represents nodes which you would prefer to have as control nodes returned by the analysis (for example, nodes corresponding to drug-targettable proteins). Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/Other/Samples/Index" asp-route-filter="HasSourceNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
         </div>
         <div class="mb-1 text-center">
             <figure class="figure">
@@ -285,19 +294,25 @@
             </figure>
         </div>
         <div class="mb-1">
-            <span>Additionally (or as an alternative to providing them manually), you can also select one or more node collections whose nodes will be used as additional source nodes.</span>
+            <span>Additionally (or as an alternative to providing them manually), you can also specify the ID of one or more node collections whose nodes will be used as additional source nodes.</span>
         </div>
         <div class="mb-1 text-center">
             <figure class="figure">
-                <img src="~/img/screenshots/analysis-source-node-collections.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Choosing (or not) additional source data for the analysis.</figcaption>
+                <img src="~/img/screenshots/analysis-source-node-collections-list.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Choosing from the available additional source data for the analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/analysis-source-node-collections-ids.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the additional source data for the analysis.</figcaption>
             </figure>
         </div>
         <div class="mb-1">
             <span>The actual way in which the provided source nodes will influence the analysis can be configured within the algorithm parameters. All source nodes that can not be found in the combined network will be ignored.</span>
         </div>
         <div class="mb-1">
-            <span>Next, you need to provide the set of target nodes to be used by the analysis. The target nodes represent nodes which you want to control (for example, nodes corresponding to disease-essential proteins). Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/Other/Samples/Index" asp-route-filter="ContainsTargetNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+            <span>Next, you need to provide the set of target nodes to be used by the analysis. The target nodes represent nodes which you want to control (for example, nodes corresponding to disease-essential proteins). Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/Other/Samples/Index" asp-route-filter="HasTargetNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
         </div>
         <div class="mb-1 text-center">
             <figure class="figure">
@@ -306,12 +321,18 @@
             </figure>
         </div>
         <div class="mb-1">
-            <span>Additionally (or as an alternative to providing them manually), you can also select one or more node collections whose nodes will be used as additional target nodes.</span>
+            <span>Additionally (or as an alternative to providing them manually), you can also specify the ID of one or more node collections whose nodes will be used as additional target nodes.</span>
         </div>
         <div class="mb-1 text-center">
             <figure class="figure">
-                <img src="~/img/screenshots/analysis-target-node-collections.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Choosing (or not) additional target data for the analysis.</figcaption>
+                <img src="~/img/screenshots/analysis-target-node-collections-list.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Choosing from the available additional target data for the analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/analysis-target-node-collections-ids.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the additional target data for the analysis.</figcaption>
             </figure>
         </div>
         <div class="mb-1">
