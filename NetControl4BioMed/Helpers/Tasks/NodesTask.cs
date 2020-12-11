@@ -156,7 +156,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     nodesToAdd.Add(node);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(nodesToAdd, context, token);
+                await IEnumerableExtensions.CreateAsync(nodesToAdd, serviceProvider, token);
             }
         }
 
@@ -186,10 +186,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -209,20 +205,72 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the related entities that appear in the current batch.
-                var batchDatabaseNodeFields = context.DatabaseNodeFields
-                    .Include(item => item.Database)
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .Where(item => batchDatabaseNodeFieldIds.Contains(item.Id));
-                // Get the items corresponding to the current batch.
-                var nodes = context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => batchIds.Contains(item.Id));
-                // Get the related entities to delete.
-                var batchDatabaseNodes = context.DatabaseNodes
-                    .Where(item => nodes.Contains(item.Node));
-                var batchDatabaseNodeFieldNodes = context.DatabaseNodeFieldNodes
-                    .Where(item => nodes.Contains(item.Node));
+                // Define the list of items to get.
+                var nodes = new List<Node>();
+                var databaseNodeFields = new List<DatabaseNodeField>();
+                // Define the dependent list of items to get.
+                var analysisInputs = new List<AnalysisInputModel>();
+                var networkInputs = new List<NetworkInputModel>();
+                var edgeInputs = new List<EdgeInputModel>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Nodes
+                        .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    nodes = items
+                        .ToList();
+                    // Get the related entities that appear in the current batch.
+                    databaseNodeFields = context.DatabaseNodeFields
+                        .Include(item => item.Database)
+                        .Where(item => item.Database.DatabaseType.Name != "Generic")
+                        .Where(item => batchDatabaseNodeFieldIds.Contains(item.Id))
+                        .ToList();
+                    // Get the IDs of the dependent items.
+                    analysisInputs = items
+                        .Select(item => item.AnalysisNodes)
+                        .SelectMany(item => item)
+                        .Select(item => item.Analysis)
+                        .Distinct()
+                        .Select(item => new AnalysisInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                    networkInputs = items
+                        .Select(item => item.NetworkNodes)
+                        .SelectMany(item => item)
+                        .Select(item => item.Network)
+                        .Distinct()
+                        .Select(item => new NetworkInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                    edgeInputs = items
+                        .Select(item => item.EdgeNodes)
+                        .SelectMany(item => item)
+                        .Select(item => item.Edge)
+                        .Distinct()
+                        .Select(item => new EdgeInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                }
+                // Get the IDs of the items.
+                var nodeIds = nodes
+                    .Select(item => item.Id);
                 // Save the items to edit.
                 var nodesToEdit = new List<Node>();
                 // Go over each item in the current batch.
@@ -250,12 +298,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => !string.IsNullOrEmpty(item.Value))
                         .Select(item => (item.DatabaseNodeField.Id, item.Value))
                         .Distinct()
-                        .Where(item => batchDatabaseNodeFields.Any(item1 => item1.Id == item.Item1))
+                        .Where(item => databaseNodeFields.Any(item1 => item1.Id == item.Item1))
                         .Select(item => new DatabaseNodeFieldNode
                         {
                             DatabaseNodeFieldId = item.Item1,
-                            DatabaseNodeField = batchDatabaseNodeFields
-                                .FirstOrDefault(item1 => item1.Id == item.Item1),
                             Value = item.Item2
                         })
                         .Where(item => item.DatabaseNodeField != null);
@@ -265,9 +311,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no database node field nodes found.", showExceptionItem, batchItem);
                     }
-                    // Delete all related entities that appear in the current batch.
-                    await IQueryableExtensions.DeleteAsync(batchDatabaseNodes.Where(item => item.Node == node), context, token);
-                    await IQueryableExtensions.DeleteAsync(batchDatabaseNodeFieldNodes.Where(item => item.Node == node), context, token);
                     // Update the node.
                     node.Name = !string.IsNullOrEmpty(batchItem.Name) ? batchItem.Name :
                         (databaseNodeFieldNodes.FirstOrDefault(item => item.DatabaseNodeField.IsSearchable)?.Value ?? "Unnamed node");
@@ -278,38 +321,21 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Distinct()
                         .Select(item => new DatabaseNode
                         {
-                            DatabaseId = item.Id,
-                            Database = item,
-                            NodeId = node.Id,
-                            Node = node
+                            DatabaseId = item.Id
                         })
                         .ToList();
                     // Add the node to the list.
                     nodesToEdit.Add(node);
                 }
-                // Get the networks and analyses that contain the nodes.
-                var networks = context.Networks
-                    .Where(item => item.NetworkNodes.Any(item1 => nodesToEdit.Contains(item1.Node)));
-                var analyses = context.Analyses
-                    .Where(item => item.AnalysisNodes.Any(item1 => nodesToEdit.Contains(item1.Node)));
-                // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, context, token);
-                await IQueryableExtensions.DeleteAsync(networks, context, token);
+                // Delete the dependent entities.
+                await new AnalysesTask { Items = analysisInputs }.DeleteAsync(serviceProvider, token);
+                await new NetworksTask { Items = networkInputs }.DeleteAsync(serviceProvider, token);
+                await new EdgesTask { Items = edgeInputs }.DeleteAsync(serviceProvider, token);
+                // Delete the related entities.
+                await NodeExtensions.DeleteRelatedEntitiesAsync<DatabaseNodeFieldNode>(nodeIds, serviceProvider, token);
+                await NodeExtensions.DeleteRelatedEntitiesAsync<DatabaseNode>(nodeIds, serviceProvider, token);
                 // Edit the items.
-                await IEnumerableExtensions.EditAsync(nodesToEdit, context, token);
-                // Get the edges that contain the nodes.
-                var edges = context.Edges
-                    .Include(item => item.EdgeNodes)
-                        .ThenInclude(item => item.Node)
-                    .Where(item => item.EdgeNodes.Any(item1 => nodesToEdit.Contains(item1.Node)));
-                // Go over each edge.
-                foreach (var edge in edges)
-                {
-                    // Update its name.
-                    edge.Name = string.Concat(edge.EdgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " - ", edge.EdgeNodes.First(item => item.Type == EdgeNodeType.Target).Node.Name);
-                }
-                // Update the items.
-                await IEnumerableExtensions.EditAsync(edges, context, token);
+                await IEnumerableExtensions.EditAsync(nodesToEdit, serviceProvider, token);
             }
         }
 
@@ -337,31 +363,79 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
                     .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
-                // Get the items with the current batch IDs.
-                var nodes = context.Nodes
-                    .Where(item => batchIds.Contains(item.Id));
-                // Get the related entities that use the items.
-                var edges = context.Edges
-                    .Where(item => item.EdgeNodes.Any(item1 => nodes.Contains(item1.Node)));
-                var networks = context.Networks
-                    .Where(item => item.NetworkNodes.Any(item1 => nodes.Contains(item1.Node)));
-                var analyses = context.Analyses
-                    .Where(item => item.AnalysisNodes.Any(item1 => nodes.Contains(item1.Node)));
+                // Define the list of items to get.
+                var nodes = new List<Node>();
+                // Define the dependent list of items to get.
+                var analysisInputs = new List<AnalysisInputModel>();
+                var networkInputs = new List<NetworkInputModel>();
+                var edgeInputs = new List<EdgeInputModel>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Nodes
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    nodes = items
+                        .ToList();
+                    // Get the IDs of the dependent items.
+                    analysisInputs = items
+                        .Select(item => item.AnalysisNodes)
+                        .SelectMany(item => item)
+                        .Select(item => item.Analysis)
+                        .Distinct()
+                        .Select(item => new AnalysisInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                    networkInputs = items
+                        .Select(item => item.NetworkNodes)
+                        .SelectMany(item => item)
+                        .Select(item => item.Network)
+                        .Distinct()
+                        .Select(item => new NetworkInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                    edgeInputs = items
+                        .Select(item => item.EdgeNodes)
+                        .SelectMany(item => item)
+                        .Select(item => item.Edge)
+                        .Distinct()
+                        .Select(item => new EdgeInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                }
+                // Get the IDs of the items.
+                var nodeIds = nodes
+                    .Select(item => item.Id);
+                // Delete the dependent entities.
+                await new AnalysesTask { Items = analysisInputs }.DeleteAsync(serviceProvider, token);
+                await new NetworksTask { Items = networkInputs }.DeleteAsync(serviceProvider, token);
+                await new EdgesTask { Items = edgeInputs }.DeleteAsync(serviceProvider, token);
+                // Delete the related entities.
+                await NodeExtensions.DeleteRelatedEntitiesAsync<DatabaseNodeFieldNode>(nodeIds, serviceProvider, token);
+                await NodeExtensions.DeleteRelatedEntitiesAsync<DatabaseNode>(nodeIds, serviceProvider, token);
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, context, token);
-                await IQueryableExtensions.DeleteAsync(networks, context, token);
-                await IQueryableExtensions.DeleteAsync(edges, context, token);
-                await IQueryableExtensions.DeleteAsync(nodes, context, token);
+                await IEnumerableExtensions.DeleteAsync(nodes, serviceProvider, token);
             }
         }
     }

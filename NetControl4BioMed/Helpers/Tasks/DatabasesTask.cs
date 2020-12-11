@@ -143,7 +143,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databasesToAdd.Add(database);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(databasesToAdd, context, token);
+                await IEnumerableExtensions.CreateAsync(databasesToAdd, serviceProvider, token);
             }
         }
 
@@ -173,10 +173,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -186,10 +182,36 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the items corresponding to the current batch.
-                var databases = context.Databases
-                    .Include(item => item.DatabaseType)
-                    .Where(item => batchIds.Contains(item.Id));
+                var batchNames = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Name))
+                    .Select(item => item.Name)
+                    .Distinct();
+                // Define the list of items to get.
+                var databases = new List<Database>();
+                var duplicateDatabases = new List<Database>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Databases
+                        .Include(item => item.DatabaseType)
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    databases = items
+                        .ToList();
+                    // Get the related entities that appear in the current batch.
+                    duplicateDatabases = context.Databases
+                        .Where(item => batchNames.Contains(item.Name))
+                        .ToList();
+                }
                 // Save the items to edit.
                 var databasesToEdit = new List<Database>();
                 // Go over each item in the current batch.
@@ -211,7 +233,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("The generic database can't be edited.", showExceptionItem, batchItem);
                     }
                     // Check if there is another database with the same name.
-                    if (context.Databases.Any(item => item.Id != database.Id && item.Name == batchItem.Name) || databasesToEdit.Any(item => item.Name == batchItem.Name))
+                    if (duplicateDatabases.Any(item => item.Id != database.Id && item.Name == batchItem.Name) || databasesToEdit.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
                         throw new TaskException("A database with the same name already exists.", showExceptionItem, batchItem);
@@ -225,7 +247,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databasesToEdit.Add(database);
                 }
                 // Edit the items.
-                await IEnumerableExtensions.EditAsync(databasesToEdit, context, token);
+                await IEnumerableExtensions.EditAsync(databasesToEdit, serviceProvider, token);
             }
         }
 
@@ -253,43 +275,64 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
                     .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
-                // Get the items with the provided IDs.
-                var databases = context.Databases
-                    .Where(item => batchIds.Contains(item.Id));
-                // Get the related entities that use the items.
-                var databaseNodeFields = context.DatabaseNodeFields
-                    .Where(item => databases.Contains(item.Database));
-                var databaseEdgeFields = context.DatabaseEdgeFields
-                    .Where(item => databases.Contains(item.Database));
-                var nodes = context.Nodes
-                    .Where(item => item.DatabaseNodes.Any(item1 => databases.Contains(item1.Database)));
-                var edges = context.Edges
-                    .Where(item => item.DatabaseEdges.Any(item1 => databases.Contains(item1.Database)));
-                var nodeCollections = context.NodeCollections
-                    .Where(item => item.NodeCollectionDatabases.Any(item1 => databases.Contains(item1.Database)));
-                var networks = context.Networks
-                    .Where(item => item.NetworkDatabases.Any(item1 => databases.Contains(item1.Database)));
-                var analyses = context.Analyses
-                    .Where(item => item.AnalysisDatabases.Any(item1 => databases.Contains(item1.Database)));
+                // Define the list of items to get.
+                var databases = new List<Database>();
+                // Define the dependent list of items to get.
+                var databaseEdgeFieldInputs = new List<DatabaseEdgeFieldInputModel>();
+                var databaseNodeFieldInputs = new List<DatabaseNodeFieldInputModel>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Databases
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    databases = items
+                        .ToList();
+                    databaseEdgeFieldInputs = items
+                        .Select(item => item.DatabaseEdgeFields)
+                        .SelectMany(item => item)
+                        .Distinct()
+                        .Select(item => new DatabaseEdgeFieldInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                    databaseNodeFieldInputs = items
+                        .Select(item => item.DatabaseNodeFields)
+                        .SelectMany(item => item)
+                        .Distinct()
+                        .Select(item => new DatabaseNodeFieldInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                }
+                // Get the IDs of the items.
+                var databaseIds = databases
+                    .Select(item => item.Id);
+                // Delete the dependent entities.
+                await new DatabaseEdgeFieldsTask { Items = databaseEdgeFieldInputs }.DeleteAsync(serviceProvider, token);
+                await new DatabaseNodeFieldsTask { Items = databaseNodeFieldInputs }.DeleteAsync(serviceProvider, token);
+                // Delete the related entities.
+                await DatabaseExtensions.DeleteRelatedEntitiesAsync<DatabaseUserInvitation>(databaseIds, serviceProvider, token);
+                await DatabaseExtensions.DeleteRelatedEntitiesAsync<DatabaseUser>(databaseIds, serviceProvider, token);
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, context, token);
-                await IQueryableExtensions.DeleteAsync(networks, context, token);
-                await IQueryableExtensions.DeleteAsync(nodeCollections, context, token);
-                await IQueryableExtensions.DeleteAsync(edges, context, token);
-                await IQueryableExtensions.DeleteAsync(nodes, context, token);
-                await IQueryableExtensions.DeleteAsync(databaseEdgeFields, context, token);
-                await IQueryableExtensions.DeleteAsync(databaseNodeFields, context, token);
-                await IQueryableExtensions.DeleteAsync(databases, context, token);
+                await IEnumerableExtensions.DeleteAsync(databases, serviceProvider, token);
             }
         }
     }

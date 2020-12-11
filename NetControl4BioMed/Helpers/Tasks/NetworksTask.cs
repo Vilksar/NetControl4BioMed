@@ -268,7 +268,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     networksToAdd.Add(network);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(networksToAdd, context, token);
+                await IEnumerableExtensions.CreateAsync(networksToAdd, serviceProvider, token);
                 // Add the IDs of the created items to the list.
                 ids = ids.Concat(networksToAdd.Select(item => item.Id));
                 // Define the new background task.
@@ -322,20 +322,32 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
                     .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
-                // Get the items with the provided IDs.
-                var networks = context.Networks
-                    .Include(item => item.NetworkUsers)
-                    .Where(item => batchIds.Contains(item.Id));
+                // Define the list of items to get.
+                var networks = new List<Network>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Networks
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    networks = items
+                        .ToList();
+                }
                 // Save the items to add.
                 var networksToEdit = new List<Network>();
                 // Go over each item in the current batch.
@@ -359,7 +371,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     networksToEdit.Add(network);
                 }
                 // Edit the items.
-                await IEnumerableExtensions.EditAsync(networksToEdit, context, token);
+                await IEnumerableExtensions.EditAsync(networksToEdit, serviceProvider, token);
             }
         }
 
@@ -387,31 +399,85 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
                     .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
-                // Get the items with the provided IDs.
-                var networks = context.Networks
-                    .Where(item => batchIds.Contains(item.Id));
-                // Get the related entities that use the items.
-                var analyses = context.Analyses
-                    .Where(item => item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
-                // Get the generic entities among them.
-                var genericNetworks = networks.Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
-                var genericNodes = context.Nodes.Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
-                var genericEdges = context.Edges.Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
+                // Define the list of items to get.
+                var networks = new List<Network>();
+                // Define the dependent list of items to get.
+                var analysisInputs = new List<AnalysisInputModel>();
+                var genericEdgeInputs = new List<EdgeInputModel>();
+                var genericNodeInputs = new List<NodeInputModel>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Networks
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    networks = items
+                        .ToList();
+                    // Get the IDs of the dependent items.
+                    analysisInputs = items
+                        .Select(item => item.AnalysisNetworks)
+                        .SelectMany(item => item)
+                        .Select(item => item.Analysis)
+                        .Distinct()
+                        .Select(item => new AnalysisInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                    genericEdgeInputs = items
+                        .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .Select(item => item.NetworkEdges)
+                        .SelectMany(item => item)
+                        .Select(item => item.Edge)
+                        .Distinct()
+                        .Select(item => new EdgeInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                    genericNodeInputs = items
+                        .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .Select(item => item.NetworkNodes)
+                        .SelectMany(item => item)
+                        .Select(item => item.Node)
+                        .Distinct()
+                        .Select(item => new NodeInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                }
+                // Get the IDs of the items.
+                var networkIds = networks
+                    .Select(item => item.Id);
+                // Delete the dependent entities.
+                await new AnalysesTask { Items = analysisInputs }.DeleteAsync(serviceProvider, token);
+                await new EdgesTask { Items = genericEdgeInputs }.DeleteAsync(serviceProvider, token);
+                await new NodesTask { Items = genericNodeInputs }.DeleteAsync(serviceProvider, token);
+                // Delete the related entities.
+                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkNodeCollection>(networkIds, serviceProvider, token);
+                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkEdge>(networkIds, serviceProvider, token);
+                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkNode>(networkIds, serviceProvider, token);
+                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkDatabase>(networkIds, serviceProvider, token);
+                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkUserInvitation>(networkIds, serviceProvider, token);
+                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkUser>(networkIds, serviceProvider, token);
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, context, token);
-                await IQueryableExtensions.DeleteAsync(networks, context, token);
-                await IQueryableExtensions.DeleteAsync(genericEdges, context, token);
-                await IQueryableExtensions.DeleteAsync(genericNodes, context, token);
+                await IEnumerableExtensions.DeleteAsync(networks, serviceProvider, token);
             }
         }
 
@@ -496,7 +562,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             network.Log = network.AppendToLog("The status of the network is not valid in order to be generated.");
                             // Edit the network.
-                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                         }
                         // Continue.
                         continue;
@@ -523,7 +589,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             network.Log = network.AppendToLog("The network is now generating.");
                             // Edit the network.
-                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                         }
                         // Check the algorithm to generate the network.
                         switch (batchNetwork.Algorithm)
@@ -583,7 +649,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                     // Add a message to the log.
                                     network.Log = network.AppendToLog("The network algorithm is not valid.");
                                     // Edit the network.
-                                    await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                                 }
                                 // End the switch.
                                 break;
@@ -610,7 +676,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             network.Log = network.AppendToLog($"The try number {currentRetry + 1} ended with an error ({NumberOfRetries - currentRetry} tr{(NumberOfRetries - currentRetry != 1 ? "ies" : "y")} remaining). {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
                             // Edit the network.
-                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                         }
                         // Check if the task should be executed again.
                         if (currentRetry < NumberOfRetries)
@@ -641,7 +707,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             network.Log = network.AppendToLog("One or more errors occured while generating the network.");
                             // Edit the network.
-                            await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                         }
                         // Continue.
                         continue;
@@ -669,7 +735,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Remove the generation data.
                         network.Data = null;
                         // Edit the network.
-                        await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     }
                     // Use a new scope.
                     using (var scope = serviceProvider.CreateScope())

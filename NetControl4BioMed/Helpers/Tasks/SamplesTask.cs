@@ -104,7 +104,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     samplesToAdd.Add(sample);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(samplesToAdd, context, token);
+                await IEnumerableExtensions.CreateAsync(samplesToAdd, serviceProvider, token);
             }
         }
 
@@ -134,10 +134,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -147,9 +143,26 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the items corresponding to the current batch.
-                var samples = context.Samples
-                    .Where(item => batchIds.Contains(item.Id));
+                // Define the list of items to get.
+                var samples = new List<Sample>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Samples
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    samples = items
+                        .ToList();
+                }
                 // Save the items to edit.
                 var samplesToEdit = new List<Sample>();
                 // Go over each item in the current batch.
@@ -179,7 +192,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     samplesToEdit.Add(sample);
                 }
                 // Update the items.
-                await IEnumerableExtensions.EditAsync(samplesToEdit, context, token);
+                await IEnumerableExtensions.EditAsync(samplesToEdit, serviceProvider, token);
             }
         }
 
@@ -207,20 +220,34 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
                     .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
-                // Get the items with the current batch IDs.
-                var samples = context.Samples
-                    .Where(item => batchIds.Contains(item.Id));
-                await IQueryableExtensions.DeleteAsync(samples, context, token);
+                // Define the list of items to get.
+                var samples = new List<Sample>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Samples
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    samples = items
+                        .ToList();
+                }
+                // Delete the items.
+                await IEnumerableExtensions.DeleteAsync(samples, serviceProvider, token);
             }
         }
     }

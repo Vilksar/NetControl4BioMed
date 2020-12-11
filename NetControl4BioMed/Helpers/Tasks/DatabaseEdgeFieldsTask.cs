@@ -143,7 +143,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseEdgeFieldsToAdd.Add(databaseEdgeField);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(databaseEdgeFieldsToAdd, context, token);
+                await IEnumerableExtensions.CreateAsync(databaseEdgeFieldsToAdd, serviceProvider, token);
             }
         }
 
@@ -173,10 +173,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -186,11 +182,37 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the items corresponding to the current batch.
-                var databaseEdgeFields = context.DatabaseEdgeFields
-                    .Include(item => item.Database)
-                        .ThenInclude(item => item.DatabaseType)
-                    .Where(item => batchIds.Contains(item.Id));
+                var batchNames = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Name))
+                    .Select(item => item.Name)
+                    .Distinct();
+                // Define the list of items to get.
+                var databaseEdgeFields = new List<DatabaseEdgeField>();
+                var duplicateDatabaseEdgeFields = new List<DatabaseEdgeField>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.DatabaseEdgeFields
+                        .Include(item => item.Database)
+                            .ThenInclude(item => item.DatabaseType)
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    databaseEdgeFields = items
+                        .ToList();
+                    // Get the related entities that appear in the current batch.
+                    duplicateDatabaseEdgeFields = context.DatabaseEdgeFields
+                        .Where(item => batchNames.Contains(item.Name))
+                        .ToList();
+                }
                 // Save the items to edit.
                 var databaseEdgeFieldsToEdit = new List<DatabaseEdgeField>();
                 // Go over each item in the current batch.
@@ -212,7 +234,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("The generic database edge field can't be edited.", showExceptionItem, batchItem);
                     }
                     // Check if there is another database edge field with the same name.
-                    if (context.DatabaseEdgeFields.Any(item => item.Id != databaseEdgeField.Id && item.Name == batchItem.Name) || databaseEdgeFieldsToEdit.Any(item => item.Name == batchItem.Name))
+                    if (duplicateDatabaseEdgeFields.Any(item => item.Id != databaseEdgeField.Id && item.Name == batchItem.Name) || databaseEdgeFieldsToEdit.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
                         throw new TaskException("A database edge field with the name already exists.", showExceptionItem, batchItem);
@@ -226,7 +248,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseEdgeFieldsToEdit.Add(databaseEdgeField);
                 }
                 // Edit the items.
-                await IEnumerableExtensions.EditAsync(databaseEdgeFieldsToEdit, context, token);
+                await IEnumerableExtensions.EditAsync(databaseEdgeFieldsToEdit, serviceProvider, token);
             }
         }
 
@@ -254,31 +276,49 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
                     .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
-                // Get the items with the provided IDs.
-                var databaseEdgeFields = context.DatabaseEdgeFields
-                    .Where(item => batchIds.Contains(item.Id));
-                // Get the related entities that use the items.
-                var edges = context.Edges
-                    .Where(item => item.DatabaseEdgeFieldEdges.Any(item1 => databaseEdgeFields.Contains(item1.DatabaseEdgeField)));
-                var networks = context.Networks
-                    .Where(item => item.NetworkEdges.Any(item1 => edges.Contains(item1.Edge)));
-                var analyses = context.Analyses
-                    .Where(item => item.AnalysisEdges.Any(item1 => edges.Contains(item1.Edge)));
+                // Define the list of items to get.
+                var databaseEdgeFields = new List<DatabaseEdgeField>();
+                // Define the dependent list of items to get.
+                var edgeInputs = new List<EdgeInputModel>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.DatabaseEdgeFields
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    databaseEdgeFields = items
+                        .ToList();
+                    // Get the IDs of the dependent items.
+                    edgeInputs = items
+                        .Select(item => item.DatabaseEdgeFieldEdges)
+                        .SelectMany(item => item)
+                        .Select(item => item.Edge)
+                        .Distinct()
+                        .Select(item => new EdgeInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                }
+                // Delete the dependent entities.
+                await new EdgesTask { Items = edgeInputs }.DeleteAsync(serviceProvider, token);
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, context, token);
-                await IQueryableExtensions.DeleteAsync(networks, context, token);
-                await IQueryableExtensions.DeleteAsync(edges, context, token);
-                await IQueryableExtensions.DeleteAsync(databaseEdgeFields, context, token);
+                await IEnumerableExtensions.DeleteAsync(databaseEdgeFields, serviceProvider, token);
             }
         }
     }

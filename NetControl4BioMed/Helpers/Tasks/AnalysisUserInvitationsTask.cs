@@ -121,7 +121,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     analysisUserInvitationsToAdd.Add(analysisUserInvitation);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(analysisUserInvitationsToAdd, context, token);
+                await IEnumerableExtensions.CreateAsync(analysisUserInvitationsToAdd, serviceProvider, token);
             }
         }
 
@@ -149,10 +149,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -163,20 +159,37 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Email))
                     .Select(item => (item.Analysis.Id, item.Email));
                 // Get the IDs of all individual items.
-                var batchIdsAnalysisIds = batchIds
+                var batchAnalysisIds = batchIds
                     .Select(item => item.Item1);
-                var batchIdsEmails = batchIds
-                    .Select(item => item.Email);
-                // Get the items with the provided IDs.
-                var analysisUserInvitations = context.AnalysisUserInvitations
-                    .Include(item => item.Analysis)
-                    .Where(item => batchIdsAnalysisIds.Contains(item.Analysis.Id))
-                    .Where(item => batchIdsEmails.Contains(item.Email))
-                    .AsEnumerable()
-                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.Analysis.Id && item1.Item2 == item.Email))
-                    .AsQueryable();
+                var batchEmails = batchIds
+                    .Select(item => item.Item2);
+                // Define the list of items to get.
+                var analysisUserInvitations = new List<AnalysisUserInvitation>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.AnalysisUserInvitations
+                        .Include(item => item.Analysis)
+                        .Where(item => batchAnalysisIds.Contains(item.Analysis.Id))
+                        .Where(item => batchEmails.Contains(item.Email))
+                        .AsEnumerable()
+                        .Where(item => batchIds.Any(item1 => item1.Item1 == item.Analysis.Id && item1.Item2 == item.Email))
+                        .ToList();
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    analysisUserInvitations = items
+                        .ToList();
+                }
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analysisUserInvitations, context, token);
+                await IEnumerableExtensions.DeleteAsync(analysisUserInvitations, serviceProvider, token);
             }
         }
     }

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
+using NetControl4BioMed.Data.Interfaces;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
@@ -306,7 +307,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     analysesToAdd.Add(analysis);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(analysesToAdd, context, token);
+                await IEnumerableExtensions.CreateAsync(analysesToAdd, serviceProvider, token);
                 // Add the IDs of the created items to the list.
                 ids = ids.Concat(analysesToAdd.Select(item => item.Id));
                 // Define the new background task.
@@ -362,20 +363,32 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
                     .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
-                // Get the items with the provided IDs.
-                var analyses = context.Analyses
-                    .Include(item => item.AnalysisUsers)
-                    .Where(item => batchIds.Contains(item.Id));
+                // Define the list of items to get.
+                var analyses = new List<Analysis>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Analyses
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    analyses = items
+                        .ToList();
+                }
                 // Save the items to add.
                 var analysesToEdit = new List<Analysis>();
                 // Go over each item in the current batch.
@@ -406,7 +419,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     analysesToEdit.Add(analysis);
                 }
                 // Edit the items.
-                await IEnumerableExtensions.EditAsync(analysesToEdit, context, token);
+                await IEnumerableExtensions.EditAsync(analysesToEdit, serviceProvider, token);
             }
         }
 
@@ -424,7 +437,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 throw new TaskException("No valid items could be found with the provided data.");
             }
             // Get the total number of batches.
-            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            var count = Math.Ceiling((double)Items.Count() / 1);
             // Go over each batch.
             for (var index = 0; index < count; index++)
             {
@@ -434,21 +447,59 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
                     .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
-                // Get the items with the provided IDs.
-                var analyses = context.Analyses
-                    .Where(item => batchIds.Contains(item.Id));
+                // Define the list of items to get.
+                var analyses = new List<Analysis>();
+                // Define the dependent list of items to get.
+                var controlPathInputs = new List<ControlPathInputModel>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Analyses
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the IDs of the items found.
+                    analyses = items
+                        .ToList();
+                    // Get the IDs of the dependent items.
+                    controlPathInputs = items
+                        .Select(item => item.ControlPaths)
+                        .SelectMany(item => item)
+                        .Distinct()
+                        .Select(item => new ControlPathInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                }
+                // Get the IDs of the items.
+                var analysisIds = analyses
+                    .Select(item => item.Id);
+                // Delete the dependent entities.
+                await new ControlPathsTask { Items = controlPathInputs }.DeleteAsync(serviceProvider, token);
+                // Delete the related entities.
+                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisNetwork>(analysisIds, serviceProvider, token);
+                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisNodeCollection>(analysisIds, serviceProvider, token);
+                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisEdge>(analysisIds, serviceProvider, token);
+                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisNode>(analysisIds, serviceProvider, token);
+                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisDatabase>(analysisIds, serviceProvider, token);
+                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisUserInvitation>(analysisIds, serviceProvider, token);
+                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisUser>(analysisIds, serviceProvider, token);
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, context, token);
+                await IEnumerableExtensions.DeleteAsync(analyses, serviceProvider, token);
             }
         }
 
@@ -533,7 +584,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             analysis.Log = analysis.AppendToLog("The status of the analysis is not valid in order to be generated.");
                             // Edit the network.
-                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         }
                         // Continue.
                         continue;
@@ -560,7 +611,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             analysis.Log = analysis.AppendToLog("The analysis is now generating.");
                             // Edit the network.
-                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         }
                         // Define the required data.
                         var data = new List<AnalysisNodeInputModel>();
@@ -591,7 +642,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 // Add a message to the log.
                                 analysis.Log = analysis.AppendToLog("The source and / or target data corresponding to the analysis could not be deserialized.");
                                 // Edit the analysis.
-                                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                                 // Continue.
                                 continue;
                             }
@@ -688,7 +739,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 // Add a message to the log.
                                 analysis.Log = analysis.AppendToLog("No nodes could be found within the provided networks.");
                                 // Edit the analysis.
-                                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                                 // Continue.
                                 continue;
                             }
@@ -704,7 +755,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 // Add a message to the log.
                                 analysis.Log = analysis.AppendToLog("No edges could be found within the provided networks.");
                                 // Edit the analysis.
-                                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                                 // Continue.
                                 continue;
                             }
@@ -737,7 +788,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 // Add a message to the log.
                                 analysis.Log = analysis.AppendToLog("No target nodes could be found with the provided target data.");
                                 // Edit the analysis.
-                                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                                 // Continue.
                                 continue;
                             }
@@ -868,7 +919,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             analysis.AnalysisEdges = analysisEdges;
                             analysis.ControlPaths = new List<ControlPath>();
                             // Edit the network.
-                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         }
                     }
                     catch (Exception exception)
@@ -892,7 +943,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             analysis.Log = analysis.AppendToLog($"The try number {currentRetry + 1} ended with an error ({NumberOfRetries - currentRetry} tr{(NumberOfRetries - currentRetry != 1 ? "ies" : "y")} remaining). {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
                             // Edit the analysis.
-                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         }
                         // Check if the task should be executed again.
                         if (currentRetry < NumberOfRetries)
@@ -923,7 +974,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Update the analysis log.
                             analysis.Log = analysis.AppendToLog("One or more errors occured while generating the analysis.");
                             // Edit the analysis.
-                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         }
                         // Continue.
                         continue;
@@ -951,7 +1002,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Remove the generation data.
                         analysis.Data = null;
                         // Edit the analysis.
-                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                     }
                     // Use a new scope.
                     using (var scope = serviceProvider.CreateScope())
@@ -1070,7 +1121,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Update the end time.
                             analysis.DateTimeEnded = DateTime.UtcNow;
                             // Edit the network.
-                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         }
                         // Continue.
                         continue;
@@ -1099,7 +1150,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Update the start time of the item.
                             analysis.DateTimeStarted = DateTime.UtcNow;
                             // Edit the network.
-                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         }
                         // Check the algorithm to run the analysis.
                         switch (batchAnalysis.Algorithm)
@@ -1138,7 +1189,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                     // Update the end time.
                                     analysis.DateTimeEnded = DateTime.UtcNow;
                                     // Edit the analysis.
-                                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                                 }
                                 // End the switch.
                                 break;
@@ -1165,7 +1216,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Add a message to the log.
                             analysis.Log = analysis.AppendToLog($"The try number {currentRetry + 1} ended with an error ({NumberOfRetries - currentRetry} tr{(NumberOfRetries - currentRetry != 1 ? "ies" : "y")} remaining). {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
                             // Edit the analysis.
-                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         }
                         // Check if the task should be executed again.
                         if (currentRetry < NumberOfRetries)
@@ -1200,7 +1251,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Update the end time.
                             analysis.DateTimeEnded = DateTime.UtcNow;
                             // Edit the analysis.
-                            await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                            await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         }
                     }
                     // Reset the current retry.
@@ -1226,7 +1277,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Add a message to the log.
                         analysis.Log = analysis.AppendToLog($"The analysis has ended with the status \"{analysis.Status.GetDisplayName()}\".");
                         // Edit the analysis.
-                        await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                        await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                     }
                     // Use a new scope.
                     using (var scope = serviceProvider.CreateScope())
@@ -1314,7 +1365,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Update the log.
                     analysis.Log = analysis.AppendToLog("The analysis has been scheduled to stop.");
                     // Update the items.
-                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                 }
             }
         }

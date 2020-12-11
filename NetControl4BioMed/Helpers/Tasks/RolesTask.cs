@@ -136,12 +136,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Use a new role manager instance.
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -151,37 +145,60 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the items corresponding to the current batch.
-                var roles = context.Roles
-                    .Where(item => batchIds.Contains(item.Id));
-                // Go over each item in the current batch.
-                foreach (var batchItem in batchItems)
+                // Define the list of items to get.
+                var roles = new List<Role>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    // Get the corresponding item.
-                    var role = roles
-                        .FirstOrDefault(item => item.Id == batchItem.Id);
-                    // Check if there was no item found.
-                    if (role == null)
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Roles
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
                     {
                         // Continue.
                         continue;
                     }
-                    // Define a new identity result.
-                    var result = IdentityResult.Success;
-                    // Check if the name is different from the current one.
-                    if (batchItem.Name != role.Name)
+                    // Get the items found.
+                    roles = items
+                        .ToList();
+                }
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new role manager instance.
+                    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+                    // Go over each item in the current batch.
+                    foreach (var batchItem in batchItems)
                     {
-                        // Try to set the new role name.
-                        result = await roleManager.SetRoleNameAsync(role, batchItem.Name);
-                    }
-                    // Check if any of the operations has failed.
-                    if (!result.Succeeded)
-                    {
-                        // Define the exception messages.
-                        var messages = result.Errors
-                            .Select(item => item.Description);
-                        // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
+                        // Get the corresponding item.
+                        var role = roles
+                            .FirstOrDefault(item => item.Id == batchItem.Id);
+                        // Check if there was no item found.
+                        if (role == null)
+                        {
+                            // Continue.
+                            continue;
+                        }
+                        // Define a new identity result.
+                        var result = IdentityResult.Success;
+                        // Check if the name is different from the current one.
+                        if (batchItem.Name != role.Name)
+                        {
+                            // Try to set the new role name.
+                            result = await roleManager.SetRoleNameAsync(role, batchItem.Name);
+                        }
+                        // Check if any of the operations has failed.
+                        if (!result.Succeeded)
+                        {
+                            // Define the exception messages.
+                            var messages = result.Errors
+                                .Select(item => item.Description);
+                            // Throw an exception.
+                            throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
+                        }
                     }
                 }
             }
@@ -211,36 +228,53 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Use a new role manager instance.
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
                     .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
-                // Get the items with the provided IDs.
-                var roles = context.Roles
-                    .Where(item => batchIds.Contains(item.Id));
+                // Define the list of items to get.
+                var roles = new List<Role>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Roles
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    roles = items
+                        .ToList();
+                }
                 // Define a variable to store the error messages.
                 var errorMessages = new List<string>();
-                // Go over each item.
-                foreach (var role in roles.ToList())
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    // Delete it.
-                    var result = await roleManager.DeleteAsync(role);
-                    // Check if any of the operations has failed.
-                    if (!result.Succeeded)
+                    // Use a new role manager instance.
+                    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+                    // Go over each item.
+                    foreach (var role in roles)
                     {
-                        // Define the exception messages.
-                        var messages = result.Errors
-                            .Select(item => item.Description);
-                        // Add the exception messages to the error messages.
-                        errorMessages.AddRange(messages);
+                        // Delete it.
+                        var result = await roleManager.DeleteAsync(role);
+                        // Check if any of the operations has failed.
+                        if (!result.Succeeded)
+                        {
+                            // Define the exception messages.
+                            var messages = result.Errors
+                                .Select(item => item.Description);
+                            // Add the exception messages to the error messages.
+                            errorMessages.AddRange(messages);
+                        }
                     }
                 }
                 // Check if there have been any error messages.

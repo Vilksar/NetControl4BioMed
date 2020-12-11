@@ -124,7 +124,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseUsersToAdd.Add(databaseUser);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(databaseUsersToAdd, context, token);
+                await IEnumerableExtensions.CreateAsync(databaseUsersToAdd, serviceProvider, token);
             }
         }
 
@@ -152,10 +152,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -166,21 +162,38 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => item.User != null && !string.IsNullOrEmpty(item.User.Id))
                     .Select(item => (item.Database.Id, item.User.Id));
                 // Get the IDs of all individual items.
-                var batchIdsDatabaseIds = batchIds
+                var batchDatabaseIds = batchIds
                     .Select(item => item.Item1);
-                var batchIdsUserIds = batchIds
+                var batchUserIds = batchIds
                     .Select(item => item.Item2);
-                // Get the items with the provided IDs.
-                var databaseUsers = context.DatabaseUsers
-                    .Include(item => item.Database)
-                    .Include(item => item.User)
-                    .Where(item => batchIdsDatabaseIds.Contains(item.Database.Id))
-                    .Where(item => batchIdsUserIds.Contains(item.User.Id))
-                    .AsEnumerable()
-                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.Database.Id && item1.Item2 == item.User.Id))
-                    .AsQueryable();
+                // Define the list of items to get.
+                var databaseUsers = new List<DatabaseUser>();
+                // Create a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.DatabaseUsers
+                        .Include(item => item.Database)
+                        .Include(item => item.User)
+                        .Where(item => batchDatabaseIds.Contains(item.Database.Id))
+                        .Where(item => batchUserIds.Contains(item.User.Id))
+                        .AsEnumerable()
+                        .Where(item => batchIds.Any(item1 => item1.Item1 == item.Database.Id && item1.Item2 == item.User.Id))
+                        .ToList();
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    databaseUsers = items
+                        .ToList();
+                }
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(databaseUsers, context, token);
+                await IEnumerableExtensions.DeleteAsync(databaseUsers, serviceProvider, token);
             }
         }
     }

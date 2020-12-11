@@ -159,12 +159,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Use a new user manager instance.
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -179,30 +173,53 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Select(item => item.Item1);
                 var batchIdsRoleIds = batchIds
                     .Select(item => item.Item2);
-                // Get the items with the provided IDs.
-                var userRoles = context.UserRoles
-                    .Include(item => item.User)
-                    .Include(item => item.Role)
-                    .Where(item => batchIdsUserIds.Contains(item.User.Id))
-                    .Where(item => batchIdsRoleIds.Contains(item.Role.Id))
-                    .AsEnumerable()
-                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.User.Id && item1.Item2 == item.Role.Id))
-                    .AsQueryable();
+                // Define the list of items to get.
+                var userRoles = new List<UserRole>();
+                // Create a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.UserRoles
+                        .Include(item => item.User)
+                        .Include(item => item.Role)
+                        .Where(item => batchIdsUserIds.Contains(item.User.Id))
+                        .Where(item => batchIdsRoleIds.Contains(item.Role.Id))
+                        .AsEnumerable()
+                        .Where(item => batchIds.Any(item1 => item1.Item1 == item.User.Id && item1.Item2 == item.Role.Id))
+                        .ToList();
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    userRoles = items
+                        .ToList();
+                }
                 // Define a variable to store the error messages.
                 var errorMessages = new List<string>();
-                // Go over each item.
-                foreach (var userRole in userRoles.ToList())
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    // Delete it.
-                    var result = await userManager.RemoveFromRoleAsync(userRole.User, userRole.Role.Name);
-                    // Check if the operation has failed.
-                    if (!result.Succeeded)
+                    // Use a new user manager instance.
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                    // Go over each item.
+                    foreach (var userRole in userRoles)
                     {
-                        // Define the exception messages.
-                        var messages = result.Errors
-                            .Select(item => item.Description);
-                        // Add the exception messages to the error messages.
-                        errorMessages.AddRange(messages);
+                        // Delete it.
+                        var result = await userManager.RemoveFromRoleAsync(userRole.User, userRole.Role.Name);
+                        // Check if the operation has failed.
+                        if (!result.Succeeded)
+                        {
+                            // Define the exception messages.
+                            var messages = result.Errors
+                                .Select(item => item.Description);
+                            // Add the exception messages to the error messages.
+                            errorMessages.AddRange(messages);
+                        }
                     }
                 }
                 // Check if there have been any error messages.

@@ -36,78 +36,137 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
+        /// <returns>A dictionary containing the number of items in the database.</returns>
         public async Task<Dictionary<string, int>> CountAllItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Create a new scope.
-            using var scope = serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the dictionary to return.
-            var dictionary = new Dictionary<string, int>
+            var dictionary = new Dictionary<string, int>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
             {
-                {
-                    "Users",
-                    await context.Users
-                        .CountAsync()
-                },
-                {
-                    "Roles",
-                    await context.Roles
-                        .CountAsync()
-                },
-                {
-                    "DatabaseTypes",
-                    await context.DatabaseTypes
-                        .Where(item => item.Name != "Generic")
-                        .CountAsync()
-                },
-                {
-                    "Databases",
-                    await context.Databases
-                        .Where(item => item.DatabaseType.Name != "Generic")
-                        .CountAsync()
-                },
-                {
-                    "DatabaseNodeFields",
-                    await context.DatabaseNodeFields
-                        .Where(item => item.Database.DatabaseType.Name != "Generic")
-                        .CountAsync()
-                },
-                {
-                    "DatabaseEdgeFields",
-                    await context.DatabaseEdgeFields
-                        .Where(item => item.Database.DatabaseType.Name != "Generic")
-                        .CountAsync()
-                },
-                {
-                    "Nodes",
-                    await context.Nodes
-                        .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                        .CountAsync()
-                },
-                {
-                    "Edges",
-                    await context.Edges
-                        .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                        .CountAsync()
-                },
-                {
-                    "NodeCollections",
-                    await context.NodeCollections
-                        .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                        .CountAsync()
-                },
-                {
-                    "Networks",
-                    await context.Networks
-                        .CountAsync()
-                },
-                {
-                    "Analyses",
-                    await context.Analyses
-                        .CountAsync()
-                }
-            };
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Users"] = await context.Users
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Roles"] = await context.Roles
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["DatabaseTypes"] = await context.DatabaseTypes
+                    .Where(item => item.Name != "Generic")
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Databases"] = await context.Databases
+                    .Where(item => item.DatabaseType.Name != "Generic")
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["DatabaseNodeFields"] = await context.DatabaseNodeFields
+                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["DatabaseEdgeFields"] = await context.DatabaseEdgeFields
+                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Nodes"] = await context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Edges"] = await context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["GenericNodes"] = await context.Nodes
+                    .Where(item => item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["GenericEdges"] = await context.Edges
+                    .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["NodeCollections"] = await context.NodeCollections
+                    .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Networks"] = await context.Networks
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Analyses"] = await context.Analyses
+                    .CountAsync();
+            }
             // Return the dictionary.
             return dictionary;
         }
@@ -117,99 +176,130 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
+        /// <returns>A dictionary containing the number of duplicate items in the database.</returns>
         public async Task<Dictionary<string, int>> CountDuplicateItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Create a new scope.
-            using var scope = serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the dictionary to return.
-            var dictionary = new Dictionary<string, int>
+            var dictionary = new Dictionary<string, int>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
             {
-                {
-                    "DatabaseTypes",
-                    await context.DatabaseTypes
-                        .Where(item => item.Name != "Generic")
-                        .GroupBy(item => item.Name)
-                        .Where(item => item.Count() > 1)
-                        .Select(item => item.Key)
-                        .CountAsync()
-                },
-                {
-                    "Databases",
-                    await context.Databases
-                        .Where(item => item.DatabaseType.Name != "Generic")
-                        .GroupBy(item => item.Name)
-                        .Where(item => item.Count() > 1)
-                        .Select(item => item.Key)
-                        .CountAsync()
-                },
-                {
-                    "DatabaseNodeFields",
-                    await context.DatabaseNodeFields
-                        .Where(item => item.Database.DatabaseType.Name != "Generic")
-                        .GroupBy(item => item.Name)
-                        .Where(item => item.Count() > 1)
-                        .Select(item => item.Key)
-                        .CountAsync()
-                },
-                {
-                    "DatabaseEdgeFields",
-                    await context.DatabaseEdgeFields
-                        .Where(item => item.Database.DatabaseType.Name != "Generic")
-                        .GroupBy(item => item.Name)
-                        .Where(item => item.Count() > 1)
-                        .Select(item => item.Key)
-                        .CountAsync()
-                },
-                {
-                    "DatabaseNodeFieldNodes",
-                    await context.DatabaseNodeFieldNodes
-                        .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
-                        .Where(item => item.DatabaseNodeField.IsSearchable)
-                        .GroupBy(item => new { item.DatabaseNodeFieldId, item.Value })
-                        .Where(item => item.Count() > 1)
-                        .Select(item => item.Key)
-                        .CountAsync()
-                },
-                {
-                    "DatabaseEdgeFieldEdges",
-                    await context.DatabaseEdgeFieldEdges
-                        .Where(item => item.DatabaseEdgeField.Database.DatabaseType.Name != "Generic")
-                        .Where(item => item.DatabaseEdgeField.IsSearchable)
-                        .GroupBy(item => new { item.DatabaseEdgeFieldId, item.Value })
-                        .Where(item => item.Count() > 1)
-                        .Select(item => item.Key)
-                        .CountAsync()
-                },
-                {
-                    "Nodes",
-                    await context.Nodes
-                        .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                        .GroupBy(item => item.Name)
-                        .Where(item => item.Count() > 1)
-                        .Select(item => item.Key)
-                        .CountAsync()
-                },
-                {
-                    "Edges",
-                    await context.Edges
-                        .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                        .GroupBy(item => item.Name)
-                        .Where(item => item.Count() > 1)
-                        .Select(item => item.Key)
-                        .CountAsync()
-                },
-                {
-                    "NodeCollections",
-                    await context.NodeCollections
-                        .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                        .GroupBy(item => item.Name)
-                        .Where(item => item.Count() > 1)
-                        .Select(item => item.Key)
-                        .CountAsync()
-                }
-            };
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["DatabaseTypes"] = await context.DatabaseTypes
+                    .Where(item => item.Name != "Generic")
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Databases"] = await context.Databases
+                    .Where(item => item.DatabaseType.Name != "Generic")
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["DatabaseNodeFields"] = await context.DatabaseNodeFields
+                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["DatabaseEdgeFields"] = await context.DatabaseEdgeFields
+                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["DatabaseNodeFieldNodes"] = await context.DatabaseNodeFieldNodes
+                    .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
+                    .Where(item => item.DatabaseNodeField.IsSearchable)
+                    .GroupBy(item => new { item.DatabaseNodeFieldId, item.Value })
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["DatabaseEdgeFieldEdges"] = await context.DatabaseEdgeFieldEdges
+                    .Where(item => item.DatabaseEdgeField.Database.DatabaseType.Name != "Generic")
+                    .Where(item => item.DatabaseEdgeField.IsSearchable)
+                    .GroupBy(item => new { item.DatabaseEdgeFieldId, item.Value })
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Nodes"] = await context.Nodes
+                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Edges"] = await context.Edges
+                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["NodeCollections"] = await context.NodeCollections
+                    .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .GroupBy(item => item.Name)
+                    .Where(item => item.Count() > 1)
+                    .Select(item => item.Key)
+                    .CountAsync();
+            }
             // Return the dictionary.
             return dictionary;
         }
@@ -219,46 +309,83 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
+        /// <returns>A dictionary containing the number of orphaned items in the database.</returns>
         public async Task<Dictionary<string, int>> CountOrphanedItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Create a new scope.
-            using var scope = serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the dictionary to return.
-            var dictionary = new Dictionary<string, int>
+            var dictionary = new Dictionary<string, int>(7);
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
             {
-                {
-                    "Nodes",
-                    await context.Nodes
-                        .Where(item => !item.DatabaseNodeFieldNodes.Any())
-                        .CountAsync()
-                },
-                {
-                    "Edges",
-                    await context.Edges
-                        .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
-                        .CountAsync()
-                },
-                {
-                    "NodeCollections",
-                    await context.NodeCollections
-                        .Where(item => !item.NodeCollectionNodes.Any())
-                        .CountAsync()
-                },
-                {
-                    "Networks",
-                    await context.Networks
-                        .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any())
-                        .CountAsync()
-                },
-                {
-                    "Analyses",
-                    await context.Analyses
-                        .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any())
-                        .CountAsync()
-                }
-            };
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Nodes"] = await context.Nodes
+                    .Where(item => !item.DatabaseNodeFieldNodes.Any())
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Edges"] = await context.Edges
+                    .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["GenericNodes"] = await context.Nodes
+                    .Where(item => item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Where(item => !item.NetworkNodes.Any())
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["GenericEdges"] = await context.Edges
+                    .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Where(item => !item.NetworkEdges.Any())
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["NodeCollections"] = await context.NodeCollections
+                    .Where(item => !item.NodeCollectionNodes.Any())
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Networks"] = await context.Networks
+                    .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any())
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Analyses"] = await context.Analyses
+                    .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any())
+                    .CountAsync();
+            }
             // Return the dictionary.
             return dictionary;
         }
@@ -268,46 +395,61 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
+        /// <returns>A dictionary containing the number of inconsistent items in the database.</returns>
         public async Task<Dictionary<string, int>> CountInconsistentItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Create a new scope.
-            using var scope = serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the dictionary to return.
-            var dictionary = new Dictionary<string, int>
+            var dictionary = new Dictionary<string, int>(5);
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
             {
-                {
-                    "Nodes",
-                    await context.Nodes
-                        .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                        .CountAsync()
-                },
-                {
-                    "Edges",
-                    await context.Edges
-                        .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                        .CountAsync()
-                },
-                {
-                    "NodeCollections",
-                    await context.NodeCollections
-                        .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                        .CountAsync()
-                },
-                {
-                    "Networks",
-                    await context.Networks
-                        .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                        .CountAsync()
-                },
-                {
-                    "Analyses",
-                    await context.Analyses
-                        .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                        .CountAsync()
-                }
-            };
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Nodes"] = await context.Nodes
+                    .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Edges"] = await context.Edges
+                    .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["NodeCollections"] = await context.NodeCollections
+                    .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Networks"] = await context.Networks
+                    .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Analyses"] = await context.Analyses
+                    .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                    .CountAsync();
+            }
             // Return the dictionary.
             return dictionary;
         }
@@ -319,23 +461,29 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public async Task StopAnalysesAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Create a new scope.
-            using var scope = serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the limit date.
             var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeStop);
-            // Get the items to stop.
-            var items = context.Analyses
-                .Where(item => item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing)
-                .Where(item => item.DateTimeStarted < limitDate);
+            // Define the IDs of the items to get.
+            var itemIds = new List<string>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the IDs of the items to stop.
+                itemIds = context.Analyses
+                    .Where(item => item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing)
+                    .Where(item => item.DateTimeStarted < limitDate)
+                    .Select(item => item.Id)
+                    .ToList();
+            }
             // Define a new task.
             var task = new AnalysesTask
             {
-                Items = items
+                Items = itemIds
                     .Select(item => new AnalysisInputModel
                     {
-                        Id = item.Id
+                        Id = item
                     })
             };
             // Run the task.
@@ -349,74 +497,103 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public async Task AlertUsersAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Create a new scope.
-            using var scope = serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            // Use a new e-mail sender instance.
-            var emailSender = scope.ServiceProvider.GetRequiredService<ISendGridEmailSender>();
-            // Use a new link generator instance.
-            var linkGenerator = scope.ServiceProvider.GetRequiredService<LinkGenerator>();
             // Define the host.
             var host = new HostString(HostValue);
             // Define the limit dates.
             var limitDateStart = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeAlert + 1);
             var limitDateEnd = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeAlert);
-            // Get the networks and analyses.
-            var networks = context.Networks
-                .Where(item => limitDateStart < item.DateTimeCreated && item.DateTimeCreated < limitDateEnd);
-            var analyses = context.Analyses
-                .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
-                .Where(item => limitDateStart < item.DateTimeEnded && item.DateTimeEnded < limitDateEnd)
-                .Concat(networks
-                    .Select(item => item.AnalysisNetworks)
-                    .SelectMany(item => item)
-                    .Select(item => item.Analysis))
-                .Distinct();
-            // Get the users.
-            var networkUsers = networks
-                .Select(item => item.NetworkUsers)
-                .SelectMany(item => item)
-                .Select(item => item.User);
-            var analysisUsers = analyses
-                .Select(item => item.AnalysisUsers)
-                .SelectMany(item => item)
-                .Select(item => item.User);
-            // Get the users that have access to the items.
-            var users = networkUsers
-                .Concat(analysisUsers)
-                .Include(item => item.NetworkUsers)
-                    .ThenInclude(item => item.Network)
-                .Include(item => item.AnalysisUsers)
-                    .ThenInclude(item => item.Analysis);
-            // Go over each of the users.
-            foreach (var user in users)
+            // Define the items to get.
+            var alertNetworks = new List<AlertItemModel>();
+            var alertAnalyses = new List<AlertItemModel>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
             {
-                // Send an alert delete e-mail.
-                await emailSender.SendAlertDeleteEmailAsync(new EmailAlertDeleteViewModel
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the networks and analyses.
+                alertNetworks = context.Networks
+                    .Where(item => limitDateStart < item.DateTimeCreated && item.DateTimeCreated < limitDateEnd)
+                    .Select(item => new AlertItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Emails = item.NetworkUsers
+                            .Select(item1 => item1.User.Email)
+                    })
+                    .ToList();
+                alertAnalyses = context.Analyses
+                    .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
+                    .Where(item => limitDateStart < item.DateTimeEnded && item.DateTimeEnded < limitDateEnd)
+                    .Concat(context.Networks
+                        .Where(item => limitDateStart < item.DateTimeCreated && item.DateTimeCreated < limitDateEnd)
+                        .Select(item => item.AnalysisNetworks)
+                        .SelectMany(item => item)
+                        .Select(item => item.Analysis))
+                    .Distinct()
+                    .Select(item => new AlertItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Emails = item.AnalysisUsers
+                            .Select(item1 => item1.User.Email)
+                    })
+                    .ToList();
+            }
+            // Define the user items to get.
+            var alertUsers = new List<AlertUserModel>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new link generator instance.
+                var linkGenerator = scope.ServiceProvider.GetRequiredService<LinkGenerator>();
+                // Get the user items.
+                var users = alertNetworks
+                    .Select(item => item.Emails)
+                    .Concat(alertAnalyses
+                        .Select(item => item.Emails))
+                    .SelectMany(item => item)
+                    .Distinct()
+                    .Select(item => new AlertUserModel
+                    {
+                        Email = item,
+                        NetworkItems = alertNetworks
+                            .Where(item1 => item1.Emails.Contains(item))
+                            .Select(item1 => new EmailAlertDeleteViewModel.ItemModel
+                            {
+                                Id = item1.Id,
+                                Name = item1.Name,
+                                Url = linkGenerator.GetUriByPage("/Content/Created/Networks/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
+                            }),
+                        AnalysisItems = alertAnalyses
+                            .Where(item1 => item1.Emails.Contains(item))
+                            .Select(item1 => new EmailAlertDeleteViewModel.ItemModel
+                            {
+                                Id = item1.Id,
+                                Name = item1.Name,
+                                Url = linkGenerator.GetUriByPage("/Content/Created/Analyses/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
+                            })
+                    });
+            }
+            // Go over each of the users.
+            foreach (var user in alertUsers)
+            {
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    Email = user.Email,
-                    DateTime = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete - ApplicationDbContext.DaysBeforeAlert),
-                    NetworkItems = user.NetworkUsers
-                        .Select(item => item.Network)
-                        .Where(item => networks.Contains(item))
-                        .Select(item => new EmailAlertDeleteViewModel.ItemModel
-                        {
-                            Id = item.Id,
-                            Name = item.Name,
-                            Url = linkGenerator.GetUriByPage("/Content/Created/Networks/Details/Index", handler: null, values: new { id = item.Id }, scheme: Scheme, host: host)
-                        }),
-                    AnalysisItems = user.AnalysisUsers
-                        .Select(item => item.Analysis)
-                        .Where(item => analyses.Contains(item))
-                        .Select(item => new EmailAlertDeleteViewModel.ItemModel
-                        {
-                            Id = item.Id,
-                            Name = item.Name,
-                            Url = linkGenerator.GetUriByPage("/Content/Created/Analyses/Details/Index", handler: null, values: new { id = item.Id }, scheme: Scheme, host: host)
-                        }),
-                    ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
-                });
+                    // Use a new e-mail sender instance.
+                    var emailSender = scope.ServiceProvider.GetRequiredService<ISendGridEmailSender>();
+                    // Use a new link generator instance.
+                    var linkGenerator = scope.ServiceProvider.GetRequiredService<LinkGenerator>();
+                    // Send an alert delete e-mail.
+                    await emailSender.SendAlertDeleteEmailAsync(new EmailAlertDeleteViewModel
+                    {
+                        Email = user.Email,
+                        DateTime = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete - ApplicationDbContext.DaysBeforeAlert),
+                        NetworkItems = user.NetworkItems,
+                        AnalysisItems = user.AnalysisItems,
+                        ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
+                    });
+                }
             }
         }
 
@@ -427,23 +604,29 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public async Task DeleteUnconfirmedUsersAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Create a new scope.
-            using var scope = serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the limit date.
             var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
-            // Get the items to stop.
-            var items = context.Users
-                .Where(item => !item.EmailConfirmed)
-                .Where(item => item.DateTimeCreated < limitDate);
+            // Define the IDs of the items to get.
+            var itemIds = new List<string>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the IDs of the items to delete.
+                itemIds = context.Users
+                    .Where(item => !item.EmailConfirmed)
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => item.Id)
+                    .ToList();
+            }
             // Define a new task.
             var task = new UsersTask
             {
-                Items = items
+                Items = itemIds
                     .Select(item => new UserInputModel
                     {
-                        Id = item.Id
+                        Id = item
                     })
             };
             // Run the task.
@@ -457,22 +640,28 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public async Task DeleteNetworksAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Create a new scope.
-            using var scope = serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the limit date.
             var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
-            // Get the items to delete.
-            var items = context.Networks
-                .Where(item => item.DateTimeCreated < limitDate);
+            // Define the IDs of the items to get.
+            var itemIds = new List<string>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the IDs of the items to delete.
+                itemIds = context.Networks
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => item.Id)
+                    .ToList();
+            }
             // Define a new task.
             var task = new NetworksTask
             {
-                Items = items
+                Items = itemIds
                     .Select(item => new NetworkInputModel
                     {
-                        Id = item.Id
+                        Id = item
                     })
             };
             // Run the task.
@@ -486,27 +675,75 @@ namespace NetControl4BioMed.Helpers.Tasks
         /// <param name="token">The cancellation token for the task.</param>
         public async Task DeleteAnalysesAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
-            // Create a new scope.
-            using var scope = serviceProvider.CreateScope();
-            // Use a new context instance.
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Define the limit date.
             var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
-            // Get the items to delete.
-            var items = context.Analyses
-                .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
-                .Where(item => item.DateTimeEnded < limitDate);
+            // Define the IDs of the items to get.
+            var itemIds = new List<string>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the IDs of the items to delete.
+                itemIds = context.Analyses
+                    .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
+                    .Where(item => item.DateTimeEnded < limitDate)
+                    .Select(item => item.Id)
+                    .ToList();
+            }
             // Define a new task.
             var task = new AnalysesTask
             {
-                Items = items
+                Items = itemIds
                     .Select(item => new AnalysisInputModel
                     {
-                        Id = item.Id
+                        Id = item
                     })
             };
             // Run the task.
             await task.DeleteAsync(serviceProvider, token);
+        }
+
+        /// <summary>
+        /// Represents the model of an alert item.
+        /// </summary>
+        private class AlertItemModel
+        {
+            /// <summary>
+            /// Represents the ID of the alert item.
+            /// </summary>
+            public string Id { get; set; }
+
+            /// <summary>
+            /// Represents the name of the alert item.
+            /// </summary>
+            public string Name { get; set; }
+
+            /// <summary>
+            /// Represents the e-mails of the alert item.
+            /// </summary>
+            public IEnumerable<string> Emails { get; set; }
+        }
+
+        /// <summary>
+        /// Represents the model of an alert user.
+        /// </summary>
+        private class AlertUserModel
+        {
+            /// <summary>
+            /// Represents the e-mail of the alert user.
+            /// </summary>
+            public string Email { get; set; }
+
+            /// <summary>
+            /// Represents the network items of the alert user.
+            /// </summary>
+            public IEnumerable<EmailAlertDeleteViewModel.ItemModel> NetworkItems { get; set; }
+
+            /// <summary>
+            /// Represents the analysis items of the alert user.
+            /// </summary>
+            public IEnumerable<EmailAlertDeleteViewModel.ItemModel> AnalysisItems { get; set; }
         }
     }
 }

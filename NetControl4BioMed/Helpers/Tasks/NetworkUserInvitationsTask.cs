@@ -121,7 +121,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     networkUserInvitationsToAdd.Add(networkUserInvitation);
                 }
                 // Create the items.
-                await IEnumerableExtensions.CreateAsync(networkUserInvitationsToAdd, context, token);
+                await IEnumerableExtensions.CreateAsync(networkUserInvitationsToAdd, serviceProvider, token);
             }
         }
 
@@ -149,10 +149,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -163,20 +159,37 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Email))
                     .Select(item => (item.Network.Id, item.Email));
                 // Get the IDs of all individual items.
-                var batchIdsNetworkIds = batchIds
+                var batchNetworkIds = batchIds
                     .Select(item => item.Item1);
-                var batchIdsEmails = batchIds
+                var batchEmails = batchIds
                     .Select(item => item.Email);
-                // Get the items with the provided IDs.
-                var networkUserInvitations = context.NetworkUserInvitations
-                    .Include(item => item.Network)
-                    .Where(item => batchIdsNetworkIds.Contains(item.Network.Id))
-                    .Where(item => batchIdsEmails.Contains(item.Email))
-                    .AsEnumerable()
-                    .Where(item => batchIds.Any(item1 => item1.Item1 == item.Network.Id && item1.Item2 == item.Email))
-                    .AsQueryable();
+                // Define the list of items to get.
+                var networkUserInvitations = new List<NetworkUserInvitation>();
+                // Create a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.NetworkUserInvitations
+                        .Include(item => item.Network)
+                        .Where(item => batchNetworkIds.Contains(item.Network.Id))
+                        .Where(item => batchEmails.Contains(item.Email))
+                        .AsEnumerable()
+                        .Where(item => batchIds.Any(item1 => item1.Item1 == item.Network.Id && item1.Item2 == item.Email))
+                        .ToList();
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    networkUserInvitations = items
+                        .ToList();
+                }
                 // Delete the items.
-                await IQueryableExtensions.DeleteAsync(networkUserInvitations, context, token);
+                await IEnumerableExtensions.DeleteAsync(networkUserInvitations, serviceProvider, token);
             }
         }
     }

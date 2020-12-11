@@ -186,13 +186,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                         DateTimeCreated = item.DateTimeCreated
                     });
                     // Create the items.
-                    await IEnumerableExtensions.CreateAsync(databaseUsers, context, token);
-                    await IEnumerableExtensions.CreateAsync(networkUsers, context, token);
-                    await IEnumerableExtensions.CreateAsync(analysisUsers, context, token);
+                    await IEnumerableExtensions.CreateAsync(databaseUsers, serviceProvider, token);
+                    await IEnumerableExtensions.CreateAsync(networkUsers, serviceProvider, token);
+                    await IEnumerableExtensions.CreateAsync(analysisUsers, serviceProvider, token);
                     // Delete the items
-                    await IQueryableExtensions.DeleteAsync(databaseUserInvitations, context, token);
-                    await IQueryableExtensions.DeleteAsync(networkUserInvitations, context, token);
-                    await IQueryableExtensions.DeleteAsync(analysisUserInvitations, context, token);
+                    await IEnumerableExtensions.DeleteAsync(databaseUserInvitations, serviceProvider, token);
+                    await IEnumerableExtensions.DeleteAsync(networkUserInvitations, serviceProvider, token);
+                    await IEnumerableExtensions.DeleteAsync(analysisUserInvitations, serviceProvider, token);
                 }
             }
         }
@@ -223,12 +223,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Use a new user manager instance.
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -238,116 +232,184 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the items corresponding to the current batch.
-                var users = context.Users
-                    .Where(item => batchIds.Contains(item.Id));
-                // Go over each item in the current batch.
-                foreach (var batchItem in batchItems)
+                var batchEmails = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Email))
+                    .Select(item => item.Id)
+                    .Distinct();
+                // Define the list of items to get.
+                var users = new List<User>();
+                // Define the dependent list of items to get.
+                var databaseUserInvitationInputs = new List<DatabaseUserInvitationInputModel>();
+                var networkUserInvitationInputs = new List<NetworkUserInvitationInputModel>();
+                var analysisUserInvitationInputs = new List<AnalysisUserInvitationInputModel>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    // Get the corresponding item.
-                    var user = users
-                        .FirstOrDefault(item => item.Id == batchItem.Id);
-                    // Check if there was no item found.
-                    if (user == null)
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Users
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
                     {
                         // Continue.
                         continue;
                     }
-                    // Define a new identity result.
-                    var result = IdentityResult.Success;
-                    // Check if the e-mail is different from the current e-mail.
-                    if (batchItem.Email != user.Email)
-                    {
-                        // Try to update the e-mail.
-                        result = result.Succeeded ? await userManager.SetEmailAsync(user, batchItem.Email) : result;
-                    }
-                    // Check if the e-mail is different from the current username.
-                    if (batchItem.Email != user.UserName)
-                    {
-                        // Try to update the username.
-                        result = result.Succeeded ? await userManager.SetUserNameAsync(user, batchItem.Email) : result;
-                    }
-                    // Check if the e-mail should be set as confirmed.
-                    if (!user.EmailConfirmed && batchItem.EmailConfirmed)
-                    {
-                        // Generate the token and try to set it.
-                        var confirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                        result = result.Succeeded ? await userManager.ConfirmEmailAsync(user, confirmationToken) : result;
-                    }
-                    // Check if any of the operations has failed.
-                    if (!result.Succeeded)
-                    {
-                        // Define the exception messages.
-                        var messages = result.Errors
-                            .Select(item => item.Description);
-                        // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
-                    }
-                    // Get the databases, networks and analyses to which the user already has access.
-                    var databaseUserInvitations = context.DatabaseUserInvitations
-                        .Where(item => item.Email == user.Email);
-                    var networkUserInvitations = context.NetworkUserInvitations
-                        .Where(item => item.Email == user.Email);
-                    var analysisUserInvitations = context.AnalysisUserInvitations
-                        .Where(item => item.Email == user.Email);
-                    // Get the IDs of all the databases, networks and analyses to assign to the user.
-                    var databaseIds = databaseUserInvitations
-                        .Select(item => item.Database.Id)
-                        .Except(context.DatabaseUsers
-                            .Where(item => item.User == user)
-                            .Select(item => item.Database.Id))
-                        .AsEnumerable();
-                    var networkIds = networkUserInvitations
-                        .Select(item => item.Network.Id)
-                        .Except(context.NetworkUsers
-                            .Where(item => item.User == user)
-                            .Select(item => item.Network.Id))
-                        .AsEnumerable();
-                    var analysisIds = analysisUserInvitations
-                        .Select(item => item.Analysis.Id)
-                        .Except(context.AnalysisUsers
-                            .Where(item => item.User == user)
-                            .Select(item => item.Analysis.Id))
-                        .AsEnumerable();
-                    // Create, for each, a corresponding user entry.
-                    var databaseUsers = databaseUserInvitations
-                        .Where(item => databaseIds.Contains(item.Database.Id))
-                        .Select(item => new DatabaseUser
+                    // Get the items found.
+                    users = items
+                        .ToList();
+                    // Get the IDs of the dependent items.
+                    databaseUserInvitationInputs = context.DatabaseUserInvitations
+                        .Where(item => batchEmails.Contains(item.Email))
+                        .Distinct()
+                        .Select(item => new DatabaseUserInvitationInputModel
                         {
-                            DatabaseId = item.Database.Id,
-                            Database = item.Database,
-                            UserId = user.Id,
-                            User = user,
-                            DateTimeCreated = item.DateTimeCreated
-                        });
-                    var networkUsers = networkUserInvitations
-                        .Where(item => networkIds.Contains(item.Network.Id))
-                        .Select(item => new NetworkUser
+                            Database = new DatabaseInputModel
+                            {
+                                Id = item.Database.Id
+                            },
+                            Email = item.Email
+                        })
+                        .ToList();
+                    networkUserInvitationInputs = context.NetworkUserInvitations
+                        .Where(item => batchEmails.Contains(item.Email))
+                        .Distinct()
+                        .Select(item => new NetworkUserInvitationInputModel
                         {
-                            NetworkId = item.NetworkId,
-                            Network = item.Network,
-                            UserId = user.Id,
-                            User = user,
-                            DateTimeCreated = item.DateTimeCreated
-                        });
-                    var analysisUsers = analysisUserInvitations
-                        .Where(item => analysisIds.Contains(item.Analysis.Id))
-                        .Select(item => new AnalysisUser
+                            Network = new NetworkInputModel
+                            {
+                                Id = item.Network.Id
+                            },
+                            Email = item.Email
+                        })
+                        .ToList();
+                    analysisUserInvitationInputs = context.AnalysisUserInvitations
+                        .Where(item => batchEmails.Contains(item.Email))
+                        .Distinct()
+                        .Select(item => new AnalysisUserInvitationInputModel
                         {
-                            AnalysisId = item.AnalysisId,
-                            Analysis = item.Analysis,
-                            UserId = user.Id,
-                            User = user,
-                            DateTimeCreated = item.DateTimeCreated
-                        });
-                    // Create the items.
-                    await IEnumerableExtensions.CreateAsync(databaseUsers, context, token);
-                    await IEnumerableExtensions.CreateAsync(networkUsers, context, token);
-                    await IEnumerableExtensions.CreateAsync(analysisUsers, context, token);
-                    // Delete the items
-                    await IQueryableExtensions.DeleteAsync(databaseUserInvitations, context, token);
-                    await IQueryableExtensions.DeleteAsync(networkUserInvitations, context, token);
-                    await IQueryableExtensions.DeleteAsync(analysisUserInvitations, context, token);
+                            Analysis = new AnalysisInputModel
+                            {
+                                Id = item.Analysis.Id
+                            },
+                            Email = item.Email
+                        })
+                        .ToList();
+                }
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new user manager instance.
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                    // Go over each item in the current batch.
+                    foreach (var batchItem in batchItems)
+                    {
+                        // Get the corresponding item.
+                        var user = users
+                            .FirstOrDefault(item => item.Id == batchItem.Id);
+                        // Check if there was no item found.
+                        if (user == null)
+                        {
+                            // Continue.
+                            continue;
+                        }
+                        // Define a new identity result.
+                        var result = IdentityResult.Success;
+                        // Check if the e-mail is different from the current e-mail.
+                        if (batchItem.Email != user.Email)
+                        {
+                            // Try to update the e-mail.
+                            result = result.Succeeded ? await userManager.SetEmailAsync(user, batchItem.Email) : result;
+                        }
+                        // Check if the e-mail is different from the current username.
+                        if (batchItem.Email != user.UserName)
+                        {
+                            // Try to update the username.
+                            result = result.Succeeded ? await userManager.SetUserNameAsync(user, batchItem.Email) : result;
+                        }
+                        // Check if the e-mail should be set as confirmed.
+                        if (!user.EmailConfirmed && batchItem.EmailConfirmed)
+                        {
+                            // Generate the token and try to set it.
+                            var confirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                            result = result.Succeeded ? await userManager.ConfirmEmailAsync(user, confirmationToken) : result;
+                        }
+                        // Check if any of the operations has failed.
+                        if (!result.Succeeded)
+                        {
+                            // Define the exception messages.
+                            var messages = result.Errors
+                                .Select(item => item.Description);
+                            // Throw an exception.
+                            throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
+                        }
+                        // Create the dependent entities.
+                        await new DatabaseUsersTask
+                        {
+                            Items = databaseUserInvitationInputs
+                                .Where(item => item.Email == user.Email)
+                                .Select(item => new DatabaseUserInputModel
+                                {
+                                    Database = new DatabaseInputModel
+                                    {
+                                        Id = item.Database.Id
+                                    },
+                                    User = new UserInputModel
+                                    {
+                                        Id = user.Id
+                                    }
+                                })
+                        }.CreateAsync(serviceProvider, token);
+                        await new NetworkUsersTask
+                        {
+                            Items = networkUserInvitationInputs
+                                .Where(item => item.Email == user.Email)
+                                .Select(item => new NetworkUserInputModel
+                                {
+                                    Network = new NetworkInputModel
+                                    {
+                                        Id = item.Network.Id
+                                    },
+                                    User = new UserInputModel
+                                    {
+                                        Id = user.Id
+                                    }
+                                })
+                        }.CreateAsync(serviceProvider, token);
+                        await new AnalysisUsersTask
+                        {
+                            Items = analysisUserInvitationInputs
+                                 .Where(item => item.Email == user.Email)
+                                 .Select(item => new AnalysisUserInputModel
+                                 {
+                                     Analysis = new AnalysisInputModel
+                                     {
+                                         Id = item.Analysis.Id
+                                     },
+                                     User = new UserInputModel
+                                     {
+                                         Id = user.Id
+                                     }
+                                 })
+                        }.CreateAsync(serviceProvider, token);
+                        // Delete the dependent entities.
+                        await new DatabaseUserInvitationsTask
+                        {
+                            Items = databaseUserInvitationInputs
+                                 .Where(item => item.Email == user.Email)
+                        }.DeleteAsync(serviceProvider, token);
+                        await new NetworkUserInvitationsTask
+                        {
+                            Items = networkUserInvitationInputs
+                                 .Where(item => item.Email == user.Email)
+                        }.DeleteAsync(serviceProvider, token);
+                        await new AnalysisUserInvitationsTask
+                        {
+                            Items = analysisUserInvitationInputs
+                                 .Where(item => item.Email == user.Email)
+                        }.DeleteAsync(serviceProvider, token);
+                    }
                 }
             }
         }
@@ -376,55 +438,99 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Use a new user manager instance.
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
                     .Take(ApplicationDbContext.BatchSize);
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems.Select(item => item.Id);
-                // Get the items with the provided IDs.
-                var users = context.Users
-                    .Where(item => batchIds.Contains(item.Id));
+                // Define the list of items to get.
+                var users = new List<User>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Users
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    users = items
+                        .ToList();
+                }
+                // Get the IDs of the items.
+                var userIds = users
+                    .Select(item => item.Id);
+                // Define the dependent list of items to get.
+                var analysisInputs = new List<AnalysisInputModel>();
+                var networkInputs = new List<NetworkInputModel>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items found.
+                    var networks = context.Networks
+                        .Where(item => item.NetworkUsers.All(item1 => userIds.Contains(item1.User.Id)))
+                        .Select(item => item.NetworkEdges)
+                        .SelectMany(item => item)
+                        .Select(item => item.Network)
+                        .Distinct();
+                    // Get the IDs of the dependent items.
+                    analysisInputs = context.Analyses
+                        .Where(item => item.AnalysisUsers.All(item1 => userIds.Contains(item1.User.Id)) || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)))
+                        .Select(item => item.AnalysisEdges)
+                        .SelectMany(item => item)
+                        .Select(item => item.Analysis)
+                        .Distinct()
+                        .Select(item => new AnalysisInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                    networkInputs = networks
+                        .Select(item => new NetworkInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .ToList();
+                }
+                // Delete the dependent entities.
+                await new AnalysesTask { Items = analysisInputs }.DeleteAsync(serviceProvider, token);
+                await new NetworksTask { Items = networkInputs }.DeleteAsync(serviceProvider, token);
+                // Delete the related entities.
+                await UserExtensions.DeleteRelatedEntitiesAsync<AnalysisUser>(userIds, serviceProvider, token);
+                await UserExtensions.DeleteRelatedEntitiesAsync<NetworkUser>(userIds, serviceProvider, token);
+                await UserExtensions.DeleteRelatedEntitiesAsync<DatabaseUser>(userIds, serviceProvider, token);
                 // Define a variable to store the error messages.
                 var errorMessages = new List<string>();
-                // Go over each item.
-                foreach (var user in users.ToList())
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    // Delete it.
-                    var result = await userManager.DeleteAsync(user);
-                    // Check if the operation has failed.
-                    if (!result.Succeeded)
+                    // Use a new user manager instance.
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                    // Go over each item.
+                    foreach (var user in users)
                     {
-                        // Define the exception messages.
-                        var messages = result.Errors
-                            .Select(item => item.Description);
-                        // Add the exception messages to the error messages.
-                        errorMessages.AddRange(messages);
+                        // Delete it.
+                        var result = await userManager.DeleteAsync(user);
+                        // Check if the operation has failed.
+                        if (!result.Succeeded)
+                        {
+                            // Define the exception messages.
+                            var messages = result.Errors
+                                .Select(item => item.Description);
+                            // Add the exception messages to the error messages.
+                            errorMessages.AddRange(messages);
+                        }
                     }
                 }
-                // Get the related entities that use the items.
-                var networks = context.Networks
-                    .Where(item => !item.NetworkUsers.Any());
-                var analyses = context.Analyses
-                    .Where(item => !item.AnalysisUsers.Any() || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)));
-                // Get the generic entities among them.
-                var genericNetworks = networks
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"));
-                var genericNodes = context.Nodes
-                    .Where(item => item.NetworkNodes.Any(item1 => genericNetworks.Contains(item1.Network)));
-                var genericEdges = context.Edges
-                    .Where(item => item.NetworkEdges.Any(item1 => genericNetworks.Contains(item1.Network)) || item.EdgeNodes.Any(item1 => genericNodes.Contains(item1.Node)));
-                // Delete the items.
-                await IQueryableExtensions.DeleteAsync(analyses, context, token);
-                await IQueryableExtensions.DeleteAsync(networks, context, token);
-                await IQueryableExtensions.DeleteAsync(genericEdges, context, token);
-                await IQueryableExtensions.DeleteAsync(genericNodes, context, token);
                 // Check if there have been any error messages.
                 if (errorMessages.Any())
                 {
