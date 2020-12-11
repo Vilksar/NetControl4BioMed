@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetControl4BioMed.Data.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace NetControl4BioMed.Data.Models
     /// <summary>
     /// Represents the database model of a one-to-one relationship between an analysis and a network which it contains.
     /// </summary>
-    public class AnalysisNetwork
+    public class AnalysisNetwork : IAnalysisDependent
     {
         /// <summary>
         /// Gets or sets the analysis ID of the relationship.

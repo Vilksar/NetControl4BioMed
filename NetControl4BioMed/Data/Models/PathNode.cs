@@ -1,4 +1,5 @@
 ﻿using NetControl4BioMed.Data.Enumerations;
+using NetControl4BioMed.Data.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace NetControl4BioMed.Data.Models
     /// <summary>
     /// Represents the database model of a one-to-one relationship between a path and a node which it contains.
     /// </summary>
-    public class PathNode
+    public class PathNode : IPathDependent
     {
         /// <summary>
         /// Gets or sets the path ID of the relationship.

@@ -1,4 +1,5 @@
 ﻿using NetControl4BioMed.Data.Enumerations;
+using NetControl4BioMed.Data.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace NetControl4BioMed.Data.Models
     /// <summary>
     /// Represents the database model of a one-to-one relationship between a network and a node collection which it uses.
     /// </summary>
-    public class NetworkNodeCollection
+    public class NetworkNodeCollection : INetworkDependent
     {
         /// <summary>
         /// Gets or sets the network ID of the relationship.

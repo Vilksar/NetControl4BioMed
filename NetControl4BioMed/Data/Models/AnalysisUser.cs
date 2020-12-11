@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetControl4BioMed.Data.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace NetControl4BioMed.Data.Models
     /// <summary>
     /// Represents the database model of a one-to-one relationship between an analysis and a registered user that has access to it.
     /// </summary>
-    public class AnalysisUser
+    public class AnalysisUser : IAnalysisDependent, IUserDependent
     {
         /// <summary>
         /// Gets or sets the date when the relationship was created.

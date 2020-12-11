@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetControl4BioMed.Data.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace NetControl4BioMed.Data.Models
     /// <summary>
     /// Represents the database model of a one-to-one relationship between a database node field and a node with a corresponding value.
     /// </summary>
-    public class DatabaseNodeFieldNode
+    public class DatabaseNodeFieldNode : INodeDependent
     {
         /// <summary>
         /// Gets or sets the database node field ID of the relationship.

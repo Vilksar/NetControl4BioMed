@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetControl4BioMed.Data.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace NetControl4BioMed.Data.Models
     /// <summary>
     /// Represents the database model of a one-to-one relationship between a network and an unregistered user that will have access to it after registration.
     /// </summary>
-    public class NetworkUserInvitation
+    public class NetworkUserInvitation : INetworkDependent
     {
         /// <summary>
         /// Gets or sets the date when the relationship was created.
