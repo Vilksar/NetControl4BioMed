@@ -59,7 +59,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.None
                     // Add a message to the log.
                     network.Log = network.AppendToLog("There was an error in retrieving related data from the database.");
                     // Edit the network.
-                    await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     // End the function.
                     return;
                 }
@@ -71,7 +71,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.None
                     // Add a message to the log.
                     network.Log = network.AppendToLog("No database types corresponding to the network databases could be found.");
                     // Edit the network.
-                    await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     // End the function.
                     return;
                 }
@@ -83,7 +83,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.None
                     // Add a message to the log.
                     network.Log = network.AppendToLog("The database types corresponding to the network databases are different.");
                     // Edit the network.
-                    await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     // End the function.
                     return;
                 }
@@ -95,7 +95,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.None
                     // Add a message to the log.
                     network.Log = network.AppendToLog("The database type corresponding to the network databases and the network algorithm don't match.");
                     // Edit the network.
-                    await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     // End the function.
                     return;
                 }
@@ -107,7 +107,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.None
                     // Add a message to the log.
                     network.Log = network.AppendToLog("The seed data corresponding to the network could not be deserialized.");
                     // Edit the network.
-                    await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     // End the function.
                     return;
                 }
@@ -179,7 +179,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.None
                     // Add a message to the log.
                     network.Log = network.AppendToLog("The seed data corresponding to the network does not contain any valid edges.");
                     // Edit the network.
-                    await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                 }
                 // End the function.
                 return;
@@ -274,7 +274,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.None
                 network.NetworkNodes = networkNodes;
                 network.NetworkEdges = networkEdges;
                 // Edit the network.
-                await IEnumerableExtensions.EditAsync(network.Yield(), context, token);
+                await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
             }
         }
     }

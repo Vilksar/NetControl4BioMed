@@ -105,7 +105,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                     // Update the analysis end time.
                     analysis.DateTimeEnded = DateTime.UtcNow;
                     // Update the analysis.
-                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                     // End the function.
                     return;
                 }
@@ -119,7 +119,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                     // Update the analysis end time.
                     analysis.DateTimeEnded = DateTime.UtcNow;
                     // Update the analysis.
-                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                     // End the function.
                     return;
                 }
@@ -133,7 +133,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                     // Update the analysis end time.
                     analysis.DateTimeEnded = DateTime.UtcNow;
                     // Update the analysis.
-                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                     // End the function.
                     return;
                 }
@@ -147,7 +147,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                     // Update the analysis end time.
                     analysis.DateTimeEnded = DateTime.UtcNow;
                     // Update the analysis.
-                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                     // End the function.
                     return;
                 }
@@ -184,7 +184,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                 // Add a message to the log.
                 analysis.Log = analysis.AppendToLog("The analysis is now running.");
                 // Update the analysis.
-                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
             }
             // Define the required data.
             var analysisStillExists = true;
@@ -215,7 +215,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                     analysis.CurrentIteration = currentIteration;
                     analysis.CurrentIterationWithoutImprovement = currentIterationWithoutImprovement;
                     // Update the analysis.
-                    await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                    await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                 }
             }, null, TimeSpan.FromSeconds(0.0), TimeSpan.FromSeconds(30.0)))
             {
@@ -410,7 +410,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                 analysis.CurrentIterationWithoutImprovement = currentIterationWithoutImprovement;
                 analysis.ControlPaths = controlPaths;
                 // Update the analysis.
-                await IEnumerableExtensions.EditAsync(analysis.Yield(), context, token);
+                await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
             }
             // End the function.
             return;
