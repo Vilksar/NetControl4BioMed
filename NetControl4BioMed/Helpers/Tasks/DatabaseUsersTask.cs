@@ -50,10 +50,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -71,11 +67,22 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the related entities that appear in the current batch.
-                var batchDatabases = context.Databases
-                    .Where(item => batchDatabaseIds.Contains(item.Id));
-                var batchUsers = context.Users
-                    .Where(item => batchUserIds.Contains(item.Id));
+                // Define the list of items to get.
+                var databases = new List<Database>();
+                var users = new List<User>();
+                // Create a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the related entities that appear in the current batch.
+                    databases = context.Databases
+                        .Where(item => batchDatabaseIds.Contains(item.Id))
+                        .ToList();
+                    users = context.Users
+                        .Where(item => batchUserIds.Contains(item.Id))
+                        .ToList();
+                }
                 // Save the items to add.
                 var databaseUsersToAdd = new List<DatabaseUser>();
                 // Go over each item in the current batch.
@@ -88,7 +95,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("There was no database provided.", showExceptionItem, batchItem);
                     }
                     // Get the database.
-                    var database = batchDatabases
+                    var database = databases
                         .FirstOrDefault(item => item.Id == batchItem.Database.Id);
                     // Check if there was no database found.
                     if (database == null)
@@ -103,7 +110,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("There was no user provided.", showExceptionItem, batchItem);
                     }
                     // Get the user.
-                    var user = batchUsers
+                    var user = users
                         .FirstOrDefault(item => item.Id == batchItem.User.Id);
                     // Check if there was no user found.
                     if (user == null)

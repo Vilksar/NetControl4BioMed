@@ -50,12 +50,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Use a new user manager instance.
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -73,63 +67,71 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the related entities that appear in the current batch.
-                var batchUsers = context.Users
-                    .Where(item => batchUserIds.Contains(item.Id));
-                var batchRoles = context.Roles
-                    .Where(item => batchRoleIds.Contains(item.Id));
-                // Go over each item in the current batch.
-                foreach (var batchItem in batchItems)
+                // Define the list of items to get.
+                var users = new List<User>();
+                var roles = new List<Role>();
+                // Create a new scope.
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    // Check if there was no user provided.
-                    if (batchItem.User == null || string.IsNullOrEmpty(batchItem.User.Id))
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the related entities that appear in the current batch.
+                    users = context.Users
+                        .Where(item => batchUserIds.Contains(item.Id))
+                        .ToList();
+                    roles = context.Roles
+                        .Where(item => batchRoleIds.Contains(item.Id))
+                        .ToList();
+                }
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new user manager instance.
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                    // Go over each item in the current batch.
+                    foreach (var batchItem in batchItems)
                     {
-                        // Throw an exception.
-                        throw new TaskException("There was no user provided.", showExceptionItem, batchItem);
-                    }
-                    // Get the user.
-                    var user = batchUsers
-                        .FirstOrDefault(item => item.Id == batchItem.User.Id);
-                    // Check if there was no user found.
-                    if (user == null)
-                    {
-                        // Throw an exception.
-                        throw new TaskException("There was no user found.", showExceptionItem, batchItem);
-                    }
-                    // Check if there was no role provided.
-                    if (batchItem.Role == null || string.IsNullOrEmpty(batchItem.Role.Id))
-                    {
-                        // Throw an exception.
-                        throw new TaskException("There was no role provided.", showExceptionItem, batchItem);
-                    }
-                    // Get the role.
-                    var role = batchRoles
-                        .FirstOrDefault(item => item.Id == batchItem.Role.Id);
-                    // Check if there was no role found.
-                    if (role == null)
-                    {
-                        // Throw an exception.
-                        throw new TaskException("There was no role found.", showExceptionItem, batchItem);
-                    }
-                    // Try to add the user to the role.
-                    var result = await userManager.AddToRoleAsync(user, role.Name);
-                    // Check if any of the operations has failed.
-                    if (!result.Succeeded)
-                    {
-                        // Define the exception messages.
-                        var messages = result.Errors
-                            .Select(item => item.Description);
-                        // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
-                    }
-                    // Get the item.
-                    var userRole = context.UserRoles
-                        .FirstOrDefault(item => item.User.Id == user.Id && item.Role.Id == role.Id);
-                    // Check if there was no item found.
-                    if (userRole == null)
-                    {
-                        // Throw an exception.
-                        throw new TaskException("There was an error in retrieving the user role from the database after it was added.");
+                        // Check if there was no user provided.
+                        if (batchItem.User == null || string.IsNullOrEmpty(batchItem.User.Id))
+                        {
+                            // Throw an exception.
+                            throw new TaskException("There was no user provided.", showExceptionItem, batchItem);
+                        }
+                        // Get the user.
+                        var user = users
+                            .FirstOrDefault(item => item.Id == batchItem.User.Id);
+                        // Check if there was no user found.
+                        if (user == null)
+                        {
+                            // Throw an exception.
+                            throw new TaskException("There was no user found.", showExceptionItem, batchItem);
+                        }
+                        // Check if there was no role provided.
+                        if (batchItem.Role == null || string.IsNullOrEmpty(batchItem.Role.Id))
+                        {
+                            // Throw an exception.
+                            throw new TaskException("There was no role provided.", showExceptionItem, batchItem);
+                        }
+                        // Get the role.
+                        var role = roles
+                            .FirstOrDefault(item => item.Id == batchItem.Role.Id);
+                        // Check if there was no role found.
+                        if (role == null)
+                        {
+                            // Throw an exception.
+                            throw new TaskException("There was no role found.", showExceptionItem, batchItem);
+                        }
+                        // Try to add the user to the role.
+                        var result = await userManager.AddToRoleAsync(user, role.Name);
+                        // Check if any of the operations has failed.
+                        if (!result.Succeeded)
+                        {
+                            // Define the exception messages.
+                            var messages = result.Errors
+                                .Select(item => item.Description);
+                            // Throw an exception.
+                            throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
+                        }
                     }
                 }
             }

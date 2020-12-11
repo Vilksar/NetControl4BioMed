@@ -51,10 +51,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -69,11 +65,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Throw an exception.
                     throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
-                // Get the valid IDs, that do not appear in the database.
-                var validBatchIds = batchIds
-                    .Except(context.Nodes
-                        .Where(item => batchIds.Contains(item.Id))
-                        .Select(item => item.Id));
                 // Get the IDs of the related entities that appear in the current batch.
                 var batchDatabaseNodeFieldIds = batchItems
                     .Where(item => item.DatabaseNodeFieldNodes != null)
@@ -84,11 +75,27 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the related entities that appear in the current batch.
-                var batchDatabaseNodeFields = context.DatabaseNodeFields
-                    .Include(item => item.Database)
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .Where(item => batchDatabaseNodeFieldIds.Contains(item.Id));
+                // Define the list of items to get.
+                var validBatchIds = new List<string>();
+                var databaseNodeFields = new List<DatabaseNodeField>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the related entities that appear in the current batch.
+                    databaseNodeFields = context.DatabaseNodeFields
+                        .Include(item => item.Database)
+                        .Where(item => item.Database.DatabaseType.Name != "Generic")
+                        .Where(item => batchDatabaseNodeFieldIds.Contains(item.Id))
+                        .ToList();
+                    // Get the valid IDs, that do not appear in the database.
+                    validBatchIds = batchIds
+                        .Except(context.Nodes
+                            .Where(item => batchIds.Contains(item.Id))
+                            .Select(item => item.Id))
+                        .ToList();
+                }
                 // Save the items to add.
                 var nodesToAdd = new List<Node>();
                 // Go over each item in the current batch.
@@ -113,11 +120,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => !string.IsNullOrEmpty(item.Value))
                         .Select(item => (item.DatabaseNodeField.Id, item.Value))
                         .Distinct()
-                        .Where(item => batchDatabaseNodeFields.Any(item1 => item1.Id == item.Item1))
+                        .Where(item => databaseNodeFields.Any(item1 => item1.Id == item.Item1))
                         .Select(item => new DatabaseNodeFieldNode
                         {
                             DatabaseNodeFieldId = item.Item1,
-                            DatabaseNodeField = batchDatabaseNodeFields
+                            DatabaseNodeField = databaseNodeFields
                                 .FirstOrDefault(item1 => item1.Id == item.Item1),
                             Value = item.Item2
                         })

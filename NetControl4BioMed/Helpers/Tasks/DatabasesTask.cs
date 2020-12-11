@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
@@ -51,10 +50,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -63,17 +58,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id);
+                var batchNames = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Name))
+                    .Select(item => item.Name)
+                    .Distinct();
                 // Check if any of the IDs are repeating in the list.
                 if (batchIds.Distinct().Count() != batchIds.Count())
                 {
                     // Throw an exception.
                     throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
-                // Get the valid IDs, that do not appear in the database.
-                var validBatchIds = batchIds
-                    .Except(context.Databases
-                        .Where(item => batchIds.Contains(item.Id))
-                        .Select(item => item.Id));
                 // Get the IDs of the related entities that appear in the current batch.
                 var batchDatabaseTypeIds = batchItems
                     .Where(item => item.DatabaseType != null)
@@ -81,9 +75,30 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the related entities that appear in the current batch.
-                var batchDatabaseTypes = context.DatabaseTypes
-                    .Where(item => batchDatabaseTypeIds.Contains(item.Id));
+                // Define the list of items to get.
+                var databaseTypes = new List<DatabaseType>();
+                var existingDatabaseNames = new List<string>();
+                var validBatchIds = new List<string>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the related entities that appear in the current batch.
+                    databaseTypes = context.DatabaseTypes
+                        .Where(item => batchDatabaseTypeIds.Contains(item.Id))
+                        .ToList();
+                    existingDatabaseNames = context.Databases
+                        .Where(item => batchNames.Contains(item.Name))
+                        .Select(item => item.Name)
+                        .ToList();
+                    // Get the valid IDs, that do not appear in the database.
+                    validBatchIds = batchIds
+                        .Except(context.Databases
+                            .Where(item => batchIds.Contains(item.Id))
+                            .Select(item => item.Id))
+                        .ToList();
+                }
                 // Save the items to add.
                 var databasesToAdd = new List<Database>();
                 // Go over each item in the current batch.
@@ -96,7 +111,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Check if there is another database with the same name.
-                    if (context.Databases.Any(item => item.Name == batchItem.Name) || databasesToAdd.Any(item => item.Name == batchItem.Name))
+                    if (existingDatabaseNames.Any(item => item == batchItem.Name) || databasesToAdd.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
                         throw new TaskException("A database with the same name already exists.", showExceptionItem, batchItem);
@@ -108,7 +123,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("There was no database type provided.", showExceptionItem, batchItem);
                     }
                     // Get the database type.
-                    var databaseType = batchDatabaseTypes
+                    var databaseType = databaseTypes
                         .FirstOrDefault(item => item.Id == batchItem.DatabaseType.Id);
                     // Check if there was no database type found.
                     if (databaseType == null)
@@ -188,7 +203,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Distinct();
                 // Define the list of items to get.
                 var databases = new List<Database>();
-                var duplicateDatabases = new List<Database>();
+                var existingDatabases = new List<Database>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -208,7 +223,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databases = items
                         .ToList();
                     // Get the related entities that appear in the current batch.
-                    duplicateDatabases = context.Databases
+                    existingDatabases = context.Databases
                         .Where(item => batchNames.Contains(item.Name))
                         .ToList();
                 }
@@ -233,7 +248,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("The generic database can't be edited.", showExceptionItem, batchItem);
                     }
                     // Check if there is another database with the same name.
-                    if (duplicateDatabases.Any(item => item.Id != database.Id && item.Name == batchItem.Name) || databasesToEdit.Any(item => item.Name == batchItem.Name))
+                    if (existingDatabases.Any(item => item.Id != database.Id && item.Name == batchItem.Name) || databasesToEdit.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
                         throw new TaskException("A database with the same name already exists.", showExceptionItem, batchItem);

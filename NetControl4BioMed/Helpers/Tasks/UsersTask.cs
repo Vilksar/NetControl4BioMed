@@ -52,12 +52,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Use a new user manager instance.
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -66,133 +60,218 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id);
+                var batchEmails = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Email))
+                    .Select(item => item.Id)
+                    .Distinct();
                 // Check if any of the IDs are repeating in the list.
                 if (batchIds.Distinct().Count() != batchIds.Count())
                 {
                     // Throw an exception.
                     throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
-                // Get the valid IDs, that do not appear in the database.
-                var validBatchIds = batchIds
-                    .Except(context.Users
-                        .Where(item => batchIds.Contains(item.Id))
-                        .Select(item => item.Id));
-                // Go over each item in the current batch.
-                foreach (var batchItem in batchItems)
+                // Define the list of items to get.
+                var validBatchIds = new List<string>();
+                // Define the dependent list of items to get.
+                var databaseUserInvitationInputs = new List<DatabaseUserInvitationInputModel>();
+                var networkUserInvitationInputs = new List<NetworkUserInvitationInputModel>();
+                var analysisUserInvitationInputs = new List<AnalysisUserInvitationInputModel>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    // Check if the ID of the item is not valid.
-                    if (!string.IsNullOrEmpty(batchItem.Id) && !validBatchIds.Contains(batchItem.Id))
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the valid IDs, that do not appear in the database.
+                    validBatchIds = batchIds
+                        .Except(context.Users
+                            .Where(item => batchIds.Contains(item.Id))
+                            .Select(item => item.Id))
+                        .ToList();
+                    // Get the IDs of the dependent items.
+                    databaseUserInvitationInputs = context.DatabaseUserInvitations
+                        .Where(item => batchEmails.Contains(item.Email))
+                        .Distinct()
+                        .Select(item => new DatabaseUserInvitationInputModel
+                        {
+                            Database = new DatabaseInputModel
+                            {
+                                Id = item.Database.Id
+                            },
+                            Email = item.Email
+                        })
+                        .ToList();
+                    networkUserInvitationInputs = context.NetworkUserInvitations
+                        .Where(item => batchEmails.Contains(item.Email))
+                        .Distinct()
+                        .Select(item => new NetworkUserInvitationInputModel
+                        {
+                            Network = new NetworkInputModel
+                            {
+                                Id = item.Network.Id
+                            },
+                            Email = item.Email
+                        })
+                        .ToList();
+                    analysisUserInvitationInputs = context.AnalysisUserInvitations
+                        .Where(item => batchEmails.Contains(item.Email))
+                        .Distinct()
+                        .Select(item => new AnalysisUserInvitationInputModel
+                        {
+                            Analysis = new AnalysisInputModel
+                            {
+                                Id = item.Analysis.Id
+                            },
+                            Email = item.Email
+                        })
+                        .ToList();
+                }
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new user manager instance.
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                    // Go over each item in the current batch.
+                    foreach (var batchItem in batchItems)
                     {
-                        // Continue.
-                        continue;
-                    }
-                    // Define the corresponding item.
-                    var user = new User
-                    {
-                        UserName = batchItem.Email,
-                        Email = batchItem.Email,
-                        DateTimeCreated = DateTime.UtcNow
-                    };
-                    // Check if there is any ID provided.
-                    if (!string.IsNullOrEmpty(batchItem.Id))
-                    {
-                        // Assign it to the item.
-                        user.Id = batchItem.Id;
-                    }
-                    // Define a new identity result.
-                    var result = IdentityResult.Success;
-                    // Check the type of the item.
-                    if (batchItem.Type == "None")
-                    {
-                        // Try to create the new user.
-                        result = result.Succeeded ? await userManager.CreateAsync(user) : result;
-                    }
-                    else if (batchItem.Type == "Password")
-                    {
-                        // Try to get the passsord from the data.
-                        if (!batchItem.Data.TryDeserializeJsonObject<string>(out var password))
+                        // Check if the ID of the item is not valid.
+                        if (!string.IsNullOrEmpty(batchItem.Id) && !validBatchIds.Contains(batchItem.Id))
+                        {
+                            // Continue.
+                            continue;
+                        }
+                        // Define the corresponding item.
+                        var user = new User
+                        {
+                            UserName = batchItem.Email,
+                            Email = batchItem.Email,
+                            DateTimeCreated = DateTime.UtcNow
+                        };
+                        // Check if there is any ID provided.
+                        if (!string.IsNullOrEmpty(batchItem.Id))
+                        {
+                            // Assign it to the item.
+                            user.Id = batchItem.Id;
+                        }
+                        // Define a new identity result.
+                        var result = IdentityResult.Success;
+                        // Check the type of the item.
+                        if (batchItem.Type == "None")
+                        {
+                            // Try to create the new user.
+                            result = result.Succeeded ? await userManager.CreateAsync(user) : result;
+                        }
+                        else if (batchItem.Type == "Password")
+                        {
+                            // Try to get the passsord from the data.
+                            if (!batchItem.Data.TryDeserializeJsonObject<string>(out var password))
+                            {
+                                // Throw an exception.
+                                throw new TaskException("The provided data couldn't be deserialized.", showExceptionItem, batchItem);
+                            }
+                            // Try to create the new user.
+                            result = result.Succeeded ? await userManager.CreateAsync(user, password) : result;
+                        }
+                        else if (batchItem.Type == "External")
+                        {
+                            // Try to get the passsord from the data.
+                            if (!batchItem.Data.TryDeserializeJsonObject<ExternalLoginInfo>(out var info))
+                            {
+                                // Throw an exception.
+                                throw new TaskException("The provided data couldn't be deserialized.", showExceptionItem, batchItem);
+                            }
+                            // Try to create the new user.
+                            result = result.Succeeded ? await userManager.CreateAsync(user) : result;
+                            // Add the external login.
+                            result = result.Succeeded ? await userManager.AddLoginAsync(user, info) : result;
+                        }
+                        else
                         {
                             // Throw an exception.
-                            throw new TaskException("The provided data couldn't be deserialized.", showExceptionItem, batchItem);
+                            throw new TaskException("The provided data type is invalid.", showExceptionItem, batchItem);
                         }
-                        // Try to create the new user.
-                        result = result.Succeeded? await userManager.CreateAsync(user, password) : result;
-                    }
-                    else if (batchItem.Type == "External")
-                    {
-                        // Try to get the passsord from the data.
-                        if (!batchItem.Data.TryDeserializeJsonObject<ExternalLoginInfo>(out var info))
+                        // Check if the e-mail should be set as confirmed.
+                        if (batchItem.EmailConfirmed)
                         {
-                            // Throw an exception.
-                            throw new TaskException("The provided data couldn't be deserialized.", showExceptionItem, batchItem);
+                            // Generate the token for e-mail confirmation.
+                            var confirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                            // Confirm the e-mail address.
+                            result = result.Succeeded ? await userManager.ConfirmEmailAsync(user, confirmationToken) : result;
                         }
-                        // Try to create the new user.
-                        result = result.Succeeded ? await userManager.CreateAsync(user) : result;
-                        // Add the external login.
-                        result = result.Succeeded ? await userManager.AddLoginAsync(user, info) : result;
+                        // Check if any of the operations has failed.
+                        if (!result.Succeeded)
+                        {
+                            // Define the exception messages.
+                            var messages = result.Errors
+                                .Select(item => item.Description);
+                            // Throw an exception.
+                            throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
+                        }
+                        // Create the dependent entities.
+                        await new DatabaseUsersTask
+                        {
+                            Items = databaseUserInvitationInputs
+                                .Where(item => item.Email == user.Email)
+                                .Select(item => new DatabaseUserInputModel
+                                {
+                                    Database = new DatabaseInputModel
+                                    {
+                                        Id = item.Database.Id
+                                    },
+                                    User = new UserInputModel
+                                    {
+                                        Id = user.Id
+                                    }
+                                })
+                        }.CreateAsync(serviceProvider, token);
+                        await new NetworkUsersTask
+                        {
+                            Items = networkUserInvitationInputs
+                                .Where(item => item.Email == user.Email)
+                                .Select(item => new NetworkUserInputModel
+                                {
+                                    Network = new NetworkInputModel
+                                    {
+                                        Id = item.Network.Id
+                                    },
+                                    User = new UserInputModel
+                                    {
+                                        Id = user.Id
+                                    }
+                                })
+                        }.CreateAsync(serviceProvider, token);
+                        await new AnalysisUsersTask
+                        {
+                            Items = analysisUserInvitationInputs
+                                 .Where(item => item.Email == user.Email)
+                                 .Select(item => new AnalysisUserInputModel
+                                 {
+                                     Analysis = new AnalysisInputModel
+                                     {
+                                         Id = item.Analysis.Id
+                                     },
+                                     User = new UserInputModel
+                                     {
+                                         Id = user.Id
+                                     }
+                                 })
+                        }.CreateAsync(serviceProvider, token);
+                        // Delete the dependent entities.
+                        await new DatabaseUserInvitationsTask
+                        {
+                            Items = databaseUserInvitationInputs
+                                 .Where(item => item.Email == user.Email)
+                        }.DeleteAsync(serviceProvider, token);
+                        await new NetworkUserInvitationsTask
+                        {
+                            Items = networkUserInvitationInputs
+                                 .Where(item => item.Email == user.Email)
+                        }.DeleteAsync(serviceProvider, token);
+                        await new AnalysisUserInvitationsTask
+                        {
+                            Items = analysisUserInvitationInputs
+                                 .Where(item => item.Email == user.Email)
+                        }.DeleteAsync(serviceProvider, token);
                     }
-                    else
-                    {
-                        // Throw an exception.
-                        throw new TaskException("The provided data type is invalid.", showExceptionItem, batchItem);
-                    }
-                    // Check if the e-mail should be set as confirmed.
-                    if (batchItem.EmailConfirmed)
-                    {
-                        // Generate the token for e-mail confirmation.
-                        var confirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                        // Confirm the e-mail address.
-                        result = result.Succeeded ? await userManager.ConfirmEmailAsync(user, confirmationToken) : result;
-                    }
-                    // Check if any of the operations has failed.
-                    if (!result.Succeeded)
-                    {
-                        // Define the exception messages.
-                        var messages = result.Errors
-                            .Select(item => item.Description);
-                        // Throw an exception.
-                        throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
-                    }
-                    // Get all the databases, networks and analyses to which the user already has access.
-                    var databaseUserInvitations = context.DatabaseUserInvitations
-                        .Where(item => item.Email == user.Email);
-                    var networkUserInvitations = context.NetworkUserInvitations
-                        .Where(item => item.Email == user.Email);
-                    var analysisUserInvitations = context.AnalysisUserInvitations
-                        .Where(item => item.Email == user.Email);
-                    // Create, for each, a corresponding user entry.
-                    var databaseUsers = databaseUserInvitations.Select(item => new DatabaseUser
-                    {
-                        DatabaseId = item.DatabaseId,
-                        Database = item.Database,
-                        UserId = user.Id,
-                        User = user,
-                        DateTimeCreated = item.DateTimeCreated
-                    });
-                    var networkUsers = networkUserInvitations.Select(item => new NetworkUser
-                    {
-                        NetworkId = item.NetworkId,
-                        Network = item.Network,
-                        UserId = user.Id,
-                        User = user,
-                        DateTimeCreated = item.DateTimeCreated
-                    });
-                    var analysisUsers = analysisUserInvitations.Select(item => new AnalysisUser
-                    {
-                        AnalysisId = item.AnalysisId,
-                        Analysis = item.Analysis,
-                        UserId = user.Id,
-                        User = user,
-                        DateTimeCreated = item.DateTimeCreated
-                    });
-                    // Create the items.
-                    await IEnumerableExtensions.CreateAsync(databaseUsers, serviceProvider, token);
-                    await IEnumerableExtensions.CreateAsync(networkUsers, serviceProvider, token);
-                    await IEnumerableExtensions.CreateAsync(analysisUsers, serviceProvider, token);
-                    // Delete the items
-                    await IEnumerableExtensions.DeleteAsync(databaseUserInvitations, serviceProvider, token);
-                    await IEnumerableExtensions.DeleteAsync(networkUserInvitations, serviceProvider, token);
-                    await IEnumerableExtensions.DeleteAsync(analysisUserInvitations, serviceProvider, token);
                 }
             }
         }

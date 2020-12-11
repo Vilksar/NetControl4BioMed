@@ -50,10 +50,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -68,11 +64,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Throw an exception.
                     throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
-                // Get the valid IDs, that do not appear in the database.
-                var validBatchIds = batchIds
-                    .Except(context.Edges
-                        .Where(item => batchIds.Contains(item.Id))
-                        .Select(item => item.Id));
                 // Get the IDs of the related entities that appear in the current batch.
                 var batchDatabaseIds = batchItems
                     .Where(item => item.DatabaseEdges != null)
@@ -101,20 +92,41 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the related entities that appear in the current batch.
-                var batchDatabaseEdgeFields = context.DatabaseEdgeFields
-                    .Include(item => item.Database)
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .Where(item => batchDatabaseEdgeFieldIds.Contains(item.Id));
-                var batchDatabases = context.Databases
-                    .Where(item => item.DatabaseType.Name != "Generic")
-                    .Where(item => batchDatabaseIds.Contains(item.Id))
-                    .Concat(batchDatabaseEdgeFields
-                        .Select(item => item.Database))
-                    .Distinct();
-                var batchNodes = context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => batchNodeIds.Contains(item.Id));
+                // Define the list of items to get.
+                var validBatchIds = new List<string>();
+                var databaseEdgeFields = new List<DatabaseEdgeField>();
+                var databases = new List<Database>();
+                var nodes = new List<Node>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the related entities that appear in the current batch.
+                    databaseEdgeFields = context.DatabaseEdgeFields
+                        .Where(item => item.Database.DatabaseType.Name != "Generic")
+                        .Where(item => batchDatabaseEdgeFieldIds.Contains(item.Id))
+                        .ToList();
+                    databases = context.Databases
+                        .Where(item => item.DatabaseType.Name != "Generic")
+                        .Where(item => batchDatabaseIds.Contains(item.Id))
+                        .Concat(context.DatabaseEdgeFields
+                            .Where(item => item.Database.DatabaseType.Name != "Generic")
+                            .Where(item => batchDatabaseEdgeFieldIds.Contains(item.Id))
+                            .Select(item => item.Database))
+                        .Distinct()
+                        .ToList();
+                    nodes = context.Nodes
+                        .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .Where(item => batchNodeIds.Contains(item.Id))
+                        .ToList();
+                    // Get the valid IDs, that do not appear in the database.
+                    validBatchIds = batchIds
+                        .Except(context.Edges
+                            .Where(item => batchIds.Contains(item.Id))
+                            .Select(item => item.Id))
+                        .ToList();
+                }
                 // Save the items to add.
                 var edgesToAdd = new List<Edge>();
                 // Go over each of the items.
@@ -139,11 +151,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => item.Type == "Source" || item.Type == "Target")
                         .Select(item => (item.Node.Id, item.Type))
                         .Distinct()
-                        .Where(item => batchNodes.Any(item1 => item1.Id == item.Item1))
+                        .Where(item => nodes.Any(item1 => item1.Id == item.Item1))
                         .Select(item => new EdgeNode
                         {
                             NodeId = item.Item1,
-                            Node = batchNodes
+                            Node = nodes
                                 .FirstOrDefault(item1 => item1.Id == item.Item1),
                             Type = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>(item.Item2)
                         })
@@ -168,11 +180,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Where(item => !string.IsNullOrEmpty(item.Value))
                             .Select(item => (item.DatabaseEdgeField.Id, item.Value))
                             .Distinct()
-                            .Where(item => batchDatabaseEdgeFields.Any(item1 => item1.Id == item.Item1))
+                            .Where(item => databaseEdgeFields.Any(item1 => item1.Id == item.Item1))
                             .Select(item => new DatabaseEdgeFieldEdge
                             {
                                 DatabaseEdgeFieldId = item.Item1,
-                                DatabaseEdgeField = batchDatabaseEdgeFields
+                                DatabaseEdgeField = databaseEdgeFields
                                     .FirstOrDefault(item1 => item1.Id == item.Item1),
                                 Value = item.Item2
                             })
@@ -186,11 +198,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Select(item => item.Database.Id)
                             .Concat(databaseEdgeFieldEdges.Select(item => item.DatabaseEdgeField.Database.Id))
                             .Distinct()
-                            .Where(item => batchDatabases.Any(item1 => item1.Id == item))
+                            .Where(item => databases.Any(item1 => item1.Id == item))
                             .Select(item => new DatabaseEdge
                             {
                                 DatabaseId = item,
-                                Database = batchDatabases
+                                Database = databases
                                     .FirstOrDefault(item1 => item1.Id == item)
                             })
                             .Where(item => item.Database != null) :

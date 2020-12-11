@@ -50,10 +50,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -62,17 +58,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id);
+                var batchNames = batchItems
+                    .Where(item => !string.IsNullOrEmpty(item.Name))
+                    .Select(item => item.Name)
+                    .Distinct();
                 // Check if any of the IDs are repeating in the list.
                 if (batchIds.Distinct().Count() != batchIds.Count())
                 {
                     // Throw an exception.
                     throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
-                // Get the valid IDs, that do not appear in the database.
-                var validBatchIds = batchIds
-                    .Except(context.DatabaseEdgeFields
-                        .Where(item => batchIds.Contains(item.Id))
-                        .Select(item => item.Id));
                 // Get the IDs of the related entities that appear in the current batch.
                 var batchDatabaseIds = batchItems
                     .Where(item => item.Database != null)
@@ -80,10 +75,31 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the related entities that appear in the current batch.
-                var batchDatabases = context.Databases
-                    .Include(item => item.DatabaseType)
-                    .Where(item => batchDatabaseIds.Contains(item.Id));
+                // Define the list of items to get.
+                var databases = new List<Database>();
+                var existingDatabaseEdgeFieldNames = new List<string>();
+                var validBatchIds = new List<string>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the related entities that appear in the current batch.
+                    databases = context.Databases
+                        .Include(item => item.DatabaseType)
+                        .Where(item => batchDatabaseIds.Contains(item.Id))
+                        .ToList();
+                    existingDatabaseEdgeFieldNames = context.DatabaseEdgeFields
+                        .Where(item => batchNames.Contains(item.Name))
+                        .Select(item => item.Name)
+                        .ToList();
+                    // Get the valid IDs, that do not appear in the database.
+                    validBatchIds = batchIds
+                        .Except(context.DatabaseEdgeFields
+                            .Where(item => batchIds.Contains(item.Id))
+                            .Select(item => item.Id))
+                        .ToList();
+                }
                 // Save the items to add.
                 var databaseEdgeFieldsToAdd = new List<DatabaseEdgeField>();
                 // Go over each item in the current batch.
@@ -96,7 +112,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Check if there is another database edge field with the same name.
-                    if (context.DatabaseEdgeFields.Any(item => item.Name == batchItem.Name) || databaseEdgeFieldsToAdd.Any(item => item.Name == batchItem.Name))
+                    if (existingDatabaseEdgeFieldNames.Any(item => item == batchItem.Name) || databaseEdgeFieldsToAdd.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
                         throw new TaskException("A database edge field with the same name already exists.", showExceptionItem, batchItem);
@@ -108,7 +124,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("There was no database provided.", showExceptionItem, batchItem);
                     }
                     // Get the database.
-                    var database = batchDatabases
+                    var database = databases
                         .FirstOrDefault(item => item.Id == batchItem.Database.Id);
                     // Check if there was no database found.
                     if (database == null)
@@ -188,7 +204,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Distinct();
                 // Define the list of items to get.
                 var databaseEdgeFields = new List<DatabaseEdgeField>();
-                var duplicateDatabaseEdgeFields = new List<DatabaseEdgeField>();
+                var existingDatabaseEdgeFields = new List<DatabaseEdgeField>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -209,7 +225,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     databaseEdgeFields = items
                         .ToList();
                     // Get the related entities that appear in the current batch.
-                    duplicateDatabaseEdgeFields = context.DatabaseEdgeFields
+                    existingDatabaseEdgeFields = context.DatabaseEdgeFields
                         .Where(item => batchNames.Contains(item.Name))
                         .ToList();
                 }
@@ -234,7 +250,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("The generic database edge field can't be edited.", showExceptionItem, batchItem);
                     }
                     // Check if there is another database edge field with the same name.
-                    if (duplicateDatabaseEdgeFields.Any(item => item.Id != databaseEdgeField.Id && item.Name == batchItem.Name) || databaseEdgeFieldsToEdit.Any(item => item.Name == batchItem.Name))
+                    if (existingDatabaseEdgeFields.Any(item => item.Id != databaseEdgeField.Id && item.Name == batchItem.Name) || databaseEdgeFieldsToEdit.Any(item => item.Name == batchItem.Name))
                     {
                         // Throw an exception.
                         throw new TaskException("A database edge field with the name already exists.", showExceptionItem, batchItem);

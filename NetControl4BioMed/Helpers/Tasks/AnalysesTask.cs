@@ -75,10 +75,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -93,11 +89,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Throw an exception.
                     throw new TaskException("One or more of the manually provided IDs are duplicated.");
                 }
-                // Get the valid IDs, that do not appear in the database.
-                var validBatchIds = batchIds
-                    .Except(context.Analyses
-                        .Where(item => batchIds.Contains(item.Id))
-                        .Select(item => item.Id));
                 // Get the IDs of the related entities that appear in the current batch.
                 var batchUserIds = batchItems
                     .Where(item => item.AnalysisUsers != null)
@@ -126,17 +117,37 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the related entities that appear in the current batch.
-                var batchUsers = context.Users
-                    .Where(item => batchUserIds.Contains(item.Id));
-                var batchNodeCollections = context.NodeCollections
-                    .Include(item => item.NodeCollectionDatabases)
-                        .ThenInclude(item => item.Database)
-                    .Where(item => batchNodeCollectionIds.Contains(item.Id));
-                var batchNetworks = context.Networks
-                    .Include(item => item.NetworkDatabases)
-                        .ThenInclude(item => item.Database)
-                    .Where(item => batchNetworkIds.Contains(item.Id));
+                // Define the list of items to get.
+                var users = new List<User>();
+                var nodeCollections = new List<NodeCollection>();
+                var networks = new List<Network>();
+                var validBatchIds = new List<string>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the related entities that appear in the current batch.
+                    users = context.Users
+                        .Where(item => batchUserIds.Contains(item.Id))
+                        .ToList();
+                    nodeCollections = context.NodeCollections
+                        .Include(item => item.NodeCollectionDatabases)
+                            .ThenInclude(item => item.Database)
+                        .Where(item => batchNodeCollectionIds.Contains(item.Id))
+                        .ToList();
+                    networks = context.Networks
+                        .Include(item => item.NetworkDatabases)
+                            .ThenInclude(item => item.Database)
+                        .Where(item => batchNetworkIds.Contains(item.Id))
+                        .ToList();
+                    // Get the valid IDs, that do not appear in the database.
+                    validBatchIds = batchIds
+                        .Except(context.Analyses
+                            .Where(item => batchIds.Contains(item.Id))
+                            .Select(item => item.Id))
+                        .ToList();
+                }
                 // Save the items to add.
                 var analysesToAdd = new List<Analysis>();
                 // Go over each item in the current batch.
@@ -160,12 +171,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => !string.IsNullOrEmpty(item.User.Id))
                         .Select(item => item.User.Id)
                         .Distinct()
-                        .Where(item => batchUsers.Any(item1 => item1.Id == item))
+                        .Where(item => users.Any(item1 => item1.Id == item))
                         .Select(item => new AnalysisUser
                         {
                             DateTimeCreated = DateTime.UtcNow,
                             UserId = item,
-                            User = batchUsers
+                            User = users
                                 .FirstOrDefault(item1 => item1.Id == item)
                         })
                         .Where(item => item.User != null);
@@ -187,11 +198,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => !string.IsNullOrEmpty(item.Network.Id))
                         .Select(item => item.Network.Id)
                         .Distinct()
-                        .Where(item => batchNetworks.Any(item1 => item1.Id == item))
+                        .Where(item => networks.Any(item1 => item1.Id == item))
                         .Select(item => new AnalysisNetwork
                         {
                             NetworkId = item,
-                            Network = batchNetworks
+                            Network = networks
                                 .FirstOrDefault(item1 => item1.Id == item)
                         })
                         .Where(item => item.Network != null);
@@ -252,11 +263,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Where(item => item.Type == "Source" || item.Type == "Target")
                             .Select(item => (item.NodeCollection.Id, item.Type))
                             .Distinct()
-                            .Where(item => batchNodeCollections.Any(item1 => item1.Id == item.Item1))
+                            .Where(item => nodeCollections.Any(item1 => item1.Id == item.Item1))
                             .Select(item => new AnalysisNodeCollection
                             {
                                 NodeCollectionId = item.Item1,
-                                NodeCollection = batchNodeCollections
+                                NodeCollection = nodeCollections
                                     .FirstOrDefault(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabases.Contains(item2.Database))),
                                 Type = EnumerationExtensions.GetEnumerationValue<AnalysisNodeCollectionType>(item.Item2)
                             })
@@ -310,28 +321,34 @@ namespace NetControl4BioMed.Helpers.Tasks
                 await IEnumerableExtensions.CreateAsync(analysesToAdd, serviceProvider, token);
                 // Add the IDs of the created items to the list.
                 ids = ids.Concat(analysesToAdd.Select(item => item.Id));
-                // Define the new background task.
-                var backgroundTask = new BackgroundTask
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.GenerateAnalysesAsync)}",
-                    IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new AnalysesTask
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Define the new background task.
+                    var backgroundTask = new BackgroundTask
                     {
-                        Scheme = Scheme,
-                        HostValue = HostValue,
-                        Items = analysesToAdd.Select(item => new AnalysisInputModel
+                        DateTimeCreated = DateTime.UtcNow,
+                        Name = $"{nameof(IContentTaskManager)}.{nameof(IContentTaskManager.GenerateAnalysesAsync)}",
+                        IsRecurring = false,
+                        Data = JsonSerializer.Serialize(new AnalysesTask
                         {
-                            Id = item.Id
+                            Scheme = Scheme,
+                            HostValue = HostValue,
+                            Items = analysesToAdd.Select(item => new AnalysisInputModel
+                            {
+                                Id = item.Id
+                            })
                         })
-                    })
-                };
-                // Mark the task for addition.
-                context.BackgroundTasks.Add(backgroundTask);
-                // Save the changes to the database.
-                await context.SaveChangesAsync();
-                // Create a new Hangfire background job.
-                BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateAnalysesAsync(backgroundTask.Id, CancellationToken.None));
+                    };
+                    // Mark the task for addition.
+                    context.BackgroundTasks.Add(backgroundTask);
+                    // Save the changes to the database.
+                    await context.SaveChangesAsync();
+                    // Create a new Hangfire background job.
+                    BackgroundJob.Enqueue<IContentTaskManager>(item => item.GenerateAnalysesAsync(backgroundTask.Id, CancellationToken.None));
+                }
             }
             // Return the IDs of the created items.
             return ids;

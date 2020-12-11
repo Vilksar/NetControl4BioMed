@@ -50,10 +50,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Break.
                     break;
                 }
-                // Create a new scope.
-                using var scope = serviceProvider.CreateScope();
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
@@ -68,11 +64,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Throw an exception.
                     throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
-                // Get the valid IDs, that do not appear in the database.
-                var validBatchIds = batchIds
-                    .Except(context.Edges
-                        .Where(item => batchIds.Contains(item.Id))
-                        .Select(item => item.Id));
                 // Get the IDs of the related entities that appear in the current batch.
                 var batchDatabaseIds = batchItems
                     .Where(item => item.NodeCollectionDatabases != null)
@@ -92,14 +83,32 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                // Get the related entities that appear in the current batch.
-                var batchDatabases = context.Databases
-                    .Where(item => item.DatabaseType.Name != "Generic")
-                    .Where(item => batchDatabaseIds.Contains(item.Id))
-                    .Distinct();
-                var batchNodes = context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => batchNodeIds.Contains(item.Id));
+                // Define the list of items to get.
+                var validBatchIds = new List<string>();
+                var databases = new List<Database>();
+                var nodes = new List<Node>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the related entities that appear in the current batch.
+                    databases = context.Databases
+                        .Where(item => item.DatabaseType.Name != "Generic")
+                        .Where(item => batchDatabaseIds.Contains(item.Id))
+                        .Distinct()
+                        .ToList();
+                    nodes = context.Nodes
+                        .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .Where(item => batchNodeIds.Contains(item.Id))
+                        .ToList();
+                    // Get the valid IDs, that do not appear in the database.
+                    validBatchIds = batchIds
+                        .Except(context.Edges
+                            .Where(item => batchIds.Contains(item.Id))
+                            .Select(item => item.Id))
+                        .ToList();
+                }
                 // Save the items to add.
                 var nodeCollectionsToAdd = new List<NodeCollection>();
                 // Go over each of the items.
@@ -123,11 +132,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => !string.IsNullOrEmpty(item.Database.Id))
                         .Select(item => item.Database.Id)
                         .Distinct()
-                        .Where(item => batchDatabases.Any(item1 => item1.Id == item))
+                        .Where(item => databases.Any(item1 => item1.Id == item))
                         .Select(item => new NodeCollectionDatabase
                         {
                             DatabaseId = item,
-                            Database = batchDatabases
+                            Database = databases
                                 .FirstOrDefault(item1 => item1.Id == item)
                         })
                         .Where(item => item.Database != null);
@@ -147,11 +156,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     var nodeCollectionNodes = batchItem.NodeCollectionNodes
                         .Where(item => item.Node != null)
                         .Where(item => !string.IsNullOrEmpty(item.Node.Id))
-                        .Where(item => batchNodes.Any(item1 => item1.Id == item.Node.Id))
+                        .Where(item => nodes.Any(item1 => item1.Id == item.Node.Id))
                         .Select(item => new NodeCollectionNode
                         {
                             NodeId = item.Node.Id,
-                            Node = batchNodes
+                            Node = nodes
                                 .FirstOrDefault(item1 => item1.Id == item.Node.Id)
                         })
                         .Where(item => item.Node != null);
