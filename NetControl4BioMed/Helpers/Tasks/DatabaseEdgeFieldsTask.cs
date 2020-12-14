@@ -299,8 +299,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems.Select(item => item.Id);
                 // Define the list of items to get.
                 var databaseEdgeFields = new List<DatabaseEdgeField>();
-                // Define the dependent list of items to get.
-                var edgeInputs = new List<EdgeInputModel>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -318,20 +316,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Get the items found.
                     databaseEdgeFields = items
                         .ToList();
-                    // Get the IDs of the dependent items.
-                    edgeInputs = items
-                        .Select(item => item.DatabaseEdgeFieldEdges)
-                        .SelectMany(item => item)
-                        .Select(item => item.Edge)
-                        .Distinct()
-                        .Select(item => new EdgeInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
                 }
+                // Get the IDs of the items.
+                var databaseEdgeFieldIds = databaseEdgeFields
+                    .Select(item => item.Id);
                 // Delete the dependent entities.
-                await new EdgesTask { Items = edgeInputs }.DeleteAsync(serviceProvider, token);
+                await DatabaseEdgeFieldExtensions.DeleteDependentEdgesAsync(databaseEdgeFieldIds, serviceProvider, token);
                 // Delete the items.
                 await IEnumerableExtensions.DeleteAsync(databaseEdgeFields, serviceProvider, token);
             }

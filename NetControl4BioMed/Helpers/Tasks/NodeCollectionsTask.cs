@@ -244,9 +244,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var nodeCollections = new List<NodeCollection>();
                 var databases = new List<Database>();
                 var nodes = new List<Node>();
-                // Define the dependent list of items to get.
-                var analysisInputs = new List<AnalysisInputModel>();
-                var networkInputs = new List<NetworkInputModel>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -274,27 +271,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     nodes = context.Nodes
                         .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                         .Where(item => batchNodeIds.Contains(item.Id))
-                        .ToList();
-                    // Get the IDs of the dependent items.
-                    analysisInputs = items
-                        .Select(item => item.AnalysisNodeCollections)
-                        .SelectMany(item => item)
-                        .Select(item => item.Analysis)
-                        .Distinct()
-                        .Select(item => new AnalysisInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
-                    networkInputs = items
-                        .Select(item => item.NetworkNodeCollections)
-                        .SelectMany(item => item)
-                        .Select(item => item.Network)
-                        .Distinct()
-                        .Select(item => new NetworkInputModel
-                        {
-                            Id = item.Id
-                        })
                         .ToList();
                 }
                 // Get the IDs of the items.
@@ -367,8 +343,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     nodeCollectionsToEdit.Add(nodeCollection);
                 }
                 // Delete the dependent entities.
-                await new AnalysesTask { Items = analysisInputs }.DeleteAsync(serviceProvider, token);
-                await new NetworksTask { Items = networkInputs }.DeleteAsync(serviceProvider, token);
+                await NodeCollectionExtensions.DeleteDependentAnalysesAsync(nodeCollectionIds, serviceProvider, token);
+                await NodeCollectionExtensions.DeleteDependentNetworksAsync(nodeCollectionIds, serviceProvider, token);
                 // Delete the related entities.
                 await NodeCollectionExtensions.DeleteRelatedEntitiesAsync<NodeCollectionNode>(nodeCollectionIds, serviceProvider, token);
                 await NodeCollectionExtensions.DeleteRelatedEntitiesAsync<NodeCollectionDatabase>(nodeCollectionIds, serviceProvider, token);
@@ -409,9 +385,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems.Select(item => item.Id);
                 // Define the list of items to get.
                 var nodeCollections = new List<NodeCollection>();
-                // Define the dependent list of items to get.
-                var analysisInputs = new List<AnalysisInputModel>();
-                var networkInputs = new List<NetworkInputModel>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -429,34 +402,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Get the items found.
                     nodeCollections = items
                         .ToList();
-                    // Get the IDs of the dependent items.
-                    analysisInputs = items
-                        .Select(item => item.AnalysisNodeCollections)
-                        .SelectMany(item => item)
-                        .Select(item => item.Analysis)
-                        .Distinct()
-                        .Select(item => new AnalysisInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
-                    networkInputs = items
-                        .Select(item => item.NetworkNodeCollections)
-                        .SelectMany(item => item)
-                        .Select(item => item.Network)
-                        .Distinct()
-                        .Select(item => new NetworkInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
                 }
                 // Get the IDs of the items.
                 var nodeCollectionIds = nodeCollections
                     .Select(item => item.Id);
                 // Delete the dependent entities.
-                await new AnalysesTask { Items = analysisInputs }.DeleteAsync(serviceProvider, token);
-                await new NetworksTask { Items = networkInputs }.DeleteAsync(serviceProvider, token);
+                await NodeCollectionExtensions.DeleteDependentAnalysesAsync(nodeCollectionIds, serviceProvider, token);
+                await NodeCollectionExtensions.DeleteDependentNetworksAsync(nodeCollectionIds, serviceProvider, token);
                 // Delete the related entities.
                 await NodeCollectionExtensions.DeleteRelatedEntitiesAsync<NodeCollectionNode>(nodeCollectionIds, serviceProvider, token);
                 await NodeCollectionExtensions.DeleteRelatedEntitiesAsync<NodeCollectionDatabase>(nodeCollectionIds, serviceProvider, token);

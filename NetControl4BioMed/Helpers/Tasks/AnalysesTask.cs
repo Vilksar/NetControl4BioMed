@@ -464,8 +464,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems.Select(item => item.Id);
                 // Define the list of items to get.
                 var analyses = new List<Analysis>();
-                // Define the dependent list of items to get.
-                var controlPathInputs = new List<ControlPathInputModel>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -483,22 +481,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Get the IDs of the items found.
                     analyses = items
                         .ToList();
-                    // Get the IDs of the dependent items.
-                    controlPathInputs = items
-                        .Select(item => item.ControlPaths)
-                        .SelectMany(item => item)
-                        .Distinct()
-                        .Select(item => new ControlPathInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
                 }
                 // Get the IDs of the items.
                 var analysisIds = analyses
                     .Select(item => item.Id);
                 // Delete the dependent entities.
-                await new ControlPathsTask { Items = controlPathInputs }.DeleteAsync(serviceProvider, token);
+                await AnalysisExtensions.DeleteDependentControlPathsAsync(analysisIds, serviceProvider, token);
                 // Delete the related entities.
                 await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisNetwork>(analysisIds, serviceProvider, token);
                 await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisNodeCollection>(analysisIds, serviceProvider, token);

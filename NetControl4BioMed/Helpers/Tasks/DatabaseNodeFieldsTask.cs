@@ -299,8 +299,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems.Select(item => item.Id);
                 // Define the list of items to get.
                 var databaseNodeFields = new List<DatabaseNodeField>();
-                // Define the dependent list of items to get.
-                var nodeInputs = new List<NodeInputModel>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -318,20 +316,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Get the items found.
                     databaseNodeFields = items
                         .ToList();
-                    // Get the IDs of the dependent items.
-                    nodeInputs = items
-                        .Select(item => item.DatabaseNodeFieldNodes)
-                        .SelectMany(item => item)
-                        .Select(item => item.Node)
-                        .Distinct()
-                        .Select(item => new NodeInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
                 }
+                // Get the IDs of the items.
+                var databaseNodeFieldIds = databaseNodeFields
+                    .Select(item => item.Id);
                 // Delete the dependent entities.
-                await new NodesTask { Items = nodeInputs }.DeleteAsync(serviceProvider, token);
+                await DatabaseNodeFieldExtensions.DeleteDependentNodesAsync(databaseNodeFieldIds, serviceProvider, token);
                 // Delete the items.
                 await IEnumerableExtensions.DeleteAsync(databaseNodeFields, serviceProvider, token);
             }

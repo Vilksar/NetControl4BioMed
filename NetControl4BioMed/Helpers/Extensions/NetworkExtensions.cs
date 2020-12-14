@@ -5,6 +5,8 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Interfaces;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 using NetControl4BioMed.Helpers.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -106,6 +108,204 @@ namespace NetControl4BioMed.Helpers.Extensions
                 }
                 // Delete the items.
                 await IEnumerableExtensions.DeleteAsync<T>(batchItems, serviceProvider, token);
+            }
+        }
+
+        /// <summary>
+        /// Deletes the dependent analyses of the corresponding networks.
+        /// </summary>
+        /// <param name="networkIds">The networks whose entities should be deleted.</param>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public static async Task DeleteDependentAnalysesAsync(IEnumerable<string> networkIds, IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Define a variable to store the total number of entities.
+            var entityCount = 0;
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                entityCount = context.AnalysisNetworks
+                    .Where(item => networkIds.Contains(item.Network.Id))
+                    .Select(item => item.Analysis)
+                    .Distinct()
+                    .Count();
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)entityCount / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (int index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Define the batch items.
+                var batchItemInputs = new List<AnalysisInputModel>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items in the current batch.
+                    batchItemInputs = context.AnalysisNetworks
+                        .Where(item => networkIds.Contains(item.Network.Id))
+                        .Select(item => item.Analysis)
+                        .Distinct()
+                        .Select(item => new AnalysisInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .Take(ApplicationDbContext.BatchSize)
+                        .ToList();
+                    // Check if there were no items found.
+                    if (batchItemInputs == null || !batchItemInputs.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                }
+                // Delete the items.
+                await new AnalysesTask { Items = batchItemInputs }.DeleteAsync(serviceProvider, token);
+            }
+        }
+
+        /// <summary>
+        /// Deletes the dependent generic edges of the corresponding networks.
+        /// </summary>
+        /// <param name="networkIds">The networks whose entities should be deleted.</param>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public static async Task DeleteDependentGenericEdgesAsync(IEnumerable<string> networkIds, IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Define a variable to store the total number of entities.
+            var entityCount = 0;
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                entityCount = context.NetworkEdges
+                    .Where(item => networkIds.Contains(item.Network.Id))
+                    .Where(item => item.Network.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Select(item => item.Edge)
+                    .Distinct()
+                    .Count();
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)entityCount / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (int index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Define the batch items.
+                var edges = new List<Edge>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items in the current batch.
+                    edges = context.NetworkEdges
+                        .Where(item => networkIds.Contains(item.Network.Id))
+                        .Where(item => item.Network.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .Select(item => item.Edge)
+                        .Distinct()
+                        .Take(ApplicationDbContext.BatchSize)
+                        .ToList();
+                    // Check if there were no items found.
+                    if (edges == null || !edges.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                }
+                // Get the IDs of the items.
+                var edgeIds = edges
+                    .Select(item => item.Id);
+                // Delete the related entities.
+                await EdgeExtensions.DeleteRelatedEntitiesAsync<EdgeNode>(edgeIds, serviceProvider, token);
+                await EdgeExtensions.DeleteRelatedEntitiesAsync<DatabaseEdgeFieldEdge>(edgeIds, serviceProvider, token);
+                await EdgeExtensions.DeleteRelatedEntitiesAsync<DatabaseEdge>(edgeIds, serviceProvider, token);
+                // Delete the items.
+                await IEnumerableExtensions.DeleteAsync(edges, serviceProvider, token);
+            }
+        }
+
+        /// <summary>
+        /// Deletes the dependent generic nodes of the corresponding networks.
+        /// </summary>
+        /// <param name="networkIds">The networks whose entities should be deleted.</param>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public static async Task DeleteDependentGenericNodesAsync(IEnumerable<string> networkIds, IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Define a variable to store the total number of entities.
+            var entityCount = 0;
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                entityCount = context.NetworkNodes
+                    .Where(item => networkIds.Contains(item.Network.Id))
+                    .Where(item => item.Network.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Select(item => item.Node)
+                    .Distinct()
+                    .Count();
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)entityCount / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (int index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Define the batch items.
+                var nodes = new List<Node>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items in the current batch.
+                    nodes = context.NetworkNodes
+                        .Where(item => networkIds.Contains(item.Network.Id))
+                        .Where(item => item.Network.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                        .Select(item => item.Node)
+                        .Distinct()
+                        .Take(ApplicationDbContext.BatchSize)
+                        .ToList();
+                    // Check if there were no items found.
+                    if (nodes == null || !nodes.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                }
+                // Get the IDs of the items.
+                var nodeIds = nodes
+                    .Select(item => item.Id);
+                // Delete the related entities.
+                await NodeExtensions.DeleteRelatedEntitiesAsync<DatabaseNodeFieldNode>(nodeIds, serviceProvider, token);
+                await NodeExtensions.DeleteRelatedEntitiesAsync<DatabaseNode>(nodeIds, serviceProvider, token);
+                // Delete the items.
+                await IEnumerableExtensions.DeleteAsync(nodes, serviceProvider, token);
             }
         }
 

@@ -258,8 +258,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems.Select(item => item.Id);
                 // Define the list of items to get.
                 var databaseTypes = new List<DatabaseType>();
-                // Define the dependent list of items to get.
-                var databaseInputs = new List<DatabaseInputModel>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -277,19 +275,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Get the items found.
                     databaseTypes = items
                         .ToList();
-                    // Get the IDs of the dependent items.
-                    databaseInputs = items
-                        .Select(item => item.Databases)
-                        .SelectMany(item => item)
-                        .Distinct()
-                        .Select(item => new DatabaseInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
                 }
+                // Get the IDs of the items.
+                var databaseTypeIds = databaseTypes
+                    .Select(item => item.Id);
                 // Delete the dependent entities.
-                await new DatabasesTask { Items = databaseInputs }.DeleteAsync(serviceProvider, token);
+                await DatabaseTypeExtensions.DeleteDependentDatabasesAsync(databaseTypeIds, serviceProvider, token);
                 // Delete the items.
                 await IEnumerableExtensions.DeleteAsync(databaseTypes, serviceProvider, token);
             }

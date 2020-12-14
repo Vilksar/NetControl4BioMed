@@ -297,9 +297,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems.Select(item => item.Id);
                 // Define the list of items to get.
                 var databases = new List<Database>();
-                // Define the dependent list of items to get.
-                var databaseEdgeFieldInputs = new List<DatabaseEdgeFieldInputModel>();
-                var databaseNodeFieldInputs = new List<DatabaseNodeFieldInputModel>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -317,31 +314,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Get the items found.
                     databases = items
                         .ToList();
-                    databaseEdgeFieldInputs = items
-                        .Select(item => item.DatabaseEdgeFields)
-                        .SelectMany(item => item)
-                        .Distinct()
-                        .Select(item => new DatabaseEdgeFieldInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
-                    databaseNodeFieldInputs = items
-                        .Select(item => item.DatabaseNodeFields)
-                        .SelectMany(item => item)
-                        .Distinct()
-                        .Select(item => new DatabaseNodeFieldInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
                 }
                 // Get the IDs of the items.
                 var databaseIds = databases
                     .Select(item => item.Id);
                 // Delete the dependent entities.
-                await new DatabaseEdgeFieldsTask { Items = databaseEdgeFieldInputs }.DeleteAsync(serviceProvider, token);
-                await new DatabaseNodeFieldsTask { Items = databaseNodeFieldInputs }.DeleteAsync(serviceProvider, token);
+                await DatabaseExtensions.DeleteDependentDatabaseEdgeFieldsAsync(databaseIds, serviceProvider, token);
+                await DatabaseExtensions.DeleteDependentDatabaseNodeFieldsAsync(databaseIds, serviceProvider, token);
                 // Delete the related entities.
                 await DatabaseExtensions.DeleteRelatedEntitiesAsync<DatabaseUserInvitation>(databaseIds, serviceProvider, token);
                 await DatabaseExtensions.DeleteRelatedEntitiesAsync<DatabaseUser>(databaseIds, serviceProvider, token);

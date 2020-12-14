@@ -253,37 +253,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => item.Database.DatabaseType.Name != "Generic")
                         .Where(item => batchDatabaseNodeFieldIds.Contains(item.Id))
                         .ToList();
-                    // Get the IDs of the dependent items.
-                    analysisInputs = items
-                        .Select(item => item.AnalysisNodes)
-                        .SelectMany(item => item)
-                        .Select(item => item.Analysis)
-                        .Distinct()
-                        .Select(item => new AnalysisInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
-                    networkInputs = items
-                        .Select(item => item.NetworkNodes)
-                        .SelectMany(item => item)
-                        .Select(item => item.Network)
-                        .Distinct()
-                        .Select(item => new NetworkInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
-                    edgeInputs = items
-                        .Select(item => item.EdgeNodes)
-                        .SelectMany(item => item)
-                        .Select(item => item.Edge)
-                        .Distinct()
-                        .Select(item => new EdgeInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
                 }
                 // Get the IDs of the items.
                 var nodeIds = nodes
@@ -358,9 +327,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                     nodesToEdit.Add(node);
                 }
                 // Delete the dependent entities.
-                await new AnalysesTask { Items = analysisInputs }.DeleteAsync(serviceProvider, token);
-                await new NetworksTask { Items = networkInputs }.DeleteAsync(serviceProvider, token);
-                await new EdgesTask { Items = edgeInputs }.DeleteAsync(serviceProvider, token);
+                await NodeExtensions.DeleteDependentAnalysesAsync(nodeIds, serviceProvider, token);
+                await NodeExtensions.DeleteDependentNetworksAsync(nodeIds, serviceProvider, token);
+                await NodeExtensions.DeleteDependentNodeCollectionsAsync(nodeIds, serviceProvider, token);
+                await NodeExtensions.DeleteDependentEdgesAsync(nodeIds, serviceProvider, token);
                 // Delete the related entities.
                 await NodeExtensions.DeleteRelatedEntitiesAsync<DatabaseNodeFieldNode>(nodeIds, serviceProvider, token);
                 await NodeExtensions.DeleteRelatedEntitiesAsync<DatabaseNode>(nodeIds, serviceProvider, token);
@@ -401,10 +371,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchIds = batchItems.Select(item => item.Id);
                 // Define the list of items to get.
                 var nodes = new List<Node>();
-                // Define the dependent list of items to get.
-                var analysisInputs = new List<AnalysisInputModel>();
-                var networkInputs = new List<NetworkInputModel>();
-                var edgeInputs = new List<EdgeInputModel>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -422,45 +388,15 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Get the items found.
                     nodes = items
                         .ToList();
-                    // Get the IDs of the dependent items.
-                    analysisInputs = items
-                        .Select(item => item.AnalysisNodes)
-                        .SelectMany(item => item)
-                        .Select(item => item.Analysis)
-                        .Distinct()
-                        .Select(item => new AnalysisInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
-                    networkInputs = items
-                        .Select(item => item.NetworkNodes)
-                        .SelectMany(item => item)
-                        .Select(item => item.Network)
-                        .Distinct()
-                        .Select(item => new NetworkInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
-                    edgeInputs = items
-                        .Select(item => item.EdgeNodes)
-                        .SelectMany(item => item)
-                        .Select(item => item.Edge)
-                        .Distinct()
-                        .Select(item => new EdgeInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
                 }
                 // Get the IDs of the items.
                 var nodeIds = nodes
                     .Select(item => item.Id);
                 // Delete the dependent entities.
-                await new AnalysesTask { Items = analysisInputs }.DeleteAsync(serviceProvider, token);
-                await new NetworksTask { Items = networkInputs }.DeleteAsync(serviceProvider, token);
-                await new EdgesTask { Items = edgeInputs }.DeleteAsync(serviceProvider, token);
+                await NodeExtensions.DeleteDependentAnalysesAsync(nodeIds, serviceProvider, token);
+                await NodeExtensions.DeleteDependentNetworksAsync(nodeIds, serviceProvider, token);
+                await NodeExtensions.DeleteDependentNodeCollectionsAsync(nodeIds, serviceProvider, token);
+                await NodeExtensions.DeleteDependentEdgesAsync(nodeIds, serviceProvider, token);
                 // Delete the related entities.
                 await NodeExtensions.DeleteRelatedEntitiesAsync<DatabaseNodeFieldNode>(nodeIds, serviceProvider, token);
                 await NodeExtensions.DeleteRelatedEntitiesAsync<DatabaseNode>(nodeIds, serviceProvider, token);
