@@ -135,11 +135,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => databases.Any(item1 => item1.Id == item))
                         .Select(item => new NodeCollectionDatabase
                         {
-                            DatabaseId = item,
-                            Database = databases
-                                .FirstOrDefault(item1 => item1.Id == item)
-                        })
-                        .Where(item => item.Database != null);
+                            DatabaseId = item
+                        });
                     // Check if there were no node collection databases found.
                     if (nodeCollectionDatabases == null || !nodeCollectionDatabases.Any())
                     {
@@ -159,11 +156,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => nodes.Any(item1 => item1.Id == item.Node.Id))
                         .Select(item => new NodeCollectionNode
                         {
-                            NodeId = item.Node.Id,
-                            Node = nodes
-                                .FirstOrDefault(item1 => item1.Id == item.Node.Id)
-                        })
-                        .Where(item => item.Node != null);
+                            NodeId = item.Node.Id
+                        });
                     // Check if there were no edge nodes found.
                     if (nodeCollectionNodes == null)
                     {
@@ -335,11 +329,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => databases.Any(item1 => item1.Id == item))
                         .Select(item => new NodeCollectionDatabase
                         {
-                            DatabaseId = item,
-                            Database = databases
-                                .FirstOrDefault(item1 => item1.Id == item)
-                        })
-                        .Where(item => item.Database != null);
+                            DatabaseId = item
+                        });
                     // Check if there were no node collection databases found.
                     if (nodeCollectionDatabases == null || !nodeCollectionDatabases.Any())
                     {
@@ -359,11 +350,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => nodes.Any(item1 => item1.Id == item.Node.Id))
                         .Select(item => new NodeCollectionNode
                         {
-                            NodeId = item.Node.Id,
-                            Node = nodes
-                                .FirstOrDefault(item1 => item1.Id == item.Node.Id)
-                        })
-                        .Where(item => item.Node != null);
+                            NodeId = item.Node.Id
+                        });
                     // Check if there were no edge nodes found.
                     if (nodeCollectionNodes == null)
                     {

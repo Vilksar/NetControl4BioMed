@@ -155,11 +155,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Select(item => new EdgeNode
                         {
                             NodeId = item.Item1,
-                            Node = nodes
-                                .FirstOrDefault(item1 => item1.Id == item.Item1),
                             Type = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>(item.Item2)
-                        })
-                        .Where(item => item.Node != null);
+                        });
                     // Check if there were no edge nodes found.
                     if (edgeNodes == null || !edgeNodes.Any(item => item.Type == EdgeNodeType.Source) || !edgeNodes.Any(item => item.Type == EdgeNodeType.Target))
                     {
@@ -184,28 +181,28 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Select(item => new DatabaseEdgeFieldEdge
                             {
                                 DatabaseEdgeFieldId = item.Item1,
-                                DatabaseEdgeField = databaseEdgeFields
-                                    .FirstOrDefault(item1 => item1.Id == item.Item1),
                                 Value = item.Item2
-                            })
-                            .Where(item => item.DatabaseEdgeField != null) :
+                            }) :
                         Enumerable.Empty<DatabaseEdgeFieldEdge>();
                     // Get the database edges.
+                    var databaseEdgeFieldIds = databaseEdgeFieldEdges
+                        .Select(item => item.DatabaseEdgeFieldId)
+                        .Distinct();
+                    var currentDatabaseEdgeFields = databaseEdgeFields
+                        .Where(item => databaseEdgeFieldIds.Contains(item.Id));
                     var databaseEdges = batchItem.DatabaseEdges != null ?
                         batchItem.DatabaseEdges
                             .Where(item => item.Database != null)
                             .Where(item => !string.IsNullOrEmpty(item.Database.Id))
                             .Select(item => item.Database.Id)
-                            .Concat(databaseEdgeFieldEdges.Select(item => item.DatabaseEdgeField.Database.Id))
+                            .Concat(currentDatabaseEdgeFields
+                                .Select(item => item.Database.Id))
                             .Distinct()
                             .Where(item => databases.Any(item1 => item1.Id == item))
                             .Select(item => new DatabaseEdge
                             {
                                 DatabaseId = item,
-                                Database = databases
-                                    .FirstOrDefault(item1 => item1.Id == item)
-                            })
-                            .Where(item => item.Database != null) :
+                            }) :
                         Enumerable.Empty<DatabaseEdge>();
                     // Check if there were no database edges found.
                     if (databaseEdges == null || !databaseEdges.Any())
@@ -217,7 +214,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     var edge = new Edge
                     {
                         DateTimeCreated = DateTime.UtcNow,
-                        Name = string.Concat(edgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " - ", edgeNodes.First(item1 => item1.Type == EdgeNodeType.Target).Node.Name),
+                        Name = string.Concat(nodes.First(item => item.Id == edgeNodes.First(item => item.Type == EdgeNodeType.Source).NodeId).Name, " - ", nodes.First(item => item.Id == edgeNodes.First(item => item.Type == EdgeNodeType.Target).NodeId).Name),
                         Description = batchItem.Description,
                         EdgeNodes = new List<EdgeNode>
                         {
@@ -397,13 +394,14 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => item.Node != null)
                         .Where(item => !string.IsNullOrEmpty(item.Node.Id))
                         .Where(item => item.Type == "Source" || item.Type == "Target")
-                        .Where(item => nodes.Any(item1 => item1.Id == item.Node.Id))
+                        .Select(item => (item.Node.Id, item.Type))
+                        .Distinct()
+                        .Where(item => nodes.Any(item1 => item1.Id == item.Item1))
                         .Select(item => new EdgeNode
                         {
-                            NodeId = item.Node.Id,
-                            Type = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>(item.Type)
-                        })
-                        .Where(item => item.Node != null);
+                            NodeId = item.Item1,
+                            Type = EnumerationExtensions.GetEnumerationValue<EdgeNodeType>(item.Item2)
+                        });
                     // Check if there were no edge nodes found.
                     if (edgeNodes == null || !edgeNodes.Any(item => item.Type == EdgeNodeType.Source) || !edgeNodes.Any(item => item.Type == EdgeNodeType.Target))
                     {
@@ -429,23 +427,27 @@ namespace NetControl4BioMed.Helpers.Tasks
                             {
                                 DatabaseEdgeFieldId = item.Item1,
                                 Value = item.Item2
-                            })
-                            .Where(item => item.DatabaseEdgeField != null) :
+                            }) :
                         Enumerable.Empty<DatabaseEdgeFieldEdge>();
                     // Get the database edges.
+                    var databaseEdgeFieldIds = databaseEdgeFieldEdges
+                        .Select(item => item.DatabaseEdgeFieldId)
+                        .Distinct();
+                    var currentDatabaseEdgeFields = databaseEdgeFields
+                        .Where(item => databaseEdgeFieldIds.Contains(item.Id));
                     var databaseEdges = batchItem.DatabaseEdges != null ?
                         batchItem.DatabaseEdges
                             .Where(item => item.Database != null)
                             .Where(item => !string.IsNullOrEmpty(item.Database.Id))
                             .Select(item => item.Database.Id)
-                            .Concat(databaseEdgeFieldEdges.Select(item => item.DatabaseEdgeField.Database.Id))
+                            .Concat(currentDatabaseEdgeFields
+                                .Select(item => item.Database.Id))
                             .Distinct()
                             .Where(item => databases.Any(item1 => item1.Id == item))
                             .Select(item => new DatabaseEdge
                             {
-                                DatabaseId = item
-                            })
-                            .Where(item => item.Database != null) :
+                                DatabaseId = item,
+                            }) :
                         Enumerable.Empty<DatabaseEdge>();
                     // Check if there were no database edges found.
                     if (databaseEdges == null || !databaseEdges.Any())
@@ -454,7 +456,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("There were no database edges found.", showExceptionItem, batchItem);
                     }
                     // Update the edge.
-                    edge.Name = string.Concat(edgeNodes.First(item => item.Type == EdgeNodeType.Source).Node.Name, " - ", edgeNodes.First(item => item.Type == EdgeNodeType.Target).Node.Name);
+                    edge.Name = string.Concat(nodes.First(item => item.Id == edgeNodes.First(item => item.Type == EdgeNodeType.Source).NodeId).Name, " - ", nodes.First(item => item.Id == edgeNodes.First(item => item.Type == EdgeNodeType.Target).NodeId).Name);
                     edge.Description = batchItem.Description;
                     edge.EdgeNodes = new List<EdgeNode>
                     {

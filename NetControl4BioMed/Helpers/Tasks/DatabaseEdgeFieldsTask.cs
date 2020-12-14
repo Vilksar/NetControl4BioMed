@@ -146,8 +146,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         Description = batchItem.Description,
                         Url = batchItem.Url,
                         IsSearchable = batchItem.IsSearchable,
-                        DatabaseId = database.Id,
-                        Database = database
+                        DatabaseId = database.Id
                     };
                     // Check if there is any ID provided.
                     if (!string.IsNullOrEmpty(batchItem.Id))

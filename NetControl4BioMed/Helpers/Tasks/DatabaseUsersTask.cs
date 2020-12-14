@@ -123,9 +123,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         DateTimeCreated = DateTime.UtcNow,
                         DatabaseId = database.Id,
-                        Database = database,
-                        UserId = user.Id,
-                        User = user
+                        UserId = user.Id
                     };
                     // Add the item to the list.
                     databaseUsersToAdd.Add(databaseUser);

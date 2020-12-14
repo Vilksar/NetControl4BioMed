@@ -123,9 +123,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         DateTimeCreated = DateTime.UtcNow,
                         NetworkId = network.Id,
-                        Network = network,
-                        UserId = user.Id,
-                        User = user
+                        UserId = user.Id
                     };
                     // Add the item to the list.
                     networkUsersToAdd.Add(networkUser);

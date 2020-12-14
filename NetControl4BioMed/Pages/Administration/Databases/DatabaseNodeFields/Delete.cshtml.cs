@@ -59,8 +59,9 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
             View = new ViewModel
             {
                 Items = _context.DatabaseNodeFields
-                    .Where(item => ids.Contains(item.Id))
                     .Include(item => item.Database)
+                        .ThenInclude(item => item.DatabaseType)
+                    .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -96,8 +97,9 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseNodeFields
             View = new ViewModel
             {
                 Items = _context.DatabaseNodeFields
-                    .Where(item => Input.Ids.Contains(item.Id))
                     .Include(item => item.Database)
+                        .ThenInclude(item => item.DatabaseType)
+                    .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())

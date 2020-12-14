@@ -145,8 +145,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         Description = batchItem.Description,
                         Url = batchItem.Url,
                         IsPublic = batchItem.IsPublic,
-                        DatabaseTypeId = databaseType.Id,
-                        DatabaseType = databaseType
+                        DatabaseTypeId = databaseType.Id
                     };
                     // Check if there is any ID provided.
                     if (!string.IsNullOrEmpty(batchItem.Id))

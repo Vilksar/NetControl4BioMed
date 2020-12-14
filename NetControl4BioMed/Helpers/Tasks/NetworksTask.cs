@@ -173,11 +173,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Select(item => new NetworkUser
                         {
                             DateTimeCreated = DateTime.UtcNow,
-                            UserId = item,
-                            User = users
-                                .FirstOrDefault(item1 => item1.Id == item)
-                        })
-                        .Where(item => item.User != null);
+                            UserId = item
+                        });
                     // Check if there were no network users found.
                     if (!batchItem.IsPublic && (networkUsers == null || !networkUsers.Any()))
                     {
@@ -201,11 +198,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Select(item => new NetworkDatabase
                         {
                             DatabaseId = item.Item1,
-                            Database = databases
-                                .FirstOrDefault(item1 => item1.Id == item.Item1),
                             Type = EnumerationExtensions.GetEnumerationValue<NetworkDatabaseType>(item.Item2)
-                        })
-                        .Where(item => item.Database != null);
+                        });
                     // Check if there were no network databases found.
                     if (networkDatabases == null || !networkDatabases.Any())
                     {
@@ -213,7 +207,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("There were no network databases found.", showExceptionItem, batchItem);
                     }
                     // Check if the network databases have different database types.
-                    if (networkDatabases.Select(item => item.Database.DatabaseType).Distinct().Count() > 1)
+                    var batchNetworkDatabaseIds = networkDatabases.Select(item => item.DatabaseId);
+                    if (databases.Where(item => batchNetworkDatabaseIds.Contains(item.Id)).Select(item => item.DatabaseType).Distinct().Count() > 1)
                     {
                         // Throw an exception.
                         throw new TaskException("The network databases found have different database types.", showExceptionItem, batchItem);
@@ -230,15 +225,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Where(item => item.Type == "Seed")
                             .Select(item => (item.NodeCollection.Id, item.Type))
                             .Distinct()
-                            .Where(item => nodeCollections.Any(item1 => item1.Id == item.Item1))
+                            .Where(item => nodeCollections.Any(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabases.Contains(item2.Database))))
                             .Select(item => new NetworkNodeCollection
                             {
                                 NodeCollectionId = item.Item1,
-                                NodeCollection = nodeCollections
-                                    .FirstOrDefault(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabases.Contains(item2.Database))),
                                 Type = EnumerationExtensions.GetEnumerationValue<NetworkNodeCollectionType>(item.Item2)
-                            })
-                            .Where(item => item.NodeCollection != null) :
+                            }) :
                         Enumerable.Empty<NetworkNodeCollection>();
                     // Define the new item.
                     var network = new Network

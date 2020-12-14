@@ -124,32 +124,42 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Select(item => new DatabaseNodeFieldNode
                         {
                             DatabaseNodeFieldId = item.Item1,
-                            DatabaseNodeField = databaseNodeFields
-                                .FirstOrDefault(item1 => item1.Id == item.Item1),
                             Value = item.Item2
-                        })
-                        .Where(item => item.DatabaseNodeField != null);
-                    // Check if there were no database node field nodes found.
-                    if (databaseNodeFieldNodes == null || !databaseNodeFieldNodes.Any(item => item.DatabaseNodeField.IsSearchable))
+                        });
+                    // Check if there were no database node fields found.
+                    if (databaseNodeFieldNodes == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database node field nodes found.", showExceptionItem, batchItem);
+                        throw new TaskException("There were no database node fields found.", showExceptionItem, batchItem);
+                    }
+                    // Check if there were no searchable database node fields found.
+                    var databaseNodeFieldIds = databaseNodeFieldNodes
+                        .Select(item => item.DatabaseNodeFieldId)
+                        .Distinct();
+                    var currentDatabaseNodeFields = databaseNodeFields
+                        .Where(item => databaseNodeFieldIds.Contains(item.Id));
+                    if (!currentDatabaseNodeFields.Any(item => item.IsSearchable))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no searchable database node fields found.", showExceptionItem, batchItem);
                     }
                     // Define the new node.
                     var node = new Node
                     {
                         DateTimeCreated = DateTime.UtcNow,
                         Name = !string.IsNullOrEmpty(batchItem.Name) ? batchItem.Name :
-                            (databaseNodeFieldNodes.FirstOrDefault(item => item.DatabaseNodeField.IsSearchable)?.Value ?? "Unnamed node"),
+                            (databaseNodeFieldNodes
+                                .FirstOrDefault(item => item.DatabaseNodeFieldId == currentDatabaseNodeFields
+                                    .FirstOrDefault(item => item.IsSearchable)?.Id)?.Value ??
+                            "Unnamed node"),
                         Description = batchItem.Description,
                         DatabaseNodeFieldNodes = databaseNodeFieldNodes.ToList(),
-                        DatabaseNodes = databaseNodeFieldNodes
-                            .Select(item => item.DatabaseNodeField.Database)
+                        DatabaseNodes = currentDatabaseNodeFields
+                            .Select(item => item.Database)
                             .Distinct()
                             .Select(item => new DatabaseNode
                             {
-                                DatabaseId = item.Id,
-                                Database = item
+                                DatabaseId = item.Id
                             })
                             .ToList()
                     };
@@ -310,21 +320,34 @@ namespace NetControl4BioMed.Helpers.Tasks
                         {
                             DatabaseNodeFieldId = item.Item1,
                             Value = item.Item2
-                        })
-                        .Where(item => item.DatabaseNodeField != null);
-                    // Check if there were no database node field nodes found.
-                    if (databaseNodeFieldNodes == null || !databaseNodeFieldNodes.Any(item => item.DatabaseNodeField.IsSearchable))
+                        });
+                    // Check if there were no database node fields found.
+                    if (databaseNodeFieldNodes == null)
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no database node field nodes found.", showExceptionItem, batchItem);
+                        throw new TaskException("There were no database node fields found.", showExceptionItem, batchItem);
+                    }
+                    // Check if there were no searchable database node fields found.
+                    var databaseNodeFieldIds = databaseNodeFieldNodes
+                        .Select(item => item.DatabaseNodeFieldId)
+                        .Distinct();
+                    var currentDatabaseNodeFields = databaseNodeFields
+                        .Where(item => databaseNodeFieldIds.Contains(item.Id));
+                    if (!currentDatabaseNodeFields.Any(item => item.IsSearchable))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no searchable database node fields found.", showExceptionItem, batchItem);
                     }
                     // Update the node.
                     node.Name = !string.IsNullOrEmpty(batchItem.Name) ? batchItem.Name :
-                        (databaseNodeFieldNodes.FirstOrDefault(item => item.DatabaseNodeField.IsSearchable)?.Value ?? "Unnamed node");
+                        (databaseNodeFieldNodes
+                            .FirstOrDefault(item => item.DatabaseNodeFieldId == currentDatabaseNodeFields
+                                .FirstOrDefault(item => item.IsSearchable)?.Id)?.Value ??
+                        "Unnamed node");
                     node.Description = batchItem.Description;
                     node.DatabaseNodeFieldNodes = databaseNodeFieldNodes.ToList();
-                    node.DatabaseNodes = databaseNodeFieldNodes
-                        .Select(item => item.DatabaseNodeField.Database)
+                    node.DatabaseNodes = currentDatabaseNodeFields
+                        .Select(item => item.Database)
                         .Distinct()
                         .Select(item => new DatabaseNode
                         {

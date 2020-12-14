@@ -121,7 +121,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         DateTimeCreated = DateTime.UtcNow,
                         AnalysisId = analysis.Id,
-                        Analysis = analysis,
                         Email = batchItem.Email
                     };
                     // Add the item to the list.

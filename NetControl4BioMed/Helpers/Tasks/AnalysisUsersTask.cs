@@ -123,9 +123,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         DateTimeCreated = DateTime.UtcNow,
                         AnalysisId = analysis.Id,
-                        Analysis = analysis,
-                        UserId = user.Id,
-                        User = user
+                        UserId = user.Id
                     };
                     // Add the item to the list.
                     analysisUsersToAdd.Add(analysisUser);

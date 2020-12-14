@@ -8,6 +8,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
@@ -58,6 +59,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
             View = new ViewModel
             {
                 Items = _context.DatabaseEdgeFields
+                    .Include(item => item.Database)
+                        .ThenInclude(item => item.DatabaseType)
                     .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -94,6 +97,8 @@ namespace NetControl4BioMed.Pages.Administration.Databases.DatabaseEdgeFields
             View = new ViewModel
             {
                 Items = _context.DatabaseEdgeFields
+                    .Include(item => item.Database)
+                        .ThenInclude(item => item.DatabaseType)
                     .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.

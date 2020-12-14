@@ -175,11 +175,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Select(item => new AnalysisUser
                         {
                             DateTimeCreated = DateTime.UtcNow,
-                            UserId = item,
-                            User = users
-                                .FirstOrDefault(item1 => item1.Id == item)
-                        })
-                        .Where(item => item.User != null);
+                            UserId = item
+                        });
                     // Check if there were no analysis users found.
                     if (!batchItem.IsPublic && (analysisUsers == null || !analysisUsers.Any()))
                     {
@@ -201,20 +198,20 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => networks.Any(item1 => item1.Id == item))
                         .Select(item => new AnalysisNetwork
                         {
-                            NetworkId = item,
-                            Network = networks
-                                .FirstOrDefault(item1 => item1.Id == item)
-                        })
-                        .Where(item => item.Network != null);
+                            NetworkId = item
+                        });
                     // Check if there were no analysis networks found.
                     if (analysisNetworks == null || !analysisNetworks.Any())
                     {
                         // Throw an exception.
                         throw new TaskException("There were no analysis networks found.", showExceptionItem, batchItem);
                     }
+                    // Get the IDs of the used networks.
+                    var networkIds = analysisNetworks
+                        .Select(item => item.NetworkId);
                     // Get the node analysis databases.
-                    var nodeAnalysisDatabases = analysisNetworks
-                            .Select(item => item.Network)
+                    var nodeAnalysisDatabases = networks
+                            .Where(item => networkIds.Contains(item.Id))
                             .Select(item => item.NetworkDatabases)
                             .SelectMany(item => item)
                             .Where(item => item.Type == NetworkDatabaseType.Node)
@@ -223,7 +220,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Select(item => new AnalysisDatabase
                             {
                                 DatabaseId = item.Id,
-                                Database = item,
                                 Type = AnalysisDatabaseType.Node
                             });
                     // Check if there were no node analysis databases found.
@@ -233,8 +229,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("There were no node analysis databases found.", showExceptionItem, batchItem);
                     }
                     // Get the edge analysis databases.
-                    var edgeAnalysisDatabases = analysisNetworks
-                            .Select(item => item.Network)
+                    var edgeAnalysisDatabases = networks
+                            .Where(item => networkIds.Contains(item.Id))
                             .Select(item => item.NetworkDatabases)
                             .SelectMany(item => item)
                             .Where(item => item.Type == NetworkDatabaseType.Edge)
@@ -243,7 +239,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Select(item => new AnalysisDatabase
                             {
                                 DatabaseId = item.Id,
-                                Database = item,
                                 Type = AnalysisDatabaseType.Edge
                             });
                     // Check if there were no edge analysis databases found.
@@ -263,15 +258,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Where(item => item.Type == "Source" || item.Type == "Target")
                             .Select(item => (item.NodeCollection.Id, item.Type))
                             .Distinct()
-                            .Where(item => nodeCollections.Any(item1 => item1.Id == item.Item1))
+                            .Where(item => nodeCollections.Any(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabases.Contains(item2.Database))))
                             .Select(item => new AnalysisNodeCollection
                             {
                                 NodeCollectionId = item.Item1,
-                                NodeCollection = nodeCollections
-                                    .FirstOrDefault(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabases.Contains(item2.Database))),
                                 Type = EnumerationExtensions.GetEnumerationValue<AnalysisNodeCollectionType>(item.Item2)
-                            })
-                            .Where(item => item.NodeCollection != null) :
+                            }) :
                         Enumerable.Empty<AnalysisNodeCollection>();
                     // Define the new item.
                     var analysis = new Analysis
