@@ -634,6 +634,129 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
+        /// Deletes the long-standing analyses from the database.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task DeleteOrphanedItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the input models of the items to delete.
+                var itemInputModels = context.Nodes
+                    .Where(item => !item.DatabaseNodeFieldNodes.Any())
+                    .Select(item => new NodeInputModel
+                    {
+                        Id = item.Id
+                    })
+                    .ToList();
+                // Run a new task.
+                await new NodesTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the input models of the items to delete.
+                var itemInputModels = context.Edges
+                    .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
+                    .Select(item => new EdgeInputModel
+                    {
+                        Id = item.Id
+                    })
+                    .ToList();
+                // Run a new task.
+                await new EdgesTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the input models of the items to delete.
+                var itemInputModels = context.Nodes
+                    .Where(item => item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Where(item => !item.NetworkNodes.Any())
+                    .Select(item => new NodeInputModel
+                    {
+                        Id = item.Id
+                    })
+                    .ToList();
+                // Run a new task.
+                await new NodesTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the input models of the items to delete.
+                var itemInputModels = context.Edges
+                    .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Where(item => !item.NetworkEdges.Any())
+                    .Select(item => new EdgeInputModel
+                    {
+                        Id = item.Id
+                    })
+                    .ToList();
+                // Run a new task.
+                await new EdgesTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the input models of the items to delete.
+                var itemInputModels = context.NodeCollections
+                    .Where(item => !item.NodeCollectionNodes.Any())
+                    .Select(item => new NodeCollectionInputModel
+                    {
+                        Id = item.Id
+                    })
+                    .ToList();
+                // Run a new task.
+                await new NodeCollectionsTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the input models of the items to delete.
+                var itemInputModels = context.Networks
+                    .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any())
+                    .Select(item => new NetworkInputModel
+                    {
+                        Id = item.Id
+                    })
+                    .ToList();
+                // Run a new task.
+                await new NetworksTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the input models of the items to delete.
+                var itemInputModels = context.Analyses
+                    .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any())
+                    .Select(item => new AnalysisInputModel
+                    {
+                        Id = item.Id
+                    })
+                    .ToList();
+                // Run a new task.
+                await new AnalysesTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
+            }
+        }
+
+        /// <summary>
         /// Deletes the long-standing networks from the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>

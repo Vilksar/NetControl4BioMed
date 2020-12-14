@@ -143,6 +143,7 @@ namespace NetControl4BioMed.Pages.Administration
                 nameof(IRecurringTaskManager.StopAnalysesAsync),
                 nameof(IRecurringTaskManager.AlertUsersAsync),
                 nameof(IRecurringTaskManager.DeleteUnconfirmedUsersAsync),
+                nameof(IRecurringTaskManager.DeleteOrphanedItemsAsync),
                 nameof(IRecurringTaskManager.DeleteNetworksAsync),
                 nameof(IRecurringTaskManager.DeleteAnalysesAsync)
             };
