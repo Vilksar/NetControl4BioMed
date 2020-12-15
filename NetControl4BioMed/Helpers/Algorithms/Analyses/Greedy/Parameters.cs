@@ -80,7 +80,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
         [JsonIgnore]
         public static Dictionary<string, string> PossibleHeuristics { get; } = new Dictionary<string, string>()
         {
-            { "A", "Previously seen edges coming from drug-target nodes" },
+            { "A", "Previously seen edges coming from source nodes" },
             { "B", "Edges to any drug target node" },
             { "C", "Previously seen edges from controlling nodes" },
             { "D", "Edges to any controlling node" },

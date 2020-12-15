@@ -163,16 +163,19 @@
                     <span><span class="font-weight-bold">Stop analyses</span>, which stops all analyses created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeStop days before the current date.</span>
                 </li>
                 <li>
-                    <span><span class="font-weight-bold">Alert users</span>, which sends an e-mail to all users which have access to a network or to an analysis created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeAlert days before the current date, and scheduled to be automatically deleted in @(NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete - NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeAlert) days.</span>
+                    <span><span class="font-weight-bold">Alert users</span>, which sends an e-mail to all users which have access to a network or to an analysis created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeAlert day(s) before the current date, and scheduled to be automatically deleted in @(NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete - NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeAlert) day(s).</span>
                 </li>
                 <li>
-                    <span><span class="font-weight-bold">Delete unconfirmed users</span>, which deletes all users with accounts created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete days before the current date, but with still unconfirmed e-mails.</span>
+                    <span><span class="font-weight-bold">Delete unconfirmed users</span>, which deletes all users with accounts created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete day(s) before the current date, but with still unconfirmed e-mails.</span>
                 </li>
                 <li>
-                    <span><span class="font-weight-bold">Delete networks</span>, which deletes all networks created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete days before the current date.</span>
+                    <span><span class="font-weight-bold">Delete orphaned items</span>, which deletes all corresponding orphaned items currently identified in the database.</span>
                 </li>
                 <li>
-                    <span><span class="font-weight-bold">Delete analyses</span>, which deletes all analyses created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete days before the current date.</span>
+                    <span><span class="font-weight-bold">Delete networks</span>, which deletes all networks created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete day(s) before the current date.</span>
+                </li>
+                <li>
+                    <span><span class="font-weight-bold">Delete analyses</span>, which deletes all analyses created over @NetControl4BioMed.Data.ApplicationDbContext.DaysBeforeDelete day(s) before the current date.</span>
                 </li>
             </ul>
         </div>
