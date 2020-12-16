@@ -1,0 +1,167 @@
+﻿@page
+@model IndexModel
+@using NetControl4BioMed.Data.Enumerations
+@using Helpers.Extensions
+@{
+    ViewData["Title"] = "Analysis control path details";
+}
+
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetControlPathNavigationTitleCard(Model.View.ControlPath)" />
+<div class="row align-items-center">
+    <div class="col-lg mb-3">
+        <a asp-page="/Content/DatabaseTypes/Default/Created/Analyses/Details/Created/ControlPaths/Download" asp-route-ids="@Model.View.ControlPath.Id" class="btn btn-primary btn-block" title="Download">
+            <span><i class="fas fa-download"></i></span>
+            <span>Download</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-long-arrow-alt-right"></i></span>
+            </div>
+            <div>
+                <span>Paths</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-success text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>Click the button below to see the list of paths forming the current control path.</span>
+        </div>
+        <a asp-page="/Content/DatabaseTypes/Default/Created/Analyses/Details/Created/ControlPaths/Details/Paths/Index" asp-route-id="@Model.View.ControlPath.Id" class="btn btn-success btn-block">
+            <span><i class="fas fa-long-arrow-alt-right"></i></span>
+            <span>View paths</span>
+        </a>
+    </div>
+</div>
+@if (Model.View.ShowVisualization)
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-eye"></i></span>
+                </div>
+                <div>
+                    <span>Visualize</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>As the network corresponding to the control path is relatively small, you can click the button below to visualize it in browser.</span>
+            </div>
+            <a asp-page="/Content/DatabaseTypes/Default/Created/Analyses/Details/Created/ControlPaths/Details/Visualize" asp-route-id="@Model.View.ControlPath.Id" class="btn btn-info btn-block">
+                <span><i class="fas fa-eye"></i></span>
+                <span>Visualize</span>
+            </a>
+        </div>
+    </div>
+}
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-circle"></i></span>
+            </div>
+            <div>
+                <span>Unique control nodes</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>This section contains the unique control nodes.</span>
+        </div>
+        @if (Model.View.Analysis.Algorithm == AnalysisAlgorithm.Genetic)
+        {
+            <div class="alert alert-warning text-justify text-wrap">
+                <span><i class="fas fa-exclamation-triangle"></i></span>
+                <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control nodes, and not control paths. Thus, while the returned set of control nodes does indeed control the entire set of target nodes, the actual number of controlled nodes might differ.</span>
+            </div>
+        }
+        <table class="table table-hover table-bordered table-datatable" data-order="[[1]]">
+            <thead class="thead-light">
+                <tr>
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                        <span>#</span>
+                    </th>
+                    <th class="text-left text-break">
+                        <span>Node</span>
+                    </th>
+                    @if (Model.View.SourceNodes.Any())
+                    {
+                        <th class="d-none d-lg-table-cell text-center text-break">
+                            <span>Source</span>
+                        </th>
+                    }
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <span>Links</span>
+                    </th>
+                    <th class="d-none d-lg-table-cell text-center text-break">
+                        <span>Controlled nodes</span>
+                    </th>
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <span>Links</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var uniqueControlNode in Model.View.UniqueControlNodes)
+                {
+                    <tr>
+                        <td class="text-center text-break">
+                            <span></span>
+                        </td>
+                        <td class="text-left text-break">
+                            <span title="@uniqueControlNode.Key.Name" class="font-weight-bold">@uniqueControlNode.Key.Name</span>
+                        </td>
+                        @if (Model.View.SourceNodes.Any())
+                        {
+                            var isSource = Model.View.SourceNodes.Contains(uniqueControlNode.Key);
+                            <td class="d-none d-lg-table-cell text-center text-break">
+                                <div class="text-uppercase">
+                                    @switch (isSource)
+                                    {
+                                        case false:
+                                            <span class="text-danger" title="@isSource"><i class="fas fa-times-circle"></i></span>
+                                            break;
+                                        case true:
+                                            <span class="text-success" title="@isSource"><i class="fas fa-check-circle"></i></span>
+                                            break;
+                                    }
+                                    <span title="@isSource">@isSource</span>
+                                </div>
+                            </td>
+                        }
+                        <td class="text-center text-break">
+                            @if (!Model.View.IsGeneric)
+                            {
+                                <a asp-page="/Content/DatabaseTypes/Default/Data/Nodes/Details" asp-route-id="@uniqueControlNode.Key.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td class="d-none d-lg-table-cell text-center text-break">
+                            <span title="@uniqueControlNode.Value">@uniqueControlNode.Value</span>
+                        </td>
+                        <td class="text-center text-break">
+                            <a asp-page="/Content/DatabaseTypes/Default/Created/Analyses/Details/Created/ControlPaths/Details/Paths/Index" asp-route-id="@Model.View.ControlPath.Id" asp-route-searchIn="SourceNodeId" asp-route-searchString="@uniqueControlNode.Key.Id" title="View">
+                                <span>View</span>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

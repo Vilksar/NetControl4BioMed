@@ -1,0 +1,602 @@
+﻿@page
+@model CreateModel
+@using Helpers.Extensions
+@{
+    ViewData["Title"] = "Create analysis";
+}
+
+<form method="post" class="text-justify">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-info"></i></span>
+                </div>
+                <div>
+                    <span>Details</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the general details of the new analysis.</span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="Input.DatabaseTypeId" class="font-weight-bold">ID</label>
+                <input asp-for="Input.DatabaseTypeId" class="form-control" readonly />
+                <span asp-description-for="Input.DatabaseTypeId" class="text-muted small">The database type ID of the new analysis.</span>
+                <span asp-validation-for="Input.DatabaseTypeId" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Name" class="font-weight-bold">Name</label>
+                <input asp-for="Input.Name" class="form-control" />
+                <span asp-description-for="Input.Name" class="text-muted small">The name of the new analysis.</span>
+                <span asp-validation-for="Input.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="Input.Description" class="form-control"></textarea>
+                <span asp-description-for="Input.Description" class="text-muted small">The description of the new analysis.</span>
+                <span asp-validation-for="Input.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group" hidden="@(Model.View.IsUserAuthenticated ? null : "hidden")">
+                <label asp-for="Input.IsPublic" class="font-weight-bold">Set the analysis as public?</label>
+                <select asp-for="Input.IsPublic" class="custom-select form-control">
+                    <option value="false" selected="@(Model.View.IsUserAuthenticated ? "selected" : null)">No</option>
+                    <option value="true" selected="@(Model.View.IsUserAuthenticated ? null : "selected")">Yes</option>
+                </select>
+                <span asp-description-for="Input.IsPublic" class="text-muted small">The public availability of the analysis. If public, anyone that has its ID or URL can access it.</span>
+                <span asp-validation-for="Input.IsPublic" class="text-danger small"></span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="Input.Algorithm" class="font-weight-bold">Algorithm</label>
+                <select asp-for="Input.Algorithm" class="custom-select">
+                    @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
+                    {
+                        <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                    }
+                </select>
+                <span asp-description-for="Input.Algorithm" class="text-muted small">The algorithm to be used by the new analysis.</span>
+                <span asp-validation-for="Input.Algorithm" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-share-alt"></i></span>
+                </div>
+                <div>
+                    <span>Networks</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the network data to be used by the new analysis (namely, the IDs of the networks should be provided). You need to have access to the corresponding networks!</span>
+                @if (Model.View.IsUserAuthenticated)
+                {
+                    <span>You can find the available networks associated with your account <a asp-page="/Content/DatabaseTypes/Default/Created/Networks/Index" asp-route-searchString="@Model.Input.DatabaseTypeId" asp-route-searchIn="DatabaseTypeId" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                }
+            </div>
+            <div class="file-group" data-type="items">
+                <div class="form-group" hidden>
+                    <label asp-for="Input.NetworkData" class="font-weight-bold">Networks</label>
+                    <textarea asp-for="Input.NetworkData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.NetworkData" class="text-muted small">The IDs of the networks to be used by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.NetworkData" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <div class="row align-items-center mb-2">
+                        <div class="col-lg-4">
+                            <label for="data-textarea-network" class="font-weight-bold mb-0">Data</label>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row align-items-center">
+                                <div class="col-6 col-form-label-sm text-right">
+                                    <label for="data-line-separator-network" class="font-weight-normal mb-0">Line separator:</label>
+                                </div>
+                                <div class="col-6 text-left">
+                                    <select id="data-line-separator-network" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                        <option value=",">comma (",")</option>
+                                        <option value=";">semicolon (";")</option>
+                                        <option value="\t">tab ("\t")</option>
+                                        <option value="\s">space (" ")</option>
+                                        <option value="\n" selected>new line ("\n")</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="data-textarea-network" class="form-control file-group-text mb-2"></textarea>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input file-group-file-upload" />
+                        <label class="custom-file-label file-group-file-label">Choose file</label>
+                    </div>
+                    <span class="text-muted small">The IDs of the networks of the new analysis. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-syringe"></i></span>
+                </div>
+                <div>
+                    <span>Source data</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the source data to be used by the new analysis (namely, the identifiers of the source nodes should be provided). You can find possible input samples <a asp-page="/Content/DatabaseTypes/Default/Other/Samples/Index" asp-route-filter="HasSourceNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+            </div>
+            <div class="file-group" data-type="items">
+                <div class="form-group" hidden>
+                    <label asp-for="Input.SourceData" class="font-weight-bold">Source nodes</label>
+                    <textarea asp-for="Input.SourceData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.SourceData" class="text-muted small">The nodes to be used as source nodes by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.SourceData" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <div class="row align-items-center mb-2">
+                        <div class="col-lg-4">
+                            <label for="data-textarea-source" class="font-weight-bold mb-0">Data</label>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row align-items-center">
+                                <div class="col-6 col-form-label-sm text-right">
+                                    <label for="data-line-separator-source" class="font-weight-normal mb-0">Line separator:</label>
+                                </div>
+                                <div class="col-6 text-left">
+                                    <select id="data-line-separator-source" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                        <option value=",">comma (",")</option>
+                                        <option value=";">semicolon (";")</option>
+                                        <option value="\t">tab ("\t")</option>
+                                        <option value="\s">space (" ")</option>
+                                        <option value="\n" selected>new line ("\n")</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="data-textarea-source" class="form-control file-group-text mb-2"></textarea>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input file-group-file-upload" />
+                        <label class="custom-file-label file-group-file-label">Choose file</label>
+                    </div>
+                    <span class="text-muted small">The source nodes of the new analysis. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3" hidden="@(!Model.View.SourceNodeCollections.Any() ? "hidden" : null)">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-folder"></i></span>
+                </div>
+                <div>
+                    <span>Source node collections</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the node collections which can be used as additional source nodes to be used by the new analysis (namely, the IDs of the node collections should be provided). You can find the available node collections <a asp-page="/Content/DatabaseTypes/Default/Data/NodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+            </div>
+            <div class="file-group" data-type="items">
+                <div class="form-group" hidden>
+                    <label asp-for="Input.SourceNodeCollectionData" class="font-weight-bold">Source node collection IDs</label>
+                    <textarea asp-for="Input.SourceNodeCollectionData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.SourceNodeCollectionData" class="text-muted small">The IDs of the source node collections to be used by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.SourceNodeCollectionData" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <div class="row align-items-center mb-2">
+                        <div class="col-lg-4">
+                            <label for="data-textarea-source-node-collection" class="font-weight-bold mb-0">Data</label>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row align-items-center">
+                                <div class="col-6 col-form-label-sm text-right">
+                                    <label for="data-line-separator-source-node-collection" class="font-weight-normal mb-0">Line separator:</label>
+                                </div>
+                                <div class="col-6 text-left">
+                                    <select id="data-line-separator-source-node-collection" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                        <option value=",">comma (",")</option>
+                                        <option value=";">semicolon (";")</option>
+                                        <option value="\t">tab ("\t")</option>
+                                        <option value="\s">space (" ")</option>
+                                        <option value="\n" selected>new line ("\n")</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="data-textarea-source-node-collection" class="form-control file-group-text mb-2"></textarea>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input file-group-file-upload" />
+                        <label class="custom-file-label file-group-file-label">Choose file</label>
+                    </div>
+                    <span class="text-muted small">The IDs of the source node collections of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-bullseye"></i></span>
+                </div>
+                <div>
+                    <span>Target data</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the target data to be used by the new analysis (namely, the identifiers of the target nodes should be provided). You can find possible input samples <a asp-page="/Content/DatabaseTypes/Default/Other/Samples/Index" asp-route-filter="ContainsTargetNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+            </div>
+            <div class="file-group" data-type="items">
+                <div class="form-group" hidden>
+                    <label asp-for="Input.TargetData" class="font-weight-bold">Target nodes</label>
+                    <textarea asp-for="Input.TargetData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.TargetData" class="text-muted small">The nodes to be used as target nodes by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.TargetData" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <div class="row align-items-center mb-2">
+                        <div class="col-lg-4">
+                            <label for="data-textarea-target" class="font-weight-bold mb-0">Data</label>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row align-items-center">
+                                <div class="col-6 col-form-label-sm text-right">
+                                    <label for="data-line-separator-target" class="font-weight-normal mb-0">Line separator:</label>
+                                </div>
+                                <div class="col-6 text-left">
+                                    <select id="data-line-separator-target" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                        <option value=",">comma (",")</option>
+                                        <option value=";">semicolon (";")</option>
+                                        <option value="\t">tab ("\t")</option>
+                                        <option value="\s">space (" ")</option>
+                                        <option value="\n" selected>new line ("\n")</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="data-textarea-target" class="form-control file-group-text mb-2"></textarea>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input file-group-file-upload" />
+                        <label class="custom-file-label file-group-file-label">Choose file</label>
+                    </div>
+                    <span class="text-muted small">The target nodes of the new analysis. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3" hidden="@(!Model.View.TargetNodeCollections.Any() ? "hidden" : null)">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-folder"></i></span>
+                </div>
+                <div>
+                    <span>Target node collections</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the node collections which can be used as additional target nodes to be used by the new analysis (namely, the IDs of the node collections should be provided). You can find the available node collections <a asp-page="/Content/DatabaseTypes/Default/Data/NodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+            </div>
+            <div class="file-group" data-type="items">
+                <div class="form-group" hidden>
+                    <label asp-for="Input.TargetNodeCollectionData" class="font-weight-bold">Target node collection IDs</label>
+                    <textarea asp-for="Input.TargetNodeCollectionData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.TargetNodeCollectionData" class="text-muted small">The IDs of the target node collections to be used by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.TargetNodeCollectionData" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <div class="row align-items-center mb-2">
+                        <div class="col-lg-4">
+                            <label for="data-textarea-target-node-collection" class="font-weight-bold mb-0">Data</label>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row align-items-center">
+                                <div class="col-6 col-form-label-sm text-right">
+                                    <label for="data-line-separator-target-node-collection" class="font-weight-normal mb-0">Line separator:</label>
+                                </div>
+                                <div class="col-6 text-left">
+                                    <select id="data-line-separator-target-node-collection" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                        <option value=",">comma (",")</option>
+                                        <option value=";">semicolon (";")</option>
+                                        <option value="\t">tab ("\t")</option>
+                                        <option value="\s">space (" ")</option>
+                                        <option value="\n" selected>new line ("\n")</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="data-textarea-target-node-collection" class="form-control file-group-text mb-2"></textarea>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input file-group-file-upload" />
+                        <label class="custom-file-label file-group-file-label">Choose file</label>
+                    </div>
+                    <span class="text-muted small">The IDs of the target node collections of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-code"></i></span>
+                </div>
+                <div>
+                    <span>Parameters</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This section contains the parameters of the algorithm used by the new analysis.</span>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                    <label asp-for="Input.MaximumIterations" class="font-weight-bold">Maximum iterations</label>
+                </div>
+                <div class="col-lg-6 order-1 order-lg-2">
+                    <input asp-for="Input.MaximumIterations" class="form-control" />
+                </div>
+                <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                    <span asp-description-for="Input.MaximumIterations" class="text-muted small">The maximum number of iterations for which the analysis to run.</span>
+                    <span asp-validation-for="Input.MaximumIterations" class="text-danger small"></span>
+                </div>
+                <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                    <label asp-for="Input.MaximumIterationsWithoutImprovement" class="font-weight-bold">Maximum iterations without improvement</label>
+                </div>
+                <div class="col-lg-6 order-2 order-lg-2">
+                    <input asp-for="Input.MaximumIterationsWithoutImprovement" class="form-control" />
+                </div>
+                <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                    <span asp-description-for="Input.MaximumIterationsWithoutImprovement" class="text-muted small">The maximum number of iterations without improvement in the size of the best solution for which the analysis to run.</span>
+                    <span asp-validation-for="Input.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
+                </div>
+            </div>
+            @if (Model.View.Algorithm == NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm.Greedy.ToString())
+            {
+                <div class="row">
+                    <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                        <label asp-for="Input.GreedyAlgorithmParameters.RandomSeed" class="font-weight-bold">Random seed</label>
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-2">
+                        <input asp-for="Input.GreedyAlgorithmParameters.RandomSeed" class="form-control" />
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                        <span asp-description-for="Input.GreedyAlgorithmParameters.RandomSeed" class="text-muted small">The random seed to be used throughout the algorithm.</span>
+                        <span asp-validation-for="Input.GreedyAlgorithmParameters.RandomSeed" class="text-danger small"></span>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                        <label asp-for="Input.GreedyAlgorithmParameters.MaximumPathLength" class="font-weight-bold">Maximum path length</label>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-2">
+                        <input asp-for="Input.GreedyAlgorithmParameters.MaximumPathLength" class="form-control" />
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                        <span asp-description-for="Input.GreedyAlgorithmParameters.MaximumPathLength" class="text-muted small">The maximum length of any path between a source node and a target node.</span>
+                        <span asp-validation-for="Input.GreedyAlgorithmParameters.MaximumPathLength" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="row" hidden>
+                    <div class="col-lg-12 order-1 order-lg-1 align-self-center">
+                        <label asp-for="Input.GreedyAlgorithmParameters.Repeats" class="font-weight-bold">Repeats</label>
+                    </div>
+                    <div class="col-lg-12 order-1 order-lg-2">
+                        <input asp-for="Input.GreedyAlgorithmParameters.Repeats" class="form-control" />
+                    </div>
+                    <div class="col-lg-12 order-1 order-lg-3 mb-3">
+                        <span asp-description-for="Input.GreedyAlgorithmParameters.Repeats" class="text-muted small">The number of times that each heuristic will be repeated in one iteration.</span>
+                        <span asp-validation-for="Input.GreedyAlgorithmParameters.Repeats" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="heuristics-group">
+                    <div class="row" hidden>
+                        <div class="col-lg-12 order-1 order-lg-1 align-self-center">
+                            <label asp-for="Input.GreedyAlgorithmParameters.Heuristics" class="font-weight-bold">Heuristics</label>
+                        </div>
+                        <div class="col-lg-12 order-1 order-lg-2">
+                            <textarea asp-for="Input.GreedyAlgorithmParameters.Heuristics" class="form-control heuristics-group-input"></textarea>
+                        </div>
+                        <div class="col-lg-12 order-1 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GreedyAlgorithmParameters.Heuristics" class="text-muted small">The search heuristics for the algorithm. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                            <span asp-validation-for="Input.GreedyAlgorithmParameters.Heuristics" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-5 order-1 order-lg-1 align-self-center">
+                            <label for="heuristics-group-possible" class="font-weight-bold">Possible heuristics</label>
+                        </div>
+                        <div class="col-lg-5 order-1 order-lg-2">
+                            <select id="heuristics-group-possible" class="custom-select heuristics-group-possible" size="10" multiple title="Current heuristics">
+                                <option value="" title="New group">--- New group ---</option>
+                                @foreach (var item in Helpers.Algorithms.Analyses.Greedy.Parameters.PossibleHeuristics)
+                                {
+                                    <option value="@item.Key" title="@item.Value">@item.Value</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-lg-2 order-2 order-lg-1 align-self-center"></div>
+                        <div class="col-lg-2 order-2 order-lg-2 align-self-center">
+                            <button type="button" class="btn btn-dark btn-block heuristics-group-add my-2" title="Add heuristic">
+                                <span class="d-none d-lg-block"><i class="fas fa-angle-right"></i></span>
+                                <span class="d-block d-lg-none"><i class="fas fa-angle-down"></i></span>
+                            </button>
+                            <button type="button" class="btn btn-dark btn-block heuristics-group-remove my-2" title="Remove heuristic">
+                                <span class="d-none d-lg-block"><i class="fas fa-angle-left"></i></span>
+                                <span class="d-block d-lg-none"><i class="fas fa-angle-up"></i></span>
+                            </button>
+                        </div>
+                        <div class="col-lg-5 order-3 order-lg-1 align-self-center">
+                            <label for="heuristics-group-current" class="font-weight-bold">Current heuristics</label>
+                        </div>
+                        <div class="col-lg-5 order-3 order-lg-2">
+                            <select id="heuristics-group-current" class="custom-select heuristics-group-current" size="10" multiple title="Current heuristics"></select>
+                        </div>
+                        <div class="col-lg-12 order-4 order-lg-3 mb-3">
+                            <span description-for="heuristics-group-current" class="text-muted small">The search heuristics for the algorithm. The current heuristics can be seen on the right (or lower) side. Select one or more options on the right (or lower) side, and click the "Remove heuristic" button to remove them. Select one or more options on the left (or upper) side, and click the "Add heuristic" button to add them to the selected group on the right side. A new group containing only the heuristic "Any possible edge" will be automatically added at the end of the list.</span>
+                            <span validation-for="heuristics-group-current" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (Model.View.Algorithm == NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm.Genetic.ToString())
+            {
+                <div class="row">
+                    <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                        <label asp-for="Input.GeneticAlgorithmParameters.RandomSeed" class="font-weight-bold">Random seed</label>
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-2">
+                        <input asp-for="Input.GeneticAlgorithmParameters.RandomSeed" class="form-control" />
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                        <span asp-description-for="Input.GeneticAlgorithmParameters.RandomSeed" class="text-muted small">The random seed to be used throughout the algorithm.</span>
+                        <span asp-validation-for="Input.GeneticAlgorithmParameters.RandomSeed" class="text-danger small"></span>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                        <label asp-for="Input.GeneticAlgorithmParameters.MaximumPathLength" class="font-weight-bold">Maximum path length</label>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-2">
+                        <input asp-for="Input.GeneticAlgorithmParameters.MaximumPathLength" class="form-control" />
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                        <span asp-description-for="Input.GeneticAlgorithmParameters.MaximumPathLength" class="text-muted small">The maximum length of any path between a source node and a target node.</span>
+                        <span asp-validation-for="Input.GeneticAlgorithmParameters.MaximumPathLength" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                        <label asp-for="Input.GeneticAlgorithmParameters.PopulationSize" class="font-weight-bold">Population size</label>
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-2">
+                        <input asp-for="Input.GeneticAlgorithmParameters.PopulationSize" class="form-control" />
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                        <span asp-description-for="Input.GeneticAlgorithmParameters.PopulationSize" class="text-muted small">The number of chromosomes in each population.</span>
+                        <span asp-validation-for="Input.GeneticAlgorithmParameters.PopulationSize" class="text-danger small"></span>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                        <label asp-for="Input.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="font-weight-bold">Random genes per chromosome</label>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-2">
+                        <input asp-for="Input.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="form-control" />
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                        <span asp-description-for="Input.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="text-muted small">The maximum number of genes whose value can be simultaneously randomly generated.</span>
+                        <span asp-validation-for="Input.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 order-1 order-lg-1 align-self-center">
+                        <label asp-for="Input.GeneticAlgorithmParameters.PercentageRandom" class="font-weight-bold">Percentage random</label>
+                    </div>
+                    <div class="col-lg-4 order-1 order-lg-2">
+                        <input asp-for="Input.GeneticAlgorithmParameters.PercentageRandom" class="form-control" />
+                    </div>
+                    <div class="col-lg-4 order-1 order-lg-3 mb-3">
+                        <span asp-description-for="Input.GeneticAlgorithmParameters.PercentageRandom" class="text-muted small">The percentage of a population which is composed of randomly generated chromosomes.</span>
+                        <span asp-validation-for="Input.GeneticAlgorithmParameters.PercentageRandom" class="text-danger small"></span>
+                    </div>
+                    <div class="col-lg-4 order-2 order-lg-1 align-self-center">
+                        <label asp-for="Input.GeneticAlgorithmParameters.PercentageElite" class="font-weight-bold">Percentage elite</label>
+                    </div>
+                    <div class="col-lg-4 order-2 order-lg-2">
+                        <input asp-for="Input.GeneticAlgorithmParameters.PercentageElite" class="form-control" />
+                    </div>
+                    <div class="col-lg-4 order-2 order-lg-3 mb-3">
+                        <span asp-description-for="Input.GeneticAlgorithmParameters.PercentageElite" class="text-muted small">The percentage of a population which is composed of the elite chromosomes of the previous population.</span>
+                        <span asp-validation-for="Input.GeneticAlgorithmParameters.PercentageElite" class="text-danger small"></span>
+                    </div>
+                    <div class="col-lg-4 order-3 order-lg-1 align-self-center">
+                        <label asp-for="Input.GeneticAlgorithmParameters.ProbabilityMutation" class="font-weight-bold">Probability of mutation</label>
+                    </div>
+                    <div class="col-lg-4 order-3 order-lg-2">
+                        <input asp-for="Input.GeneticAlgorithmParameters.ProbabilityMutation" class="form-control" />
+                    </div>
+                    <div class="col-lg-4 order-3 order-lg-3 mb-3">
+                        <span asp-description-for="Input.GeneticAlgorithmParameters.ProbabilityMutation" class="text-muted small">The probability of mutation for each gene of a chromosome.</span>
+                        <span asp-validation-for="Input.GeneticAlgorithmParameters.ProbabilityMutation" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                        <label asp-for="Input.GeneticAlgorithmParameters.CrossoverType" class="font-weight-bold">Crossover algorithm</label>
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-2">
+                        <select asp-for="Input.GeneticAlgorithmParameters.CrossoverType" class="custom-select">
+                            @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Analyses.Genetic.CrossoverType)).Cast<Helpers.Algorithms.Analyses.Genetic.CrossoverType>())
+                            {
+                                <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                        <span asp-description-for="Input.GeneticAlgorithmParameters.CrossoverType" class="text-muted small">The crossover algorithm to be used.</span>
+                        <span asp-validation-for="Input.GeneticAlgorithmParameters.CrossoverType" class="text-danger small"></span>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                        <label asp-for="Input.GeneticAlgorithmParameters.MutationType" class="font-weight-bold">Mutation algorithm</label>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-2">
+                        <select asp-for="Input.GeneticAlgorithmParameters.MutationType" class="custom-select">
+                            @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Analyses.Genetic.MutationType)).Cast<Helpers.Algorithms.Analyses.Genetic.MutationType>())
+                            {
+                                <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                        <span asp-description-for="Input.GeneticAlgorithmParameters.MutationType" class="text-muted small">The mutation algorithm to be used.</span>
+                        <span asp-validation-for="Input.GeneticAlgorithmParameters.MutationType" class="text-danger small"></span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="form-group" hidden>
+        <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+        <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+        <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+        <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+    </div>
+    <button type="submit" class="btn btn-block btn-success" title="Create">
+        <span><i class="fas fa-plus"></i></span>
+        <span>Create</span>
+    </button>
+</form>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+    <partial name="_ScriptsReCaptchaPartial" />
+}
