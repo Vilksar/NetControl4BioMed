@@ -6,7 +6,7 @@
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetUserNavigationTitleCard(Model.View.User)" />
 <div class="card mb-3">
-    <div class="card-body text-center small utc-date" data-date="@Model.View.User.DateTimeCreated.ToString("u")">
+    <div class="card-body text-center small utc-date" data-date="@Model.View.User.DateTimeCreated.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
         @if (Model.View.User.EmailConfirmed)
         {
             <span class="text-success" title="E-mail confirmed"><i class="fas fa-check-circle"></i></span>

@@ -83,7 +83,7 @@
                         <td class="text-left text-break">
                             <span title="@item.Email" class="font-weight-bold">@item.Email</span>
                         </td>
-                        <td class="d-none d-lg-table-cell text-center text-break utc-date" data-date="@Model.View.Analysis.DateTimeCreated.ToString("u")">
+                        <td class="d-none d-lg-table-cell text-center text-break utc-date" data-date="@Model.View.Analysis.DateTimeCreated.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
                             <span class="utc-date-date" title="@Model.View.Analysis.DateTimeCreated.ToShortDateString()">@Model.View.Analysis.DateTimeCreated.ToShortDateString()</span>
                             <br />
                             <span class="utc-date-time" title="@Model.View.Analysis.DateTimeCreated.ToShortTimeString()">@Model.View.Analysis.DateTimeCreated.ToShortTimeString()</span>

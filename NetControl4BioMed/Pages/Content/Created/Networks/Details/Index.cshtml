@@ -54,7 +54,7 @@
     <div class="card mb-3">
         <div class="card-body text-center">
             <div class="row align-items-center">
-                <div class="col-lg utc-date" title="Date created" data-date="@Model.View.Network.DateTimeCreated.ToString("u")">
+                <div class="col-lg utc-date" title="Date created" data-date="@Model.View.Network.DateTimeCreated.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
                     <span><i class="fas fa-calendar"></i></span>
                     <span class="utc-date-date" title="@Model.View.Network.DateTimeCreated.ToShortDateString()">@Model.View.Network.DateTimeCreated.ToShortDateString()</span>
                     <span class="utc-date-time" title="@Model.View.Network.DateTimeCreated.ToShortTimeString()">@Model.View.Network.DateTimeCreated.ToShortTimeString()</span>
@@ -153,7 +153,7 @@
             <ul class="mb-0">
                 @foreach (var logEntry in logEntries)
                 {
-                    <li class="utc-date" data-date="@logEntry.DateTime.ToString("u")">
+                    <li class="utc-date" data-date="@logEntry.DateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
                         <div>
                             <span class="utc-date-date" title="@logEntry.DateTime.ToShortDateString()">@logEntry.DateTime.ToShortDateString()</span>
                             <span class="utc-date-time" title="@logEntry.DateTime.ToShortTimeString()">@logEntry.DateTime.ToShortTimeString()</span>
