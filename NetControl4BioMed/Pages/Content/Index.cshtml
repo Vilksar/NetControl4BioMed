@@ -4,156 +4,43 @@
     ViewData["Title"] = "Overview";
 }
 
-<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetContentNavigationQuickLinks(Model.View.ItemCount)" />
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
-                <span><i class="fas fa-share-alt"></i></span>
+                <span><i class="fas fa-info-circle"></i></span>
             </div>
             <div>
-                <span>Recent networks</span>
+                <span>Available user data</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         @if (!Model.View.IsUserAuthenticated)
         {
-            <div class="alert alert-info text-justify text-wrap mb-0">
+            <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no recent networks available, as you are not logged in.</span>
+                <span>You have no networks available, as you are not logged in. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Create" class="alert-link">here</a> to upload a new generic network, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Create" class="alert-link">here</a> to construct a new PPI network.</span>
             </div>
-        }
-        else if (!Model.View.RecentNetworks.Any())
-        {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no recent networks.</span>
+                <span>You have no analyses available, as you are not logged in. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Create" class="alert-link">here</a> to create a new generic analysis, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Create" class="alert-link">here</a> to create a new PPI analysis.</span>
             </div>
         }
         else
         {
+            var genericNetworkCount = Model.View.ItemCount.GetValueOrDefault("GenericNetworks", null) ?? 0;
+            var genericAnalysisCount = Model.View.ItemCount.GetValueOrDefault("GenericAnalyses", null) ?? 0;
+            var ppiNetworkCount = Model.View.ItemCount.GetValueOrDefault("PPINetworks", null) ?? 0;
+            var ppiAnalysisCount = Model.View.ItemCount.GetValueOrDefault("PPIAnalyses", null) ?? 0;
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>These are the most recently created networks to which you have access.</span>
+                <span>You have @genericNetworkCount generic network@(genericNetworkCount != 1 ? "s" : string.Empty) and @ppiNetworkCount PPI network@(ppiNetworkCount != 1 ? "s" : string.Empty) available. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Index" class="alert-link">here</a> to view the generic networks, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Index" class="alert-link">here</a> to view the PPI networks.</span>
             </div>
-            <table class="table table-hover table-bordered mb-0" data-paging="false" data-info="false" data-searching="false">
-                <thead class="thead-light">
-                    <tr>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
-                            <span>#</span>
-                        </th>
-                        <th class="text-left text-break">
-                            <span>Name</span>
-                        </th>
-                        <th class="d-none d-lg-table-cell text-center text-break">
-                            <span>Status</span>
-                        </th>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>Links</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var (item, index) in Model.View.RecentNetworks.Select((item, index) => (item, index + 1)))
-                    {
-                        <tr>
-                            <td class="text-center text-break">
-                                <span>@index</span>
-                            </td>
-                            <td class="text-left text-break">
-                                <span title="@item.Name" class="font-weight-bold">@item.Name</span>
-                                <br />
-                                <span title="@item.Id" class="small text-muted">@item.Id</span>
-                            </td>
-                            <td class="d-none d-lg-table-cell text-center text-break">
-                                <partial name="_NetworkStatusPartial" model="@item.Status" />
-                            </td>
-                            <td class="text-center text-break">
-                                <a asp-page="/Content/Created/Networks/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
-                                    <span><i class="fas fa-info-circle"></i></span>
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-desktop"></i></span>
-            </div>
-            <div>
-                <span>Recent analyses</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        @if (!Model.View.IsUserAuthenticated)
-        {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no recent analyses available, as you are not logged in.</span>
+                <span>You have @genericAnalysisCount generic analys@(genericAnalysisCount != 1 ? "e" : "i")s and @ppiAnalysisCount PPI analys@(ppiAnalysisCount != 1 ? "e" : "i")s available. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Index" class="alert-link">here</a> to view the generic analyses, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Index" class="alert-link">here</a> to view the PPI analyses.</span>
             </div>
-        }
-        else if (!Model.View.RecentAnalyses.Any())
-        {
-            <div class="alert alert-info text-justify text-wrap mb-0">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no recent analyses.</span>
-            </div>
-        }
-        else
-        {
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>These are the most recently created analyses to which you have access.</span>
-            </div>
-            <table class="table table-hover table-bordered mb-0" data-paging="false" data-info="false" data-searching="false">
-                <thead class="thead-light">
-                    <tr>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
-                            <span>#</span>
-                        </th>
-                        <th class="text-left text-break">
-                            <span>Name</span>
-                        </th>
-                        <th class="d-none d-lg-table-cell text-center text-break">
-                            <span>Status</span>
-                        </th>
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>Links</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var (item, index) in Model.View.RecentAnalyses.Select((item, index) => (item, index + 1)))
-                    {
-                        <tr>
-                            <td class="text-center text-break">
-                                <span>@index</span>
-                            </td>
-                            <td class="text-left text-break">
-                                <span title="@item.Name" class="font-weight-bold">@item.Name</span>
-                                <br />
-                                <span title="@item.Id" class="small text-muted">@item.Id</span>
-                            </td>
-                            <td class="d-none d-lg-table-cell text-center text-break">
-                                <partial name="_AnalysisStatusPartial" model="@item.Status" />
-                            </td>
-                            <td class="text-center text-break">
-                                <a asp-page="/Content/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
-                                    <span><i class="fas fa-info-circle"></i></span>
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
         }
     </div>
 </div>
@@ -178,6 +65,7 @@
             <div class="form-group">
                 <label asp-for="Input.Type" class="font-weight-bold">Type</label>
                 <select asp-for="Input.Type" class="custom-select form-control">
+                    <option value="Any">Any</option>
                     <option value="Networks">Network</option>
                     <option value="Analyses">Analysis</option>
                 </select>

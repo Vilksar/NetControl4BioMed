@@ -1,0 +1,112 @@
+﻿@page
+@model DownloadModel
+@{
+    ViewData["Title"] = "Download analyses";
+}
+
+<div class="alert alert-warning text-justify text-wrap">
+    <span><i class="fas fa-exclamation-triangle"></i></span>
+    <span>Please note that downloading an analysis will only download the corresponding network. You can download separately specific identified control paths for each analysis.</span>
+</div>
+<div class="alert alert-warning text-justify text-wrap">
+    <span><i class="fas fa-exclamation-triangle"></i></span>
+    <span>Please check that the names of the analyses do not contain any invalid characters (&lt; &gt; \ / | : " * ?), or you might encounter an error when unarchiving. You can rename an analysis from its corresponding details page.</span>
+</div>
+<div class="alert alert-primary text-justify text-wrap">
+    <span><i class="fas fa-info-circle"></i></span>
+    <span>The following @Model.View.Items.Count() analys@(Model.View.Items.Count() != 1 ? "e" : "i")s will be downloaded in a <a href="https://en.wikipedia.org/wiki/Zip_(file_format)" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">ZIP archive</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
+</div>
+<form method="post" class="text-justify">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
+    <div class="form-group" hidden>
+        <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+        <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+        <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+        <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+    </div>
+    <div class="input-group mb-3">
+        <select asp-for="Input.FileFormat" class="custom-select">
+            <option value="Text">Text (*.txt)</option>
+            <option value="Json">JSON (*.json)</option>
+            <option value="CytoscapeJson">Cytoscape JSON (*.json)</option>
+            <option value="Excel">Excel (*.xlsx)</option>
+        </select>
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-primary btn-block item-group-button" title="Download">
+                <span><i class="fas fa-download"></i></span>
+                <span>Download</span>
+            </button>
+        </div>
+    </div>
+    @if (!Model.View.Items.Any())
+    {
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>No analyses have been found with the provided IDs.</span>
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-header font-weight-bold">
+                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                    <div>
+                        <span><i class="fas fa-download"></i></span>
+                    </div>
+                    <div>
+                        <span>Download</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-bordered table-datatable" data-order="[[2]]">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="text-center text-break" data-orderable="false" data-searchable="false" hidden>
+                                <span></span>
+                            </th>
+                            <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                                <span>#</span>
+                            </th>
+                            <th class="text-left text-break">
+                                <span>Analysis</span>
+                            </th>
+                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                <span>Links</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.View.Items)
+                        {
+                            <tr>
+                                <td class="text-center text-break" hidden>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" id="checkbox-@item.Id" name="Input.Ids" value="@item.Id" class="custom-control-input" title="Select" checked="checked" />
+                                        <label for="checkbox-@item.Id" class="custom-control-label"></label>
+                                    </div>
+                                </td>
+                                <td class="text-center text-break">
+                                    <span></span>
+                                </td>
+                                <td class="text-left text-break">
+                                    <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                                </td>
+                                <td class="text-center text-break">
+                                    <a asp-page="/Content/DatabaseTypes/Default/Created/Analyses/Details/Index" asp-route-id="@item.Id" title="Details">
+                                        <span>Details</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</form>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+    <partial name="_ScriptsReCaptchaPartial" />
+}
