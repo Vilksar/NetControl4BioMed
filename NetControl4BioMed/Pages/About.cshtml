@@ -62,7 +62,7 @@
         </div>
         <div class="mb-1">
             <div class="mb-0">
-                <span>You can start the network creation by navigating to the <a asp-page="/Content/Created/Networks/Index">Networks</a> overview page. Here, you need to select the type of the network that you would like to define or generate:</span>
+                <span>You can start the network creation by navigating to the <a asp-page="/Content/DatabaseTypes/Default/Created/Networks/Index">Networks</a> overview page. Here, you need to select the type of the network that you would like to define or generate:</span>
             </div>
             <ul class="mb-0">
                 <li class="">
@@ -109,7 +109,7 @@
                     <span>For a generic network:</span>
                 </div>
                 <div class="mb-1">
-                    <span>The only input that is required is the list of edges in the network. Each edge should contain exactly two nodes, separated by an "in-line separator" (by default, ";"). Two consecutive edges should be separated by a "line separator" (by default, "new line"). Both separators can be configured, and the number of provided edges will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/Other/Samples/Index" asp-route-filter="HasSeedEdges" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    <span>The only input that is required is the list of edges in the network. Each edge should contain exactly two nodes, separated by an "in-line separator" (by default, ";"). Two consecutive edges should be separated by a "line separator" (by default, "new line"). Both separators can be configured, and the number of provided edges will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/DatabaseTypes/Default/Other/Samples/Index" asp-route-filter="HasSeedEdges" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 </div>
                 <div class="mb-1 text-center">
                     <figure class="figure">
@@ -123,7 +123,7 @@
                     <span>For a PPI network:</span>
                 </div>
                 <div class="mb-1">
-                    <span>The main input that is required is the list of seed nodes (which are, in this case, protein identifiers) around which to build the network. Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/Other/Samples/Index" asp-route-filter="HasSeedNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    <span>The main input that is required is the list of seed nodes (which are, in this case, protein identifiers) around which to build the network. Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/DatabaseTypes/Default/Other/Samples/Index" asp-route-filter="HasSeedNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 </div>
                 <div class="mb-1 text-center">
                     <figure class="figure">
@@ -147,7 +147,7 @@
                     </figure>
                 </div>
                 <div class="mb-1">
-                    <span>You also need to choose the databases to be used. The protein identifiers (for example, "EGFR" or "ENSG00000146648") that you will provide will be looked up in the specified node databases (for example, for the two provided identifiers to be found, you would need to specify the IDs of the "HGNC" and "Ensembl" databases). If you are not sure, you can just specify the IDs of all of the available databases, although this will increase the time it takes to generate the network. The available databases can be found <a asp-page="/Content/Databases/Databases/Index" asp-route-filter="HasDatabaseNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    <span>You also need to choose the databases to be used. The protein identifiers (for example, "EGFR" or "ENSG00000146648") that you will provide will be looked up in the specified node databases (for example, for the two provided identifiers to be found, you would need to specify the IDs of the "HGNC" and "Ensembl" databases). If you are not sure, you can just specify the IDs of all of the available databases, although this will increase the time it takes to generate the network. The available databases can be found <a asp-page="/Content/DatabaseTypes/Default/Databases/Databases/Index" asp-route-filter="HasDatabaseNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 </div>
                 <div class="mb-1 text-center">
                     <figure class="figure">
@@ -162,7 +162,7 @@
                     </figure>
                 </div>
                 <div class="mb-1">
-                    <span>Once the corresponding proteins will have been found, the interactions between them will be looked up in the specified edge databases (an edge may appear in one or more of the databases). The available databases can be found <a asp-page="/Content/Databases/Databases/Index" asp-route-filter="HasDatabaseEdges" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    <span>Once the corresponding proteins will have been found, the interactions between them will be looked up in the specified edge databases (an edge may appear in one or more of the databases). The available databases can be found <a asp-page="/Content/DatabaseTypes/Default/Databases/Databases/Index" asp-route-filter="HasDatabaseEdges" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 </div>
                 <div class="mb-1 text-center">
                     <figure class="figure">
@@ -237,7 +237,7 @@
         </div>
         <div class="mb-1">
             <div class="mb-0">
-                <span>Once a network has been generated, you can start the analysis creation by navigating to the <a asp-page="/Content/Created/Analyses/Index">Analyses</a> overview page. Here, you need to select the type of the analysis that you would like to define (which only influences the networks and node collections that it can use), as well as the algorithm to be used:</span>
+                <span>Once a network has been generated, you can start the analysis creation by navigating to the <a asp-page="/Content/DatabaseTypes/Default/Created/Analyses/Index">Analyses</a> overview page. Here, you need to select the type of the analysis that you would like to define (which only influences the networks and node collections that it can use), as well as the algorithm to be used:</span>
             </div>
             <ul class="mb-0">
                 <li class="">
@@ -285,7 +285,7 @@
             </figure>
         </div>
         <div class="mb-1">
-            <span>Optionally, you can provide a set of source nodes to be used by the analysis. The source nodes represents nodes which you would prefer to have as control nodes returned by the analysis (for example, nodes corresponding to drug-targettable proteins). Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/Other/Samples/Index" asp-route-filter="HasSourceNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+            <span>Optionally, you can provide a set of source nodes to be used by the analysis. The source nodes represent nodes which you would prefer to have as control nodes returned by the analysis (for example, nodes corresponding to drug-targettable proteins). Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/DatabaseTypes/Default/Other/Samples/Index" asp-route-filter="HasSourceNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
         </div>
         <div class="mb-1 text-center">
             <figure class="figure">
@@ -312,7 +312,7 @@
             <span>The actual way in which the provided source nodes will influence the analysis can be configured within the algorithm parameters. All source nodes that can not be found in the combined network will be ignored.</span>
         </div>
         <div class="mb-1">
-            <span>Next, you need to provide the set of target nodes to be used by the analysis. The target nodes represent nodes which you want to control (for example, nodes corresponding to disease-essential proteins). Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/Other/Samples/Index" asp-route-filter="HasTargetNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+            <span>Next, you need to provide the set of target nodes to be used by the analysis. The target nodes represent nodes which you want to control (for example, nodes corresponding to disease-essential proteins). Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type. Possible input samples can be found <a asp-page="/Content/DatabaseTypes/Default/Other/Samples/Index" asp-route-filter="HasTargetNodes" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
         </div>
         <div class="mb-1 text-center">
             <figure class="figure">
