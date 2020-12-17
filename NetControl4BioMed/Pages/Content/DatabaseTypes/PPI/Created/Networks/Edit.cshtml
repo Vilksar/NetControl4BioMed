@@ -1,0 +1,79 @@
+﻿@page
+@model EditModel
+@{
+    ViewData["Title"] = "Edit network";
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Details/Index" asp-route-id="@Model.View.Network.Id" class="btn btn-info btn-block" title="Details">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>Details</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Delete" asp-route-ids="@Model.View.Network.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-pencil-alt"></i></span>
+            </div>
+            <div>
+                <span>Edit</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="post" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
+            <div class="form-group" hidden>
+                <label asp-for="Input.Id" class="font-weight-bold">ID</label>
+                <input asp-for="Input.Id" class="form-control" readonly />
+                <span asp-description-for="Input.Id" class="text-muted small">The ID of the network.</span>
+                <span asp-validation-for="Input.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Name" class="font-weight-bold">Name</label>
+                <input asp-for="Input.Name" class="form-control" />
+                <span asp-description-for="Input.Name" class="text-muted small">The name of the network.</span>
+                <span asp-validation-for="Input.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="Input.Description" class="form-control"></textarea>
+                <span asp-description-for="Input.Description" class="text-muted small">The description of the network.</span>
+                <span asp-validation-for="Input.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.IsPublic" class="font-weight-bold">Set the network as public?</label>
+                <select asp-for="Input.IsPublic" class="custom-select form-control">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+                <span asp-description-for="Input.IsPublic" class="text-muted small">The public availability of the network. If public, anyone that has its ID or URL can access it.</span>
+                <span asp-validation-for="Input.IsPublic" class="text-danger small"></span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+                <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+                <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+                <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+            </div>
+            <button type="submit" class="btn btn-block btn-warning" title="Update">
+                <span><i class="fas fa-pencil-alt"></i></span>
+                <span>Update</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+    <partial name="_ScriptsReCaptchaPartial" />
+}

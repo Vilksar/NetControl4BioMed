@@ -16,7 +16,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Default.Created
         public IActionResult OnGet()
         {
             // Redirect to the index page.
-            return RedirectToPage("/Content/DatabaseTypes/Default/DatabaseTypes/Default/Index");
+            return RedirectToPage("/Content/DatabaseTypes/Default/Index");
         }
     }
 }

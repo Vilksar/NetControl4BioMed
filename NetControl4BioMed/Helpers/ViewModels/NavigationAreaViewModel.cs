@@ -1080,27 +1080,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Index"
                         }
                     }
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Other",
-                    Title = "Other",
-                    Description = string.Empty,
-                    Icon = "fa-ellipsis-h",
-                    Color = "warning",
-                    Link = "/Content/DatabaseTypes/Generic/Other/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Samples",
-                            Title = "Samples",
-                            Description = string.Empty,
-                            Icon = "fa-paste",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Other/Samples/Index"
-                        }
-                    }
                 }
             }
         };
@@ -1492,27 +1471,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Icon = "fa-desktop",
                             Color = "light",
                             Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Index"
-                        }
-                    }
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Other",
-                    Title = "Other",
-                    Description = string.Empty,
-                    Icon = "fa-ellipsis-h",
-                    Color = "warning",
-                    Link = "/Content/DatabaseTypes/PPI/Other/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Samples",
-                            Title = "Samples",
-                            Description = string.Empty,
-                            Icon = "fa-paste",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Other/Samples/Index"
                         }
                     }
                 }
