@@ -31,5 +31,15 @@ namespace NetControl4BioMed.Helpers.InputModels
         /// Represents the data of the sample.
         /// </summary>
         public string Data { get; set; }
+
+        /// <summary>
+        /// Represents the sample types of the sample.
+        /// </summary>
+        public IEnumerable<SampleTypeInputModel> SampleTypes { get; set; }
+
+        /// <summary>
+        /// Represents the sample databases of the sample.
+        /// </summary>
+        public IEnumerable<SampleDatabaseInputModel> SampleDatabases { get; set; }
     }
 }

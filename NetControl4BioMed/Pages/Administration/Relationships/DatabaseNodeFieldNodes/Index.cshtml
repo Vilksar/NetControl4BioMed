@@ -53,8 +53,8 @@
                     <tr class="item-group-item">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" id="checkbox-@item.DatabaseNodeField.Id-@item.Node.Id" name="ids" value="@item.Node.Id" class="custom-control-input item-group-item-checkbox" title="Select" />
-                                <label for="checkbox-@item.DatabaseNodeField.Id-@item.Node.Id" class="custom-control-label"></label>
+                                <input type="checkbox" id="checkbox-@item.DatabaseNodeField.Id-@item.Node.Id-@item.Value.ToString().Replace(" ", "-")" name="ids" value="@item.Node.Id" class="custom-control-input item-group-item-checkbox" title="Select" />
+                                <label for="checkbox-@item.DatabaseNodeField.Id-@item.Node.Id-@item.Value.ToString().Replace(" ", "-")" class="custom-control-label"></label>
                             </div>
                         </td>
                         <td class="text-left text-break">

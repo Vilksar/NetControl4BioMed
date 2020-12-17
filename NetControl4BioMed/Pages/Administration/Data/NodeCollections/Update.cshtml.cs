@@ -71,6 +71,13 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                         Id = "ID",
                         Name = "Name",
                         Description = "Description",
+                        NodeCollectionTypes = new List<NodeCollectionTypeInputModel>
+                        {
+                            new NodeCollectionTypeInputModel
+                            {
+                                Type = "Type"
+                            }
+                        },
                         NodeCollectionDatabases = new List<NodeCollectionDatabaseInputModel>
                         {
                             new NodeCollectionDatabaseInputModel
@@ -105,6 +112,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 Id = item.Id,
                 Name = item.Name,
                 Description = item.Description,
+                NodeCollectionTypes = item.NodeCollectionTypes.Select(item1 => new NodeCollectionTypeInputModel
+                {
+                   Type = item1.Type.ToString() 
+                }),
                 NodeCollectionDatabases = item.NodeCollectionDatabases.Select(item1 => new NodeCollectionDatabaseInputModel
                 {
                     Database = new DatabaseInputModel
@@ -148,6 +159,13 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                         Id = "ID",
                         Name = "Name",
                         Description = "Description",
+                        NodeCollectionTypes = new List<NodeCollectionTypeInputModel>
+                        {
+                            new NodeCollectionTypeInputModel
+                            {
+                                Type = "Type"
+                            }
+                        },
                         NodeCollectionDatabases = new List<NodeCollectionDatabaseInputModel>
                         {
                             new NodeCollectionDatabaseInputModel

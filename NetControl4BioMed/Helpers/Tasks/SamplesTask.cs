@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
@@ -12,6 +11,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using EnumerationSampleType = NetControl4BioMed.Data.Enumerations.SampleType;
 
 namespace NetControl4BioMed.Helpers.Tasks
 {
@@ -65,23 +65,39 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Throw an exception.
                     throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
+                // Get the IDs of the related entities that appear in the current batch.
+                var batchDatabaseIds = batchItems
+                    .Where(item => item.SampleDatabases != null)
+                    .Select(item => item.SampleDatabases)
+                    .SelectMany(item => item)
+                    .Where(item => item.Database != null)
+                    .Select(item => item.Database)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id)
+                    .Distinct();
                 // Define the list of items to get.
                 var validBatchIds = new List<string>();
+                var databases = new List<Database>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
                     // Use a new context instance.
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the related entities that appear in the current batch.
+                    databases = context.Databases
+                        .Where(item => batchDatabaseIds.Contains(item.Id))
+                        .Distinct()
+                        .ToList();
                     // Get the valid IDs, that do not appear in the database.
                     validBatchIds = batchIds
-                        .Except(context.Nodes
+                        .Except(context.Samples
                             .Where(item => batchIds.Contains(item.Id))
                             .Select(item => item.Id))
                         .ToList();
                 }
                 // Save the items to add.
                 var samplesToAdd = new List<Sample>();
-                // Go over each item in the current batch.
+                // Go over each of the items.
                 foreach (var batchItem in batchItems)
                 {
                     // Check if the ID of the item is not valid.
@@ -90,22 +106,67 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Continue.
                         continue;
                     }
-                    // Check if the type is not valid.
-                    if (!Enum.TryParse<SampleType>(batchItem.Type, out var type))
+                    // Check if there were no sample databases provided.
+                    if (batchItem.SampleDatabases == null || !batchItem.SampleDatabases.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("The provided type is not valid.", showExceptionItem, batchItem);
+                        throw new TaskException("There were no sample databases provided.", showExceptionItem, batchItem);
                     }
-                    // Define the new sample.
+                    // Get the sample databases.
+                    var sampleDatabases = batchItem.SampleDatabases
+                        .Where(item => item.Database != null)
+                        .Where(item => !string.IsNullOrEmpty(item.Database.Id))
+                        .Select(item => item.Database.Id)
+                        .Distinct()
+                        .Where(item => databases.Any(item1 => item1.Id == item))
+                        .Select(item => new SampleDatabase
+                        {
+                            DatabaseId = item
+                        });
+                    // Check if there were no node collection databases found.
+                    if (sampleDatabases == null || !sampleDatabases.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no sample databases found.", showExceptionItem, batchItem);
+                    }
+                    // Check if there were no sample types provided.
+                    if (batchItem.SampleTypes == null || !batchItem.SampleTypes.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no sample types provided.", showExceptionItem, batchItem);
+                    }
+                    // Get the node collection types.
+                    var sampleTypes = batchItem.SampleTypes
+                        .Select(item => item.Type)
+                        .Select(item => (Enum.TryParse<EnumerationSampleType>(item, out var type), type))
+                        .Where(item => item.Item1)
+                        .Select(item => new SampleType
+                        {
+                            Type = item.Item2
+                        });
+                    // Check if there were no edge nodes found.
+                    if (sampleTypes == null || !sampleTypes.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no sample types found.", showExceptionItem, batchItem);
+                    }
+                    // Define the new node collection.
                     var sample = new Sample
                     {
                         DateTimeCreated = DateTime.UtcNow,
                         Name = batchItem.Name,
                         Description = batchItem.Description,
-                        Type = type,
-                        Data = batchItem.Data
+                        Data = batchItem.Data,
+                        SampleTypes = sampleTypes.ToList(),
+                        SampleDatabases = sampleDatabases.ToList()
                     };
-                    // Add the item to the list.
+                    // Check if there is any ID provided.
+                    if (!string.IsNullOrEmpty(batchItem.Id))
+                    {
+                        // Assign it to the node collection.
+                        sample.Id = batchItem.Id;
+                    }
+                    // Add the new node collection to the list.
                     samplesToAdd.Add(sample);
                 }
                 // Create the items.
@@ -146,10 +207,20 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the IDs of the items in the current batch.
                 var batchIds = batchItems
                     .Where(item => !string.IsNullOrEmpty(item.Id))
+                    .Select(item => item.Id);
+                // Get the IDs of the related entities that appear in the current batch.
+                var batchDatabaseIds = batchItems
+                    .Where(item => item.SampleDatabases != null)
+                    .Select(item => item.SampleDatabases)
+                    .SelectMany(item => item)
+                    .Where(item => item.Database != null)
+                    .Select(item => item.Database)
+                    .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
                 // Define the list of items to get.
                 var samples = new List<Sample>();
+                var databases = new List<Database>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -167,35 +238,85 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Get the items found.
                     samples = items
                         .ToList();
+                    // Get the related entities that appear in the current batch.
+                    databases = context.Databases
+                        .Where(item => batchDatabaseIds.Contains(item.Id))
+                        .Distinct()
+                        .ToList();
                 }
+                // Get the IDs of the items.
+                var sampleIds = samples
+                    .Select(item => item.Id);
                 // Save the items to edit.
                 var samplesToEdit = new List<Sample>();
-                // Go over each item in the current batch.
+                // Go over each of the valid items.
                 foreach (var batchItem in batchItems)
                 {
                     // Get the corresponding item.
                     var sample = samples
-                        .FirstOrDefault(item => item.Id == batchItem.Id);
+                        .FirstOrDefault(item => batchItem.Id == item.Id);
                     // Check if there was no item found.
                     if (sample == null)
                     {
                         // Continue.
                         continue;
                     }
-                    // Check if the type is not valid.
-                    if (!Enum.TryParse<SampleType>(batchItem.Type, out var type))
+                    // Check if there were no sample databases provided.
+                    if (batchItem.SampleDatabases == null || !batchItem.SampleDatabases.Any())
                     {
                         // Throw an exception.
-                        throw new TaskException("The provided type is not valid.", showExceptionItem, batchItem);
+                        throw new TaskException("There were no sample databases provided.", showExceptionItem, batchItem);
                     }
-                    // Update the item.
+                    // Get the sample databases.
+                    var sampleDatabases = batchItem.SampleDatabases
+                        .Where(item => item.Database != null)
+                        .Where(item => !string.IsNullOrEmpty(item.Database.Id))
+                        .Select(item => item.Database.Id)
+                        .Distinct()
+                        .Where(item => databases.Any(item1 => item1.Id == item))
+                        .Select(item => new SampleDatabase
+                        {
+                            DatabaseId = item
+                        });
+                    // Check if there were no node collection databases found.
+                    if (sampleDatabases == null || !sampleDatabases.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no sample databases found.", showExceptionItem, batchItem);
+                    }
+                    // Check if there were no sample types provided.
+                    if (batchItem.SampleTypes == null || !batchItem.SampleTypes.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no sample types provided.", showExceptionItem, batchItem);
+                    }
+                    // Get the node collection types.
+                    var sampleTypes = batchItem.SampleTypes
+                        .Select(item => item.Type)
+                        .Select(item => (Enum.TryParse<EnumerationSampleType>(item, out var type), type))
+                        .Where(item => item.Item1)
+                        .Select(item => new SampleType
+                        {
+                            Type = item.Item2
+                        });
+                    // Check if there were no edge nodes found.
+                    if (sampleTypes == null || !sampleTypes.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no sample types found.", showExceptionItem, batchItem);
+                    }
+                    // Update the node collection.
                     sample.Name = batchItem.Name;
                     sample.Description = batchItem.Description;
-                    sample.Type = type;
                     sample.Data = batchItem.Data;
-                    // Add the item to the list.
+                    sample.SampleTypes = sampleTypes.ToList();
+                    sample.SampleDatabases = sampleDatabases.ToList();
+                    // Add the node collection to the list.
                     samplesToEdit.Add(sample);
                 }
+                // Delete the related entities.
+                await SampleExtensions.DeleteRelatedEntitiesAsync<SampleType>(sampleIds, serviceProvider, token);
+                await SampleExtensions.DeleteRelatedEntitiesAsync<SampleDatabase>(sampleIds, serviceProvider, token);
                 // Update the items.
                 await IEnumerableExtensions.EditAsync(samplesToEdit, serviceProvider, token);
             }
@@ -251,6 +372,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     samples = items
                         .ToList();
                 }
+                // Get the IDs of the items.
+                var sampleIds = samples
+                    .Select(item => item.Id);
+                // Delete the related entities.
+                await SampleExtensions.DeleteRelatedEntitiesAsync<SampleType>(sampleIds, serviceProvider, token);
+                await SampleExtensions.DeleteRelatedEntitiesAsync<SampleDatabase>(sampleIds, serviceProvider, token);
                 // Delete the items.
                 await IEnumerableExtensions.DeleteAsync(samples, serviceProvider, token);
             }

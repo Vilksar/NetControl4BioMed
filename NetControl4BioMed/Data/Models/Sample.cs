@@ -32,13 +32,18 @@ namespace NetControl4BioMed.Data.Models
         public string Description { get; set; }
 
         /// <summary>
-        /// Gets or sets the type of the sample.
-        /// </summary>
-        public SampleType Type { get; set; }
-
-        /// <summary>
         /// Gets or sets the data of the sample.
         /// </summary>
         public string Data { get; set; }
+
+        /// <summary>
+        /// Gets or sets the types of the sample uses.
+        /// </summary>
+        public ICollection<SampleType> SampleTypes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the databases that the sample uses.
+        /// </summary>
+        public ICollection<SampleDatabase> SampleDatabases { get; set; }
     }
 }

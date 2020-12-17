@@ -42,6 +42,15 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task CreateNodeCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
+        /// Creates samples in the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        [AutomaticRetry(Attempts = 0)]
+        [DisableConcurrentExecution(86400)]
+        Task CreateSamplesAsync(string id, CancellationToken token);
+
+        /// <summary>
         /// Edits nodes in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
@@ -67,6 +76,15 @@ namespace NetControl4BioMed.Helpers.Interfaces
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         Task EditNodeCollectionsAsync(string id, CancellationToken token);
+
+        /// <summary>
+        /// Edits samples in the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        [AutomaticRetry(Attempts = 2)]
+        [DisableConcurrentExecution(86400)]
+        Task EditSamplesAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes users from the database.

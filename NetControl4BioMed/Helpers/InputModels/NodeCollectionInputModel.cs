@@ -23,6 +23,11 @@ namespace NetControl4BioMed.Helpers.InputModels
         public string Description { get; set; }
 
         /// <summary>
+        /// Represents the node collection types of the node collection.
+        /// </summary>
+        public IEnumerable<NodeCollectionTypeInputModel> NodeCollectionTypes { get; set; }
+
+        /// <summary>
         /// Represents the node collection databases of the node collection.
         /// </summary>
         public IEnumerable<NodeCollectionDatabaseInputModel> NodeCollectionDatabases { get; set; }

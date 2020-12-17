@@ -214,9 +214,9 @@
                         <option value="AllNodes" title="Nodes">Nodes</option>
                         <option value="AllEdges" title="Edges">Edges</option>
                         <option value="AllNodeCollections" title="Node collections">Node collections</option>
+                        <option value="AllSamples" title="Samples">Samples</option>
                         <option value="AllNetworks" title="Networks">Networks</option>
                         <option value="AllAnalyses" title="Analyses">Analyses</option>
-                        <option value="AllSamples" title="Samples">Samples</option>
                     </optgroup>
                     <optgroup title="Duplicate" label="Duplicate">
                         <option value="DuplicateDatabaseTypes" title="Database types">Database types</option>
@@ -228,11 +228,13 @@
                         <option value="DuplicateNodes" title="Nodes">Nodes</option>
                         <option value="DuplicateEdges" title="Edges">Edges</option>
                         <option value="DuplicateNodeCollections" title="Node collections">Node collections</option>
+                        <option value="DuplicateSamples" title="Samples">Samples</option>
                     </optgroup>
                     <optgroup title="Orphaned" label="Orphaned">
                         <option value="OrphanedNodes" title="Nodes">Nodes</option>
                         <option value="OrphanedEdges" title="Edges">Edges</option>
                         <option value="OrphanedNodeCollections" title="Node collections">Node collections</option>
+                        <option value="OrphanedSamples" title="Samples">Samples</option>
                         <option value="OrphanedNetworks" title="Networks">Networks</option>
                         <option value="OrphanedAnalyses" title="Analyses">Analyses</option>
                     </optgroup>
@@ -240,6 +242,7 @@
                         <option value="InconsistentNodes" title="Nodes">Nodes</option>
                         <option value="InconsistentEdges" title="Edges">Edges</option>
                         <option value="InconsistentNodeCollections" title="Node collections">Node collections</option>
+                        <option value="InconsistentSamples" title="Samples">Samples</option>
                         <option value="InconsistentNetworks" title="Networks">Networks</option>
                         <option value="InconsistentAnalyses" title="Analyses">Analyses</option>
                     </optgroup>
@@ -296,9 +299,9 @@
                     <option value="Nodes" title="Nodes">Nodes</option>
                     <option value="Edges" title="Edges">Edges</option>
                     <option value="NodeCollections" title="Node collections">Node collections</option>
+                    <option value="Samples" title="Samples">Samples</option>
                     <option value="Networks" title="Networks">Networks</option>
                     <option value="Analyses" title="Analyses">Analyses</option>
-                    <option value="Samples" title="Samples">Samples</option>
                 </select>
                 <span description-for="deleteItems" class="text-muted small">The items to delete.</span>
                 <span validation-for="deleteItems" class="text-danger small"></span>
@@ -306,7 +309,7 @@
             <div class="form-group">
                 <label for="deleteConfirmation" class="font-weight-bold">Confirmation</label>
                 <input for="deleteConfirmation" id="deleteConfirmation" name="deleteConfirmation" class="form-control" autocomplete="off" required="required" />
-                <span description-for="deleteConfirmation" class="text-muted small">The confirmation for the deletion. You need to type "I confirm that I want to delete <span class=""> all Items</span>!" (including the exclamation mark), replacing the word "Items" with the case-sensitive name of the actual items that you would like to delete ("Nodes", "Edges", "NodeCollections", "Networks", "Analyses", or "Samples"). If more than one set of items is to be deleted at a time, then they should be separated by the word "and" ("all Nodes and all Edges and all NodeCollections and all Networks and all Analyses and all Samples"), in the same order as in the previous selection.</span>
+                <span description-for="deleteConfirmation" class="text-muted small">The confirmation for the deletion. You need to type "I confirm that I want to delete <span class=""> all Items</span>!" (including the exclamation mark), replacing the word "Items" with the case-sensitive name of the actual items that you would like to delete ("Nodes", "Edges", "NodeCollections", "Samples", "Networks", or "Analyses"). If more than one set of items is to be deleted at a time, then they should be separated by the word "and" ("all Nodes and all Edges and all NodeCollections and all Samples and all Networks and all Analyses"), in the same order as in the previous selection.</span>
                 <span validation-for="deleteConfirmation" class="text-danger small"></span>
             </div>
             <div class="form-group" hidden>

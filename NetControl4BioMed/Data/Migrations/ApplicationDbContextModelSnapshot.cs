@@ -784,6 +784,19 @@ namespace NetControl4BioMed.Data.Migrations
                     b.ToTable("NodeCollectionNodes");
                 });
 
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.NodeCollectionType", b =>
+                {
+                    b.Property<string>("NodeCollectionId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("NodeCollectionId", "Type");
+
+                    b.ToTable("NodeCollectionTypes");
+                });
+
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Path", b =>
                 {
                     b.Property<string>("Id")
@@ -888,12 +901,37 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Samples");
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.SampleDatabase", b =>
+                {
+                    b.Property<string>("SampleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DatabaseId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("SampleId", "DatabaseId");
+
+                    b.HasIndex("DatabaseId");
+
+                    b.ToTable("SampleDatabases");
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.SampleType", b =>
+                {
+                    b.Property<string>("SampleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("SampleId", "Type");
+
+                    b.ToTable("SampleTypes");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.User", b =>
@@ -1363,6 +1401,15 @@ namespace NetControl4BioMed.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.NodeCollectionType", b =>
+                {
+                    b.HasOne("NetControl4BioMed.Data.Models.NodeCollection", "NodeCollection")
+                        .WithMany("NodeCollectionTypes")
+                        .HasForeignKey("NodeCollectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Path", b =>
                 {
                     b.HasOne("NetControl4BioMed.Data.Models.ControlPath", "ControlPath")
@@ -1398,6 +1445,30 @@ namespace NetControl4BioMed.Data.Migrations
                     b.HasOne("NetControl4BioMed.Data.Models.Path", "Path")
                         .WithMany("PathNodes")
                         .HasForeignKey("PathId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.SampleDatabase", b =>
+                {
+                    b.HasOne("NetControl4BioMed.Data.Models.Database", "Database")
+                        .WithMany("SampleDatabases")
+                        .HasForeignKey("DatabaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NetControl4BioMed.Data.Models.Sample", "Sample")
+                        .WithMany("SampleDatabases")
+                        .HasForeignKey("SampleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.SampleType", b =>
+                {
+                    b.HasOne("NetControl4BioMed.Data.Models.Sample", "Sample")
+                        .WithMany("SampleTypes")
+                        .HasForeignKey("SampleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

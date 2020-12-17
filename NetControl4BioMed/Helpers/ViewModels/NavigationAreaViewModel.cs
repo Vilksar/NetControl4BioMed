@@ -301,6 +301,15 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Icon = "fa-folder",
                             Color = "light",
                             Link = "/Administration/Data/NodeCollections/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "Samples",
+                            Title = "Samples",
+                            Description = string.Empty,
+                            Icon = "fa-paste",
+                            Color = "light",
+                            Link = "/Administration/Data/Samples/Index"
                         }
                     }
                 },
@@ -361,6 +370,15 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         },
                         new NavigationPageViewModel
                         {
+                            Id = "NodeCollectionTypes",
+                            Title = "Node collection types",
+                            Description = string.Empty,
+                            Icon = "fa-folder",
+                            Color = "light",
+                            Link = "/Administration/Relationships/NodeCollectionTypes/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
                             Id = "NodeCollectionDatabases",
                             Title = "Node collection databases",
                             Description = string.Empty,
@@ -376,6 +394,24 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Icon = "fa-folder",
                             Color = "light",
                             Link = "/Administration/Relationships/NodeCollectionNodes/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "SampleTypes",
+                            Title = "Sample types",
+                            Description = string.Empty,
+                            Icon = "fa-paste",
+                            Color = "light",
+                            Link = "/Administration/Relationships/SampleTypes/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "SampleDatabases",
+                            Title = "Sample databases",
+                            Description = string.Empty,
+                            Icon = "fa-paste",
+                            Color = "light",
+                            Link = "/Administration/Relationships/SampleDatabases/Index"
                         }
                     }
                 },
@@ -427,15 +463,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Icon = "fa-tasks",
                             Color = "light",
                             Link = "/Administration/Other/BackgroundTasks/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "Samples",
-                            Title = "Samples",
-                            Description = string.Empty,
-                            Icon = "fa-paste",
-                            Color = "light",
-                            Link = "/Administration/Other/Samples/Index"
                         }
                     }
                 }
