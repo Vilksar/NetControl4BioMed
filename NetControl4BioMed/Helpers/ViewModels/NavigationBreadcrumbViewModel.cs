@@ -527,6 +527,36 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
+        /// Gets the navigation breadcrumb for the content generic data index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Data",
+            Title = "Data",
+            Link = "/Content/Generic/Data/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content generic data nodes index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericDataNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Nodes",
+            Title = "Nodes",
+            Link = "/Content/Generic/Data/Nodes/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content generic data edges index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericDataEdgesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Edges",
+            Title = "Edges",
+            Link = "/Content/Generic/Data/Edges/Index"
+        };
+
+        /// <summary>
         /// Gets the navigation breadcrumb for the content PPI index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPINavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
