@@ -7,12 +7,12 @@
 }
 
 @section Breadcrumbs {
-    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.ContentDatabaseTypesPPICreatedAnalysesDetailsNavigationBreadcrumb" />
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.ContentDatabaseTypesGenericCreatedAnalysesDetailsNavigationBreadcrumb" />
     @RenderSection("Breadcrumbs", required: false)
 }
 
 @section Navigation {
-    <partial name="_NavigationAreaPartial" model="@Helpers.ViewModels.NavigationAreaViewModel.GetContentDefaultAnalysisNavigationArea(Model.View.Analysis)" />
+    <partial name="_NavigationAreaPartial" model="@Helpers.ViewModels.NavigationAreaViewModel.GetContentGenericAnalysisNavigationArea(Model.View.Analysis)" />
     @RenderSection("Navigation", required: false)
 }
 
