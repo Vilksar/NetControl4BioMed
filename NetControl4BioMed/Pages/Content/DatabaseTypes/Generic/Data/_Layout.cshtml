@@ -1,5 +1,5 @@
 ﻿@{
-    Layout = "/Pages/Content/DatabaseTypes/PPI/Databases/_Layout.cshtml";
+    Layout = "/Pages/Content/DatabaseTypes/Generic/_Layout.cshtml";
 }
 
 @section Banner {
@@ -7,7 +7,7 @@
 }
 
 @section Breadcrumbs {
-    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.ContentDatabaseTypesPPIDatabasesDatabaseNodeFieldsNavigationBreadcrumb" />
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.ContentDatabaseTypesGenericDataNavigationBreadcrumb" />
     @RenderSection("Breadcrumbs", required: false)
 }
 
