@@ -1,0 +1,88 @@
+﻿@page
+@model IndexModel
+@using NetControl4BioMed.Data.Enumerations
+@using Helpers.Extensions
+@{
+    ViewData["Title"] = "Analysis paths";
+}
+
+@if (Model.View.Analysis.Algorithm == AnalysisAlgorithm.Genetic)
+{
+    <div class="alert alert-warning text-justify text-wrap">
+        <span><i class="fas fa-exclamation-triangle"></i></span>
+        <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control nodes, and not control paths. Thus, all displayed path lengths correspond to the shortest paths between a control node and its corresponding controlled target nodes, instead of the actual control path.</span>
+    </div>
+}
+<partial name="_SearchInputPartial" model="Model.View.Search.Input" />
+<partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
+@if (!Model.View.Search.Items.Any())
+{
+    <div class="alert alert-info text-justify text-wrap">
+        <span><i class="fas fa-info-circle"></i></span>
+        <span>No paths have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
+    </div>
+}
+else
+{
+    <table class="table table-hover table-bordered" data-paging="false" data-info="false" data-searching="false">
+        <thead class="thead-light">
+            <tr>
+                <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                    <span>#</span>
+                </th>
+                <th class="text-left text-break">
+                    <span>Control node</span>
+                </th>
+                <th class="text-left text-break">
+                    <span>Target node</span>
+                </th>
+                <th class="d-none d-lg-table-cell text-center text-break">
+                    <span>Length</span>
+                </th>
+                <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                    <span>Links</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var (item, index) in Model.View.Search.Items.Select((item, index) => (item, index)))
+            {
+                var sourceNode = item.PathNodes
+                    .Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Source)
+                    .Select(item => item.Node)
+                    .First();
+                var targetNode = item.PathNodes
+                    .Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.Target)
+                    .Select(item => item.Node)
+                    .First();
+                var pathLength = item.PathNodes
+                    .Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.None)
+                    .Count() - 1;
+                <tr>
+                    <td class="text-center text-break">
+                        <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
+                    </td>
+                    <td class="text-left text-break">
+                        <span title="@sourceNode.Name" class="font-weight-bold">@sourceNode.Name</span>
+                        <br />
+                        <span title="@sourceNode.Id" class="small text-muted">@sourceNode.Id</span>
+                    </td>
+                    <td class="text-left text-break">
+                        <span title="@targetNode.Name" class="font-weight-bold">@targetNode.Name</span>
+                        <br />
+                        <span title="@targetNode.Id" class="small text-muted">@targetNode.Id</span>
+                    </td>
+                    <td class="d-none d-lg-table-cell text-center text-break">
+                        <span title="@pathLength">@pathLength</span>
+                    </td>
+                    <td class="text-center text-break">
+                        <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Details/Created/ControlPaths/Details/Paths/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                            <span><i class="fas fa-info-circle"></i></span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <partial name="_SearchPaginationPartial" model="Model.View.Search.Pagination" />
+}

@@ -727,6 +727,16 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
+        /// Gets the navigation breadcrumb for the content generic created index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericCreatedNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Created",
+            Title = "Created",
+            Link = "/Content/Generic/Created/Index"
+        };
+
+        /// <summary>
         /// Gets the navigation breadcrumb for the content generic created analyses index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericCreatedAnalysesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
@@ -904,26 +914,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "Databases",
             Title = "Databases",
             Link = "/Content/PPI/Databases/Databases/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content other index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIOtherNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Other",
-            Title = "Other",
-            Link = "/Content/PPI/Other/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content other samples index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIOtherSamplesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Samples",
-            Title = "Samples",
-            Link = "/Content/PPI/Other/Samples/Index"
         };
     }
 }

@@ -19,13 +19,11 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Default
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
-        private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public IndexModel(UserManager<User> userManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
+        public IndexModel(UserManager<User> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _context = context;
-            _reCaptchaChecker = reCaptchaChecker;
         }
 
         public ViewModel View { get; set; }
