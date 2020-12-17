@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
@@ -11,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EnumerationNodeCollectionType = NetControl4BioMed.Data.Enumerations.NodeCollectionType;
 
 namespace NetControl4BioMed.Helpers.Tasks
 {
@@ -104,7 +104,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .ToList();
                     // Get the valid IDs, that do not appear in the database.
                     validBatchIds = batchIds
-                        .Except(context.Edges
+                        .Except(context.NodeCollections
                             .Where(item => batchIds.Contains(item.Id))
                             .Select(item => item.Id))
                         .ToList();
@@ -144,7 +144,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("There were no node collection databases found.", showExceptionItem, batchItem);
                     }
                     // Check if there were no node collection nodes provided.
-                    if (batchItem.NodeCollectionNodes == null)
+                    if (batchItem.NodeCollectionNodes == null || !batchItem.NodeCollectionNodes.Any())
                     {
                         // Throw an exception.
                         throw new TaskException("There were no node collection nodes provided.", showExceptionItem, batchItem);
@@ -158,11 +158,32 @@ namespace NetControl4BioMed.Helpers.Tasks
                         {
                             NodeId = item.Node.Id
                         });
-                    // Check if there were no edge nodes found.
-                    if (nodeCollectionNodes == null)
+                    // Check if there were no node collection nodes found.
+                    if (nodeCollectionNodes == null || !nodeCollectionNodes.Any())
                     {
                         // Throw an exception.
                         throw new TaskException("There were no node collection nodes found.", showExceptionItem, batchItem);
+                    }
+                    // Check if there were no node collection types provided.
+                    if (batchItem.NodeCollectionTypes == null || !batchItem.NodeCollectionTypes.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no node collection types provided.", showExceptionItem, batchItem);
+                    }
+                    // Get the node collection types.
+                    var nodeCollectionTypes = batchItem.NodeCollectionTypes
+                        .Select(item => item.Type)
+                        .Select(item => (Enum.TryParse<EnumerationNodeCollectionType>(item, out var type), type))
+                        .Where(item => item.Item1)
+                        .Select(item => new NodeCollectionType
+                        {
+                            Type = item.Item2
+                        });
+                    // Check if there were no node collection types found.
+                    if (nodeCollectionTypes == null || !nodeCollectionTypes.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no node collection types found.", showExceptionItem, batchItem);
                     }
                     // Define the new node collection.
                     var nodeCollection = new NodeCollection
@@ -170,6 +191,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         DateTimeCreated = DateTime.UtcNow,
                         Name = batchItem.Name,
                         Description = batchItem.Description,
+                        NodeCollectionTypes = nodeCollectionTypes.ToList(),
                         NodeCollectionDatabases = nodeCollectionDatabases.ToList(),
                         NodeCollectionNodes = nodeCollectionNodes.ToList()
                     };
@@ -314,7 +336,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         throw new TaskException("There were no node collection databases found.", showExceptionItem, batchItem);
                     }
                     // Check if there were no node collection nodes provided.
-                    if (batchItem.NodeCollectionNodes == null)
+                    if (batchItem.NodeCollectionNodes == null || !batchItem.NodeCollectionNodes.Any())
                     {
                         // Throw an exception.
                         throw new TaskException("There were no node collection nodes provided.", showExceptionItem, batchItem);
@@ -328,15 +350,37 @@ namespace NetControl4BioMed.Helpers.Tasks
                         {
                             NodeId = item.Node.Id
                         });
-                    // Check if there were no edge nodes found.
-                    if (nodeCollectionNodes == null)
+                    // Check if there were no node collection nodes found.
+                    if (nodeCollectionNodes == null || !nodeCollectionNodes.Any())
                     {
                         // Throw an exception.
                         throw new TaskException("There were no node collection nodes found.", showExceptionItem, batchItem);
                     }
+                    // Check if there were no node collection types provided.
+                    if (batchItem.NodeCollectionTypes == null || !batchItem.NodeCollectionTypes.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no node collection types provided.", showExceptionItem, batchItem);
+                    }
+                    // Get the node collection types.
+                    var nodeCollectionTypes = batchItem.NodeCollectionTypes
+                        .Select(item => item.Type)
+                        .Select(item => (Enum.TryParse<EnumerationNodeCollectionType>(item, out var type), type))
+                        .Where(item => item.Item1)
+                        .Select(item => new NodeCollectionType
+                        {
+                            Type = item.Item2
+                        });
+                    // Check if there were no node collection types found.
+                    if (nodeCollectionTypes == null || !nodeCollectionTypes.Any())
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no node collection types found.", showExceptionItem, batchItem);
+                    }
                     // Update the node collection.
                     nodeCollection.Name = batchItem.Name;
                     nodeCollection.Description = batchItem.Description;
+                    nodeCollection.NodeCollectionTypes = nodeCollectionTypes.ToList();
                     nodeCollection.NodeCollectionDatabases = nodeCollectionDatabases.ToList();
                     nodeCollection.NodeCollectionNodes = nodeCollectionNodes.ToList();
                     // Add the node collection to the list.
@@ -346,6 +390,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 await NodeCollectionExtensions.DeleteDependentAnalysesAsync(nodeCollectionIds, serviceProvider, token);
                 await NodeCollectionExtensions.DeleteDependentNetworksAsync(nodeCollectionIds, serviceProvider, token);
                 // Delete the related entities.
+                await NodeCollectionExtensions.DeleteRelatedEntitiesAsync<NodeCollectionType>(nodeCollectionIds, serviceProvider, token);
                 await NodeCollectionExtensions.DeleteRelatedEntitiesAsync<NodeCollectionNode>(nodeCollectionIds, serviceProvider, token);
                 await NodeCollectionExtensions.DeleteRelatedEntitiesAsync<NodeCollectionDatabase>(nodeCollectionIds, serviceProvider, token);
                 // Update the items.
@@ -410,6 +455,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 await NodeCollectionExtensions.DeleteDependentAnalysesAsync(nodeCollectionIds, serviceProvider, token);
                 await NodeCollectionExtensions.DeleteDependentNetworksAsync(nodeCollectionIds, serviceProvider, token);
                 // Delete the related entities.
+                await NodeCollectionExtensions.DeleteRelatedEntitiesAsync<NodeCollectionType>(nodeCollectionIds, serviceProvider, token);
                 await NodeCollectionExtensions.DeleteRelatedEntitiesAsync<NodeCollectionNode>(nodeCollectionIds, serviceProvider, token);
                 await NodeCollectionExtensions.DeleteRelatedEntitiesAsync<NodeCollectionDatabase>(nodeCollectionIds, serviceProvider, token);
                 // Delete the items.

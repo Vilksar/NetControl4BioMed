@@ -17,8 +17,6 @@
             <span>Delete</span>
         </a>
     </div>
-    <div class="col-lg-12 mb-3">
-    </div>
 </div>
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
@@ -59,6 +57,24 @@
                 <span asp-validation-for="View.NodeCollection.Description" class="text-danger small"></span>
             </div>
         </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-font"></i></span>
+            </div>
+            <div>
+                <span>Types</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The node collection is currently assigned to @Model.View.TypeCount database@(Model.View.TypeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/NodeCollectionTypes/Index" asp-route-searchString="@Model.View.NodeCollection.Id" asp-route-searchIn="NodeCollectionId" class="alert-link">view the types</a>.</span>
+        </div>
     </div>
 </div>
 <div class="card mb-3">

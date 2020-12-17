@@ -73,6 +73,11 @@ namespace NetControl4BioMed.Helpers.InputModels
         public IEnumerable<NodeCollectionDatabaseInputModel> NodeCollectionDatabases { get; set; }
 
         /// <summary>
+        /// Represents the sample databases of the database.
+        /// </summary>
+        public IEnumerable<SampleDatabaseInputModel> SampleDatabases { get; set; }
+
+        /// <summary>
         /// Represents the network databases of the database.
         /// </summary>
         public IEnumerable<NetworkDatabaseInputModel> NetworkDatabases { get; set; }

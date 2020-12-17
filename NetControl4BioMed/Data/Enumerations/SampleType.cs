@@ -12,25 +12,25 @@ namespace NetControl4BioMed.Data.Enumerations
     public enum SampleType
     {
         /// <summary>
-        /// Represents a sample of seed nodes.
+        /// Represents a sample that contains seed nodes.
         /// </summary>
         [Display(Name = "Seed nodes", Description = "The sample contains seed nodes.")]
         SeedNodes,
 
         /// <summary>
-        /// Represents a sample of seed edges.
+        /// Represents a sample that contains seed edges.
         /// </summary>
         [Display(Name = "Seed edges", Description = "The sample contains seed edges.")]
         SeedEdges,
 
         /// <summary>
-        /// Represents a sample of source nodes.
+        /// Represents a sample that contains source nodes.
         /// </summary>
         [Display(Name = "Source nodes", Description = "The sample contains source nodes.")]
         SourceNodes,
 
         /// <summary>
-        /// Represents a sample of target nodes.
+        /// Represents a sample that contains target nodes.
         /// </summary>
         [Display(Name = "Target nodes", Description = "The sample contains target nodes.")]
         TargetNodes

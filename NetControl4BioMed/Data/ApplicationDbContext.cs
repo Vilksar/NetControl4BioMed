@@ -200,6 +200,11 @@ namespace NetControl4BioMed.Data
         public DbSet<NodeCollectionNode> NodeCollectionNodes { get; set; }
 
         /// <summary>
+        /// Gets or sets the database table containing the one-to-one relationship between node collections and types.
+        /// </summary>
+        public DbSet<NodeCollectionType> NodeCollectionTypes { get; set; }
+
+        /// <summary>
         /// Gets or sets the database table containing the paths in control paths for analyses.
         /// </summary>
         public DbSet<Path> Paths { get; set; }
@@ -218,6 +223,16 @@ namespace NetControl4BioMed.Data
         /// Gets or sets the database table containing the samples.
         /// </summary>
         public DbSet<Sample> Samples { get; set; }
+
+        /// <summary>
+        /// Gets or sets the database table containing the one-to-one relationship between samples and databases.
+        /// </summary>
+        public DbSet<SampleDatabase> SampleDatabases { get; set; }
+
+        /// <summary>
+        /// Gets or sets the database table containing the one-to-one relationship between samples and types.
+        /// </summary>
+        public DbSet<SampleType> SampleTypes { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the database context.
@@ -557,6 +572,14 @@ namespace NetControl4BioMed.Data
                     .HasForeignKey(item => item.NodeId)
                     .IsRequired();
             });
+            modelBuilder.Entity<NodeCollectionType>(entity =>
+            {
+                entity.HasKey(item => new { item.NodeCollectionId, item.Type });
+                entity.HasOne(item => item.NodeCollection)
+                    .WithMany(item => item.NodeCollectionTypes)
+                    .HasForeignKey(item => item.NodeCollectionId)
+                    .IsRequired();
+            });
             modelBuilder.Entity<Path>(entity =>
             {
                 entity.Property(item => item.Id)
@@ -594,6 +617,26 @@ namespace NetControl4BioMed.Data
             {
                 entity.Property(item => item.Id)
                     .ValueGeneratedOnAdd();
+            });
+            modelBuilder.Entity<SampleDatabase>(entity =>
+            {
+                entity.HasKey(item => new { item.SampleId, item.DatabaseId });
+                entity.HasOne(item => item.Sample)
+                    .WithMany(item => item.SampleDatabases)
+                    .HasForeignKey(item => item.SampleId)
+                    .IsRequired();
+                entity.HasOne(item => item.Database)
+                    .WithMany(item => item.SampleDatabases)
+                    .HasForeignKey(item => item.DatabaseId)
+                    .IsRequired();
+            });
+            modelBuilder.Entity<SampleType>(entity =>
+            {
+                entity.HasKey(item => new { item.SampleId, item.Type });
+                entity.HasOne(item => item.Sample)
+                    .WithMany(item => item.SampleTypes)
+                    .HasForeignKey(item => item.SampleId)
+                    .IsRequired();
             });
             modelBuilder.Entity<UserRole>(entity =>
             {

@@ -227,6 +227,16 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
+        /// Gets the navigation breadcrumb for the administration data samples index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AdministrationDataSamplesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Samples",
+            Title = "Samples",
+            Link = "/Administration/Data/Samples/Index"
+        };
+
+        /// <summary>
         /// Gets the navigation breadcrumb for the administration databases index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel AdministrationDatabasesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
@@ -294,16 +304,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "BackgroundTasks",
             Title = "Background tasks",
             Link = "/Administration/Other/BackgroundTasks/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the administration other samples index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel AdministrationOtherSamplesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Samples",
-            Title = "Samples",
-            Link = "/Administration/Other/Samples/Index"
         };
 
         /// <summary>
@@ -414,6 +414,36 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "NodeCollectionNodes",
             Title = "Node collection nodes",
             Link = "/Administration/Relationships/NodeCollectionNodes/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the administration relationships node collection types index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AdministrationRelationshipsNodeCollectionTypesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "NodeCollectionTypes",
+            Title = "Node collection types",
+            Link = "/Administration/Relationships/NodeCollectionTypes/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the administration relationships sample databases index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AdministrationRelationshipsSampleDatabasesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "SampleDatabases",
+            Title = "Sample databases",
+            Link = "/Administration/Relationships/SampleDatabases/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the administration relationships sample types index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AdministrationRelationshipsSampleTypesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "SampleTypes",
+            Title = "Sample types",
+            Link = "/Administration/Relationships/SampleTypes/Index"
         };
 
         /// <summary>
