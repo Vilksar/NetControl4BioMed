@@ -91,16 +91,9 @@
                             <partial name="_PathNodeTypePartial" model="pathNode.Type" />
                         </td>
                         <td class="text-center text-break">
-                            @if (!Model.View.IsGeneric)
-                            {
-                                <a asp-page="/Content/DatabaseTypes/Generic/Data/Nodes/Details" asp-route-id="@pathNode.Node.Id" title="Details">
-                                    <span>Details</span>
-                                </a>
-                            }
-                            else
-                            {
-                                <span>-</span>
-                            }
+                            <a asp-page="/Content/DatabaseTypes/Generic/Data/Nodes/Details" asp-route-id="@pathNode.Node.Id" title="Details">
+                                <span>Details</span>
+                            </a>
                         </td>
                     </tr>
                 }
@@ -155,16 +148,9 @@
                             <span title="@pathEdge.Index">@pathEdge.Index</span>
                         </td>
                         <td class="text-center text-break">
-                            @if (!Model.View.IsGeneric)
-                            {
-                                <a asp-page="/Content/DatabaseTypes/Generic/Data/Edges/Details" asp-route-id="@pathEdge.Edge.Id" title="Details">
-                                    <span>Details</span>
-                                </a>
-                            }
-                            else
-                            {
-                                <span>-</span>
-                            }
+                            <a asp-page="/Content/DatabaseTypes/Generic/Data/Edges/Details" asp-route-id="@pathEdge.Edge.Id" title="Details">
+                                <span>Details</span>
+                            </a>
                         </td>
                     </tr>
                 }

@@ -45,10 +45,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
         {
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            public string DatabaseTypeId { get; set; }
-
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
             public string Name { get; set; }
 
             [DataType(DataType.MultilineText)]
@@ -58,25 +54,9 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
             [Required(ErrorMessage = "This field is required.")]
             public bool IsPublic { get; set; }
 
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
-            public string Algorithm { get; set; }
-
-            [DataType(DataType.MultilineText)]
-            [Required(ErrorMessage = "This field is required.")]
-            public string NodeDatabaseData { get; set; }
-
-            [DataType(DataType.MultilineText)]
-            [Required(ErrorMessage = "This field is required.")]
-            public string EdgeDatabaseData { get; set; }
-
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
             public string SeedData { get; set; }
-
-            [DataType(DataType.MultilineText)]
-            [Required(ErrorMessage = "This field is required.")]
-            public string SeedNodeCollectionData { get; set; }
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
@@ -88,14 +68,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
         public class ViewModel
         {
             public bool IsUserAuthenticated { get; set; }
-
-            public bool IsGeneric { get; set; }
-
-            public IEnumerable<Database> NodeDatabases { get; set; }
-
-            public IEnumerable<Database> EdgeDatabases { get; set; }
-
-            public IEnumerable<NodeCollection> SeedNodeCollections { get; set; }
         }
 
         public class ItemModel
@@ -105,39 +77,17 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
             public string TargetNode { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string databaseTypeId = null, string networkId = null)
+        public async Task<IActionResult> OnGetAsync(string networkId = null)
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if there wasn't any database type ID provided.
-            if (string.IsNullOrEmpty(databaseTypeId))
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: A type is required for creating a network.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
-            }
-            // Try to get the database type with the provided ID.
-            var databaseType = _context.DatabaseTypes
-                .FirstOrDefault(item => item.Id == databaseTypeId);
-            // Check if there wasn't any database type found.
-            if (databaseType == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No type could be found with the provided ID, or you don't have access to it.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
-            }
-            // Check if the database type is generic.
-            var isGeneric = databaseType.Name == "Generic";
             // Try to get the network with the provided ID.
             var networks = _context.Networks
+                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                 .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == networkId);
-            // Check if there wasn't any network found.
-            var networksFound = networks != null && networks.Any();
             // Check if there was an ID provided, but there was no network found.
-            if (!string.IsNullOrEmpty(networkId) && !networksFound)
+            if (!string.IsNullOrEmpty(networkId) && (networks == null || !networks.Any()))
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No network could be found with the provided ID, or you don't have access to it.";
@@ -147,158 +97,60 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
             // Define the view.
             View = new ViewModel
             {
-                IsUserAuthenticated = user != null,
-                IsGeneric = isGeneric,
-                NodeDatabases = _context.Databases
-                    .Where(item => item.DatabaseType == databaseType)
-                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => isGeneric || item.DatabaseNodeFields.Any(item1 => item1.IsSearchable)),
-                EdgeDatabases = _context.Databases
-                    .Where(item => item.DatabaseType == databaseType)
-                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => isGeneric || item.DatabaseEdges.Any()),
-                SeedNodeCollections = _context.NodeCollections
-                    .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
-                    .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                IsUserAuthenticated = user != null
             };
-            // Check if there weren't any node databases available.
-            if (!View.NodeDatabases.Any())
+            // Get the available databases.
+            var databases = _context.Databases
+                .Where(item => item.DatabaseType.Name == "Generic")
+                .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user));
+            // Check if there weren't any databases available.
+            if (!databases.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: A new network can't be created, as there are no node databases available.";
+                TempData["StatusMessage"] = "Error: A new network can't be created, as there are no databases available.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
             }
-            // Check if there weren't any edge databases available.
-            if (!View.EdgeDatabases.Any())
+            // Check if there was a network provided.
+            if (!string.IsNullOrEmpty(networkId))
             {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: A new network can't be created, as there are no edge databases available.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
+                // Define the input.
+                Input = new InputModel
+                {
+                    Name = networks
+                        .Select(item => item.Name)
+                        .FirstOrDefault(),
+                    Description = networks
+                        .Select(item => item.Description)
+                        .FirstOrDefault(),
+                    IsPublic = networks
+                        .Select(item => item.IsPublic)
+                        .FirstOrDefault(),
+                    SeedData = JsonSerializer.Serialize(networks
+                        .Select(item => item.NetworkEdges)
+                        .SelectMany(item => item)
+                        .Select(item => new ItemModel
+                        {
+                            SourceNode = item.Edge.EdgeNodes
+                                .Where(item1 => item1.Type == EdgeNodeType.Source)
+                                .Select(item1 => item1.Node.Name)
+                                .FirstOrDefault(),
+                            TargetNode = item.Edge.EdgeNodes
+                                .Where(item1 => item1.Type == EdgeNodeType.Target)
+                                .Select(item1 => item1.Node.Name)
+                                .FirstOrDefault()
+                        })
+                        .Where(item => !string.IsNullOrEmpty(item.SourceNode) && !string.IsNullOrEmpty(item.TargetNode)))
+                };
             }
-            // Define the input based on the database type and the provided networks.
-            switch ((networksFound, View.IsGeneric))
+            else
             {
-                case (false, false):
-                    Input = new InputModel
-                    {
-                        DatabaseTypeId = databaseType.Id,
-                        IsPublic = !View.IsUserAuthenticated,
-                        Algorithm = NetworkAlgorithm.None.ToString(),
-                        NodeDatabaseData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
-                        EdgeDatabaseData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
-                        SeedData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
-                        SeedNodeCollectionData = JsonSerializer.Serialize(Enumerable.Empty<string>())
-                    };
-                    break;
-                case (false, true):
-                    Input = new InputModel
-                    {
-                        DatabaseTypeId = databaseType.Id,
-                        IsPublic = !View.IsUserAuthenticated,
-                        Algorithm = NetworkAlgorithm.Neighbors.ToString(),
-                        NodeDatabaseData = JsonSerializer.Serialize(View.NodeDatabases.Select(item => item.Id)),
-                        EdgeDatabaseData = JsonSerializer.Serialize(View.EdgeDatabases.Select(item => item.Id)),
-                        SeedData = JsonSerializer.Serialize(Enumerable.Empty<ItemModel>()),
-                        SeedNodeCollectionData = JsonSerializer.Serialize(Enumerable.Empty<string>())
-                    };
-                    break;
-                case (true, false):
-                    Input = new InputModel
-                    {
-                        DatabaseTypeId = databaseType.Id,
-                        Name = networks
-                            .Select(item => item.Name)
-                            .FirstOrDefault(),
-                        Description = networks
-                            .Select(item => item.Description)
-                            .FirstOrDefault(),
-                        IsPublic = networks
-                            .Select(item => item.IsPublic)
-                            .FirstOrDefault(),
-                        Algorithm = networks
-                            .Select(item => item.Algorithm)
-                            .FirstOrDefault()
-                            .ToString(),
-                        NodeDatabaseData = JsonSerializer.Serialize(networks
-                            .Select(item => item.NetworkDatabases)
-                            .SelectMany(item => item)
-                            .Select(item => item.Database)
-                            .Intersect(View.NodeDatabases)
-                            .Select(item => item.Id)),
-                        EdgeDatabaseData = JsonSerializer.Serialize(networks
-                            .Select(item => item.NetworkDatabases)
-                            .SelectMany(item => item)
-                            .Select(item => item.Database)
-                            .Intersect(View.EdgeDatabases)
-                            .Select(item => item.Id)),
-                        SeedData = JsonSerializer.Serialize(networks
-                            .Select(item => item.NetworkNodes)
-                            .SelectMany(item => item)
-                            .Where(item => item.Type == NetworkNodeType.Seed)
-                            .Select(item => item.Node.Name)),
-                        SeedNodeCollectionData = JsonSerializer.Serialize(networks
-                            .Select(item => item.NetworkNodeCollections)
-                            .SelectMany(item => item)
-                            .Select(item => item.NodeCollection)
-                            .Intersect(View.SeedNodeCollections)
-                            .Select(item => item.Id))
-                    };
-                    break;
-                case (true, true):
-                    Input = new InputModel
-                    {
-                        DatabaseTypeId = databaseType.Id,
-                        Name = networks
-                            .Select(item => item.Name)
-                            .FirstOrDefault(),
-                        Description = networks
-                            .Select(item => item.Description)
-                            .FirstOrDefault(),
-                        IsPublic = networks
-                            .Select(item => item.IsPublic)
-                            .FirstOrDefault(),
-                        Algorithm = networks
-                            .Select(item => item.Algorithm)
-                            .FirstOrDefault()
-                            .ToString(),
-                        NodeDatabaseData = JsonSerializer.Serialize(networks
-                            .Select(item => item.NetworkDatabases)
-                            .SelectMany(item => item)
-                            .Select(item => item.Database)
-                            .Intersect(View.NodeDatabases)
-                            .Select(item => item.Id)),
-                        EdgeDatabaseData = JsonSerializer.Serialize(networks
-                            .Select(item => item.NetworkDatabases)
-                            .SelectMany(item => item)
-                            .Select(item => item.Database)
-                            .Intersect(View.EdgeDatabases)
-                            .Select(item => item.Id)),
-                        SeedData = JsonSerializer.Serialize(networks
-                            .Select(item => item.NetworkEdges)
-                            .SelectMany(item => item)
-                            .Select(item => new ItemModel
-                            {
-                                SourceNode = item.Edge.EdgeNodes
-                                    .Where(item1 => item1.Type == EdgeNodeType.Source)
-                                    .Select(item1 => item1.Node.Name)
-                                    .FirstOrDefault(),
-                                TargetNode = item.Edge.EdgeNodes
-                                    .Where(item1 => item1.Type == EdgeNodeType.Target)
-                                    .Select(item1 => item1.Node.Name)
-                                    .FirstOrDefault()
-                            })
-                            .Where(item => !string.IsNullOrEmpty(item.SourceNode) && !string.IsNullOrEmpty(item.TargetNode))),
-                        SeedNodeCollectionData = JsonSerializer.Serialize(networks
-                            .Select(item => item.NetworkNodeCollections)
-                            .SelectMany(item => item)
-                            .Select(item => item.NodeCollection)
-                            .Intersect(View.SeedNodeCollections)
-                            .Select(item => item.Id))
-                    };
-                    break;
-                default:
+                // Define the input.
+                Input = new InputModel
+                {
+                    IsPublic = !View.IsUserAuthenticated,
+                    SeedData = JsonSerializer.Serialize(Enumerable.Empty<ItemModel>())
+                };
             }
             // Return the page.
             return Page();
@@ -308,56 +160,20 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if there isn't any database type ID provided or if the database type ID couldn't be inferred.
-            if (string.IsNullOrEmpty(Input.DatabaseTypeId))
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: A type is required for creating an analysis.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
-            }
-            // Try to get the database type with the provided ID.
-            var databaseType = _context.DatabaseTypes.FirstOrDefault(item => item.Id == Input.DatabaseTypeId);
-            // Check if there wasn't any database type found.
-            if (databaseType == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No type could be found with the provided ID.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
-            }
-            // Check if the database type is generic.
-            var isGeneric = databaseType.Name == "Generic";
             // Define the view.
             View = new ViewModel
             {
-                IsUserAuthenticated = user != null,
-                IsGeneric = isGeneric,
-                NodeDatabases = _context.Databases
-                    .Where(item => item.DatabaseType == databaseType)
-                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => isGeneric || item.DatabaseNodeFields.Any(item1 => item1.IsSearchable)),
-                EdgeDatabases = _context.Databases
-                    .Where(item => item.DatabaseType == databaseType)
-                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => isGeneric || item.DatabaseEdges.Any()),
-                SeedNodeCollections = _context.NodeCollections
-                    .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType == databaseType))
-                    .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                IsUserAuthenticated = user != null
             };
-            // Check if there weren't any node databases available.
-            if (!View.NodeDatabases.Any())
+            // Get the available databases.
+            var databases = _context.Databases
+                .Where(item => item.DatabaseType.Name == "Generic")
+                .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user));
+            // Check if there weren't any databases available.
+            if (!databases.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: A new network can't be created, as there are no node databases available.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
-            }
-            // Check if there weren't any edge databases available.
-            if (!View.EdgeDatabases.Any())
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: A new network can't be created, as there are no edge databases available.";
+                TempData["StatusMessage"] = "Error: A new network can't be created, as there are no databases available.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
             }
@@ -385,118 +201,30 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
                 // Redisplay the page.
                 return Page();
             }
-            // Try to get the algorithm.
-            try
-            {
-                // Get the algorithm.
-                var algorithm = EnumerationExtensions.GetEnumerationValue<NetworkAlgorithm>(Input.Algorithm);
-            }
-            catch (Exception)
+            // Try to deserialize the seed data.
+            if (!Input.SeedData.TryDeserializeJsonObject<IEnumerable<ItemModel>>(out var items) || items == null)
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The network generation algorithm couldn't be determined from the provided string.");
+                ModelState.AddModelError(string.Empty, "The provided seed data could not be deserialized.");
                 // Redisplay the page.
                 return Page();
             }
-            // Check if the algorithm is not valid.
-            if (View.IsGeneric ^ Input.Algorithm == "None")
+            // Check if there weren't any items found.
+            if (!items.Any())
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The network generation algorithm is not valid for the provided database type.");
+                ModelState.AddModelError(string.Empty, "No edges could be found within the provided seed data.");
                 // Redisplay the page.
                 return Page();
             }
-            // Try to deserialize the node database data.
-            if (!Input.NodeDatabaseData.TryDeserializeJsonObject<IEnumerable<string>>(out var nodeDatabaseIds) || nodeDatabaseIds == null)
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided node database data could not be deserialized.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Check if there weren't any node database IDs provided.
-            if (!nodeDatabaseIds.Any())
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "At least one node database ID must be provided.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Try to get the node databases with the provided IDs.
-            var nodeDatabases = View.NodeDatabases.Where(item => nodeDatabaseIds.Contains(item.Id));
-            // Check if there weren't any node databases found.
-            if (!nodeDatabases.Any())
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No node databases could be found with the provided ID(s).");
-                // Redisplay the page.
-                return Page();
-            }
-            // Try to deserialize the edge database data.
-            if (!Input.EdgeDatabaseData.TryDeserializeJsonObject<IEnumerable<string>>(out var edgeDatabaseIds) || edgeDatabaseIds == null)
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided edge database data could not be deserialized.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Check if there weren't any edge database IDs provided.
-            if (!edgeDatabaseIds.Any())
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "At least one edge database ID must be provided.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Try to get the edge databases with the provided IDs.
-            var edgeDatabases = View.EdgeDatabases.Where(item => edgeDatabaseIds.Contains(item.Id));
-            // Check if there weren't any edge databases found.
-            if (!edgeDatabases.Any())
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No edge databases could be found with the provided ID(s).");
-                // Redisplay the page.
-                return Page();
-            }
-            // Try to deserialize the seed node collection data.
-            if (!Input.SeedNodeCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out var seedNodeCollectionIds) || seedNodeCollectionIds == null)
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided seed node collection data could not be deserialized.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Try to get the seed node collections with the provided IDs.
-            var seedNodeCollections = View.SeedNodeCollections.Where(item => seedNodeCollectionIds.Contains(item.Id));
-            // Define the data for generating the network.
-            var data = View.IsGeneric ? JsonSerializer.Serialize(Enumerable.Empty<NetworkEdgeInputModel>()) : JsonSerializer.Serialize(Enumerable.Empty<NetworkNodeInputModel>());
-            // Check the database type of the network.
-            if (View.IsGeneric)
-            {
-                // Try to deserialize the seed data.
-                if (!Input.SeedData.TryDeserializeJsonObject<IEnumerable<ItemModel>>(out var items) || items == null)
+            // Serialize the seed data.
+            var data = JsonSerializer.Serialize(items
+                .Select(item => new NetworkEdgeInputModel
                 {
-                    // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "The provided seed data could not be deserialized.");
-                    // Redisplay the page.
-                    return Page();
-                }
-                // Check if there weren't any items found.
-                if (!items.Any())
-                {
-                    // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "No edges could be found within the provided seed data.");
-                    // Redisplay the page.
-                    return Page();
-                }
-                // Serialize the seed data.
-                data = JsonSerializer.Serialize(items
-                    .Select(item => new NetworkEdgeInputModel
+                    Edge = new EdgeInputModel
                     {
-                        Edge = new EdgeInputModel
+                        EdgeNodes = new List<EdgeNodeInputModel>
                         {
-                            EdgeNodes = new List<EdgeNodeInputModel>
-                            {
                                 new EdgeNodeInputModel
                                 {
                                     Node = new NodeInputModel
@@ -513,39 +241,9 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
                                     },
                                     Type = "Target"
                                 }
-                            }
                         }
-                    }));
-            }
-            else
-            {
-                // Try to deserialize the seed data.
-                if (!Input.SeedData.TryDeserializeJsonObject<IEnumerable<string>>(out var items) || items == null)
-                {
-                    // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "The provided seed data could not be deserialized.");
-                    // Redisplay the page.
-                    return Page();
-                }
-                // Check if there weren't any items found.
-                if (!items.Any() && !seedNodeCollections.Any())
-                {
-                    // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "No items could be found within the provided seed data or the selected seed node collections.");
-                    // Redisplay the page.
-                    return Page();
-                }
-                // Serialize the seed data.
-                data = JsonSerializer.Serialize(items
-                    .Select(item => new NetworkNodeInputModel
-                    {
-                        Node = new NodeInputModel
-                        {
-                            Id = item
-                        },
-                        Type = "Seed"
-                    }));
-            }
+                    }
+                }));
             // Define a new task.
             var task = new NetworksTask
             {
@@ -558,9 +256,9 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
                         Name = Input.Name,
                         Description = Input.Description,
                         IsPublic = Input.IsPublic,
-                        Algorithm = Input.Algorithm,
+                        Algorithm = NetworkAlgorithm.None.ToString(),
                         Data = data,
-                        NetworkDatabases = nodeDatabases
+                        NetworkDatabases = databases
                             .Select(item => item.Id)
                             .Select(item => new NetworkDatabaseInputModel
                             {
@@ -570,7 +268,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
                                 },
                                 Type = "Node"
                             })
-                            .Concat(edgeDatabases
+                            .Concat(databases
                                 .Select(item => item.Id)
                                 .Select(item => new NetworkDatabaseInputModel
                                 {
@@ -591,17 +289,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
                                     }
                                 }
                             } :
-                            new List<NetworkUserInputModel>(),
-                        NetworkNodeCollections = seedNodeCollections
-                            .Select(item => item.Id)
-                            .Select(item => new NetworkNodeCollectionInputModel
-                            {
-                                NodeCollection = new NodeCollectionInputModel
-                                {
-                                    Id = item
-                                },
-                                Type = "Seed"
-                            })
+                            new List<NetworkUserInputModel>()
                     }
                 }
             };
@@ -624,12 +312,12 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
             if (ids != null && ids.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = $"Success: 1 network of type \"{databaseType.Name}\" defined successfully with the ID \"{ids.First()}\" and scheduled for generation.";
+                TempData["StatusMessage"] = $"Success: 1 generic network defined successfully with the ID \"{ids.First()}\" and scheduled for generation.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Details/Index", new { id = ids.First() });
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: 1 network of type \"{databaseType.Name}\" defined successfully and scheduled for generation.";
+            TempData["StatusMessage"] = $"Success: 1 generic network of type defined successfully and scheduled for generation.";
             // Redirect to the index page.
             return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
         }

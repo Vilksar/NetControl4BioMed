@@ -34,8 +34,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
         {
             public Analysis Analysis { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public SearchViewModel<Path> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
@@ -81,6 +79,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
             }
             // Get the items with the provided ID.
             var items = _context.Paths
+                .Where(item => item.ControlPath.Analysis.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                 .Where(item => item.ControlPath.Analysis.IsPublic || item.ControlPath.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.ControlPath.Id == id);
             // Check if there were no items found.
@@ -166,10 +165,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
                 Analysis = items
                     .Select(item => item.ControlPath.Analysis)
                     .First(),
-                IsGeneric = items
-                    .Select(item => item.ControlPath.Analysis.AnalysisDatabases)
-                    .SelectMany(item => item)
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 Search = new SearchViewModel<Path>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.

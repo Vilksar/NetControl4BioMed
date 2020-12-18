@@ -77,6 +77,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
             }
             // Define the query.
             var query = _context.Analyses
+                .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                 .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Define the view.
@@ -120,6 +121,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
             }
             // Define the query.
             var query = _context.Analyses
+                .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                 .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == Input.Id);
             // Define the view.

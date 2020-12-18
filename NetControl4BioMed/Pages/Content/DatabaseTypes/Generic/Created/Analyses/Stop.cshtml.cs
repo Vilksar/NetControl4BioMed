@@ -64,6 +64,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
             View = new ViewModel
             {
                 Items = _context.Analyses
+                    .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
                     .Where(item => item.Status == AnalysisStatus.Ongoing)
                     .Where(item => ids.Contains(item.Id))
@@ -96,6 +97,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
             View = new ViewModel
             {
                 Items = _context.Analyses
+                    .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
                     .Where(item => item.Status == AnalysisStatus.Ongoing)
                     .Where(item => Input.Ids.Contains(item.Id))
