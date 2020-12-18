@@ -140,16 +140,9 @@
                             </td>
                         }
                         <td class="text-center text-break">
-                            @if (!Model.View.IsGeneric)
-                            {
-                                <a asp-page="/Content/DatabaseTypes/Generic/Data/Nodes/Details" asp-route-id="@uniqueControlNode.Key.Id" title="Details">
-                                    <span>Details</span>
-                                </a>
-                            }
-                            else
-                            {
-                                <span>-</span>
-                            }
+                            <a asp-page="/Content/DatabaseTypes/Generic/Data/Nodes/Details" asp-route-id="@uniqueControlNode.Key.Id" title="Details">
+                                <span>Details</span>
+                            </a>
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break">
                             <span title="@uniqueControlNode.Value">@uniqueControlNode.Value</span>

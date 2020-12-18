@@ -29,10 +29,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Data.Edges
         {
             public Edge Edge { get; set; }
 
-            public IEnumerable<DatabaseEdge> DatabaseEdges { get; set; }
-
-            public IEnumerable<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }
-
             public IEnumerable<EdgeNode> EdgeNodes { get; set; }
         }
 
@@ -51,8 +47,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Data.Edges
             // Get the item with the provided ID.
             var items = _context.Edges
                 .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                .Where(item => item.EdgeNodes.All(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
+                .Where(item => item.NetworkEdges.Any(item1 => item1.Network.IsPublic || item1.Network.NetworkUsers.Any(item2 => item2.User == user)) || item.AnalysisEdges.Any(item1 => item1.Analysis.IsPublic || item1.Analysis.AnalysisUsers.Any(item2 => item2.User == user)))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
             if (items == null || !items.Any())
@@ -67,16 +62,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Data.Edges
             {
                 Edge = items
                     .First(),
-                DatabaseEdges = items
-                    .Select(item => item.DatabaseEdges)
-                    .SelectMany(item => item)
-                    .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Include(item => item.Database),
-                DatabaseEdgeFieldEdges = items
-                    .Select(item => item.DatabaseEdgeFieldEdges)
-                    .SelectMany(item => item)
-                    .Where(item => item.DatabaseEdgeField.Database.IsPublic || item.DatabaseEdgeField.Database.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Include(item => item.DatabaseEdgeField),
                 EdgeNodes = items
                     .Select(item => item.EdgeNodes)
                     .SelectMany(item => item)

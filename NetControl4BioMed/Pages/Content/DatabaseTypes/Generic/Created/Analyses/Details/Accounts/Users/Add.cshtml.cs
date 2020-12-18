@@ -75,6 +75,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
             }
             // Get the items with the provided ID.
             var items = _context.Analyses
+                .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                 .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there were no items found.
@@ -247,7 +248,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
             {
                 Email = user.Email,
                 Name = View.Analysis.Name,
-                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = View.Analysis.Id }),
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Index", handler: null, values: new { id = View.Analysis.Id }),
                 AddedEmail = Input.Email,
                 ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };
@@ -258,7 +259,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
             {
                 Email = Input.Email,
                 Name = View.Analysis.Name,
-                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = View.Analysis.Id }),
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Index", handler: null, values: new { id = View.Analysis.Id }),
                 AddedByEmail = user.Email,
                 ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };
