@@ -547,9 +547,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Created",
-                    Title = "Created",
+                    Title = "My data",
                     Description = string.Empty,
-                    Icon = "fa-smile",
+                    Icon = "fa-user",
                     Color = "warning",
                     Link = "/Content/DatabaseTypes/Generic/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -603,7 +603,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Accounts",
                     Title = "Accounts",
                     Description = string.Empty,
-                    Icon = "fa-user",
+                    Icon = "fa-user-friends",
                     Color = "dark",
                     Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Accounts/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -613,7 +613,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Users",
                             Title = "Users",
                             Description = string.Empty,
-                            Icon = "fa-user",
+                            Icon = "fa-user-friends",
                             Color = "light",
                             Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Accounts/Users/Index"
                         }
@@ -652,9 +652,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Created",
-                    Title = "Created",
+                    Title = "My data",
                     Description = string.Empty,
-                    Icon = "fa-smile",
+                    Icon = "fa-user",
                     Color = "dark",
                     Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -699,7 +699,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Accounts",
                     Title = "Accounts",
                     Description = string.Empty,
-                    Icon = "fa-user",
+                    Icon = "fa-user-friends",
                     Color = "dark",
                     Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Accounts/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -709,7 +709,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Users",
                             Title = "Users",
                             Description = string.Empty,
-                            Icon = "fa-user",
+                            Icon = "fa-user-friends",
                             Color = "light",
                             Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Accounts/Users/Index"
                         }
@@ -748,9 +748,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Created",
-                    Title = "Created",
+                    Title = "My data",
                     Description = string.Empty,
-                    Icon = "fa-smile",
+                    Icon = "fa-user",
                     Color = "dark",
                     Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -802,7 +802,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Databases",
-                    Title = "Databases",
+                    Title = "Available databases",
                     Description = string.Empty,
                     Icon = "fa-database",
                     Color = "warning",
@@ -821,7 +821,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "DatabaseNodeFields",
-                            Title = "Database node fields",
+                            Title = "Protein data",
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
@@ -830,7 +830,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "DatabaseEdgeFields",
-                            Title = "Database edge fields",
+                            Title = "Interaction data",
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
@@ -841,7 +841,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Data",
-                    Title = "Data",
+                    Title = "Available data",
                     Description = string.Empty,
                     Icon = "fa-table",
                     Color = "warning",
@@ -851,7 +851,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "Nodes",
-                            Title = "Nodes",
+                            Title = "Protein data",
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
@@ -860,7 +860,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "Edges",
-                            Title = "Edges",
+                            Title = "Interaction data",
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
@@ -869,7 +869,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "SourceNodeCollections",
-                            Title = "Source node collections",
+                            Title = "Cell-line data",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
@@ -878,7 +878,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "TargetNodeCollections",
-                            Title = "Target node collections",
+                            Title = "Drug-target data",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
@@ -889,9 +889,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Created",
-                    Title = "Created",
+                    Title = "My data",
                     Description = string.Empty,
-                    Icon = "fa-smile",
+                    Icon = "fa-user",
                     Color = "warning",
                     Link = "/Content/DatabaseTypes/PPI/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -945,7 +945,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Accounts",
                     Title = "Accounts",
                     Description = string.Empty,
-                    Icon = "fa-user",
+                    Icon = "fa-user-friends",
                     Color = "dark",
                     Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Accounts/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -955,7 +955,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Users",
                             Title = "Users",
                             Description = string.Empty,
-                            Icon = "fa-user",
+                            Icon = "fa-user-friends",
                             Color = "light",
                             Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Accounts/Users/Index"
                         }
@@ -1024,9 +1024,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Created",
-                    Title = "Created",
+                    Title = "My data",
                     Description = string.Empty,
-                    Icon = "fa-smile",
+                    Icon = "fa-user",
                     Color = "dark",
                     Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -1071,7 +1071,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Accounts",
                     Title = "Accounts",
                     Description = string.Empty,
-                    Icon = "fa-user",
+                    Icon = "fa-user-friends",
                     Color = "dark",
                     Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Accounts/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -1081,7 +1081,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Users",
                             Title = "Users",
                             Description = string.Empty,
-                            Icon = "fa-user",
+                            Icon = "fa-user-friends",
                             Color = "light",
                             Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Accounts/Users/Index"
                         }
@@ -1150,9 +1150,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Created",
-                    Title = "Created",
+                    Title = "My data",
                     Description = string.Empty,
-                    Icon = "fa-smile",
+                    Icon = "fa-user",
                     Color = "dark",
                     Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
