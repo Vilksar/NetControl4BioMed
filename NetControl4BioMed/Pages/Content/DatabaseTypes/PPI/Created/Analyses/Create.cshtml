@@ -11,7 +11,7 @@
         <div class="card-header font-weight-bold">
             <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
                 <div>
-                    <span><i class="fas fa-info"></i></span>
+                    <span><i class="fas fa-info-circle"></i></span>
                 </div>
                 <div>
                     <span>Details</span>
@@ -21,13 +21,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the general details of the new analysis.</span>
-            </div>
-            <div class="form-group" hidden>
-                <label asp-for="Input.DatabaseTypeId" class="font-weight-bold">ID</label>
-                <input asp-for="Input.DatabaseTypeId" class="form-control" readonly />
-                <span asp-description-for="Input.DatabaseTypeId" class="text-muted small">The database type ID of the new analysis.</span>
-                <span asp-validation-for="Input.DatabaseTypeId" class="text-danger small"></span>
+                <span>Input here the general details of the new analysis.</span>
             </div>
             <div class="form-group">
                 <label asp-for="Input.Name" class="font-weight-bold">Name</label>
@@ -77,10 +71,10 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the network data to be used by the new analysis (namely, the IDs of the networks should be provided). You need to have access to the corresponding networks!</span>
+                <span>Input here the IDs of the PPI networks to be used by the new analysis. The specified networks need to be public, or associated with your account!</span>
                 @if (Model.View.IsUserAuthenticated)
                 {
-                    <span>You can find the available networks associated with your account <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Index" asp-route-searchString="@Model.Input.DatabaseTypeId" asp-route-searchIn="DatabaseTypeId" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    <span>You can find the PPI networks associated with your account <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 }
             </div>
             <div class="file-group" data-type="items">
@@ -118,7 +112,7 @@
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
                     </div>
-                    <span class="text-muted small">The IDs of the networks of the new analysis. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                    <span class="text-muted small">The IDs of the networks to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
                 </div>
             </div>
         </div>
@@ -130,14 +124,14 @@
                     <span><i class="fas fa-syringe"></i></span>
                 </div>
                 <div>
-                    <span>Source data</span>
+                    <span>Source proteins</span>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the source data to be used by the new analysis (namely, the identifiers of the source nodes should be provided). You can find possible input samples <a asp-page="/Content/DatabaseTypes/PPI/Other/Samples/Index" asp-route-filter="HasSourceNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                <span>Input here the source proteins (proteins which you would prefer to have as controlling proteins) to be used by the new analysis. The specified proteins should appear in the corresponding networks. This field is not required!</span>
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
@@ -174,7 +168,7 @@
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
                     </div>
-                    <span class="text-muted small">The source nodes of the new analysis. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                    <span class="text-muted small">The source proteins to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
                 </div>
             </div>
         </div>
@@ -186,14 +180,18 @@
                     <span><i class="fas fa-folder"></i></span>
                 </div>
                 <div>
-                    <span>Source node collections</span>
+                    <span>Additional source proteins</span>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the node collections which can be used as additional source nodes to be used by the new analysis (namely, the IDs of the node collections should be provided). You can find the available node collections <a asp-page="/Content/DatabaseTypes/PPI/Data/NodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                <span>Input here the IDs of the drug data to be used as source proteins by the new analysis. This can be done either in addition to, or instead of the source proteins above. You can check the available drug data <a asp-page="/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and copy and paste below the IDs of your choice.</span>
+            </div>
+            <div class="alert alert-warning text-justify text-wrap">
+                <span><i class="fas fa-exclamation-triangle"></i></span>
+                <span>IDs are required here!</span>
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
@@ -230,7 +228,7 @@
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
                     </div>
-                    <span class="text-muted small">The IDs of the source node collections of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                    <span class="text-muted small">The IDs of the drug data to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
                 </div>
             </div>
         </div>
@@ -242,14 +240,14 @@
                     <span><i class="fas fa-bullseye"></i></span>
                 </div>
                 <div>
-                    <span>Target data</span>
+                    <span>Target proteins</span>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the target data to be used by the new analysis (namely, the identifiers of the target nodes should be provided). You can find possible input samples <a asp-page="/Content/DatabaseTypes/PPI/Other/Samples/Index" asp-route-filter="ContainsTargetNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                <span>Input here the target proteins to be used by the new analysis. The specified proteins should appear in the corresponding networks. This field is required!</span>
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
@@ -286,7 +284,7 @@
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
                     </div>
-                    <span class="text-muted small">The target nodes of the new analysis. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                    <span class="text-muted small">The target proteins to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
                 </div>
             </div>
         </div>
@@ -298,14 +296,18 @@
                     <span><i class="fas fa-folder"></i></span>
                 </div>
                 <div>
-                    <span>Target node collections</span>
+                    <span>Additional target proteins</span>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the node collections which can be used as additional target nodes to be used by the new analysis (namely, the IDs of the node collections should be provided). You can find the available node collections <a asp-page="/Content/DatabaseTypes/PPI/Data/NodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                <span>Input here the IDs of the cell-line data to be used as target proteins by the new analysis. This can be done either in addition to, or instead of the target proteins above. You can check the available cell-line data <a asp-page="/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and copy and paste below the IDs of your choice.</span>
+            </div>
+            <div class="alert alert-warning text-justify text-wrap">
+                <span><i class="fas fa-exclamation-triangle"></i></span>
+                <span>IDs are required here!</span>
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
@@ -342,7 +344,7 @@
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
                     </div>
-                    <span class="text-muted small">The IDs of the target node collections of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                    <span class="text-muted small">The IDs of the cell-line data to be used by the new network. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
                 </div>
             </div>
         </div>
@@ -361,7 +363,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the parameters of the algorithm used by the new analysis.</span>
+                <span>Input here the values for the parameters of the algorithm used by the new analysis.</span>
             </div>
             <div class="row">
                 <div class="col-lg-6 order-1 order-lg-1 align-self-center">
@@ -465,7 +467,7 @@
                             <select id="heuristics-group-current" class="custom-select heuristics-group-current" size="10" multiple title="Current heuristics"></select>
                         </div>
                         <div class="col-lg-12 order-4 order-lg-3 mb-3">
-                            <span description-for="heuristics-group-current" class="text-muted small">The search heuristics for the algorithm. The current heuristics can be seen on the right (or lower) side. Select one or more options on the right (or lower) side, and click the "Remove heuristic" button to remove them. Select one or more options on the left (or upper) side, and click the "Add heuristic" button to add them to the selected group on the right side. A new group containing only the heuristic "Any possible edge" will be automatically added at the end of the list.</span>
+                            <span description-for="heuristics-group-current" class="text-muted small">The search heuristics for the algorithm. The current heuristics can be seen on the right (or lower) side. Select one or more options on the right (or lower) side, and click the "Remove heuristic" button to remove them. Select one or more options on the left (or upper) side, and click the "Add heuristic" button to add them to the selected group on the right side. If you want to insert a new group, you must also select, at the same time, the corresponding group options. A new group containing only the heuristic "Any possible edge" will be automatically added at the end of the list.</span>
                             <span validation-for="heuristics-group-current" class="text-danger small"></span>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 ﻿@page
 @model CreateModel
-@using Helpers.Extensions
+@using NetControl4BioMed.Helpers.Extensions 
 @{
     ViewData["Title"] = "Create network";
 }
@@ -11,7 +11,7 @@
         <div class="card-header font-weight-bold">
             <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
                 <div>
-                    <span><i class="fas fa-info"></i></span>
+                    <span><i class="fas fa-info-circle"></i></span>
                 </div>
                 <div>
                     <span>Details</span>
@@ -21,13 +21,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the general details of the new network.</span>
-            </div>
-            <div class="form-group" hidden>
-                <label asp-for="Input.DatabaseTypeId" class="font-weight-bold">ID</label>
-                <input asp-for="Input.DatabaseTypeId" class="form-control" readonly />
-                <span asp-description-for="Input.DatabaseTypeId" class="text-muted small">The database type ID of the new network.</span>
-                <span asp-validation-for="Input.DatabaseTypeId" class="text-danger small"></span>
+                <span>Input here the general details of the new network.</span>
             </div>
             <div class="form-group">
                 <label asp-for="Input.Name" class="font-weight-bold">Name</label>
@@ -50,10 +44,10 @@
                 <span asp-description-for="Input.IsPublic" class="text-muted small">The public availability of the network. If public, anyone that has its ID or URL can access it.</span>
                 <span asp-validation-for="Input.IsPublic" class="text-danger small"></span>
             </div>
-            <div class="form-group" hidden="@(Model.View.IsGeneric ? "hidden" : null)">
+            <div class="form-group">
                 <label asp-for="Input.Algorithm" class="font-weight-bold">Algorithm</label>
                 <select asp-for="Input.Algorithm" class="custom-select">
-                    @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.NetworkAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.NetworkAlgorithm>().Where(item => Model.View.IsGeneric ^ item != NetControl4BioMed.Data.Enumerations.NetworkAlgorithm.None))
+                    @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.NetworkAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.NetworkAlgorithm>().Where(item => item != NetControl4BioMed.Data.Enumerations.NetworkAlgorithm.None))
                     {
                         <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
                     }
@@ -63,21 +57,25 @@
             </div>
         </div>
     </div>
-    <div class="card mb-3" hidden="@(Model.View.IsGeneric ? "hidden" : null)">
+    <div class="card mb-3">
         <div class="card-header font-weight-bold">
             <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
                 <div>
                     <span><i class="fas fa-database"></i></span>
                 </div>
                 <div>
-                    <span>Node databases</span>
+                    <span>Protein databases</span>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the databases to be used when searching for the nodes of the new network (namely, the IDs of the databases should be provided). You can find the available node databases <a asp-page="/Content/DatabaseTypes/PPI/Databases/Databases/Index" asp-route-filter="HasDatabaseNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                <span>Input here the IDs of the protein databases to be used by the new network. The chosen protein databases must match the identifiers used to define the seed proteins. You can check the available databases <a asp-page="/Content/DatabaseTypes/PPI/Databases/Databases/Index" asp-route-filter="HasDatabaseNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and copy and paste below the IDs of your choice.</span>
+            </div>
+            <div class="alert alert-warning text-justify text-wrap">
+                <span><i class="fas fa-exclamation-triangle"></i></span>
+                <span>IDs are required here!</span>
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
@@ -114,26 +112,30 @@
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
                     </div>
-                    <span class="text-muted small">The IDs of the node databases of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                    <span class="text-muted small">The IDs of the protein databases to be used by the new network. The data can also be uploaded from a file; in this case, the file content will be displayed, unchanged, above.</span>
                 </div>
             </div>
         </div>
     </div>
-    <div class="card mb-3" hidden="@(Model.View.IsGeneric ? "hidden" : null)">
+    <div class="card mb-3">
         <div class="card-header font-weight-bold">
             <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
                 <div>
                     <span><i class="fas fa-database"></i></span>
                 </div>
                 <div>
-                    <span>Edge databases</span>
+                    <span>Interaction databases</span>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the databases to be used when searching for the edges of the new network (namely, the IDs of the databases should be provided). You can find the available edge databases <a asp-page="/Content/DatabaseTypes/PPI/Databases/Databases/Index" asp-route-filter="HasDatabaseEdges" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                <span>Input here the IDs of the interaction databases to be used by the new network. You can check the available databases <a asp-page="/Content/DatabaseTypes/PPI/Databases/Databases/Index" asp-route-filter="HasDatabaseEdges" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and copy and paste below the IDs of your choice.</span>
+            </div>
+            <div class="alert alert-warning text-justify text-wrap">
+                <span><i class="fas fa-exclamation-triangle"></i></span>
+                <span>IDs are required here!</span>
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
@@ -170,143 +172,67 @@
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
                     </div>
-                    <span class="text-muted small">The IDs of the edge databases of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                    <span class="text-muted small">The IDs of the interaction databases to be used by the new network. The data can also be uploaded from a file; in this case, the file content will be displayed, unchanged, above.</span>
                 </div>
             </div>
         </div>
     </div>
-    @if (Model.View.IsGeneric)
-    {
-        <div class="card mb-3">
-            <div class="card-header font-weight-bold">
-                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                    <div>
-                        <span><i class="fas fa-list"></i></span>
-                    </div>
-                    <div>
-                        <span>Data</span>
-                    </div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-list"></i></span>
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info text-justify text-wrap">
-                    <span><i class="fas fa-info-circle"></i></span>
-                    <span>This section contains the data to be used in generating the new network (namely, the edges should be provided). You can find possible input samples <a asp-page="/Content/DatabaseTypes/PPI/Other/Samples/Index" asp-route-filter="HasSeedEdges" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
-                </div>
-                <div class="file-group" data-type="edges">
-                    <div class="form-group" hidden>
-                        <label asp-for="Input.SeedData" class="font-weight-bold">Data</label>
-                        <textarea asp-for="Input.SeedData" class="form-control file-group-input"></textarea>
-                        <span asp-description-for="Input.SeedData" class="text-muted small">The edges of the new network, formatted as a JSON object. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                        <span asp-validation-for="Input.SeedData" class="text-danger small"></span>
-                    </div>
-                    <div class="form-group">
-                        <div class="row align-items-center mb-2">
-                            <div class="col-lg-4">
-                                <label for="data-textarea-seed" class="font-weight-bold mb-0">Data</label>
-                                <span class="badge badge-dark file-group-count">0</span>
-                            </div>
-                            <div class="col-lg-8">
-                                <div class="row align-items-center mb-1">
-                                    <div class="col-6 col-form-label-sm text-right">
-                                        <label for="data-in-line-separator-seed" class="font-weight-normal mb-0">In-line separator:</label>
-                                    </div>
-                                    <div class="col-6 text-left">
-                                        <select id="data-in-line-separator-seed" class="custom-select custom-select-sm file-group-separator file-group-in-line-separator">
-                                            <option value=",">comma (",")</option>
-                                            <option value=";" selected>semicolon (";")</option>
-                                            <option value="\t">tab ("\t")</option>
-                                            <option value="\s">space (" ")</option>
-                                            <option value="\n">new line ("\n")</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row align-items-center">
-                                    <div class="col-6 col-form-label-sm text-right">
-                                        <label for="data-line-separator-seed" class="font-weight-normal mb-0">Line separator:</label>
-                                    </div>
-                                    <div class="col-6 text-left">
-                                        <select id="data-line-separator-seed" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
-                                            <option value=",">comma (",")</option>
-                                            <option value=";">semicolon (";")</option>
-                                            <option value="\t">tab ("\t")</option>
-                                            <option value="\s">space (" ")</option>
-                                            <option value="\n" selected>new line ("\n")</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <textarea id="data-textarea-seed" class="form-control file-group-text mb-2"></textarea>
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input file-group-file-upload" />
-                            <label class="custom-file-label file-group-file-label">Choose file</label>
-                        </div>
-                        <span class="text-muted small">The edges of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
-                    </div>
+                <div>
+                    <span>Seed proteins</span>
                 </div>
             </div>
         </div>
-    }
-    else
-    {
-        <div class="card mb-3">
-            <div class="card-header font-weight-bold">
-                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                    <div>
-                        <span><i class="fas fa-list"></i></span>
-                    </div>
-                    <div>
-                        <span>Data</span>
-                    </div>
-                </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>Input here the identifiers of the seed proteins to be used by the new network. The identifiers must match the chosen protein databases.</span>
             </div>
-            <div class="card-body">
-                <div class="alert alert-info text-justify text-wrap">
-                    <span><i class="fas fa-info-circle"></i></span>
-                    <span>This section contains the data to be used in generating the new network (namely, the identifiers of the seed nodes should be provided). You can find possible input samples <a asp-page="/Content/DatabaseTypes/PPI/Other/Samples/Index" asp-route-filter="HasSeedNodes" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+            <div class="file-group" data-type="items">
+                <div class="form-group" hidden>
+                    <label asp-for="Input.SeedData" class="font-weight-bold">Data</label>
+                    <textarea asp-for="Input.SeedData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.SeedData" class="text-muted small">The nodes to be used as seed nodes when generating the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.SeedData" class="text-danger small"></span>
                 </div>
-                <div class="file-group" data-type="items">
-                    <div class="form-group" hidden>
-                        <label asp-for="Input.SeedData" class="font-weight-bold">Data</label>
-                        <textarea asp-for="Input.SeedData" class="form-control file-group-input"></textarea>
-                        <span asp-description-for="Input.SeedData" class="text-muted small">The nodes to be used as seed nodes when generating the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                        <span asp-validation-for="Input.SeedData" class="text-danger small"></span>
-                    </div>
-                    <div class="form-group">
-                        <div class="row align-items-center mb-2">
-                            <div class="col-lg-4">
-                                <label for="data-textarea-seed" class="font-weight-bold mb-0">Data</label>
-                                <span class="badge badge-dark file-group-count">0</span>
-                            </div>
-                            <div class="col-lg-8">
-                                <div class="row align-items-center">
-                                    <div class="col-6 col-form-label-sm text-right">
-                                        <label for="data-line-separator-seed" class="font-weight-normal mb-0">Line separator:</label>
-                                    </div>
-                                    <div class="col-6 text-left">
-                                        <select id="data-line-separator-seed" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
-                                            <option value=",">comma (",")</option>
-                                            <option value=";">semicolon (";")</option>
-                                            <option value="\t">tab ("\t")</option>
-                                            <option value="\s">space (" ")</option>
-                                            <option value="\n" selected>new line ("\n")</option>
-                                        </select>
-                                    </div>
+                <div class="form-group">
+                    <div class="row align-items-center mb-2">
+                        <div class="col-lg-4">
+                            <label for="data-textarea-seed" class="font-weight-bold mb-0">Data</label>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row align-items-center">
+                                <div class="col-6 col-form-label-sm text-right">
+                                    <label for="data-line-separator-seed" class="font-weight-normal mb-0">Line separator:</label>
+                                </div>
+                                <div class="col-6 text-left">
+                                    <select id="data-line-separator-seed" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                        <option value=",">comma (",")</option>
+                                        <option value=";">semicolon (";")</option>
+                                        <option value="\t">tab ("\t")</option>
+                                        <option value="\s">space (" ")</option>
+                                        <option value="\n" selected>new line ("\n")</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                        <textarea id="data-textarea-seed" class="form-control file-group-text mb-2"></textarea>
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input file-group-file-upload" />
-                            <label class="custom-file-label file-group-file-label">Choose file</label>
-                        </div>
-                        <span class="text-muted small">The seed nodes of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
                     </div>
+                    <textarea id="data-textarea-seed" class="form-control file-group-text mb-2"></textarea>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input file-group-file-upload" />
+                        <label class="custom-file-label file-group-file-label">Choose file</label>
+                    </div>
+                    <span class="text-muted small">The seed proteins to be used by the new network. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
                 </div>
             </div>
         </div>
-    }
+    </div>
     <div class="card mb-3" hidden="@(!Model.View.SeedNodeCollections.Any() ? "hidden" : null)">
         <div class="card-header font-weight-bold">
             <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
@@ -314,14 +240,18 @@
                     <span><i class="fas fa-folder"></i></span>
                 </div>
                 <div>
-                    <span>Seed node collections</span>
+                    <span>Additional seed proteins</span>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>This section contains the node collections which can be used as additional seed nodes when generating the new network (namely, the IDs of the node collections should be provided). You can find the available node collections <a asp-page="/Content/DatabaseTypes/PPI/Data/NodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                <span>Input here the IDs of the cell-line data or drug data to be used as seed proteins by the new network. This can be done either in addition to, or instead of the seed proteins above. You can check the available cell-line data <a asp-page="/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and the available drug data <a asp-page="/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and copy and paste below the IDs of your choice.</span>
+            </div>
+            <div class="alert alert-warning text-justify text-wrap">
+                <span><i class="fas fa-exclamation-triangle"></i></span>
+                <span>IDs are required here!</span>
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
@@ -358,7 +288,7 @@
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
                     </div>
-                    <span class="text-muted small">The IDs of the seed node collections of the new network. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                    <span class="text-muted small">The IDs of the cell-line data or drug data to be used by the new network. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
                 </div>
             </div>
         </div>
