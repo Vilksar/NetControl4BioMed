@@ -50,8 +50,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.Edges
                     { "Id", "ID" },
                     { "DateTimeCreated", "Date created" },
                     { "Name", "Name" },
-                    { "DatabaseEdgeCount", "Number of database edges" },
-                    { "DatabaseEdgeFieldEdgeCount", "Number of database edge field edges" }
+                    { "DatabaseEdgeCount", "Number of databases" },
+                    { "DatabaseEdgeFieldEdgeCount", "Number of values" }
                 }
             };
         }
@@ -77,7 +77,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.Edges
             }
             // Start with all of the items in the non-generic databases.
             var query = _context.Edges
-                .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                 .Where(item => item.EdgeNodes.All(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))));
             // Select the results matching the search string.

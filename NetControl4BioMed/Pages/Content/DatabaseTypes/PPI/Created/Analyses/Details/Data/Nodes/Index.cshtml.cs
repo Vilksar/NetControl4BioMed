@@ -34,8 +34,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
         {
             public Analysis Analysis { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public SearchViewModel<AnalysisNode> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
@@ -79,6 +77,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
             }
             // Get the items with the provided ID.
             var items = _context.Analyses
+                .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there were no items found.
@@ -148,10 +147,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
             {
                 Analysis = items
                     .First(),
-                IsGeneric = items
-                    .Select(item => item.AnalysisDatabases)
-                    .SelectMany(item => item)
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 Search = new SearchViewModel<AnalysisNode>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.

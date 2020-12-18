@@ -81,6 +81,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
             }
             // Get the item with the provided ID.
             var items = _context.ControlPaths
+                .Where(item => item.Analysis.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.Analysis.IsPublic || item.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => ids.Contains(item.Id));
             // Check if there was no item found.
@@ -127,6 +128,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
             }
             // Get the item with the provided ID.
             var items = _context.ControlPaths
+                .Where(item => item.Analysis.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.Analysis.IsPublic || item.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => Input.Ids.Contains(item.Id));
             // Check if there was no item found.

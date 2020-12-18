@@ -34,8 +34,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
         {
             public bool IsUserAuthenticated { get; set; }
 
-            public IEnumerable<DatabaseType> DatabaseTypes { get; set; }
-
             public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
@@ -47,31 +45,27 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     { "Description", "Description" },
                     { "UserId", "User ID" },
                     { "UserEmail", "User e-mail" },
-                    { "DatabaseTypeId", "Database type ID" },
-                    { "DatabaseTypeName", "Database type name" },
                     { "DatabaseId", "Database ID" },
                     { "DatabaseName", "Database name" },
-                    { "NodeId", "Node ID" },
-                    { "NodeName", "Node name" },
-                    { "EdgeId", "Edge ID" },
-                    { "EdgeName", "Edge name" },
-                    { "NodeCollectionId", "Node collection ID" },
-                    { "NodeCollectionName", "Node collection name" },
+                    { "NodeId", "Protein ID" },
+                    { "NodeName", "Protein name" },
+                    { "EdgeId", "Interaction ID" },
+                    { "EdgeName", "Interaction name" },
+                    { "NodeCollectionId", "Protein collection ID" },
+                    { "NodeCollectionName", "Protein collection name" },
                     { "AnalysisId", "Analysis ID" },
                     { "AnalysisName", "Analysis name" }
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "IsError", "Is error" },
-                    { "IsNotError", "Is not error" },
-                    { "IsDefined", "Is defined" },
-                    { "IsNotDefined", "Is not defined" },
-                    { "IsGenerating", "Is generating" },
-                    { "IsNotGenerating", "Is not generating" },
-                    { "IsCompleted", "Is completed" },
-                    { "IsNotCompleted", "Is not completed" },
-                    { "UsesAlgorithmNone", "Was provided by user" },
-                    { "UsesNotAlgorithmNone", "Was not provided by user" },
+                    { "HasStatusError", "Has status \"Error\"" },
+                    { "HasNotStatusError", "Does not have status \"Error\"" },
+                    { "HasStatusDefined", "Has status \"Defined\"" },
+                    { "HasNotStatusDefined", "Does not have status \"Defined\"" },
+                    { "HasStatusGenerating", "Has status \"Generating\"" },
+                    { "HasNotStatusGenerating", "Does not have status \"Generating\"" },
+                    { "HasStatusCompleted", "Has status \"Completed\"" },
+                    { "HasNotStatusCompleted", "Does not have status \"Completed\"" },
                     { "UsesAlgorithmNeighbors", "Was generated using \"Neighbors\" algorithm" },
                     { "UsesNotAlgorithmNeighbors", "Was not generated using \"Neighbors\" algorithm" },
                     { "UsesAlgorithmGap0", "Was generated using \"Gap 0\" algorithm" },
@@ -84,10 +78,10 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     { "UsesNotAlgorithmGap3", "Was not generated using \"Gap 3\" algorithm" },
                     { "UsesAlgorithmGap4", "Was generated using \"Gap 4\" algorithm" },
                     { "UsesNotAlgorithmGap4", "Was not generated using \"Gap 4\" algorithm" },
+                    { "HasNetworkNodeCollections", "Has protein collections" },
+                    { "HasNoNetworkNodeCollections", "Does not have protein collections" },
                     { "HasAnalysisNetworks", "Has analyses" },
-                    { "HasNoAnalysisNetworks", "Does not have analyses" },
-                    { "HasNetworkNodeCollections", "Has node collections" },
-                    { "HasNoNetworkNodeCollections", "Does not have node collections" }
+                    { "HasNoAnalysisNetworks", "Does not have analyses" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -99,7 +93,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     { "NetworkDatabaseCount", "Number of databases" },
                     { "NetworkNodeCount", "Number of nodes" },
                     { "NetworkEdgeCount", "Number of edges" },
-                    { "NetworkNodeCollectionCount", "Number of node collections" },
+                    { "NetworkNodeCollectionCount", "Number of protein collections" },
                     { "AnalysisNetworkCount", "Number of analyses" }
                 }
             };
@@ -128,6 +122,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             }
             // Start with all of the items to which the user has access.
             var query = _context.Networks
+                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user));
             // Select the results matching the search string.
             query = query
@@ -137,8 +132,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
                     input.SearchIn.Contains("UserId") && item.NetworkUsers.Any(item1 => item1.User.Id.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("UserEmail") && (item.NetworkUsers.Any(item1 => item1.User.Email.Contains(input.SearchString)) || item.NetworkUserInvitations.Any(item1 => item1.Email.Contains(input.SearchString))) ||
-                    input.SearchIn.Contains("DatabaseTypeId") && item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Id.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("DatabaseTypeName") && item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("DatabaseId") && item.NetworkDatabases.Any(item1 => item1.Database.Id.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("DatabaseName") && item.NetworkDatabases.Any(item1 => item1.Database.Name.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("NodeId") && item.NetworkNodes.Any(item1 => item1.Node.Id.Contains(input.SearchString)) ||
@@ -151,16 +144,14 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     input.SearchIn.Contains("AnalysisName") && item.AnalysisNetworks.Any(item1 => item1.Analysis.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
-                .Where(item => input.Filter.Contains("IsError") ? item.Status == NetworkStatus.Error : true)
-                .Where(item => input.Filter.Contains("IsNotError") ? item.Status != NetworkStatus.Error : true)
-                .Where(item => input.Filter.Contains("IsDefined") ? item.Status == NetworkStatus.Defined : true)
-                .Where(item => input.Filter.Contains("IsNotDefined") ? item.Status != NetworkStatus.Defined : true)
-                .Where(item => input.Filter.Contains("IsGenerating") ? item.Status == NetworkStatus.Generating : true)
-                .Where(item => input.Filter.Contains("IsNotGenerating") ? item.Status != NetworkStatus.Generating : true)
-                .Where(item => input.Filter.Contains("IsCompleted") ? item.Status == NetworkStatus.Completed : true)
-                .Where(item => input.Filter.Contains("IsNotCompleted") ? item.Status != NetworkStatus.Completed : true)
-                .Where(item => input.Filter.Contains("UsesAlgorithmNone") ? item.Algorithm == NetworkAlgorithm.None : true)
-                .Where(item => input.Filter.Contains("UsesNotAlgorithmNone") ? item.Algorithm != NetworkAlgorithm.None : true)
+                .Where(item => input.Filter.Contains("HasStatusError") ? item.Status == NetworkStatus.Error : true)
+                .Where(item => input.Filter.Contains("HasNotStatusError") ? item.Status != NetworkStatus.Error : true)
+                .Where(item => input.Filter.Contains("HasStatusDefined") ? item.Status == NetworkStatus.Defined : true)
+                .Where(item => input.Filter.Contains("HasNotStatusDefined") ? item.Status != NetworkStatus.Defined : true)
+                .Where(item => input.Filter.Contains("HasStatusGenerating") ? item.Status == NetworkStatus.Generating : true)
+                .Where(item => input.Filter.Contains("HasNotStatusGenerating") ? item.Status != NetworkStatus.Generating : true)
+                .Where(item => input.Filter.Contains("HasStatusCompleted") ? item.Status == NetworkStatus.Completed : true)
+                .Where(item => input.Filter.Contains("HasNotStatusCompleted") ? item.Status != NetworkStatus.Completed : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmNeighbors") ? item.Algorithm == NetworkAlgorithm.Neighbors : true)
                 .Where(item => input.Filter.Contains("UsesNotAlgorithmNeighbors") ? item.Algorithm != NetworkAlgorithm.Neighbors : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmGap0") ? item.Algorithm == NetworkAlgorithm.Gap0 : true)
@@ -173,10 +164,10 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                 .Where(item => input.Filter.Contains("UsesNotAlgorithmGap3") ? item.Algorithm != NetworkAlgorithm.Gap3 : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmGap4") ? item.Algorithm == NetworkAlgorithm.Gap4 : true)
                 .Where(item => input.Filter.Contains("UsesNotAlgorithmGap4") ? item.Algorithm != NetworkAlgorithm.Gap4 : true)
-                .Where(item => input.Filter.Contains("HasAnalysisNetworks") ? item.AnalysisNetworks.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoAnalysisNetworks") ? !item.AnalysisNetworks.Any() : true)
                 .Where(item => input.Filter.Contains("HasNetworkNodeCollections") ? item.NetworkNodeCollections.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoNetworkNodeCollections") ? !item.NetworkNodeCollections.Any() : true);
+                .Where(item => input.Filter.Contains("HasNoNetworkNodeCollections") ? !item.NetworkNodeCollections.Any() : true)
+                .Where(item => input.Filter.Contains("HasAnalysisNetworks") ? item.AnalysisNetworks.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoAnalysisNetworks") ? !item.AnalysisNetworks.Any() : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -228,17 +219,17 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                 case var sort when sort == ("NetworkEdgeCount", "Descending"):
                     query = query.OrderByDescending(item => item.NetworkEdges.Count());
                     break;
-                case var sort when sort == ("AnalysisNetworkCount", "Ascending"):
-                    query = query.OrderBy(item => item.AnalysisNetworks.Count());
-                    break;
-                case var sort when sort == ("AnalysisNetworkCount", "Descending"):
-                    query = query.OrderByDescending(item => item.AnalysisNetworks.Count());
-                    break;
                 case var sort when sort == ("NetworkNodeCollectionCount", "Ascending"):
                     query = query.OrderBy(item => item.NetworkNodeCollections.Count());
                     break;
                 case var sort when sort == ("NetworkNodeCollectionCount", "Descending"):
                     query = query.OrderByDescending(item => item.NetworkNodeCollections.Count());
+                    break;
+                case var sort when sort == ("AnalysisNetworkCount", "Ascending"):
+                    query = query.OrderBy(item => item.AnalysisNetworks.Count());
+                    break;
+                case var sort when sort == ("AnalysisNetworkCount", "Descending"):
+                    query = query.OrderByDescending(item => item.AnalysisNetworks.Count());
                     break;
                 default:
                     break;
@@ -247,7 +238,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             View = new ViewModel
             {
                 IsUserAuthenticated = user != null,
-                DatabaseTypes = _context.DatabaseTypes.AsEnumerable(),
                 Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.Select(item => new ItemModel
                 {
                     Id = item.Id,
@@ -271,6 +261,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             }
             // Get the item with the provided ID.
             var item = _context.Networks
+                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id)
                 .FirstOrDefault();

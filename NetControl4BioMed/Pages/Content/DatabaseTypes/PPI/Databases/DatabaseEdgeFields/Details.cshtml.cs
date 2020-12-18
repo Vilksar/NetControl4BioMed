@@ -29,8 +29,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Databases.DatabaseEd
         {
             public DatabaseEdgeField DatabaseEdgeField { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public int EdgeCount { get; set; }
         }
 
@@ -48,7 +46,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Databases.DatabaseEd
             }
             // Get the item with the provided ID.
             var items = _context.DatabaseEdgeFields
-                .Where(item => item.Database.DatabaseType.Name != "Generic")
+                .Where(item => item.Database.DatabaseType.Name == "PPI")
                 .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
@@ -65,8 +63,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Databases.DatabaseEd
                 DatabaseEdgeField = items
                     .Include(item => item.Database)
                     .First(),
-                IsGeneric = items
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 EdgeCount = items
                     .Select(item => item.DatabaseEdgeFieldEdges)
                     .SelectMany(item => item)

@@ -49,17 +49,17 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Databases.DatabaseNo
                 {
                     { "IsSearchable", "Is searchable" },
                     { "IsNotSearchable", "Is not searchable" },
-                    { "HasDatabaseNodeFieldNodes", "Has database node field nodes" },
-                    { "HasNoDatabaseNodeFieldNodes", "Does not have database node field nodes" }
+                    { "HasDatabaseNodeFieldNodes", "Has proteins" },
+                    { "HasNoDatabaseNodeFieldNodes", "Does not have proteins" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
                     { "DateTimeCreated", "Date created" },
                     { "Name", "Name" },
-                    { "DatabaseId", "Database type ID" },
-                    { "DatabaseName", "Database type name" },
-                    { "DatabaseNodeFieldNodeCount", "Number of database node field nodes" }
+                    { "DatabaseId", "Database ID" },
+                    { "DatabaseName", "Database name" },
+                    { "DatabaseNodeFieldNodeCount", "Number of proteins" }
                 }
             };
         }
@@ -85,7 +85,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Databases.DatabaseNo
             }
             // Start with all of the items to which the user has access.
             var query = _context.DatabaseNodeFields
-                .Where(item => item.Database.DatabaseType.Name != "Generic")
+                .Where(item => item.Database.DatabaseType.Name == "PPI")
                 .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user));
             // Select the results matching the search string.
             query = query

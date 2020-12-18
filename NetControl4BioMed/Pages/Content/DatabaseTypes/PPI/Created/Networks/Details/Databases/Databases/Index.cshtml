@@ -48,7 +48,7 @@ else
                         <partial name="_NetworkDatabaseTypePartial" model="@item.Type" />
                     </td>
                     <td class="text-center text-break">
-                        <a asp-page="/Content/DatabaseTypes/PPI/Databases/Databases/Details" asp-route-id="@item.Database.Id" class="btn btn-info m-1 @(Model.View.IsGeneric ? "disabled" : string.Empty)" title="Details">
+                        <a asp-page="/Content/DatabaseTypes/PPI/Databases/Databases/Details" asp-route-id="@item.Database.Id" class="btn btn-info m-1" title="Details">
                             <span><i class="fas fa-info-circle"></i></span>
                         </a>
                         @if (!string.IsNullOrEmpty(item.Database.Url))

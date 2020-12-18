@@ -31,8 +31,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
         {
             public Analysis Analysis { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public bool ShowVisualization { get; set; }
 
             public ControlPath ControlPath { get; set; }
@@ -56,6 +54,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
             }
             // Get the item with the provided ID.
             var items = _context.ControlPaths
+                .Where(item => item.Analysis.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.Analysis.IsPublic || item.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
@@ -72,10 +71,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
                 Analysis = items
                     .Select(item => item.Analysis)
                     .First(),
-                IsGeneric = items
-                    .Select(item => item.Analysis.AnalysisDatabases)
-                    .SelectMany(item => item)
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 ShowVisualization = items
                     .All(item => item.Paths
                         .Select(item1 => item1.PathNodes)

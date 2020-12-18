@@ -43,14 +43,14 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
                 SearchIn = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
-                    { "NodeId", "Node ID" },
-                    { "NodeName", "Node name" },
-                    { "SourceNodeId", "Source node ID" },
-                    { "SourceNodeName", "Source node name" },
-                    { "TargetNodeId", "Target node ID" },
-                    { "TargetNodeName", "Target node name" },
-                    { "EdgeId", "Edge ID" },
-                    { "EdgeName", "Edge name" }
+                    { "NodeId", "Protein ID" },
+                    { "NodeName", "Protein name" },
+                    { "SourceNodeId", "Source protein ID" },
+                    { "SourceNodeName", "Source protein name" },
+                    { "TargetNodeId", "Target protein ID" },
+                    { "TargetNodeName", "Target protein name" },
+                    { "EdgeId", "Interaction ID" },
+                    { "EdgeName", "Interaction name" }
                 },
                 Filter = new Dictionary<string, string>
                 {
@@ -58,7 +58,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
-                    { "ControlNodeCount", "Number of control nodes" }
+                    { "ControlNodeCount", "Number of control proteins" }
                 }
             };
         }
@@ -77,6 +77,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
             }
             // Get the items with the provided ID.
             var items = _context.Analyses
+                .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there were no items found.

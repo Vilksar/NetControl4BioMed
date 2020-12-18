@@ -10,7 +10,7 @@
 {
     <div class="alert alert-warning text-justify text-wrap">
         <span><i class="fas fa-exclamation-triangle"></i></span>
-        <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control nodes, and not control paths. Thus, all displayed path lengths correspond to the shortest paths between a control node and its corresponding controlled target nodes, instead of the actual control path.</span>
+        <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control proteins, and not control paths. Thus, all displayed path lengths correspond to the shortest paths between a control protein and its corresponding controlled target proteins, instead of the actual control path.</span>
     </div>
 }
 <partial name="_SearchInputPartial" model="Model.View.Search.Input" />
@@ -31,10 +31,10 @@ else
                     <span>#</span>
                 </th>
                 <th class="text-left text-break">
-                    <span>Control node</span>
+                    <span>Control protein</span>
                 </th>
                 <th class="text-left text-break">
-                    <span>Target node</span>
+                    <span>Target protein</span>
                 </th>
                 <th class="d-none d-lg-table-cell text-center text-break">
                     <span>Length</span>

@@ -69,20 +69,20 @@
                 <span><i class="fas fa-circle"></i></span>
             </div>
             <div>
-                <span>Unique control nodes</span>
+                <span>Unique control proteins</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>This section contains the unique control nodes.</span>
+            <span>This section contains the unique control proteins.</span>
         </div>
         @if (Model.View.Analysis.Algorithm == AnalysisAlgorithm.Genetic)
         {
             <div class="alert alert-warning text-justify text-wrap">
                 <span><i class="fas fa-exclamation-triangle"></i></span>
-                <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control nodes, and not control paths. Thus, while the returned set of control nodes does indeed control the entire set of target nodes, the actual number of controlled nodes might differ.</span>
+                <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control proteins, and not control paths. Thus, while the returned set of control proteins does indeed control the entire set of target proteins, the actual number of controlled proteins might differ.</span>
             </div>
         }
         <table class="table table-hover table-bordered table-datatable" data-order="[[1]]">
@@ -92,7 +92,7 @@
                         <span>#</span>
                     </th>
                     <th class="text-left text-break">
-                        <span>Node</span>
+                        <span>Protein</span>
                     </th>
                     @if (Model.View.SourceNodes.Any())
                     {
@@ -104,7 +104,7 @@
                         <span>Links</span>
                     </th>
                     <th class="d-none d-lg-table-cell text-center text-break">
-                        <span>Controlled nodes</span>
+                        <span>Controlled proteins</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
                         <span>Links</span>
@@ -140,16 +140,9 @@
                             </td>
                         }
                         <td class="text-center text-break">
-                            @if (!Model.View.IsGeneric)
-                            {
-                                <a asp-page="/Content/DatabaseTypes/PPI/Data/Nodes/Details" asp-route-id="@uniqueControlNode.Key.Id" title="Details">
-                                    <span>Details</span>
-                                </a>
-                            }
-                            else
-                            {
-                                <span>-</span>
-                            }
+                            <a asp-page="/Content/DatabaseTypes/PPI/Data/Nodes/Details" asp-route-id="@uniqueControlNode.Key.Id" title="Details">
+                                <span>Details</span>
+                            </a>
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break">
                             <span title="@uniqueControlNode.Value">@uniqueControlNode.Value</span>

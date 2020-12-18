@@ -33,8 +33,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks.Det
 
             public Network Network { get; set; }
 
-            public string DatabaseTypeId { get; set; }
-
             public bool ShowVisualization { get; set; }
 
             public Dictionary<string, int?> ItemCount { get; set; }
@@ -54,6 +52,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks.Det
             }
             // Get the item with the provided ID.
             var items = _context.Networks
+                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
@@ -70,12 +69,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks.Det
                 IsUserAuthenticated = user != null,
                 Network = items
                     .First(),
-                DatabaseTypeId = items
-                    .Select(item => item.NetworkDatabases)
-                    .SelectMany(item => item)
-                    .Select(item => item.Database.DatabaseType.Id)
-                    .Distinct()
-                    .FirstOrDefault(),
                 ShowVisualization = items
                     .All(item => item.Status == NetworkStatus.Completed && item.NetworkNodes
                         .Where(item1 => item1.Type == NetworkNodeType.None)
@@ -106,6 +99,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks.Det
             }
             // Get the item with the provided ID.
             var item = _context.Networks
+                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id)
                 .FirstOrDefault();

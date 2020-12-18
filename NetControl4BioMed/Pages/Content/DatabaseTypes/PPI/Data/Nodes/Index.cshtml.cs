@@ -44,20 +44,20 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.Nodes
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "HasEdgeNodes", "Has edge nodes" },
-                    { "HasNoEdgeNodes", "Does not have edge nodes" },
-                    { "HasNodeCollectionNodes", "Has node collection nodes" },
-                    { "HasNoNodeCollectionNodes", "Does not have node collection nodes" }
+                    { "HasEdgeNodes", "Has interactions" },
+                    { "HasNoEdgeNodes", "Does not have interactions" },
+                    { "HasNodeCollectionNodes", "Is contained by protein collections" },
+                    { "HasNoNodeCollectionNodes", "Is not contained by protein collections" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
                     { "DateTimeCreated", "Date created" },
                     { "Name", "Name" },
-                    { "DatabaseNodeCount", "Number of database nodes" },
-                    { "DatabaseNodeFieldNodeCount", "Number of database node field nodes" },
-                    { "EdgeNodeCount", "Number of edge nodes" },
-                    { "NodeCollectionNodeCount", "Number of node collection nodes" }
+                    { "DatabaseNodeCount", "Number of databases" },
+                    { "DatabaseNodeFieldNodeCount", "Number of values" },
+                    { "EdgeNodeCount", "Number of interactions" },
+                    { "NodeCollectionNodeCount", "Number of protein collections" }
                 }
             };
         }
@@ -83,7 +83,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.Nodes
             }
             // Start with all of the items to which the user has access.
             var query = _context.Nodes
-                .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Where(item => item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.DatabaseNodes.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)));
             // Select the results matching the search string.
             query = query
