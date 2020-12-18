@@ -637,13 +637,23 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the navigation breadcrumb for the content data node collections index page.
+        /// Gets the navigation breadcrumb for the content data source node collections index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataNodeCollectionsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataSourceNodeCollectionsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
-            Id = "NodeCollections",
-            Title = "Node collections",
-            Link = "/Content/PPI/Data/NodeCollections/Index"
+            Id = "SourceNodeCollections",
+            Title = "Source node collections",
+            Link = "/Content/PPI/Data/SourceNodeCollections/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content data target node collections index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataTargetNodeCollectionsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "TargetNodeCollections",
+            Title = "Target node collections",
+            Link = "/Content/PPI/Data/TargetNodeCollections/Index"
         };
 
         /// <summary>

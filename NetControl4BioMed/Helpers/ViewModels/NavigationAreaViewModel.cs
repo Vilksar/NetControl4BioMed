@@ -868,12 +868,21 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "NodeCollections",
-                            Title = "Node collections",
+                            Id = "SourceNodeCollections",
+                            Title = "Source node collections",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Data/NodeCollections/Index"
+                            Link = "/Content/DatabaseTypes/PPI/Data/SourceNodeCollections/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "TargetNodeCollections",
+                            Title = "Target node collections",
+                            Description = string.Empty,
+                            Icon = "fa-folder",
+                            Color = "light",
+                            Link = "/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index"
                         }
                     }
                 },

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 
-namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.NodeCollections
+namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.SourceNodeCollections
 {
     public class DetailsModel : PageModel
     {
