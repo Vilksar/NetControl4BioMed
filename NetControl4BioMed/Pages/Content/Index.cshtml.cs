@@ -151,7 +151,7 @@ namespace NetControl4BioMed.Pages.Content
                         return RedirectToPage();
                     }
                     // Redirect to page.
-                    return RedirectToPage($"/Content/Created/DatabaseTypes/{databaseType.Name}/Created/Networks/Details/Index", new { id = Input.Id });
+                    return RedirectToPage($"/Content/DatabaseTypes/Created/{databaseType.Name}/Created/Networks/Details/Index", new { id = Input.Id });
                 }
                 // Check if only a network should have been searched for.
                 if (Input.Type == "Networks")
@@ -187,7 +187,7 @@ namespace NetControl4BioMed.Pages.Content
                         return RedirectToPage();
                     }
                     // Redirect to page.
-                    return RedirectToPage($"/Content/Created/DatabaseTypes/{databaseType.Name}/Created/Analyses/Details/Index", new { id = Input.Id });
+                    return RedirectToPage($"/Content/DatabaseTypes/Created/{databaseType.Name}/Created/Analyses/Details/Index", new { id = Input.Id });
                 }
                 // Check if only an analysis should have been searched for.
                 if (Input.Type == "Analyses")

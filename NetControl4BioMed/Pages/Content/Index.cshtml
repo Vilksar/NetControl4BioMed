@@ -20,11 +20,11 @@
         {
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>You have no networks available, as you are not logged in. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Create" class="alert-link">here</a> to upload a new generic network, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Create" class="alert-link">here</a> to construct a new PPI network.</span>
+                <span>There are no networks associated with your account, as you are not logged in. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Create" class="alert-link">here</a> to upload a new generic network, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Create" class="alert-link">here</a> to construct a new PPI network.</span>
             </div>
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>You have no analyses available, as you are not logged in. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Create" class="alert-link">here</a> to create a new generic analysis, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Create" class="alert-link">here</a> to create a new PPI analysis.</span>
+                <span>There are no analyses associated with your account, as you are not logged in. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Create" class="alert-link">here</a> to create a new generic analysis, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Create" class="alert-link">here</a> to create a new PPI analysis.</span>
             </div>
         }
         else
@@ -35,11 +35,11 @@
             var ppiAnalysisCount = Model.View.ItemCount.GetValueOrDefault("PPIAnalyses", null) ?? 0;
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>You have @genericNetworkCount generic network@(genericNetworkCount != 1 ? "s" : string.Empty) and @ppiNetworkCount PPI network@(ppiNetworkCount != 1 ? "s" : string.Empty) available. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Index" class="alert-link">here</a> to view the generic networks, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Index" class="alert-link">here</a> to view the PPI networks.</span>
+                <span>There are @genericNetworkCount generic network@(genericNetworkCount != 1 ? "s" : string.Empty) and @genericAnalysisCount generic analys@(genericAnalysisCount != 1 ? "e" : "i")s associated with your account. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Index" class="alert-link">here</a> to view the generic networks, or <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Index" class="alert-link">here</a> to view the generic analyses.</span>
             </div>
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>You have @genericAnalysisCount generic analys@(genericAnalysisCount != 1 ? "e" : "i")s and @ppiAnalysisCount PPI analys@(ppiAnalysisCount != 1 ? "e" : "i")s available. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Index" class="alert-link">here</a> to view the generic analyses, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Index" class="alert-link">here</a> to view the PPI analyses.</span>
+                <span>There are @ppiNetworkCount PPI network@(ppiNetworkCount != 1 ? "s" : string.Empty) and @ppiAnalysisCount PPI analys@(ppiAnalysisCount != 1 ? "e" : "i")s associated with your account. You can click <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Index" class="alert-link">here</a> to view the PPI networks, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Index" class="alert-link">here</a> to view the PPI analyses.</span>
             </div>
         }
     </div>
@@ -58,7 +58,7 @@
     <div class="card-body">
         <div class="alert alert-primary text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>If you have the ID of a network or analysis, you can input it below to look it up. You need to have access to it, or it needs to be public, in order to be able to see it.</span>
+            <span>If you have the ID of a network or analysis, you can input it below to look it up. You need to have access to it (or it needs to be public) in order to be able to see it.</span>
         </div>
         <form method="post" class="text-justify">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>

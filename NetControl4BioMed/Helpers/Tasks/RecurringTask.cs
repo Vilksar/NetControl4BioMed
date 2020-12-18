@@ -517,9 +517,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         Id = item.Id,
                         Name = item.Name,
+                        DatabaseTypeName = item.NetworkDatabases
+                            .Select(item1 => item1.Database.DatabaseType.Name)
+                            .FirstOrDefault(),
                         Emails = item.NetworkUsers
                             .Select(item1 => item1.User.Email)
                     })
+                    .Where(item => !string.IsNullOrEmpty(item.DatabaseTypeName))
                     .ToList();
                 alertAnalyses = context.Analyses
                     .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
@@ -534,9 +538,13 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         Id = item.Id,
                         Name = item.Name,
+                        DatabaseTypeName = item.AnalysisDatabases
+                            .Select(item1 => item1.Database.DatabaseType.Name)
+                            .FirstOrDefault(),
                         Emails = item.AnalysisUsers
                             .Select(item1 => item1.User.Email)
                     })
+                    .Where(item => !string.IsNullOrEmpty(item.DatabaseTypeName))
                     .ToList();
             }
             // Define the user items to get.
@@ -562,7 +570,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             {
                                 Id = item1.Id,
                                 Name = item1.Name,
-                                Url = linkGenerator.GetUriByPage("/Content/Created/Networks/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
+                                Url = linkGenerator.GetUriByPage($"/Content/DatabaseTypes/{item1.DatabaseTypeName}/Created/Networks/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
                             }),
                         AnalysisItems = alertAnalyses
                             .Where(item1 => item1.Emails.Contains(item))
@@ -570,7 +578,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             {
                                 Id = item1.Id,
                                 Name = item1.Name,
-                                Url = linkGenerator.GetUriByPage("/Content/Created/Analyses/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
+                                Url = linkGenerator.GetUriByPage($"/Content/DatabaseTypes/{item1.DatabaseTypeName}/Created/Analyses/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
                             })
                     });
             }
@@ -841,6 +849,11 @@ namespace NetControl4BioMed.Helpers.Tasks
             /// Represents the name of the alert item.
             /// </summary>
             public string Name { get; set; }
+
+            /// <summary>
+            /// Represents the name of the database type of the alert item.
+            /// </summary>
+            public string DatabaseTypeName { get; set; }
 
             /// <summary>
             /// Represents the e-mails of the alert item.
