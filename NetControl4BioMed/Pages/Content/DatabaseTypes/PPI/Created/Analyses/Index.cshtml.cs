@@ -34,8 +34,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
         {
             public bool IsUserAuthenticated { get; set; }
 
-            public IEnumerable<DatabaseType> DatabaseTypes { get; set; }
-
             public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
@@ -47,49 +45,42 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     { "Description", "Description" },
                     { "UserId", "User ID" },
                     { "UserEmail", "User e-mail" },
-                    { "DatabaseTypeId", "Database type ID" },
-                    { "DatabaseTypeName", "Database type name" },
                     { "DatabaseId", "Database ID" },
                     { "DatabaseName", "Database name" },
-                    { "NodeId", "Node ID" },
-                    { "NodeName", "Node name" },
-                    { "EdgeId", "Edge ID" },
-                    { "EdgeName", "Edge name" },
-                    { "NodeCollectionId", "Node collection ID" },
-                    { "NodeCollectionName", "Node collection name" },
+                    { "NodeId", "Protein ID" },
+                    { "NodeName", "Protein name" },
+                    { "EdgeId", "Interaction ID" },
+                    { "EdgeName", "Interaction name" },
+                    { "NodeCollectionId", "Protein collection ID" },
+                    { "NodeCollectionName", "Protein collection name" },
                     { "NetworkId", "Network ID" },
                     { "NetworkName", "Network name" }
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "IsError", "Is error" },
-                    { "IsNotError", "Is not error" },
-                    { "IsDefined", "Is defined" },
-                    { "IsNotDefined", "Is not defined" },
-                    { "IsGenerating", "Is generating" },
-                    { "IsNotGenerating", "Is not generating" },
-                    { "IsScheduled", "Is scheduled" },
-                    { "IsNotScheduled", "Is not scheduled" },
-                    { "IsInitializing", "Is initializing" },
-                    { "IsNotInitializing", "Is not initializing" },
-                    { "IsOngoing", "Is ongoing" },
-                    { "IsNotOngoing", "Is not ongoing" },
-                    { "IsStopping", "Is stopping" },
-                    { "IsNotStopping", "Is not stopping" },
-                    { "IsStopped", "Is stopped" },
-                    { "IsNotStopped", "Is not stopped" },
-                    { "IsCompleted", "Is completed" },
-                    { "IsNotCompleted", "Is not completed" },
-                    { "UsesGreedyAlgorithm", "Uses the greedy algorithm" },
-                    { "UsesNotGreedyAlgorithm", "Doesn't use the greedy algorithm" },
-                    { "UsesGeneticAlgorithm", "Uses the genetic algorithm" },
-                    { "UsesNotGeneticAlgorithm", "Doesn't use the genetic algorithm" },
-                    { "HasAnalysisNodeCollections", "Has node collections" },
-                    { "HasNoAnalysisNodeCollections", "Does not have node collections" }
+                    { "HasStatusError", "Has status \"Error\"" },
+                    { "HasNotStatusError", "Does not have status \"Error\"" },
+                    { "HasStatusDefined", "Has status \"Defined\"" },
+                    { "HasNotStatusDefined", "Does not have status \"Defined\"" },
+                    { "HasStatusGenerating", "Has status \"Generating\"" },
+                    { "HasNotStatusGenerating", "Does not have status \"Generating\"" },
+                    { "HasStatusScheduled", "Has status \"Scheduled\"" },
+                    { "HasNotStatusScheduled", "Does not have status \"Scheduled\"" },
+                    { "HasStatusOngoing", "Has status \"Ongoing\"" },
+                    { "HasNotStatusOngoing", "Does not have status \"Ongoing\"" },
+                    { "HasStatusStopping", "Has status \"Stopping\"" },
+                    { "HasNotStatusStopping", "Does not have status \"Stopping\"" },
+                    { "HasStatusStopped", "Has status \"Stopped\"" },
+                    { "HasNotStatusStopped", "Does not have status \"Stopped\"" },
+                    { "HasStatusCompleted", "Has status \"Completed\"" },
+                    { "HasNotStatusCompleted", "Does not have status \"Completed\"" },
+                    { "HasAnalysisNodeCollections", "Has protein collections" },
+                    { "HasNoAnalysisNodeCollections", "Does not have protein collections" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
+                    { "DateTimeCreated", "Date created" },
                     { "DateTimeStarted", "Date started" },
                     { "DateTimeEnded", "Date ended" },
                     { "Name", "Name" },
@@ -98,9 +89,9 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     { "CurrentIterationWithoutImprovement", "Current iteration without improvement" },
                     { "AnalysisUserCount", "Number of users" },
                     { "AnalysisDatabaseCount", "Number of databases" },
-                    { "AnalysisNodeCount", "Number of nodes" },
-                    { "AnalysisEdgeCount", "Number of edges" },
-                    { "AnalysisNodeCollectionCount", "Number of node collections" },
+                    { "AnalysisNodeCount", "Number of proteins" },
+                    { "AnalysisEdgeCount", "Number of interactions" },
+                    { "AnalysisNodeCollectionCount", "Number of protein collections" },
                     { "AnalysisNetworkCount", "Number of networks" }
                 }
             };
@@ -129,6 +120,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
             }
             // Start with all of the items to which the user has access.
             var query = _context.Analyses
+                .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user));
             // Select the results matching the search string.
             query = query
@@ -138,8 +130,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
                     input.SearchIn.Contains("UserId") && item.AnalysisUsers.Any(item1 => item1.User.Id.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("UserEmail") && (item.AnalysisUsers.Any(item1 => item1.User.Email.Contains(input.SearchString)) || item.AnalysisUserInvitations.Any(item1 => item1.Email.Contains(input.SearchString))) ||
-                    input.SearchIn.Contains("DatabaseTypeId") && item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Id.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("DatabaseTypeName") && item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("DatabaseId") && item.AnalysisDatabases.Any(item1 => item1.Database.Id.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("DatabaseName") && item.AnalysisDatabases.Any(item1 => item1.Database.Name.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("NodeId") && item.AnalysisNodes.Any(item1 => item1.Node.Id.Contains(input.SearchString)) ||
@@ -152,28 +142,24 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     input.SearchIn.Contains("NetworkName") && item.AnalysisNetworks.Any(item1 => item1.Network.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
-                .Where(item => input.Filter.Contains("IsError") ? item.Status == AnalysisStatus.Error : true)
-                .Where(item => input.Filter.Contains("IsNotError") ? item.Status != AnalysisStatus.Error : true)
-                .Where(item => input.Filter.Contains("IsDefined") ? item.Status == AnalysisStatus.Defined : true)
-                .Where(item => input.Filter.Contains("IsNotDefined") ? item.Status != AnalysisStatus.Defined : true)
-                .Where(item => input.Filter.Contains("IsGenerating") ? item.Status == AnalysisStatus.Generating : true)
-                .Where(item => input.Filter.Contains("IsNotGenerating") ? item.Status != AnalysisStatus.Generating : true)
-                .Where(item => input.Filter.Contains("IsScheduled") ? item.Status == AnalysisStatus.Scheduled : true)
-                .Where(item => input.Filter.Contains("IsNotScheduled") ? item.Status != AnalysisStatus.Scheduled : true)
-                .Where(item => input.Filter.Contains("IsInitializing") ? item.Status == AnalysisStatus.Initializing : true)
-                .Where(item => input.Filter.Contains("IsNotInitializing") ? item.Status != AnalysisStatus.Initializing : true)
-                .Where(item => input.Filter.Contains("IsOngoing") ? item.Status == AnalysisStatus.Ongoing : true)
-                .Where(item => input.Filter.Contains("IsNotOngoing") ? item.Status != AnalysisStatus.Ongoing : true)
-                .Where(item => input.Filter.Contains("IsStopping") ? item.Status == AnalysisStatus.Stopping : true)
-                .Where(item => input.Filter.Contains("IsNotStopping") ? item.Status != AnalysisStatus.Stopping : true)
-                .Where(item => input.Filter.Contains("IsStopped") ? item.Status == AnalysisStatus.Stopped : true)
-                .Where(item => input.Filter.Contains("IsNotStopped") ? item.Status != AnalysisStatus.Stopped : true)
-                .Where(item => input.Filter.Contains("IsCompleted") ? item.Status == AnalysisStatus.Completed : true)
-                .Where(item => input.Filter.Contains("IsNotCompleted") ? item.Status != AnalysisStatus.Completed : true)
-                .Where(item => input.Filter.Contains("UsesGreedyAlgorithm") ? item.Algorithm == AnalysisAlgorithm.Greedy : true)
-                .Where(item => input.Filter.Contains("UsesNotGreedyAlgorithm") ? item.Algorithm != AnalysisAlgorithm.Greedy : true)
-                .Where(item => input.Filter.Contains("UsesGeneticAlgorithm") ? item.Algorithm == AnalysisAlgorithm.Genetic : true)
-                .Where(item => input.Filter.Contains("UsesNotGeneticAlgorithm") ? item.Algorithm != AnalysisAlgorithm.Genetic : true)
+                .Where(item => input.Filter.Contains("HasStatusError") ? item.Status == AnalysisStatus.Error : true)
+                .Where(item => input.Filter.Contains("HasNotStatusError") ? item.Status != AnalysisStatus.Error : true)
+                .Where(item => input.Filter.Contains("HasStatusDefined") ? item.Status == AnalysisStatus.Defined : true)
+                .Where(item => input.Filter.Contains("HasNotStatusDefined") ? item.Status != AnalysisStatus.Defined : true)
+                .Where(item => input.Filter.Contains("HasStatusGenerating") ? item.Status == AnalysisStatus.Generating : true)
+                .Where(item => input.Filter.Contains("HasNotStatusGenerating") ? item.Status != AnalysisStatus.Generating : true)
+                .Where(item => input.Filter.Contains("HasStatusScheduled") ? item.Status == AnalysisStatus.Scheduled : true)
+                .Where(item => input.Filter.Contains("HasNotStatusScheduled") ? item.Status != AnalysisStatus.Scheduled : true)
+                .Where(item => input.Filter.Contains("HasStatusInitializing") ? item.Status == AnalysisStatus.Initializing : true)
+                .Where(item => input.Filter.Contains("HasNotStatusInitializing") ? item.Status != AnalysisStatus.Initializing : true)
+                .Where(item => input.Filter.Contains("HasStatusOngoing") ? item.Status == AnalysisStatus.Ongoing : true)
+                .Where(item => input.Filter.Contains("HasNotStatusOngoing") ? item.Status != AnalysisStatus.Ongoing : true)
+                .Where(item => input.Filter.Contains("HasStatusStopping") ? item.Status == AnalysisStatus.Stopping : true)
+                .Where(item => input.Filter.Contains("HasNotStatusStopping") ? item.Status != AnalysisStatus.Stopping : true)
+                .Where(item => input.Filter.Contains("HasStatusStopped") ? item.Status == AnalysisStatus.Stopped : true)
+                .Where(item => input.Filter.Contains("HasNotStatusStopped") ? item.Status != AnalysisStatus.Stopped : true)
+                .Where(item => input.Filter.Contains("HasStatusCompleted") ? item.Status == AnalysisStatus.Completed : true)
+                .Where(item => input.Filter.Contains("HasNotStatusCompleted") ? item.Status != AnalysisStatus.Completed : true)
                 .Where(item => input.Filter.Contains("HasAnalysisNodeCollections") ? item.AnalysisNodeCollections.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoAnalysisNodeCollections") ? !item.AnalysisNodeCollections.Any() : true);
             // Sort it according to the parameters.
@@ -184,6 +170,12 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     break;
                 case var sort when sort == ("Id", "Descending"):
                     query = query.OrderByDescending(item => item.Id);
+                    break;
+                case var sort when sort == ("DateTimeCreated", "Ascending"):
+                    query = query.OrderBy(item => item.DateTimeCreated);
+                    break;
+                case var sort when sort == ("DateTimeCreated", "Descending"):
+                    query = query.OrderByDescending(item => item.DateTimeCreated);
                     break;
                 case var sort when sort == ("DateTimeStarted", "Ascending"):
                     query = query.OrderBy(item => item.DateTimeStarted);
@@ -264,7 +256,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
             View = new ViewModel
             {
                 IsUserAuthenticated = user != null,
-                DatabaseTypes = _context.DatabaseTypes.AsEnumerable(),
                 Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.Select(item => new ItemModel
                 {
                     Id = item.Id,
@@ -288,6 +279,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
             }
             // Get the item with the provided ID.
             var item = _context.Analyses
+                .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id)
                 .FirstOrDefault();

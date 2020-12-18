@@ -50,8 +50,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.NodeCollections
                     { "Id", "ID" },
                     { "DateTimeCreated", "Date created" },
                     { "Name", "Name" },
-                    { "NodeCollectionDatabaseCount", "Number of node collection databases" },
-                    { "NodeCollectionNodeCount", "Number of node collection nodes" }
+                    { "NodeCollectionDatabaseCount", "Number of databases" },
+                    { "NodeCollectionNodeCount", "Number of proteins" }
                 }
             };
         }
@@ -77,7 +77,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.NodeCollections
             }
             // Start with all of the items to which the user has access.
             var query = _context.NodeCollections
-                .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                 .Where(item => item.NodeCollectionNodes.Any(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))));
             // Select the results matching the search string.

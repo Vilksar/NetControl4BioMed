@@ -29,8 +29,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Databases.DatabaseNo
         {
             public DatabaseNodeField DatabaseNodeField { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public int NodeCount { get; set; }
         }
 
@@ -48,7 +46,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Databases.DatabaseNo
             }
             // Get the item with the provided ID.
             var items = _context.DatabaseNodeFields
-                .Where(item => item.Database.DatabaseType.Name != "Generic")
+                .Where(item => item.Database.DatabaseType.Name == "PPI")
                 .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
@@ -65,8 +63,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Databases.DatabaseNo
                 DatabaseNodeField = items
                     .Include(item => item.Database)
                     .First(),
-                IsGeneric = items
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 NodeCount = items
                     .Select(item => item.DatabaseNodeFieldNodes)
                     .SelectMany(item => item)

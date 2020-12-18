@@ -1,7 +1,7 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Edge fields";
+    ViewData["Title"] = "Interaction data";
 }
 
 <partial name="_SearchInputPartial" model="Model.View.Search.Input" />
@@ -10,7 +10,7 @@
 {
     <div class="alert alert-info text-justify text-wrap">
         <span><i class="fas fa-info-circle"></i></span>
-        <span>No edge fields have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
+        <span>No interaction data has been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
     </div>
 }
 else

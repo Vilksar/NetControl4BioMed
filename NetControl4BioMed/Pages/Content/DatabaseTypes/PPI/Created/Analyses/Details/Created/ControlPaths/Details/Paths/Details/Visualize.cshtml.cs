@@ -51,6 +51,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
             }
             // Get the item with the provided ID.
             var items = _context.Paths
+                .Where(item => item.ControlPath.Analysis.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.ControlPath.Analysis.IsPublic || item.ControlPath.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there was no item found.

@@ -1,7 +1,7 @@
 ﻿@page
 @model DetailsModel
 @{
-    ViewData["Title"] = "Edge field details";
+    ViewData["Title"] = "Interaction data details";
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetDatabaseEdgeFieldNavigationTitleCard(Model.View.DatabaseEdgeField)" />
@@ -64,24 +64,21 @@
         </table>
     </div>
 </div>
-@if (!Model.View.IsGeneric)
-{
-    <div class="card mb-3">
-        <div class="card-header font-weight-bold">
-            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                <div>
-                    <span><i class="fas fa-arrow-right"></i></span>
-                </div>
-                <div>
-                    <span>Edges</span>
-                </div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-arrow-right"></i></span>
             </div>
-        </div>
-        <div class="card-body">
-            <div class="alert alert-info text-justify text-wrap mb-0">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>The edge field currently contains @Model.View.EdgeCount edge@(Model.View.EdgeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/DatabaseTypes/PPI/Relationships/DatabaseEdgeFieldEdges/Index" asp-route-searchString="@Model.View.DatabaseEdgeField.Id" asp-route-searchIn="DatabaseEdgeFieldId" class="alert-link">view the edges</a>.</span>
+            <div>
+                <span>Interactions</span>
             </div>
         </div>
     </div>
-}
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The data set currently contains @Model.View.EdgeCount interaction@(Model.View.EdgeCount != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>

@@ -1,7 +1,7 @@
 ﻿@page
 @model DetailsModel
 @{
-    ViewData["Title"] = "Edge details";
+    ViewData["Title"] = "Interaction details";
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetEdgeNavigationTitleCard(Model.View.Edge)" />
@@ -43,7 +43,7 @@
         {
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The edge is currently assigned to @Model.View.DatabaseEdges.Count() database@(Model.View.DatabaseEdges.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Content/DatabaseTypes/PPI/Relationships/DatabaseEdges/Index" asp-route-searchString="@Model.View.Edge.Id" asp-route-searchIn="EdgeId" class="alert-link">view the databases</a>.</span>
+                <span>The interaction is currently assigned to @Model.View.DatabaseEdges.Count() database@(Model.View.DatabaseEdges.Count() != 1 ? "s" : string.Empty).</span>
             </div>
             <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
                 <thead class="thead-light">
@@ -88,7 +88,7 @@
                 <span><i class="fas fa-table"></i></span>
             </div>
             <div>
-                <span>Fields</span>
+                <span>Values</span>
             </div>
         </div>
     </div>
@@ -97,14 +97,14 @@
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no fields currently assigned.</span>
+                <span>There are no values currently assigned.</span>
             </div>
         }
         else
         {
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The edge is currently assigned to @Model.View.DatabaseEdgeFieldEdges.Count() field@(Model.View.DatabaseEdgeFieldEdges.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Content/DatabaseTypes/PPI/Relationships/DatabaseEdgeFieldEdges/Index" asp-route-searchString="@Model.View.Edge.Id" asp-route-searchIn="EdgeId" class="alert-link">view the fields</a>.</span>
+                <span>The interaction is currently assigned to @Model.View.DatabaseEdgeFieldEdges.Count() value@(Model.View.DatabaseEdgeFieldEdges.Count() != 1 ? "s" : string.Empty).</span>
             </div>
             <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
                 <thead class="thead-light">
@@ -113,7 +113,7 @@
                             <span>#</span>
                         </th>
                         <th class="text-left text-break">
-                            <span>Field</span>
+                            <span>Data</span>
                         </th>
                         <th class="text-center text-break">
                             <span>Value</span>
@@ -171,7 +171,7 @@
                 <span><i class="fas fa-circle"></i></span>
             </div>
             <div>
-                <span>Nodes</span>
+                <span>Proteins</span>
             </div>
         </div>
     </div>
@@ -180,14 +180,14 @@
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no nodes currently assigned.</span>
+                <span>There are no proteins currently assigned.</span>
             </div>
         }
         else
         {
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The edge is currently assigned to @Model.View.EdgeNodes.Count() edge@(Model.View.EdgeNodes.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Content/DatabaseTypes/PPI/Relationships/EdgeNodes/Index" asp-route-searchString="@Model.View.Edge.Id" asp-route-searchIn="EdgeId" class="alert-link">view the nodes</a>.</span>
+                <span>The interaction is currently assigned to @Model.View.EdgeNodes.Count() protein@(Model.View.EdgeNodes.Count() != 1 ? "s" : string.Empty).</span>
             </div>
             <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
                 <thead class="thead-light">
@@ -196,7 +196,7 @@
                             <span>#</span>
                         </th>
                         <th class="text-left text-break">
-                            <span>Node</span>
+                            <span>Protein</span>
                         </th>
                         <th class="text-left text-break">
                             <span>Type</span>

@@ -10,7 +10,7 @@
 {
     <div class="alert alert-warning text-justify text-wrap">
         <span><i class="fas fa-exclamation-triangle"></i></span>
-        <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control nodes, and not control paths. Thus, all displayed paths are the shortest paths between a control node and its corresponding controlled target nodes, instead of the actual control path.</span>
+        <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control proteins, and not control paths. Thus, all displayed paths are the shortest paths between a control protein and its corresponding controlled target proteins, instead of the actual control path.</span>
     </div>
 }
 @if (Model.View.ShowVisualization)
@@ -45,14 +45,14 @@
                 <span><i class="fas fa-circle"></i></span>
             </div>
             <div>
-                <span>Path nodes</span>
+                <span>Path proteins</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>This section contains the nodes in the path.</span>
+            <span>This section contains the proteins in the path.</span>
         </div>
         <table class="table table-hover table-bordered table-datatable" data-order="[[2, &quot;asc&quot;]]">
             <thead class="thead-light">
@@ -61,7 +61,7 @@
                         <span>#</span>
                     </th>
                     <th class="text-left text-break">
-                        <span>Node</span>
+                        <span>Protein</span>
                     </th>
                     <th class="text-center text-break" hidden>
                         <span>Index</span>
@@ -91,16 +91,9 @@
                             <partial name="_PathNodeTypePartial" model="pathNode.Type" />
                         </td>
                         <td class="text-center text-break">
-                            @if (!Model.View.IsGeneric)
-                            {
-                                <a asp-page="/Content/DatabaseTypes/PPI/Data/Nodes/Details" asp-route-id="@pathNode.Node.Id" title="Details">
-                                    <span>Details</span>
-                                </a>
-                            }
-                            else
-                            {
-                                <span>-</span>
-                            }
+                            <a asp-page="/Content/DatabaseTypes/PPI/Data/Nodes/Details" asp-route-id="@pathNode.Node.Id" title="Details">
+                                <span>Details</span>
+                            </a>
                         </td>
                     </tr>
                 }
@@ -115,14 +108,14 @@
                 <span><i class="fas fa-arrow-right"></i></span>
             </div>
             <div>
-                <span>Path edges</span>
+                <span>Path interactions</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>This section contains the edges in the path.</span>
+            <span>This section contains the interactions in the path.</span>
         </div>
         <table class="table table-hover table-bordered table-datatable" data-order="[[2, &quot;asc&quot;]]">
             <thead class="thead-light">
@@ -131,7 +124,7 @@
                         <span>#</span>
                     </th>
                     <th class="text-left text-break">
-                        <span>Edge</span>
+                        <span>Interaction</span>
                     </th>
                     <th class="text-center text-break" hidden>
                         <span>Index</span>
@@ -155,16 +148,9 @@
                             <span title="@pathEdge.Index">@pathEdge.Index</span>
                         </td>
                         <td class="text-center text-break">
-                            @if (!Model.View.IsGeneric)
-                            {
-                                <a asp-page="/Content/DatabaseTypes/PPI/Data/Edges/Details" asp-route-id="@pathEdge.Edge.Id" title="Details">
-                                    <span>Details</span>
-                                </a>
-                            }
-                            else
-                            {
-                                <span>-</span>
-                            }
+                            <a asp-page="/Content/DatabaseTypes/PPI/Data/Edges/Details" asp-route-id="@pathEdge.Edge.Id" title="Details">
+                                <span>Details</span>
+                            </a>
                         </td>
                     </tr>
                 }

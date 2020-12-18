@@ -1,7 +1,7 @@
 ﻿@page
 @model DetailsModel
 @{
-    ViewData["Title"] = "Node collection details";
+    ViewData["Title"] = "Protein collection details";
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetNodeCollectionNavigationTitleCard(Model.View.NodeCollection)" />
@@ -43,7 +43,7 @@
         {
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The node collection is currently assigned to @Model.View.NodeCollectionDatabases.Count() database@(Model.View.NodeCollectionDatabases.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Content/DatabaseTypes/PPI/Relationships/NodeCollectionDatabases/Index" asp-route-searchString="@Model.View.NodeCollection.Id" asp-route-searchIn="NodeCollectionId" class="alert-link">view the databases</a>.</span>
+                <span>The protein collection is currently assigned to @Model.View.NodeCollectionDatabases.Count() database@(Model.View.NodeCollectionDatabases.Count() != 1 ? "s" : string.Empty).</span>
             </div>
             <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
                 <thead class="thead-light">
@@ -88,7 +88,7 @@
                 <span><i class="fas fa-circle"></i></span>
             </div>
             <div>
-                <span>Nodes</span>
+                <span>Proteins</span>
             </div>
         </div>
     </div>
@@ -97,14 +97,14 @@
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no nodes currently assigned.</span>
+                <span>There are no proteins currently assigned.</span>
             </div>
         }
         else
         {
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The node collection currently contains @Model.View.NodeCollectionNodes.Count() node@(Model.View.NodeCollectionNodes.Count() != 1 ? "s" : string.Empty). You can <a asp-page="/Content/DatabaseTypes/PPI/Relationships/NodeCollectionNodes/Index" asp-route-searchString="@Model.View.NodeCollection.Id" asp-route-searchIn="NodeCollectionId" class="alert-link">view the nodes</a>.</span>
+                <span>The protein collection currently contains @Model.View.NodeCollectionNodes.Count() protein@(Model.View.NodeCollectionNodes.Count() != 1 ? "s" : string.Empty).</span>
             </div>
             <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
                 <thead class="thead-light">
@@ -113,7 +113,7 @@
                             <span>#</span>
                         </th>
                         <th class="text-left text-break">
-                            <span>Node</span>
+                            <span>Protein</span>
                         </th>
                         <th class="text-center text-break" data-orderable="false" data-searchable="false">
                             <span>Links</span>

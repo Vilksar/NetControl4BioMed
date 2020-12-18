@@ -36,8 +36,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
 
             public Analysis Analysis { get; set; }
 
-            public string DatabaseTypeId { get; set; }
-
             public bool ShowVisualization { get; set; }
 
             public Algorithms.Analyses.Greedy.Parameters GreedyAlgorithmParameters { get; set; }
@@ -61,6 +59,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
             }
             // Get the item with the provided ID.
             var items = _context.Analyses
+                .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
@@ -77,12 +76,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
                 IsUserAuthenticated = user != null,
                 Analysis = items
                     .First(),
-                DatabaseTypeId = items
-                    .Select(item => item.AnalysisDatabases)
-                    .SelectMany(item => item)
-                    .Select(item => item.Database.DatabaseType.Id)
-                    .Distinct()
-                    .FirstOrDefault(),
                 ShowVisualization = items
                     .All(item => (item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed) && item.AnalysisNodes
                         .Where(item1 => item1.Type == AnalysisNodeType.None)
@@ -134,6 +127,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
             }
             // Get the item with the provided ID.
             var item = _context.Analyses
+                .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id)
                 .FirstOrDefault();

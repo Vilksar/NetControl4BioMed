@@ -27,7 +27,6 @@ using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
 {
-    [Authorize]
     public class DownloadModel : PageModel
     {
         private readonly UserManager<User> _userManager;
@@ -81,6 +80,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             View = new ViewModel
             {
                 Items = _context.Networks
+                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                     .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                     .Where(item => ids.Contains(item.Id))
             };
@@ -112,6 +112,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             View = new ViewModel
             {
                 Items = _context.Networks
+                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                     .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                     .Where(item => Input.Ids.Contains(item.Id))
             };

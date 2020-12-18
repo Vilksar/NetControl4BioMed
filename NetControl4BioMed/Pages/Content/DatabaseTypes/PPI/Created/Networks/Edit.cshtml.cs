@@ -77,6 +77,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             }
             // Define the query.
             var query = _context.Networks
+                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Define the view.
@@ -120,6 +121,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             }
             // Define the query.
             var query = _context.Networks
+                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == Input.Id);
             // Define the view.

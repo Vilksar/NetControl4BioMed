@@ -29,8 +29,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Databases.Databases
         {
             public Database Database { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public IEnumerable<DatabaseNodeField> DatabaseNodeFields { get; set; }
 
             public IEnumerable<DatabaseEdgeField> DatabaseEdgeFields { get; set; }
@@ -56,7 +54,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Databases.Databases
             }
             // Get the item with the provided ID.
             var items = _context.Databases
-                .Where(item => item.DatabaseType.Name != "Generic")
+                .Where(item => item.DatabaseType.Name == "PPI")
                 .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
@@ -73,18 +71,12 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Databases.Databases
                 Database = items
                     .Include(item => item.DatabaseType)
                     .First(),
-                IsGeneric = items
-                    .Any(item => item.DatabaseType.Name == "Generic"),
                 DatabaseNodeFields = items
                     .Select(item => item.DatabaseNodeFields)
-                    .SelectMany(item => item)
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user)),
+                    .SelectMany(item => item),
                 DatabaseEdgeFields = items
                     .Select(item => item.DatabaseEdgeFields)
-                    .SelectMany(item => item)
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
-                    .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user)),
+                    .SelectMany(item => item),
                 NodeCount = items
                     .Select(item => item.DatabaseNodes)
                     .SelectMany(item => item)

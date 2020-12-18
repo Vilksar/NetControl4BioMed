@@ -34,8 +34,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
         {
             public Analysis Analysis { get; set; }
 
-            public bool IsGeneric { get; set; }
-
             public SearchViewModel<Path> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
@@ -43,14 +41,14 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
                 SearchIn = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
-                    { "NodeId", "Node ID" },
-                    { "NodeName", "Node name" },
-                    { "SourceNodeId", "Source node ID" },
-                    { "SourceNodeName", "Source node name" },
-                    { "TargetNodeId", "Target node ID" },
-                    { "TargetNodeName", "Target node name" },
-                    { "EdgeId", "Edge ID" },
-                    { "EdgeName", "Edge name" }
+                    { "NodeId", "Protein ID" },
+                    { "NodeName", "Protein name" },
+                    { "SourceNodeId", "Source protein ID" },
+                    { "SourceNodeName", "Source protein name" },
+                    { "TargetNodeId", "Target protein ID" },
+                    { "TargetNodeName", "Target protein name" },
+                    { "EdgeId", "Interaction ID" },
+                    { "EdgeName", "Interaction name" }
                 },
                 Filter = new Dictionary<string, string>
                 {
@@ -58,10 +56,10 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
-                    { "SourceNodeId", "Source node ID" },
-                    { "SourceNodeName", "Source node name" },
-                    { "TargetNodeId", "Target node ID" },
-                    { "TargetNodeName", "Target node name" },
+                    { "SourceNodeId", "Source protein ID" },
+                    { "SourceNodeName", "Source protein name" },
+                    { "TargetNodeId", "Target protein ID" },
+                    { "TargetNodeName", "Target protein name" },
                     { "Length", "Length" }
                 }
             };
@@ -81,6 +79,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
             }
             // Get the items with the provided ID.
             var items = _context.Paths
+                .Where(item => item.ControlPath.Analysis.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.ControlPath.Analysis.IsPublic || item.ControlPath.Analysis.AnalysisUsers.Any(item1 => item1.User == user))
                 .Where(item => item.ControlPath.Id == id);
             // Check if there were no items found.
@@ -166,10 +165,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
                 Analysis = items
                     .Select(item => item.ControlPath.Analysis)
                     .First(),
-                IsGeneric = items
-                    .Select(item => item.ControlPath.Analysis.AnalysisDatabases)
-                    .SelectMany(item => item)
-                    .Any(item => item.Database.DatabaseType.Name == "Generic"),
                 Search = new SearchViewModel<Path>(_linkGenerator, HttpContext, input, query)
             };
             // Return the page.

@@ -1,7 +1,7 @@
 ﻿@page
 @model DetailsModel
 @{
-    ViewData["Title"] = "Node field details";
+    ViewData["Title"] = "Protein data details";
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetDatabaseNodeFieldNavigationTitleCard(Model.View.DatabaseNodeField)" />
@@ -64,24 +64,21 @@
         </table>
     </div>
 </div>
-@if (!Model.View.IsGeneric)
-{
-    <div class="card mb-3">
-        <div class="card-header font-weight-bold">
-            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                <div>
-                    <span><i class="fas fa-circle"></i></span>
-                </div>
-                <div>
-                    <span>Nodes</span>
-                </div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-circle"></i></span>
             </div>
-        </div>
-        <div class="card-body">
-            <div class="alert alert-info text-justify text-wrap mb-0">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>The node field currently contains @Model.View.NodeCount node@(Model.View.NodeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Content/DatabaseTypes/PPI/Relationships/DatabaseNodeFieldNodes/Index" asp-route-searchString="@Model.View.DatabaseNodeField.Id" asp-route-searchIn="DatabaseNodeFieldId" class="alert-link">view the nodes</a>.</span>
+            <div>
+                <span>Proteins</span>
             </div>
         </div>
     </div>
-}
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The data set currently contains @Model.View.NodeCount protein@(Model.View.NodeCount != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
