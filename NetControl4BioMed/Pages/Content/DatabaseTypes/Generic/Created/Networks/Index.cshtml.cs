@@ -34,8 +34,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
         {
             public bool IsUserAuthenticated { get; set; }
 
-            public IEnumerable<DatabaseType> DatabaseTypes { get; set; }
-
             public SearchViewModel<ItemModel> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
@@ -190,7 +188,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
             View = new ViewModel
             {
                 IsUserAuthenticated = user != null,
-                DatabaseTypes = _context.DatabaseTypes.AsEnumerable(),
                 Search = new SearchViewModel<ItemModel>(_linkGenerator, HttpContext, input, query.Select(item => new ItemModel
                 {
                     Id = item.Id,

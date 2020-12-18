@@ -36,8 +36,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
 
             public Analysis Analysis { get; set; }
 
-            public string DatabaseTypeId { get; set; }
-
             public bool ShowVisualization { get; set; }
 
             public Algorithms.Analyses.Greedy.Parameters GreedyAlgorithmParameters { get; set; }
@@ -78,12 +76,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
                 IsUserAuthenticated = user != null,
                 Analysis = items
                     .First(),
-                DatabaseTypeId = items
-                    .Select(item => item.AnalysisDatabases)
-                    .SelectMany(item => item)
-                    .Select(item => item.Database.DatabaseType.Id)
-                    .Distinct()
-                    .FirstOrDefault(),
                 ShowVisualization = items
                     .All(item => (item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed) && item.AnalysisNodes
                         .Where(item1 => item1.Type == AnalysisNodeType.None)
