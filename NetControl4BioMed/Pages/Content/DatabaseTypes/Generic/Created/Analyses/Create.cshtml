@@ -116,7 +116,7 @@
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
                     </div>
-                    <span class="text-muted small">The IDs of the networks of the new analysis. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                    <span class="text-muted small">The IDs of the networks to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
                 </div>
             </div>
         </div>
@@ -135,7 +135,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>Input here the source nodes to be used by the new analysis. They represent nodes which you would prefer to have as controlling nodes. The specified nodes should appear in the corresponding networks.</span>
+                <span>Input here the source nodes (nodes which you would prefer to have as controlling nodes) to be used by the new analysis. The specified nodes should appear in the corresponding networks. This field is not required!</span>
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
@@ -172,7 +172,7 @@
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
                     </div>
-                    <span class="text-muted small">The source nodes of the new analysis. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                    <span class="text-muted small">The source nodes to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
                 </div>
             </div>
         </div>
@@ -191,7 +191,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>Input here the target nodes to be used by the new analysis. The specified nodes should appear in the corresponding networks.</span>
+                <span>Input here the target nodes to be used by the new analysis. The specified nodes should appear in the corresponding networks. This field is required!</span>
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
@@ -228,7 +228,7 @@
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
                     </div>
-                    <span class="text-muted small">The target nodes of the new analysis. The data can also be uploaded from a file. The content will appear, unchanged, above.</span>
+                    <span class="text-muted small">The target nodes to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
                 </div>
             </div>
         </div>
@@ -247,7 +247,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>Input here the parameters of the algorithm used by the new analysis.</span>
+                <span>Input here the values for the parameters of the algorithm used by the new analysis.</span>
             </div>
             <div class="row">
                 <div class="col-lg-6 order-1 order-lg-1 align-self-center">
@@ -351,7 +351,7 @@
                             <select id="heuristics-group-current" class="custom-select heuristics-group-current" size="10" multiple title="Current heuristics"></select>
                         </div>
                         <div class="col-lg-12 order-4 order-lg-3 mb-3">
-                            <span description-for="heuristics-group-current" class="text-muted small">The search heuristics for the algorithm. The current heuristics can be seen on the right (or lower) side. Select one or more options on the right (or lower) side, and click the "Remove heuristic" button to remove them. Select one or more options on the left (or upper) side, and click the "Add heuristic" button to add them to the selected group on the right side. A new group containing only the heuristic "Any possible edge" will be automatically added at the end of the list.</span>
+                            <span description-for="heuristics-group-current" class="text-muted small">The search heuristics for the algorithm. The current heuristics can be seen on the right (or lower) side. Select one or more options on the right (or lower) side, and click the "Remove heuristic" button to remove them. Select one or more options on the left (or upper) side, and click the "Add heuristic" button to add them to the selected group on the right side. If you want to insert a new group, you must also select, at the same time, the corresponding group options. A new group containing only the heuristic "Any possible edge" will be automatically added at the end of the list.</span>
                             <span validation-for="heuristics-group-current" class="text-danger small"></span>
                         </div>
                     </div>
