@@ -621,27 +621,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "Databases",
-                    Title = "Databases",
-                    Description = string.Empty,
-                    Icon = "fa-database",
-                    Color = "dark",
-                    Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Databases/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Databases",
-                            Title = "Databases",
-                            Description = string.Empty,
-                            Icon = "fa-database",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Databases/Databases/Index"
-                        }
-                    }
-                },
-                new NavigationGroupViewModel
-                {
                     Id = "Data",
                     Title = "Data",
                     Description = string.Empty,
@@ -667,15 +646,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Icon = "fa-arrow-right",
                             Color = "light",
                             Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Data/Edges/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "NodeCollections",
-                            Title = "Node collections",
-                            Description = string.Empty,
-                            Icon = "fa-folder",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Data/NodeCollections/Index"
                         }
                     }
                 },
@@ -747,27 +717,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "Databases",
-                    Title = "Databases",
-                    Description = string.Empty,
-                    Icon = "fa-database",
-                    Color = "dark",
-                    Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Databases/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Databases",
-                            Title = "Databases",
-                            Description = string.Empty,
-                            Icon = "fa-database",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Databases/Databases/Index"
-                        }
-                    }
-                },
-                new NavigationGroupViewModel
-                {
                     Id = "Data",
                     Title = "Data",
                     Description = string.Empty,
@@ -793,15 +742,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Icon = "fa-arrow-right",
                             Color = "light",
                             Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Data/Edges/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "NodeCollections",
-                            Title = "Node collections",
-                            Description = string.Empty,
-                            Icon = "fa-folder",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Data/NodeCollections/Index"
                         }
                     }
                 },

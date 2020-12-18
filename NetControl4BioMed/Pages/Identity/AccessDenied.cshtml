@@ -20,7 +20,7 @@
                 <div class="my-3">
                     <div class="row">
                         <div class="col-lg-6 my-2 my-lg-0">
-                            @if (User.Identity.IsAuthenticated)
+                            @if (Model.View.IsUserAuthenticated)
                             {
                                 <form asp-page="/Logout" method="post" class="text-justify">
                                     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>

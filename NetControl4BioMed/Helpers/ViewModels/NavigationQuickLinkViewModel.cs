@@ -235,32 +235,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the databases navigation quick link for the networks index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel ContentGenericNetworkDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Databases",
-            Title = "Database",
-            Color = "info",
-            Icon = "fa-database",
-            Width = 6,
-            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Databases/Databases/Index"
-        };
-
-        /// <summary>
-        /// Gets the node collections navigation quick link for the networks index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel ContentGenericNetworkNodeCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "NodeCollections",
-            Title = "Node collection",
-            Color = "info",
-            Icon = "fa-folder",
-            Width = 6,
-            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Data/NodeCollections/Index"
-        };
-
-        /// <summary>
         /// Gets the users navigation quick link for the networks index page.
         /// </summary>
         public static NavigationQuickLinkViewModel ContentGenericNetworkUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
@@ -310,32 +284,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Icon = "fa-arrow-right",
             Width = 6,
             Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Data/Edges/Index"
-        };
-
-        /// <summary>
-        /// Gets the databases navigation quick link for the analysis index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel ContentGenericAnalysisDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Databases",
-            Title = "Database",
-            Color = "info",
-            Icon = "fa-database",
-            Width = 6,
-            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Databases/Databases/Index"
-        };
-
-        /// <summary>
-        /// Gets the node collections navigation quick link for the analysis index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel ContentGenericAnalysisNodeCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "NodeCollections",
-            Title = "Node collection",
-            Color = "info",
-            Icon = "fa-folder",
-            Width = 6,
-            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Data/NodeCollections/Index"
         };
 
         /// <summary>
@@ -645,8 +593,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             // Get the corresponding navigation quick links.
             var networkNodesNavigationQuickLink = ContentGenericNetworkNodesNavigationQuickLink;
             var networkEdgesNavigationQuickLink = ContentGenericNetworkEdgesNavigationQuickLink;
-            var networkDatabasesNavigationQuickLink = ContentGenericNetworkDatabasesNavigationQuickLink;
-            var networkNodeCollectionsNavigationQuickLink = ContentGenericNetworkNodeCollectionsNavigationQuickLink;
             var networkUsersNavigationQuickLink = ContentGenericNetworkUsersNavigationQuickLink;
             var networkAnalysesNavigationQuickLink = ContentGenericNetworkAnalysesNavigationQuickLink;
             // Update the count and the route ID.
@@ -654,10 +600,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             networkNodesNavigationQuickLink.RouteId = networkId;
             networkEdgesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Edges", null);
             networkEdgesNavigationQuickLink.RouteId = networkId;
-            networkDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
-            networkDatabasesNavigationQuickLink.RouteId = networkId;
-            networkNodeCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("NodeCollections", null);
-            networkNodeCollectionsNavigationQuickLink.RouteId = networkId;
             networkUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
             networkUsersNavigationQuickLink.RouteId = networkId;
             networkAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
@@ -667,8 +609,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             {
                 networkNodesNavigationQuickLink,
                 networkEdgesNavigationQuickLink,
-                networkDatabasesNavigationQuickLink,
-                networkNodeCollectionsNavigationQuickLink,
                 networkUsersNavigationQuickLink,
                 networkAnalysesNavigationQuickLink
             };
@@ -737,8 +677,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             // Get the corresponding navigation quick links.
             var analysisNodesNavigationQuickLink = ContentGenericAnalysisNodesNavigationQuickLink;
             var analysisEdgesNavigationQuickLink = ContentGenericAnalysisEdgesNavigationQuickLink;
-            var analysisDatabasesNavigationQuickLink = ContentGenericAnalysisDatabasesNavigationQuickLink;
-            var analysisNodeCollectionsNavigationQuickLink = ContentGenericAnalysisNodeCollectionsNavigationQuickLink;
             var analysisUsersNavigationQuickLink = ContentGenericAnalysisUsersNavigationQuickLink;
             var analysisNetworksNavigationQuickLink = ContentGenericAnalysisNetworksNavigationQuickLink;
             // Update the count and the route ID.
@@ -746,10 +684,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             analysisNodesNavigationQuickLink.RouteId = analysisId;
             analysisEdgesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Edges", null);
             analysisEdgesNavigationQuickLink.RouteId = analysisId;
-            analysisDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
-            analysisDatabasesNavigationQuickLink.RouteId = analysisId;
-            analysisNodeCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("NodeCollections", null);
-            analysisNodeCollectionsNavigationQuickLink.RouteId = analysisId;
             analysisUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
             analysisUsersNavigationQuickLink.RouteId = analysisId;
             analysisNetworksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
@@ -759,8 +693,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             {
                 analysisNodesNavigationQuickLink,
                 analysisEdgesNavigationQuickLink,
-                analysisDatabasesNavigationQuickLink,
-                analysisNodeCollectionsNavigationQuickLink,
                 analysisUsersNavigationQuickLink,
                 analysisNetworksNavigationQuickLink
             };

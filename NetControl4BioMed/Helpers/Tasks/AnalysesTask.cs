@@ -1411,6 +1411,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analyses = context.Analyses
                     .Include(item => item.AnalysisUsers)
                         .ThenInclude(item => item.User)
+                    .Include(item => item.AnalysisDatabases)
+                        .ThenInclude(item => item.Database)
+                            .ThenInclude(item => item.DatabaseType)
                     .Where(item => batchIds.Contains(item.Id));
                 // Go over each item in the current batch.
                 foreach (var batchItem in batchItems)
@@ -1420,6 +1423,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .FirstOrDefault(item => item.Id == batchItem.Id);
                     // Check if there was no item found.
                     if (analysis == null)
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the database type name.
+                    var databaseTypeName = analysis.AnalysisDatabases
+                        .Select(item => item.Database.DatabaseType.Name)
+                        .FirstOrDefault();
+                    // Check if there was no database type name found.
+                    if (string.IsNullOrEmpty(databaseTypeName))
                     {
                         // Continue.
                         continue;
@@ -1436,7 +1449,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             Id = analysis.Id,
                             Name = analysis.Name,
                             Status = analysis.Status.GetDisplayName(),
-                            Url = linkGenerator.GetUriByPage("/Content/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }, scheme: Scheme, host: host),
+                            Url = linkGenerator.GetUriByPage($"/Content/DatabaseTypes/{databaseTypeName}/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }, scheme: Scheme, host: host),
                             ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
                         });
                     }
