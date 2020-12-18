@@ -27,7 +27,6 @@ using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
 {
-    [Authorize]
     public class DownloadModel : PageModel
     {
         private readonly UserManager<User> _userManager;

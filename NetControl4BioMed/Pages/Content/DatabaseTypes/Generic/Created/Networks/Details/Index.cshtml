@@ -26,7 +26,7 @@
     @if (Model.View.ShowVisualization)
     {
         <div class="col-lg mb-3">
-            <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Create" asp-route-databaseTypeId="@Model.View.DatabaseTypeId" asp-route-networkId="@Model.View.Network.Id" class="btn btn-dark btn-block" title="Copy">
+            <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Create" asp-route-networkId="@Model.View.Network.Id" class="btn btn-dark btn-block" title="Copy">
                 <span><i class="fas fa-copy"></i></span>
                 <span>Copy</span>
             </a>
