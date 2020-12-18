@@ -247,7 +247,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
             {
                 Email = user.Email,
                 Name = View.Analysis.Name,
-                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = View.Analysis.Id }),
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Index", handler: null, values: new { id = View.Analysis.Id }),
                 AddedEmail = Input.Email,
                 ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };
@@ -258,7 +258,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
             {
                 Email = Input.Email,
                 Name = View.Analysis.Name,
-                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Analyses/Details/Index", handler: null, values: new { id = View.Analysis.Id }),
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Index", handler: null, values: new { id = View.Analysis.Id }),
                 AddedByEmail = user.Email,
                 ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };

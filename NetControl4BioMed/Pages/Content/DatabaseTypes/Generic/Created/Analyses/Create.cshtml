@@ -72,6 +72,10 @@
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
                 <span>Input here the IDs of the generic networks to be used by the new analysis. The specified networks need to be public, or associated with your account!</span>
+                @if (Model.View.IsUserAuthenticated)
+                {
+                    <span>You can find the generic networks associated with your account <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                }
             </div>
             <div class="alert alert-warning text-justify text-wrap">
                 <span><i class="fas fa-exclamation-triangle"></i></span>
