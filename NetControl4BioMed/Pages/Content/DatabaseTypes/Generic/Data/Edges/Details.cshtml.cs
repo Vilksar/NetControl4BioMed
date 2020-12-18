@@ -42,11 +42,11 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Data.Edges
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No ID has been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/Generic/Data/Edges/Index");
+                return RedirectToPage("/Content/DatabaseTypes/Generic/Index");
             }
             // Get the item with the provided ID.
             var items = _context.Edges
-                .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                 .Where(item => item.NetworkEdges.Any(item1 => item1.Network.IsPublic || item1.Network.NetworkUsers.Any(item2 => item2.User == user)) || item.AnalysisEdges.Any(item1 => item1.Analysis.IsPublic || item1.Analysis.AnalysisUsers.Any(item2 => item2.User == user)))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
@@ -55,7 +55,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Data.Edges
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/Generic/Data/Edges/Index");
+                return RedirectToPage("/Content/DatabaseTypes/Generic/Index");
             }
             // Define the view.
             View = new ViewModel

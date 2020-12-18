@@ -247,7 +247,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks.Det
             {
                 Email = user.Email,
                 Name = View.Network.Name,
-                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Networks/Details/Index", handler: null, values: new { id = View.Network.Id }),
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/DatabaseTypes/PPI/Created/Networks/Details/Index", handler: null, values: new { id = View.Network.Id }),
                 AddedEmail = Input.Email,
                 ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };
@@ -258,7 +258,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks.Det
             {
                 Email = Input.Email,
                 Name = View.Network.Name,
-                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/Created/Networks/Details/Index", handler: null, values: new { id = View.Network.Id }),
+                Url = _linkGenerator.GetUriByPage(HttpContext, "/Content/DatabaseTypes/PPI/Created/Networks/Details/Index", handler: null, values: new { id = View.Network.Id }),
                 AddedByEmail = user.Email,
                 ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
             };

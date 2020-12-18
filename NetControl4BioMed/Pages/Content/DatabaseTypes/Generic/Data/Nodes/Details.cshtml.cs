@@ -42,7 +42,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Data.Nodes
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No ID has been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/Generic/Data/Nodes/Index");
+                return RedirectToPage("/Content/DatabaseTypes/Generic/Index");
             }
             // Get the item with the provided ID.
             var items = _context.Nodes
@@ -55,7 +55,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Data.Nodes
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/Generic/Data/Nodes/Index");
+                return RedirectToPage("/Content/DatabaseTypes/Generic/Index");
             }
             // Define the view.
             View = new ViewModel
