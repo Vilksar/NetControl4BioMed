@@ -1,7 +1,7 @@
 ﻿@page
 @model DetailsModel
 @{
-    ViewData["Title"] = "Protein collection details";
+    ViewData["Title"] = "Source protein collection details";
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetNodeCollectionNavigationTitleCard(Model.View.NodeCollection)" />
@@ -20,6 +20,14 @@
         </div>
     </div>
 }
+<div class="row align-items-center">
+    <div class="col-lg mb-3">
+        <a asp-page="/Content/DatabaseTypes/PPI/Data/SourceNodeCollections/Download" asp-route-ids="@Model.View.NodeCollection.Id" class="btn btn-primary btn-block" title="Download">
+            <span><i class="fas fa-download"></i></span>
+            <span>Download</span>
+        </a>
+    </div>
+</div>
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">

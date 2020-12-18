@@ -44,7 +44,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.SourceNodeColle
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No ID has been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/NodeCollections/Index");
+                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/SourceNodeCollections/Index");
             }
             // Get the item with the provided ID.
             var items = _context.NodeCollections
@@ -58,7 +58,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.SourceNodeColle
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/NodeCollections/Index");
+                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/SourceNodeCollections/Index");
             }
             // Define the view.
             View = new ViewModel
