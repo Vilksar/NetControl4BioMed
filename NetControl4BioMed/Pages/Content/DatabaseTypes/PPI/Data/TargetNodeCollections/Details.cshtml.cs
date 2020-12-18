@@ -44,13 +44,12 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No ID has been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/NodeCollections/Index");
+                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index");
             }
             // Get the item with the provided ID.
             var items = _context.NodeCollections
                 .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                .Where(item => item.NodeCollectionNodes.Any(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
             if (items == null || !items.Any())
@@ -58,7 +57,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/NodeCollections/Index");
+                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index");
             }
             // Define the view.
             View = new ViewModel
