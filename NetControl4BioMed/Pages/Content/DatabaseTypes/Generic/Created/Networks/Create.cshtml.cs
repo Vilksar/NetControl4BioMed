@@ -68,6 +68,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
         public class ViewModel
         {
             public bool IsUserAuthenticated { get; set; }
+
+            public IEnumerable<Sample> Samples { get; set; }
         }
 
         public class ItemModel
@@ -77,7 +79,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
             public string TargetNode { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string networkId = null)
+        public async Task<IActionResult> OnGetAsync(string networkId = null, string sampleId = null)
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
@@ -97,8 +99,21 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
             // Define the view.
             View = new ViewModel
             {
-                IsUserAuthenticated = user != null
+                IsUserAuthenticated = user != null,
+                Samples = _context.Samples
+                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
             };
+            // Try to get the sample with the provided ID.
+            var sample = View.Samples?
+                .FirstOrDefault(item => item.Id == sampleId);
+            // Check if there was an ID provided, but there was no sample found.
+            if (!string.IsNullOrEmpty(sampleId) && sample == null)
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: No sample could be found with the provided ID.";
+                // Redirect to the index page.
+                return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
+            }
             // Get the available databases.
             var databases = _context.Databases
                 .Where(item => item.DatabaseType.Name == "Generic")
@@ -123,9 +138,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
                     Description = networks
                         .Select(item => item.Description)
                         .FirstOrDefault(),
-                    IsPublic = networks
-                        .Select(item => item.IsPublic)
-                        .FirstOrDefault(),
+                    IsPublic = !View.IsUserAuthenticated,
                     SeedData = JsonSerializer.Serialize(networks
                         .Select(item => item.NetworkEdges)
                         .SelectMany(item => item)
@@ -141,6 +154,18 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
                                 .FirstOrDefault()
                         })
                         .Where(item => !string.IsNullOrEmpty(item.SourceNode) && !string.IsNullOrEmpty(item.TargetNode)))
+                };
+            }
+            // Check if there was a sample provided.
+            if (!string.IsNullOrEmpty(sampleId))
+            {
+                // Define the input.
+                Input = new InputModel
+                {
+                    Name = sample.Name,
+                    Description = sample.Description,
+                    IsPublic = !View.IsUserAuthenticated,
+                    SeedData = sample.NetworkSeedData
                 };
             }
             else
@@ -163,7 +188,9 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
             // Define the view.
             View = new ViewModel
             {
-                IsUserAuthenticated = user != null
+                IsUserAuthenticated = user != null,
+                Samples = _context.Samples
+                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
             };
             // Get the available databases.
             var databases = _context.Databases

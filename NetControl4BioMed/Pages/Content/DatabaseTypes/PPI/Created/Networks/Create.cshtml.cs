@@ -85,6 +85,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
         {
             public bool IsUserAuthenticated { get; set; }
 
+            public IEnumerable<Sample> Samples { get; set; }
+
             public IEnumerable<Database> NodeDatabases { get; set; }
 
             public IEnumerable<Database> EdgeDatabases { get; set; }
@@ -99,7 +101,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             public string TargetNode { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string networkId = null)
+        public async Task<IActionResult> OnGetAsync(string networkId = null, string sampleId = null)
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
@@ -120,6 +122,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             View = new ViewModel
             {
                 IsUserAuthenticated = user != null,
+                Samples = _context.Samples
+                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI")),
                 NodeDatabases = _context.Databases
                     .Where(item => item.DatabaseType.Name == "PPI")
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
@@ -133,7 +137,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
             };
             // Check if there weren't any node databases available.
-            if (!View.NodeDatabases.Any())
+            if (View.NodeDatabases == null || !View.NodeDatabases.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: A new network can't be created, as there are no protein databases available.";
@@ -141,10 +145,21 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                 return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Networks/Index");
             }
             // Check if there weren't any edge databases available.
-            if (!View.EdgeDatabases.Any())
+            if (View.EdgeDatabases == null || !View.EdgeDatabases.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: A new network can't be created, as there are no interaction databases available.";
+                // Redirect to the index page.
+                return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Networks/Index");
+            }
+            // Try to get the sample with the provided ID.
+            var sample = View.Samples?
+                .FirstOrDefault(item => item.Id == sampleId);
+            // Check if there was an ID provided, but there was no sample found.
+            if (!string.IsNullOrEmpty(sampleId) && sample == null)
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: No sample could be found with the provided ID.";
                 // Redirect to the index page.
                 return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Networks/Index");
             }
@@ -192,6 +207,22 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                         .Select(item => item.Id))
                 };
             }
+            // Check if there was a sample provided.
+            if (!string.IsNullOrEmpty(sampleId))
+            {
+                // Define the input.
+                Input = new InputModel
+                {
+                    Name = sample.Name,
+                    Description = sample.Description,
+                    IsPublic = !View.IsUserAuthenticated,
+                    Algorithm = sample.NetworkAlgorithm.ToString(),
+                    NodeDatabaseData = sample.NetworkNodeDatabaseData,
+                    EdgeDatabaseData = sample.NetworkEdgeDatabaseData,
+                    SeedData = sample.NetworkSeedData,
+                    SeedNodeCollectionData = sample.NetworkSeedNodeCollectionData
+                };
+            }
             else
             {
                 // Define the input.
@@ -217,6 +248,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             View = new ViewModel
             {
                 IsUserAuthenticated = user != null,
+                Samples = _context.Samples
+                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI")),
                 NodeDatabases = _context.Databases
                     .Where(item => item.DatabaseType.Name == "PPI")
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
@@ -230,7 +263,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
             };
             // Check if there weren't any node databases available.
-            if (!View.NodeDatabases.Any())
+            if (View.NodeDatabases == null || !View.NodeDatabases.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: A new network can't be created, as there are no protein databases available.";
@@ -238,7 +271,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                 return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Networks/Index");
             }
             // Check if there weren't any edge databases available.
-            if (!View.EdgeDatabases.Any())
+            if (View.EdgeDatabases == null || !View.EdgeDatabases.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: A new network can't be created, as there are no interaction databases available.";

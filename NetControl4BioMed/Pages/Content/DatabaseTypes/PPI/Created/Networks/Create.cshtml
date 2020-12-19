@@ -1,10 +1,25 @@
 ﻿@page
 @model CreateModel
-@using NetControl4BioMed.Helpers.Extensions 
+@using NetControl4BioMed.Helpers.Extensions
 @{
     ViewData["Title"] = "Create network";
 }
 
+@if (Model.View.Samples != null && Model.View.Samples.Any())
+{
+    <div class="dropdown mb-3">
+        <button class="btn btn-dark btn-block dropdown-toggle" type="button" data-toggle="dropdown">
+            <span><i class="fas fa-clipboard"></i></span>
+            <span>Load a sample</span>
+        </button>
+        <div class="dropdown-menu w-100">
+            @foreach (var sample in Model.View.Samples)
+            {
+                <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Create" asp-route-sampleId="@sample.Id" class="dropdown-item" title="@sample.Description">@sample.Name</a>
+            }
+        </div>
+    </div>
+}
 <form method="post" class="text-justify">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
     <div class="card mb-3">
