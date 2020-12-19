@@ -47,9 +47,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
             new List<string> { "B" },
             new List<string> { "C" },
             new List<string> { "D" },
-            new List<string> { "E" },
-            new List<string> { "F" },
-            new List<string> { "G" },
             new List<string> { "Z" }
         });
 
@@ -80,13 +77,11 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
         [JsonIgnore]
         public static Dictionary<string, string> PossibleHeuristics { get; } = new Dictionary<string, string>()
         {
-            { "A", "Previously seen edges coming from source nodes" },
-            { "B", "Edges to any drug target node" },
-            { "C", "Previously seen edges from controlling nodes" },
-            { "D", "Edges to any controlling node" },
-            { "E", "Previously seen edges" },
-            { "F", "Edges to previously seen nodes" },
-            { "G", "Edges to a node that has not appeared in the current path" },
+            { "A", "Edges from previously seen source nodes" },
+            { "B", "Edges from any source node" },
+            { "C", "Edges from any controlling node" },
+            { "D", "Edges from previously seen nodes" },
+            { "E", "Edges from a node that has not appeared in the current path" },
             { "Z", "Any possible edge" }
         };
     }

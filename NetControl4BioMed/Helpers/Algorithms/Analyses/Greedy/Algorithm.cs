@@ -451,39 +451,43 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
         {
             // Define the variable to return.
             var heuristicEdges = new List<(string, string)>();
-            // Get all edges in the current control path, if needed.
-            var currentEdges = heuristicSet.Contains("A") || heuristicSet.Contains("C") || heuristicSet.Contains("E") ?
-                controlPath.Select(item => item.Value.Zip(item.Value.Skip(1), (item1, item2) => (item2.ToString(), item1.ToString())))
-                    .SelectMany(item => item)
-                    .Distinct() :
-                Enumerable.Empty<(string, string)>();
             // Get all already identified control nodes, if needed.
             var currentLength = controlPath.Max(item => item.Value.Count());
-            var controlNodes = heuristicSet.Contains("C") || heuristicSet.Contains("D") ?
+            var controlNodes = heuristicSet.Contains("C") ?
                 controlPath.Where(item => item.Value.Count() < currentLength)
                     .Select(item => item.Value.Last())
+                    .Distinct()
                     .AsEnumerable() :
                 Enumerable.Empty<string>();
             // Get all previously seen nodes in the control paths, if needed.
-            var currentNodes = heuristicSet.Contains("E") || heuristicSet.Contains("F") ?
+            var seenNodes = heuristicSet.Contains("A") || heuristicSet.Contains("D") || heuristicSet.Contains("E") ?
                 controlPath.Select(item => item.Value)
                     .SelectMany(item => item)
-                    .Distinct() :
+                    .Distinct()
+                    .AsEnumerable() :
                 Enumerable.Empty<string>();
+            // Get all previously seen source nodes in the control paths, if needed.
+            var seenSourceNodes = heuristicSet.Contains("A") ?
+                seenNodes.Intersect(sources) :
+                Enumerable.Empty<string>();
+            // Get all edges starting from a previously seen source node and ending in target nodes, if needed.
+            var seenSourceEdges = heuristicSet.Contains("A") ?
+                edges.Where(item => rightNodes.Contains(item.Item2) && seenSourceNodes.Contains(item.Item1)) :
+                Enumerable.Empty<(string, string)>();
             // Get all edges starting from a source node and ending in target nodes, if needed.
-            var sourceEdges = heuristicSet.Contains("A") || heuristicSet.Contains("B") ?
+            var sourceEdges = heuristicSet.Contains("B") ?
                 edges.Where(item => rightNodes.Contains(item.Item2) && sources.Contains(item.Item1)) :
                 Enumerable.Empty<(string, string)>();
             // Get all edges starting from an already identified control node and ending in target nodes, if needed.
-            var controlEdges = heuristicSet.Contains("C") || heuristicSet.Contains("D") ?
+            var controlEdges = heuristicSet.Contains("C") ?
                 edges.Where(item => rightNodes.Contains(item.Item2) && controlNodes.Contains(item.Item1)) :
                 Enumerable.Empty<(string, string)>();
             // Get all edges starting from a previously seen node, if needed.
-            var seenEdges = heuristicSet.Contains("E") || heuristicSet.Contains("F") ?
-                edges.Where(item => rightNodes.Contains(item.Item2) && currentNodes.Contains(item.Item1)) :
+            var seenEdges = heuristicSet.Contains("D") ?
+                edges.Where(item => rightNodes.Contains(item.Item2) && seenNodes.Contains(item.Item1)) :
                 Enumerable.Empty<(string, string)>();
             // Get all edges not starting from a node in the current control path, if needed (to avoid loops).
-            var differentEdges = heuristicSet.Contains("G") ?
+            var differentEdges = heuristicSet.Contains("E") ?
                 edges.Where(item => rightNodes.Contains(item.Item2) && !controlPath.Where(item1 => item1.Value.Last() == item.Item2).Any(item1 => item1.Value.Contains(item.Item1))) :
                 Enumerable.Empty<(string, string)>();
             // Get all possible edges.
@@ -495,8 +499,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                 switch (heuristic)
                 {
                     case "A":
-                        // Add previously seen edges from source nodes.
-                        heuristicEdges.AddRange(currentEdges.Intersect(sourceEdges));
+                        // Add all edges from previously seen source nodes.
+                        heuristicEdges.AddRange(seenSourceEdges);
                         // End the switch.
                         break;
                     case "B":
@@ -505,26 +509,16 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                         // End the switch.
                         break;
                     case "C":
-                        // Add previously seen edges from already identified control nodes.
-                        heuristicEdges.AddRange(currentEdges.Intersect(controlEdges));
-                        // End the switch.
-                        break;
-                    case "D":
-                        // Add all edges from already identified control nodes.
+                        // Add all edges from already identified controlling nodes.
                         heuristicEdges.AddRange(controlEdges);
                         // End the switch.
                         break;
-                    case "E":
-                        // Add previously seen edges.
-                        heuristicEdges.AddRange(currentEdges.Intersect(seenEdges));
-                        // End the switch.
-                        break;
-                    case "F":
+                    case "D":
                         // Add all edges from previously seen nodes.
                         heuristicEdges.AddRange(seenEdges);
                         // End the switch.
                         break;
-                    case "G":
+                    case "E":
                         // Add all edges not starting from a node in the current control path (to avoid loops).
                         heuristicEdges.AddRange(differentEdges);
                         // End the switch.
