@@ -12,8 +12,8 @@
         {
             <a asp-page="@navigationGroup.Link" asp-route-id="@Model.RouteId" class="list-group-item list-group-item-action list-group-item-@navigationGroup.Color @(activeArea == Model.Id && activeGroup == navigationGroup.Id && activePage == navigationGroup.Id ? "active" : string.Empty)" title="@navigationGroup.Description">
                 <div class="row">
-                    <span class="col-2 text-center"><i class="fas @navigationGroup.Icon"></i></span>
-                    <span class="col-8 text-left text-wrap">@navigationGroup.Title</span>
+                    <span class="col-2 text-center px-2"><i class="fas @navigationGroup.Icon"></i></span>
+                    <span class="col-8 text-left text-wrap px-2">@navigationGroup.Title</span>
                 </div>
             </a>
         }
@@ -21,9 +21,9 @@
         {
             <a asp-page="@navigationGroup.Link" class="list-group-item list-group-item-action list-group-item-@navigationGroup.Color @(activeArea == Model.Id && activeGroup == navigationGroup.Id ? "active" : string.Empty)" data-toggle="collapse" data-target="#navigation-area-@Model.Id.ToLower()-@navigationGroup.Id.ToLower()" title="@navigationGroup.Description">
                 <div class="row">
-                    <span class="col-2 text-center"><i class="fas @navigationGroup.Icon"></i></span>
-                    <span class="col-8 text-left text-wrap">@navigationGroup.Title</span>
-                    <span class="col-2 text-center"><i class="fas fa-angle-down"></i></span>
+                    <span class="col-2 text-center px-2"><i class="fas @navigationGroup.Icon"></i></span>
+                    <span class="col-8 text-left text-wrap px-2">@navigationGroup.Title</span>
+                    <span class="col-2 text-center px-2"><i class="fas fa-angle-down"></i></span>
                 </div>
             </a>
             <div id="navigation-area-@Model.Id.ToLower()-@navigationGroup.Id.ToLower()" class="list-group list-group-flush collapse @(activeArea == Model.Id && activeGroup == navigationGroup.Id ? "show" : string.Empty)" data-parent="#navigation-area-@Model.Id.ToLower()">
@@ -31,8 +31,8 @@
                 {
                     <a asp-page="@navigationPage.Link" asp-route-id="@Model.RouteId" class="list-group-item list-group-item-action list-group-item-@navigationPage.Color @(activeArea == Model.Id && activeGroup == navigationGroup.Id && activePage == navigationPage.Id ? "active" : string.Empty)" title="@navigationPage.Description">
                         <div class="row small align-items-center">
-                            <span class="col-9 text-left text-wrap">@navigationPage.Title</span>
-                            <span class="col-3 text-center"><i class="fas @navigationPage.Icon"></i></span>
+                            <span class="col-9 text-left text-wrap px-2">@navigationPage.Title</span>
+                            <span class="col-3 text-center px-2"><i class="fas @navigationPage.Icon"></i></span>
                         </div>
                     </a>
                 }

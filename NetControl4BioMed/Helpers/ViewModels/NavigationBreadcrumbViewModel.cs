@@ -227,6 +227,16 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
+        /// Gets the navigation breadcrumb for the administration data samples index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AdministrationDataSamplesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Samples",
+            Title = "Samples",
+            Link = "/Administration/Data/Samples/Index"
+        };
+
+        /// <summary>
         /// Gets the navigation breadcrumb for the administration databases index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel AdministrationDatabasesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
@@ -294,16 +304,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "BackgroundTasks",
             Title = "Background tasks",
             Link = "/Administration/Other/BackgroundTasks/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the administration other samples index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel AdministrationOtherSamplesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Samples",
-            Title = "Samples",
-            Link = "/Administration/Other/Samples/Index"
         };
 
         /// <summary>
@@ -417,6 +417,36 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
+        /// Gets the navigation breadcrumb for the administration relationships node collection types index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AdministrationRelationshipsNodeCollectionTypesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "NodeCollectionTypes",
+            Title = "Node collection types",
+            Link = "/Administration/Relationships/NodeCollectionTypes/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the administration relationships sample databases index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AdministrationRelationshipsSampleDatabasesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "SampleDatabases",
+            Title = "Sample databases",
+            Link = "/Administration/Relationships/SampleDatabases/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the administration relationships sample types index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AdministrationRelationshipsSampleTypesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "SampleTypes",
+            Title = "Sample types",
+            Link = "/Administration/Relationships/SampleTypes/Index"
+        };
+
+        /// <summary>
         /// Gets the navigation breadcrumb for the content index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel ContentNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
@@ -427,243 +457,253 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the navigation breadcrumb for the content created index page.
+        /// Gets the navigation breadcrumb for the content database types index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentCreatedNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "DatabaseTypes",
+            Title = "Database types",
+            Link = "/Content/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content generic index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Generic",
+            Title = "Generic",
+            Link = "/Content/Generic/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content generic created index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericCreatedNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Created",
             Title = "Created",
-            Link = "/Content/Created/Index"
+            Link = "/Content/Generic/Created/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content generic created analyses index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericCreatedAnalysesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Analyses",
+            Title = "Analyses",
+            Link = "/Content/Generic/Created/Analyses/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content generic created analyses details index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericCreatedAnalysesDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Details",
+            Title = "Details",
+            Link = "/Content/Generic/Created/Analyses/Details/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content generic created networks index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericCreatedNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Networks",
+            Title = "Networks",
+            Link = "/Content/Generic/Created/Networks/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content generic created network details index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericCreatedNetworksDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Details",
+            Title = "Details",
+            Link = "/Content/Generic/Created/Networks/Details/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content generic data index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Data",
+            Title = "Data",
+            Link = "/Content/Generic/Data/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content generic data nodes index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericDataNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Nodes",
+            Title = "Nodes",
+            Link = "/Content/Generic/Data/Nodes/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content generic data edges index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericDataEdgesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Edges",
+            Title = "Edges",
+            Link = "/Content/Generic/Data/Edges/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content PPI index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPINavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "PPI",
+            Title = "PPI",
+            Link = "/Content/PPI/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content created index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPICreatedNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Created",
+            Title = "Created",
+            Link = "/Content/PPI/Created/Index"
         };
 
         /// <summary>
         /// Gets the navigation breadcrumb for the content created analyses index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentCreatedAnalysesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPICreatedAnalysesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Analyses",
             Title = "Analyses",
-            Link = "/Content/Created/Analyses/Index"
+            Link = "/Content/PPI/Created/Analyses/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content PPI created analyses details index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPICreatedAnalysesDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Details",
+            Title = "Details",
+            Link = "/Content/PPI/Created/Analyses/Details/Index"
         };
 
         /// <summary>
         /// Gets the navigation breadcrumb for the content created networks index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentCreatedNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPICreatedNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Networks",
             Title = "Networks",
-            Link = "/Content/Created/Networks/Index"
+            Link = "/Content/PPI/Created/Networks/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content PPI created network details index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPICreatedNetworksDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Details",
+            Title = "Details",
+            Link = "/Content/PPI/Created/Networks/Details/Index"
         };
 
         /// <summary>
         /// Gets the navigation breadcrumb for the content data index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Data",
             Title = "Data",
-            Link = "/Content/Data/Index"
+            Link = "/Content/PPI/Data/Index"
         };
 
         /// <summary>
         /// Gets the navigation breadcrumb for the content data edges index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDataEdgesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataEdgesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Edges",
             Title = "Edges",
-            Link = "/Content/Data/Edges/Index"
+            Link = "/Content/PPI/Data/Edges/Index"
         };
 
         /// <summary>
-        /// Gets the navigation breadcrumb for the content data node collections index page.
+        /// Gets the navigation breadcrumb for the content data source node collections index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDataNodeCollectionsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataSourceNodeCollectionsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
-            Id = "NodeCollections",
-            Title = "Node collections",
-            Link = "/Content/Data/NodeCollections/Index"
+            Id = "SourceNodeCollections",
+            Title = "Source node collections",
+            Link = "/Content/PPI/Data/SourceNodeCollections/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the content data target node collections index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataTargetNodeCollectionsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "TargetNodeCollections",
+            Title = "Target node collections",
+            Link = "/Content/PPI/Data/TargetNodeCollections/Index"
         };
 
         /// <summary>
         /// Gets the navigation breadcrumb for the content data nodes index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDataNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Nodes",
             Title = "Nodes",
-            Link = "/Content/Data/Nodes/Index"
+            Link = "/Content/PPI/Data/Nodes/Index"
         };
 
         /// <summary>
         /// Gets the navigation breadcrumb for the content databases index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDatabasesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDatabasesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Databases",
             Title = "Databases",
-            Link = "/Content/Databases/Index"
+            Link = "/Content/PPI/Databases/Index"
         };
 
         /// <summary>
         /// Gets the navigation breadcrumb for the content databases database edge fields index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDatabasesDatabaseEdgeFieldsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDatabasesDatabaseEdgeFieldsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "DatabaseEdgeFields",
             Title = "Database edge fields",
-            Link = "/Content/Databases/DatabaseEdgeFields/Index"
+            Link = "/Content/PPI/Databases/DatabaseEdgeFields/Index"
         };
 
         /// <summary>
         /// Gets the navigation breadcrumb for the content databases database node fields index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDatabasesDatabaseNodeFieldsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDatabasesDatabaseNodeFieldsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "DatabaseNodeFields",
             Title = "Database node fields",
-            Link = "/Content/Databases/DatabaseNodeFields/Index"
+            Link = "/Content/PPI/Databases/DatabaseNodeFields/Index"
         };
 
         /// <summary>
         /// Gets the navigation breadcrumb for the content databases databases index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDatabasesDatabasesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDatabasesDatabasesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Databases",
             Title = "Databases",
-            Link = "/Content/Databases/Databases/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content databases database types index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDatabasesDatabaseTypesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "DatabaseTypes",
-            Title = "Database types",
-            Link = "/Content/Databases/DatabaseTypes/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content other index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentOtherNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Other",
-            Title = "Other",
-            Link = "/Content/Other/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content other samples index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentOtherSamplesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Samples",
-            Title = "Samples",
-            Link = "/Content/Other/Samples/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content relationships index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentRelationshipsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Relationships",
-            Title = "Relationships",
-            Link = "/Content/Relationships/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content relationships database edge field edges index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentRelationshipsDatabaseEdgeFieldEdgesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "DatabaseEdgeFieldEdges",
-            Title = "Database edge field edges",
-            Link = "/Content/Relationships/DatabaseEdgeFieldEdges/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content relationships database edges index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentRelationshipsDatabaseEdgesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "DatabaseEdges",
-            Title = "Database edges",
-            Link = "/Content/Relationships/DatabaseEdges/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content relationships database node field nodes index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentRelationshipsDatabaseNodeFieldNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "DatabaseNodeFieldNodes",
-            Title = "Database node field nodes",
-            Link = "/Content/Relationships/DatabaseNodeFieldNodes/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content relationships database nodes index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentRelationshipsDatabaseNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "DatabaseNodes",
-            Title = "Database nodes",
-            Link = "/Content/Relationships/DatabaseNodes/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content relationships edge nodes index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentRelationshipsEdgeNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "EdgeNodes",
-            Title = "Edge nodes",
-            Link = "/Content/Relationships/EdgeNodes/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content relationships node collection databases index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentRelationshipsNodeCollectionDatabasesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "NodeCollectionDatabases",
-            Title = "Node collection databases",
-            Link = "/Content/Relationships/NodeCollectionDatabases/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content relationships node collection nodes index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentRelationshipsNodeCollectionNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "NodeCollectionNodes",
-            Title = "Node collection nodes",
-            Link = "/Content/Relationships/NodeCollectionNodes/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the network details index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel NetworkDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Details",
-            Title = "Details",
-            Link = "/Content/Created/Networks/Details/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the analysis details index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel AnalysisDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Details",
-            Title = "Details",
-            Link = "/Content/Created/Analyses/Details/Index"
+            Link = "/Content/PPI/Databases/Databases/Index"
         };
     }
 }

@@ -1,0 +1,191 @@
+﻿@page
+@model IndexModel
+@using NetControl4BioMed.Data
+@using NetControl4BioMed.Data.Enumerations
+@using Helpers.Extensions
+@{
+    ViewData["Title"] = "Network details";
+}
+
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetNetworkNavigationTitleCard(Model.View.Network)" />
+@if (Model.View.Network.IsPublic)
+{
+    <div class="alert alert-info text-justify text-wrap">
+        <span><i class="fas fa-info-circle"></i></span>
+        <span>The network is public. You can share the network ID (<span class="font-weight-bold">@Model.View.Network.Id</span>) or the current URL with other users. <span class="font-weight-bold">Anyone with the ID or the URL can access the network!</span></span>
+    </div>
+    @if (!Model.View.IsUserAuthenticated)
+    {
+        <div class="alert alert-warning text-justify text-wrap">
+            <span><i class="fas fa-exclamation-triangle"></i></span>
+            <span><span class="font-weight-bold">If you close this page without saving the network ID or the current URL, you have no way of returning to it!</span> Alternatively, you can log in and assign the network to your account.</span>
+        </div>
+    }
+}
+<div class="row align-items-center">
+    @if (Model.View.ShowVisualization)
+    {
+        <div class="col-lg mb-3">
+            <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Create" asp-route-networkId="@Model.View.Network.Id" class="btn btn-dark btn-block" title="Copy">
+                <span><i class="fas fa-copy"></i></span>
+                <span>Copy</span>
+            </a>
+        </div>
+    }
+    <div class="col-lg mb-3">
+        <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Edit" asp-route-id="@Model.View.Network.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+        </a>
+    </div>
+    <div class="col-lg mb-3">
+        <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Download" asp-route-ids="@Model.View.Network.Id" class="btn btn-primary btn-block" title="Download">
+            <span><i class="fas fa-download"></i></span>
+            <span>Download</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3" title="Status">
+    <div class="card-body text-center">
+        <partial name="_NetworkStatusPartial" model="@Model.View.Network.Status" />
+    </div>
+</div>
+<div class="item-refresh" data-id="@Model.View.Network.Id" data-status="@Model.View.Network.Status.ToString()" data-refresh="@(Model.View.Network.Status == NetworkStatus.Defined || Model.View.Network.Status == NetworkStatus.Generating)">
+    <div class="card mb-3">
+        <div class="card-body text-center">
+            <div class="row align-items-center">
+                <div class="col-lg utc-date" title="Date created" data-date="@Model.View.Network.DateTimeCreated.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
+                    <span><i class="fas fa-calendar"></i></span>
+                    <span class="utc-date-date" title="@Model.View.Network.DateTimeCreated.ToShortDateString()">@Model.View.Network.DateTimeCreated.ToShortDateString()</span>
+                    <span class="utc-date-time" title="@Model.View.Network.DateTimeCreated.ToShortTimeString()">@Model.View.Network.DateTimeCreated.ToShortTimeString()</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (!string.IsNullOrEmpty(Model.View.Network.Description))
+{
+    <div class="card mb-3">
+        <div class="card-body text-justify small">
+            <span title="Description">@Model.View.Network.Description</span>
+        </div>
+    </div>
+}
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetContentPPINetworkNavigationQuickLinks(Model.View.Network.Id, Model.View.ItemCount)" />
+@if (Model.View.ShowVisualization)
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-eye"></i></span>
+                </div>
+                <div>
+                    <span>Visualize</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>As the network is relatively small, you can click the button below to visualize it in browser.</span>
+            </div>
+            <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Details/Visualize" asp-route-id="@Model.View.Network.Id" class="btn btn-info btn-block">
+                <span><i class="fas fa-eye"></i></span>
+                <span>Visualize</span>
+            </a>
+        </div>
+    </div>
+}
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-code"></i></span>
+            </div>
+            <div>
+                <span>Parameters</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The parameters used by the algorithm corresponding to the network are displayed below.</span>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 order-3 order-lg-1 align-self-center">
+                <label asp-for="View.Network.Algorithm" class="font-weight-bold">Algorithm</label>
+            </div>
+            <div class="col-lg-12 order-3 order-lg-2">
+                <select asp-for="View.Network.Algorithm" class="custom-select" title="@Model.View.Network.Algorithm.GetDisplayDescription()" disabled>
+                    @foreach (var item in Enum.GetValues(typeof(NetworkAlgorithm)).Cast<NetworkAlgorithm>())
+                    {
+                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                    }
+                </select>
+            </div>
+            <div class="col-lg-12 order-4 order-lg-3">
+                <span asp-description-for="View.Network.Algorithm" class="text-muted small">The algorithm used in generating the network.</span>
+                <span asp-validation-for="View.Network.Algorithm" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-list"></i></span>
+            </div>
+            <div>
+                <span>Log</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The log messages of the network are displayed below.</span>
+        </div>
+        @if (Model.View.Network.Log.TryDeserializeJsonObject<IEnumerable<NetControl4BioMed.Helpers.ViewModels.LogEntryViewModel>>(out var logEntries))
+        {
+            <ul class="mb-0">
+                @foreach (var logEntry in logEntries)
+                {
+                    <li class="utc-date" data-date="@logEntry.DateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
+                        <div>
+                            <span class="utc-date-date" title="@logEntry.DateTime.ToShortDateString()">@logEntry.DateTime.ToShortDateString()</span>
+                            <span class="utc-date-time" title="@logEntry.DateTime.ToShortTimeString()">@logEntry.DateTime.ToShortTimeString()</span>
+                        </div>
+                        <div>
+                            <span>@logEntry.Message</span>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-trash"></i></span>
+            </div>
+            <div>
+                <span>Delete</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger text-justify text-wrap">
+            <span><i class="fas fa-exclamation-circle"></i></span>
+            <span>The network will be deleted automatically on @((Model.View.Network.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()). Alternatively, you can press the button below to delete it.</span>
+        </div>
+        <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Delete" asp-route-ids="@Model.View.Network.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>

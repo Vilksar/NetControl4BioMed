@@ -32,13 +32,83 @@ namespace NetControl4BioMed.Data.Models
         public string Description { get; set; }
 
         /// <summary>
-        /// Gets or sets the type of the sample.
+        /// Gets or sets the network name of the sample.
         /// </summary>
-        public SampleType Type { get; set; }
+        public string NetworkName { get; set; }
 
         /// <summary>
-        /// Gets or sets the data of the sample.
+        /// Gets or sets the network description of the sample.
         /// </summary>
-        public string Data { get; set; }
+        public string NetworkDescription { get; set; }
+
+        /// <summary>
+        /// Gets or sets the network algorithm of the sample.
+        /// </summary>
+        public NetworkAlgorithm NetworkAlgorithm { get; set; }
+
+        /// <summary>
+        /// Gets or sets the network node database data of the sample.
+        /// </summary>
+        public string NetworkNodeDatabaseData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the network edge database data of the sample.
+        /// </summary>
+        public string NetworkEdgeDatabaseData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the network seed data of the sample.
+        /// </summary>
+        public string NetworkSeedData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the network seed node collection data of the sample.
+        /// </summary>
+        public string NetworkSeedNodeCollectionData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the analysis name of the sample.
+        /// </summary>
+        public string AnalysisName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the analysis description of the sample.
+        /// </summary>
+        public string AnalysisDescription { get; set; }
+
+        /// <summary>
+        /// Gets or sets the analysis algorithm of the sample.
+        /// </summary>
+        public AnalysisAlgorithm AnalysisAlgorithm { get; set; }
+
+        /// <summary>
+        /// Gets or sets the analysis network data of the sample.
+        /// </summary>
+        public string AnalysisNetworkData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the analysis source data of the sample.
+        /// </summary>
+        public string AnalysisSourceData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the analysis source node collection data of the sample.
+        /// </summary>
+        public string AnalysisSourceNodeCollectionData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the analysis target data of the sample.
+        /// </summary>
+        public string AnalysisTargetData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the analysis target node collection data of the sample.
+        /// </summary>
+        public string AnalysisTargetNodeCollectionData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the databases that the sample uses.
+        /// </summary>
+        public ICollection<SampleDatabase> SampleDatabases { get; set; }
     }
 }

@@ -31,6 +31,11 @@ namespace NetControl4BioMed.Data.Models
         public string Description { get; set; }
 
         /// <summary>
+        /// Gets or sets the types of the node collection.
+        /// </summary>
+        public ICollection<NodeCollectionType> NodeCollectionTypes { get; set; }
+
+        /// <summary>
         /// Gets or sets the databases that the node collection uses.
         /// </summary>
         public ICollection<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }

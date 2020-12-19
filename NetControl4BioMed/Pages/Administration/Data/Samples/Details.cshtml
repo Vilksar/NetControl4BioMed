@@ -1,0 +1,169 @@
+﻿@page
+@model DetailsModel
+@{
+    ViewData["Title"] = "Sample details";
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Data/Samples/Update" asp-route-type="Edit" asp-route-ids="@Model.View.Sample.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Update</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Data/Samples/Delete" asp-route-ids="@Model.View.Sample.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div>
+                <span>Details</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label asp-for="View.Sample.Id" class="font-weight-bold">ID</label>
+                <input asp-for="View.Sample.Id" class="form-control" readonly />
+                <span asp-description-for="View.Sample.Id" class="text-muted small">The ID of the sample.</span>
+                <span asp-validation-for="View.Sample.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.DateTimeCreated" class="font-weight-bold">Date</label>
+                <input asp-for="View.Sample.DateTimeCreated" class="form-control" readonly />
+                <span asp-description-for="View.Sample.DateTimeCreated" class="text-muted small">The date and time when the sample was created.</span>
+                <span asp-validation-for="View.Sample.DateTimeCreated" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.Name" class="font-weight-bold">Name</label>
+                <input asp-for="View.Sample.Name" class="form-control" readonly />
+                <span asp-description-for="View.Sample.Name" class="text-muted small">The name of the sample.</span>
+                <span asp-validation-for="View.Sample.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="View.Sample.Description" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.Description" class="text-muted small">The description of the sample.</span>
+                <span asp-validation-for="View.Sample.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.NetworkName" class="font-weight-bold">Network name</label>
+                <input asp-for="View.Sample.NetworkName" class="form-control" readonly />
+                <span asp-description-for="View.Sample.NetworkName" class="text-muted small">The name of the network corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.NetworkName" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.NetworkDescription" class="font-weight-bold">Network description</label>
+                <input asp-for="View.Sample.NetworkDescription" class="form-control" readonly />
+                <span asp-description-for="View.Sample.NetworkDescription" class="text-muted small">The description of the network corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.NetworkDescription" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.NetworkAlgorithm" class="font-weight-bold">Network algorithm</label>
+                <input asp-for="View.Sample.NetworkAlgorithm" class="form-control" readonly />
+                <span asp-description-for="View.Sample.NetworkAlgorithm" class="text-muted small">The algorithm of the network corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.NetworkAlgorithm" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.NetworkNodeDatabaseData" class="font-weight-bold">Network node database data</label>
+                <textarea asp-for="View.Sample.NetworkNodeDatabaseData" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.NetworkNodeDatabaseData" class="text-muted small">The node database data of the network corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.NetworkNodeDatabaseData" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.NetworkEdgeDatabaseData" class="font-weight-bold">Network edge database data</label>
+                <textarea asp-for="View.Sample.NetworkEdgeDatabaseData" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.NetworkEdgeDatabaseData" class="text-muted small">The edge database data of the network corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.NetworkEdgeDatabaseData" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.NetworkSeedData" class="font-weight-bold">Network seed data</label>
+                <textarea asp-for="View.Sample.NetworkSeedData" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.NetworkSeedData" class="text-muted small">The seed data of the network corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.NetworkSeedData" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.NetworkSeedNodeCollectionData" class="font-weight-bold">Network seed node collection data</label>
+                <textarea asp-for="View.Sample.NetworkSeedNodeCollectionData" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.NetworkSeedNodeCollectionData" class="text-muted small">The seed node collection data of the network corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.NetworkSeedNodeCollectionData" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.AnalysisName" class="font-weight-bold">Analysis name</label>
+                <input asp-for="View.Sample.AnalysisName" class="form-control" readonly />
+                <span asp-description-for="View.Sample.AnalysisName" class="text-muted small">The name of the analysis corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.AnalysisName" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.AnalysisDescription" class="font-weight-bold">Analysis description</label>
+                <input asp-for="View.Sample.AnalysisDescription" class="form-control" readonly />
+                <span asp-description-for="View.Sample.AnalysisDescription" class="text-muted small">The description of the analysis corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.AnalysisDescription" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.AnalysisAlgorithm" class="font-weight-bold">Analysis algorithm</label>
+                <input asp-for="View.Sample.AnalysisAlgorithm" class="form-control" readonly />
+                <span asp-description-for="View.Sample.AnalysisAlgorithm" class="text-muted small">The algorithm of the analysis corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.AnalysisAlgorithm" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.AnalysisNetworkData" class="font-weight-bold">Analysis network data</label>
+                <textarea asp-for="View.Sample.AnalysisNetworkData" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.AnalysisNetworkData" class="text-muted small">The network data of the analysis corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.AnalysisNetworkData" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.AnalysisSourceData" class="font-weight-bold">Analysis source data</label>
+                <textarea asp-for="View.Sample.AnalysisSourceData" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.AnalysisSourceData" class="text-muted small">The source data of the analysis corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.AnalysisSourceData" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.AnalysisSourceNodeCollectionData" class="font-weight-bold">Analysis source node collection data</label>
+                <textarea asp-for="View.Sample.AnalysisSourceNodeCollectionData" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.AnalysisSourceNodeCollectionData" class="text-muted small">The source node collection data of the analysis corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.AnalysisSourceNodeCollectionData" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.AnalysisTargetData" class="font-weight-bold">Analysis target data</label>
+                <textarea asp-for="View.Sample.AnalysisTargetData" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.AnalysisTargetData" class="text-muted small">The target data of the analysis corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.AnalysisTargetData" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Sample.AnalysisTargetNodeCollectionData" class="font-weight-bold">Analysis target node collection data</label>
+                <textarea asp-for="View.Sample.AnalysisTargetNodeCollectionData" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.AnalysisTargetNodeCollectionData" class="text-muted small">The target node collection data of the analysis corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.AnalysisTargetNodeCollectionData" class="text-danger small"></span>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-database"></i></span>
+            </div>
+            <div>
+                <span>Databases</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The sample is currently assigned to @Model.View.DatabaseCount database@(Model.View.DatabaseCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/SampleDatabases/Index" asp-route-searchString="@Model.View.Sample.Id" asp-route-searchIn="SampleId" class="alert-link">view the databases</a>.</span>
+        </div>
+    </div>
+</div>

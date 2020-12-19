@@ -1,0 +1,23 @@
+﻿@{
+    Layout = "/Pages/Content/DatabaseTypes/PPI/Created/Analyses/_Layout.cshtml";
+}
+
+@section Banner {
+    @RenderSection("Banner", required: false)
+}
+
+@section Breadcrumbs {
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.ContentDatabaseTypesPPICreatedAnalysesDetailsNavigationBreadcrumb" />
+    @RenderSection("Breadcrumbs", required: false)
+}
+
+@section Navigation {
+    <partial name="_NavigationAreaPartial" model="@Helpers.ViewModels.NavigationAreaViewModel.GetContentPPIAnalysisNavigationArea(Model.View.Analysis)" />
+    @RenderSection("Navigation", required: false)
+}
+
+@RenderBody()
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

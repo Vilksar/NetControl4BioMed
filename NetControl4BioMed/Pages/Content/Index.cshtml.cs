@@ -10,8 +10,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Interfaces;
-using NetworkItemModel = NetControl4BioMed.Pages.Content.Created.Networks.IndexModel.ItemModel;
-using AnalysisItemModel = NetControl4BioMed.Pages.Content.Created.Analyses.IndexModel.ItemModel;
 
 namespace NetControl4BioMed.Pages.Content
 {
@@ -35,7 +33,7 @@ namespace NetControl4BioMed.Pages.Content
         {
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            [RegularExpression("Networks|Analyses")]
+            [RegularExpression("Any|Networks|Analyses")]
             public string Type { get; set; }
 
             [DataType(DataType.Text)]
@@ -52,10 +50,6 @@ namespace NetControl4BioMed.Pages.Content
             public bool IsUserAuthenticated { get; set; }
 
             public Dictionary<string, int?> ItemCount { get; set; }
-
-            public IEnumerable<NetworkItemModel> RecentNetworks { get; set; }
-
-            public IEnumerable<AnalysisItemModel> RecentAnalyses { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -66,38 +60,24 @@ namespace NetControl4BioMed.Pages.Content
             View = new ViewModel
             {
                 IsUserAuthenticated = user != null,
-                ItemCount = new Dictionary<string, int?>(),
-                RecentNetworks = Enumerable.Empty<NetworkItemModel>(),
-                RecentAnalyses = Enumerable.Empty<AnalysisItemModel>()
+                ItemCount = new Dictionary<string, int?>()
             };
             // Check if the user is authenticated.
             if (View.IsUserAuthenticated)
             {
                 // Update the view.
-                View.ItemCount["Networks"] = _context.Networks
+                View.ItemCount["GenericNetworks"] = _context.Networks
+                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Count(item => item.NetworkUsers.Any(item1 => item1.User == user));
-                View.ItemCount["Analyses"] = _context.Analyses
+                View.ItemCount["GenericAnalyses"] = _context.Analyses
+                    .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Count(item => item.AnalysisUsers.Any(item1 => item1.User == user));
-                View.RecentNetworks = _context.Networks
-                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                    .OrderByDescending(item => item.DateTimeCreated)
-                    .Take(5)
-                    .Select(item => new NetworkItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name,
-                        Status = item.Status
-                    });
-                View.RecentAnalyses = _context.Analyses
-                    .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                    .OrderByDescending(item => item.DateTimeStarted)
-                    .Take(5)
-                    .Select(item => new AnalysisItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name,
-                        Status = item.Status
-                    });
+                View.ItemCount["PPINetworks"] = _context.Networks
+                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
+                    .Count(item => item.NetworkUsers.Any(item1 => item1.User == user));
+                View.ItemCount["PPIAnalyses"] = _context.Analyses
+                    .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
+                    .Count(item => item.AnalysisUsers.Any(item1 => item1.User == user));
             }
             // Return the page.
             return Page();
@@ -111,38 +91,24 @@ namespace NetControl4BioMed.Pages.Content
             View = new ViewModel
             {
                 IsUserAuthenticated = user != null,
-                ItemCount = new Dictionary<string, int?>(),
-                RecentNetworks = Enumerable.Empty<NetworkItemModel>(),
-                RecentAnalyses = Enumerable.Empty<AnalysisItemModel>()
+                ItemCount = new Dictionary<string, int?>()
             };
             // Check if the user is authenticated.
             if (View.IsUserAuthenticated)
             {
                 // Update the view.
-                View.ItemCount["Networks"] = _context.Networks
+                View.ItemCount["GenericNetworks"] = _context.Networks
+                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Count(item => item.NetworkUsers.Any(item1 => item1.User == user));
-                View.ItemCount["Analyses"] = _context.Analyses
+                View.ItemCount["GenericAnalyses"] = _context.Analyses
+                    .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Count(item => item.AnalysisUsers.Any(item1 => item1.User == user));
-                View.RecentNetworks = _context.Networks
-                    .Where(item => item.NetworkUsers.Any(item1 => item1.User == user))
-                    .OrderByDescending(item => item.DateTimeCreated)
-                    .Take(5)
-                    .Select(item => new NetworkItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name,
-                        Status = item.Status
-                    });
-                View.RecentAnalyses = _context.Analyses
-                    .Where(item => item.AnalysisUsers.Any(item1 => item1.User == user))
-                    .OrderByDescending(item => item.DateTimeStarted)
-                    .Take(5)
-                    .Select(item => new AnalysisItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name,
-                        Status = item.Status
-                    });
+                View.ItemCount["PPINetworks"] = _context.Networks
+                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
+                    .Count(item => item.NetworkUsers.Any(item1 => item1.User == user));
+                View.ItemCount["PPIAnalyses"] = _context.Analyses
+                    .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
+                    .Count(item => item.AnalysisUsers.Any(item1 => item1.User == user));
             }
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
@@ -160,8 +126,82 @@ namespace NetControl4BioMed.Pages.Content
                 // Return the page.
                 return Page();
             }
-            // Redirect to page.
-            return RedirectToPage($"/Content/Created/{Input.Type}/Details/Index", new { id = Input.Id });
+            // Check if a network should be searched for.
+            if (Input.Type == "Any" || Input.Type == "Networks")
+            {
+                // Try to find a network with the given ID.
+                var network = _context.Networks
+                    .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.Id == Input.Id)
+                    .FirstOrDefault();
+                // Check if a network has been found.
+                if (network != null)
+                {
+                    // Get the database type.
+                    var databaseType = _context.Databases
+                        .Where(item => item.NetworkDatabases.Any(item1 => item1.Network == network))
+                        .Select(item => item.DatabaseType)
+                        .FirstOrDefault();
+                    // Check if there was no database type found.
+                    if (databaseType == null)
+                    {
+                        // Display a message.
+                        TempData["StatusMessage"] = "Error: The network with the provided ID does not have a valid database type.";
+                        // Redirect to the index page.
+                        return RedirectToPage();
+                    }
+                    // Redirect to page.
+                    return RedirectToPage($"/Content/DatabaseTypes/Created/{databaseType.Name}/Created/Networks/Details/Index", new { id = Input.Id });
+                }
+                // Check if only a network should have been searched for.
+                if (Input.Type == "Networks")
+                {
+                    // Display a message.
+                    TempData["StatusMessage"] = "Error: No network has been found with the provided ID, or you don't have access to it.";
+                    // Redirect to the index page.
+                    return RedirectToPage();
+                }
+            }
+            // Check if an analysis should be searched for.
+            if (Input.Type == "Any" || Input.Type == "Analyses")
+            {
+                // Try to find an analysis with the given ID.
+                var analysis = _context.Analyses
+                    .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.Id == Input.Id)
+                    .FirstOrDefault();
+                // Check if an analysis has been found.
+                if (analysis != null)
+                {
+                    // Get the database type.
+                    var databaseType = _context.Databases
+                        .Where(item => item.AnalysisDatabases.Any(item1 => item1.Analysis == analysis))
+                        .Select(item => item.DatabaseType)
+                        .FirstOrDefault();
+                    // Check if there was no database type found.
+                    if (databaseType == null)
+                    {
+                        // Display a message.
+                        TempData["StatusMessage"] = "Error: The analysis with the provided ID does not have a valid database type.";
+                        // Redirect to the index page.
+                        return RedirectToPage();
+                    }
+                    // Redirect to page.
+                    return RedirectToPage($"/Content/DatabaseTypes/Created/{databaseType.Name}/Created/Analyses/Details/Index", new { id = Input.Id });
+                }
+                // Check if only an analysis should have been searched for.
+                if (Input.Type == "Analyses")
+                {
+                    // Display a message.
+                    TempData["StatusMessage"] = "Error: No analysis has been found with the provided ID, or you don't have access to it.";
+                    // Redirect to the index page.
+                    return RedirectToPage();
+                }
+            }
+            // Display a message.
+            TempData["StatusMessage"] = "Error: No network or analysis has been found with the provided ID, or you don't have access to it.";
+            // Redirect to the index page.
+            return RedirectToPage();
         }
     }
 }

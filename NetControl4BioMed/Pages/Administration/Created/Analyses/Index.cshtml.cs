@@ -86,6 +86,7 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 SortBy = new Dictionary<string, string>
                 {
                     { "Id", "ID" },
+                    { "DateTimeCreated", "Date created" },
                     { "DateTimeStarted", "Date started" },
                     { "DateTimeEnded", "Date ended" },
                     { "Name", "Name" },
@@ -171,10 +172,16 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 case var sort when sort == ("Id", "Descending"):
                     query = query.OrderByDescending(item => item.Id);
                     break;
+                case var sort when sort == ("DateTimeCreated", "Ascending"):
+                    query = query.OrderBy(item => item.DateTimeCreated);
+                    break;
+                case var sort when sort == ("DateTimeCreated", "Descending"):
+                    query = query.OrderByDescending(item => item.DateTimeCreated);
+                    break;
                 case var sort when sort == ("DateTimeStarted", "Ascending"):
                     query = query.OrderBy(item => item.DateTimeStarted);
                     break;
-                case var sort when sort == ("DateTimeCreated", "Descending"):
+                case var sort when sort == ("DateTimeStarted", "Descending"):
                     query = query.OrderByDescending(item => item.DateTimeStarted);
                     break;
                 case var sort when sort == ("DateTimeEnded", "Ascending"):

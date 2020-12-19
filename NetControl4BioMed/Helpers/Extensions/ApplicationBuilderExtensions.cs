@@ -80,10 +80,6 @@ namespace NetControl4BioMed.Helpers.Extensions
                     context.DatabaseTypes.AddRange(DatabaseTypes.Seed);
                     // Save the changes.
                     await context.SaveChangesAsync();
-                }
-                // Check if there isn't any entry already defined.
-                if (!context.Databases.Any())
-                {
                     // Mark the seed data for addition.
                     context.Databases.AddRange(Databases.Seed);
                     // Save the changes.
@@ -94,14 +90,6 @@ namespace NetControl4BioMed.Helpers.Extensions
                     await context.SaveChangesAsync();
                     // Mark the seed data for addition.
                     context.DatabaseEdgeFields.AddRange(DatabaseEdgeFields.Seed);
-                    // Save the changes.
-                    await context.SaveChangesAsync();
-                }
-                // Check if there isn't any entry already defined.
-                if (!context.Samples.Any())
-                {
-                    // Mark the seed data for addition.
-                    context.Samples.AddRange(Samples.Seed);
                     // Save the changes.
                     await context.SaveChangesAsync();
                 }

@@ -199,5 +199,68 @@ namespace NetControl4BioMed.Helpers.Extensions
                 await new DatabaseNodeFieldsTask { Items = batchItemInputs }.DeleteAsync(serviceProvider, token);
             }
         }
+
+        /// <summary>
+        /// Deletes the dependent database node fields of the corresponding databases.
+        /// </summary>
+        /// <param name="databaseIds">The databases whose entities should be deleted.</param>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public static async Task DeleteDependentSamplesAsync(IEnumerable<string> databaseIds, IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Define a variable to store the total number of entities.
+            var entityCount = 0;
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items in the current batch.
+                entityCount = context.SampleDatabases
+                    .Where(item => databaseIds.Contains(item.Database.Id))
+                    .Select(item => item.Sample)
+                    .Distinct()
+                    .Count();
+            }
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)entityCount / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (int index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Define the batch items.
+                var batchItemInputs = new List<SampleInputModel>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items in the current batch.
+                    batchItemInputs = context.SampleDatabases
+                        .Where(item => databaseIds.Contains(item.Database.Id))
+                        .Select(item => item.Sample)
+                        .Distinct()
+                        .Select(item => new SampleInputModel
+                        {
+                            Id = item.Id
+                        })
+                        .Take(ApplicationDbContext.BatchSize)
+                        .ToList();
+                    // Check if there were no items found.
+                    if (batchItemInputs == null || !batchItemInputs.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                }
+                // Delete the items.
+                await new SamplesTask { Items = batchItemInputs }.DeleteAsync(serviceProvider, token);
+            }
+        }
     }
 }

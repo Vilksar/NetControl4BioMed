@@ -86,6 +86,11 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }
 
         /// <summary>
+        /// Gets or sets the samples which use the database.
+        /// </summary>
+        public ICollection<SampleDatabase> SampleDatabases { get; set; }
+
+        /// <summary>
         /// Gets or sets the networks which use the database.
         /// </summary>
         public ICollection<NetworkDatabase> NetworkDatabases { get; set; }

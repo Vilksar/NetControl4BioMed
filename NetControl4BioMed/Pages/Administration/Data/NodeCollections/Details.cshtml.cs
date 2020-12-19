@@ -27,6 +27,8 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
         {
             public NodeCollection NodeCollection { get; set; }
 
+            public int TypeCount { get; set; }
+
             public int DatabaseCount { get; set; }
 
             public int NodeCount { get; set; }
@@ -54,6 +56,10 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
             {
                 NodeCollection = query
                     .FirstOrDefault(),
+                TypeCount = query
+                    .Select(item => item.NodeCollectionTypes)
+                    .Distinct()
+                    .Count(),
                 DatabaseCount = query
                     .Select(item => item.NodeCollectionDatabases)
                     .SelectMany(item => item)

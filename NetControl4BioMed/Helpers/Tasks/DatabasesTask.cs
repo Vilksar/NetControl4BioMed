@@ -319,6 +319,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var databaseIds = databases
                     .Select(item => item.Id);
                 // Delete the dependent entities.
+                await DatabaseExtensions.DeleteDependentSamplesAsync(databaseIds, serviceProvider, token);
                 await DatabaseExtensions.DeleteDependentDatabaseEdgeFieldsAsync(databaseIds, serviceProvider, token);
                 await DatabaseExtensions.DeleteDependentDatabaseNodeFieldsAsync(databaseIds, serviceProvider, token);
                 // Delete the related entities.

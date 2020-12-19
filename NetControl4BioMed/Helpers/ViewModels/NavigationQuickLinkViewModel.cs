@@ -159,183 +159,313 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets the networks navigation quick link for the content index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel ContentNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel ContentGenericNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Networks",
             Title = "Network",
             Color = "success",
             Icon = "fa-share-alt",
             Width = 6,
-            Link = "/Content/Created/Networks/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Index"
         };
 
         /// <summary>
         /// Gets the analyses navigation quick link for the content index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel ContentAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel ContentGenericAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Analyses",
             Title = "Analysis",
             Color = "success",
             Icon = "fa-desktop",
             Width = 6,
-            Link = "/Content/Created/Analyses/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Index"
+        };
+
+        /// <summary>
+        /// Gets the networks navigation quick link for the content index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPINetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Networks",
+            Title = "Network",
+            Color = "success",
+            Icon = "fa-share-alt",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Index"
+        };
+
+        /// <summary>
+        /// Gets the analyses navigation quick link for the content index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPIAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Analyses",
+            Title = "Analysis",
+            Color = "success",
+            Icon = "fa-desktop",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Index"
         };
 
         /// <summary>
         /// Gets the nodes navigation quick link for the networks index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel NetworkNodesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel ContentGenericNetworkNodesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Nodes",
             Title = "Node",
             Color = "success",
             Icon = "fa-circle",
             Width = 6,
-            Link = "/Content/Created/Networks/Details/Data/Nodes/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Data/Nodes/Index"
         };
 
         /// <summary>
         /// Gets the edges navigation quick link for the networks index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel NetworkEdgesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel ContentGenericNetworkEdgesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Edges",
             Title = "Edge",
             Color = "success",
             Icon = "fa-arrow-right",
             Width = 6,
-            Link = "/Content/Created/Networks/Details/Data/Edges/Index"
-        };
-
-        /// <summary>
-        /// Gets the databases navigation quick link for the networks index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel NetworkDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Databases",
-            Title = "Database",
-            Color = "info",
-            Icon = "fa-database",
-            Width = 6,
-            Link = "/Content/Created/Networks/Details/Databases/Databases/Index"
-        };
-
-        /// <summary>
-        /// Gets the node collections navigation quick link for the networks index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel NetworkNodeCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "NodeCollections",
-            Title = "Node collection",
-            Color = "info",
-            Icon = "fa-folder",
-            Width = 6,
-            Link = "/Content/Created/Networks/Details/Data/NodeCollections/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Data/Edges/Index"
         };
 
         /// <summary>
         /// Gets the users navigation quick link for the networks index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel NetworkUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel ContentGenericNetworkUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Users",
             Title = "User",
             Color = "primary",
             Icon = "fa-user",
             Width = 6,
-            Link = "/Content/Created/Networks/Details/Accounts/Users/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Accounts/Users/Index"
         };
 
         /// <summary>
         /// Gets the analyses navigation quick link for the networks index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel NetworkAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel ContentGenericNetworkAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Analyses",
             Title = "Analysis",
             Color = "primary",
             Icon = "fa-desktop",
             Width = 6,
-            Link = "/Content/Created/Networks/Details/Created/Analyses/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Created/Analyses/Index"
         };
 
         /// <summary>
         /// Gets the nodes navigation quick link for the analysis index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel AnalysisNodesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel ContentGenericAnalysisNodesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Nodes",
             Title = "Node",
             Color = "success",
             Icon = "fa-circle",
             Width = 6,
-            Link = "/Content/Created/Analyses/Details/Data/Nodes/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Data/Nodes/Index"
         };
 
         /// <summary>
         /// Gets the edges navigation quick link for the analysis index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel AnalysisEdgesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel ContentGenericAnalysisEdgesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Edges",
             Title = "Edge",
             Color = "success",
             Icon = "fa-arrow-right",
             Width = 6,
-            Link = "/Content/Created/Analyses/Details/Data/Edges/Index"
-        };
-
-        /// <summary>
-        /// Gets the databases navigation quick link for the analysis index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel AnalysisDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Databases",
-            Title = "Database",
-            Color = "info",
-            Icon = "fa-database",
-            Width = 6,
-            Link = "/Content/Created/Analyses/Details/Databases/Databases/Index"
-        };
-
-        /// <summary>
-        /// Gets the node collections navigation quick link for the analysis index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel AnalysisNodeCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "NodeCollections",
-            Title = "Node collection",
-            Color = "info",
-            Icon = "fa-folder",
-            Width = 6,
-            Link = "/Content/Created/Analyses/Details/Data/NodeCollections/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Data/Edges/Index"
         };
 
         /// <summary>
         /// Gets the users navigation quick link for the analysis index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel AnalysisUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel ContentGenericAnalysisUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Users",
             Title = "User",
             Color = "primary",
             Icon = "fa-user",
             Width = 6,
-            Link = "/Content/Created/Analyses/Details/Accounts/Users/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Accounts/Users/Index"
         };
 
         /// <summary>
         /// Gets the networks navigation quick link for the analysis index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel AnalysisNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel ContentGenericAnalysisNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Networks",
             Title = "Network",
             Color = "primary",
             Icon = "fa-share-alt",
             Width = 6,
-            Link = "/Content/Created/Analyses/Details/Created/Networks/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Created/Networks/Index"
+        };
+
+        /// <summary>
+        /// Gets the nodes navigation quick link for the networks index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPINetworkNodesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Nodes",
+            Title = "Node",
+            Color = "success",
+            Icon = "fa-circle",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Data/Nodes/Index"
+        };
+
+        /// <summary>
+        /// Gets the edges navigation quick link for the networks index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPINetworkEdgesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Edges",
+            Title = "Edge",
+            Color = "success",
+            Icon = "fa-arrow-right",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Data/Edges/Index"
+        };
+
+        /// <summary>
+        /// Gets the databases navigation quick link for the networks index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPINetworkDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Databases",
+            Title = "Database",
+            Color = "info",
+            Icon = "fa-database",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Databases/Databases/Index"
+        };
+
+        /// <summary>
+        /// Gets the node collections navigation quick link for the networks index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPINetworkNodeCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "NodeCollections",
+            Title = "Node collection",
+            Color = "info",
+            Icon = "fa-folder",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Data/NodeCollections/Index"
+        };
+
+        /// <summary>
+        /// Gets the users navigation quick link for the networks index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPINetworkUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Users",
+            Title = "User",
+            Color = "primary",
+            Icon = "fa-user",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Accounts/Users/Index"
+        };
+
+        /// <summary>
+        /// Gets the analyses navigation quick link for the networks index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPINetworkAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Analyses",
+            Title = "Analysis",
+            Color = "primary",
+            Icon = "fa-desktop",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Created/Analyses/Index"
+        };
+
+        /// <summary>
+        /// Gets the nodes navigation quick link for the analysis index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPIAnalysisNodesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Nodes",
+            Title = "Node",
+            Color = "success",
+            Icon = "fa-circle",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Data/Nodes/Index"
+        };
+
+        /// <summary>
+        /// Gets the edges navigation quick link for the analysis index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPIAnalysisEdgesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Edges",
+            Title = "Edge",
+            Color = "success",
+            Icon = "fa-arrow-right",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Data/Edges/Index"
+        };
+
+        /// <summary>
+        /// Gets the databases navigation quick link for the analysis index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPIAnalysisDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Databases",
+            Title = "Database",
+            Color = "info",
+            Icon = "fa-database",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Databases/Databases/Index"
+        };
+
+        /// <summary>
+        /// Gets the node collections navigation quick link for the analysis index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPIAnalysisNodeCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "NodeCollections",
+            Title = "Node collection",
+            Color = "info",
+            Icon = "fa-folder",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Data/NodeCollections/Index"
+        };
+
+        /// <summary>
+        /// Gets the users navigation quick link for the analysis index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPIAnalysisUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Users",
+            Title = "User",
+            Color = "primary",
+            Icon = "fa-user",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Accounts/Users/Index"
+        };
+
+        /// <summary>
+        /// Gets the networks navigation quick link for the analysis index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel ContentPPIAnalysisNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Networks",
+            Title = "Network",
+            Color = "primary",
+            Icon = "fa-share-alt",
+            Width = 6,
+            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Created/Networks/Index"
         };
 
         /// <summary>
@@ -385,26 +515,74 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static IEnumerable<NavigationQuickLinkViewModel> GetContentNavigationQuickLinks(Dictionary<string, int?> count = null)
         {
             // Get the corresponding navigation quick links.
-            var contentNetworksNavigationQuickLink = ContentNetworksNavigationQuickLink;
-            var contentAnalysesNavigationQuickLink = ContentAnalysesNavigationQuickLink;
+            var contentGenericNetworksNavigationQuickLink = ContentGenericNetworksNavigationQuickLink;
+            var contentGenericAnalysesNavigationQuickLink = ContentGenericAnalysesNavigationQuickLink;
+            var contentPPINetworksNavigationQuickLink = ContentPPINetworksNavigationQuickLink;
+            var contentPPIAnalysesNavigationQuickLink = ContentPPIAnalysesNavigationQuickLink;
             // Update the count and the route ID.
-            contentNetworksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
-            contentAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
+            contentGenericNetworksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("GenericNetworks", null);
+            contentGenericAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("GenericAnalyses", null);
+            contentPPINetworksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("PPINetworks", null);
+            contentPPIAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("PPIAnalyses", null);
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
-                contentNetworksNavigationQuickLink,
-                contentAnalysesNavigationQuickLink
+                contentGenericNetworksNavigationQuickLink,
+                contentGenericAnalysesNavigationQuickLink,
+                contentPPINetworksNavigationQuickLink,
+                contentPPIAnalysesNavigationQuickLink
             };
         }
 
         /// <summary>
-        /// Gets the navigation quick links for the network index page.
+        /// Gets the navigation quick links for the content generic index page.
+        /// </summary>
+        /// <param name="count">The dictionary containing the current counts.</param>
+        /// <returns>The navigation quick links for the content index page.</returns>
+        public static IEnumerable<NavigationQuickLinkViewModel> GetContentGenericNavigationQuickLinks(Dictionary<string, int?> count = null)
+        {
+            // Get the corresponding navigation quick links.
+            var contentGenericNetworksNavigationQuickLink = ContentGenericNetworksNavigationQuickLink;
+            var contentGenericAnalysesNavigationQuickLink = ContentGenericAnalysesNavigationQuickLink;
+            // Update the count and the route ID.
+            contentGenericNetworksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
+            contentGenericAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
+            // Return the navigation quick links.
+            return new List<NavigationQuickLinkViewModel>
+            {
+                contentGenericNetworksNavigationQuickLink,
+                contentGenericAnalysesNavigationQuickLink
+            };
+        }
+
+        /// <summary>
+        /// Gets the navigation quick links for the content PPI index page.
+        /// </summary>
+        /// <param name="count">The dictionary containing the current counts.</param>
+        /// <returns>The navigation quick links for the content index page.</returns>
+        public static IEnumerable<NavigationQuickLinkViewModel> GetContentPPINavigationQuickLinks(Dictionary<string, int?> count = null)
+        {
+            // Get the corresponding navigation quick links.
+            var contentPPINetworksNavigationQuickLink = ContentPPINetworksNavigationQuickLink;
+            var contentPPIAnalysesNavigationQuickLink = ContentPPIAnalysesNavigationQuickLink;
+            // Update the count and the route ID.
+            contentPPINetworksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
+            contentPPIAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
+            // Return the navigation quick links.
+            return new List<NavigationQuickLinkViewModel>
+            {
+                contentPPINetworksNavigationQuickLink,
+                contentPPIAnalysesNavigationQuickLink
+            };
+        }
+
+        /// <summary>
+        /// Gets the navigation quick links for the generic network index page.
         /// </summary>
         /// <param name="networkId">The ID of the current network.</param>
         /// <param name="count">The dictionary containing the current counts.</param>
         /// <returns>The navigation quick links for the network index page.</returns>
-        public static IEnumerable<NavigationQuickLinkViewModel> GetNetworkNavigationQuickLinks(string networkId = null, Dictionary<string, int?> count = null)
+        public static IEnumerable<NavigationQuickLinkViewModel> GetContentGenericNetworkNavigationQuickLinks(string networkId = null, Dictionary<string, int?> count = null)
         {
             // Check if there is no network ID provided.
             if (string.IsNullOrEmpty(networkId))
@@ -413,12 +591,50 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 networkId = string.Empty;
             }
             // Get the corresponding navigation quick links.
-            var networkNodesNavigationQuickLink = NetworkNodesNavigationQuickLink;
-            var networkEdgesNavigationQuickLink = NetworkEdgesNavigationQuickLink;
-            var networkDatabasesNavigationQuickLink = NetworkDatabasesNavigationQuickLink;
-            var networkNodeCollectionsNavigationQuickLink = NetworkNodeCollectionsNavigationQuickLink;
-            var networkUsersNavigationQuickLink = NetworkUsersNavigationQuickLink;
-            var networkAnalysesNavigationQuickLink = NetworkAnalysesNavigationQuickLink;
+            var networkNodesNavigationQuickLink = ContentGenericNetworkNodesNavigationQuickLink;
+            var networkEdgesNavigationQuickLink = ContentGenericNetworkEdgesNavigationQuickLink;
+            var networkUsersNavigationQuickLink = ContentGenericNetworkUsersNavigationQuickLink;
+            var networkAnalysesNavigationQuickLink = ContentGenericNetworkAnalysesNavigationQuickLink;
+            // Update the count and the route ID.
+            networkNodesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Nodes", null);
+            networkNodesNavigationQuickLink.RouteId = networkId;
+            networkEdgesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Edges", null);
+            networkEdgesNavigationQuickLink.RouteId = networkId;
+            networkUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
+            networkUsersNavigationQuickLink.RouteId = networkId;
+            networkAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
+            networkAnalysesNavigationQuickLink.RouteId = networkId;
+            // Return the navigation quick links.
+            return new List<NavigationQuickLinkViewModel>
+            {
+                networkNodesNavigationQuickLink,
+                networkEdgesNavigationQuickLink,
+                networkUsersNavigationQuickLink,
+                networkAnalysesNavigationQuickLink
+            };
+        }
+
+        /// <summary>
+        /// Gets the navigation quick links for the PPI network index page.
+        /// </summary>
+        /// <param name="networkId">The ID of the current network.</param>
+        /// <param name="count">The dictionary containing the current counts.</param>
+        /// <returns>The navigation quick links for the network index page.</returns>
+        public static IEnumerable<NavigationQuickLinkViewModel> GetContentPPINetworkNavigationQuickLinks(string networkId = null, Dictionary<string, int?> count = null)
+        {
+            // Check if there is no network ID provided.
+            if (string.IsNullOrEmpty(networkId))
+            {
+                // Assign the empty string to it.
+                networkId = string.Empty;
+            }
+            // Get the corresponding navigation quick links.
+            var networkNodesNavigationQuickLink = ContentPPINetworkNodesNavigationQuickLink;
+            var networkEdgesNavigationQuickLink = ContentPPINetworkEdgesNavigationQuickLink;
+            var networkDatabasesNavigationQuickLink = ContentPPINetworkDatabasesNavigationQuickLink;
+            var networkNodeCollectionsNavigationQuickLink = ContentPPINetworkNodeCollectionsNavigationQuickLink;
+            var networkUsersNavigationQuickLink = ContentPPINetworkUsersNavigationQuickLink;
+            var networkAnalysesNavigationQuickLink = ContentPPINetworkAnalysesNavigationQuickLink;
             // Update the count and the route ID.
             networkNodesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Nodes", null);
             networkNodesNavigationQuickLink.RouteId = networkId;
@@ -445,12 +661,12 @@ namespace NetControl4BioMed.Helpers.ViewModels
         }
 
         /// <summary>
-        /// Gets the navigation quick links for the analysis index page.
+        /// Gets the navigation quick links for the analysis generic index page.
         /// </summary>
         /// <param name="analysisId">The ID of the current analysis.</param>
         /// <param name="count">The dictionary containing the current counts.</param>
         /// <returns>The navigation quick links for the analysis index page.</returns>
-        public static IEnumerable<NavigationQuickLinkViewModel> GetAnalysisNavigationQuickLinks(string analysisId = null, Dictionary<string, int?> count = null)
+        public static IEnumerable<NavigationQuickLinkViewModel> GetContentGenericAnalysisNavigationQuickLinks(string analysisId = null, Dictionary<string, int?> count = null)
         {
             // Check if there is no analysis ID provided.
             if (string.IsNullOrEmpty(analysisId))
@@ -459,12 +675,50 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 analysisId = string.Empty;
             }
             // Get the corresponding navigation quick links.
-            var analysisNodesNavigationQuickLink = AnalysisNodesNavigationQuickLink;
-            var analysisEdgesNavigationQuickLink = AnalysisEdgesNavigationQuickLink;
-            var analysisDatabasesNavigationQuickLink = AnalysisDatabasesNavigationQuickLink;
-            var analysisNodeCollectionsNavigationQuickLink = AnalysisNodeCollectionsNavigationQuickLink;
-            var analysisUsersNavigationQuickLink = AnalysisUsersNavigationQuickLink;
-            var analysisNetworksNavigationQuickLink = AnalysisNetworksNavigationQuickLink;
+            var analysisNodesNavigationQuickLink = ContentGenericAnalysisNodesNavigationQuickLink;
+            var analysisEdgesNavigationQuickLink = ContentGenericAnalysisEdgesNavigationQuickLink;
+            var analysisUsersNavigationQuickLink = ContentGenericAnalysisUsersNavigationQuickLink;
+            var analysisNetworksNavigationQuickLink = ContentGenericAnalysisNetworksNavigationQuickLink;
+            // Update the count and the route ID.
+            analysisNodesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Nodes", null);
+            analysisNodesNavigationQuickLink.RouteId = analysisId;
+            analysisEdgesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Edges", null);
+            analysisEdgesNavigationQuickLink.RouteId = analysisId;
+            analysisUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
+            analysisUsersNavigationQuickLink.RouteId = analysisId;
+            analysisNetworksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
+            analysisNetworksNavigationQuickLink.RouteId = analysisId;
+            // Return the navigation quick links.
+            return new List<NavigationQuickLinkViewModel>
+            {
+                analysisNodesNavigationQuickLink,
+                analysisEdgesNavigationQuickLink,
+                analysisUsersNavigationQuickLink,
+                analysisNetworksNavigationQuickLink
+            };
+        }
+
+        /// <summary>
+        /// Gets the navigation quick links for the analysis PPI index page.
+        /// </summary>
+        /// <param name="analysisId">The ID of the current analysis.</param>
+        /// <param name="count">The dictionary containing the current counts.</param>
+        /// <returns>The navigation quick links for the analysis index page.</returns>
+        public static IEnumerable<NavigationQuickLinkViewModel> GetContentPPIAnalysisNavigationQuickLinks(string analysisId = null, Dictionary<string, int?> count = null)
+        {
+            // Check if there is no analysis ID provided.
+            if (string.IsNullOrEmpty(analysisId))
+            {
+                // Assign the empty string to it.
+                analysisId = string.Empty;
+            }
+            // Get the corresponding navigation quick links.
+            var analysisNodesNavigationQuickLink = ContentPPIAnalysisNodesNavigationQuickLink;
+            var analysisEdgesNavigationQuickLink = ContentPPIAnalysisEdgesNavigationQuickLink;
+            var analysisDatabasesNavigationQuickLink = ContentPPIAnalysisDatabasesNavigationQuickLink;
+            var analysisNodeCollectionsNavigationQuickLink = ContentPPIAnalysisNodeCollectionsNavigationQuickLink;
+            var analysisUsersNavigationQuickLink = ContentPPIAnalysisUsersNavigationQuickLink;
+            var analysisNetworksNavigationQuickLink = ContentPPIAnalysisNetworksNavigationQuickLink;
             // Update the count and the route ID.
             analysisNodesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Nodes", null);
             analysisNodesNavigationQuickLink.RouteId = analysisId;

@@ -414,6 +414,13 @@ namespace NetControl4BioMed.Pages.Administration
                             DateTimeCreated = item.DateTimeCreated,
                             Name = item.Name,
                             Description = item.Description,
+                            NodeCollectionTypes = item.NodeCollectionTypes
+                                .Select(item => new
+                                {
+                                    Id = item.Type.ToString(),
+                                    Name = item.Type.GetDisplayName(),
+                                    Description = item.Type.GetDisplayDescription()
+                                }),
                             NodeCollectionNodes = item.NodeCollectionNodes
                                 .Select(item1 => new
                                 {
@@ -424,6 +431,45 @@ namespace NetControl4BioMed.Pages.Administration
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-All-NodeCollections.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("AllSamples"))
+                {
+                    // Get the required data.
+                    var data = _context.Samples
+                        .Select(item => new
+                        {
+                            Id = item.Id,
+                            DateTimeCreated = item.DateTimeCreated,
+                            Name = item.Name,
+                            Description = item.Description,
+                            NetworkName = item.NetworkName,
+                            NetworkDescription = item.Description,
+                            NetworkAlgorithm = item.NetworkAlgorithm.ToString(),
+                            NetworkNodeDatabaseData = item.NetworkNodeDatabaseData,
+                            NetworkEdgeDatabaseData = item.NetworkEdgeDatabaseData,
+                            NetworkSeedData = item.NetworkSeedData,
+                            NetworkSeedNodeCollectionData = item.NetworkSeedNodeCollectionData,
+                            AnalysisName = item.NetworkName,
+                            AnalysisDescription = item.Description,
+                            AnalysisAlgorithm = item.AnalysisAlgorithm.ToString(),
+                            AnalysisNetworkData = item.AnalysisNetworkData,
+                            AnalysisSourceData = item.AnalysisSourceData,
+                            AnalysisSourceNodeCollectionData = item.AnalysisSourceNodeCollectionData,
+                            AnalysisTargetData = item.AnalysisTargetData,
+                            AnalysisTargetNodeCollectionData = item.AnalysisTargetNodeCollectionData,
+                            SampleDatabases = item.SampleDatabases
+                                .Select(item1 => new
+                                {
+                                    Id = item1.Database.Id,
+                                    Name = item1.Database.Name
+                            })
+                        })
+                        .AsNoTracking();
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-All-Samples.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
                     await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
                 }
@@ -463,26 +509,6 @@ namespace NetControl4BioMed.Pages.Administration
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-All-Analyses.json", CompressionLevel.Fastest).Open();
-                    // Write the data to the stream corresponding to the file.
-                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
-                }
-                // Check the items to download.
-                if (downloadItems.Contains("AllSamples"))
-                {
-                    // Get the required data.
-                    var data = _context.Samples
-                        .Select(item => new
-                        {
-                            Id = item.Id,
-                            DateTimeCreated = item.DateTimeCreated,
-                            Name = item.Name,
-                            Description = item.Description,
-                            Type = item.Type.GetDisplayName(),
-                            Data = item.Data
-                        })
-                        .AsNoTracking();
-                    // Create a new entry in the archive and open it.
-                    using var stream = archive.CreateEntry($"NetControl4BioMed-All-Samples.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
                     await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
                 }
@@ -749,6 +775,32 @@ namespace NetControl4BioMed.Pages.Administration
                     await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
                 }
                 // Check the items to download.
+                if (downloadItems.Contains("DuplicateSamples"))
+                {
+                    // Get the duplicate keys.
+                    var keys = _context.Samples
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => item.Key)
+                        .ToList();
+                    // Get the required data.
+                    var data = _context.Samples
+                        .Where(item => keys.Contains(item.Name))
+                        .AsNoTracking()
+                        .AsEnumerable()
+                        .GroupBy(item => item.Name)
+                        .Where(item => item.Count() > 1)
+                        .Select(item => new
+                        {
+                            Key = item.Key,
+                            Values = item.Select(item1 => item1.Id)
+                        });
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Duplicate-Samples.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
                 if (downloadItems.Contains("OrphanedNodes"))
                 {
                     // Get the required data.
@@ -779,11 +831,24 @@ namespace NetControl4BioMed.Pages.Administration
                 {
                     // Get the required data.
                     var data = _context.NodeCollections
-                        .Where(item => !item.NodeCollectionNodes.Any())
+                        .Where(item => !item.NodeCollectionTypes.Any() || !item.NodeCollectionDatabases.Any() || !item.NodeCollectionNodes.Any())
                         .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-NodeCollections.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("OrphanedSamples"))
+                {
+                    // Get the required data.
+                    var data = _context.Samples
+                        .Where(item => !item.SampleDatabases.Any())
+                        .Select(item => item.Id)
+                        .AsNoTracking();
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Orphaned-Samples.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
                     await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
                 }
@@ -844,11 +909,24 @@ namespace NetControl4BioMed.Pages.Administration
                 {
                     // Get the required data.
                     var data = _context.NodeCollections
-                        .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                        .Where(item => item.NodeCollectionDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1 || item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
                         .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
                     using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-NodeCollections.json", CompressionLevel.Fastest).Open();
+                    // Write the data to the stream corresponding to the file.
+                    await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
+                }
+                // Check the items to download.
+                if (downloadItems.Contains("InconsistentSamples"))
+                {
+                    // Get the required data.
+                    var data = _context.Samples
+                        .Where(item => item.SampleDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                        .Select(item => item.Id)
+                        .AsNoTracking();
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"NetControl4BioMed-Inconsistent-Samples.json", CompressionLevel.Fastest).Open();
                     // Write the data to the stream corresponding to the file.
                     await JsonSerializer.SerializeAsync(stream, data, jsonSerializerOptions);
                 }
@@ -970,6 +1048,24 @@ namespace NetControl4BioMed.Pages.Administration
                 var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllNodeCollectionsAsync(backgroundTask.Id, CancellationToken.None));
             }
             // Check the items to delete.
+            if (deleteItems.Contains("Samples"))
+            {
+                // Define a new background task.
+                var backgroundTask = new BackgroundTask
+                {
+                    DateTimeCreated = DateTime.UtcNow,
+                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllSamplesAsync)}",
+                    IsRecurring = false,
+                    Data = JsonSerializer.Serialize(new AnalysesTask(), jsonSerializerOptions)
+                };
+                // Mark the background task for addition.
+                _context.BackgroundTasks.Add(backgroundTask);
+                // Save the changes to the database.
+                await _context.SaveChangesAsync();
+                // Create a new Hangfire background job.
+                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllSamplesAsync(backgroundTask.Id, CancellationToken.None));
+            }
+            // Check the items to delete.
             if (deleteItems.Contains("Networks"))
             {
                 // Define a new background task.
@@ -1004,24 +1100,6 @@ namespace NetControl4BioMed.Pages.Administration
                 await _context.SaveChangesAsync();
                 // Create a new Hangfire background job.
                 var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllAnalysesAsync(backgroundTask.Id, CancellationToken.None));
-            }
-            // Check the items to delete.
-            if (deleteItems.Contains("Samples"))
-            {
-                // Define a new background task.
-                var backgroundTask = new BackgroundTask
-                {
-                    DateTimeCreated = DateTime.UtcNow,
-                    Name = $"{nameof(IAdministrationTaskManager)}.{nameof(IAdministrationTaskManager.DeleteAllSamplesAsync)}",
-                    IsRecurring = false,
-                    Data = JsonSerializer.Serialize(new AnalysesTask(), jsonSerializerOptions)
-                };
-                // Mark the background task for addition.
-                _context.BackgroundTasks.Add(backgroundTask);
-                // Save the changes to the database.
-                await _context.SaveChangesAsync();
-                // Create a new Hangfire background job.
-                var jobId = BackgroundJob.Enqueue<IAdministrationTaskManager>(item => item.DeleteAllSamplesAsync(backgroundTask.Id, CancellationToken.None));
             }
             // Display a message.
             TempData["StatusMessage"] = $"Success: A new background task was created to delete {string.Join(" and ", deleteItems.Select(item => $"all {item}"))}.";

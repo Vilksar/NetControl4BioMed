@@ -84,6 +84,23 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
+        /// Creates samples in the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task CreateSamplesAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<SamplesTask>(backgroundTask);
+            // Run the task.
+            await task.CreateAsync(_serviceProvider, token);
+            // Complete the task.
+            await DeleteBackgroundTaskAsync(backgroundTask);
+        }
+
+        /// <summary>
         /// Edits nodes in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
@@ -128,6 +145,23 @@ namespace NetControl4BioMed.Helpers.Services
             var backgroundTask = GetBackgroundTask(id);
            // Get the task corresponding to the background task.
             var task = GetTask<NodeCollectionsTask>(backgroundTask);
+            // Run the task.
+            await task.EditAsync(_serviceProvider, token);
+            // Complete the task.
+            await DeleteBackgroundTaskAsync(backgroundTask);
+        }
+
+        /// <summary>
+        /// Edits samples in the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task EditSamplesAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<SamplesTask>(backgroundTask);
             // Run the task.
             await task.EditAsync(_serviceProvider, token);
             // Complete the task.
