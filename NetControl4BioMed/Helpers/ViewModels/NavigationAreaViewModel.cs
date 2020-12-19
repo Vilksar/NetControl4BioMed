@@ -397,15 +397,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "SampleTypes",
-                            Title = "Sample types",
-                            Description = string.Empty,
-                            Icon = "fa-paste",
-                            Color = "light",
-                            Link = "/Administration/Relationships/SampleTypes/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
                             Id = "SampleDatabases",
                             Title = "Sample databases",
                             Description = string.Empty,

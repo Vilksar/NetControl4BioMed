@@ -230,11 +230,6 @@ namespace NetControl4BioMed.Data
         public DbSet<SampleDatabase> SampleDatabases { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between samples and types.
-        /// </summary>
-        public DbSet<SampleType> SampleTypes { get; set; }
-
-        /// <summary>
         /// Initializes a new instance of the database context.
         /// </summary>
         /// <param name="options">Represents the options for the database context.</param>
@@ -628,14 +623,6 @@ namespace NetControl4BioMed.Data
                 entity.HasOne(item => item.Database)
                     .WithMany(item => item.SampleDatabases)
                     .HasForeignKey(item => item.DatabaseId)
-                    .IsRequired();
-            });
-            modelBuilder.Entity<SampleType>(entity =>
-            {
-                entity.HasKey(item => new { item.SampleId, item.Type });
-                entity.HasOne(item => item.Sample)
-                    .WithMany(item => item.SampleTypes)
-                    .HasForeignKey(item => item.SampleId)
                     .IsRequired();
             });
             modelBuilder.Entity<UserRole>(entity =>

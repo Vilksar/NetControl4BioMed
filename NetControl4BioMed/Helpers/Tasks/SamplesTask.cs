@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
+using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
@@ -11,7 +12,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using EnumerationSampleType = NetControl4BioMed.Data.Enumerations.SampleType;
 
 namespace NetControl4BioMed.Helpers.Tasks
 {
@@ -129,26 +129,17 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no sample databases found.", showExceptionItem, batchItem);
                     }
-                    // Check if there were no sample types provided.
-                    if (batchItem.SampleTypes == null || !batchItem.SampleTypes.Any())
+                    // Check if the network algorithm is valid.
+                    if (!Enum.TryParse<NetworkAlgorithm>(batchItem.NetworkAlgorithm, out var networkAlgorithm))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no sample types provided.", showExceptionItem, batchItem);
+                        throw new TaskException("The network algorithm is not valid.", showExceptionItem, batchItem);
                     }
-                    // Get the node collection types.
-                    var sampleTypes = batchItem.SampleTypes
-                        .Select(item => item.Type)
-                        .Select(item => (Enum.TryParse<EnumerationSampleType>(item, out var type), type))
-                        .Where(item => item.Item1)
-                        .Select(item => new SampleType
-                        {
-                            Type = item.Item2
-                        });
-                    // Check if there were no edge nodes found.
-                    if (sampleTypes == null || !sampleTypes.Any())
+                    // Check if the analysis algorithm is valid.
+                    if (!Enum.TryParse<AnalysisAlgorithm>(batchItem.AnalysisAlgorithm, out var analysisAlgorithm))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no sample types found.", showExceptionItem, batchItem);
+                        throw new TaskException("The analysis algorithm is not valid.", showExceptionItem, batchItem);
                     }
                     // Define the new node collection.
                     var sample = new Sample
@@ -156,8 +147,21 @@ namespace NetControl4BioMed.Helpers.Tasks
                         DateTimeCreated = DateTime.UtcNow,
                         Name = batchItem.Name,
                         Description = batchItem.Description,
-                        Data = batchItem.Data,
-                        SampleTypes = sampleTypes.ToList(),
+                        NetworkName = batchItem.NetworkName,
+                        NetworkDescription = batchItem.Description,
+                        NetworkAlgorithm = networkAlgorithm,
+                        NetworkNodeDatabaseData = batchItem.NetworkNodeDatabaseData,
+                        NetworkEdgeDatabaseData = batchItem.NetworkEdgeDatabaseData,
+                        NetworkSeedData = batchItem.NetworkSeedData,
+                        NetworkSeedNodeCollectionData = batchItem.NetworkSeedNodeCollectionData,
+                        AnalysisName = batchItem.NetworkName,
+                        AnalysisDescription = batchItem.Description,
+                        AnalysisAlgorithm = analysisAlgorithm,
+                        AnalysisNetworkData = batchItem.AnalysisNetworkData,
+                        AnalysisSourceData = batchItem.AnalysisSourceData,
+                        AnalysisSourceNodeCollectionData = batchItem.AnalysisSourceNodeCollectionData,
+                        AnalysisTargetData = batchItem.AnalysisTargetData,
+                        AnalysisTargetNodeCollectionData = batchItem.AnalysisTargetNodeCollectionData,
                         SampleDatabases = sampleDatabases.ToList()
                     };
                     // Check if there is any ID provided.
@@ -284,38 +288,41 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no sample databases found.", showExceptionItem, batchItem);
                     }
-                    // Check if there were no sample types provided.
-                    if (batchItem.SampleTypes == null || !batchItem.SampleTypes.Any())
+                    // Check if the network algorithm is valid.
+                    if (!Enum.TryParse<NetworkAlgorithm>(batchItem.NetworkAlgorithm, out var networkAlgorithm))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no sample types provided.", showExceptionItem, batchItem);
+                        throw new TaskException("The network algorithm is not valid.", showExceptionItem, batchItem);
                     }
-                    // Get the node collection types.
-                    var sampleTypes = batchItem.SampleTypes
-                        .Select(item => item.Type)
-                        .Select(item => (Enum.TryParse<EnumerationSampleType>(item, out var type), type))
-                        .Where(item => item.Item1)
-                        .Select(item => new SampleType
-                        {
-                            Type = item.Item2
-                        });
-                    // Check if there were no edge nodes found.
-                    if (sampleTypes == null || !sampleTypes.Any())
+                    // Check if the analysis algorithm is valid.
+                    if (!Enum.TryParse<AnalysisAlgorithm>(batchItem.AnalysisAlgorithm, out var analysisAlgorithm))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no sample types found.", showExceptionItem, batchItem);
+                        throw new TaskException("The analysis algorithm is not valid.", showExceptionItem, batchItem);
                     }
                     // Update the node collection.
                     sample.Name = batchItem.Name;
                     sample.Description = batchItem.Description;
-                    sample.Data = batchItem.Data;
-                    sample.SampleTypes = sampleTypes.ToList();
+                    sample.NetworkName = batchItem.NetworkName;
+                    sample.NetworkDescription = batchItem.Description;
+                    sample.NetworkAlgorithm = networkAlgorithm;
+                    sample.NetworkNodeDatabaseData = batchItem.NetworkNodeDatabaseData;
+                    sample.NetworkEdgeDatabaseData = batchItem.NetworkEdgeDatabaseData;
+                    sample.NetworkSeedData = batchItem.NetworkSeedData;
+                    sample.NetworkSeedNodeCollectionData = batchItem.NetworkSeedNodeCollectionData;
+                    sample.AnalysisName = batchItem.NetworkName;
+                    sample.AnalysisDescription = batchItem.Description;
+                    sample.AnalysisAlgorithm = analysisAlgorithm;
+                    sample.AnalysisNetworkData = batchItem.AnalysisNetworkData;
+                    sample.AnalysisSourceData = batchItem.AnalysisSourceData;
+                    sample.AnalysisSourceNodeCollectionData = batchItem.AnalysisSourceNodeCollectionData;
+                    sample.AnalysisTargetData = batchItem.AnalysisTargetData;
+                    sample.AnalysisTargetNodeCollectionData = batchItem.AnalysisTargetNodeCollectionData;
                     sample.SampleDatabases = sampleDatabases.ToList();
                     // Add the node collection to the list.
                     samplesToEdit.Add(sample);
                 }
                 // Delete the related entities.
-                await SampleExtensions.DeleteRelatedEntitiesAsync<SampleType>(sampleIds, serviceProvider, token);
                 await SampleExtensions.DeleteRelatedEntitiesAsync<SampleDatabase>(sampleIds, serviceProvider, token);
                 // Update the items.
                 await IEnumerableExtensions.EditAsync(samplesToEdit, serviceProvider, token);
@@ -376,7 +383,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var sampleIds = samples
                     .Select(item => item.Id);
                 // Delete the related entities.
-                await SampleExtensions.DeleteRelatedEntitiesAsync<SampleType>(sampleIds, serviceProvider, token);
                 await SampleExtensions.DeleteRelatedEntitiesAsync<SampleDatabase>(sampleIds, serviceProvider, token);
                 // Delete the items.
                 await IEnumerableExtensions.DeleteAsync(samples, serviceProvider, token);
