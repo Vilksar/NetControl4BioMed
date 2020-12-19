@@ -81,7 +81,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.Nodes
                 EdgeNodes = items
                     .Select(item => item.EdgeNodes)
                     .SelectMany(item => item)
-                    .Where(item => !item.Edge.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
                     .Where(item => item.Edge.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                     .Where(item => item.Edge.EdgeNodes.All(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
                     .Include(item => item.Edge),

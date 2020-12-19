@@ -52,7 +52,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.Edges
             var items = _context.Edges
                 .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                 .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                .Where(item => item.EdgeNodes.All(item1 => !item1.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
+                .Where(item => item.EdgeNodes.All(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
             if (items == null || !items.Any())

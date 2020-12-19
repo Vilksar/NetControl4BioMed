@@ -72,7 +72,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                 NodeCollectionNodes = items
                     .Select(item => item.NodeCollectionNodes)
                     .SelectMany(item => item)
-                    .Where(item => !item.Node.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic") && item.Node.DatabaseNodes.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                    .Where(item => item.Node.DatabaseNodes.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                     .Include(item => item.Node)
             };
             // Return the page.

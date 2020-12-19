@@ -860,7 +860,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "SourceNodeCollections",
-                            Title = "Cell-line data",
+                            Title = "Drug-target data",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
@@ -869,7 +869,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "TargetNodeCollections",
-                            Title = "Drug-target data",
+                            Title = "Cell-line data",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",

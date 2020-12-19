@@ -124,7 +124,7 @@
         <div class="mb-0">
             <span>Once a network has been generated, you can start its analysis by navigating to the <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Index">Analyses</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the analysis creation page. Here, you might have to select the algorithm to be used:</span>
         </div>
-        <ul class="mb-0">
+        <ul class="mb-1">
             <li class="">
                 <span><span class="font-italic">Greedy</span>, which uses a greedy algorithm based on the algorithm described <a href="http://dx.doi.org/10.1109/TCBB.2018.2797271" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span> in order to identify the control nodes.</span>
             </li>
@@ -369,19 +369,13 @@
         <div class="mb-1">
             <span>The completed network can be downloaded in a variety of formats for offline processing and visualization (for example, using <a href="https://cytoscape.org/" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span class=""><i class="fas fa-external-link-alt"></i></span>). Additionally, if the network is relatively small (for performance reasons, under @NetControl4BioMed.Helpers.Extensions.NetworkExtensions.MaximumSizeForVisualization proteins), it can also be visualized in the browser. However, this can quickly become overwhelming even for smaller networks.</span>
         </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/ppi-network-visualization.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Visualizing the PPI network in-browser.</figcaption>
-            </figure>
-        </div>
         <div class="mb-1">
             <span>Please note that creating a network (or having access to one) is required in order to create an analysis!</span>
         </div>
         <div class="mb-0">
             <span>Once a network has been generated, you can start its analysis by navigating to the <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Index">Analyses</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the network creation page. Here, you might have to select the algorithm to be used:</span>
         </div>
-        <ul class="mb-0">
+        <ul class="mb-1">
             <li class="">
                 <span><span class="font-italic">Greedy</span>, which uses a greedy algorithm based on the algorithm described <a href="http://dx.doi.org/10.1109/TCBB.2018.2797271" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span> in order to identify the control proteins.</span>
             </li>
@@ -503,12 +497,6 @@
         <div class="mb-1">
             <span>The completed analysis and its output can be downloaded in a variety of formats for offline processing and visualization (for example, using <a href="https://cytoscape.org/" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span class=""><i class="fas fa-external-link-alt"></i></span>). Additionally, if its corresponding network is relatively small (for performance reasons, under @NetControl4BioMed.Helpers.Extensions.AnalysisExtensions.MaximumSizeForVisualization proteins), it can also be visualized in the browser. However, this can quickly become overwhelming even for smaller networks.</span>
         </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/ppi-analysis-visualization.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Visualizing the PPI analysis in-browser.</figcaption>
-            </figure>
-        </div>
         <div class="mb-1">
             <span>As output, the analysis returns one or more sets of controlling proteins which are able to control all of the provided target proteins. These controlling sets can be separately inspected, visualized and downloaded.</span>
         </div>
@@ -518,20 +506,8 @@
                 <figcaption class="figure-caption">Checking a control path returned by the PPI analysis.</figcaption>
             </figure>
         </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/ppi-analysis-control-path-visualization.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Visualizing a control path returned by the PPI analysis.</figcaption>
-            </figure>
-        </div>
         <div class="mb-1">
             <span>Furthermore, you can view more details about each of the controlling proteins (or about each of the proteins in the control path). For example, you can check the data of the returned protein which controls the most target proteins, to see if there already exists a drug targetting it.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/ppi-analysis-control-path-check.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Checking the protein in the control path returned by the PPI analysis that controls the most target proteins.</figcaption>
-            </figure>
         </div>
     </div>
     <div id="acknowledgements" class="mb-3">
