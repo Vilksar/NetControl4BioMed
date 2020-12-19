@@ -14,14 +14,10 @@ namespace NetControl4BioMed.Pages.Identity
 {
     public class LogoutModel : PageModel
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
 
-        public LogoutModel(IServiceProvider serviceProvider, UserManager<User> userManager, SignInManager<User> signInManager)
+        public LogoutModel(SignInManager<User> signInManager)
         {
-            _serviceProvider = serviceProvider;
-            _userManager = userManager;
             _signInManager = signInManager;
         }
 
@@ -33,8 +29,6 @@ namespace NetControl4BioMed.Pages.Identity
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Get the current user.
-            var user = await _userManager.GetUserAsync(User);
             // Log out the user.
             await _signInManager.SignOutAsync();
             // Display a message to the user.

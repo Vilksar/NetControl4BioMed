@@ -114,67 +114,69 @@ namespace NetControl4BioMed.Pages.Identity
                 LoginProvider = info.LoginProvider,
                 ReturnUrl = returnUrl ?? _linkGenerator.GetPathByPage(HttpContext, "/Index", handler: null, values: null)
             };
-            // Get the ID of the user trying to log in.
-            var userId = info.Principal != null ? info.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value : string.Empty;
-            // Check if there wasn't any user ID found.
-            if (string.IsNullOrEmpty(userId))
-            {
-                // Display an error.
-                TempData["StatusMessage"] = "Error: There was an error loading information from the external provider.";
-                // Redirect to the login page.
-                return RedirectToPage("/Identity/LoginWithExternalAccount");
-            }
+            // Get the e-mail of the user trying to log in.
+            var userEmail = info.Principal.HasClaim(item => item.Type == ClaimTypes.Email) ? info.Principal.FindFirstValue(ClaimTypes.Email) : string.Empty;
             // Get the user trying to log in.
-            var user = await _userManager.FindByIdAsync(userId);
-            // Check if any user has been found.
-            if (user == null)
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            // Check if a user has been found.
+            if (user != null)
             {
+                // Try to sign in the user with the external login provider information. It will work only if the user already has a login.
+                var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false, true);
+                // Check if the login was successful.
+                if (result.Succeeded)
+                {
+                    // Display an error.
+                    TempData["StatusMessage"] = "Success: You are now logged in!";
+                    // Redirect to the return URL.
+                    return LocalRedirect(View.ReturnUrl);
+                }
+                // Check if the account is locked out.
+                if (result.IsLockedOut)
+                {
+                    // Display an error.
+                    TempData["StatusMessage"] = "Error: This account has been locked out. Please try again later.";
+                    // Redirect to the home page.
+                    return RedirectToPage("/Identity/LoginWithExternalAccount");
+                }
+                // Check if the user is not allowed to sign in because the e-mail is not confirmed.
+                if (result.IsNotAllowed && !user.EmailConfirmed)
+                {
+                    // Generate an e-mail confirmation code.
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    // Create the callback URL to be encoded in the confirmation email.
+                    var callbackUrl = _linkGenerator.GetUriByPage(HttpContext, "/Identity/ConfirmEmail", handler: null, values: new { userId = user.Id, code = code });
+                    // Define a new view model for the e-mail.
+                    var emailViewModel = new EmailEmailConfirmationViewModel
+                    {
+                        Email = user.Email,
+                        Url = callbackUrl,
+                        ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
+                    };
+                    // Send the confirmation e-mail for the user.
+                    await _emailSender.SendEmailConfirmationEmailAsync(emailViewModel);
+                    // Display an error.
+                    TempData["StatusMessage"] = "Error: You are not allowed to log in because your e-mail address is not yet confirmed. A new e-mail containing instructions on how to confirm it has been sent to the specified e-mail address.";
+                    // Redirect to the login page.
+                    return RedirectToPage("/Identity/LoginWithExternalAccount");
+                }
+                // Check if the user exists, but hasn't linked the external account.
+                if (!(await _userManager.GetLoginsAsync(user)).Any(item => item.LoginProvider == info.LoginProvider))
+                {
+                    // Display an error.
+                    TempData["StatusMessage"] = "Error: Your e-mail address is already associated with an account, but you haven't linked the external login to it. You need to do so before being able to log in with an external account.";
+                    // Redirect to the login page.
+                    return RedirectToPage("/Identity/LoginWithExternalAccount");
+                }
                 // Display an error.
                 TempData["StatusMessage"] = "Error: There was an error loading information from the external provider.";
-                // Redirect to the login page.
-                return RedirectToPage("/Identity/LoginWithExternalAccount");
-            }
-            // Try to sign in the user with the external login provider information. It will work only if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false, true);
-            // Check if the login was successful.
-            if (result.Succeeded)
-            {
-                // Redirect to the return URL.
-                return LocalRedirect(View.ReturnUrl);
-            }
-            // Check if the account is locked out.
-            if (result.IsLockedOut)
-            {
-                // Display an error.
-                TempData["StatusMessage"] = "Error: This account has been locked out. Please try again later.";
-                // Redirect to the home page.
-                return RedirectToPage("/Identity/LoginWithExternalAccount");
-            }
-            // Check if the user is not allowed to sign in because the e-mail is not confirmed.
-            if (result.IsNotAllowed && !user.EmailConfirmed)
-            {
-                // Generate an e-mail confirmation code.
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                // Create the callback URL to be encoded in the confirmation email.
-                var callbackUrl = _linkGenerator.GetUriByPage(HttpContext, "/Identity/ConfirmEmail", handler: null, values: new { userId = user.Id, code = code });
-                // Define a new view model for the e-mail.
-                var emailViewModel = new EmailEmailConfirmationViewModel
-                {
-                    Email = user.Email,
-                    Url = callbackUrl,
-                    ApplicationUrl = _linkGenerator.GetUriByPage(HttpContext, "/Index", handler: null, values: null)
-                };
-                // Send the confirmation e-mail for the user.
-                await _emailSender.SendEmailConfirmationEmailAsync(emailViewModel);
-                // Display an error.
-                TempData["StatusMessage"] = "Error: You are not allowed to log in because your e-mail address is not yet confirmed. A new e-mail containing instructions on how to confirm it has been sent to the specified e-mail address.";
                 // Redirect to the login page.
                 return RedirectToPage("/Identity/LoginWithExternalAccount");
             }
             // If the user does not have an account, then ask to create one. Retrieve the e-mail from the external provider, if it exists.
             Input = new InputModel
             {
-                Email = info.Principal.HasClaim(item => item.Type == ClaimTypes.Email) ? info.Principal.FindFirstValue(ClaimTypes.Email) : string.Empty
+                Email = userEmail
             };
             // Return the page.
             return Page();
