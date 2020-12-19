@@ -104,12 +104,14 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
 
             public string Algorithm { get; set; }
 
+            public IEnumerable<Sample> Samples { get; set; }
+
             public IEnumerable<NodeCollection> SourceNodeCollections { get; set; }
 
             public IEnumerable<NodeCollection> TargetNodeCollections { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string algorithm = null, string analysisId = null)
+        public async Task<IActionResult> OnGetAsync(string algorithm = null, string analysisId = null, string sampleId = null)
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
@@ -152,6 +154,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
             {
                 IsUserAuthenticated = user != null,
                 Algorithm = algorithm,
+                Samples = _context.Samples
+                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI")),
                 SourceNodeCollections = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
@@ -159,6 +163,17 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
             };
+            // Try to get the sample with the provided ID.
+            var sample = View.Samples?
+                .FirstOrDefault(item => item.Id == sampleId);
+            // Check if there was an ID provided, but there was no sample found.
+            if (!string.IsNullOrEmpty(sampleId) && sample == null)
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: No sample could be found with the provided ID.";
+                // Redirect to the index page.
+                return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Analyses/Index");
+            }
             // Check if there was an analysis provided.
             if (!string.IsNullOrEmpty(analysisId))
             {
@@ -215,6 +230,23 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     GeneticAlgorithmParameters = algorithm == AnalysisAlgorithm.Genetic.ToString() ? JsonSerializer.Deserialize<Algorithms.Analyses.Genetic.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : null
                 };
             }
+            // Check if there was a sample provided.
+            if (!string.IsNullOrEmpty(sampleId))
+            {
+                // Define the input.
+                Input = new InputModel
+                {
+                    Name = sample.Name,
+                    Description = sample.Description,
+                    IsPublic = !View.IsUserAuthenticated,
+                    Algorithm = sample.AnalysisAlgorithm.ToString(),
+                    NetworkData = sample.AnalysisNetworkData,
+                    SourceData = sample.AnalysisSourceData,
+                    SourceNodeCollectionData = sample.AnalysisSourceNodeCollectionData,
+                    TargetData = sample.AnalysisTargetData,
+                    TargetNodeCollectionData = sample.AnalysisTargetNodeCollectionData
+                };
+            }
             else
             {
                 // Define the input.
@@ -267,6 +299,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
             {
                 IsUserAuthenticated = user != null,
                 Algorithm = Input.Algorithm,
+                Samples = _context.Samples
+                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI")),
                 SourceNodeCollections = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),

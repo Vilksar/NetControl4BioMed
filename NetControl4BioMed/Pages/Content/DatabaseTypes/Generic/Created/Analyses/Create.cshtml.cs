@@ -95,9 +95,11 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
             public bool IsUserAuthenticated { get; set; }
 
             public string Algorithm { get; set; }
+
+            public IEnumerable<Sample> Samples { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string algorithm = null, string analysisId = null)
+        public async Task<IActionResult> OnGetAsync(string algorithm = null, string analysisId = null, string sampleId = null)
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
@@ -139,8 +141,21 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
             View = new ViewModel
             {
                 IsUserAuthenticated = user != null,
-                Algorithm = algorithm
+                Algorithm = algorithm,
+                Samples = _context.Samples
+                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
             };
+            // Try to get the sample with the provided ID.
+            var sample = View.Samples?
+                .FirstOrDefault(item => item.Id == sampleId);
+            // Check if there was an ID provided, but there was no sample found.
+            if (!string.IsNullOrEmpty(sampleId) && sample == null)
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: No sample could be found with the provided ID.";
+                // Redirect to the index page.
+                return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Analyses/Index");
+            }
             // Check if there was an analysis provided.
             if (!string.IsNullOrEmpty(analysisId))
             {
@@ -181,6 +196,21 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
                         .FirstOrDefault(),
                     GreedyAlgorithmParameters = algorithm == AnalysisAlgorithm.Greedy.ToString() ? JsonSerializer.Deserialize<Algorithms.Analyses.Greedy.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : null,
                     GeneticAlgorithmParameters = algorithm == AnalysisAlgorithm.Genetic.ToString() ? JsonSerializer.Deserialize<Algorithms.Analyses.Genetic.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : null
+                };
+            }
+            // Check if there was a sample provided.
+            if (!string.IsNullOrEmpty(sampleId))
+            {
+                // Define the input.
+                Input = new InputModel
+                {
+                    Name = sample.Name,
+                    Description = sample.Description,
+                    IsPublic = !View.IsUserAuthenticated,
+                    Algorithm = sample.AnalysisAlgorithm.ToString(),
+                    NetworkData = sample.AnalysisNetworkData,
+                    SourceData = sample.AnalysisSourceData,
+                    TargetData = sample.AnalysisTargetData
                 };
             }
             else
@@ -232,7 +262,9 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
             View = new ViewModel
             {
                 IsUserAuthenticated = user != null,
-                Algorithm = Input.Algorithm
+                Algorithm = Input.Algorithm,
+                Samples = _context.Samples
+                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
             };
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
