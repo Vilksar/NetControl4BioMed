@@ -71,14 +71,21 @@ namespace NetControl4BioMed.Pages.Administration.Data.Samples
                         Id = "ID",
                         Name = "Name",
                         Description = "Description",
-                        Data = "Data",
-                        SampleTypes = new List<SampleTypeInputModel>
-                        {
-                            new SampleTypeInputModel
-                            {
-                                Type = "Type"
-                            }
-                        },
+                        NetworkName = "Name",
+                        NetworkDescription = "Description",
+                        NetworkAlgorithm = "Algorithm",
+                        NetworkNodeDatabaseData = "IDs of node databases",
+                        NetworkEdgeDatabaseData = "IDs of edge databases",
+                        NetworkSeedData = "Seed data",
+                        NetworkSeedNodeCollectionData = "IDs of seed node collections",
+                        AnalysisName = "Name",
+                        AnalysisDescription = "Description",
+                        AnalysisAlgorithm = "Algorithm",
+                        AnalysisNetworkData = "IDs of networks",
+                        AnalysisSourceData = "Source data",
+                        AnalysisSourceNodeCollectionData = "IDs of source node collections",
+                        AnalysisTargetData = "Target data",
+                        AnalysisTargetNodeCollectionData = "IDs of target node collections",
                         SampleDatabases = new List<SampleDatabaseInputModel>
                         {
                             new SampleDatabaseInputModel
@@ -103,11 +110,21 @@ namespace NetControl4BioMed.Pages.Administration.Data.Samples
                 Id = item.Id,
                 Name = item.Name,
                 Description = item.Description,
-                Data = item.Data,
-                SampleTypes = item.SampleTypes.Select(item1 => new SampleTypeInputModel
-                {
-                   Type = item1.Type.ToString() 
-                }),
+                NetworkName = item.NetworkName,
+                NetworkDescription = item.Description,
+                NetworkAlgorithm = item.NetworkAlgorithm.ToString(),
+                NetworkNodeDatabaseData = item.NetworkNodeDatabaseData,
+                NetworkEdgeDatabaseData = item.NetworkEdgeDatabaseData,
+                NetworkSeedData = item.NetworkSeedData,
+                NetworkSeedNodeCollectionData = item.NetworkSeedNodeCollectionData,
+                AnalysisName = item.NetworkName,
+                AnalysisDescription = item.Description,
+                AnalysisAlgorithm = item.AnalysisAlgorithm.ToString(),
+                AnalysisNetworkData = item.AnalysisNetworkData,
+                AnalysisSourceData = item.AnalysisSourceData,
+                AnalysisSourceNodeCollectionData = item.AnalysisSourceNodeCollectionData,
+                AnalysisTargetData = item.AnalysisTargetData,
+                AnalysisTargetNodeCollectionData = item.AnalysisTargetNodeCollectionData,
                 SampleDatabases = item.SampleDatabases.Select(item1 => new SampleDatabaseInputModel
                 {
                     Database = new DatabaseInputModel
@@ -144,14 +161,21 @@ namespace NetControl4BioMed.Pages.Administration.Data.Samples
                         Id = "ID",
                         Name = "Name",
                         Description = "Description",
-                        Data = "Data",
-                        SampleTypes = new List<SampleTypeInputModel>
-                        {
-                            new SampleTypeInputModel
-                            {
-                                Type = "Type"
-                            }
-                        },
+                        NetworkName = "Name",
+                        NetworkDescription = "Description",
+                        NetworkAlgorithm = "Algorithm",
+                        NetworkNodeDatabaseData = "IDs of node databases",
+                        NetworkEdgeDatabaseData = "IDs of edge databases",
+                        NetworkSeedData = "Seed data",
+                        NetworkSeedNodeCollectionData = "IDs of seed node collections",
+                        AnalysisName = "Name",
+                        AnalysisDescription = "Description",
+                        AnalysisAlgorithm = "Algorithm",
+                        AnalysisNetworkData = "IDs of networks",
+                        AnalysisSourceData = "Source data",
+                        AnalysisSourceNodeCollectionData = "IDs of source node collections",
+                        AnalysisTargetData = "Target data",
+                        AnalysisTargetNodeCollectionData = "IDs of target node collections",
                         SampleDatabases = new List<SampleDatabaseInputModel>
                         {
                             new SampleDatabaseInputModel

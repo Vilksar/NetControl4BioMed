@@ -445,14 +445,27 @@ namespace NetControl4BioMed.Pages.Administration
                             DateTimeCreated = item.DateTimeCreated,
                             Name = item.Name,
                             Description = item.Description,
-                            Data = item.Data,
-                            SampleTypes = item.SampleTypes
-                                .Select(item => new
+                            NetworkName = item.NetworkName,
+                            NetworkDescription = item.Description,
+                            NetworkAlgorithm = item.NetworkAlgorithm.ToString(),
+                            NetworkNodeDatabaseData = item.NetworkNodeDatabaseData,
+                            NetworkEdgeDatabaseData = item.NetworkEdgeDatabaseData,
+                            NetworkSeedData = item.NetworkSeedData,
+                            NetworkSeedNodeCollectionData = item.NetworkSeedNodeCollectionData,
+                            AnalysisName = item.NetworkName,
+                            AnalysisDescription = item.Description,
+                            AnalysisAlgorithm = item.AnalysisAlgorithm.ToString(),
+                            AnalysisNetworkData = item.AnalysisNetworkData,
+                            AnalysisSourceData = item.AnalysisSourceData,
+                            AnalysisSourceNodeCollectionData = item.AnalysisSourceNodeCollectionData,
+                            AnalysisTargetData = item.AnalysisTargetData,
+                            AnalysisTargetNodeCollectionData = item.AnalysisTargetNodeCollectionData,
+                            SampleDatabases = item.SampleDatabases
+                                .Select(item1 => new
                                 {
-                                    Id = item.Type.ToString(),
-                                    Name = item.Type.GetDisplayName(),
-                                    Description = item.Type.GetDisplayDescription()
-                                })
+                                    Id = item1.Database.Id,
+                                    Name = item1.Database.Name
+                            })
                         })
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.
@@ -831,7 +844,7 @@ namespace NetControl4BioMed.Pages.Administration
                 {
                     // Get the required data.
                     var data = _context.Samples
-                        .Where(item => !item.SampleTypes.Any() || !item.SampleDatabases.Any())
+                        .Where(item => !item.SampleDatabases.Any())
                         .Select(item => item.Id)
                         .AsNoTracking();
                     // Create a new entry in the archive and open it.

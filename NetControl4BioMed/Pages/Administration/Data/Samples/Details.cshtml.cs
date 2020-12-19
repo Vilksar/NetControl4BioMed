@@ -29,8 +29,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.Samples
         {
             public Sample Sample { get; set; }
 
-            public int TypeCount { get; set; }
-
             public int DatabaseCount { get; set; }
         }
 
@@ -52,10 +50,6 @@ namespace NetControl4BioMed.Pages.Administration.Data.Samples
             {
                 Sample = query
                     .FirstOrDefault(),
-                TypeCount = query
-                    .Select(item => item.SampleTypes)
-                    .Distinct()
-                    .Count(),
                 DatabaseCount = query
                     .Select(item => item.SampleDatabases)
                     .SelectMany(item => item)
