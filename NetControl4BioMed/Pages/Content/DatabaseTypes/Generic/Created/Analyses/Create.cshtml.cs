@@ -199,7 +199,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
                 };
             }
             // Check if there was a sample provided.
-            if (!string.IsNullOrEmpty(sampleId))
+            else if (!string.IsNullOrEmpty(sampleId))
             {
                 // Define the input.
                 Input = new InputModel
@@ -210,7 +210,11 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
                     Algorithm = sample.AnalysisAlgorithm.ToString(),
                     NetworkData = sample.AnalysisNetworkData,
                     SourceData = sample.AnalysisSourceData,
-                    TargetData = sample.AnalysisTargetData
+                    TargetData = sample.AnalysisTargetData,
+                    MaximumIterations = 100,
+                    MaximumIterationsWithoutImprovement = 25,
+                    GreedyAlgorithmParameters = View.Algorithm == AnalysisAlgorithm.Greedy.ToString() ? new Algorithms.Analyses.Greedy.Parameters() : null,
+                    GeneticAlgorithmParameters = View.Algorithm == AnalysisAlgorithm.Genetic.ToString() ? new Algorithms.Analyses.Genetic.Parameters() : null
                 };
             }
             else

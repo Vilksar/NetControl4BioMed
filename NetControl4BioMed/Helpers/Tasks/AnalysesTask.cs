@@ -247,9 +247,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no edge analysis databases found.", showExceptionItem, batchItem);
                     }
-                    // Get the node databases.
-                    var nodeDatabases = nodeAnalysisDatabases
-                        .Select(item => item.Database);
+                    // Get the node database IDs.
+                    var nodeDatabaseIds = nodeAnalysisDatabases
+                        .Select(item => item.DatabaseId);
                     // Get the analysis node collections.
                     var analysisNodeCollections = batchItem.AnalysisNodeCollections != null ?
                         batchItem.AnalysisNodeCollections
@@ -258,7 +258,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Where(item => item.Type == "Source" || item.Type == "Target")
                             .Select(item => (item.NodeCollection.Id, item.Type))
                             .Distinct()
-                            .Where(item => nodeCollections.Any(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabases.Contains(item2.Database))))
+                            .Where(item => nodeCollections.Any(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabaseIds.Contains(item2.Database.Id))))
                             .Select(item => new AnalysisNodeCollection
                             {
                                 NodeCollectionId = item.Item1,
@@ -992,6 +992,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Continue.
                             continue;
                         }
+                        // Check if an error has been encountered.
+                        if (analysis.Status == AnalysisStatus.Error)
+                        {
+                            // Continue.
+                            continue;
+                        }
                         // Update the status of the item.
                         analysis.Status = AnalysisStatus.Scheduled;
                         // Add a message to the log.
@@ -1263,6 +1269,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .FirstOrDefault(item => item.Id == batchAnalysis.Id);
                         // Check if there was no item found.
                         if (analysis == null)
+                        {
+                            // Continue.
+                            continue;
+                        }
+                        // Check if an error has been encountered.
+                        if (analysis.Status == AnalysisStatus.Error)
                         {
                             // Continue.
                             continue;

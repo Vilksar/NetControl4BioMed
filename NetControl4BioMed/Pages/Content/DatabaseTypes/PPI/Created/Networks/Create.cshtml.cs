@@ -208,7 +208,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                 };
             }
             // Check if there was a sample provided.
-            if (!string.IsNullOrEmpty(sampleId))
+            else if (!string.IsNullOrEmpty(sampleId))
             {
                 // Define the input.
                 Input = new InputModel

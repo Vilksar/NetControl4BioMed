@@ -213,10 +213,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("The network databases found have different database types.", showExceptionItem, batchItem);
                     }
-                    // Get the node databases.
-                    var nodeDatabases = networkDatabases
+                    // Get the node database IDs.
+                    var nodeDatabaseIds = networkDatabases
                         .Where(item => item.Type == NetworkDatabaseType.Node)
-                        .Select(item => item.Database);
+                        .Select(item => item.DatabaseId);
                     // Get the network node collections.
                     var networkNodeCollections = batchItem.NetworkNodeCollections != null ?
                         batchItem.NetworkNodeCollections
@@ -225,7 +225,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Where(item => item.Type == "Seed")
                             .Select(item => (item.NodeCollection.Id, item.Type))
                             .Distinct()
-                            .Where(item => nodeCollections.Any(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabases.Contains(item2.Database))))
+                            .Where(item => nodeCollections.Any(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabaseIds.Contains(item2.Database.Id))))
                             .Select(item => new NetworkNodeCollection
                             {
                                 NodeCollectionId = item.Item1,
@@ -696,6 +696,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .FirstOrDefault(item => item.Id == batchNetwork.Id);
                         // Check if there was no item found.
                         if (network == null)
+                        {
+                            // Continue.
+                            continue;
+                        }
+                        // Check if an error has been encountered.
+                        if (network.Status == NetworkStatus.Error)
                         {
                             // Continue.
                             continue;
