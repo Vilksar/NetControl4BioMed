@@ -51,9 +51,11 @@ namespace NetControl4BioMed.Pages.Account.Manage.ExternalLogins
             {
                 CurrentLogins = await _userManager.GetLoginsAsync(user)
             };
+            // Get the providers of the current logins.
+            var currentLogins = View.CurrentLogins.Select(item => item.ProviderDisplayName);
             // Get the other available external logins that are not assigned to the user.
             View.OtherLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())
-                .Where(auth => View.CurrentLogins.All(cl => !string.Equals(auth, cl)));
+                .Where(item => !currentLogins.Contains(item.DisplayName));
             // If there is only one external login and there is no local account, then hide the "Remove" button.
             View.ShowRemoveButton = await _userManager.HasPasswordAsync(user) || View.CurrentLogins.Count() > 1;
             // Return the page.

@@ -40,14 +40,14 @@
                     </div>
                     @if (Model.View.ShowRemoveButton)
                     {
-                        <button type="submit" title="Remove this login from your account." class="btn btn-block btn-success">
+                        <button type="submit" title="Remove this login from your account." class="btn btn-block btn-success my-2">
                             <span><i class="fab fa-@login.ProviderDisplayName.ToLower()"></i></span>
                             <span>@login.ProviderDisplayName</span>
                         </button>
                     }
                     else
                     {
-                        <button type="submit" title="The login can't be removed, as you would be locked out of your account." class="btn btn-block btn-success" disabled>
+                        <button type="submit" title="The login can't be removed, as you would be locked out of your account." class="btn btn-block btn-success my-2" disabled>
                             <span><i class="fab fa-@login.ProviderDisplayName.ToLower()"></i></span>
                             <span>@login.ProviderDisplayName</span>
                         </button>
