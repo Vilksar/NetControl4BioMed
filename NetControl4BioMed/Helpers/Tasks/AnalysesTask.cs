@@ -673,6 +673,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 .Select(item => item.Id)
                                 .ToList();
                             networkIds = context.AnalysisNetworks
+                                .Where(item => item.Analysis == analysis)
                                 .Select(item => item.Network)
                                 .Distinct()
                                 .Select(item => item.Id)
