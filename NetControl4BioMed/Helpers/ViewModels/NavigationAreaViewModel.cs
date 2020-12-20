@@ -484,7 +484,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "DatabaseTypes",
-                    Title = "Types",
+                    Title = "Network types",
                     Description = string.Empty,
                     Icon = "fa-list",
                     Color = "success",
@@ -832,7 +832,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Data",
-                    Title = "Available data",
+                    Title = "Browse data",
                     Description = string.Empty,
                     Icon = "fa-table",
                     Color = "warning",

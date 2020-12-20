@@ -13,7 +13,7 @@
             <a asp-page="@navigationGroup.Link" asp-route-id="@Model.RouteId" class="list-group-item list-group-item-action list-group-item-@navigationGroup.Color @(activeArea == Model.Id && activeGroup == navigationGroup.Id && activePage == navigationGroup.Id ? "active" : string.Empty)" title="@navigationGroup.Description">
                 <div class="row">
                     <span class="col-2 text-center px-2"><i class="fas @navigationGroup.Icon"></i></span>
-                    <span class="col-8 text-left text-wrap px-2">@navigationGroup.Title</span>
+                    <span class="col-8 text-left text-wrap px-0">@navigationGroup.Title</span>
                 </div>
             </a>
         }
@@ -22,7 +22,7 @@
             <a asp-page="@navigationGroup.Link" class="list-group-item list-group-item-action list-group-item-@navigationGroup.Color @(activeArea == Model.Id && activeGroup == navigationGroup.Id ? "active" : string.Empty)" data-toggle="collapse" data-target="#navigation-area-@Model.Id.ToLower()-@navigationGroup.Id.ToLower()" title="@navigationGroup.Description">
                 <div class="row">
                     <span class="col-2 text-center px-2"><i class="fas @navigationGroup.Icon"></i></span>
-                    <span class="col-8 text-left text-wrap px-2">@navigationGroup.Title</span>
+                    <span class="col-8 text-left text-wrap px-0">@navigationGroup.Title</span>
                     <span class="col-2 text-center px-2"><i class="fas fa-angle-down"></i></span>
                 </div>
             </a>

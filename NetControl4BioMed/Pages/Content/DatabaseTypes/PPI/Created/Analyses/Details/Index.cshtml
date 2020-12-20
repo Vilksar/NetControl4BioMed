@@ -32,6 +32,15 @@
             </a>
         </div>
     }
+    @if (Model.View.Analysis.Status == AnalysisStatus.Stopped || Model.View.Analysis.Status == AnalysisStatus.Completed)
+    {
+        <div class="col-lg mb-3">
+            <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Details/Created/ControlPaths/Index" asp-route-id="@Model.View.Analysis.Id" class="btn btn-success btn-block" title="View">
+                <span><i class="fas fa-microscope"></i></span>
+                <span>View</span>
+            </a>
+        </div>
+    }
     <div class="col-lg mb-3">
         <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Edit" asp-route-id="@Model.View.Analysis.Id" class="btn btn-warning btn-block" title="Edit">
             <span><i class="fas fa-pencil-alt"></i></span>

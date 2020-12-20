@@ -80,6 +80,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses.Det
                 PathNodes = items
                     .Select(item => item.PathNodes)
                     .SelectMany(item => item)
+                    .Where(item => item.Type == PathNodeType.None)
                     .Include(item => item.Node)
                     .OrderBy(item => item.Index),
                 PathEdges = items

@@ -1,5 +1,6 @@
 ﻿@page
 @model IndexModel
+@using NetControl4BioMed.Data.Enumerations
 @{
     ViewData["Title"] = "Overview";
 }
@@ -24,7 +25,7 @@
             </div>
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no analyses associated with your account, as you are not logged in. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Create" class="alert-link">here</a> to create a new generic analysis, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Create" class="alert-link">here</a> to create a new PPI analysis.</span>
+                <span>There are no analyses associated with your account, as you are not logged in. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Create" asp-route-algorithm="@AnalysisAlgorithm.Greedy.ToString()" class="alert-link">here</a> to create a new generic analysis, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Create" asp-route-algorithm="@AnalysisAlgorithm.Greedy.ToString()" class="alert-link">here</a> to create a new PPI analysis.</span>
             </div>
         }
         else

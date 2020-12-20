@@ -24,10 +24,10 @@
                 <a href="#introduction">Introduction</a>
             </li>
             <li class="">
-                <a href="#tutorial-generic">Tutorial on generic data</a>
+                <a href="#tutorial-ppi">Tutorial on PPI data</a>
             </li>
             <li class="">
-                <a href="#tutorial-ppi">Tutorial on PPI data</a>
+                <a href="#tutorial-generic">Tutorial on generic data</a>
             </li>
             <li class="">
                 <a href="#acknowledgements">Acknowledgements</a>
@@ -39,203 +39,43 @@
             <span>Introduction</span>
         </div>
         <div class="mb-1">
-            <span><a asp-page="/Index">NetControl4BioMed</a> is a web application which aims to solve the network target controllability problem. It was created using <a href="https://dotnet.microsoft.com/" target="_blank" rel="nofollow noopener noreferrer">.NET Core</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
-        </div>
-    </div>
-    <div id="tutorial-generic" class="mb-3">
-        <div class="font-weight-bold mb-2">
-            <span>Tutorial on generic data</span>
-        </div>
-        <div class="mb-1">
-            <span>This is a short tutorial to get started with uploading a generic network and analyzing it. A generic network represents a network of no specific type. In this tutorial, we will upload and analyze a small randomly-generated generic network. In order to upload it, you need to provide a list of edges in the network. From the main <a asp-page="/Content/Index">content page</a> you can navigate to the <a asp-page="/Content/DatabaseTypes/Generic/Index">generic area</a> of the application.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-area.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Navigating to the generic area.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-0">
-            <span>You can start the creation process network by navigating to the <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Index">generic networks</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the network creation page.</span>
-        </div>
-        <div class="mb-1">
-            <span>You first need to assign a name to the network. It does not need to be unique, as a unique identifier will be assigned to it upon creation, but it's recommended to give each network a name that represents it. Furthermore, you can also add a fitting description, although it is not required.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-network-details.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Inputting the details for the generic network.</figcaption>
-            </figure>
+            <div class="mb-0">
+                <span>The application offers two related services: (i) creating an interaction network based on a set of seeds uploaded by the user, and (ii) running target controllability analyses on networks (either created in our application or uploaded by the user).</span>
+            </div>
+            <div class="mb-0">
+                <span>(i) Creating an interaction network. The input data is a set of (seed) genes around which the interaction network will be built. The genes can be uploaded through their IDs, with the formats including those of Hugo, Uniprot, Ensembl, and InnateDB. The user also selects how to generate the interactions between these seeds by indicating the number of intermediate genes allowed in such interactions (the gap parameter).</span>
+            </div>
+            <div class="mb-0">
+                <span>(ii) Creating a target controllability analysis. The input data consists of the following: </span>
+            </div>
+            <ul class="mb-0">
+                <li>
+                    <span>An interaction network. If the network has been created in our application, the user writes its ID. Alternatively, the user can upload a network through its list of edges.</span>
+                </li>
+                <li>
+                    <span>A set of control target nodes. The user can upload a list of genes or can select one of the lists available in the application (e.g., lists of survivability-essential genes for many cancer cell-lines).</span>
+                </li>
+                <li>
+                    <span>A set of preferred input nodes: The user can upload a list of genes, can select one of the lists available in the application (e.g., the list of targets of all FDA-approved drugs), or can leave the list empty.</span>
+                </li>
+                <li>
+                    <span>The parameter values of the search algorithm can be customized.</span>
+                </li>
+            </ul>
         </div>
         <div class="mb-1">
-            <span>If you are logged in, you have the possibility to make the network private (meaning that only you and the people you manually assign to it will have access to it) or public (anyone with its link or unique identifier, can access it). Unregistered users can only create public networks.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-network-availability.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Setting the availability for the generic network.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>The only input that is required for a generic network is the list of edges. Each edge should contain exactly two nodes, separated by an "in-line separator" (by default, ";"). Two consecutive edges should be separated by a "line separator" (by default, "new line"). Both separators can be configured, and the number of provided edges will be updated automatically as you type.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-network-seed-data.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Inputting the seed data for the generic network.</figcaption>
-            </figure>
+            <div class="mb-0">
+                <span>The two services of the application offer the following output:</span>
+            </div>
+            <div class="mb-0">
+                <span>(i) An interaction network created around the seeds offered by the user. The basic data of the network can be seen in the app (number of nodes and edges, simple visualization for small networks). The networks can be downloaded in JSON, Cytoscape, Excel, and comma-separated value formats.</span>
+            </div>
+            <div class="mb-0">
+                <span>(ii) A control analysis: the number of input nodes controlling the targets, the list of input nodes, and the control pathways. The control pathways are constructed to maximize the use of user-preferred input nodes (such as targets of FDA-approved drugs).</span>
+            </div>
         </div>
         <div class="mb-1">
-            <span>Once all of the inputs have been successfully filled in, you can click the "Create" button.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-network-create.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Submitting the data to create the generic network.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>An error will immediately be returned if any of the provided data is missing and you will be prompted to change the corresponding inputs. Otherwise, the network will be defined and you will be redirected to its corresponding page. The next step is the actual network generation, which will be performed automatically in the background.</span>
-        </div>
-        <div class="mb-1">
-            <span>You can check the current status of the network at all times. If an error occurs during the generation, it will be shown in the message log, at the bottom of the page. Otherwise, the network was successfully generated and can now be checked, shared and used in analyses!</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-network-status.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Checking the completed generic network.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>The completed network can be downloaded in a variety of formats for offline processing and visualization (for example, using <a href="https://cytoscape.org/" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span class=""><i class="fas fa-external-link-alt"></i></span>). Additionally, if the network is relatively small (for performance reasons, under @NetControl4BioMed.Helpers.Extensions.NetworkExtensions.MaximumSizeForVisualization nodes), it can also be visualized in the browser. However, this can quickly become overwhelming even for smaller networks.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-network-visualization.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Visualizing the generic network in-browser.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>Once the network is ready, you can move on to analyzing it. Please note that creating a network (or having access to one) is required in order to create an analysis!</span>
-        </div>
-        <div class="mb-1">
-            <span>Please note that creating a network (or having access to one) is required in order to create an analysis!</span>
-        </div>
-        <div class="mb-0">
-            <span>Once a network has been generated, you can start its analysis by navigating to the <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Index">Analyses</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the analysis creation page. Here, you might have to select the algorithm to be used:</span>
-        </div>
-        <ul class="mb-1">
-            <li class="">
-                <span><span class="font-italic">Greedy</span>, which uses a greedy algorithm based on the algorithm described <a href="http://dx.doi.org/10.1109/TCBB.2018.2797271" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span> in order to identify the control nodes.</span>
-            </li>
-            @*<li class="">
-                <span><span class="font-italic">Genetic</span>, which uses a genetic algorithm based on the algorithm described <a href="" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span> in order to identify the control nodes.</span>
-            </li>*@
-        </ul>
-        <div class="mb-1">
-            <span>Similar as for a network, you first need to assign a name to the analysis. It does not need to be unique, as a unique identifier will be assigned to it upon creation, but it's recommended to give each analysis a name that represents it. Furthermore, you can also add a fitting description, although it is not required.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-analysis-details.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Inputting the details for the generic analysis.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>If you are logged in, you have the possibility to make the analysis private (meaning that only you and the people you manually assign to it will have access to it) or public (anyone with its link or unique identifier, can access it). Unregistered users can only create public analyses.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-analysis-availability.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Setting the availability for the generic analysis.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>First, you need to provide the unique identifiers of the networks which will be used by the analysis. If more than one network is provided, then a combined network will be generated, containing every interaction of each network (however, in the case of generic networks, each is a separate entity, so the combined network will just contain separate connected components). You need to have access to the specified networks, in order to use them in an analysis. In this particular case, you should use the ID of the freshly constructed generic network.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-analysis-network-data.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Inputting the network data for the generic analysis.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>Optionally, you can provide a set of source nodes to be used by the analysis. The source nodes represent nodes which are more likely to be chosen as controlling nodes. Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-analysis-source-data.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Inputting the source data for the generic analysis.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>The actual way in which the provided source nodes will influence the analysis can be configured within the algorithm parameters. All source nodes that can not be found in the combined network will be ignored.</span>
-        </div>
-        <div class="mb-1">
-            <span>Next, you need to provide the set of target nodes to be used by the analysis. The target proteins represent the nodes which you want to control. Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-analysis-target-data.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Inputting the target data for the generic analysis.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>All target nodes that can not be found in the combined network will be ignored.</span>
-        </div>
-        <div class="mb-1">
-            <span>Lastly, the required parameters change depending on the type of the algorithm. The details of each parameter are provided on the analysis creation page.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-analysis-parameters.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Inputting the parameters for the generic analysis algorithm.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>Once all of the inputs have been successfully filled in, you can click the "Create" button.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-analysis-create.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Submitting the data to create the generic analysis.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>An error will immediately be returned if any of the provided data is missing and you will be prompted to change the corresponding inputs. Otherwise, the analysis will be defined and you will be redirected to its corresponding page. The next step is the generation of the combined network corresponding to the analysis, which will be performed automatically in the background.</span>
-        </div>
-        <div class="mb-1">
-            <span>You can check the current status of the analysis at all times. If an error occurs during its generation or its run, it will be shown in the message log, at the bottom of the page. Otherwise, the analysis was successfully generated and will be automatically started. You can track its progress on the corresponding page, and stop it at any time. Once the analysis has ended, its output can be viewed, checked and shared!</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-analysis-status.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Checking the completed generic analysis.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>The completed analysis and its output can be downloaded in a variety of formats for offline processing and visualization (for example, using <a href="https://cytoscape.org/" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span class=""><i class="fas fa-external-link-alt"></i></span>). Additionally, if its corresponding network is relatively small (for performance reasons, under @NetControl4BioMed.Helpers.Extensions.AnalysisExtensions.MaximumSizeForVisualization nodes), it can also be visualized in the browser. However, this can quickly become overwhelming even for smaller networks.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-analysis-visualization.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Visualizing the generic analysis in-browser.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1">
-            <span>As output, the analysis returns one or more sets of controlling nodes which are able to control all of the provided target nodes. These controlling sets can be separately inspected, visualized and downloaded.</span>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-analysis-control-path.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Checking a control path returned by the generic analysis.</figcaption>
-            </figure>
-        </div>
-        <div class="mb-1 text-center">
-            <figure class="figure">
-                <img src="~/img/screenshots/generic-analysis-control-path-visualization.png" class="figure-img border p-2 m-2 rounded" />
-                <figcaption class="figure-caption">Visualizing a control path returned by the generic analysis.</figcaption>
-            </figure>
+            <span>An interaction network is constructed by mining interactions between the seed nodes, using data from Omnipath, InnateDB, and SIGNOR. The control analysis method is based on the directed target controllability algorithm presented <a href="https://doi.org/10.1007/978-3-319-45177-0_5" target="_blank" rel="nofollow noopener noreferrer">here</a> <span><i class="fas fa-external-link-alt"></i></span> and demonstrated in <a href="https://doi.org/10.1038/s41598-017-10491-y" target="_blank" rel="nofollow noopener noreferrer">here</a> <span><i class="fas fa-external-link-alt"></i></span>, replacing the first implementation of the application, described <a href="https://doi.org/10.1186/s12859-018-2177-3" target="_blank" rel="nofollow noopener noreferrer">here</a> <span><i class="fas fa-external-link-alt"></i></span>. The new version offers greatly improved performance, allowing the processing of larger networks, it expands on the datasets available to build and analyze interaction networks, and it offers support for collaboration through sharing networks and analyses.</span>
         </div>
     </div>
     <div id="tutorial-ppi" class="mb-3">
@@ -243,7 +83,7 @@
             <span>Tutorial on PPI data</span>
         </div>
         <div class="mb-1">
-            <span>This is a short tutorial to get started with constructing a PPI (protein-protein interaction) network and analyzing it. In this tutorial, as a study case, we will construct a PPI network around the proteins of importance to the breast cancer cell-line HCC1500 (namely, the proteins corresponding to the mutated and the essential genes in the cell-line), which we will then analyze by identifying drug-targettable controlling proteins and their control paths to the proteins corresponding to the essential genes. Unlike in the case of generic networks, here you will need to provide a list of seed proteins, around which the application will generate the actual network. In order to upload it, you need to provide a list of edges in the network. The steps are mostly similar to the ones described above, however some additional input will be required, such as the databases in which to look up the interactions. From the main <a asp-page="/Content/Index">content page</a> you can navigate to the <a asp-page="/Content/DatabaseTypes/PPI/Index">PPI area</a> of the application.</span>
+            <span>This is a short tutorial to get started with constructing a PPI (protein-protein interaction) network and analyzing it. In this tutorial, as a study case, we will construct a PPI network around the proteins of importance to the breast cancer cell-line HCC1500 (namely, the proteins corresponding to the mutated and the essential genes in the cell-line), which we will then analyze by identifying drug-targettable controlling proteins and their control paths to the proteins corresponding to the essential genes. Unlike in the case of generic networks, here you will need to provide a list of seed proteins, around which the application will generate the actual network. In order to upload it, you need to provide a list of edges in the network. The steps are mostly similar to the ones described above, however some additional input will be required, such as the databases in which to look up the interactions. From the main <a asp-page="/Content/Index" target="_blank" rel="nofollow noopener noreferrer">content page</a> you can navigate to the <a asp-page="/Content/DatabaseTypes/PPI/Index" target="_blank" rel="nofollow noopener noreferrer">PPI area</a> of the application.</span>
         </div>
         <div class="mb-1 text-center">
             <figure class="figure">
@@ -251,8 +91,8 @@
                 <figcaption class="figure-caption">Navigating to the PPI area.</figcaption>
             </figure>
         </div>
-        <div class="mb-0">
-            <span>You can start the creation process network by navigating to the <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Index">generic networks</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the network creation page.</span>
+        <div class="mb-1">
+            <span>You can start the creation process network by navigating to the <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Index" target="_blank" rel="nofollow noopener noreferrer">generic networks</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the network creation page.</span>
         </div>
         <div class="mb-1">
             <span>You first need to assign a name to the network. It does not need to be unique, as a unique identifier will be assigned to it upon creation, but it's recommended to give each network a name that represents it. Furthermore, you can also add a fitting description, although it is not required.</span>
@@ -372,17 +212,9 @@
         <div class="mb-1">
             <span>Please note that creating a network (or having access to one) is required in order to create an analysis!</span>
         </div>
-        <div class="mb-0">
-            <span>Once a network has been generated, you can start its analysis by navigating to the <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Index">Analyses</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the network creation page. Here, you might have to select the algorithm to be used:</span>
+        <div class="mb-1">
+            <span>Once a network has been generated, you can start its analysis by navigating to the <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Index" target="_blank" rel="nofollow noopener noreferrer">Analyses</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the network creation page. The control analysis uses the greedy algorithm described <a href="https://doi.org/10.1109/TCBB.2018.2797271" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
         </div>
-        <ul class="mb-1">
-            <li class="">
-                <span><span class="font-italic">Greedy</span>, which uses a greedy algorithm based on the algorithm described <a href="http://dx.doi.org/10.1109/TCBB.2018.2797271" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span> in order to identify the control proteins.</span>
-            </li>
-            @*<li class="">
-                <span><span class="font-italic">Genetic</span>, which uses a genetic algorithm based on the algorithm described <a href="" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span> in order to identify the control proteins.</span>
-            </li>*@
-        </ul>
         <div class="mb-1">
             <span>Similar as for a network, you first need to assign a name to the analysis. It does not need to be unique, as a unique identifier will be assigned to it upon creation, but it's recommended to give each analysis a name that represents it. Furthermore, you can also add a fitting description, although it is not required.</span>
         </div>
@@ -508,6 +340,194 @@
         </div>
         <div class="mb-1">
             <span>Furthermore, you can view more details about each of the controlling proteins (or about each of the proteins in the control path). For example, you can check the data of the returned protein which controls the most target proteins, to see if there already exists a drug targetting it.</span>
+        </div>
+    </div>
+    <div id="tutorial-generic" class="mb-3">
+        <div class="font-weight-bold mb-2">
+            <span>Tutorial on generic data</span>
+        </div>
+        <div class="mb-1">
+            <span>This is a short tutorial to get started with uploading a generic network and analyzing it. A generic network represents a network of no specific type. In this tutorial, we will upload and analyze a small randomly-generated generic network. In order to upload it, you need to provide a list of edges in the network. From the main <a asp-page="/Content/Index" target="_blank" rel="nofollow noopener noreferrer">content page</a> you can navigate to the <a asp-page="/Content/DatabaseTypes/Generic/Index" target="_blank" rel="nofollow noopener noreferrer">generic area</a> of the application.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-area.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Navigating to the generic area.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>You can start the creation process network by navigating to the <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Index" target="_blank" rel="nofollow noopener noreferrer">generic networks</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the network creation page.</span>
+        </div>
+        <div class="mb-1">
+            <span>You first need to assign a name to the network. It does not need to be unique, as a unique identifier will be assigned to it upon creation, but it's recommended to give each network a name that represents it. Furthermore, you can also add a fitting description, although it is not required.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-network-details.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the details for the generic network.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>If you are logged in, you have the possibility to make the network private (meaning that only you and the people you manually assign to it will have access to it) or public (anyone with its link or unique identifier, can access it). Unregistered users can only create public networks.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-network-availability.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Setting the availability for the generic network.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>The only input that is required for a generic network is the list of edges. Each edge should contain exactly two nodes, separated by an "in-line separator" (by default, ";"). Two consecutive edges should be separated by a "line separator" (by default, "new line"). Both separators can be configured, and the number of provided edges will be updated automatically as you type.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-network-seed-data.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the seed data for the generic network.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>Once all of the inputs have been successfully filled in, you can click the "Create" button.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-network-create.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Submitting the data to create the generic network.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>An error will immediately be returned if any of the provided data is missing and you will be prompted to change the corresponding inputs. Otherwise, the network will be defined and you will be redirected to its corresponding page. The next step is the actual network generation, which will be performed automatically in the background.</span>
+        </div>
+        <div class="mb-1">
+            <span>You can check the current status of the network at all times. If an error occurs during the generation, it will be shown in the message log, at the bottom of the page. Otherwise, the network was successfully generated and can now be checked, shared and used in analyses!</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-network-status.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Checking the completed generic network.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>The completed network can be downloaded in a variety of formats for offline processing and visualization (for example, using <a href="https://cytoscape.org/" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span class=""><i class="fas fa-external-link-alt"></i></span>). Additionally, if the network is relatively small (for performance reasons, under @NetControl4BioMed.Helpers.Extensions.NetworkExtensions.MaximumSizeForVisualization nodes), it can also be visualized in the browser. However, this can quickly become overwhelming even for smaller networks.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-network-visualization.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Visualizing the generic network in-browser.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>Once the network is ready, you can move on to analyzing it. Please note that creating a network (or having access to one) is required in order to create an analysis!</span>
+        </div>
+        <div class="mb-1">
+            <span>Please note that creating a network (or having access to one) is required in order to create an analysis!</span>
+        </div>
+        <div class="mb-1">
+            <span>Once a network has been generated, you can start its analysis by navigating to the <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Index" target="_blank" rel="nofollow noopener noreferrer">Analyses</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the analysis creation page. The control analysis uses the greedy algorithm described <a href="https://doi.org/10.1109/TCBB.2018.2797271" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+        </div>
+        <div class="mb-1">
+            <span>Similar as for a network, you first need to assign a name to the analysis. It does not need to be unique, as a unique identifier will be assigned to it upon creation, but it's recommended to give each analysis a name that represents it. Furthermore, you can also add a fitting description, although it is not required.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-analysis-details.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the details for the generic analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>If you are logged in, you have the possibility to make the analysis private (meaning that only you and the people you manually assign to it will have access to it) or public (anyone with its link or unique identifier, can access it). Unregistered users can only create public analyses.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-analysis-availability.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Setting the availability for the generic analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>First, you need to provide the unique identifiers of the networks which will be used by the analysis. If more than one network is provided, then a combined network will be generated, containing every interaction of each network (however, in the case of generic networks, each is a separate entity, so the combined network will just contain separate connected components). You need to have access to the specified networks, in order to use them in an analysis. In this particular case, you should use the ID of the freshly constructed generic network.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-analysis-network-data.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the network data for the generic analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>Optionally, you can provide a set of source nodes to be used by the analysis. The source nodes represent nodes which are more likely to be chosen as controlling nodes. Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-analysis-source-data.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the source data for the generic analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>The actual way in which the provided source nodes will influence the analysis can be configured within the algorithm parameters. All source nodes that can not be found in the combined network will be ignored.</span>
+        </div>
+        <div class="mb-1">
+            <span>Next, you need to provide the set of target nodes to be used by the analysis. The target proteins represent the nodes which you want to control. Two consecutive nodes should be separated by a "line separator" (by default, "new line"). The separator can be configured, and the number of provided nodes will be updated automatically as you type.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-analysis-target-data.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the target data for the generic analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>All target nodes that can not be found in the combined network will be ignored.</span>
+        </div>
+        <div class="mb-1">
+            <span>Lastly, the required parameters change depending on the type of the algorithm. The details of each parameter are provided on the analysis creation page.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-analysis-parameters.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the parameters for the generic analysis algorithm.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>Once all of the inputs have been successfully filled in, you can click the "Create" button.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-analysis-create.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Submitting the data to create the generic analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>An error will immediately be returned if any of the provided data is missing and you will be prompted to change the corresponding inputs. Otherwise, the analysis will be defined and you will be redirected to its corresponding page. The next step is the generation of the combined network corresponding to the analysis, which will be performed automatically in the background.</span>
+        </div>
+        <div class="mb-1">
+            <span>You can check the current status of the analysis at all times. If an error occurs during its generation or its run, it will be shown in the message log, at the bottom of the page. Otherwise, the analysis was successfully generated and will be automatically started. You can track its progress on the corresponding page, and stop it at any time. Once the analysis has ended, its output can be viewed, checked and shared!</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-analysis-status.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Checking the completed generic analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>The completed analysis and its output can be downloaded in a variety of formats for offline processing and visualization (for example, using <a href="https://cytoscape.org/" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span class=""><i class="fas fa-external-link-alt"></i></span>). Additionally, if its corresponding network is relatively small (for performance reasons, under @NetControl4BioMed.Helpers.Extensions.AnalysisExtensions.MaximumSizeForVisualization nodes), it can also be visualized in the browser. However, this can quickly become overwhelming even for smaller networks.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-analysis-visualization.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Visualizing the generic analysis in-browser.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>As output, the analysis returns one or more sets of controlling nodes which are able to control all of the provided target nodes. These controlling sets can be separately inspected, visualized and downloaded.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-analysis-control-path.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Checking a control path returned by the generic analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/generic-analysis-control-path-visualization.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Visualizing a control path returned by the generic analysis.</figcaption>
+            </figure>
         </div>
     </div>
     <div id="acknowledgements" class="mb-3">
