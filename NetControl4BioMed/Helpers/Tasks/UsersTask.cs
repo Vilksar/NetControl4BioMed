@@ -171,19 +171,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Try to create the new user.
                             result = result.Succeeded ? await userManager.CreateAsync(user, password) : result;
                         }
-                        else if (batchItem.Type == "External")
-                        {
-                            // Try to get the passsord from the data.
-                            if (!batchItem.Data.TryDeserializeJsonObject<ExternalLoginInfo>(out var info))
-                            {
-                                // Throw an exception.
-                                throw new TaskException("The provided data couldn't be deserialized.", showExceptionItem, batchItem);
-                            }
-                            // Try to create the new user.
-                            result = result.Succeeded ? await userManager.CreateAsync(user) : result;
-                            // Add the external login.
-                            result = result.Succeeded ? await userManager.AddLoginAsync(user, info) : result;
-                        }
                         else
                         {
                             // Throw an exception.

@@ -216,8 +216,7 @@ namespace NetControl4BioMed.Pages.Identity
                     new UserInputModel
                     {
                         Email = Input.Email,
-                        Type = "External",
-                        Data = JsonSerializer.Serialize(info)
+                        Type = "None"
                     }
                 }
             };
@@ -241,6 +240,16 @@ namespace NetControl4BioMed.Pages.Identity
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "An error was encountered. Please try again.");
+                // Redisplay the page.
+                return Page();
+            }
+            // Add the external login.
+            var result = await _userManager.AddLoginAsync(user, info);
+            // Check if there wasn't any user found.
+            if (!result.Succeeded)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "Your account has been successfully created, but an error occured while trying to link it to the external provider (so you can't yet log in with it). You might have to create a password in order to be able to log in.");
                 // Redisplay the page.
                 return Page();
             }
