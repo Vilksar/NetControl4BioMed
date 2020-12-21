@@ -204,8 +204,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Analyses
                 // Define the input.
                 Input = new InputModel
                 {
-                    Name = sample.Name,
-                    Description = sample.Description,
+                    Name = sample.AnalysisName,
+                    Description = sample.AnalysisDescription,
                     IsPublic = !View.IsUserAuthenticated,
                     Algorithm = sample.AnalysisAlgorithm.ToString(),
                     NetworkData = sample.AnalysisNetworkData,

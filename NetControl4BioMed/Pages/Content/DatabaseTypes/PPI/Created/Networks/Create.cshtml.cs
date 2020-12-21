@@ -5,9 +5,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using DocumentFormat.OpenXml;
-using Hangfire;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -213,8 +210,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                 // Define the input.
                 Input = new InputModel
                 {
-                    Name = sample.Name,
-                    Description = sample.Description,
+                    Name = sample.NetworkName,
+                    Description = sample.NetworkDescription,
                     IsPublic = !View.IsUserAuthenticated,
                     Algorithm = sample.NetworkAlgorithm.ToString(),
                     NodeDatabaseData = sample.NetworkNodeDatabaseData,

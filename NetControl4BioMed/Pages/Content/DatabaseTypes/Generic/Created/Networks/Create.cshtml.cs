@@ -162,8 +162,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
                 // Define the input.
                 Input = new InputModel
                 {
-                    Name = sample.Name,
-                    Description = sample.Description,
+                    Name = sample.NetworkName,
+                    Description = sample.NetworkDescription,
                     IsPublic = !View.IsUserAuthenticated,
                     SeedData = sample.NetworkSeedData
                 };
