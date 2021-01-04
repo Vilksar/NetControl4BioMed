@@ -83,6 +83,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                     .Where(item => item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Target))
+                    .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -115,6 +116,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                     .Where(item => item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Target))
+                    .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())

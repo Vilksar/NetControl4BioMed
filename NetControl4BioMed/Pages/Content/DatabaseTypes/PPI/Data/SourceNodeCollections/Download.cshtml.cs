@@ -84,6 +84,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.SourceNodeColle
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                     .Where(item => item.NodeCollectionNodes.Any(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
                     .Where(item => item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Source))
+                    .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -117,6 +118,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.SourceNodeColle
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                     .Where(item => item.NodeCollectionNodes.Any(item1 => item1.Node.DatabaseNodes.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
                     .Where(item => item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Source))
+                    .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
