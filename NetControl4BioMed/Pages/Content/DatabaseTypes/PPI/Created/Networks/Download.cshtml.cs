@@ -343,7 +343,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                         // Define the rows in the third sheet.
                         var worksheet3Rows = new List<List<string>>
                         {
-                            new List<string> { "Internal ID", "Source node ID", "Source node name", "Target node ID", "Target node name" }
+                            new List<string> { "Internal ID", "Source protein ID", "Source protein name", "Target protein ID", "Target protein name" }
                                 .Concat(databaseEdgeFields
                                     .Select(item => $"{item.Name} ({item.DatabaseName})")
                                     .ToList())
@@ -396,14 +396,14 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                         // Define the second worksheet.
                         var worksheet2Part = workbookPart.AddNewPart<WorksheetPart>();
                         var worksheet2Data = new SheetData();
-                        var worksheet2 = new Sheet { Id = workbookPart.GetIdOfPart(worksheet2Part), SheetId = 2, Name = "Nodes" };
+                        var worksheet2 = new Sheet { Id = workbookPart.GetIdOfPart(worksheet2Part), SheetId = 2, Name = "Proteins" };
                         worksheet2Part.Worksheet = new Worksheet(worksheet2Data);
                         worksheet2Data.Append(worksheet2Rows.Select(item => new Row(item.Select(item1 => new Cell { DataType = CellValues.String, CellValue = new CellValue(item1) }))));
                         worksheets.Append(worksheet2);
                         // Define the third worksheet.
                         var worksheet3Part = workbookPart.AddNewPart<WorksheetPart>();
                         var worksheet3Data = new SheetData();
-                        var worksheet3 = new Sheet { Id = workbookPart.GetIdOfPart(worksheet3Part), SheetId = 3, Name = "Edges" };
+                        var worksheet3 = new Sheet { Id = workbookPart.GetIdOfPart(worksheet3Part), SheetId = 3, Name = "Interactions" };
                         worksheet3Part.Worksheet = new Worksheet(worksheet3Data);
                         worksheet3Data.Append(worksheet3Rows.Select(item => new Row(item.Select(item1 => new Cell { DataType = CellValues.String, CellValue = new CellValue(item1) }))));
                         worksheets.Append(worksheet3);

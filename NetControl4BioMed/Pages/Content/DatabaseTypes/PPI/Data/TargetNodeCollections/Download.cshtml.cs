@@ -284,7 +284,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                 }
             })
             {
-                FileDownloadName = $"NetControl4BioMed-Networks-{DateTime.UtcNow:yyyyMMdd}.zip"
+                FileDownloadName = $"NetControl4BioMed-TargetProteinCollections-{DateTime.UtcNow:yyyyMMdd}.zip"
             };
         }
     }
