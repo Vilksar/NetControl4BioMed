@@ -27,7 +27,7 @@ namespace NetControl4BioMed.Data
         /// <summary>
         /// Gets or sets the number of days before an alert on user-created database items close to deletion will be automatically sent.
         /// </summary>
-        public static int DaysBeforeAlert { get; } = 1;
+        public static int DaysBeforeAlert { get; } = 6;
 
         /// <summary>
         /// Gets or sets the number of days before user-created database items will be automatically deleted.

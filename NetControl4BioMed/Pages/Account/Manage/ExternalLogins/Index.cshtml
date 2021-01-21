@@ -40,14 +40,14 @@
                     </div>
                     @if (Model.View.ShowRemoveButton)
                     {
-                        <button type="submit" title="Remove this login from your account." class="btn btn-block btn-success my-2">
+                        <button type="submit" title="Remove this login from your account." class="btn btn-block btn-danger my-2">
                             <span><i class="fab fa-@login.ProviderDisplayName.ToLower()"></i></span>
                             <span>@login.ProviderDisplayName</span>
                         </button>
                     }
                     else
                     {
-                        <button type="submit" title="The login can't be removed, as you would be locked out of your account." class="btn btn-block btn-success my-2" disabled>
+                        <button type="submit" title="The login can't be removed, as you would be locked out of your account." class="btn btn-danger btn-success my-2" disabled>
                             <span><i class="fab fa-@login.ProviderDisplayName.ToLower()"></i></span>
                             <span>@login.ProviderDisplayName</span>
                         </button>
@@ -79,7 +79,7 @@
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
                 @foreach (var provider in Model.View.OtherLogins)
                 {
-                    <button type="submit" title="Log in using your @provider.DisplayName account" class="btn btn-block btn-primary" name="provider" value="@provider.Name">
+                    <button type="submit" title="Log in using your @provider.DisplayName account" class="btn btn-block btn-success" name="provider" value="@provider.Name">
                         <span><i class="fab fa-@provider.DisplayName.ToLower()"></i></span>
                         <span>@provider.DisplayName</span>
                     </button>
