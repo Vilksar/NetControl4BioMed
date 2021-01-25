@@ -48,7 +48,7 @@ else
                         <partial name="_NetworkNodeCollectionTypePartial" model="@item.Type" />
                     </td>
                     <td class="text-center text-break">
-                        <a asp-page="/Content/DatabaseTypes/PPI/Data/NodeCollections/Details" asp-route-id="@item.NodeCollection.Id" class="btn btn-info m-1" title="Details">
+                        <a asp-page="/Content/DatabaseTypes/PPI/Data/@(item.Type)NodeCollections/Details" asp-route-id="@item.NodeCollection.Id" class="btn btn-info m-1" title="Details">
                             <span><i class="fas fa-info-circle"></i></span>
                         </a>
                     </td>
