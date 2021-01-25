@@ -463,7 +463,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "DatabaseTypes",
             Title = "Database types",
-            Link = "/Content/Index"
+            Link = "/Content/DatabaseTypes/Index"
         };
 
         /// <summary>
@@ -473,7 +473,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Generic",
             Title = "Generic",
-            Link = "/Content/Generic/Index"
+            Link = "/Content/DatabaseTypes/Generic/Index"
         };
 
         /// <summary>
@@ -483,7 +483,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Created",
             Title = "Created",
-            Link = "/Content/Generic/Created/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Index"
         };
 
         /// <summary>
@@ -493,7 +493,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Analyses",
             Title = "Analyses",
-            Link = "/Content/Generic/Created/Analyses/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Index"
         };
 
         /// <summary>
@@ -503,7 +503,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Details",
             Title = "Details",
-            Link = "/Content/Generic/Created/Analyses/Details/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Index"
         };
 
         /// <summary>
@@ -513,7 +513,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Networks",
             Title = "Networks",
-            Link = "/Content/Generic/Created/Networks/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Index"
         };
 
         /// <summary>
@@ -523,7 +523,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Details",
             Title = "Details",
-            Link = "/Content/Generic/Created/Networks/Details/Index"
+            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Index"
         };
 
         /// <summary>
@@ -533,7 +533,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Data",
             Title = "Data",
-            Link = "/Content/Generic/Data/Index"
+            Link = "/Content/DatabaseTypes/Generic/Data/Index"
         };
 
         /// <summary>
@@ -543,7 +543,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Nodes",
             Title = "Nodes",
-            Link = "/Content/Generic/Data/Nodes/Index"
+            Link = "/Content/DatabaseTypes/Generic/Data/Nodes/Index"
         };
 
         /// <summary>
@@ -553,7 +553,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Edges",
             Title = "Edges",
-            Link = "/Content/Generic/Data/Edges/Index"
+            Link = "/Content/DatabaseTypes/Generic/Data/Edges/Index"
         };
 
         /// <summary>
@@ -563,7 +563,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "PPI",
             Title = "PPI",
-            Link = "/Content/PPI/Index"
+            Link = "/Content/DatabaseTypes/PPI/Index"
         };
 
         /// <summary>
@@ -573,7 +573,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Created",
             Title = "Created",
-            Link = "/Content/PPI/Created/Index"
+            Link = "/Content/DatabaseTypes/PPI/Created/Index"
         };
 
         /// <summary>
@@ -583,7 +583,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Analyses",
             Title = "Analyses",
-            Link = "/Content/PPI/Created/Analyses/Index"
+            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Index"
         };
 
         /// <summary>
@@ -593,7 +593,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Details",
             Title = "Details",
-            Link = "/Content/PPI/Created/Analyses/Details/Index"
+            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Index"
         };
 
         /// <summary>
@@ -603,7 +603,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Networks",
             Title = "Networks",
-            Link = "/Content/PPI/Created/Networks/Index"
+            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Index"
         };
 
         /// <summary>
@@ -613,7 +613,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Details",
             Title = "Details",
-            Link = "/Content/PPI/Created/Networks/Details/Index"
+            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Index"
         };
 
         /// <summary>
@@ -623,7 +623,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Data",
             Title = "Data",
-            Link = "/Content/PPI/Data/Index"
+            Link = "/Content/DatabaseTypes/PPI/Data/Index"
         };
 
         /// <summary>
@@ -633,7 +633,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Edges",
             Title = "Edges",
-            Link = "/Content/PPI/Data/Edges/Index"
+            Link = "/Content/DatabaseTypes/PPI/Data/Edges/Index"
         };
 
         /// <summary>
@@ -643,7 +643,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "SourceNodeCollections",
             Title = "Source node collections",
-            Link = "/Content/PPI/Data/SourceNodeCollections/Index"
+            Link = "/Content/DatabaseTypes/PPI/Data/SourceNodeCollections/Index"
         };
 
         /// <summary>
@@ -653,7 +653,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "TargetNodeCollections",
             Title = "Target node collections",
-            Link = "/Content/PPI/Data/TargetNodeCollections/Index"
+            Link = "/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index"
         };
 
         /// <summary>
@@ -663,7 +663,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Nodes",
             Title = "Nodes",
-            Link = "/Content/PPI/Data/Nodes/Index"
+            Link = "/Content/DatabaseTypes/PPI/Data/Nodes/Index"
         };
 
         /// <summary>
@@ -673,7 +673,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Databases",
             Title = "Databases",
-            Link = "/Content/PPI/Databases/Index"
+            Link = "/Content/DatabaseTypes/PPI/Databases/Index"
         };
 
         /// <summary>
@@ -683,7 +683,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "DatabaseEdgeFields",
             Title = "Database edge fields",
-            Link = "/Content/PPI/Databases/DatabaseEdgeFields/Index"
+            Link = "/Content/DatabaseTypes/PPI/Databases/DatabaseEdgeFields/Index"
         };
 
         /// <summary>
@@ -693,7 +693,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "DatabaseNodeFields",
             Title = "Database node fields",
-            Link = "/Content/PPI/Databases/DatabaseNodeFields/Index"
+            Link = "/Content/DatabaseTypes/PPI/Databases/DatabaseNodeFields/Index"
         };
 
         /// <summary>
@@ -703,7 +703,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         {
             Id = "Databases",
             Title = "Databases",
-            Link = "/Content/PPI/Databases/Databases/Index"
+            Link = "/Content/DatabaseTypes/PPI/Databases/Databases/Index"
         };
     }
 }
