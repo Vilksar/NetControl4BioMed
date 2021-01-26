@@ -560,7 +560,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Check if the status is not valid.
-                    if (batchAnalysis.Status != AnalysisStatus.Defined)
+                    if (batchAnalysis.Status != AnalysisStatus.Defined && batchAnalysis.Status != AnalysisStatus.Generating)
                     {
                         // Use a new scope.
                         using (var scope = serviceProvider.CreateScope())
@@ -1100,7 +1100,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Check if the status is not valid.
-                    if (batchAnalysis.Status != AnalysisStatus.Scheduled)
+                    if (batchAnalysis.Status != AnalysisStatus.Scheduled && batchAnalysis.Status != AnalysisStatus.Initializing && batchAnalysis.Status != AnalysisStatus.Ongoing)
                     {
                         // Use a new scope.
                         using (var scope = serviceProvider.CreateScope())

@@ -513,7 +513,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Check if the status is not valid.
-                    if (batchNetwork.Status != NetworkStatus.Defined)
+                    if (batchNetwork.Status != NetworkStatus.Defined && batchNetwork.Status != NetworkStatus.Generating)
                     {
                         // Use a new scope.
                         using (var scope = serviceProvider.CreateScope())
