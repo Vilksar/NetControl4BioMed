@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Helpers.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
+        [Queue("secondary")]
         Task GenerateNetworksAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -43,6 +45,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
+        [Queue("secondary")]
         Task GenerateAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -51,6 +54,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
+        [Queue("secondary")]
         Task StartAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
