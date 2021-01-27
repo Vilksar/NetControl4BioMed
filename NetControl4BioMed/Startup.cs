@@ -157,12 +157,12 @@ namespace NetControl4BioMed
             app.UseHangfireServer(new BackgroundJobServerOptions
             {
                 WorkerCount = 4 < Environment.ProcessorCount ? Environment.ProcessorCount - 3 : 1,
-                Queues = new[] { "default" }
+                Queues = new[] { "recurring", "default" }
             });
             app.UseHangfireServer(new BackgroundJobServerOptions
             {
                 WorkerCount = 4 < Environment.ProcessorCount ? 2 : 1,
-                Queues = new[] { "secondary" }
+                Queues = new[] { "background" }
             });
             // Seed the database.
             app.SeedDatabaseAsync(Configuration).Wait();

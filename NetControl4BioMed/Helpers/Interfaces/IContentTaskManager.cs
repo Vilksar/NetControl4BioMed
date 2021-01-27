@@ -20,6 +20,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
+        [Queue("default")]
         Task DeleteNetworksAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -28,6 +29,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
+        [Queue("default")]
         Task DeleteAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -36,7 +38,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
-        [Queue("secondary")]
+        [Queue("background")]
         Task GenerateNetworksAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -45,7 +47,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
-        [Queue("secondary")]
+        [Queue("background")]
         Task GenerateAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -54,7 +56,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
-        [Queue("secondary")]
+        [Queue("background")]
         Task StartAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -63,6 +65,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
+        [Queue("default")]
         Task StopAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -71,6 +74,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
+        [Queue("default")]
         Task SendNetworksEndedEmailsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -79,6 +83,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
+        [Queue("default")]
         Task SendAnalysesEndedEmailsAsync(string id, CancellationToken token);
     }
 }

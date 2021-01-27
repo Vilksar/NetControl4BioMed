@@ -21,6 +21,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
         Task CountAllItemsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -30,6 +31,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
         Task CountDuplicateItemsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -39,6 +41,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
         Task CountOrphanedItemsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -48,6 +51,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
         Task CountInconsistentItemsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -57,6 +61,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
         Task StopAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -66,6 +71,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
         Task AlertUsersAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -75,6 +81,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
         Task DeleteUnconfirmedUsersAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -84,6 +91,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
         Task DeleteOrphanedItemsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -93,6 +101,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
         Task DeleteNetworksAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -102,6 +111,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
         Task DeleteAnalysesAsync(string id, CancellationToken token);
     }
 }

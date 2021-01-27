@@ -21,6 +21,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task CreateNodesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -30,6 +31,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task CreateEdgesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -39,6 +41,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task CreateNodeCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -48,6 +51,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task CreateSamplesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -57,6 +61,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task EditNodesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -66,6 +71,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task EditEdgesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -75,6 +81,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task EditNodeCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -84,6 +91,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task EditSamplesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -93,6 +101,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteUsersAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -102,6 +111,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteRolesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -111,6 +121,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteUserRolesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -120,6 +131,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteDatabaseTypesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -129,6 +141,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteDatabasesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -138,6 +151,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteDatabaseUsersAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -147,6 +161,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteDatabaseUserInvitationsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -156,6 +171,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteDatabaseNodeFieldsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -165,6 +181,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteDatabaseEdgeFieldsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -174,6 +191,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteNodesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -183,6 +201,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteEdgesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -192,6 +211,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteNodeCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -201,6 +221,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteSamplesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -210,6 +231,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteNetworksAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -219,6 +241,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -228,6 +251,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task StopAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -237,6 +261,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteAllNodesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -246,6 +271,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteAllEdgesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -255,6 +281,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteAllNodeCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -264,6 +291,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteAllNetworksAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -273,6 +301,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteAllAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
@@ -282,6 +311,7 @@ namespace NetControl4BioMed.Helpers.Interfaces
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
+        [Queue("default")]
         Task DeleteAllSamplesAsync(string id, CancellationToken token);
     }
 }
