@@ -35,8 +35,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
             var sources = new List<string>();
             var targets = new List<string>();
             var parameters = new Parameters();
-            var currentIteration = 0;
-            var currentIterationWithoutImprovement = 0;
             var maximumIterations = 100;
             var maximumIterationsWithoutImprovement = 25;
             // Use a new scope.
@@ -152,8 +150,6 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
                     return;
                 }
                 // Set up the first iteration.
-                currentIteration = analysis.CurrentIteration;
-                currentIterationWithoutImprovement = analysis.CurrentIterationWithoutImprovement;
                 maximumIterations = analysis.MaximumIterations;
                 maximumIterationsWithoutImprovement = analysis.MaximumIterationsWithoutImprovement;
             }
@@ -189,6 +185,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
             // Define the required data.
             var analysisStillExists = true;
             var analysisStatus = AnalysisStatus.Ongoing;
+            var currentIteration = 0;
+            var currentIterationWithoutImprovement = 0;
             var controlPaths = new List<ControlPath>();
             // Use a new timer to display the progress.
             using (new Timer(async (state) =>

@@ -15,7 +15,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
         /// <summary>
         /// Represents the maximum number of parallel operations.
         /// </summary>
-        private static readonly int DegreeOfParallelism = (int)Math.Floor((double)(Environment.ProcessorCount - 1) / 4) + 1;
+        private static readonly int DegreeOfParallelism = 4 < Environment.ProcessorCount ? (int)Math.Floor((double)(Environment.ProcessorCount - 3) / 2) : 1;
 
         /// <summary>
         /// Represents the chromosomes in the population.
@@ -67,7 +67,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
             var randomSeeds = new ConcurrentQueue<int>(Enumerable.Range(0, parameters.PopulationSize).Select(item => random.Next()));
             var defaultRandomSeed = random.Next();
             // Repeat for each group.
-            Parallel.For(0, numberOfGroups, new ParallelOptions { MaxDegreeOfParallelism = DegreeOfParallelism }, index1 =>
+            for (var index1 = 0; index1 < numberOfGroups; index1++)
             {
                 // Get the lower and upper limits.
                 var lowerLimit = geneGroups[index1];
@@ -86,7 +86,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
                     // Add a new, initialized, chromosome.
                     bag.Add(new Chromosome(targetNodes).Initialize(nodeIndex, targetAncestors, powersMatrixCA, lowerLimit, upperLimit, localRandom));
                 });
-            });
+            }
             // Add all chromosomes to the current population.
             Chromosomes.AddRange(bag);
         }

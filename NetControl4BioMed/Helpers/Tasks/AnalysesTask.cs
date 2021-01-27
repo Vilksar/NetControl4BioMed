@@ -1100,7 +1100,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Check if the status is not valid.
-                    if (batchAnalysis.Status != AnalysisStatus.Scheduled && batchAnalysis.Status != AnalysisStatus.Initializing && batchAnalysis.Status != AnalysisStatus.Ongoing)
+                    if (batchAnalysis.Status != AnalysisStatus.Scheduled && batchAnalysis.Status != AnalysisStatus.Initializing && batchAnalysis.Status != AnalysisStatus.Ongoing && batchAnalysis.Status != AnalysisStatus.Stopping)
                     {
                         // Use a new scope.
                         using (var scope = serviceProvider.CreateScope())
@@ -1216,7 +1216,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 continue;
                             }
                             // Update the status of the item.
-                            analysis.Status = AnalysisStatus.Defined;
+                            analysis.Status = AnalysisStatus.Scheduled;
                             // Add a message to the log.
                             analysis.Log = analysis.AppendToLog($"The try number {currentRetry + 1} ended with an error ({NumberOfRetries - currentRetry} tr{(NumberOfRetries - currentRetry != 1 ? "ies" : "y")} remaining). {(string.IsNullOrEmpty(exception.Message) ? "There was no error message returned." : exception.Message)}");
                             // Edit the analysis.
