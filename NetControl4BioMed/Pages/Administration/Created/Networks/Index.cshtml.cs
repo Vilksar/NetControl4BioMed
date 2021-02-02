@@ -48,6 +48,14 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsError", "Is error" },
+                    { "IsNotError", "Is not error" },
+                    { "IsDefined", "Is defined" },
+                    { "IsNotDefined", "Is not defined" },
+                    { "IsGenerating", "Is generating" },
+                    { "IsNotGenerating", "Is not generating" },
+                    { "IsCompleted", "Is completed" },
+                    { "IsNotCompleted", "Is not completed" },
                     { "UsesAlgorithmNone", "Was provided by user" },
                     { "UsesNotAlgorithmNone", "Was not provided by user" },
                     { "UsesAlgorithmNeighbors", "Was generated using \"Neighbors\" algorithm" },
@@ -120,6 +128,14 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                     input.SearchIn.Contains("NodeCollectionName") && item.NetworkNodeCollections.Any(item1 => item1.NodeCollection.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
+                .Where(item => input.Filter.Contains("IsError") ? item.Status == NetworkStatus.Error : true)
+                .Where(item => input.Filter.Contains("IsNotError") ? item.Status != NetworkStatus.Error : true)
+                .Where(item => input.Filter.Contains("IsDefined") ? item.Status == NetworkStatus.Defined : true)
+                .Where(item => input.Filter.Contains("IsNotDefined") ? item.Status != NetworkStatus.Defined : true)
+                .Where(item => input.Filter.Contains("IsGenerating") ? item.Status == NetworkStatus.Generating : true)
+                .Where(item => input.Filter.Contains("IsNotGenerating") ? item.Status != NetworkStatus.Generating : true)
+                .Where(item => input.Filter.Contains("IsCompleted") ? item.Status == NetworkStatus.Completed : true)
+                .Where(item => input.Filter.Contains("IsNotCompleted") ? item.Status != NetworkStatus.Completed : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmNone") ? item.Algorithm == NetworkAlgorithm.None : true)
                 .Where(item => input.Filter.Contains("UsesNotAlgorithmNone") ? item.Algorithm != NetworkAlgorithm.None : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmNeighbors") ? item.Algorithm == NetworkAlgorithm.Neighbors : true)

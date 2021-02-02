@@ -48,6 +48,12 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsError", "Is error" },
+                    { "IsNotError", "Is not error" },
+                    { "IsDefined", "Is defined" },
+                    { "IsNotDefined", "Is not defined" },
+                    { "IsGenerating", "Is generating" },
+                    { "IsNotGenerating", "Is not generating" },
                     { "IsScheduled", "Is scheduled" },
                     { "IsNotScheduled", "Is not scheduled" },
                     { "IsInitializing", "Is initializing" },
@@ -60,8 +66,6 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                     { "IsNotStopped", "Is not stopped" },
                     { "IsCompleted", "Is completed" },
                     { "IsNotCompleted", "Is not completed" },
-                    { "IsError", "Is error" },
-                    { "IsNotError", "Is not error" },
                     { "UsesGreedyAlgorithm", "Uses the greedy algorithm" },
                     { "UsesNotGreedyAlgorithm", "Doesn't use the greedy algorithm" },
                     { "UsesGeneticAlgorithm", "Uses the genetic algorithm" },
@@ -129,6 +133,12 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                     input.SearchIn.Contains("NodeCollectionName") && item.AnalysisNodeCollections.Any(item1 => item1.NodeCollection.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
+                .Where(item => input.Filter.Contains("IsError") ? item.Status == AnalysisStatus.Error : true)
+                .Where(item => input.Filter.Contains("IsNotError") ? item.Status != AnalysisStatus.Error : true)
+                .Where(item => input.Filter.Contains("IsDefined") ? item.Status == AnalysisStatus.Defined : true)
+                .Where(item => input.Filter.Contains("IsNotDefined") ? item.Status != AnalysisStatus.Defined : true)
+                .Where(item => input.Filter.Contains("IsGenerating") ? item.Status == AnalysisStatus.Generating : true)
+                .Where(item => input.Filter.Contains("IsNotGenerating") ? item.Status != AnalysisStatus.Generating : true)
                 .Where(item => input.Filter.Contains("IsScheduled") ? item.Status == AnalysisStatus.Scheduled : true)
                 .Where(item => input.Filter.Contains("IsNotScheduled") ? item.Status != AnalysisStatus.Scheduled : true)
                 .Where(item => input.Filter.Contains("IsInitializing") ? item.Status == AnalysisStatus.Initializing : true)
@@ -141,8 +151,6 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 .Where(item => input.Filter.Contains("IsNotStopped") ? item.Status != AnalysisStatus.Stopped : true)
                 .Where(item => input.Filter.Contains("IsCompleted") ? item.Status == AnalysisStatus.Completed : true)
                 .Where(item => input.Filter.Contains("IsNotCompleted") ? item.Status != AnalysisStatus.Completed : true)
-                .Where(item => input.Filter.Contains("IsError") ? item.Status == AnalysisStatus.Error : true)
-                .Where(item => input.Filter.Contains("IsNotError") ? item.Status != AnalysisStatus.Error : true)
                 .Where(item => input.Filter.Contains("UsesGreedyAlgorithm") ? item.Algorithm == AnalysisAlgorithm.Greedy : true)
                 .Where(item => input.Filter.Contains("UsesNotGreedyAlgorithm") ? item.Algorithm != AnalysisAlgorithm.Greedy : true)
                 .Where(item => input.Filter.Contains("UsesGeneticAlgorithm") ? item.Algorithm == AnalysisAlgorithm.Genetic : true)

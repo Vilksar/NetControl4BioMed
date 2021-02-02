@@ -584,7 +584,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .ToList();
             }
             // Go over each of the users.
-            foreach (var user in alertUsers)
+            foreach (var alertUser in alertUsers)
             {
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
@@ -596,10 +596,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Send an alert delete e-mail.
                     await emailSender.SendAlertDeleteEmailAsync(new EmailAlertDeleteViewModel
                     {
-                        Email = user.Email,
+                        Email = alertUser.Email,
                         DateTime = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete - ApplicationDbContext.DaysBeforeAlert),
-                        NetworkItems = user.NetworkItems,
-                        AnalysisItems = user.AnalysisItems,
+                        NetworkItems = alertUser.NetworkItems,
+                        AnalysisItems = alertUser.AnalysisItems,
                         ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
                     });
                 }

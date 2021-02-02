@@ -42,6 +42,12 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "ContainsSeedNodes", "Contains seed nodes"},
+                    { "ContainsNotSeedNodes", "Does not contain seed nodes"},
+                    { "ContainsSourceNodes", "Contains source nodes"},
+                    { "ContainsNotSourceNodes", "Does not contain source nodes"},
+                    { "ContainsTargetNodes", "Contains target nodes"},
+                    { "ContainsNotTargetNodes", "Does not contain target nodes"},
                     { "HasNodeCollectionTypes", "Has node collection types" },
                     { "HasNoNodeCollectionTypes", "Does not have node collection types" },
                     { "HasNodeCollectionDatabases", "Has node collection databases" },
