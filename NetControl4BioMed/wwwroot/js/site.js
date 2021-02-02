@@ -53,18 +53,12 @@ $(window).on('load', () => {
             if (form.length !== 0) {
                 // Add a listener for the form submission.
                 $(form).on('submit', (event) => {
-                    // Iterate over all checkboxes in the table.
-                    table.$('input[type="checkbox"]').each((checkboxIndex, checkboxElement) => {
-                        // Check if the checkbox doesn't exist in DOM.
-                        if (!$.contains(document, checkboxElement)) {
-                            // Check if the checkbox is checked.
-                            if (checkboxElement.checked) {
-                                // Create a hidden element.
-                                $(form).append($('<input>').attr('type', 'hidden').attr('id', $(checkboxElement).attr('id')).attr('name', $(checkboxElement).attr('name')).val($(checkboxElement).val()));
-                            }
-                        }
+                    // Iterate over all the checkboxes in the table that are checked, but don't exist in DOM.
+                    table.$('input[type="checkbox"]').filter((index, element) => !$.contains(document, element)).filter((index, element) => element.checked).each((index, element) => {
+                        // Create a hidden element and append it to the form.
+                        $(form).append($('<input>').attr('type', 'hidden').attr('id', $(element).attr('id')).attr('name', $(element).attr('name')).val($(element).val()))
                     });
-                })
+                });
             }
         });
     }

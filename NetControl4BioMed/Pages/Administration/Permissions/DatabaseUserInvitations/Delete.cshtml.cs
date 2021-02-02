@@ -131,7 +131,8 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUserInvitat
                         Database = new DatabaseInputModel
                         {
                             Id = item.Database.Id
-                        }
+                        },
+                        Email = item.Email
                     })
                 }, new JsonSerializerOptions { IgnoreNullValues = true })
             };

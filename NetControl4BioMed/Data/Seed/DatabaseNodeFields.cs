@@ -120,7 +120,7 @@ namespace NetControl4BioMed.Data.Seed
                 Name = "KEGG ID",
                 Description = "The unique identifier of a gene in the KEGG database.",
                 IsSearchable = true,
-                Url = "https://www.genome.jp/dbget-bin/www_bget?",
+                Url = "https://www.genome.jp/dbget-bin/www_bget?hsa:",
                 DatabaseId = "c7da2735-bd4b-4f1f-a855-a9da130583ee"
             },
             // The node fields in the NCBI database.
