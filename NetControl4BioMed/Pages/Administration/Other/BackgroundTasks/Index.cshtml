@@ -36,11 +36,8 @@
                     <th class="text-left text-break">
                         <span>Name</span>
                     </th>
-                    <th class="d-none d-lg-table-cell text-center text-break">
+                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
                         <span>Date created</span>
-                    </th>
-                    <th class="text-center text-break">
-                        <span>Is recurring</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
                         <span>Actions</span>
@@ -65,11 +62,13 @@
                                 <span title="@item.Id" class="small">@item.Id</span>
                             </div>
                         </td>
-                        <td class="d-none d-lg-table-cell text-center text-break">
-                            <span title="@item.DateTimeCreated.ToShortDateString()">@item.DateTimeCreated.ToShortDateString()</span>
-                        </td>
-                        <td class="text-center text-break">
-                            <span title="@item.IsRecurring.ToString()">@item.IsRecurring.ToString()</span>
+                        <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                            <div>
+                                <span title="@item.DateTimeCreated.ToShortDateString()">@item.DateTimeCreated.ToShortDateString()</span>
+                            </div>
+                            <div>
+                                <span title="@item.DateTimeCreated.ToShortTimeString()">@item.DateTimeCreated.ToShortTimeString()</span>
+                            </div>
                         </td>
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Other/BackgroundTasks/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
