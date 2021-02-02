@@ -10,11 +10,11 @@
 
 Welcome to the NetControl4BioMed repository!
 
-This is a C# / .Net Core web application which aims to solve the target network controllability problem. The application is cross-platform, and can be run or hosted on all modern operating systems (Windows, MacOS, Linux).
+This is a C# / .NET web application which aims to solve the target network controllability problem. The application is cross-platform, and can be run or hosted on all modern operating systems (Windows, MacOS, Linux).
 
 ## Download
 
-The repository consists of a Visual Studio 2019 project. You can download it to run or build the application yourself. You need to have [.NET Core 3.1](https://dotnet.microsoft.com/download/dotnet-core/3.1) installed in order to run it, or the corresponding SDK in order to also be able to build it.
+The repository consists of a Visual Studio 2019 project. You can download it to run or build the application yourself. You need to have [.NET 5](https://dotnet.microsoft.com/download/dotnet/5.0) installed in order to run it, or the corresponding SDK in order to also be able to build it.
 
 ## Usage
 
