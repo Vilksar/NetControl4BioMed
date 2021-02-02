@@ -39,7 +39,7 @@
                     </th>
                     @if (Model.View.SourceNodes.Any())
                     {
-                        <th class="d-none d-lg-table-cell text-center text-break">
+                        <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
                             <span>Source proteins</span>
                         </th>
                     }
@@ -73,7 +73,7 @@
                         </td>
                         @if (Model.View.SourceNodes.Any())
                         {
-                            <td class="d-none d-lg-table-cell text-center text-break">
+                            <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
                                 <span title="@controlSourceNodeCount">@controlSourceNodeCount</span>
                             </td>
                         }

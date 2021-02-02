@@ -68,7 +68,7 @@
                     <th class="text-left text-break">
                         <span>Name</span>
                     </th>
-                    <th class="d-none d-lg-table-cell text-center text-break">
+                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
                         <span>Status</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -91,7 +91,7 @@
                             <br />
                             <span title="@item.Id" class="small text-muted">ID: @item.Id</span>
                         </td>
-                        <td class="d-none d-lg-table-cell text-center text-break">
+                        <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
                             <partial name="_NetworkStatusPartial" model="@item.Status" />
                         </td>
                         <td class="text-center text-break">

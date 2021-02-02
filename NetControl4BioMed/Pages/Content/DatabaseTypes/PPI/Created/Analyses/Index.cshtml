@@ -80,10 +80,10 @@
                     <th class="text-left text-break">
                         <span>Name</span>
                     </th>
-                    <th class="d-none d-lg-table-cell text-center text-break">
+                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
                         <span>Status</span>
                     </th>
-                    <th class="d-none d-lg-table-cell text-center text-break">
+                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
                         <span>Progress</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -106,10 +106,10 @@
                             <br />
                             <span title="@item.Id" class="small text-muted">ID: @item.Id</span>
                         </td>
-                        <td class="d-none d-lg-table-cell text-center text-break">
+                        <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
                             <partial name="_AnalysisStatusPartial" model="@item.Status" />
                         </td>
-                        <td class="d-none d-lg-table-cell text-center text-break">
+                        <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
                             <span><span class="item-refresh-item" data-type="progress"></span>%</span>
                             <br />
                             <span><span class="item-refresh-item" data-type="progressWithoutImprovement"></span>%</span>

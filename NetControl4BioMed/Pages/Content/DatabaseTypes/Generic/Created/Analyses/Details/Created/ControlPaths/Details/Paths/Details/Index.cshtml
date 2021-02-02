@@ -57,16 +57,16 @@
         <table class="table table-hover table-bordered table-datatable" data-order="[[2, &quot;asc&quot;]]">
             <thead class="thead-light">
                 <tr>
-                    <th class="text-center text-break" data-name="index">
+                    <th class="text-center text-break text-nowrap" data-name="index">
                         <span>#</span>
                     </th>
                     <th class="text-left text-break">
                         <span>Node</span>
                     </th>
-                    <th class="text-center text-break" hidden>
+                    <th class="text-center text-break text-nowrap" hidden>
                         <span>Index</span>
                     </th>
-                    <th class="d-none d-lg-table-cell text-center text-break" hidden>
+                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap" hidden>
                         <span>Type</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -78,16 +78,16 @@
                 @foreach (var pathNode in Model.View.PathNodes)
                 {
                     <tr>
-                        <td class="text-center text-break">
+                        <td class="text-center text-break text-nowrap">
                             <span></span>
                         </td>
                         <td class="text-left text-break">
                             <span title="@pathNode.Node.Name" class="font-weight-bold">@pathNode.Node.Name</span>
                         </td>
-                        <td class="text-center text-break" hidden>
+                        <td class="text-center text-break text-nowrap" hidden>
                             <span title="@pathNode.Index" class="font-weight-bold">@pathNode.Index</span>
                         </td>
-                        <td class="d-none d-lg-table-cell text-center text-break" hidden>
+                        <td class="d-none d-lg-table-cell text-center text-break text-nowrap" hidden>
                             <partial name="_PathNodeTypePartial" model="pathNode.Type" />
                         </td>
                         <td class="text-center text-break">
@@ -120,13 +120,13 @@
         <table class="table table-hover table-bordered table-datatable" data-order="[[2, &quot;asc&quot;]]">
             <thead class="thead-light">
                 <tr>
-                    <th class="text-center text-break" data-name="index">
+                    <th class="text-center text-break text-nowrap" data-name="index">
                         <span>#</span>
                     </th>
                     <th class="text-left text-break">
                         <span>Edge</span>
                     </th>
-                    <th class="text-center text-break" hidden>
+                    <th class="text-center text-break text-nowrap" hidden>
                         <span>Index</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -138,13 +138,13 @@
                 @foreach (var pathEdge in Model.View.PathEdges)
                 {
                     <tr>
-                        <td class="text-center text-break">
+                        <td class="text-center text-break text-nowrap">
                             <span></span>
                         </td>
                         <td class="text-left text-break">
                             <span title="@pathEdge.Edge.Name" class="font-weight-bold">@pathEdge.Edge.Name</span>
                         </td>
-                        <td class="text-center text-break" hidden>
+                        <td class="text-center text-break text-nowrap" hidden>
                             <span title="@pathEdge.Index">@pathEdge.Index</span>
                         </td>
                         <td class="text-center text-break">

@@ -18,7 +18,7 @@ else
     <table class="table table-hover table-bordered" data-paging="false" data-info="false" data-searching="false">
         <thead class="thead-light">
             <tr>
-                <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
                     <span>#</span>
                 </th>
                 <th class="text-left text-break">
@@ -33,7 +33,7 @@ else
             @foreach (var (item, index) in Model.View.Search.Items.Select((item, index) => (item, index)))
             {
                 <tr>
-                    <td class="text-center text-break">
+                    <td class="text-center text-break text-nowrap">
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
                     </td>
                     <td class="text-left text-break">

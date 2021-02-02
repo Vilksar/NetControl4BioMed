@@ -7,7 +7,11 @@
 
 <div class="alert alert-warning text-justify text-wrap">
     <span><i class="fas fa-exclamation-triangle"></i></span>
-    <span>Please check that the name of the analysis does not contain any invalid characters (&lt; &gt; \ / | : " * ?), or you might encounter an error when unarchiving. Also, please note that downloading a control path will only download details on corresponding control nodes and target nodes. You can rename the analysis or download all of its data from the <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Details/Index" asp-route-id="@Model.View.Analysis.Id" class="alert-link">Overview page</a>.</span>
+    <span>Please note that downloading a control path will only download details on corresponding control proteins and target proteins. You can download separately the network corresponding to the analysis from its details page.</span>
+</div>
+<div class="alert alert-warning text-justify text-wrap">
+    <span><i class="fas fa-exclamation-triangle"></i></span>
+    <span>Please check that the name of the analysis does not contain any invalid characters (&lt; &gt; \ / | : " * ?), or you might encounter an error when unarchiving. You can rename the analysis  from its details page.</span>
 </div>
 <div class="alert alert-primary text-justify text-wrap">
     <span><i class="fas fa-info-circle"></i></span>
@@ -62,7 +66,7 @@
                             <th class="text-center text-break" data-orderable="false" data-searchable="false" hidden>
                                 <span></span>
                             </th>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                            <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
                                 <span>#</span>
                             </th>
                             <th class="text-center text-break">
@@ -70,7 +74,7 @@
                             </th>
                             @if (Model.View.SourceNodes.Any())
                             {
-                                <th class="d-none d-lg-table-cell text-center text-break">
+                                <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
                                     <span>Source nodes</span>
                                 </th>
                             }
@@ -95,7 +99,7 @@
                                         <label for="checkbox-@item.Id" class="custom-control-label"></label>
                                     </div>
                                 </td>
-                                <td class="text-center text-break">
+                                <td class="text-center text-break text-nowrap">
                                     <span></span>
                                 </td>
                                 <td class="text-center text-break">
@@ -103,7 +107,7 @@
                                 </td>
                                 @if (Model.View.SourceNodes.Any())
                                 {
-                                    <td class="d-none d-lg-table-cell text-center text-break">
+                                    <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
                                         <span>@controlNodes.Where(item => Model.View.SourceNodes.Contains(item)).Count()</span>
                                     </td>
                                 }

@@ -27,7 +27,7 @@ else
     <table class="table table-hover table-bordered" data-paging="false" data-info="false" data-searching="false">
         <thead class="thead-light">
             <tr>
-                <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
                     <span>#</span>
                 </th>
                 <th class="text-left text-break">
@@ -36,7 +36,7 @@ else
                 <th class="text-left text-break">
                     <span>Target protein</span>
                 </th>
-                <th class="d-none d-lg-table-cell text-center text-break">
+                <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
                     <span>Length</span>
                 </th>
                 <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -59,7 +59,7 @@ else
                     .Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathNodeType.None)
                     .Count() - 1;
                 <tr>
-                    <td class="text-center text-break">
+                    <td class="text-center text-break text-nowrap">
                         <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
                     </td>
                     <td class="text-left text-break">
@@ -72,7 +72,7 @@ else
                         <br />
                         <span title="@targetNode.Id" class="small text-muted">@targetNode.Id</span>
                     </td>
-                    <td class="d-none d-lg-table-cell text-center text-break">
+                    <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
                         <span title="@pathLength">@pathLength</span>
                     </td>
                     <td class="text-center text-break">

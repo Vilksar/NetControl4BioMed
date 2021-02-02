@@ -62,7 +62,7 @@
                     <th class="text-left text-break">
                         <span>E-mail</span>
                     </th>
-                    <th class="d-none d-lg-table-cell text-center text-break">
+                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
                         <span>Date</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -83,7 +83,7 @@
                         <td class="text-left text-break">
                             <span title="@item.Email" class="font-weight-bold">@item.Email</span>
                         </td>
-                        <td class="d-none d-lg-table-cell text-center text-break utc-date" data-date="@Model.View.Network.DateTimeCreated.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
+                        <td class="d-none d-lg-table-cell text-center text-break text-nowrap utc-date" data-date="@Model.View.Network.DateTimeCreated.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
                             <span class="utc-date-date" title="@Model.View.Network.DateTimeCreated.ToShortDateString()">@Model.View.Network.DateTimeCreated.ToShortDateString()</span>
                             <br />
                             <span class="utc-date-time" title="@Model.View.Network.DateTimeCreated.ToShortTimeString()">@Model.View.Network.DateTimeCreated.ToShortTimeString()</span>

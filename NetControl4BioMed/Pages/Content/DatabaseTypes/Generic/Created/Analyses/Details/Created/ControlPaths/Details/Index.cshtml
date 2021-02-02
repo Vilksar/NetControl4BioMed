@@ -88,7 +88,7 @@
         <table class="table table-hover table-bordered table-datatable" data-order="[[1]]">
             <thead class="thead-light">
                 <tr>
-                    <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                    <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
                         <span>#</span>
                     </th>
                     <th class="text-left text-break">
@@ -96,14 +96,14 @@
                     </th>
                     @if (Model.View.SourceNodes.Any())
                     {
-                        <th class="d-none d-lg-table-cell text-center text-break">
+                        <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
                             <span>Source</span>
                         </th>
                     }
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
                         <span>Links</span>
                     </th>
-                    <th class="d-none d-lg-table-cell text-center text-break">
+                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
                         <span>Controlled nodes</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -115,7 +115,7 @@
                 @foreach (var uniqueControlNode in Model.View.UniqueControlNodes)
                 {
                     <tr>
-                        <td class="text-center text-break">
+                        <td class="text-center text-break text-nowrap">
                             <span></span>
                         </td>
                         <td class="text-left text-break">
@@ -124,7 +124,7 @@
                         @if (Model.View.SourceNodes.Any())
                         {
                             var isSource = Model.View.SourceNodes.Contains(uniqueControlNode.Key);
-                            <td class="d-none d-lg-table-cell text-center text-break">
+                            <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
                                 <div class="text-uppercase">
                                     @switch (isSource)
                                     {
@@ -144,7 +144,7 @@
                                 <span>Details</span>
                             </a>
                         </td>
-                        <td class="d-none d-lg-table-cell text-center text-break">
+                        <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
                             <span title="@uniqueControlNode.Value">@uniqueControlNode.Value</span>
                         </td>
                         <td class="text-center text-break">
