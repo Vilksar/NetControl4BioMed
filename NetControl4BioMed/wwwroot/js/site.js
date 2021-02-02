@@ -47,6 +47,25 @@ $(window).on('load', () => {
                     });
                 }).draw();
             }
+            // Get the enclosing form.
+            const form = $(element).closest('form');
+            // Check if there is an enclosing form.
+            if (form.length !== 0) {
+                // Add a listener for the form submission.
+                $(form).on('submit', (event) => {
+                    // Iterate over all checkboxes in the table.
+                    table.$('input[type="checkbox"]').each((checkboxIndex, checkboxElement) => {
+                        // Check if the checkbox doesn't exist in DOM.
+                        if (!$.contains(document, checkboxElement)) {
+                            // Check if the checkbox is checked.
+                            if (checkboxElement.checked) {
+                                // Create a hidden element.
+                                $(form).append($('<input>').attr('type', 'hidden').attr('id', $(checkboxElement).attr('id')).attr('name', $(checkboxElement).attr('name')).val($(checkboxElement).val()));
+                            }
+                        }
+                    });
+                })
+            }
         });
     }
 
