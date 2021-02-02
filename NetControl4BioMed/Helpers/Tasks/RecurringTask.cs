@@ -555,7 +555,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new link generator instance.
                 var linkGenerator = scope.ServiceProvider.GetRequiredService<LinkGenerator>();
                 // Get the user items.
-                var users = alertNetworks
+                alertUsers = alertNetworks
                     .Select(item => item.Emails)
                     .Concat(alertAnalyses
                         .Select(item => item.Emails))
@@ -580,7 +580,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 Name = item1.Name,
                                 Url = linkGenerator.GetUriByPage($"/Content/DatabaseTypes/{item1.DatabaseTypeName}/Created/Analyses/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
                             })
-                    });
+                    })
+                    .ToList();
             }
             // Go over each of the users.
             foreach (var user in alertUsers)
