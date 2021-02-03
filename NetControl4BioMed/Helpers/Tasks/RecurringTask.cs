@@ -500,8 +500,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             // Define the host.
             var host = new HostString(HostValue);
             // Define the limit dates.
-            var limitDateStart = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeAlert + 1);
-            var limitDateEnd = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeAlert);
+            var limitDateStart = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeAlert);
+            var limitDateEnd = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeAlert - 1);
             // Define the items to get.
             var alertNetworks = new List<AlertItemModel>();
             var alertAnalyses = new List<AlertItemModel>();
