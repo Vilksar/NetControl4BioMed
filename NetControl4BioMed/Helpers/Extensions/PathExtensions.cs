@@ -98,7 +98,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 .Select(item => item.ControlPath.Analysis.AnalysisDatabases)
                 .SelectMany(item => item)
                 .Select(item => item.Database.DatabaseType.Name)
-                .FirstOrDefault();
+                .First();
             // Get the control data.
             var analysis = context.Paths
                 .Where(item => item == path)
@@ -176,8 +176,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                                 Name = item.Name,
                                 Href = linkGenerator.GetUriByPage(httpContext, $"/Content/DatabaseTypes/{databaseTypeName}/Data/Edges/Details", handler: null, values: new { id = item.Id }),
                                 Source = item.SourceNodeId,
-                                Target = item.TargetNodeId,
-                                Interaction = databaseTypeName.ToLower()
+                                Target = item.TargetNodeId
                             },
                             Classes = controlEdges.Contains(item.Id) ? new List<string> { "control" } : new List<string> { }
                         })

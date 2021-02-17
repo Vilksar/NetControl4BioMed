@@ -117,10 +117,10 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     public string Href { get; set; }
 
                     /// <summary>
-                    /// Represents the types of the node.
+                    /// Represents the type of the node.
                     /// </summary>
-                    [JsonPropertyName("types")]
-                    public string Types { get; set; }
+                    [JsonPropertyName("type")]
+                    public string Type { get; set; }
                 }
             }
 
@@ -177,16 +177,10 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     public string Target { get; set; }
 
                     /// <summary>
-                    /// Represents the interaction of the edge.
+                    /// Represents the type of the edge.
                     /// </summary>
-                    [JsonPropertyName("interaction")]
-                    public string Interaction { get; set; }
-
-                    /// <summary>
-                    /// Represents the types of the edge.
-                    /// </summary>
-                    [JsonPropertyName("types")]
-                    public string Types { get; set; }
+                    [JsonPropertyName("type")]
+                    public string Type { get; set; }
                 }
             }
         }
