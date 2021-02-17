@@ -183,7 +183,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     foreach (var analysis in View.Items)
                     {
                         // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"Analysis-{analysis.Name.Replace(" ", "-")}-{analysis.Id}.json", CompressionLevel.Fastest).Open();
+                        using var stream = archive.CreateEntry($"Analysis-{analysis.Name.Replace(" ", "-")}-{analysis.Id}.cyjs", CompressionLevel.Fastest).Open();
                         // Write to the entry the corresponding file content.
                         await analysis.WriteToStreamCyjsFileContent(stream, _serviceProvider);
                     }

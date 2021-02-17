@@ -10,7 +10,24 @@
 </div>
 <div class="alert alert-primary text-justify text-wrap">
     <span><i class="fas fa-info-circle"></i></span>
-    <span>The following @Model.View.Items.Count() network@(Model.View.Items.Count() != 1 ? "s" : string.Empty) will be downloaded in a <a href="https://en.wikipedia.org/wiki/Zip_(file_format)" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">ZIP archive</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
+    <span>Please select a file format, then click the button to download the @Model.View.Items.Count() listed network@(Model.View.Items.Count() != 1 ? "s" : string.Empty) in a <a href="https://en.wikipedia.org/wiki/Zip_(file_format)" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">ZIP archive</a> <span><i class="fas fa-external-link-alt"></i></span>. The available file formats are:</span>
+    <ul class="mt-1 mb-0">
+        <li>
+            <span><span class="font-weight-bold">Text</span>, which contains the list of interactions in the network as pairs of proteins. This file can be used to directly specify the interactions when uploading a network in the application.</span>
+        </li>
+        <li>
+            <span><span class="font-weight-bold">SIF</span>, which contains the list of interactions in the network as pairs of proteinss, together with the type of the relationship between them. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
+        </li>
+        <li>
+            <span><span class="font-weight-bold">JSON</span>, which contains the network details, together with the list of proteins and interactions in the network. This file can be used to directly upload the network in the application.</span>
+        </li>
+        <li>
+            <span><span class="font-weight-bold">Cytoscape.js JSON</span>, which contains the network data required for visualization. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
+        </li>
+        <li>
+            <span><span class="font-weight-bold">Excel</span>, which contains the complete network data.</span>
+        </li>
+    </ul>
 </div>
 <form method="post" class="text-justify">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
@@ -25,7 +42,7 @@
             <option value="txt">Text (*.txt)</option>
             <option value="sif">SIF (*.sif)</option>
             <option value="json">JSON (*.json)</option>
-            <option value="cyjs">CytoscapeJS (*.cyjs)</option>
+            <option value="cyjs">Cytoscape.js JSON (*.cyjs)</option>
             <option value="xlsx">Excel (*.xlsx)</option>
         </select>
         <div class="input-group-append">

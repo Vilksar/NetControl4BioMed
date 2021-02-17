@@ -7,7 +7,7 @@
 
 <div class="alert alert-warning text-justify text-wrap">
     <span><i class="fas fa-exclamation-triangle"></i></span>
-    <span>Please note that downloading a control path will only download details on corresponding control proteins and target proteins. You can download separately the network corresponding to the analysis from its details page.</span>
+    <span>Please note that downloading a control path will only download details on corresponding control nodes and target nodes. You can download separately the network corresponding to the analysis from its details page.</span>
 </div>
 <div class="alert alert-warning text-justify text-wrap">
     <span><i class="fas fa-exclamation-triangle"></i></span>
@@ -15,7 +15,24 @@
 </div>
 <div class="alert alert-primary text-justify text-wrap">
     <span><i class="fas fa-info-circle"></i></span>
-    <span>The following @Model.View.Items.Count() control path@(Model.View.Items.Count() != 1 ? "s" : string.Empty) will be downloaded in a <a href="https://en.wikipedia.org/wiki/Zip_(file_format)" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">ZIP archive</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
+    <span>Please select a file format, then click the button to download the @Model.View.Items.Count() listed control path@(Model.View.Items.Count() != 1 ? "s" : string.Empty) in a <a href="https://en.wikipedia.org/wiki/Zip_(file_format)" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">ZIP archive</a> <span><i class="fas fa-external-link-alt"></i></span>. The available file formats are:</span>
+    <ul class="mt-1 mb-0">
+        <li>
+            <span><span class="font-weight-bold">Text</span>, which contains the ordered list of nodes in each path of the control path.</span>
+        </li>
+        <li>
+            <span><span class="font-weight-bold">SIF</span>, which contains the list of edges in the control path as pairs of nodes, together with the type of the relationship between them. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
+        </li>
+        <li>
+            <span><span class="font-weight-bold">JSON</span>, which contains the control path details, together with the list of paths in the control path.</span>
+        </li>
+        <li>
+            <span><span class="font-weight-bold">Cytoscape.js JSON</span>, which contains the control path data required for visualization. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
+        </li>
+        <li>
+            <span><span class="font-weight-bold">Excel</span>, which contains the complete control path data.</span>
+        </li>
+    </ul>
 </div>
 <form method="post" class="text-justify">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
@@ -30,7 +47,7 @@
             <option value="txt">Text (*.txt)</option>
             <option value="sif">SIF (*.sif)</option>
             <option value="json">JSON (*.json)</option>
-            <option value="cyjs">CytoscapeJS (*.cyjs)</option>
+            <option value="cyjs">Cytoscape.js JSON (*.cyjs)</option>
             <option value="xlsx">Excel (*.xlsx)</option>
         </select>
         <div class="input-group-append">
