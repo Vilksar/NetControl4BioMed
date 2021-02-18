@@ -23,14 +23,14 @@ using NetControl4BioMed.Helpers.Tasks;
 namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
 {
     [RequestFormLimits(ValueLengthLimit = 16 * 1024 * 1024)]
-    public class CreateModel : PageModel
+    public class UploadModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public CreateModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
+        public UploadModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
         {
             _serviceProvider = serviceProvider;
             _userManager = userManager;

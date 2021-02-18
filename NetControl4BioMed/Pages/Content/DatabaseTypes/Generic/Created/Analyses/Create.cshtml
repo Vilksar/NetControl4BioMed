@@ -7,18 +7,25 @@
 
 @if (Model.View.Samples != null && Model.View.Samples.Any())
 {
-    <div class="dropdown mb-3">
-        <button class="btn btn-dark btn-block dropdown-toggle" type="button" data-toggle="dropdown">
-            <span><i class="fas fa-clipboard"></i></span>
-            <span>Load a sample</span>
-        </button>
-        <div class="dropdown-menu text-center w-100">
-            @foreach (var sample in Model.View.Samples)
-            {
-                <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Create" asp-route-algorithm="@sample.AnalysisAlgorithm.ToString()" asp-route-sampleId="@sample.Id" class="dropdown-item" title="@sample.Description">@sample.Name</a>
-            }
+    <form method="get" class="text-justify">
+        <div class="input-group mb-3">
+            <select name="sampleId" class="custom-select">
+                <option value="" title="Select a sample to load" selected hidden disabled>Select a sample to load</option>
+                <optgroup label="Available samples">
+                    @foreach (var sample in Model.View.Samples)
+                    {
+                        <option value="@sample.Id" title="@sample.Description">@sample.Name</option>
+                    }
+                </optgroup>
+            </select>
+            <div class="input-group-append">
+                <button asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Create" type="submit" class="btn btn-dark btn-block item-group-button" title="Load the selected sample">
+                    <span><i class="fas fa-cloud-upload-alt"></i></span>
+                    <span>Load sample</span>
+                </button>
+            </div>
         </div>
-    </div>
+    </form>
 }
 <form method="post" class="text-justify">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
