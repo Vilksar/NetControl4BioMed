@@ -104,11 +104,20 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
 
             public string Algorithm { get; set; }
 
-            public IEnumerable<Sample> Samples { get; set; }
+            public IEnumerable<SampleItemModel> SampleItems { get; set; }
 
             public IEnumerable<NodeCollection> SourceNodeCollections { get; set; }
 
             public IEnumerable<NodeCollection> TargetNodeCollections { get; set; }
+        }
+
+        public class SampleItemModel
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
+
+            public string Description { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string algorithm = null, string analysisId = null, string sampleId = null)
@@ -136,26 +145,19 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                 // Redirect to the index page.
                 return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Analyses/Index");
             }
-            // Try to get the analysis with the provided ID.
-            var analyses = _context.Analyses
-                .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
-                .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == analysisId);
-            // Check if there was an ID provided, but there was no analysis found.
-            if (!string.IsNullOrEmpty(analysisId) && (analyses == null || !analyses.Any()))
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No analysis could be found with the provided ID, or you don't have access to it.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Analyses/Index");
-            }
             // Define the view.
             View = new ViewModel
             {
                 IsUserAuthenticated = user != null,
                 Algorithm = algorithm,
-                Samples = _context.Samples
-                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI")),
+                SampleItems = _context.Samples
+                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
+                    .Select(item => new SampleItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Description = item.Description
+                    }),
                 SourceNodeCollections = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),
@@ -163,20 +165,22 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
             };
-            // Try to get the sample with the provided ID.
-            var sample = View.Samples?
-                .FirstOrDefault(item => item.Id == sampleId);
-            // Check if there was an ID provided, but there was no sample found.
-            if (!string.IsNullOrEmpty(sampleId) && sample == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No sample could be found with the provided ID.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Analyses/Index");
-            }
             // Check if there was an analysis provided.
             if (!string.IsNullOrEmpty(analysisId))
             {
+                // Try to get the analysis with the provided ID.
+                var analyses = _context.Analyses
+                    .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
+                    .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.Id == analysisId);
+                // Check if there was an ID provided, but there was no analysis found.
+                if (analyses == null || !analyses.Any())
+                {
+                    // Display a message.
+                    TempData["StatusMessage"] = "Error: No analysis could be found with the provided ID, or you don't have access to it.";
+                    // Redirect to the index page.
+                    return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Analyses/Index");
+                }
                 // Define the input.
                 Input = new InputModel
                 {
@@ -233,6 +237,18 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
             // Check if there was a sample provided.
             else if (!string.IsNullOrEmpty(sampleId))
             {
+                // Try to get the sample with the provided ID.
+                var sample = _context.Samples
+                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
+                    .FirstOrDefault(item => item.Id == sampleId);
+                // Check if there was an ID provided, but there was no sample found.
+                if (sample == null)
+                {
+                    // Display a message.
+                    TempData["StatusMessage"] = "Error: No sample could be found with the provided ID.";
+                    // Redirect to the index page.
+                    return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Analyses/Index");
+                }
                 // Define the input.
                 Input = new InputModel
                 {
@@ -303,8 +319,14 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
             {
                 IsUserAuthenticated = user != null,
                 Algorithm = Input.Algorithm,
-                Samples = _context.Samples
-                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI")),
+                SampleItems = _context.Samples
+                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
+                    .Select(item => new SampleItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Description = item.Description
+                    }),
                 SourceNodeCollections = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user))),

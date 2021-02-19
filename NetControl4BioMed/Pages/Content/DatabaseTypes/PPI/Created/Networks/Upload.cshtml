@@ -4,18 +4,16 @@
     ViewData["Title"] = "Create network";
 }
 
-@if (Model.View.Samples != null && Model.View.Samples.Any())
+@if (Model.View.SampleItems != null && Model.View.SampleItems.Any())
 {
     <form method="get" class="text-justify">
         <div class="input-group mb-3">
             <select name="sampleId" class="custom-select">
                 <option value="" title="Select a sample to load" selected hidden disabled>Select a sample to load</option>
-                <optgroup label="Available samples">
-                    @foreach (var sample in Model.View.Samples)
-                    {
-                        <option value="@sample.Id" title="@sample.Description">@sample.Name</option>
-                    }
-                </optgroup>
+                @foreach (var sampleItem in Model.View.SampleItems)
+                {
+                    <option value="@sampleItem.Id" title="@sampleItem.Description">@sampleItem.Name</option>
+                }
             </select>
             <div class="input-group-append">
                 <button asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Upload" type="submit" class="btn btn-dark btn-block item-group-button" title="Load the selected sample">
@@ -205,10 +203,10 @@
             </div>
             <div class="file-group" data-type="edges">
                 <div class="form-group" hidden>
-                    <label asp-for="Input.SeedData" class="font-weight-bold">Data</label>
-                    <textarea asp-for="Input.SeedData" class="form-control file-group-input"></textarea>
-                    <span asp-description-for="Input.SeedData" class="text-muted small">The interactions of the new network, formatted as a JSON object. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                    <span asp-validation-for="Input.SeedData" class="text-danger small"></span>
+                    <label asp-for="Input.SeedEdgeData" class="font-weight-bold">Data</label>
+                    <textarea asp-for="Input.SeedEdgeData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.SeedEdgeData" class="text-muted small">The interactions of the new network, formatted as a JSON object. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.SeedEdgeData" class="text-danger small"></span>
                 </div>
                 <div class="form-group">
                     <div class="row align-items-center mb-2">

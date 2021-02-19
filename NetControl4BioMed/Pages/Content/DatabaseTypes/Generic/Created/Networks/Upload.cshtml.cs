@@ -56,7 +56,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
-            public string SeedData { get; set; }
+            public string SeedEdgeData { get; set; }
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
@@ -69,51 +69,42 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
         {
             public bool IsUserAuthenticated { get; set; }
 
-            public IEnumerable<Sample> Samples { get; set; }
+            public IEnumerable<SampleItemModel> SampleItems { get; set; }
         }
 
-        public class ItemModel
+        public class EdgeItemModel
         {
             public string SourceNode { get; set; }
 
             public string TargetNode { get; set; }
         }
 
+        public class SampleItemModel
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
+
+            public string Description { get; set; }
+        }
+
         public async Task<IActionResult> OnGetAsync(string networkId = null, string sampleId = null)
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Try to get the network with the provided ID.
-            var networks = _context.Networks
-                .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
-                .Where(item => item.Id == networkId);
-            // Check if there was an ID provided, but there was no network found.
-            if (!string.IsNullOrEmpty(networkId) && (networks == null || !networks.Any()))
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No network could be found with the provided ID, or you don't have access to it.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
-            }
             // Define the view.
             View = new ViewModel
             {
                 IsUserAuthenticated = user != null,
-                Samples = _context.Samples
+                SampleItems = _context.Samples
                     .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Select(item => new SampleItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Description = item.Description
+                    })
             };
-            // Try to get the sample with the provided ID.
-            var sample = View.Samples?
-                .FirstOrDefault(item => item.Id == sampleId);
-            // Check if there was an ID provided, but there was no sample found.
-            if (!string.IsNullOrEmpty(sampleId) && sample == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No sample could be found with the provided ID.";
-                // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
-            }
             // Get the available databases.
             var databases = _context.Databases
                 .Where(item => item.DatabaseType.Name == "Generic")
@@ -129,6 +120,19 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
             // Check if there was a network provided.
             if (!string.IsNullOrEmpty(networkId))
             {
+                // Try to get the network with the provided ID.
+                var networks = _context.Networks
+                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.Id == networkId);
+                // Check if there was an ID provided, but there was no network found.
+                if (networks == null || !networks.Any())
+                {
+                    // Display a message.
+                    TempData["StatusMessage"] = "Error: No network could be found with the provided ID, or you don't have access to it.";
+                    // Redirect to the index page.
+                    return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
+                }
                 // Define the input.
                 Input = new InputModel
                 {
@@ -139,10 +143,10 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
                         .Select(item => item.Description)
                         .FirstOrDefault(),
                     IsPublic = !View.IsUserAuthenticated,
-                    SeedData = JsonSerializer.Serialize(networks
+                    SeedEdgeData = JsonSerializer.Serialize(networks
                         .Select(item => item.NetworkEdges)
                         .SelectMany(item => item)
-                        .Select(item => new ItemModel
+                        .Select(item => new EdgeItemModel
                         {
                             SourceNode = item.Edge.EdgeNodes
                                 .Where(item1 => item1.Type == EdgeNodeType.Source)
@@ -159,13 +163,25 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
             // Check if there was a sample provided.
             else if (!string.IsNullOrEmpty(sampleId))
             {
+                // Try to get the sample with the provided ID.
+                var sample = _context.Samples
+                    .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .FirstOrDefault(item => item.Id == sampleId);
+                // Check if there was an ID provided, but there was no sample found.
+                if (sample == null)
+                {
+                    // Display a message.
+                    TempData["StatusMessage"] = "Error: No sample could be found with the provided ID.";
+                    // Redirect to the index page.
+                    return RedirectToPage("/Content/DatabaseTypes/Generic/Created/Networks/Index");
+                }
                 // Define the input.
                 Input = new InputModel
                 {
                     Name = sample.NetworkName,
                     Description = sample.NetworkDescription,
                     IsPublic = !View.IsUserAuthenticated,
-                    SeedData = sample.NetworkSeedEdgeData
+                    SeedEdgeData = sample.NetworkSeedEdgeData
                 };
             }
             else
@@ -174,7 +190,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
                 Input = new InputModel
                 {
                     IsPublic = !View.IsUserAuthenticated,
-                    SeedData = JsonSerializer.Serialize(Enumerable.Empty<ItemModel>())
+                    SeedEdgeData = JsonSerializer.Serialize(Enumerable.Empty<EdgeItemModel>())
                 };
             }
             // Return the page.
@@ -189,8 +205,14 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
             View = new ViewModel
             {
                 IsUserAuthenticated = user != null,
-                Samples = _context.Samples
+                SampleItems = _context.Samples
                     .Where(item => item.SampleDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                    .Select(item => new SampleItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Description = item.Description
+                    })
             };
             // Get the available databases.
             var databases = _context.Databases
@@ -229,7 +251,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
                 return Page();
             }
             // Try to deserialize the seed data.
-            if (!Input.SeedData.TryDeserializeJsonObject<IEnumerable<ItemModel>>(out var items) || items == null)
+            if (!Input.SeedEdgeData.TryDeserializeJsonObject<IEnumerable<EdgeItemModel>>(out var items) || items == null)
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The provided seed data could not be deserialized.");

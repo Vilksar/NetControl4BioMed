@@ -5,18 +5,16 @@
     ViewData["Title"] = "Create analysis";
 }
 
-@if (Model.View.Samples != null && Model.View.Samples.Any())
+@if (Model.View.SampleItems != null && Model.View.SampleItems.Any())
 {
     <form method="get" class="text-justify">
         <div class="input-group mb-3">
             <select name="sampleId" class="custom-select">
                 <option value="" title="Select a sample to load" selected hidden disabled>Select a sample to load</option>
-                <optgroup label="Available samples">
-                    @foreach (var sample in Model.View.Samples)
-                    {
-                        <option value="@sample.Id" title="@sample.Description">@sample.Name</option>
-                    }
-                </optgroup>
+                @foreach (var sampleItem in Model.View.SampleItems)
+                {
+                    <option value="@sampleItem.Id" title="@sampleItem.Description">@sampleItem.Name</option>
+                }
             </select>
             <div class="input-group-append">
                 <button asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Create" type="submit" class="btn btn-dark btn-block item-group-button" title="Load the selected sample">
