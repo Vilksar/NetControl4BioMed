@@ -152,7 +152,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         NetworkAlgorithm = networkAlgorithm,
                         NetworkNodeDatabaseData = batchItem.NetworkNodeDatabaseData,
                         NetworkEdgeDatabaseData = batchItem.NetworkEdgeDatabaseData,
-                        NetworkSeedData = batchItem.NetworkSeedData,
+                        NetworkSeedNodeData = batchItem.NetworkSeedNodeData,
+                        NetworkSeedEdgeData = batchItem.NetworkSeedEdgeData,
                         NetworkSeedNodeCollectionData = batchItem.NetworkSeedNodeCollectionData,
                         AnalysisName = batchItem.AnalysisName,
                         AnalysisDescription = batchItem.AnalysisDescription,
@@ -308,7 +309,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     sample.NetworkAlgorithm = networkAlgorithm;
                     sample.NetworkNodeDatabaseData = batchItem.NetworkNodeDatabaseData;
                     sample.NetworkEdgeDatabaseData = batchItem.NetworkEdgeDatabaseData;
-                    sample.NetworkSeedData = batchItem.NetworkSeedData;
+                    sample.NetworkSeedNodeData = batchItem.NetworkSeedNodeData;
+                    sample.NetworkSeedEdgeData = batchItem.NetworkSeedEdgeData;
                     sample.NetworkSeedNodeCollectionData = batchItem.NetworkSeedNodeCollectionData;
                     sample.AnalysisName = batchItem.AnalysisName;
                     sample.AnalysisDescription = batchItem.AnalysisDescription;

@@ -57,9 +57,14 @@ namespace NetControl4BioMed.Data.Models
         public string NetworkEdgeDatabaseData { get; set; }
 
         /// <summary>
-        /// Gets or sets the network seed data of the sample.
+        /// Gets or sets the network seed node data of the sample.
         /// </summary>
-        public string NetworkSeedData { get; set; }
+        public string NetworkSeedNodeData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the network seed edge data of the sample.
+        /// </summary>
+        public string NetworkSeedEdgeData { get; set; }
 
         /// <summary>
         /// Gets or sets the network seed node collection data of the sample.

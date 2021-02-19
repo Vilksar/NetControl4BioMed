@@ -203,7 +203,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     IsPublic = !View.IsUserAuthenticated,
                     NodeDatabaseData = sample.NetworkNodeDatabaseData,
                     EdgeDatabaseData = sample.NetworkEdgeDatabaseData,
-                    SeedData = sample.NetworkSeedData
+                    SeedData = sample.NetworkSeedEdgeData
                 };
             }
             else

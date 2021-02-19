@@ -209,7 +209,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     Algorithm = sample.NetworkAlgorithm.ToString(),
                     NodeDatabaseData = sample.NetworkNodeDatabaseData,
                     EdgeDatabaseData = sample.NetworkEdgeDatabaseData,
-                    SeedData = sample.NetworkSeedData,
+                    SeedData = sample.NetworkSeedNodeData,
                     SeedNodeCollectionData = sample.NetworkSeedNodeCollectionData
                 };
             }

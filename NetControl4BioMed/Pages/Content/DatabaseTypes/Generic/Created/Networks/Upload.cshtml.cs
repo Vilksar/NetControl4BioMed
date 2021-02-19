@@ -165,7 +165,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.Generic.Created.Networks
                     Name = sample.NetworkName,
                     Description = sample.NetworkDescription,
                     IsPublic = !View.IsUserAuthenticated,
-                    SeedData = sample.NetworkSeedData
+                    SeedData = sample.NetworkSeedEdgeData
                 };
             }
             else
