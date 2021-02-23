@@ -387,6 +387,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items with the provided IDs.
                     var items = context.Analyses
+                        .Include(item => item.AnalysisUsers)
                         .Where(item => batchIds.Contains(item.Id));
                     // Check if there were no items found.
                     if (items == null || !items.Any())

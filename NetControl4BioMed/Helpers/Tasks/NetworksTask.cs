@@ -320,6 +320,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Throw an exception.
                 throw new TaskException("No valid items could be found with the provided data.");
             }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
             // Get the total number of batches.
             var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
             // Go over each batch.
@@ -346,6 +348,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items with the provided IDs.
                     var items = context.Networks
+                        .Include(item => item.NetworkUsers)
                         .Where(item => batchIds.Contains(item.Id));
                     // Check if there were no items found.
                     if (items == null || !items.Any())
@@ -369,6 +372,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         // Continue.
                         continue;
+                    }
+                    // Check if there were no network users found.
+                    if (!batchItem.IsPublic && (network.NetworkUsers == null || !network.NetworkUsers.Any()))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("There were no analysis users found, so the analysis must be public.", showExceptionItem, batchItem);
                     }
                     // Update the data.
                     network.Name = batchItem.Name;
