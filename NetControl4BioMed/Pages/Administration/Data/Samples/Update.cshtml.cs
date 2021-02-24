@@ -82,9 +82,9 @@ namespace NetControl4BioMed.Pages.Administration.Data.Samples
                         AnalysisName = "Name",
                         AnalysisDescription = "Description",
                         AnalysisNetworkData = "IDs of networks",
-                        AnalysisSourceData = "Source data",
+                        AnalysisSourceNodeData = "Source node data",
                         AnalysisSourceNodeCollectionData = "IDs of source node collections",
-                        AnalysisTargetData = "Target data",
+                        AnalysisTargetNodeData = "Target node data",
                         AnalysisTargetNodeCollectionData = "IDs of target node collections",
                         SampleDatabases = new List<SampleDatabaseInputModel>
                         {
@@ -121,9 +121,9 @@ namespace NetControl4BioMed.Pages.Administration.Data.Samples
                 AnalysisName = item.AnalysisName,
                 AnalysisDescription = item.AnalysisDescription,
                 AnalysisNetworkData = item.AnalysisNetworkData,
-                AnalysisSourceData = item.AnalysisSourceData,
+                AnalysisSourceNodeData = item.AnalysisSourceNodeData,
                 AnalysisSourceNodeCollectionData = item.AnalysisSourceNodeCollectionData,
-                AnalysisTargetData = item.AnalysisTargetData,
+                AnalysisTargetNodeData = item.AnalysisTargetNodeData,
                 AnalysisTargetNodeCollectionData = item.AnalysisTargetNodeCollectionData,
                 SampleDatabases = item.SampleDatabases.Select(item1 => new SampleDatabaseInputModel
                 {
@@ -172,9 +172,9 @@ namespace NetControl4BioMed.Pages.Administration.Data.Samples
                         AnalysisName = "Name",
                         AnalysisDescription = "Description",
                         AnalysisNetworkData = "IDs of networks",
-                        AnalysisSourceData = "Source data",
+                        AnalysisSourceNodeData = "Source node data",
                         AnalysisSourceNodeCollectionData = "IDs of source node collections",
-                        AnalysisTargetData = "Target data",
+                        AnalysisTargetNodeData = "Target node data",
                         AnalysisTargetNodeCollectionData = "IDs of target node collections",
                         SampleDatabases = new List<SampleDatabaseInputModel>
                         {

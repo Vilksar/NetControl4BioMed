@@ -87,9 +87,9 @@ namespace NetControl4BioMed.Data.Models
         public string AnalysisNetworkData { get; set; }
 
         /// <summary>
-        /// Gets or sets the analysis source data of the sample.
+        /// Gets or sets the analysis source node data of the sample.
         /// </summary>
-        public string AnalysisSourceData { get; set; }
+        public string AnalysisSourceNodeData { get; set; }
 
         /// <summary>
         /// Gets or sets the analysis source node collection data of the sample.
@@ -97,9 +97,9 @@ namespace NetControl4BioMed.Data.Models
         public string AnalysisSourceNodeCollectionData { get; set; }
 
         /// <summary>
-        /// Gets or sets the analysis target data of the sample.
+        /// Gets or sets the analysis target node data of the sample.
         /// </summary>
-        public string AnalysisTargetData { get; set; }
+        public string AnalysisTargetNodeData { get; set; }
 
         /// <summary>
         /// Gets or sets the analysis target node collection data of the sample.

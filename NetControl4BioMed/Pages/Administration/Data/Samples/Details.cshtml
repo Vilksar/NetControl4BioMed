@@ -64,6 +64,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="View.Sample.NetworkDescription" class="font-weight-bold">Network description</label>
+                <textarea asp-for="View.Sample.NetworkDescription" class="form-control" rows="5" readonly></textarea>
                 <input asp-for="View.Sample.NetworkDescription" class="form-control" readonly />
                 <span asp-description-for="View.Sample.NetworkDescription" class="text-muted small">The description of the network corresponding to the sample.</span>
                 <span asp-validation-for="View.Sample.NetworkDescription" class="text-danger small"></span>
@@ -112,7 +113,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="View.Sample.AnalysisDescription" class="font-weight-bold">Analysis description</label>
-                <input asp-for="View.Sample.AnalysisDescription" class="form-control" readonly />
+                <textarea asp-for="View.Sample.AnalysisDescription" class="form-control" rows="5" readonly></textarea>
                 <span asp-description-for="View.Sample.AnalysisDescription" class="text-muted small">The description of the analysis corresponding to the sample.</span>
                 <span asp-validation-for="View.Sample.AnalysisDescription" class="text-danger small"></span>
             </div>
@@ -123,10 +124,10 @@
                 <span asp-validation-for="View.Sample.AnalysisNetworkData" class="text-danger small"></span>
             </div>
             <div class="form-group">
-                <label asp-for="View.Sample.AnalysisSourceData" class="font-weight-bold">Analysis source data</label>
-                <textarea asp-for="View.Sample.AnalysisSourceData" class="form-control" rows="5" readonly></textarea>
-                <span asp-description-for="View.Sample.AnalysisSourceData" class="text-muted small">The source data of the analysis corresponding to the sample.</span>
-                <span asp-validation-for="View.Sample.AnalysisSourceData" class="text-danger small"></span>
+                <label asp-for="View.Sample.AnalysisSourceNodeData" class="font-weight-bold">Analysis source node data</label>
+                <textarea asp-for="View.Sample.AnalysisSourceNodeData" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.AnalysisSourceNodeData" class="text-muted small">The source node data of the analysis corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.AnalysisSourceNodeData" class="text-danger small"></span>
             </div>
             <div class="form-group">
                 <label asp-for="View.Sample.AnalysisSourceNodeCollectionData" class="font-weight-bold">Analysis source node collection data</label>
@@ -135,16 +136,16 @@
                 <span asp-validation-for="View.Sample.AnalysisSourceNodeCollectionData" class="text-danger small"></span>
             </div>
             <div class="form-group">
-                <label asp-for="View.Sample.AnalysisTargetData" class="font-weight-bold">Analysis target data</label>
-                <textarea asp-for="View.Sample.AnalysisTargetData" class="form-control" rows="5" readonly></textarea>
-                <span asp-description-for="View.Sample.AnalysisTargetData" class="text-muted small">The target data of the analysis corresponding to the sample.</span>
-                <span asp-validation-for="View.Sample.AnalysisTargetData" class="text-danger small"></span>
+                <label asp-for="View.Sample.AnalysisTargetNodeData" class="font-weight-bold">Analysis target node data</label>
+                <textarea asp-for="View.Sample.AnalysisTargetNodeData" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.AnalysisTargetNodeData" class="text-muted small">The target node data of the analysis corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.AnalysisTargetNodeData" class="text-danger small"></span>
             </div>
             <div class="form-group">
-                <label asp-for="View.Sample.AnalysisTargetNodeCollectionData" class="font-weight-bold">Analysis target node collection data</label>
-                <textarea asp-for="View.Sample.AnalysisTargetNodeCollectionData" class="form-control" rows="5" readonly></textarea>
-                <span asp-description-for="View.Sample.AnalysisTargetNodeCollectionData" class="text-muted small">The target node collection data of the analysis corresponding to the sample.</span>
-                <span asp-validation-for="View.Sample.AnalysisTargetNodeCollectionData" class="text-danger small"></span>
+                <label asp-for="View.Sample.AnalysisSourceNodeCollectionData" class="font-weight-bold">Analysis target node collection data</label>
+                <textarea asp-for="View.Sample.AnalysisSourceNodeCollectionData" class="form-control" rows="5" readonly></textarea>
+                <span asp-description-for="View.Sample.AnalysisSourceNodeCollectionData" class="text-muted small">The target node collection data of the analysis corresponding to the sample.</span>
+                <span asp-validation-for="View.Sample.AnalysisSourceNodeCollectionData" class="text-danger small"></span>
             </div>
         </form>
     </div>

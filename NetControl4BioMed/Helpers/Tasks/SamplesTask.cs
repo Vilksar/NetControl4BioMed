@@ -152,9 +152,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                         AnalysisName = batchItem.AnalysisName,
                         AnalysisDescription = batchItem.AnalysisDescription,
                         AnalysisNetworkData = batchItem.AnalysisNetworkData,
-                        AnalysisSourceData = batchItem.AnalysisSourceData,
+                        AnalysisSourceNodeData = batchItem.AnalysisSourceNodeData,
                         AnalysisSourceNodeCollectionData = batchItem.AnalysisSourceNodeCollectionData,
-                        AnalysisTargetData = batchItem.AnalysisTargetData,
+                        AnalysisTargetNodeData = batchItem.AnalysisTargetNodeData,
                         AnalysisTargetNodeCollectionData = batchItem.AnalysisTargetNodeCollectionData,
                         SampleDatabases = sampleDatabases.ToList()
                     };
@@ -302,9 +302,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                     sample.AnalysisName = batchItem.AnalysisName;
                     sample.AnalysisDescription = batchItem.AnalysisDescription;
                     sample.AnalysisNetworkData = batchItem.AnalysisNetworkData;
-                    sample.AnalysisSourceData = batchItem.AnalysisSourceData;
+                    sample.AnalysisSourceNodeData = batchItem.AnalysisSourceNodeData;
                     sample.AnalysisSourceNodeCollectionData = batchItem.AnalysisSourceNodeCollectionData;
-                    sample.AnalysisTargetData = batchItem.AnalysisTargetData;
+                    sample.AnalysisTargetNodeData = batchItem.AnalysisTargetNodeData;
                     sample.AnalysisTargetNodeCollectionData = batchItem.AnalysisTargetNodeCollectionData;
                     sample.SampleDatabases = sampleDatabases.ToList();
                     // Add the node collection to the list.
