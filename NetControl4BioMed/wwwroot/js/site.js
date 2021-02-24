@@ -34,7 +34,9 @@ $(window).on('load', () => {
         // Go over each datatable.
         $('.table-datatable').each((index, element) => {
             // Format the table as datatable.
-            const table = $(element).DataTable();
+            const table = $(element).DataTable({
+                'autoWidth': false
+            });
             // Get the index of the index column.
             const columnIndex = table.column('index:name').index();
             // Check if there is any index column.
@@ -171,7 +173,7 @@ $(window).on('load', () => {
             // Check if the provided type doesn't match the data.
             if (!data.hasOwnProperty('Type') || typeof(data['Type']) !== 'string' || data['Type'].toLowerCase() !== type) {
                 // Show an error.
-                formFileGroupShowAlert(groupElement, 'danger', 'exclamation-circle', `The file does not have the required type \"${data['Type']}\". Please make sure that the right file was selected, and that the file has the correct format.`);
+                formFileGroupShowAlert(groupElement, 'danger', 'exclamation-circle', `The file does not have the required type \"${type}\". Please make sure that the right file was selected, and that the file has the correct format.`);
                 // Return from the function.
                 return;
             }
@@ -180,7 +182,7 @@ $(window).on('load', () => {
             // Check if the provided database type doesn't match the data.
             if (!data.hasOwnProperty('DatabaseType') || typeof (data['DatabaseType']) !== 'string' || data['DatabaseType'].toLowerCase() !== databaseType) {
                 // Show an error.
-                formFileGroupShowAlert(groupElement, 'danger', 'exclamation-circle', `The file does not have the required database type \"${data['DatabaseType']}\". Please make sure that the right file was selected, and that the file has the correct format.`);
+                formFileGroupShowAlert(groupElement, 'danger', 'exclamation-circle', `The file does not have the required database type \"${databaseType}\". Please make sure that the right file was selected, and that the file has the correct format.`);
                 // Return from the function.
                 return;
             }
@@ -191,7 +193,7 @@ $(window).on('load', () => {
                 // Define the required fields.
                 const requiredFields = ['Name', 'Description', 'IsPublic', 'Algorithm', 'NodeDatabaseData', 'EdgeDatabaseData', 'SeedNodeData', 'SeedNodeCollectionData', 'SeedEdgeData'];
                 // Get the fields that do not appear in the data.
-                const missingFields = requiredFields.filter(item => !Object.keys(data).Contains(item));
+                const missingFields = requiredFields.filter(item => !Object.keys(data).includes(item));
                 // Check if there are any missing fields.
                 if (missingFields.length !== 0) {
                     // Show an error.
@@ -222,7 +224,7 @@ $(window).on('load', () => {
                 // Check if the provided database type doesn't match the data.
                 if (!data.hasOwnProperty('Algorithm') || typeof (data['Algorithm']) !== 'string' || data['Algorithm'].toLowerCase() !== algorithm) {
                     // Show an error.
-                    formFileGroupShowAlert(groupElement, 'danger', 'exclamation-circle', `The file does not have the required algorithm \"${data['Algorithm']}\". Please make sure that the right file was selected, and that the file has the correct format.`);
+                    formFileGroupShowAlert(groupElement, 'danger', 'exclamation-circle', `The file does not have the required algorithm \"${algorithm}\". Please make sure that the right file was selected, and that the file has the correct format.`);
                     // Return from the function.
                     return;
                 }
