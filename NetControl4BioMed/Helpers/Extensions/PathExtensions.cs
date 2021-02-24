@@ -93,15 +93,12 @@ namespace NetControl4BioMed.Helpers.Extensions
         public static CytoscapeViewModel GetCytoscapeViewModel(this Path path, HttpContext httpContext, LinkGenerator linkGenerator, ApplicationDbContext context)
         {
             // Get the default values.
-            var emptyEnumerable = Enumerable.Empty<string>();
-            var interactionType = context.Paths
+            var databaseTypeName = context.Paths
                 .Where(item => item == path)
                 .Select(item => item.ControlPath.Analysis.AnalysisDatabases)
                 .SelectMany(item => item)
                 .Select(item => item.Database.DatabaseType.Name)
-                .FirstOrDefault();
-            var isGeneric = interactionType == "Generic";
-            var controlClasses = new List<string> { "control" };
+                .First();
             // Get the control data.
             var analysis = context.Paths
                 .Where(item => item == path)
@@ -135,9 +132,6 @@ namespace NetControl4BioMed.Helpers.Extensions
                         {
                             Id = item.Id,
                             Name = item.Name,
-                            Alias = item.DatabaseNodeFieldNodes
-                                .Where(item1 => item1.DatabaseNodeField.IsSearchable)
-                                .Select(item1 => item1.Value),
                             Classes = item.AnalysisNodes
                                 .Where(item1 => item1.Analysis == analysis)
                                 .Select(item1 => item1.Type.ToString().ToLower())
@@ -149,11 +143,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                             {
                                 Id = item.Id,
                                 Name = item.Name,
-                                Href = isGeneric ? string.Empty : linkGenerator.GetUriByPage(httpContext, "/Content/Data/Nodes/Details", handler: null, values: new { id = item.Id }),
-                                Alias = item.Alias
+                                Href = linkGenerator.GetUriByPage(httpContext, $"/Content/DatabaseTypes/{databaseTypeName}/Data/Nodes/Details", handler: null, values: new { id = item.Id })
                             },
-                            Classes = item.Classes
-                                .Concat(controlNodes.Contains(item.Id) ? controlClasses : emptyEnumerable)
+                            Classes = item.Classes.Concat(controlNodes.Contains(item.Id) ? new List<string> { "control" } : new List<string> { })
                         }),
                     Edges = context.PathEdges
                         .Where(item => item.Path == path)
@@ -182,11 +174,11 @@ namespace NetControl4BioMed.Helpers.Extensions
                             {
                                 Id = item.Id,
                                 Name = item.Name,
+                                Href = linkGenerator.GetUriByPage(httpContext, $"/Content/DatabaseTypes/{databaseTypeName}/Data/Edges/Details", handler: null, values: new { id = item.Id }),
                                 Source = item.SourceNodeId,
-                                Target = item.TargetNodeId,
-                                Interaction = interactionType
+                                Target = item.TargetNodeId
                             },
-                            Classes = controlEdges.Contains(item.Id) ? controlClasses : emptyEnumerable
+                            Classes = controlEdges.Contains(item.Id) ? new List<string> { "control" } : new List<string> { }
                         })
                 },
                 Layout = CytoscapeViewModel.DefaultLayout,

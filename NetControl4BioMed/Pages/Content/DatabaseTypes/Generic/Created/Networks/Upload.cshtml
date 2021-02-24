@@ -1,25 +1,51 @@
 ﻿@page
-@model CreateModel
+@model UploadModel
 @{
     ViewData["Title"] = "Create network";
 }
 
-@if (Model.View.Samples != null && Model.View.Samples.Any())
+@if (Model.View.SampleItems != null && Model.View.SampleItems.Any())
 {
-    <div class="dropdown mb-3">
-        <button class="btn btn-dark btn-block dropdown-toggle" type="button" data-toggle="dropdown">
-            <span><i class="fas fa-clipboard"></i></span>
-            <span>Load a sample</span>
-        </button>
-        <div class="dropdown-menu text-center w-100">
-            @foreach (var sample in Model.View.Samples)
-            {
-                <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Create" asp-route-sampleId="@sample.Id" class="dropdown-item" title="@sample.Description">@sample.Name</a>
-            }
+    <form method="get" class="text-justify">
+        <div class="alert alert-dark text-wrap text-justify form-file-group-alert">
+            <span class="form-file-group-alert-icon"><i class="fas fa-info-circle"></i></span>
+            <span class="form-file-group-alert-text">Optionally, select an available sample in order to automatically fill in the form.</span>
         </div>
-    </div>
+        <div class="input-group mb-3">
+            <select name="sampleId" class="custom-select">
+                <option value="" title="Select a sample to load" selected hidden disabled>Select a sample to load</option>
+                @foreach (var sampleItem in Model.View.SampleItems)
+                {
+                    <option value="@sampleItem.Id" title="@sampleItem.Description">@sampleItem.Name</option>
+                }
+            </select>
+            <div class="input-group-append">
+                <button asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Upload" type="submit" class="btn btn-dark btn-block" title="Load the selected sample">
+                    <span><i class="fas fa-cloud-upload-alt"></i></span>
+                    <span>Load sample</span>
+                </button>
+            </div>
+        </div>
+    </form>
 }
 <form method="post" class="text-justify">
+    <div class="form-file-group" data-type="network" data-database-type="generic">
+        <div class="alert alert-dark text-wrap text-justify">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>Optionally, select a JSON file containing a previously created network in order to automatically fill in the form and recreate it.</span>
+        </div>
+        <div class="alert text-wrap text-justify form-file-group-alert" hidden>
+            <span class="form-file-group-alert-icon"></span>
+            <span class="form-file-group-alert-text"></span>
+        </div>
+        <div class="form-group">
+            <textarea id="data-textarea-upload" class="form-control form-file-group-text mb-2" hidden></textarea>
+            <div class="custom-file">
+                <input type="file" accept=".json" class="custom-file-input form-file-group-file-upload" />
+                <label class="custom-file-label form-file-group-file-label text-truncate">Select a file to load</label>
+            </div>
+        </div>
+    </div>
     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
     <div class="card mb-3">
         <div class="card-header font-weight-bold">
@@ -74,19 +100,19 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>Input here the edges of the network.</span>
+                <span>Input here the edges of the new network, as pairs of nodes using their names.</span>
             </div>
             <div class="file-group" data-type="edges">
                 <div class="form-group" hidden>
-                    <label asp-for="Input.SeedData" class="font-weight-bold">Data</label>
-                    <textarea asp-for="Input.SeedData" class="form-control file-group-input"></textarea>
-                    <span asp-description-for="Input.SeedData" class="text-muted small">The edges of the new network, formatted as a JSON object. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                    <span asp-validation-for="Input.SeedData" class="text-danger small"></span>
+                    <label asp-for="Input.SeedEdgeData" class="font-weight-bold">Data</label>
+                    <textarea asp-for="Input.SeedEdgeData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.SeedEdgeData" class="text-muted small">The edges of the new network, formatted as a JSON object. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.SeedEdgeData" class="text-danger small"></span>
                 </div>
                 <div class="form-group">
                     <div class="row align-items-center mb-2">
                         <div class="col-lg-4">
-                            <label for="data-textarea-seed" class="font-weight-bold mb-0">Edges</label>
+                            <label for="data-textarea-seed-edge" class="font-weight-bold mb-0">Edges</label>
                             <span class="badge badge-dark file-group-count">0</span>
                         </div>
                         <div class="col-lg-8">
@@ -120,7 +146,7 @@
                             </div>
                         </div>
                     </div>
-                    <textarea id="data-textarea-seed" class="form-control file-group-text mb-2"></textarea>
+                    <textarea id="data-textarea-seed-edge" class="form-control file-group-text mb-2"></textarea>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>

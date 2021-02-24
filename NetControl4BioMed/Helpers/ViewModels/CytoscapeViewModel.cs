@@ -7,10 +7,16 @@ using System.Threading.Tasks;
 namespace NetControl4BioMed.Helpers.ViewModels
 {
     /// <summary>
-    /// Represents the model of a JSON file to be loaded in Cytoscape.
+    /// Represents the model of a JSON file to be rendered in Cytoscape and CytoscapeJS.
     /// </summary>
     public class CytoscapeViewModel
     {
+        /// <summary>
+        /// Represents the details of the data.
+        /// </summary>
+        [JsonPropertyName("data")]
+        public CytoscapeData Data { get; set; }
+
         /// <summary>
         /// Represents the elements of the data.
         /// </summary>
@@ -28,6 +34,30 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// </summary>
         [JsonPropertyName("style")]
         public IEnumerable<CytoscapeStyle> Styles { get; set; }
+
+        /// <summary>
+        /// Represents the model of the data.
+        /// </summary>
+        public class CytoscapeData
+        {
+            /// <summary>
+            /// Represents the ID of the data.
+            /// </summary>
+            [JsonPropertyName("id")]
+            public string Id { get; set; }
+
+            /// <summary>
+            /// Represents the name of the data.
+            /// </summary>
+            [JsonPropertyName("name")]
+            public string Name { get; set; }
+
+            /// <summary>
+            /// Represents the description of the data.
+            /// </summary>
+            [JsonPropertyName("description")]
+            public string Description { get; set; }
+        }
 
         /// <summary>
         /// Represents the model of the elements of the data.
@@ -87,10 +117,10 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     public string Href { get; set; }
 
                     /// <summary>
-                    /// Represents the aliases of the node.
+                    /// Represents the type of the node.
                     /// </summary>
-                    [JsonPropertyName("alias")]
-                    public IEnumerable<string> Alias { get; set; }
+                    [JsonPropertyName("type")]
+                    public string Type { get; set; }
                 }
             }
 
@@ -129,6 +159,12 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     public string Name { get; set; }
 
                     /// <summary>
+                    /// Represents the link destination of the edge.
+                    /// </summary>
+                    [JsonPropertyName("href")]
+                    public string Href { get; set; }
+
+                    /// <summary>
                     /// Represents the ID of the source node of the edge.
                     /// </summary>
                     [JsonPropertyName("source")]
@@ -143,8 +179,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     /// <summary>
                     /// Represents the type of the edge.
                     /// </summary>
-                    [JsonPropertyName("interaction")]
-                    public string Interaction { get; set; }
+                    [JsonPropertyName("type")]
+                    public string Type { get; set; }
                 }
             }
         }

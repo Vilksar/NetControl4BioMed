@@ -135,12 +135,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("The network algorithm is not valid.", showExceptionItem, batchItem);
                     }
-                    // Check if the analysis algorithm is valid.
-                    if (!Enum.TryParse<AnalysisAlgorithm>(batchItem.AnalysisAlgorithm, out var analysisAlgorithm))
-                    {
-                        // Throw an exception.
-                        throw new TaskException("The analysis algorithm is not valid.", showExceptionItem, batchItem);
-                    }
                     // Define the new node collection.
                     var sample = new Sample
                     {
@@ -152,11 +146,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                         NetworkAlgorithm = networkAlgorithm,
                         NetworkNodeDatabaseData = batchItem.NetworkNodeDatabaseData,
                         NetworkEdgeDatabaseData = batchItem.NetworkEdgeDatabaseData,
-                        NetworkSeedData = batchItem.NetworkSeedData,
+                        NetworkSeedNodeData = batchItem.NetworkSeedNodeData,
+                        NetworkSeedEdgeData = batchItem.NetworkSeedEdgeData,
                         NetworkSeedNodeCollectionData = batchItem.NetworkSeedNodeCollectionData,
                         AnalysisName = batchItem.AnalysisName,
                         AnalysisDescription = batchItem.AnalysisDescription,
-                        AnalysisAlgorithm = analysisAlgorithm,
                         AnalysisNetworkData = batchItem.AnalysisNetworkData,
                         AnalysisSourceData = batchItem.AnalysisSourceData,
                         AnalysisSourceNodeCollectionData = batchItem.AnalysisSourceNodeCollectionData,
@@ -294,12 +288,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("The network algorithm is not valid.", showExceptionItem, batchItem);
                     }
-                    // Check if the analysis algorithm is valid.
-                    if (!Enum.TryParse<AnalysisAlgorithm>(batchItem.AnalysisAlgorithm, out var analysisAlgorithm))
-                    {
-                        // Throw an exception.
-                        throw new TaskException("The analysis algorithm is not valid.", showExceptionItem, batchItem);
-                    }
                     // Update the node collection.
                     sample.Name = batchItem.Name;
                     sample.Description = batchItem.Description;
@@ -308,11 +296,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     sample.NetworkAlgorithm = networkAlgorithm;
                     sample.NetworkNodeDatabaseData = batchItem.NetworkNodeDatabaseData;
                     sample.NetworkEdgeDatabaseData = batchItem.NetworkEdgeDatabaseData;
-                    sample.NetworkSeedData = batchItem.NetworkSeedData;
+                    sample.NetworkSeedNodeData = batchItem.NetworkSeedNodeData;
+                    sample.NetworkSeedEdgeData = batchItem.NetworkSeedEdgeData;
                     sample.NetworkSeedNodeCollectionData = batchItem.NetworkSeedNodeCollectionData;
                     sample.AnalysisName = batchItem.AnalysisName;
                     sample.AnalysisDescription = batchItem.AnalysisDescription;
-                    sample.AnalysisAlgorithm = analysisAlgorithm;
                     sample.AnalysisNetworkData = batchItem.AnalysisNetworkData;
                     sample.AnalysisSourceData = batchItem.AnalysisSourceData;
                     sample.AnalysisSourceNodeCollectionData = batchItem.AnalysisSourceNodeCollectionData;

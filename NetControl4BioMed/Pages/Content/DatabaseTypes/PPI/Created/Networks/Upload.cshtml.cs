@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml;
+using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,14 +23,14 @@ using NetControl4BioMed.Helpers.Tasks;
 namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
 {
     [RequestFormLimits(ValueLengthLimit = 16 * 1024 * 1024)]
-    public class CreateModel : PageModel
+    public class UploadModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public CreateModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
+        public UploadModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
         {
             _serviceProvider = serviceProvider;
             _userManager = userManager;
@@ -51,10 +54,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             [Required(ErrorMessage = "This field is required.")]
             public bool IsPublic { get; set; }
 
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
-            public string Algorithm { get; set; }
-
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
             public string NodeDatabaseData { get; set; }
@@ -65,11 +64,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
-            public string SeedNodeData { get; set; }
-
-            [DataType(DataType.MultilineText)]
-            [Required(ErrorMessage = "This field is required.")]
-            public string SeedNodeCollectionData { get; set; }
+            public string SeedEdgeData { get; set; }
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
@@ -87,8 +82,13 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             public IEnumerable<Database> NodeDatabases { get; set; }
 
             public IEnumerable<Database> EdgeDatabases { get; set; }
+        }
 
-            public IEnumerable<NodeCollection> SeedNodeCollections { get; set; }
+        public class EdgeItemModel
+        {
+            public string SourceNode { get; set; }
+
+            public string TargetNode { get; set; }
         }
 
         public class SampleItemModel
@@ -123,10 +123,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                 EdgeDatabases = _context.Databases
                     .Where(item => item.DatabaseType.Name == "PPI")
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.DatabaseEdges.Any()),
-                SeedNodeCollections = _context.NodeCollections
-                    .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
-                    .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                    .Where(item => item.DatabaseEdges.Any())
             };
             // Check if there weren't any node databases available.
             if (View.NodeDatabases == null || !View.NodeDatabases.Any())
@@ -169,13 +166,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     Description = networks
                         .Select(item => item.Description)
                         .FirstOrDefault(),
-                    IsPublic = networks
-                        .Select(item => item.IsPublic)
-                        .FirstOrDefault(),
-                    Algorithm = networks
-                        .Select(item => item.Algorithm)
-                        .FirstOrDefault()
-                        .ToString(),
+                    IsPublic = !View.IsUserAuthenticated,
                     NodeDatabaseData = JsonSerializer.Serialize(networks
                         .Select(item => item.NetworkDatabases)
                         .SelectMany(item => item)
@@ -188,17 +179,21 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                         .Select(item => item.Database)
                         .Intersect(View.EdgeDatabases)
                         .Select(item => item.Id)),
-                    SeedNodeData = JsonSerializer.Serialize(networks
-                        .Select(item => item.NetworkNodes)
+                    SeedEdgeData = JsonSerializer.Serialize(networks
+                        .Select(item => item.NetworkEdges)
                         .SelectMany(item => item)
-                        .Where(item => item.Type == NetworkNodeType.Seed)
-                        .Select(item => item.Node.Name)),
-                    SeedNodeCollectionData = JsonSerializer.Serialize(networks
-                        .Select(item => item.NetworkNodeCollections)
-                        .SelectMany(item => item)
-                        .Select(item => item.NodeCollection)
-                        .Intersect(View.SeedNodeCollections)
-                        .Select(item => item.Id))
+                        .Select(item => new EdgeItemModel
+                        {
+                            SourceNode = item.Edge.EdgeNodes
+                                .Where(item1 => item1.Type == EdgeNodeType.Source)
+                                .Select(item1 => item1.Node.Name)
+                                .FirstOrDefault(),
+                            TargetNode = item.Edge.EdgeNodes
+                                .Where(item1 => item1.Type == EdgeNodeType.Target)
+                                .Select(item1 => item1.Node.Name)
+                                .FirstOrDefault()
+                        })
+                        .Where(item => !string.IsNullOrEmpty(item.SourceNode) && !string.IsNullOrEmpty(item.TargetNode)))
                 };
             }
             // Check if there was a sample provided.
@@ -222,11 +217,9 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     Name = sample.NetworkName,
                     Description = sample.NetworkDescription,
                     IsPublic = !View.IsUserAuthenticated,
-                    Algorithm = sample.NetworkAlgorithm.ToString(),
                     NodeDatabaseData = sample.NetworkNodeDatabaseData,
                     EdgeDatabaseData = sample.NetworkEdgeDatabaseData,
-                    SeedNodeData = sample.NetworkSeedNodeData,
-                    SeedNodeCollectionData = sample.NetworkSeedNodeCollectionData
+                    SeedEdgeData = sample.NetworkSeedEdgeData
                 };
             }
             else
@@ -235,11 +228,9 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                 Input = new InputModel
                 {
                     IsPublic = !View.IsUserAuthenticated,
-                    Algorithm = NetworkAlgorithm.None.ToString(),
                     NodeDatabaseData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                     EdgeDatabaseData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
-                    SeedNodeData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
-                    SeedNodeCollectionData = JsonSerializer.Serialize(Enumerable.Empty<string>())
+                    SeedEdgeData = JsonSerializer.Serialize(Enumerable.Empty<EdgeItemModel>())
                 };
             }
             // Return the page.
@@ -269,10 +260,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                 EdgeDatabases = _context.Databases
                     .Where(item => item.DatabaseType.Name == "PPI")
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
-                    .Where(item => item.DatabaseEdges.Any()),
-                SeedNodeCollections = _context.NodeCollections
-                    .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
-                    .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                    .Where(item => item.DatabaseEdges.Any())
             };
             // Check if there weren't any node databases available.
             if (View.NodeDatabases == null || !View.NodeDatabases.Any())
@@ -311,27 +299,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "You are not logged in, so the network must be set as public.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Try to get the algorithm.
-            try
-            {
-                // Get the algorithm.
-                var algorithm = EnumerationExtensions.GetEnumerationValue<NetworkAlgorithm>(Input.Algorithm);
-            }
-            catch (Exception)
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The network generation algorithm couldn't be determined from the provided string.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Check if the algorithm is not valid.
-            if (!Enum.GetValues(typeof(NetworkAlgorithm)).Cast<NetworkAlgorithm>().Where(item => item != NetworkAlgorithm.None).Select(item => item.ToString()).Contains(Input.Algorithm))
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The network generation algorithm is not valid.");
                 // Redisplay the page.
                 return Page();
             }
@@ -387,18 +354,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                 // Redisplay the page.
                 return Page();
             }
-            // Try to deserialize the seed node collection data.
-            if (!Input.SeedNodeCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out var seedNodeCollectionIds) || seedNodeCollectionIds == null)
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided seed protein collection data could not be deserialized.");
-                // Redisplay the page.
-                return Page();
-            }
-            // Try to get the seed node collections with the provided IDs.
-            var seedNodeCollections = View.SeedNodeCollections.Where(item => seedNodeCollectionIds.Contains(item.Id));
             // Try to deserialize the seed data.
-            if (!Input.SeedNodeData.TryDeserializeJsonObject<IEnumerable<string>>(out var items) || items == null)
+            if (!Input.SeedEdgeData.TryDeserializeJsonObject<IEnumerable<EdgeItemModel>>(out var items) || items == null)
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The provided seed data could not be deserialized.");
@@ -406,22 +363,39 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                 return Page();
             }
             // Check if there weren't any items found.
-            if (!items.Any() && !seedNodeCollections.Any())
+            if (!items.Any())
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No items could be found within the provided seed data or the selected seed protein collections.");
+                ModelState.AddModelError(string.Empty, "No interactions could be found within the provided seed data.");
                 // Redisplay the page.
                 return Page();
             }
             // Serialize the seed data.
             var data = JsonSerializer.Serialize(items
-                .Select(item => new NetworkNodeInputModel
+                .Select(item => new NetworkEdgeInputModel
                 {
-                    Node = new NodeInputModel
+                    Edge = new EdgeInputModel
                     {
-                        Id = item
-                    },
-                    Type = "Seed"
+                        EdgeNodes = new List<EdgeNodeInputModel>
+                        {
+                                new EdgeNodeInputModel
+                                {
+                                    Node = new NodeInputModel
+                                    {
+                                        Id = item.SourceNode
+                                    },
+                                    Type = "Source"
+                                },
+                                new EdgeNodeInputModel
+                                {
+                                    Node = new NodeInputModel
+                                    {
+                                        Id = item.TargetNode
+                                    },
+                                    Type = "Target"
+                                }
+                        }
+                    }
                 }));
             // Define a new task.
             var task = new NetworksTask
@@ -435,7 +409,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                         Name = Input.Name,
                         Description = Input.Description,
                         IsPublic = Input.IsPublic,
-                        Algorithm = Input.Algorithm,
+                        Algorithm = NetworkAlgorithm.None.ToString(),
                         Data = data,
                         NetworkDatabases = nodeDatabases
                             .Select(item => item.Id)
@@ -468,17 +442,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                                     }
                                 }
                             } :
-                            new List<NetworkUserInputModel>(),
-                        NetworkNodeCollections = seedNodeCollections
-                            .Select(item => item.Id)
-                            .Select(item => new NetworkNodeCollectionInputModel
-                            {
-                                NodeCollection = new NodeCollectionInputModel
-                                {
-                                    Id = item
-                                },
-                                Type = "Seed"
-                            })
+                            new List<NetworkUserInputModel>()
                     }
                 }
             };
@@ -506,7 +470,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                 return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Networks/Details/Index", new { id = ids.First() });
             }
             // Display a message.
-            TempData["StatusMessage"] = $"Success: 1 PPI network defined successfully and scheduled for generation.";
+            TempData["StatusMessage"] = $"Success: 1 PPI network of type defined successfully and scheduled for generation.";
             // Redirect to the index page.
             return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Networks/Index");
         }

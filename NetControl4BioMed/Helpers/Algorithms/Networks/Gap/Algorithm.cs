@@ -77,6 +77,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Gap
             }
             // Define the required data.
             var data = new List<NetworkNodeInputModel>();
+            var databaseTypeName = string.Empty;
             var nodeDatabaseIds = new List<string>();
             var edgeDatabaseIds = new List<string>();
             var seedNodeCollectionIds = new List<string>();
@@ -146,6 +147,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Gap
                     // End the function.
                     return;
                 }
+                // Get the database type name.
+                databaseTypeName = databaseTypes.Select(item => item.Name).First();
                 // Try to deserialize the data.
                 if (!network.Data.TryDeserializeJsonObject<List<NetworkNodeInputModel>>(out data) || data == null)
                 {
@@ -181,6 +184,9 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Gap
                     .Select(item => item.Id)
                     .ToList();
             }
+            // Get the related data.
+            var nodeTitle = databaseTypeName == "PPI" ? "Protein" : "Node";
+            var edgeTitle = databaseTypeName == "PPI" ? "Interaction" : "Edge";
             // Get the node identifiers from the data.
             var seedNodeIdentifiers = data
                 .Where(item => item.Type == "Seed")
@@ -214,7 +220,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Gap
                     // Update the status of the item.
                     network.Status = NetworkStatus.Error;
                     // Add a message to the log.
-                    network.Log = network.AppendToLog("No available nodes could be found in the selected databases.");
+                    network.Log = network.AppendToLog($"No available {nodeTitle.ToLower()}s could be found in the selected databases.");
                     // Edit the network.
                     await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     // End the function.
@@ -230,7 +236,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Gap
                     // Update the status of the item.
                     network.Status = NetworkStatus.Error;
                     // Add a message to the log.
-                    network.Log = network.AppendToLog("No available edges could be found in the selected databases.");
+                    network.Log = network.AppendToLog($"No available {edgeTitle.ToLower()}s could be found in the selected databases.");
                     // Edit the network.
                     await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     // End the function.
@@ -252,7 +258,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Gap
                     // Update the status of the item.
                     network.Status = NetworkStatus.Error;
                     // Add a message to the log.
-                    network.Log = network.AppendToLog("No seed nodes could be found with the provided seed data.");
+                    network.Log = network.AppendToLog($"No seed {nodeTitle.ToLower()}s could be found with the provided seed data.");
                     // Edit the network.
                     await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     // End the function.
@@ -260,7 +266,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Gap
                 }
             }
             // Define the list to store the edges.
-            var currentEdgeList = new List<List<EdgeItemModel>>();
+            var currentEdgeLists = new List<List<EdgeItemModel>>();
             // For "gap" times, for all terminal nodes, add all possible edges.
             for (int gapIndex = 0; gapIndex < gapValue + 1; gapIndex++)
             {
@@ -276,7 +282,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Gap
                     var terminalNodeIds = gapIndex == 0 ?
                         seedNodeIds
                             .ToList() :
-                        currentEdgeList
+                        currentEdgeLists
                             .Last()
                             .Select(item => item.TargetNodeId)
                             .Distinct()
@@ -301,7 +307,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Gap
                         .Where(item => !string.IsNullOrEmpty(item.EdgeId) && !string.IsNullOrEmpty(item.SourceNodeId) && !string.IsNullOrEmpty(item.TargetNodeId))
                         .ToList();
                     // Add them to the list.
-                    currentEdgeList.Add(temporaryList);
+                    currentEdgeLists.Add(temporaryList);
                 }
             }
             // Define a variable to store, at each step, the nodes to keep.
@@ -310,24 +316,21 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Gap
             for (int gapIndex = gapValue; gapIndex >= 0; gapIndex--)
             {
                 // Remove from the list all edges that do not end in nodes to keep.
-                currentEdgeList.ElementAt(gapIndex)
+                currentEdgeLists.ElementAt(gapIndex)
                     .RemoveAll(item => !nodeIdsToKeep.Contains(item.TargetNodeId));
                 // Update the nodes to keep to be the source nodes of the interactions of the current step together with the seed nodes.
-                nodeIdsToKeep = currentEdgeList
+                nodeIdsToKeep = currentEdgeLists
                     .ElementAt(gapIndex)
                     .Select(item => item.SourceNodeId)
                     .Concat(seedNodeIds)
                     .Distinct()
                     .ToList();
             }
-            // Define the edges of the network.
-            var edgeIds = currentEdgeList
-                .SelectMany(item => item)
-                .Select(item => item.EdgeId)
-                .Distinct()
-                .ToList();
+            // Define the list to store the edges.
+            var currentEdgeList = currentEdgeLists
+                .SelectMany(item => item);
             // Check if there haven't been any edges found.
-            if (edgeIds == null || !edgeIds.Any())
+            if (currentEdgeList == null || !currentEdgeList.Any())
             {
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
@@ -346,19 +349,22 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Gap
                     // Update the status of the item.
                     network.Status = NetworkStatus.Error;
                     // Add a message to the log.
-                    network.Log = network.AppendToLog("No edges could be found with the provided data using the provided algorithm.");
+                    network.Log = network.AppendToLog($"No {edgeTitle.ToLower()}s could be found with the provided data using the provided algorithm.");
                     // Edit the network.
                     await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                 }
                 // End the function.
                 return;
             }
+            // Define the edges of the network.
+            var edgeIds = currentEdgeList
+                .Select(item => item.EdgeId)
+                .Distinct()
+                .ToList();
             // Get all of the nodes used by the found edges.
             var nodeIds = currentEdgeList
-                .SelectMany(item => item)
                 .Select(item => item.SourceNodeId)
                 .Concat(currentEdgeList
-                    .SelectMany(item => item)
                     .Select(item => item.TargetNodeId))
                 .Distinct()
                 .ToList();
@@ -366,87 +372,26 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Gap
             seedNodeIds = seedNodeIds
                 .Intersect(nodeIds)
                 .ToList();
-            // Define the required items.
-            var networkNodes = new List<NetworkNode>();
-            // Get the total number of batches.
-            var seedNodeBatchCount = Math.Ceiling((double)seedNodeIds.Count() / ApplicationDbContext.BatchSize);
-            // Go over each batch.
-            for (var index = 0; index < seedNodeBatchCount; index++)
-            {
-                // Use a new scope.
-                using (var scope = serviceProvider.CreateScope())
+            // Define the related entities.
+            var networkNodes = nodeIds
+                .Select(item => new NetworkNode
                 {
-                    // Use a new context instance.
-                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    // Get the items in the current batch.
-                    var batchItems = seedNodeIds
-                        .Skip(index * ApplicationDbContext.BatchSize)
-                        .Take(ApplicationDbContext.BatchSize);
-                    // Get the corresponding items.
-                    var items = context.Nodes
-                        .Where(item => batchItems.Contains(item.Id))
-                        .Select(item => new NetworkNode
-                        {
-                            NodeId = item.Id,
-                            Type = NetworkNodeType.Seed
-                        });
-                    // Add the items to the list.
-                    networkNodes.AddRange(items);
-                }
-            }
-            // Get the total number of batches.
-            var nodeBatchCount = Math.Ceiling((double)nodeIds.Count() / ApplicationDbContext.BatchSize);
-            // Go over each batch.
-            for (var index = 0; index < nodeBatchCount; index++)
-            {
-                // Use a new scope.
-                using (var scope = serviceProvider.CreateScope())
+                    NodeId = item,
+                    Type = NetworkNodeType.None
+                })
+                .Concat(seedNodeIds
+                    .Select(item => new NetworkNode
+                    {
+                        NodeId = item,
+                        Type = NetworkNodeType.Seed
+                    }))
+                .ToList();
+            var networkEdges = edgeIds
+                .Select(item => new NetworkEdge
                 {
-                    // Use a new context instance.
-                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    // Get the items in the current batch.
-                    var batchItems = nodeIds
-                        .Skip(index * ApplicationDbContext.BatchSize)
-                        .Take(ApplicationDbContext.BatchSize);
-                    // Get the corresponding items.
-                    var items = context.Nodes
-                        .Where(item => batchItems.Contains(item.Id))
-                        .Select(item => new NetworkNode
-                        {
-                            NodeId = item.Id,
-                            Type = NetworkNodeType.None
-                        });
-                    // Add the items to the list.
-                    networkNodes.AddRange(items);
-                }
-            }
-            // Define the required items.
-            var networkEdges = new List<NetworkEdge>();
-            // Get the total number of batches.
-            var edgeBatchCount = Math.Ceiling((double)edgeIds.Count() / ApplicationDbContext.BatchSize);
-            // Go over each batch.
-            for (var index = 0; index < edgeBatchCount; index++)
-            {
-                // Use a new scope.
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    // Use a new context instance.
-                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    // Get the items in the current batch.
-                    var batchItems = edgeIds
-                        .Skip(index * ApplicationDbContext.BatchSize)
-                        .Take(ApplicationDbContext.BatchSize);
-                    // Get the corresponding items.
-                    var items = context.Edges
-                        .Where(item => batchItems.Contains(item.Id))
-                        .Select(item => new NetworkEdge
-                        {
-                            EdgeId = item.Id
-                        });
-                    // Add the items to the list.
-                    networkEdges.AddRange(items);
-                }
-            }
+                    EdgeId = item
+                })
+                .ToList();
             // Use a new scope.
             using (var scope = serviceProvider.CreateScope())
             {
