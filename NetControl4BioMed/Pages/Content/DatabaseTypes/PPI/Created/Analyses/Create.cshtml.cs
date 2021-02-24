@@ -42,7 +42,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
         [BindProperty]
         public InputModel Input { get; set; }
 
-        public class InputModel
+        public class InputModel : IValidatableObject
         {
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
@@ -65,7 +65,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
-            public string SourceData { get; set; }
+            public string SourceNodeData { get; set; }
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
@@ -73,7 +73,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
-            public string TargetData { get; set; }
+            public string TargetNodeData { get; set; }
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
@@ -94,6 +94,45 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
             public string ReCaptchaToken { get; set; }
+
+            public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+            {
+                // Check the selected algorithm.
+                if (Algorithm == AnalysisAlgorithm.Greedy.ToString())
+                {
+                    // Check if the parameters don't match the algorithm.
+                    if (GreedyAlgorithmParameters == null)
+                    {
+                        // Return an error.
+                        yield return new ValidationResult("The parameters do not match the chosen algorithm.", new List<string> { string.Empty });
+                    }
+                    // Get the validation results for the parameters.
+                    var validationResults = GreedyAlgorithmParameters.Validate(validationContext);
+                    // Go over each validation error.
+                    foreach (var validationResult in validationResults)
+                    {
+                        // Return an error.
+                        yield return new ValidationResult(validationResult.ErrorMessage, validationResult.MemberNames.Select(item => $"Input.{nameof(GreedyAlgorithmParameters)}.{item}"));
+                    }
+                }
+                else if (Algorithm == AnalysisAlgorithm.Genetic.ToString())
+                {
+                    // Check if the parameters don't match the algorithm.
+                    if (GeneticAlgorithmParameters == null)
+                    {
+                        // Return an error.
+                        yield return new ValidationResult("The parameters do not match the chosen algorithm.", new List<string> { string.Empty });
+                    }
+                    // Get the validation results for the parameters.
+                    var validationResults = GeneticAlgorithmParameters.Validate(validationContext);
+                    // Go over each validation error.
+                    foreach (var validationResult in validationResults)
+                    {
+                        // Return an error.
+                        yield return new ValidationResult(validationResult.ErrorMessage, validationResult.MemberNames.Select(item => $"Input.{nameof(GeneticAlgorithmParameters)}.{item}"));
+                    }
+                }
+            }
         }
 
         public ViewModel View { get; set; }
@@ -193,14 +232,14 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     IsPublic = analyses
                         .Select(item => item.IsPublic)
                         .FirstOrDefault(),
-                    Algorithm = algorithm,
+                    Algorithm = View.Algorithm,
                     NetworkData = JsonSerializer.Serialize(analyses
                         .Select(item => item.AnalysisNetworks)
                         .SelectMany(item => item)
                         .Select(item => item.Network)
                         .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
                         .Select(item => item.Id)),
-                    SourceData = JsonSerializer.Serialize(analyses
+                    SourceNodeData = JsonSerializer.Serialize(analyses
                         .Select(item => item.AnalysisNodes)
                         .SelectMany(item => item)
                         .Where(item => item.Type == AnalysisNodeType.Source)
@@ -212,7 +251,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                         .Select(item => item.NodeCollection)
                         .Intersect(View.SourceNodeCollections)
                         .Select(item => item.Id)),
-                    TargetData = JsonSerializer.Serialize(analyses
+                    TargetNodeData = JsonSerializer.Serialize(analyses
                         .Select(item => item.AnalysisNodes)
                         .SelectMany(item => item)
                         .Where(item => item.Type == AnalysisNodeType.Target)
@@ -255,11 +294,11 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     Name = sample.AnalysisName,
                     Description = sample.AnalysisDescription,
                     IsPublic = !View.IsUserAuthenticated,
-                    Algorithm = sample.AnalysisAlgorithm.ToString(),
+                    Algorithm = View.Algorithm,
                     NetworkData = sample.AnalysisNetworkData,
-                    SourceData = sample.AnalysisSourceData,
+                    SourceNodeData = sample.AnalysisSourceData,
                     SourceNodeCollectionData = sample.AnalysisSourceNodeCollectionData,
-                    TargetData = sample.AnalysisTargetData,
+                    TargetNodeData = sample.AnalysisTargetData,
                     TargetNodeCollectionData = sample.AnalysisTargetNodeCollectionData,
                     MaximumIterations = 100,
                     MaximumIterationsWithoutImprovement = 25,
@@ -275,9 +314,9 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     IsPublic = !View.IsUserAuthenticated,
                     Algorithm = View.Algorithm,
                     NetworkData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
-                    SourceData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
+                    SourceNodeData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                     SourceNodeCollectionData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
-                    TargetData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
+                    TargetNodeData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                     TargetNodeCollectionData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                     MaximumIterations = 100,
                     MaximumIterationsWithoutImprovement = 25,
@@ -358,14 +397,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                 // Redisplay the page.
                 return Page();
             }
-            // Check if the parameters match the given algorithm.
-            if ((Input.Algorithm == AnalysisAlgorithm.Greedy.ToString() && Input.GreedyAlgorithmParameters == null) || (Input.Algorithm == AnalysisAlgorithm.Genetic.ToString() && Input.GeneticAlgorithmParameters == null))
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The parameter values are not valid for the chosen algorithm.");
-                // Redisplay the page.
-                return Page();
-            }
             // Try to deserialize the network data.
             if (!Input.NetworkData.TryDeserializeJsonObject<IEnumerable<string>>(out var networkIds) || networkIds == null)
             {
@@ -397,7 +428,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                 return Page();
             }
             // Try to deserialize the seed data.
-            if (!Input.SourceData.TryDeserializeJsonObject<IEnumerable<string>>(out var sourceItems) || sourceItems == null)
+            if (!Input.SourceNodeData.TryDeserializeJsonObject<IEnumerable<string>>(out var sourceItems) || sourceItems == null)
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The provided source data could not be deserialized.");
@@ -416,7 +447,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
             var sourceNodeCollections = View.SourceNodeCollections
                 .Where(item => sourceNodeCollectionIds.Contains(item.Id));
             // Try to deserialize the target data.
-            if (!Input.TargetData.TryDeserializeJsonObject<IEnumerable<string>>(out var targetItems) || targetItems == null)
+            if (!Input.TargetNodeData.TryDeserializeJsonObject<IEnumerable<string>>(out var targetItems) || targetItems == null)
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The provided target data could not be deserialized.");
@@ -477,8 +508,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                         MaximumIterations = Input.MaximumIterations,
                         MaximumIterationsWithoutImprovement = Input.MaximumIterationsWithoutImprovement,
                         Algorithm = Input.Algorithm,
-                        Parameters = Input.Algorithm == AnalysisAlgorithm.Greedy.ToString() ? JsonSerializer.Serialize(Input.GreedyAlgorithmParameters, new JsonSerializerOptions { IgnoreReadOnlyProperties = true }) :
-                            Input.Algorithm == AnalysisAlgorithm.Genetic.ToString() ? JsonSerializer.Serialize(Input.GeneticAlgorithmParameters, new JsonSerializerOptions { IgnoreReadOnlyProperties = true }) :
+                        Parameters = Input.Algorithm == AnalysisAlgorithm.Greedy.ToString() ? JsonSerializer.Serialize(Input.GreedyAlgorithmParameters) :
+                            Input.Algorithm == AnalysisAlgorithm.Genetic.ToString() ? JsonSerializer.Serialize(Input.GeneticAlgorithmParameters) :
                             null,
                         AnalysisUsers = View.IsUserAuthenticated ?
                             new List<AnalysisUserInputModel>

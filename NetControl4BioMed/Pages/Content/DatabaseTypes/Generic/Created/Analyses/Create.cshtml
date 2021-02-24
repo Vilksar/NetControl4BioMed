@@ -1,31 +1,58 @@
 ﻿@page
 @model CreateModel
 @using Helpers.Extensions
+@using NetControl4BioMed.Data.Enumerations
 @{
     ViewData["Title"] = "Create analysis";
 }
 
 @if (Model.View.SampleItems != null && Model.View.SampleItems.Any())
 {
-    <form method="get" class="text-justify">
-        <div class="input-group mb-3">
-            <select name="sampleId" class="custom-select">
-                <option value="" title="Select a sample to load" selected hidden disabled>Select a sample to load</option>
-                @foreach (var sampleItem in Model.View.SampleItems)
-                {
-                    <option value="@sampleItem.Id" title="@sampleItem.Description">@sampleItem.Name</option>
-                }
-            </select>
-            <div class="input-group-append">
-                <button asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Create" type="submit" class="btn btn-dark btn-block item-group-button" title="Load the selected sample">
-                    <span><i class="fas fa-cloud-upload-alt"></i></span>
-                    <span>Load sample</span>
-                </button>
-            </div>
+<form method="get" class="text-justify">
+    <div class="alert alert-dark text-wrap text-justify form-file-group-alert">
+        <span class="form-file-group-alert-icon"><i class="fas fa-info-circle"></i></span>
+        <span class="form-file-group-alert-text">Optionally, select an available sample in order to automatically fill in the form.</span>
+    </div>
+    <div class="form-group" hidden>
+        <label class="font-weight-bold">Algorithm</label>
+        <input type="text" name="algorithm" class="form-control" value="@Model.View.Algorithm" />
+        <span class="text-muted small">The name of the algorithm new analysis.</span>
+    </div>
+    <div class="input-group mb-3">
+        <select name="sampleId" class="custom-select">
+            <option value="" title="Select a sample to load" selected hidden disabled>Select a sample to load</option>
+            @foreach (var sampleItem in Model.View.SampleItems)
+            {
+                <option value="@sampleItem.Id" title="@sampleItem.Description">@sampleItem.Name</option>
+            }
+        </select>
+        <div class="input-group-append">
+            <button asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Create" type="submit" class="btn btn-dark btn-block" title="Load the selected sample">
+                <span><i class="fas fa-cloud-upload-alt"></i></span>
+                <span>Load sample</span>
+            </button>
         </div>
-    </form>
+    </div>
+</form>
 }
 <form method="post" class="text-justify">
+    <div class="form-file-group" data-type="analysis" data-database-type="generic" data-algorithm="@Model.View.Algorithm.ToLower()">
+        <div class="alert alert-dark text-wrap text-justify">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>Optionally, select a JSON file containing a previously created analysis in order to automatically fill in the form and recreate it.</span>
+        </div>
+        <div class="alert text-wrap text-justify form-file-group-alert" hidden>
+            <span class="form-file-group-alert-icon"></span>
+            <span class="form-file-group-alert-text"></span>
+        </div>
+        <div class="form-group">
+            <textarea id="data-textarea-upload" class="form-control form-file-group-text mb-2" hidden></textarea>
+            <div class="custom-file">
+                <input type="file" accept=".json" class="custom-file-input form-file-group-file-upload" />
+                <label class="custom-file-label form-file-group-file-label text-truncate">Select a file to load</label>
+            </div>
+        </div>
+    </div>
     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
     <div class="card mb-3">
         <div class="card-header font-weight-bold">
@@ -67,7 +94,7 @@
             <div class="form-group" hidden>
                 <label asp-for="Input.Algorithm" class="font-weight-bold">Algorithm</label>
                 <select asp-for="Input.Algorithm" class="custom-select">
-                    @foreach (var item in Enum.GetValues(typeof(NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
+                    @foreach (var item in Enum.GetValues(typeof(AnalysisAlgorithm)).Cast<AnalysisAlgorithm>())
                     {
                         <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
                     }
@@ -159,15 +186,15 @@
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
-                    <label asp-for="Input.SourceData" class="font-weight-bold">Source nodes</label>
-                    <textarea asp-for="Input.SourceData" class="form-control file-group-input"></textarea>
-                    <span asp-description-for="Input.SourceData" class="text-muted small">The nodes to be used as source nodes by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                    <span asp-validation-for="Input.SourceData" class="text-danger small"></span>
+                    <label asp-for="Input.SourceNodeData" class="font-weight-bold">Source nodes</label>
+                    <textarea asp-for="Input.SourceNodeData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.SourceNodeData" class="text-muted small">The nodes to be used as source nodes by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.SourceNodeData" class="text-danger small"></span>
                 </div>
                 <div class="form-group">
                     <div class="row align-items-center mb-2">
                         <div class="col-lg-4">
-                            <label for="data-textarea-source" class="font-weight-bold mb-0">Source nodes</label>
+                            <label for="data-textarea-source-node" class="font-weight-bold mb-0">Source nodes</label>
                             <span class="badge badge-dark file-group-count">0</span>
                         </div>
                         <div class="col-lg-8">
@@ -187,7 +214,7 @@
                             </div>
                         </div>
                     </div>
-                    <textarea id="data-textarea-source" class="form-control file-group-text mb-2"></textarea>
+                    <textarea id="data-textarea-source-node" class="form-control file-group-text mb-2"></textarea>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
@@ -215,15 +242,15 @@
             </div>
             <div class="file-group" data-type="items">
                 <div class="form-group" hidden>
-                    <label asp-for="Input.TargetData" class="font-weight-bold">Target nodes</label>
-                    <textarea asp-for="Input.TargetData" class="form-control file-group-input"></textarea>
-                    <span asp-description-for="Input.TargetData" class="text-muted small">The nodes to be used as target nodes by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                    <span asp-validation-for="Input.TargetData" class="text-danger small"></span>
+                    <label asp-for="Input.TargetNodeData" class="font-weight-bold">Target nodes</label>
+                    <textarea asp-for="Input.TargetNodeData" class="form-control file-group-input"></textarea>
+                    <span asp-description-for="Input.TargetNodeData" class="text-muted small">The nodes to be used as target nodes by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                    <span asp-validation-for="Input.TargetNodeData" class="text-danger small"></span>
                 </div>
                 <div class="form-group">
                     <div class="row align-items-center mb-2">
                         <div class="col-lg-4">
-                            <label for="data-textarea-target" class="font-weight-bold mb-0">Target nodes</label>
+                            <label for="data-textarea-target-node" class="font-weight-bold mb-0">Target nodes</label>
                             <span class="badge badge-dark file-group-count">0</span>
                         </div>
                         <div class="col-lg-8">
@@ -243,7 +270,7 @@
                             </div>
                         </div>
                     </div>
-                    <textarea id="data-textarea-target" class="form-control file-group-text mb-2"></textarea>
+                    <textarea id="data-textarea-target-node" class="form-control file-group-text mb-2"></textarea>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input file-group-file-upload" />
                         <label class="custom-file-label file-group-file-label">Choose file</label>
@@ -292,7 +319,7 @@
                 </div>
             </div>
             @if (Model.View.Algorithm == NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm.Greedy.ToString())
-            {
+            { 
                 <div class="row">
                     <div class="col-lg-6 order-1 order-lg-1 align-self-center">
                         <label asp-for="Input.GreedyAlgorithmParameters.RandomSeed" class="font-weight-bold">Random seed</label>

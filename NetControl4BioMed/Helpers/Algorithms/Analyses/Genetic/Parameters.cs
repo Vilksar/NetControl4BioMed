@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
@@ -64,11 +65,13 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
         /// Gets or sets the crossover algorithm to be used.
         /// </summary>
         [Required(ErrorMessage = "This field is required.")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public CrossoverType CrossoverType { get; set; } = CrossoverType.WeightedRandom;
 
         /// <summary>
         /// Gets or sets the mutation algorithm to be used.
         /// </summary>
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         [Required(ErrorMessage = "This field is required.")]
         public MutationType MutationType { get; set; } = MutationType.WeightedRandom;
 
@@ -79,8 +82,48 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
         /// <returns>Returns a list with the validation errors.</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            // Don't return any errors.
-            yield break;
+            // Check if the random seed is not valid.
+            if (RandomSeed < 0)
+            {
+                // Return an error.
+                yield return new ValidationResult("The value must be a positive integer.", new List<string> { nameof(RandomSeed) });
+            }
+            // Check if the maximum path length is not valid.
+            if (MaximumPathLength < 0 || 25 < MaximumPathLength)
+            {
+                // Return an error.
+                yield return new ValidationResult("The value must be between 0 and 25.", new List<string> { nameof(MaximumPathLength) });
+            }
+            // Check if the population size is not valid.
+            if (PopulationSize < 2 || 150 < PopulationSize)
+            {
+                // Return an error.
+                yield return new ValidationResult("The value must be between 2 and 150.", new List<string> { nameof(PopulationSize) });
+            }
+            // Check if the number of random genes per chromosome is not valid.
+            if (RandomGenesPerChromosome < 0 || 30 < RandomGenesPerChromosome)
+            {
+                // Return an error.
+                yield return new ValidationResult("The value must be between 0 and 30.", new List<string> { nameof(RandomGenesPerChromosome) });
+            }
+            // Check if the percentage of random chromosomes is not valid.
+            if (PercentageRandom < 0.0 || 1.0 < PercentageRandom)
+            {
+                // Return an error.
+                yield return new ValidationResult("The value must be between 0 and 1.", new List<string> { nameof(PercentageRandom) });
+            }
+            // Check if the percentage of elite chromosomes is not valid.
+            if (PercentageElite < 0.0 || 1.0 < PercentageElite)
+            {
+                // Return an error.
+                yield return new ValidationResult("The value must be between 0 and 1.", new List<string> { nameof(PercentageElite) });
+            }
+            // Check if the probability of mutation is not valid.
+            if (ProbabilityMutation < 0.0 || 1.0 < ProbabilityMutation)
+            {
+                // Return an error.
+                yield return new ValidationResult("The value must be between 0 and 1.", new List<string> { nameof(ProbabilityMutation) });
+            }
         }
     }
 }

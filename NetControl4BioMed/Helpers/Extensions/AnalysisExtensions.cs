@@ -350,43 +350,38 @@ namespace NetControl4BioMed.Helpers.Extensions
             // Get the required data.
             var data = new
             {
+                Type = "Analysis",
                 Id = analysis.Id,
                 Name = analysis.Name,
                 Description = analysis.Description,
                 IsPublic = analysis.IsPublic,
+                Algorithm = analysis.Algorithm.ToString(),
                 DatabaseType = context.AnalysisDatabases
                     .Where(item => item.Analysis == analysis)
                     .Select(item => item.Database.DatabaseType.Name)
                     .FirstOrDefault(),
-                Networks = context.AnalysisNetworks
+                NetworkData = context.AnalysisNetworks
                     .Where(item => item.Analysis == analysis)
                     .Select(item => item.Network.Id),
-                SourceNodes = context.AnalysisNodes
+                SourceNodeData = context.AnalysisNodes
                     .Where(item => item.Analysis == analysis)
                     .Where(item => item.Type == AnalysisNodeType.Source)
                     .Select(item => item.Node.Name),
-                SourceNodeCollections = context.AnalysisNodeCollections
+                SourceNodeCollectionData = context.AnalysisNodeCollections
                     .Where(item => item.Analysis == analysis)
                     .Where(item => item.Type == AnalysisNodeCollectionType.Source)
                     .Select(item => item.NodeCollection.Id),
-                TargetNodes = context.AnalysisNodes
+                TargetNodeData = context.AnalysisNodes
                     .Where(item => item.Analysis == analysis)
                     .Where(item => item.Type == AnalysisNodeType.Target)
                     .Select(item => item.Node.Name),
-                TargetNodeCollections = context.AnalysisNodeCollections
+                TargetNodeCollectionData = context.AnalysisNodeCollections
                     .Where(item => item.Analysis == analysis)
                     .Where(item => item.Type == AnalysisNodeCollectionType.Target)
                     .Select(item => item.NodeCollection.Id),
-                Algorithm = new
-                {
-                    Name = analysis.Algorithm.ToString(),
-                    Parameters = new
-                    {
-                        MaximumIterations = analysis.MaximumIterations,
-                        MaximumIterationsWithoutImprovement = analysis.MaximumIterationsWithoutImprovement,
-                        AlgorithmSpecificParameters = analysis.Parameters
-                    }
-                }
+                MaximumIterations = analysis.MaximumIterations,
+                MaximumIterationsWithoutImprovement = analysis.MaximumIterationsWithoutImprovement,
+                AlgorithmParameters = analysis.Parameters
             };
             // Write the data corresponding to the file.
             await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { IgnoreNullValues = true });

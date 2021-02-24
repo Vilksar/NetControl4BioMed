@@ -57,6 +57,24 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
         /// <returns>Returns a list with the validation errors.</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            // Check if the random seed is not valid.
+            if (RandomSeed < 0)
+            {
+                // Return an error.
+                yield return new ValidationResult("The value must be a positive integer.", new List<string> { nameof(RandomSeed) });
+            }
+            // Check if the maximum path length is not valid.
+            if (MaximumPathLength < 0 || 25 < MaximumPathLength)
+            {
+                // Return an error.
+                yield return new ValidationResult("The value must be between 0 and 25.", new List<string> { nameof(MaximumPathLength) });
+            }
+            // Check if the number of repeats is not valid.
+            if (Repeats < 1 || 3 < Repeats)
+            {
+                // Return an error.
+                yield return new ValidationResult("The value must be between 1 and 3.", new List<string> { nameof(Repeats) });
+            }
             // Check if the string is not a valid JSON array.
             if (!Heuristics.TryDeserializeJsonObject<IEnumerable<IEnumerable<string>>>(out var heuristics))
             {

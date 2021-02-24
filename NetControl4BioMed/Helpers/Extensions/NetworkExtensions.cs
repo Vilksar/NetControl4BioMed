@@ -491,6 +491,7 @@ namespace NetControl4BioMed.Helpers.Extensions
             // Get the required data.
             var data = new
             {
+                Type = "Network",
                 Id = network.Id,
                 Name = network.Name,
                 Description = network.Description,
@@ -500,23 +501,23 @@ namespace NetControl4BioMed.Helpers.Extensions
                     .Where(item => item.Network == network)
                     .Select(item => item.Database.DatabaseType.Name)
                     .FirstOrDefault(),
-                DatabaseNodeFields = context.NetworkDatabases
+                NodeDatabaseData = context.NetworkDatabases
                     .Where(item => item.Network == network)
                     .Where(item => item.Type == NetworkDatabaseType.Node)
                     .Select(item => item.Database.Id),
-                DatabaseEdgeFields = context.NetworkDatabases
+                EdgeDatabaseData = context.NetworkDatabases
                     .Where(item => item.Network == network)
                     .Where(item => item.Type == NetworkDatabaseType.Edge)
                     .Select(item => item.Database.Id),
-                SeedNodes = context.NetworkNodes
+                SeedNodeData = context.NetworkNodes
                     .Where(item => item.Network == network)
                     .Where(item => item.Type == NetworkNodeType.Seed)
                     .Select(item => item.Node.Name),
-                SeedNodeCollections = context.NetworkNodeCollections
+                SeedNodeCollectionData = context.NetworkNodeCollections
                     .Where(item => item.Network == network)
                     .Where(item => item.Type == NetworkNodeCollectionType.Seed)
                     .Select(item => item.NodeCollection.Id),
-                Edges = context.NetworkEdges
+                SeedEdgeData = context.NetworkEdges
                     .Where(item => item.Network == network)
                     .Select(item => item.Edge)
                     .Select(item => new
