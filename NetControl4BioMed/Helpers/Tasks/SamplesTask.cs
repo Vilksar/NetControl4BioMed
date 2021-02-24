@@ -135,12 +135,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("The network algorithm is not valid.", showExceptionItem, batchItem);
                     }
-                    // Check if the analysis algorithm is valid.
-                    if (!Enum.TryParse<AnalysisAlgorithm>(batchItem.AnalysisAlgorithm, out var analysisAlgorithm))
-                    {
-                        // Throw an exception.
-                        throw new TaskException("The analysis algorithm is not valid.", showExceptionItem, batchItem);
-                    }
                     // Define the new node collection.
                     var sample = new Sample
                     {
@@ -157,7 +151,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         NetworkSeedNodeCollectionData = batchItem.NetworkSeedNodeCollectionData,
                         AnalysisName = batchItem.AnalysisName,
                         AnalysisDescription = batchItem.AnalysisDescription,
-                        AnalysisAlgorithm = analysisAlgorithm,
                         AnalysisNetworkData = batchItem.AnalysisNetworkData,
                         AnalysisSourceData = batchItem.AnalysisSourceData,
                         AnalysisSourceNodeCollectionData = batchItem.AnalysisSourceNodeCollectionData,
@@ -295,12 +288,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("The network algorithm is not valid.", showExceptionItem, batchItem);
                     }
-                    // Check if the analysis algorithm is valid.
-                    if (!Enum.TryParse<AnalysisAlgorithm>(batchItem.AnalysisAlgorithm, out var analysisAlgorithm))
-                    {
-                        // Throw an exception.
-                        throw new TaskException("The analysis algorithm is not valid.", showExceptionItem, batchItem);
-                    }
                     // Update the node collection.
                     sample.Name = batchItem.Name;
                     sample.Description = batchItem.Description;
@@ -314,7 +301,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     sample.NetworkSeedNodeCollectionData = batchItem.NetworkSeedNodeCollectionData;
                     sample.AnalysisName = batchItem.AnalysisName;
                     sample.AnalysisDescription = batchItem.AnalysisDescription;
-                    sample.AnalysisAlgorithm = analysisAlgorithm;
                     sample.AnalysisNetworkData = batchItem.AnalysisNetworkData;
                     sample.AnalysisSourceData = batchItem.AnalysisSourceData;
                     sample.AnalysisSourceNodeCollectionData = batchItem.AnalysisSourceNodeCollectionData;

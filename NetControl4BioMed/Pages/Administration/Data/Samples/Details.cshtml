@@ -117,12 +117,6 @@
                 <span asp-validation-for="View.Sample.AnalysisDescription" class="text-danger small"></span>
             </div>
             <div class="form-group">
-                <label asp-for="View.Sample.AnalysisAlgorithm" class="font-weight-bold">Analysis algorithm</label>
-                <input asp-for="View.Sample.AnalysisAlgorithm" class="form-control" readonly />
-                <span asp-description-for="View.Sample.AnalysisAlgorithm" class="text-muted small">The algorithm of the analysis corresponding to the sample.</span>
-                <span asp-validation-for="View.Sample.AnalysisAlgorithm" class="text-danger small"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="View.Sample.AnalysisNetworkData" class="font-weight-bold">Analysis network data</label>
                 <textarea asp-for="View.Sample.AnalysisNetworkData" class="form-control" rows="5" readonly></textarea>
                 <span asp-description-for="View.Sample.AnalysisNetworkData" class="text-muted small">The network data of the analysis corresponding to the sample.</span>

@@ -455,7 +455,6 @@ namespace NetControl4BioMed.Pages.Administration
                             NetworkSeedNodeCollectionData = item.NetworkSeedNodeCollectionData,
                             AnalysisName = item.NetworkName,
                             AnalysisDescription = item.Description,
-                            AnalysisAlgorithm = item.AnalysisAlgorithm.ToString(),
                             AnalysisNetworkData = item.AnalysisNetworkData,
                             AnalysisSourceData = item.AnalysisSourceData,
                             AnalysisSourceNodeCollectionData = item.AnalysisSourceNodeCollectionData,

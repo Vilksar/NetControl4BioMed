@@ -82,11 +82,6 @@ namespace NetControl4BioMed.Data.Models
         public string AnalysisDescription { get; set; }
 
         /// <summary>
-        /// Gets or sets the analysis algorithm of the sample.
-        /// </summary>
-        public AnalysisAlgorithm AnalysisAlgorithm { get; set; }
-
-        /// <summary>
         /// Gets or sets the analysis network data of the sample.
         /// </summary>
         public string AnalysisNetworkData { get; set; }
