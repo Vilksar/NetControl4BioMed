@@ -9,13 +9,17 @@
 <partial name="_SearchInputPartial" model="Model.View.Search.Input" />
 <partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
 <form method="get" class="text-justify">
-    <div class="row align-items-center">
-        <div class="col-lg-12 mb-3" hidden>
-            <select name="algorithm" class="custom-select">
-                <option value="@AnalysisAlgorithm.Greedy.ToString()" title="@AnalysisAlgorithm.Greedy.GetDisplayDescription()">@AnalysisAlgorithm.Greedy.GetDisplayName()</option>
-            </select>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Algorithm</span>
         </div>
-        <div class="col-lg-12 mb-3">
+        <select name="algorithm" class="custom-select">
+            @foreach (var item in Enum.GetValues(typeof(AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>().Where(item => item == AnalysisAlgorithm.Greedy))
+            {
+                <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+            }
+        </select>
+        <div class="input-group-append">
             <button type="submit" asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Create" class="btn btn-success btn-block" title="Create">
                 <span><i class="fas fa-plus"></i></span>
                 <span>Create a generic analysis</span>

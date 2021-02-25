@@ -28,6 +28,9 @@
         <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
     </div>
     <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Format</span>
+        </div>
         <select asp-for="Input.FileFormat" class="custom-select">
             <option value="txt">Text (*.txt)</option>
             <option value="json">JSON (*.json)</option>

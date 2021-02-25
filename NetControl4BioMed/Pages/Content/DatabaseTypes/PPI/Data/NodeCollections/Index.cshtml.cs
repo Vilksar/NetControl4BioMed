@@ -71,6 +71,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.NodeCollections
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
         {
+            // Get the current user.
+            var user = await _userManager.GetUserAsync(User);
             // Define the search input.
             var input = new SearchInputViewModel(ViewModel.SearchOptions, null, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
             // Check if any of the provided variables was null before the reassignment.
@@ -79,8 +81,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.NodeCollections
                 // Redirect to the page where they are all explicitly defined.
                 return RedirectToPage(new { searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
-            // Get the current user.
-            var user = await _userManager.GetUserAsync(User);
             // Start with all of the items to which the user has access.
             var query = _context.NodeCollections
                 .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))

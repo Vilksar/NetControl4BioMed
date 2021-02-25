@@ -13,19 +13,17 @@
             <span class="form-file-group-alert-icon"><i class="fas fa-info-circle"></i></span>
             <span class="form-file-group-alert-text">Optionally, select an available sample in order to automatically fill in the form.</span>
         </div>
-        <div class="form-group" hidden>
-            <label class="font-weight-bold">Algorithm</label>
-            <input type="text" name="algorithm" class="form-control" value="@Model.View.Algorithm" />
-            <span class="text-muted small">The name of the algorithm new analysis.</span>
-        </div>
         <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Sample</span>
+            </div>
             <select name="sampleId" class="custom-select">
-                <option value="" title="Select a sample to load" selected hidden disabled>Select a sample to load</option>
                 @foreach (var sampleItem in Model.View.SampleItems)
                 {
                     <option value="@sampleItem.Id" title="@sampleItem.Description">@sampleItem.Name</option>
                 }
             </select>
+            <input type="hidden" name="algorithm" class="form-control" value="@Model.View.Algorithm" readonly />
             <div class="input-group-append">
                 <button asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Create" type="submit" class="btn btn-dark btn-block" title="Load the selected sample">
                     <span><i class="fas fa-cloud-upload-alt"></i></span>
@@ -49,7 +47,7 @@
             <textarea id="data-textarea-upload" class="form-control form-file-group-text mb-2" hidden></textarea>
             <div class="custom-file">
                 <input type="file" accept=".json" class="custom-file-input form-file-group-file-upload" />
-                <label class="custom-file-label form-file-group-file-label text-truncate">Select a file to load</label>
+                <label class="custom-file-label form-file-group-file-label text-truncate">Choose file</label>
             </div>
         </div>
     </div>

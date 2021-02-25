@@ -220,6 +220,14 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Analyses
                     // Redirect to the index page.
                     return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Analyses/Index");
                 }
+                // Check if the provided algorithm and the analysis algorithm are different.
+                if (analyses.Select(item => item.Algorithm).FirstOrDefault().ToString() != algorithm)
+                {
+                    // Display a message.
+                    TempData["StatusMessage"] = "Error: The provided algorithm and the analysis algorithm are different.";
+                    // Redirect to the index page.
+                    return RedirectToPage("/Content/DatabaseTypes/PPI/Created/Analyses/Index");
+                }
                 // Define the input.
                 Input = new InputModel
                 {

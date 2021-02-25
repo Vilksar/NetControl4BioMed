@@ -4,6 +4,8 @@
     ViewData["Title"] = "Collections";
 }
 
+<partial name="_SearchInputPartial" model="Model.View.Search.Input" />
+<partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
 <div class="row align-items-center">
     <div class="col-lg-6 mb-3">
         <a asp-page="/Content/DatabaseTypes/PPI/Data/NodeCollections/Index" asp-route-filter="IsSource" class="btn btn-outline-dark btn-block" title="Filter">
@@ -18,8 +20,6 @@
         </a>
     </div>
 </div>
-<partial name="_SearchInputPartial" model="Model.View.Search.Input" />
-<partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
 @if (!Model.View.Search.Items.Any())
 {
     <div class="alert alert-info text-justify text-wrap">
