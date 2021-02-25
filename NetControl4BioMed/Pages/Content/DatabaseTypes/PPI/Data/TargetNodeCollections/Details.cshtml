@@ -1,7 +1,7 @@
 ﻿@page
 @model DetailsModel
 @{
-    ViewData["Title"] = "Target protein collection details";
+    ViewData["Title"] = "Cell-line collection details";
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetNodeCollectionNavigationTitleCard(Model.View.NodeCollection)" />
@@ -51,7 +51,7 @@
         {
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The protein collection is currently assigned to @Model.View.NodeCollectionDatabases.Count() database@(Model.View.NodeCollectionDatabases.Count() != 1 ? "s" : string.Empty).</span>
+                <span>The cell-line collection is currently assigned to @Model.View.NodeCollectionDatabases.Count() database@(Model.View.NodeCollectionDatabases.Count() != 1 ? "s" : string.Empty).</span>
             </div>
             <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
                 <thead class="thead-light">
@@ -112,7 +112,7 @@
         {
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The protein collection currently contains @Model.View.NodeCollectionNodes.Count() protein@(Model.View.NodeCollectionNodes.Count() != 1 ? "s" : string.Empty).</span>
+                <span>The cell-line collection currently contains @Model.View.NodeCollectionNodes.Count() protein@(Model.View.NodeCollectionNodes.Count() != 1 ? "s" : string.Empty).</span>
             </div>
             <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
                 <thead class="thead-light">

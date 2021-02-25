@@ -30,6 +30,7 @@
                     <discreteMappingEntry attributeValue="control,none,source,target" value="#CCCCCC"/>
                     <discreteMappingEntry attributeValue="control,none,target" value="#00CCCC"/>
                     <discreteMappingEntry attributeValue="none" value="#FFFFFF"/>
+                    <discreteMappingEntry attributeValue="none,seed" value="#CC0000"/>
                     <discreteMappingEntry attributeValue="none,source" value="#CC0000"/>
                     <discreteMappingEntry attributeValue="none,source,target" value="#CC00CC"/>
                     <discreteMappingEntry attributeValue="none,target" value="#0000CC"/>

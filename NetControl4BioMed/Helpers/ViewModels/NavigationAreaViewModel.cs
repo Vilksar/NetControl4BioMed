@@ -1004,7 +1004,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "NodeCollections",
-                            Title = "Protein collections",
+                            Title = "Collections",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
@@ -1130,7 +1130,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "NodeCollections",
-                            Title = "Protein collections",
+                            Title = "Collections",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",

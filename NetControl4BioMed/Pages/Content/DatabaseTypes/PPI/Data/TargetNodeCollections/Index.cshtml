@@ -1,7 +1,7 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Target protein collections";
+    ViewData["Title"] = "Cell-line collections";
 }
 
 <partial name="_SearchInputPartial" model="Model.View.Search.Input" />
@@ -10,7 +10,7 @@
 {
     <div class="alert alert-info text-justify text-wrap">
         <span><i class="fas fa-info-circle"></i></span>
-        <span>No target protein collections have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
+        <span>No cell-line collections have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
     </div>
 }
 else
