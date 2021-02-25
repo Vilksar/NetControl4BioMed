@@ -58,6 +58,8 @@ namespace NetControl4BioMed.Pages.Administration.Data.NodeCollections
                     .FirstOrDefault(),
                 TypeCount = query
                     .Select(item => item.NodeCollectionTypes)
+                    .SelectMany(item => item)
+                    .Select(item => item.Type)
                     .Distinct()
                     .Count(),
                 DatabaseCount = query

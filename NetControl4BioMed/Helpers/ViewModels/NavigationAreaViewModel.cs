@@ -842,7 +842,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "Nodes",
-                            Title = "Protein data",
+                            Title = "Proteins",
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
@@ -851,7 +851,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "Edges",
-                            Title = "Interaction data",
+                            Title = "Interactions",
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
@@ -859,21 +859,12 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "SourceNodeCollections",
-                            Title = "Drug-target data",
+                            Id = "NodeCollections",
+                            Title = "Collections",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Data/SourceNodeCollections/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "TargetNodeCollections",
-                            Title = "Cell-line data",
-                            Description = string.Empty,
-                            Icon = "fa-folder",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index"
+                            Link = "/Content/DatabaseTypes/PPI/Data/NodeCollections/Index"
                         }
                     }
                 },

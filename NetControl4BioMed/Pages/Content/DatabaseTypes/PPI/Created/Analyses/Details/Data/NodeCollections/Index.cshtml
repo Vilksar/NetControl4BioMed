@@ -1,7 +1,7 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Analysis protein collections";
+    ViewData["Title"] = "Analysis collections";
 }
 
 <partial name="_SearchInputPartial" model="Model.View.Search.Input" />
@@ -10,7 +10,7 @@
 {
     <div class="alert alert-info text-justify text-wrap">
         <span><i class="fas fa-info-circle"></i></span>
-        <span>No protein collections have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
+        <span>No collections have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
     </div>
 }
 else
@@ -48,7 +48,7 @@ else
                         <partial name="_AnalysisNodeCollectionTypePartial" model="@item.Type" />
                     </td>
                     <td class="text-center text-break">
-                        <a asp-page="/Content/DatabaseTypes/PPI/Data/@(item.Type)NodeCollections/Details" asp-route-id="@item.NodeCollection.Id" class="btn btn-info m-1" title="Details">
+                        <a asp-page="/Content/DatabaseTypes/PPI/Data/NodeCollections/Details" asp-route-id="@item.NodeCollection.Id" class="btn btn-info m-1" title="Details">
                             <span><i class="fas fa-info-circle"></i></span>
                         </a>
                     </td>

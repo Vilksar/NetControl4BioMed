@@ -1,16 +1,30 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Cell-line collections";
+    ViewData["Title"] = "Collections";
 }
 
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Content/DatabaseTypes/PPI/Data/NodeCollections/Index" asp-route-filter="IsSource" class="btn btn-outline-dark btn-block" title="Filter">
+            <span><i class="fas fa-syringe"></i></span>
+            <span>Show drug-target data</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Content/DatabaseTypes/PPI/Data/NodeCollections/Index" asp-route-filter="IsTarget" class="btn btn-outline-dark btn-block" title="Filter">
+            <span><i class="fas fa-biohazard"></i></span>
+            <span>Show cell-line data</span>
+        </a>
+    </div>
+</div>
 <partial name="_SearchInputPartial" model="Model.View.Search.Input" />
 <partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
 @if (!Model.View.Search.Items.Any())
 {
     <div class="alert alert-info text-justify text-wrap">
         <span><i class="fas fa-info-circle"></i></span>
-        <span>No cell-line collections have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
+        <span>No collections have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
     </div>
 }
 else
@@ -42,7 +56,7 @@ else
                         <span title="@item.Id" class="small text-muted">ID: @item.Id</span>
                     </td>
                     <td class="text-center text-break">
-                        <a asp-page="/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                        <a asp-page="/Content/DatabaseTypes/PPI/Data/NodeCollections/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
                             <span><i class="fas fa-info-circle"></i></span>
                         </a>
                     </td>

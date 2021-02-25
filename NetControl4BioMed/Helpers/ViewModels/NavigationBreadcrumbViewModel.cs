@@ -482,7 +482,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationBreadcrumbViewModel ContentDatabaseTypesGenericCreatedNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Created",
-            Title = "Created",
+            Title = "My data",
             Link = "/Content/DatabaseTypes/Generic/Created/Index"
         };
 
@@ -572,7 +572,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPICreatedNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Created",
-            Title = "Created",
+            Title = "My data",
             Link = "/Content/DatabaseTypes/PPI/Created/Index"
         };
 
@@ -632,28 +632,18 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataEdgesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Edges",
-            Title = "Edges",
+            Title = "Interactions",
             Link = "/Content/DatabaseTypes/PPI/Data/Edges/Index"
         };
 
         /// <summary>
-        /// Gets the navigation breadcrumb for the content data source node collections index page.
+        /// Gets the navigation breadcrumb for the content data node collections index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataSourceNodeCollectionsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataNodeCollectionsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
-            Id = "SourceNodeCollections",
-            Title = "Source node collections",
-            Link = "/Content/DatabaseTypes/PPI/Data/SourceNodeCollections/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the content data target node collections index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataTargetNodeCollectionsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "TargetNodeCollections",
-            Title = "Target node collections",
-            Link = "/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index"
+            Id = "NodeCollections",
+            Title = "Collections",
+            Link = "/Content/DatabaseTypes/PPI/Data/NodeCollections/Index"
         };
 
         /// <summary>
@@ -662,7 +652,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDataNodesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Nodes",
-            Title = "Nodes",
+            Title = "Proteins",
             Link = "/Content/DatabaseTypes/PPI/Data/Nodes/Index"
         };
 
@@ -682,7 +672,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDatabasesDatabaseEdgeFieldsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "DatabaseEdgeFields",
-            Title = "Database edge fields",
+            Title = "Interaction data",
             Link = "/Content/DatabaseTypes/PPI/Databases/DatabaseEdgeFields/Index"
         };
 
@@ -692,7 +682,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationBreadcrumbViewModel ContentDatabaseTypesPPIDatabasesDatabaseNodeFieldsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "DatabaseNodeFields",
-            Title = "Database node fields",
+            Title = "Protein data",
             Link = "/Content/DatabaseTypes/PPI/Databases/DatabaseNodeFields/Index"
         };
 

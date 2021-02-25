@@ -13,7 +13,7 @@ using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
 
-namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeCollections
+namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.NodeCollections
 {
     public class IndexModel : PageModel
     {
@@ -44,6 +44,12 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsSeed", "Is of type \"Seed\"" },
+                    { "IsNotSeed", "Is not of type \"Seed\"" },
+                    { "IsSource", "Is of type \"Source\"" },
+                    { "IsNotSource", "Is not of type \"Source\"" },
+                    { "IsTarget", "Is of type \"Target\"" },
+                    { "IsNotTarget", "Is not of type \"Target\"" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -65,8 +71,6 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
 
         public async Task<IActionResult> OnGetAsync(string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
         {
-            // Get the current user.
-            var user = await _userManager.GetUserAsync(User);
             // Define the search input.
             var input = new SearchInputViewModel(ViewModel.SearchOptions, null, searchString, searchIn, filter, sortBy, sortDirection, itemsPerPage, currentPage);
             // Check if any of the provided variables was null before the reassignment.
@@ -75,17 +79,26 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                 // Redirect to the page where they are all explicitly defined.
                 return RedirectToPage(new { searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
+            // Get the current user.
+            var user = await _userManager.GetUserAsync(User);
             // Start with all of the items to which the user has access.
             var query = _context.NodeCollections
                 .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
-                .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                .Where(item => item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Target));
+                .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)));
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
                     input.SearchIn.Contains("Id") && item.Id.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Name") && item.Name.Contains(input.SearchString) ||
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString));
+            // Select the results matching the filter parameter.
+            query = query
+                .Where(item => input.Filter.Contains("IsSeed") ? item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Seed) : true)
+                .Where(item => input.Filter.Contains("IsNotSeed") ? !item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Seed) : true)
+                .Where(item => input.Filter.Contains("IsSource") ? item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Source) : true)
+                .Where(item => input.Filter.Contains("IsNotSource") ? !item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Source) : true)
+                .Where(item => input.Filter.Contains("IsTarget") ? item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Target) : true)
+                .Where(item => input.Filter.Contains("IsNotTarget") ? !item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Target) : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {

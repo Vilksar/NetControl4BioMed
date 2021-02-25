@@ -238,7 +238,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>Input here the IDs of the drug-target data to be used as source proteins by the new analysis. This can be done either in addition to, or instead of the source proteins above. You can check the available drug-target data <a asp-page="/Content/DatabaseTypes/PPI/Data/SourceNodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and copy and paste below the IDs of your choice.</span>
+                <span>Input here the IDs of the source collections to be used by the new analysis. This can be done either in addition to, or instead of the source proteins above. You can check the available drug-target data <a asp-page="/Content/DatabaseTypes/PPI/Data/NodeCollections/Index" asp-route-filter="IsSource" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and copy and paste below the IDs of your choice.</span>
             </div>
             <div class="alert alert-warning text-justify text-wrap">
                 <span><i class="fas fa-exclamation-triangle"></i></span>
@@ -354,7 +354,7 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>Input here the IDs of the cell-line data to be used as target proteins by the new analysis. This can be done either in addition to, or instead of the target proteins above. You can check the available cell-line data <a asp-page="/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and copy and paste below the IDs of your choice.</span>
+                <span>Input here the IDs of the target collections to be used by the new analysis. This can be done either in addition to, or instead of the target proteins above. You can check the available cell-line data <a asp-page="/Content/DatabaseTypes/PPI/Data/NodeCollections/Index" asp-route-filter="IsTarget" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and copy and paste below the IDs of your choice.</span>
             </div>
             <div class="alert alert-warning text-justify text-wrap">
                 <span><i class="fas fa-exclamation-triangle"></i></span>

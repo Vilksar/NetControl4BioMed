@@ -73,7 +73,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The node collection is currently assigned to @Model.View.TypeCount database@(Model.View.TypeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/NodeCollectionTypes/Index" asp-route-searchString="@Model.View.NodeCollection.Id" asp-route-searchIn="NodeCollectionId" class="alert-link">view the types</a>.</span>
+            <span>The node collection is currently assigned to @Model.View.TypeCount type@(Model.View.TypeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/NodeCollectionTypes/Index" asp-route-searchString="@Model.View.NodeCollection.Id" asp-route-searchIn="NodeCollectionId" class="alert-link">view the types</a>.</span>
         </div>
     </div>
 </div>

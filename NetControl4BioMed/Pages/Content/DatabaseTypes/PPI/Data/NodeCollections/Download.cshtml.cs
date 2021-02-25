@@ -25,7 +25,7 @@ using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Services;
 using NetControl4BioMed.Helpers.ViewModels;
 
-namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeCollections
+namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.NodeCollections
 {
     public class DownloadModel : PageModel
     {
@@ -74,7 +74,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index");
+                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/NodeCollections/Index");
             }
             // Define the view.
             View = new ViewModel
@@ -82,16 +82,15 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                 Items = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                    .Where(item => item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Target))
                     .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No cell-line collections have been found with the provided IDs, or you don't have access to them.";
+                TempData["StatusMessage"] = "Error: No items have been found with the provided IDs, or you don't have access to them.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index");
+                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/NodeCollections/Index");
             }
             // Return the page.
             return Page();
@@ -107,7 +106,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index");
+                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/NodeCollections/Index");
             }
             // Define the view.
             View = new ViewModel
@@ -115,16 +114,15 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                 Items = _context.NodeCollections
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
                     .Where(item => item.NodeCollectionDatabases.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                    .Where(item => item.NodeCollectionTypes.Any(item1 => item1.Type == NetControl4BioMed.Data.Enumerations.NodeCollectionType.Target))
                     .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No cell-line collections have been found with the provided IDs, or you don't have access to them.";
+                TempData["StatusMessage"] = "Error: No items have been found with the provided IDs, or you don't have access to them.";
                 // Redirect to the index page.
-                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/TargetNodeCollections/Index");
+                return RedirectToPage("/Content/DatabaseTypes/PPI/Data/NodeCollections/Index");
             }
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
@@ -154,7 +152,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                     foreach (var nodeCollection in View.Items)
                     {
                         // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"CellLineCollections-{nodeCollection.Name.Replace(" ", "-")}-{nodeCollection.Id}.txt", CompressionLevel.Fastest).Open();
+                        using var stream = archive.CreateEntry($"Collections-{nodeCollection.Name.Replace(" ", "-")}-{nodeCollection.Id}.txt", CompressionLevel.Fastest).Open();
                         // Write to the entry the corresponding file content.
                         await nodeCollection.WriteToStreamTxtFileContent(stream, _serviceProvider);
                     }
@@ -165,7 +163,7 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                     foreach (var nodeCollection in View.Items)
                     {
                         // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"CellLineCollections-{nodeCollection.Name.Replace(" ", "-")}-{nodeCollection.Id}.json", CompressionLevel.Fastest).Open();
+                        using var stream = archive.CreateEntry($"Collections-{nodeCollection.Name.Replace(" ", "-")}-{nodeCollection.Id}.json", CompressionLevel.Fastest).Open();
                         // Write to the entry the corresponding file content.
                         await nodeCollection.WriteToStreamJsonFileContent(stream, _serviceProvider);
                     }
@@ -176,14 +174,14 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Data.TargetNodeColle
                     foreach (var nodeCollection in View.Items)
                     {
                         // Create a new entry in the archive and open it.
-                        using var stream = archive.CreateEntry($"CellLineCollections-{nodeCollection.Name.Replace(" ", "-")}-{nodeCollection.Id}.xlsx", CompressionLevel.Fastest).Open();
+                        using var stream = archive.CreateEntry($"Collections-{nodeCollection.Name.Replace(" ", "-")}-{nodeCollection.Id}.xlsx", CompressionLevel.Fastest).Open();
                         // Write to the entry the corresponding file content.
                         await nodeCollection.WriteToStreamXlsxFileContent(stream, _serviceProvider);
                     }
                 }
             })
             {
-                FileDownloadName = $"NetControl4BioMed-CellLineCollections-{DateTime.UtcNow:yyyyMMdd}.zip"
+                FileDownloadName = $"NetControl4BioMed-Collections-{DateTime.UtcNow:yyyyMMdd}.zip"
             };
         }
     }

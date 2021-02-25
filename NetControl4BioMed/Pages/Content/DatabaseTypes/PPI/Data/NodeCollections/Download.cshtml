@@ -1,12 +1,12 @@
 ﻿@page
 @model DownloadModel
 @{
-    ViewData["Title"] = "Download drug-target collections";
+    ViewData["Title"] = "Download collections";
 }
 
 <div class="alert alert-primary text-justify text-wrap">
     <span><i class="fas fa-info-circle"></i></span>
-    <span>Please select a file format, then click the button to download the @Model.View.Items.Count() listed drug-target collection@(Model.View.Items.Count() != 1 ? "s" : string.Empty) in a <a href="https://en.wikipedia.org/wiki/Zip_(file_format)" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">ZIP archive</a> <span><i class="fas fa-external-link-alt"></i></span>. The available file formats are:</span>
+    <span>Please select a file format, then click the button to download the @Model.View.Items.Count() listed collection@(Model.View.Items.Count() != 1 ? "s" : string.Empty) in a <a href="https://en.wikipedia.org/wiki/Zip_(file_format)" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">ZIP archive</a> <span><i class="fas fa-external-link-alt"></i></span>. The available file formats are:</span>
     <ul class="mt-1 mb-0">
         <li>
             <span><span class="font-weight-bold">Text</span>, which contains the list of proteins in the collection.</span>
@@ -44,7 +44,7 @@
     {
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>No drug-target collections have been found with the provided IDs.</span>
+            <span>No collections have been found with the provided IDs.</span>
         </div>
     }
     else
@@ -95,7 +95,7 @@
                                     <span title="@item.Name" class="font-weight-bold">@item.Name</span>
                                 </td>
                                 <td class="text-center text-break">
-                                    <a asp-page="/Content/DatabaseTypes/PPI/Data/SourceNodeCollections/Details/Index" asp-route-id="@item.Id" title="Details">
+                                    <a asp-page="/Content/DatabaseTypes/PPI/Data/NodeCollections/Details/Index" asp-route-id="@item.Id" title="Details">
                                         <span>Details</span>
                                     </a>
                                 </td>
