@@ -2,9 +2,22 @@
 
 <script src="https://www.google.com/recaptcha/api.js?render=@_configuration["Authentication:reCaptcha:SiteKey"]"></script>
 <script>
-        grecaptcha.ready(function() {
-            grecaptcha.execute('@_configuration["Authentication:reCaptcha:SiteKey"]', {action: 'default'}).then(function(token) {
-                $(".recaptcha-input").val(token);
+    // Check if there is a reCaptcha on the page.
+    if ($('.recaptcha-input').length !== 0) {
+        // Go over each reCaptcha input.
+        $('.recaptcha-input').closest('form').on('submit', (event) => {
+            // Prevent the submission.
+            event.preventDefault();
+            // Define the recaptcha function.
+            grecaptcha.ready(() => {
+                // Execute the recaptcha.
+                grecaptcha.execute('@_configuration["Authentication:reCaptcha:SiteKey"]', { action: 'submit' }).then((token) => {
+                    // Update the token.
+                    $(event.target).find(".recaptcha-input").val(token);
+                    // Submit the form.
+                    $(event.target).unbind('submit').submit();
+                });
             });
         });
+    }
 </script>
