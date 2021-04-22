@@ -14,8 +14,8 @@
                 grecaptcha.execute('@_configuration["Authentication:reCaptcha:SiteKey"]', { action: 'submit' }).then((token) => {
                     // Update the token.
                     $(event.target).find(".recaptcha-input").val(token);
-                    // Submit the form.
-                    $(event.target).unbind('submit').submit();
+                    // Submit the form using the default method.
+                    $(event.target).get(0).submit();
                 });
             });
         });
