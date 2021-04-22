@@ -145,6 +145,14 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
             {
                 // Define a new ZIP archive.
                 using var archive = new ZipArchive(zipStream, ZipArchiveMode.Create);
+                // Check if the overview file should be added.
+                if (true)
+                {
+                    // Create a new entry in the archive and open it.
+                    using var stream = archive.CreateEntry($"Networks-List.txt", CompressionLevel.Fastest).Open();
+                    // Write to the entry the corresponding file content.
+                    await NetworkExtensions.WriteToStreamOverviewTextFileContent(View.Items.Select(item => item.Id), stream, _serviceProvider, HttpContext.Request.Scheme, HttpContext.Request.Host);
+                }
                 // Check which should be the format of the files within the archive.
                 if (Input.FileFormat == "txt")
                 {

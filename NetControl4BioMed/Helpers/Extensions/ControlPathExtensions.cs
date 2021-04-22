@@ -198,6 +198,42 @@ namespace NetControl4BioMed.Helpers.Extensions
         }
 
         /// <summary>
+        /// Gets the content of an overview text file to download corresponding to the provided control paths.
+        /// </summary>
+        /// <param name="controlPathIds">The IDs of the current control paths.</param>
+        /// <param name="stream">The stream to which to write to.</param>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="scheme">The HTTP context scheme.</param>
+        /// <param name="host">The HTTP context host.</param>
+        /// <returns></returns>
+        public static async Task WriteToStreamOverviewTextFileContent(IEnumerable<string> controlPathIds, Stream stream, IServiceProvider serviceProvider, string scheme, HostString host)
+        {
+            // Use a new scope.
+            using var scope = serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Use a new link generator instance.
+            var linkGenerator = scope.ServiceProvider.GetRequiredService<LinkGenerator>();
+            // Define the stream writer for the file.
+            using var streamWriter = new StreamWriter(stream);
+            // Get the required data.
+            var data = string.Concat("The following control paths have been downloaded:\n\n", string.Join("\n", context.ControlPaths
+                .Where(item => controlPathIds.Contains(item.Id))
+                .Select(item => new
+                {
+                    Id = item.Id,
+                    AnalysisName = item.Analysis.Name,
+                    DatabaseTypeName = item.Analysis.AnalysisDatabases
+                        .Select(item1 => item1.Database.DatabaseType.Name)
+                        .FirstOrDefault()
+                })
+                .AsEnumerable()
+                .Select(item => $"{item.AnalysisName} - {linkGenerator.GetUriByPage($"/Content/DatabaseTypes/{item.DatabaseTypeName}/Created/Analyses/Details/Created/ControlPaths/Details/Index", handler: null, values: new { id = item.Id }, scheme: scheme, host: host)}")));
+            // Write the data to the stream.
+            await streamWriter.WriteAsync(data);
+        }
+
+        /// <summary>
         /// Gets the content of a text file to download corresponding to the provided control path.
         /// </summary>
         /// <param name="controlPath">The current control path.</param>
