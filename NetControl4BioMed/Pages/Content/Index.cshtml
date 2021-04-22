@@ -1,6 +1,5 @@
 ﻿@page
 @model IndexModel
-@using NetControl4BioMed.Data.Enumerations
 @{
     ViewData["Title"] = "Overview";
 }
@@ -12,35 +11,25 @@
                 <span><i class="fas fa-info-circle"></i></span>
             </div>
             <div>
-                <span>Available user data</span>
+                <span>User data</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         @if (!Model.View.IsUserAuthenticated)
         {
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no networks associated with your account, as you are not logged in. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Upload" class="alert-link">here</a> to upload a new generic network, <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Upload" class="alert-link">here</a> to upload a new PPI network, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Create" class="alert-link">here</a> to construct a new PPI network.</span>
-            </div>
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no analyses associated with your account, as you are not logged in. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Create" asp-route-algorithm="@AnalysisAlgorithm.Greedy.ToString()" class="alert-link">here</a> to create a new generic analysis, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Create" asp-route-algorithm="@AnalysisAlgorithm.Greedy.ToString()" class="alert-link">here</a> to create a new PPI analysis.</span>
+                <span>You can use the navigation links to choose a network type, in order to view or create a new corresponding network or analysis.</span>
             </div>
         }
         else
         {
-            var genericNetworkCount = Model.View.ItemCount.GetValueOrDefault("GenericNetworks", null) ?? 0;
-            var genericAnalysisCount = Model.View.ItemCount.GetValueOrDefault("GenericAnalyses", null) ?? 0;
-            var ppiNetworkCount = Model.View.ItemCount.GetValueOrDefault("PPINetworks", null) ?? 0;
-            var ppiAnalysisCount = Model.View.ItemCount.GetValueOrDefault("PPIAnalyses", null) ?? 0;
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>There are @genericNetworkCount generic network@(genericNetworkCount != 1 ? "s" : string.Empty) and @genericAnalysisCount generic analys@(genericAnalysisCount != 1 ? "e" : "i")s associated with your account. You can click <a asp-page="/Content/DatabaseTypes/Generic/Created/Networks/Index" class="alert-link">here</a> to view the generic networks, or <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Index" class="alert-link">here</a> to view the generic analyses.</span>
-            </div>
+            var networkCount = Model.View.ItemCount.GetValueOrDefault("Networks", null) ?? 0;
+            var analysisCount = Model.View.ItemCount.GetValueOrDefault("Analyses", null) ?? 0;
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>There are @ppiNetworkCount PPI network@(ppiNetworkCount != 1 ? "s" : string.Empty) and @ppiAnalysisCount PPI analys@(ppiAnalysisCount != 1 ? "e" : "i")s associated with your account. You can click <a asp-page="/Content/DatabaseTypes/PPI/Created/Networks/Index" class="alert-link">here</a> to view the PPI networks, or <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Index" class="alert-link">here</a> to view the PPI analyses.</span>
+                <span>There are @networkCount network@(networkCount != 1 ? "s" : string.Empty) and @analysisCount analys@(analysisCount != 1 ? "e" : "i")s associated with your account. You can use the navigation links to choose a network type, in order to view or create a new corresponding network or analysis.</span>
             </div>
         }
     </div>

@@ -195,6 +195,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                         })
                         .Where(item => !string.IsNullOrEmpty(item.SourceNode) && !string.IsNullOrEmpty(item.TargetNode)))
                 };
+                // Display a message.
+                TempData["StatusMessage"] = "Success: The network has been loaded successfully.";
             }
             // Check if there was a sample provided.
             else if (!string.IsNullOrEmpty(sampleId))
@@ -221,6 +223,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     EdgeDatabaseData = sample.NetworkEdgeDatabaseData,
                     SeedEdgeData = sample.NetworkSeedEdgeData
                 };
+                // Display a message.
+                TempData["StatusMessage"] = "Success: The sample has been loaded successfully.";
             }
             else
             {

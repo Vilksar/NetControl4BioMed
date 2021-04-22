@@ -200,6 +200,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                         .Intersect(View.SeedNodeCollections)
                         .Select(item => item.Id))
                 };
+                // Display a message.
+                TempData["StatusMessage"] = "Success: The network has been loaded successfully.";
             }
             // Check if there was a sample provided.
             else if (!string.IsNullOrEmpty(sampleId))
@@ -228,6 +230,8 @@ namespace NetControl4BioMed.Pages.Content.DatabaseTypes.PPI.Created.Networks
                     SeedNodeData = sample.NetworkSeedNodeData,
                     SeedNodeCollectionData = sample.NetworkSeedNodeCollectionData
                 };
+                // Display a message.
+                TempData["StatusMessage"] = "Success: The sample has been loaded successfully.";
             }
             else
             {

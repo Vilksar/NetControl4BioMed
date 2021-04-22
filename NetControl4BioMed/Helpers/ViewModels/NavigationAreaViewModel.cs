@@ -493,22 +493,22 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "Generic",
-                            Title = "Generic",
-                            Description = string.Empty,
-                            Icon = "fa-circle",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
                             Id = "PPI",
-                            Title = "PPI",
+                            Title = "PPI networks",
                             Description = string.Empty,
                             Icon = "fa-dna",
                             Color = "light",
                             Link = "/Content/DatabaseTypes/PPI/Index"
                         },
+                        new NavigationPageViewModel
+                        {
+                            Id = "Generic",
+                            Title = "Generic networks",
+                            Description = string.Empty,
+                            Icon = "fa-circle",
+                            Color = "light",
+                            Link = "/Content/DatabaseTypes/Generic/Index"
+                        }
                     }
                 }
             }

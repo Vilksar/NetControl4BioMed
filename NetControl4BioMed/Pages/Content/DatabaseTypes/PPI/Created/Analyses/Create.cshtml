@@ -9,9 +9,9 @@
 @if (Model.View.SampleItems != null && Model.View.SampleItems.Any())
 {
     <form method="get" class="text-justify">
-        <div class="alert alert-dark text-wrap text-justify form-file-group-alert">
-            <span class="form-file-group-alert-icon"><i class="fas fa-info-circle"></i></span>
-            <span class="form-file-group-alert-text">Optionally, select an available sample in order to automatically fill in the form.</span>
+        <div class="alert alert-dark text-wrap text-justify">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>Optionally, select an available sample and press the button in order to automatically fill in the form.</span>
         </div>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
@@ -37,7 +37,7 @@
     <div class="form-file-group" data-type="analysis" data-database-type="ppi" data-algorithm="@Model.View.Algorithm.ToLower()">
         <div class="alert alert-dark text-wrap text-justify">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>Optionally, select a JSON file containing a previously created analysis in order to automatically fill in the form and recreate it.</span>
+            <span>Optionally, select a JSON file with a previously created analysis in order to automatically fill in the form.</span>
         </div>
         <div class="alert text-wrap text-justify form-file-group-alert" hidden>
             <span class="form-file-group-alert-icon"></span>

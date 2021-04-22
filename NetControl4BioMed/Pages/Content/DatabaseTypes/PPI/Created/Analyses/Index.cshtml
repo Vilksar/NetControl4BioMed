@@ -46,29 +46,26 @@
             </button>
         </div>
     </div>
-    @if (!Model.View.IsUserAuthenticated)
+    @if (!Model.View.Search.Items.Any() && Model.View.Search.Filters.Any())
     {
         <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>There are no analyses associated with your account, as you are not logged in. You can create a new analysis using the button above.</span>
+            <span>No analyses have been found matching the applied filter(s).</span>
+        </div>
+    }
+    else if (!Model.View.IsUserAuthenticated)
+    {
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>You can use the buttons above to create a new PPI analysis.</span>
         </div>
     }
     else if (!Model.View.Search.Items.Any())
     {
-        @if (!Model.View.Search.Filters.Any())
-        {
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>There are no analyses associated with your account. You can create a new analysis using the button above.</span>
-            </div>
-        }
-        else
-        {
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>No analyses have been found matching the applied filter(s).</span>
-            </div>
-        }
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>There are no PPI analyses associated with your account. You can use the buttons above to create a new PPI analysis.</span>
+        </div>
     }
     else
     {

@@ -66,17 +66,9 @@ namespace NetControl4BioMed.Pages.Content
             if (View.IsUserAuthenticated)
             {
                 // Update the view.
-                View.ItemCount["GenericNetworks"] = _context.Networks
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                View.ItemCount["Networks"] = _context.Networks
                     .Count(item => item.NetworkUsers.Any(item1 => item1.User == user));
-                View.ItemCount["GenericAnalyses"] = _context.Analyses
-                    .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Count(item => item.AnalysisUsers.Any(item1 => item1.User == user));
-                View.ItemCount["PPINetworks"] = _context.Networks
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
-                    .Count(item => item.NetworkUsers.Any(item1 => item1.User == user));
-                View.ItemCount["PPIAnalyses"] = _context.Analyses
-                    .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
+                View.ItemCount["Analyses"] = _context.Analyses
                     .Count(item => item.AnalysisUsers.Any(item1 => item1.User == user));
             }
             // Return the page.
@@ -97,17 +89,9 @@ namespace NetControl4BioMed.Pages.Content
             if (View.IsUserAuthenticated)
             {
                 // Update the view.
-                View.ItemCount["GenericNetworks"] = _context.Networks
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                View.ItemCount["Networks"] = _context.Networks
                     .Count(item => item.NetworkUsers.Any(item1 => item1.User == user));
-                View.ItemCount["GenericAnalyses"] = _context.Analyses
-                    .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Count(item => item.AnalysisUsers.Any(item1 => item1.User == user));
-                View.ItemCount["PPINetworks"] = _context.Networks
-                    .Where(item => item.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
-                    .Count(item => item.NetworkUsers.Any(item1 => item1.User == user));
-                View.ItemCount["PPIAnalyses"] = _context.Analyses
-                    .Where(item => item.AnalysisDatabases.Any(item1 => item1.Database.DatabaseType.Name == "PPI"))
+                View.ItemCount["Analyses"] = _context.Analyses
                     .Count(item => item.AnalysisUsers.Any(item1 => item1.User == user));
             }
             // Check if the reCaptcha is valid.
