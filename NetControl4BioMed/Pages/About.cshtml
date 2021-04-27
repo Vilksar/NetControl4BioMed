@@ -12,7 +12,7 @@
 <div class="text-justify figure-group">
     <div class="mb-3">
         <div class="mb-1">
-            <span>This page provides several details about the web application. <span class="font-weight-bold">An account is not required in order to use the application.</span></span>
+            <span>This page provides several details about the web application.</span>
         </div>
     </div>
     <div class="mb-3">
@@ -40,42 +40,22 @@
         </div>
         <div class="mb-1">
             <div class="mb-0">
-                <span>The application offers two related services: (i) creating an interaction network based on a set of seeds uploaded by the user, and (ii) running target controllability analyses on networks (either created in our application or uploaded by the user).</span>
-            </div>
-            <div class="mb-0">
-                <span>(i) Creating an interaction network. The input data is a set of (seed) genes around which the interaction network will be built. The genes can be uploaded through their IDs, with the formats including those of Hugo, Uniprot, Ensembl, and InnateDB. The user also selects how to generate the interactions between these seeds by indicating the number of intermediate genes allowed in such interactions (the gap parameter).</span>
-            </div>
-            <div class="mb-0">
-                <span>(ii) Creating a target controllability analysis. The input data consists of the following: </span>
+                <span>NetControl4BioMed is a free open-source web-based application (the second version of the software described <a href="https://doi.org/10.1186/s12859-018-2177-3" target="_blank" rel="nofollow noopener noreferrer">here</a> <span><i class="fas fa-external-link-alt"></i></span>), aimed primarily at applications in biomedicine and allowing for:</span>
             </div>
             <ul class="mb-0">
                 <li>
-                    <span>An interaction network. If the network has been created in our application, the user writes its ID. Alternatively, the user can upload a network through its list of edges.</span>
+                    <span>User-driven data protein-protein interaction network generation.</span>
                 </li>
                 <li>
-                    <span>A set of control target nodes. The user can upload a list of genes or can select one of the lists available in the application (e.g., lists of survivability-essential genes for many cancer cell-lines).</span>
+                    <span>Network controllability analysis focused on highly personalized drug-repurposing and drug-therapy suggestions.</span>
                 </li>
                 <li>
-                    <span>A set of preferred input nodes: The user can upload a list of genes, can select one of the lists available in the application (e.g., the list of targets of all FDA-approved drugs), or can leave the list empty.</span>
-                </li>
-                <li>
-                    <span>The parameter values of the search algorithm can be customized.</span>
+                    <span>Cloud-based solution facilitating collaboration between users.</span>
                 </li>
             </ul>
         </div>
         <div class="mb-1">
-            <div class="mb-0">
-                <span>The two services of the application offer the following output:</span>
-            </div>
-            <div class="mb-0">
-                <span>(i) An interaction network created around the seeds offered by the user. The basic data of the network can be seen in the app (number of nodes and edges, simple visualization for small networks). The networks can be downloaded in JSON, Cytoscape, Excel, and comma-separated value formats.</span>
-            </div>
-            <div class="mb-0">
-                <span>(ii) A control analysis: the number of input nodes controlling the targets, the list of input nodes, and the control pathways. The control pathways are constructed to maximize the use of user-preferred input nodes (such as targets of FDA-approved drugs).</span>
-            </div>
-        </div>
-        <div class="mb-1">
-            <span>An interaction network is constructed by mining interactions between the seed nodes, using data from Omnipath, InnateDB, and SIGNOR. The control analysis method is based on the directed target controllability algorithm presented <a href="https://doi.org/10.1007/978-3-319-45177-0_5" target="_blank" rel="nofollow noopener noreferrer">here</a> <span><i class="fas fa-external-link-alt"></i></span> and demonstrated in <a href="https://doi.org/10.1038/s41598-017-10491-y" target="_blank" rel="nofollow noopener noreferrer">here</a> <span><i class="fas fa-external-link-alt"></i></span>, replacing the first implementation of the application, described <a href="https://doi.org/10.1186/s12859-018-2177-3" target="_blank" rel="nofollow noopener noreferrer">here</a> <span><i class="fas fa-external-link-alt"></i></span>. The new version offers greatly improved performance, allowing the processing of larger networks, it expands on the datasets available to build and analyze interaction networks, and it offers support for collaboration through sharing networks and analyses.</span>
+            <span>The new version offers greatly improved performance, allowing for the processing of larger networks, it expands on the datasets available to build and analyze the protein-protein interaction networks, and it offers support for collaboration through sharing networks and analyses.</span>
         </div>
     </div>
     <div id="tutorial-ppi" class="mb-3">
@@ -213,7 +193,7 @@
             <span>Please note that creating a network (or having access to one) is required in order to create an analysis!</span>
         </div>
         <div class="mb-1">
-            <span>Once a network has been generated, you can start its analysis by navigating to the <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Index" target="_blank" rel="nofollow noopener noreferrer">Analyses</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the network creation page. The control analysis uses the greedy algorithm described <a href="https://doi.org/10.1109/TCBB.2018.2797271" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+            <span>Once a network has been generated, you can start its analysis by navigating to the <a asp-page="/Content/DatabaseTypes/PPI/Created/Analyses/Index" target="_blank" rel="nofollow noopener noreferrer">Analyses</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the network creation page. The control analysis uses the greedy algorithm described <a href="https://doi.org/10.1109/TCBB.2018.2797271" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span> or the genetic algorithm described <a href="https://arxiv.org/abs/2007.04853" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
         </div>
         <div class="mb-1">
             <span>Similar as for a network, you first need to assign a name to the analysis. It does not need to be unique, as a unique identifier will be assigned to it upon creation, but it's recommended to give each analysis a name that represents it. Furthermore, you can also add a fitting description, although it is not required.</span>
@@ -422,7 +402,7 @@
             <span>Please note that creating a network (or having access to one) is required in order to create an analysis!</span>
         </div>
         <div class="mb-1">
-            <span>Once a network has been generated, you can start its analysis by navigating to the <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Index" target="_blank" rel="nofollow noopener noreferrer">Analyses</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the analysis creation page. The control analysis uses the greedy algorithm described <a href="https://doi.org/10.1109/TCBB.2018.2797271" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+            <span>Once a network has been generated, you can start its analysis by navigating to the <a asp-page="/Content/DatabaseTypes/Generic/Created/Analyses/Index" target="_blank" rel="nofollow noopener noreferrer">Analyses</a> overview page. You can load one of the available samples (including the one used in this tutorial) using the corresponding button on the analysis creation page. The control analysis uses the greedy algorithm described <a href="https://doi.org/10.1109/TCBB.2018.2797271" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span> or the genetic algorithm described <a href="https://arxiv.org/abs/2007.04853" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
         </div>
         <div class="mb-1">
             <span>Similar as for a network, you first need to assign a name to the analysis. It does not need to be unique, as a unique identifier will be assigned to it upon creation, but it's recommended to give each analysis a name that represents it. Furthermore, you can also add a fitting description, although it is not required.</span>

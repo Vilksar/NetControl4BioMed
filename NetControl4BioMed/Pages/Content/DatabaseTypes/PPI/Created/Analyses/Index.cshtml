@@ -14,7 +14,7 @@
             <span class="input-group-text">Algorithm</span>
         </div>
         <select name="algorithm" class="custom-select">
-            @foreach (var item in Enum.GetValues(typeof(AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>().Where(item => item == AnalysisAlgorithm.Greedy))
+            @foreach (var item in Enum.GetValues(typeof(AnalysisAlgorithm)).Cast<NetControl4BioMed.Data.Enumerations.AnalysisAlgorithm>())
             {
                 <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
             }
