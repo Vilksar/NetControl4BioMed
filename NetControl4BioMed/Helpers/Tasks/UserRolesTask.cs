@@ -54,40 +54,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
                     .Take(ApplicationDbContext.BatchSize);
-                // Get the IDs of the related entities that appear in the current batch.
-                var batchUserIds = batchItems
-                    .Where(item => item.User != null)
-                    .Select(item => item.User)
-                    .Where(item => !string.IsNullOrEmpty(item.Id))
-                    .Select(item => item.Id)
-                    .Distinct();
-                var batchRoleIds = batchItems
-                    .Where(item => item.Role != null)
-                    .Select(item => item.Role)
-                    .Where(item => !string.IsNullOrEmpty(item.Id))
-                    .Select(item => item.Id)
-                    .Distinct();
-                // Define the list of items to get.
-                var users = new List<User>();
-                var roles = new List<Role>();
-                // Create a new scope.
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    // Use a new context instance.
-                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    // Get the related entities that appear in the current batch.
-                    users = context.Users
-                        .Where(item => batchUserIds.Contains(item.Id))
-                        .ToList();
-                    roles = context.Roles
-                        .Where(item => batchRoleIds.Contains(item.Id))
-                        .ToList();
-                }
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
-                    // Use a new user manager instance.
+                    // Use new user manager and role manager instances.
                     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
                     // Go over each item in the current batch.
                     foreach (var batchItem in batchItems)
                     {
@@ -98,8 +70,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             throw new TaskException("There was no user provided.", showExceptionItem, batchItem);
                         }
                         // Get the user.
-                        var user = users
-                            .FirstOrDefault(item => item.Id == batchItem.User.Id);
+                        var user = await userManager.FindByIdAsync(batchItem.User.Id);
                         // Check if there was no user found.
                         if (user == null)
                         {
@@ -113,8 +84,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             throw new TaskException("There was no role provided.", showExceptionItem, batchItem);
                         }
                         // Get the role.
-                        var role = roles
-                            .FirstOrDefault(item => item.Id == batchItem.Role.Id);
+                        var role = await roleManager.FindByIdAsync(batchItem.Role.Id);
                         // Check if there was no role found.
                         if (role == null)
                         {
@@ -165,54 +135,47 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var batchItems = Items
                     .Skip(index * ApplicationDbContext.BatchSize)
                     .Take(ApplicationDbContext.BatchSize);
-                // Get the IDs of the items in the current batch.
-                var batchIds = batchItems
-                    .Where(item => item.User != null && !string.IsNullOrEmpty(item.User.Id))
-                    .Where(item => item.Role != null && !string.IsNullOrEmpty(item.Role.Id))
-                    .Select(item => (item.User.Id, item.Role.Id));
-                // Get the IDs of all individual items.
-                var batchIdsUserIds = batchIds
-                    .Select(item => item.Item1);
-                var batchIdsRoleIds = batchIds
-                    .Select(item => item.Item2);
-                // Define the list of items to get.
-                var userRoles = new List<UserRole>();
-                // Create a new scope.
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    // Use a new context instance.
-                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    // Get the items with the provided IDs.
-                    var items = context.UserRoles
-                        .Include(item => item.User)
-                        .Include(item => item.Role)
-                        .Where(item => batchIdsUserIds.Contains(item.User.Id))
-                        .Where(item => batchIdsRoleIds.Contains(item.Role.Id))
-                        .AsEnumerable()
-                        .Where(item => batchIds.Any(item1 => item1.Item1 == item.User.Id && item1.Item2 == item.Role.Id))
-                        .ToList();
-                    // Check if there were no items found.
-                    if (items == null || !items.Any())
-                    {
-                        // Continue.
-                        continue;
-                    }
-                    // Get the items found.
-                    userRoles = items
-                        .ToList();
-                }
                 // Define a variable to store the error messages.
                 var errorMessages = new List<string>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
-                    // Use a new user manager instance.
+                    // Use new user manager and role manager instances.
                     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
                     // Go over each item.
-                    foreach (var userRole in userRoles)
+                    foreach (var batchItem in batchItems)
                     {
+                        // Check if there was no user provided.
+                        if (batchItem.User == null || string.IsNullOrEmpty(batchItem.User.Id))
+                        {
+                            // Continue.
+                            continue;
+                        }
+                        // Get the user.
+                        var user = await userManager.FindByIdAsync(batchItem.User.Id);
+                        // Check if there was no user found.
+                        if (user == null)
+                        {
+                            // Continue.
+                            continue;
+                        }
+                        // Check if there was no role provided.
+                        if (batchItem.Role == null || string.IsNullOrEmpty(batchItem.Role.Id))
+                        {
+                            // Continue.
+                            continue;
+                        }
+                        // Get the role.
+                        var role = await roleManager.FindByIdAsync(batchItem.Role.Id);
+                        // Check if there was no role found.
+                        if (role == null)
+                        {
+                            // Continue.
+                            continue;
+                        }
                         // Delete it.
-                        var result = await userManager.RemoveFromRoleAsync(userRole.User, userRole.Role.Name);
+                        var result = await userManager.RemoveFromRoleAsync(user, role.Name);
                         // Check if the operation has failed.
                         if (!result.Succeeded)
                         {
