@@ -129,13 +129,13 @@
                                     @switch (isSource)
                                     {
                                         case false:
-                                            <span class="text-danger" title="@isSource"><i class="fas fa-times-circle"></i></span>
+                                            <span class="text-danger" title="@isSource.ToString()"><i class="fas fa-times-circle"></i></span>
                                             break;
                                         case true:
-                                            <span class="text-success" title="@isSource"><i class="fas fa-check-circle"></i></span>
+                                            <span class="text-success" title="@isSource.ToString()"><i class="fas fa-check-circle"></i></span>
                                             break;
                                     }
-                                    <span title="@isSource">@isSource</span>
+                                    <span title="@isSource.ToString()">@isSource</span>
                                 </div>
                             </td>
                         }
