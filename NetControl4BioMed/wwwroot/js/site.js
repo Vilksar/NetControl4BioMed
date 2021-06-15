@@ -704,4 +704,5 @@ $(window).on('load', () => {
             $('.utc-date').each((index, element) => updateDate(element));
         })();
     }
+
 });
