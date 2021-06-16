@@ -43,11 +43,6 @@ namespace NetControl4BioMed.Helpers.InputModels
         public string Data { get; set; }
 
         /// <summary>
-        /// Gets or sets the owner of the network.
-        /// </summary>
-        public UserInputModel Owner { get; set; }
-
-        /// <summary>
         /// Represents the network users of the network.
         /// </summary>
         public IEnumerable<NetworkUserInputModel> NetworkUsers { get; set; }

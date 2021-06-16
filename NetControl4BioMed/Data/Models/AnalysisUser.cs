@@ -1,4 +1,5 @@
-﻿using NetControl4BioMed.Data.Interfaces;
+﻿using NetControl4BioMed.Data.Enumerations;
+using NetControl4BioMed.Data.Interfaces;
 using System;
 
 namespace NetControl4BioMed.Data.Models
@@ -37,5 +38,10 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the e-mail of the relationship.
         /// </summary>
         public string Email { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of the relationship.
+        /// </summary>
+        public AnalysisUserType Type { get; set; }
     }
 }

@@ -25,19 +25,9 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<DatabaseUser> DatabaseUsers { get; set; }
 
         /// <summary>
-        /// Gets or sets the networks for which the user is owner.
-        /// </summary>
-        public ICollection<Network> OwnedNetworks { get; set; }
-
-        /// <summary>
         /// Gets or sets the networks to which the user has access.
         /// </summary>
         public ICollection<NetworkUser> NetworkUsers { get; set; }
-
-        /// <summary>
-        /// Gets or sets the analyses for which the user is owner.
-        /// </summary>
-        public ICollection<Analysis> OwnedAnalyses { get; set; }
 
         /// <summary>
         /// Gets or sets the analyses to which the user has access.

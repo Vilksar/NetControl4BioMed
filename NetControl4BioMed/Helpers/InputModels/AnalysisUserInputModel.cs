@@ -19,5 +19,10 @@
         /// Represents the e-mail of the analysis user.
         /// </summary>
         public string Email { get; set; }
+
+        /// <summary>
+        /// Represents the type of the analysis user.
+        /// </summary>
+        public string Type { get; set; }
     }
 }

@@ -58,11 +58,6 @@ namespace NetControl4BioMed.Helpers.InputModels
         public string Parameters { get; set; }
 
         /// <summary>
-        /// Gets or sets the owner of the analysis.
-        /// </summary>
-        public UserInputModel Owner { get; set; }
-
-        /// <summary>
         /// Gets or sets the network used by the analysis.
         /// </summary>
         public NetworkInputModel Network { get; set; }

@@ -65,16 +65,6 @@ namespace NetControl4BioMed.Data.Models
         public string Data { get; set; }
 
         /// <summary>
-        /// Gets or sets the owner ID of the network.
-        /// </summary>
-        public string OwnerId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the owner of the network.
-        /// </summary>
-        public User Owner { get; set; }
-
-        /// <summary>
         /// Gets or sets the users which have access to the network.
         /// </summary>
         public ICollection<NetworkUser> NetworkUsers { get; set; }

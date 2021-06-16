@@ -207,9 +207,6 @@ namespace NetControl4BioMed.Data
                     .WithMany(item => item.Analyses)
                     .HasForeignKey(item => item.NetworkId)
                     .IsRequired();
-                entity.HasOne(item => item.Owner)
-                    .WithMany(item => item.OwnedAnalyses)
-                    .HasForeignKey(item => item.OwnerId);
             });
             modelBuilder.Entity<AnalysisDatabase>(entity =>
             {
@@ -261,7 +258,7 @@ namespace NetControl4BioMed.Data
             });
             modelBuilder.Entity<AnalysisUser>(entity =>
             {
-                entity.HasKey(item => new { item.AnalysisId, item.Email });
+                entity.HasKey(item => new { item.AnalysisId, item.Email, item.Type });
                 entity.HasOne(item => item.Analysis)
                     .WithMany(item => item.AnalysisUsers)
                     .HasForeignKey(item => item.AnalysisId)
@@ -387,9 +384,6 @@ namespace NetControl4BioMed.Data
             {
                 entity.Property(item => item.Id)
                     .ValueGeneratedOnAdd();
-                entity.HasOne(item => item.Owner)
-                    .WithMany(item => item.OwnedNetworks)
-                    .HasForeignKey(item => item.OwnerId);
             });
             modelBuilder.Entity<NetworkDatabase>(entity =>
             {
@@ -441,7 +435,7 @@ namespace NetControl4BioMed.Data
             });
             modelBuilder.Entity<NetworkUser>(entity =>
             {
-                entity.HasKey(item => new { item.NetworkId, item.Email });
+                entity.HasKey(item => new { item.NetworkId, item.Email, item.Type });
                 entity.HasOne(item => item.Network)
                     .WithMany(item => item.NetworkUsers)
                     .HasForeignKey(item => item.NetworkId)

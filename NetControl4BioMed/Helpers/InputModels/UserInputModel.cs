@@ -43,19 +43,9 @@ namespace NetControl4BioMed.Helpers.InputModels
         public IEnumerable<DatabaseUserInputModel> DatabaseUsers { get; set; }
 
         /// <summary>
-        /// Gets or sets the networks for which the user is owner.
-        /// </summary>
-        public ICollection<NetworkInputModel> OwnedNetworks { get; set; }
-
-        /// <summary>
         /// Represents the network users of the user.
         /// </summary>
         public IEnumerable<NetworkUserInputModel> NetworkUsers { get; set; }
-
-        /// <summary>
-        /// Gets or sets the analyses for which the user is owner.
-        /// </summary>
-        public ICollection<AnalysisInputModel> OwnedAnalyses { get; set; }
 
         /// <summary>
         /// Represents the analysis users of the user.

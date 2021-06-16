@@ -101,16 +101,6 @@ namespace NetControl4BioMed.Data.Models
         public string Parameters { get; set; }
 
         /// <summary>
-        /// Gets or sets the owner ID of the analysis.
-        /// </summary>
-        public string OwnerId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the owner of the analysis.
-        /// </summary>
-        public User Owner { get; set; }
-
-        /// <summary>
         /// Gets or sets the network ID used by the analysis.
         /// </summary>
         public string NetworkId { get; set; }
