@@ -14,12 +14,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Helpers.Extensions;
-using NetControl4BioMed.Helpers.Interfaces;
-using NetControl4BioMed.Helpers.Services;
-using NetControl4BioMed.Helpers.ViewModels;
 
 namespace NetControl4BioMed
 {
@@ -62,22 +56,6 @@ namespace NetControl4BioMed
             services.Configure<CookieTempDataProviderOptions>(options => {
                 options.Cookie.IsEssential = true;
             });
-            // Add the database context and connection.
-            services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]);
-            });
-            services.AddHangfire(options =>
-            {
-                options.UseSqlServerStorage(Configuration["ConnectionStrings:DefaultConnection"]);
-            });
-            // Add the default Identity functions for users and roles.
-            services.AddIdentity<User, Role>(options =>
-            {
-                options.SignIn.RequireConfirmedEmail = true;
-            })
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
             // Configure the path options.
             services.ConfigureApplicationCookie(options =>
             {
@@ -101,13 +79,6 @@ namespace NetControl4BioMed
                 });
             // Add the HTTP client dependency.
             services.AddHttpClient();
-            // Add the dependency injections.
-            services.AddTransient<IPartialViewRenderer, PartialViewRenderer>();
-            services.AddTransient<IReCaptchaChecker, ReCaptchaChecker>();
-            services.AddTransient<ISendGridEmailSender, SendGridEmailSender>();
-            services.AddTransient<IRecurringTaskManager, RecurringTaskManager>();
-            services.AddTransient<IAdministrationTaskManager, AdministrationTaskManager>();
-            services.AddTransient<IContentTaskManager, ContentTaskManager>();
             // Add Razor pages.
             services.AddRazorPages();
         }
@@ -154,23 +125,6 @@ namespace NetControl4BioMed
             {
                 endpoints.MapRazorPages();
             });
-            // Use Hangfire.
-            app.UseHangfireDashboard("/Hangfire", new DashboardOptions
-            {
-                Authorization = new[] { new HangfireAuthorizationFilter() }
-            });
-            app.UseHangfireServer(new BackgroundJobServerOptions
-            {
-                WorkerCount = 4 < Environment.ProcessorCount ? Environment.ProcessorCount - 3 : 1,
-                Queues = new[] { "recurring", "default" }
-            });
-            app.UseHangfireServer(new BackgroundJobServerOptions
-            {
-                WorkerCount = 4 < Environment.ProcessorCount ? 2 : 1,
-                Queues = new[] { "administration", "background" }
-            });
-            // Seed the database.
-            app.SeedDatabaseAsync(Configuration).Wait();
         }
     }
 }
