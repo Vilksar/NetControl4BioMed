@@ -1,16 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Hangfire;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -53,7 +45,8 @@ namespace NetControl4BioMed
                 options.Secure = CookieSecurePolicy.SameAsRequest;
             });
             // Enable cookies for temporary data.
-            services.Configure<CookieTempDataProviderOptions>(options => {
+            services.Configure<CookieTempDataProviderOptions>(options =>
+            {
                 options.Cookie.IsEssential = true;
             });
             // Configure the path options.

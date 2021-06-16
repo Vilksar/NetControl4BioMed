@@ -1,9 +1,4 @@
-﻿using NetControl4BioMed.Data.Enumerations;
-using NetControl4BioMed.Data.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using NetControl4BioMed.Data.Interfaces;
 
 namespace NetControl4BioMed.Data.Models
 {
