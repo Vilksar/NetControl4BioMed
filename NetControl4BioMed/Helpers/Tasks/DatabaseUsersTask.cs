@@ -194,7 +194,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
-        /// Updates the corresponding user in the database.
+        /// Updates the users corresponding to the items.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
