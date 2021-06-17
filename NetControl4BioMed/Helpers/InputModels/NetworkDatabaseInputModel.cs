@@ -14,5 +14,10 @@
         /// Represents the database of the network database.
         /// </summary>
         public DatabaseInputModel Database { get; set; }
+
+        /// <summary>
+        /// Represents the type of the network database.
+        /// </summary>
+        public string Type { get; set; }
     }
 }

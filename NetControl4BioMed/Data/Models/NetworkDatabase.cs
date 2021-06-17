@@ -1,4 +1,5 @@
-﻿using NetControl4BioMed.Data.Interfaces;
+﻿using NetControl4BioMed.Data.Enumerations;
+using NetControl4BioMed.Data.Interfaces;
 
 namespace NetControl4BioMed.Data.Models
 {
@@ -26,5 +27,10 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the database of the relationship.
         /// </summary>
         public Database Database { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of the relationship.
+        /// </summary>
+        public NetworkDatabaseType Type { get; set; }
     }
 }
