@@ -573,7 +573,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             };
             var analysisUserTask = new AnalysisUsersTask
             {
-                Items =analysisUserItemIds
+                Items = analysisUserItemIds
                     .Select(item => new AnalysisUserInputModel
                     {
                         Analysis = new AnalysisInputModel

@@ -3,7 +3,6 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
-using NetControl4BioMed.Helpers.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -362,12 +361,12 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                 {
                     Paths = item.Values.Select(item1 =>
                     {
-                    // Get the proteins and interactions in the path.
-                    var pathProteins = item1
-                    .Select(item2 => analysisProteinIds.FirstOrDefault(item3 => item3 == item2))
-                    .Where(item2 => item2 != null)
-                    .Reverse()
-                    .ToList();
+                        // Get the proteins and interactions in the path.
+                        var pathProteins = item1
+                        .Select(item2 => analysisProteinIds.FirstOrDefault(item3 => item3 == item2))
+                        .Where(item2 => item2 != null)
+                        .Reverse()
+                        .ToList();
                         var pathInteractions = item1
                             .Zip(item1.Skip(1), (item2, item3) => (item3.ToString(), item2.ToString()))
                             .Select(item2 => analysisInteractionIds.FirstOrDefault(item3 => item3.Item1 == item2.Item1 && item3.Item2 == item2.Item2))
@@ -375,13 +374,13 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                             .Where(item2 => !string.IsNullOrEmpty(item2))
                             .Reverse()
                             .ToList();
-                    // Return the path.
-                    return new Path
+                        // Return the path.
+                        return new Path
                         {
                             PathProteins = pathProteins.Select((item2, index) => new PathProtein { ProteinId = item2, Type = PathProteinType.None, Index = index })
-                        .Append(new PathProtein { ProteinId = pathProteins.First(), Type = PathProteinType.Source, Index = -1 })
-                        .Append(new PathProtein { ProteinId = pathProteins.Last(), Type = PathProteinType.Target, Index = pathProteins.Count() })
-                        .ToList(),
+                            .Append(new PathProtein { ProteinId = pathProteins.First(), Type = PathProteinType.Source, Index = -1 })
+                            .Append(new PathProtein { ProteinId = pathProteins.Last(), Type = PathProteinType.Target, Index = pathProteins.Count() })
+                            .ToList(),
                             PathInteractions = pathInteractions.Select((item2, index) => new PathInteraction { InteractionId = item2, Index = index }).ToList()
                         };
                     }).ToList()

@@ -1,12 +1,10 @@
-﻿using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Helpers.Extensions;
+﻿using NetControl4BioMed.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
 {
