@@ -1,11 +1,20 @@
+using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NetControl4BioMed.Data;
+using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Extensions;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Services;
+using System;
 
 namespace NetControl4BioMed
 {
@@ -37,6 +46,7 @@ namespace NetControl4BioMed
         /// <param name="services">Represents the service collection to be configured.</param>
         public void ConfigureServices(IServiceCollection services)
         {
+
             // Configure the cookie options.
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -45,10 +55,25 @@ namespace NetControl4BioMed
                 options.Secure = CookieSecurePolicy.SameAsRequest;
             });
             // Enable cookies for temporary data.
-            services.Configure<CookieTempDataProviderOptions>(options =>
-            {
+            services.Configure<CookieTempDataProviderOptions>(options => {
                 options.Cookie.IsEssential = true;
             });
+            // Add the database context and connection.
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration["ConnectionStrings:SqlConnection"]);
+            });
+            services.AddHangfire(options =>
+            {
+                options.UseSqlServerStorage(Configuration["ConnectionStrings:SqlConnection"]);
+            });
+            // Add the default Identity functions for users and roles.
+            services.AddIdentity<User, Role>(options =>
+            {
+                options.SignIn.RequireConfirmedEmail = true;
+            })
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
             // Configure the path options.
             services.ConfigureApplicationCookie(options =>
             {
@@ -72,6 +97,13 @@ namespace NetControl4BioMed
                 });
             // Add the HTTP client dependency.
             services.AddHttpClient();
+            // Add the dependency injections.
+            services.AddTransient<IPartialViewRenderer, PartialViewRenderer>();
+            services.AddTransient<IReCaptchaChecker, ReCaptchaChecker>();
+            services.AddTransient<ISendGridEmailSender, SendGridEmailSender>();
+            services.AddTransient<IRecurringTaskManager, RecurringTaskManager>();
+            services.AddTransient<IAdministrationTaskManager, AdministrationTaskManager>();
+            services.AddTransient<IContentTaskManager, ContentTaskManager>();
             // Add Razor pages.
             services.AddRazorPages();
         }
@@ -118,6 +150,23 @@ namespace NetControl4BioMed
             {
                 endpoints.MapRazorPages();
             });
+            // Use Hangfire.
+            applicationBuilder.UseHangfireDashboard("/Hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new HangfireAuthorizationFilter() }
+            });
+            applicationBuilder.UseHangfireServer(new BackgroundJobServerOptions
+            {
+                WorkerCount = 4 < Environment.ProcessorCount ? Environment.ProcessorCount - 3 : 1,
+                Queues = new[] { "recurring", "default" }
+            });
+            applicationBuilder.UseHangfireServer(new BackgroundJobServerOptions
+            {
+                WorkerCount = 4 < Environment.ProcessorCount ? 2 : 1,
+                Queues = new[] { "administration", "background" }
+            });
+            // Seed the database.
+            applicationBuilder.SeedDatabaseAsync(Configuration).Wait();
         }
     }
 }
