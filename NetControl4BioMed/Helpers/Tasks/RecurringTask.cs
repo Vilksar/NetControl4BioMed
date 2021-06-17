@@ -494,6 +494,100 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
+        /// Deletes the long-standing unconfirmed user invitations (to a database, network, or analysis) from the database.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task DeleteUnconfirmedUserInvitationsAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Define the limit date.
+            var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
+            // Define the IDs of the items to get.
+            var databaseUserItemIds = new List<(string, string)>();
+            var networkUserItemIds = new List<(string, string)>();
+            var analysisUserItemIds = new List<(string, string)>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the IDs of the items to delete.
+                databaseUserItemIds = context.DatabaseUsers
+                    .Where(item => item.User == null)
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => new
+                    {
+                        DatabaseId = item.Database.Id,
+                        Email = item.Email
+                    })
+                    .AsEnumerable()
+                    .Select(item => (item.DatabaseId, item.Email))
+                    .ToList();
+                networkUserItemIds = context.NetworkUsers
+                    .Where(item => item.User == null)
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => new
+                    {
+                        NetworkId = item.Network.Id,
+                        Email = item.Email
+                    })
+                    .AsEnumerable()
+                    .Select(item => (item.NetworkId, item.Email))
+                    .ToList();
+                analysisUserItemIds = context.AnalysisUsers
+                    .Where(item => item.User == null)
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => new
+                    {
+                        AnalysisId = item.Analysis.Id,
+                        Email = item.Email
+                    })
+                    .AsEnumerable()
+                    .Select(item => (item.AnalysisId, item.Email))
+                    .ToList();
+            }
+            // Define the new tasks.
+            var databaseUserTask = new DatabaseUsersTask
+            {
+                Items = databaseUserItemIds
+                    .Select(item => new DatabaseUserInputModel
+                    {
+                        Database = new DatabaseInputModel
+                        {
+                            Id = item.Item1
+                        },
+                        Email = item.Item2
+                    })
+            };
+            var networkUserTask = new NetworkUsersTask
+            {
+                Items = networkUserItemIds
+                    .Select(item => new NetworkUserInputModel
+                    {
+                        Network = new NetworkInputModel
+                        {
+                            Id = item.Item1
+                        },
+                        Email = item.Item2
+                    })
+            };
+            var analysisUserTask = new AnalysisUsersTask
+            {
+                Items =analysisUserItemIds
+                    .Select(item => new AnalysisUserInputModel
+                    {
+                        Analysis = new AnalysisInputModel
+                        {
+                            Id = item.Item1
+                        },
+                        Email = item.Item2
+                    })
+            };
+            // Run the tasks.
+            await databaseUserTask.DeleteAsync(serviceProvider, token);
+        }
+
+        /// <summary>
         /// Deletes the orphaned items from the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>

@@ -82,39 +82,39 @@ namespace NetControl4BioMed
         /// <remarks>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </remarks>
-        /// <param name="app">Represents the application builder.</param>
-        /// <param name="env">Represents the hosting environment of the application.</param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        /// <param name="applicationBuilder">The application builder.</param>
+        /// <param name="webHostEnvironment">The hosting environment of the application.</param>
+        public void Configure(IApplicationBuilder applicationBuilder, IWebHostEnvironment webHostEnvironment)
         {
             // Check the environment in which it is running.
-            if (env.IsDevelopment())
+            if (webHostEnvironment.IsDevelopment())
             {
                 // Display more details about the errors.
-                app.UseDeveloperExceptionPage();
+                applicationBuilder.UseDeveloperExceptionPage();
             }
             else
             {
                 // Redirect to a generic "Error" page.
-                app.UseExceptionHandler("/Error");
+                applicationBuilder.UseExceptionHandler("/Error");
                 // Use re-execution for the HTTP error status codes, to the same "Error" page.
-                app.UseStatusCodePagesWithReExecute("/Error", "?errorCode={0}");
+                applicationBuilder.UseStatusCodePagesWithReExecute("/Error", "?errorCode={0}");
                 // The default HSTS value is 30 days. This may change for production scenarios, as in https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                applicationBuilder.UseHsts();
             }
             // Parameters for the application.
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            applicationBuilder.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedProto
             });
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseCookiePolicy();
-            app.UseRouting();
+            applicationBuilder.UseHttpsRedirection();
+            applicationBuilder.UseStaticFiles();
+            applicationBuilder.UseCookiePolicy();
+            applicationBuilder.UseRouting();
             // Use authentication.
-            app.UseAuthentication();
-            app.UseAuthorization();
+            applicationBuilder.UseAuthentication();
+            applicationBuilder.UseAuthorization();
             // Use Razor pages.
-            app.UseEndpoints(endpoints =>
+            applicationBuilder.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
             });

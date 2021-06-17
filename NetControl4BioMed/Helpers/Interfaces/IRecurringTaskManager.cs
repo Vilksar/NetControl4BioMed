@@ -41,16 +41,6 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task CountOrphanedItemsAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Counts the inconsistent items in the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        [AutomaticRetry(Attempts = 2)]
-        [DisableConcurrentExecution(86400)]
-        [Queue("recurring")]
-        Task CountInconsistentItemsAsync(string id, CancellationToken token);
-
-        /// <summary>
         /// Stops the long-running analyses in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
@@ -79,6 +69,16 @@ namespace NetControl4BioMed.Helpers.Interfaces
         [DisableConcurrentExecution(86400)]
         [Queue("recurring")]
         Task DeleteUnconfirmedUsersAsync(string id, CancellationToken token);
+
+        /// <summary>
+        /// Deletes the long-standing unconfirmed user invitations (to a database, network, or analysis) from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        [AutomaticRetry(Attempts = 2)]
+        [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
+        Task DeleteUnconfirmedUserInvitationsAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes the orphaned items from the database.

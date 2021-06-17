@@ -231,7 +231,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     var analysis = new Analysis
                     {
                         DateTimeCreated = DateTime.UtcNow,
-                        DateTimeToDelete = DateTime.UtcNow + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete),
+                        DateTimeToDelete = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete),
                         Name = batchItem.Name,
                         Description = batchItem.Description,
                         IsPublic = batchItem.IsPublic,
@@ -606,7 +606,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Update the data.
-                    analysis.DateTimeToDelete = DateTime.UtcNow + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
+                    analysis.DateTimeToDelete = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
                     // Add the item to the list.
                     analysesToEdit.Add(analysis);
                 }

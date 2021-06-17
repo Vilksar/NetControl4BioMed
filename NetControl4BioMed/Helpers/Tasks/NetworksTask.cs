@@ -212,7 +212,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     var network = new Network
                     {
                         DateTimeCreated = DateTime.UtcNow,
-                        DateTimeToDelete = DateTime.UtcNow + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete),
+                        DateTimeToDelete = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete),
                         Name = batchItem.Name,
                         Description = batchItem.Description,
                         IsPublic = batchItem.IsPublic,
@@ -582,7 +582,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         continue;
                     }
                     // Update the data.
-                    network.DateTimeToDelete = DateTime.UtcNow + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
+                    network.DateTimeToDelete = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
                     // Add the item to the list.
                     networksToEdit.Add(network);
                 }
