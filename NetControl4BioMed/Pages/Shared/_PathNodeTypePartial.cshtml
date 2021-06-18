@@ -1,0 +1,21 @@
+﻿@model PathProteinType
+@using NetControl4BioMed.Data.Enumerations
+@using NetControl4BioMed.Helpers.Extensions
+
+<div class="text-uppercase">
+    @switch (Model)
+    {
+        case PathProteinType.None:
+            <span style="color: lightgray;"><i class="fas fa-circle"></i></span>
+            break;
+        case PathProteinType.Source:
+            <span style="color: lightpink;"><i class="fas fa-circle"></i></span>
+            break;
+        case PathProteinType.Target:
+            <span style="color: cornflowerblue;"><i class="fas fa-circle"></i></span>
+            break;
+        default:
+            break;
+    }
+    <span title="@Model.GetDisplayDescription()">@Model.GetDisplayName()</span>
+</div>

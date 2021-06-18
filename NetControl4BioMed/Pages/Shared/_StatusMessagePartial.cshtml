@@ -1,0 +1,20 @@
+﻿@model string
+
+@if (!string.IsNullOrEmpty(Model))
+{
+    var index = Model.IndexOf(": ");
+    var type = index < 0 ? string.Empty : Model.Substring(0, index);
+    var text = Model.Substring(index + 1);
+    var color = type == "Error" ? "danger" : type == "Success" ? "success" : "info";
+    var icon = type == "Error" ? "exclamation-circle" : type == "Success" ? "check-circle" : "info-circle";
+    <div class="alert alert-@color alert-dismissible text-wrap mb-3">
+        <div>
+            <span><i class="fas fa-@icon"></i></span>
+            <span class="sr-only">@type!</span>
+            <span>@text</span>
+        </div>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span><i class="fas fa-times"></i></span>
+        </button>
+    </div>
+}

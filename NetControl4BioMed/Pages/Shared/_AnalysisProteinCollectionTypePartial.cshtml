@@ -1,0 +1,18 @@
+﻿@model AnalysisProteinCollectionType
+@using NetControl4BioMed.Data.Enumerations
+@using NetControl4BioMed.Helpers.Extensions
+
+<div class="text-uppercase">
+    @switch (Model)
+    {
+        case AnalysisProteinCollectionType.Source:
+            <span style="color: lightpink;"><i class="fas fa-folder"></i></span>
+            break;
+        case AnalysisProteinCollectionType.Target:
+            <span style="color: cornflowerblue;"><i class="fas fa-folder"></i></span>
+            break;
+        default:
+            break;
+    }
+    <span title="@Model.GetDisplayDescription()">@Model.GetDisplayName()</span>
+</div>

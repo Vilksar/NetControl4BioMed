@@ -1,0 +1,15 @@
+﻿@model NetworkProteinCollectionType
+@using NetControl4BioMed.Data.Enumerations
+@using NetControl4BioMed.Helpers.Extensions
+
+<div class="text-uppercase">
+    @switch (Model)
+    {
+        case NetworkProteinCollectionType.Seed:
+            <span style="color: tomato;"><i class="fas fa-folder"></i></span>
+            break;
+        default:
+            break;
+    }
+    <span title="@Model.GetDisplayDescription()">@Model.GetDisplayName()</span>
+</div>

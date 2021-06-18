@@ -1,0 +1,18 @@
+﻿@model AnalysisDatabaseType
+@using NetControl4BioMed.Data.Enumerations
+@using NetControl4BioMed.Helpers.Extensions
+
+<div class="text-uppercase">
+    @switch (Model)
+    {
+        case AnalysisDatabaseType.Protein:
+            <span style="color: lightgray;"><i class="fas fa-circle"></i></span>
+            break;
+        case AnalysisDatabaseType.Interaction:
+            <span style="color: lightgray;"><i class="fas fa-arrow-right"></i></span>
+            break;
+        default:
+            break;
+    }
+    <span title="@Model.GetDisplayDescription()">@Model.GetDisplayName()</span>
+</div>

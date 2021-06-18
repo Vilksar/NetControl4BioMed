@@ -1,0 +1,56 @@
+﻿@page
+@model TutorialModel
+@{
+    ViewData["Title"] = "Tutorial";
+}
+
+<div class="text-left mt-3">
+    <div class="h4 mb-3">
+        <span>About</span>
+    </div>
+</div>
+<div class="text-justify">
+    <div class="mb-3">
+        <div class="mb-1">
+            <span>This page provides a tutorial for using the web application.</span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <div class="font-weight-bold mb-2">
+            <span>Table of contents</span>
+        </div>
+        <ol class="">
+            <li class="">
+                <a href="#video-tutorial">Video tutorial</a>
+            </li>
+            <li class="">
+                <a href="#text-tutorial">Text tutorial</a>
+            </li>
+        </ol>
+    </div>
+    <div id="video-tutorial" class="figure-group mb-3">
+        <div class="font-weight-bold mb-2">
+            <span>Video tutorial</span>
+        </div>
+        <div class="mb-1">
+            <span>The following video presents the generation and analysis of a personalized protein-protein interaction network using the web application.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <video class="video" src="~/img/videos/tutorial.mp4"></video>
+        </div>
+    </div>
+    <div id="text-tutorial" class="figure-group mb-3">
+        <div class="font-weight-bold mb-2">
+            <span>Text tutorial</span>
+        </div>
+        <div class="mb-1">
+            <span>The following text section presents the steps for the generation and analysis of the same personalized protein-protein interaction network using the web application.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-1.png" class="figure-img border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">This is the caption of the figure.</figcaption>
+            </figure>
+        </div>
+    </div>
+</div>

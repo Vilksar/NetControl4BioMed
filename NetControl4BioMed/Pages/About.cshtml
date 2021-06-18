@@ -1,0 +1,93 @@
+﻿@page
+@model AboutModel
+@{
+    ViewData["Title"] = "About";
+}
+
+<div class="text-left mt-3">
+    <div class="h4 mb-3">
+        <span>About</span>
+    </div>
+</div>
+<div class="text-justify figure-group">
+    <div class="mb-3">
+        <div class="mb-1">
+            <span>This page provides several details about the web application.</span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <div class="font-weight-bold mb-2">
+            <span>Table of contents</span>
+        </div>
+        <ol class="">
+            <li class="">
+                <a href="#introduction">Introduction</a>
+            </li>
+            <li class="">
+                <a href="#acknowledgements">Acknowledgements</a>
+            </li>
+        </ol>
+    </div>
+    <div id="introduction" class="mb-3">
+        <div class="font-weight-bold mb-2">
+            <span>Introduction</span>
+        </div>
+        <div class="mb-1">
+            <div class="mb-0">
+                <span>NetControl4BioMed is a free open-source web-based application (the second version of the software described <a href="https://doi.org/10.1186/s12859-018-2177-3" target="_blank" rel="nofollow noopener noreferrer">here</a> <span><i class="fas fa-external-link-alt"></i></span>), aimed primarily at applications in biomedicine and allowing for:</span>
+            </div>
+            <ul class="mb-0">
+                <li>
+                    <span>User-driven data protein-protein interaction network generation.</span>
+                </li>
+                <li>
+                    <span>Network controllability analysis focused on highly personalized drug-repurposing and drug-therapy suggestions.</span>
+                </li>
+                <li>
+                    <span>Cloud-based solution facilitating collaboration between users.</span>
+                </li>
+            </ul>
+        </div>
+        <div class="mb-1">
+            <span>The new version offers greatly improved performance, allowing for the processing of larger networks, it expands on the datasets available to build and analyze the protein-protein interaction networks, and it offers support for collaboration through sharing networks and analyses.</span>
+        </div>
+    </div>
+    <div id="acknowledgements" class="mb-3">
+        <div class="font-weight-bold mb-2">
+            <span>Acknowledgements</span>
+        </div>
+        <div class="mb-1">
+            <span>The logo was created by <a href="https://smashicons.com/" target="_blank" rel="nofollow noopener noreferrer">SmashIcons</a> <span class=""><i class="fas fa-external-link-alt"></i></span>, downloaded from <a href="https://www.flaticon.com/" target="_blank" rel="nofollow noopener noreferrer">FlatIcon</a> <span class=""><i class="fas fa-external-link-alt"></i></span>, and formatted using <a href="https://realfavicongenerator.net/" target="_blank" rel="nofollow noopener noreferrer">Real FavIcon Generator</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+        </div>
+        <div class="mb-1">
+            <span>The icons used throughout the application were created by <a href="https://fontawesome.com/" target="_blank" rel="nofollow noopener noreferrer">FontAwesome</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+        </div>
+        <div class="mb-1">
+            <span>The entire front-end works and looks as it does thanks to <a href="https://jquery.com/" target="_blank" rel="nofollow noopener noreferrer">JQuery</a> <span class=""><i class="fas fa-external-link-alt"></i></span> and <a href="https://getbootstrap.com/" target="_blank" rel="nofollow noopener noreferrer">Bootstrap</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+        </div>
+        <div class="mb-1">
+            <span>The client-side validation is performed using <a href="https://jqueryvalidation.org/" target="_blank" rel="nofollow noopener noreferrer">JQuery Validation</a> <span class=""><i class="fas fa-external-link-alt"></i></span> and <a href="https://bradwilson.typepad.com/blog/2010/10/mvc3-unobtrusive-validation.html" target="_blank" rel="nofollow noopener noreferrer">JQuery Validation Unobtrusive</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+        </div>
+        <div class="mb-1">
+            <span>The graphs are drawn and styled using <a href="https://js.cytoscape.org/" target="_blank" rel="nofollow noopener noreferrer">CytoscapeJS</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+        </div>
+        <div class="mb-1">
+            <span>The tables are partly formatted using <a href="https://datatables.net/" target="_blank" rel="nofollow noopener noreferrer">DataTables</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+        </div>
+        <div class="mb-1">
+            <span>The QR code for two-factor authentication is generated using <a href="https://github.com/jeromeetienne/jquery-qrcode" target="_blank" rel="nofollow noopener noreferrer">JQuery QR Code</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+        </div>
+        <div class="mb-1">
+            <span>The background tasks are managed with the help of <a href="https://www.hangfire.io/" target="_blank" rel="nofollow noopener noreferrer">Hangfire</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+        </div>
+        <div class="mb-1">
+            <span>The behind-the-scenes matrix operations are handled using <a href="https://numerics.mathdotnet.com/" target="_blank" rel="nofollow noopener noreferrer">MathNET Numerics</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+        </div>
+        <div class="mb-1">
+            <span>The download of data is made possible also using <a href="https://github.com/OfficeDev/Open-XML-SDK" target="_blank" rel="nofollow noopener noreferrer">Open XML</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+        </div>
+        <div class="mb-1">
+            <span>The e-mail sending service is provided by <a href="https://sendgrid.com/" target="_blank" rel="nofollow noopener noreferrer">SendGrid</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+        </div>
+    </div>
+</div>

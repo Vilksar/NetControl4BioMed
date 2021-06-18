@@ -9,3 +9,17 @@ html {
 body {
     min-height: 100%;
 }
+
+/* Style for the figures. */
+.figure-group {
+    counter-reset: figures;
+}
+
+    .figure-group figure {
+        counter-increment: figures;
+    }
+
+        .figure-group figure figcaption:before {
+            content: "Figure " counter(figures) ". ";
+            font-style: italic;
+        }

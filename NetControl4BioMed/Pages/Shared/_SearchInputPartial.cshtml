@@ -1,0 +1,142 @@
+﻿@model NetControl4BioMed.Helpers.ViewModels.SearchInputViewModel
+
+<form method="get" class="text-justify">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+    @if (!string.IsNullOrEmpty(Model.Id))
+    {
+        <div class="form-group" hidden>
+            <label asp-for="Id" class="font-weight-bold">ID</label>
+            <input asp-for="Id" name="id" class="form-control" />
+            <span asp-description-for="Id" class="text-muted small">The ID of the current item.</span>
+            <span asp-validation-for="Id" class="text-danger small"></span>
+        </div>
+    }
+    <div class="input-group mb-3">
+        <input asp-for="SearchString" name="searchString" class="form-control" placeholder="Search..." autocomplete="off" />
+        <div class="input-group-append">
+            <button class="btn btn-outline-dark" type="button" title="Filter" data-toggle="collapse" data-target=".search-input-filter">
+                <span class="mx-0 mx-md-1"><i class="fas fa-filter"></i></span>
+                <span class="mx-0 mx-md-1"><i class="fas fa-caret-down"></i></span>
+            </button>
+        </div>
+        <div class="input-group-append">
+            <button class="btn btn-outline-dark" type="button" title="Sort" data-toggle="collapse" data-target=".search-input-sort">
+                <span><i class="fas fa-sort-alpha-down"></i></span>
+                <span class="mx-0 mx-lg-1"><i class="fas fa-caret-down"></i></span>
+            </button>
+        </div>
+        <div class="input-group-append">
+            <button class="btn btn-dark" type="submit" title="Search">
+                <span><i class="fas fa-search"></i></span>
+            </button>
+        </div>
+    </div>
+    <div class="collapse border rounded px-3 py-2 mb-3 search-input-filter">
+        <div class="row text-left">
+            <div class="col-lg-6 py-2">
+                <span class="font-weight-bold"><i class="fas fa-search"></i></span>
+                <label asp-for="SearchIn" class="font-weight-bold">Search in</label>
+                @if (!Model.Options.SearchIn.Any())
+                {
+                    <div>
+                        <span>No options available.</span>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var option in Model.Options.SearchIn)
+                    {
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" id="search-in-@option.Key.ToLower()" name="searchIn" value="@option.Key" checked="@(Model.SearchIn.Contains(option.Key) ? "checked" : null)" class="custom-control-input" />
+                            <label for="search-in-@option.Key.ToLower()" class="custom-control-label">@option.Value</label>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="col-lg-6 py-2">
+                <span class="font-weight-bold"><i class="fas fa-filter"></i></span>
+                <label asp-for="Filter" class="font-weight-bold">Filter</label>
+                @if (!Model.Options.Filter.Any())
+                {
+                    <div>
+                        <span>No options available.</span>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var option in Model.Options.Filter)
+                    {
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" id="filter-@option.Key.ToLower()" name="filter" value="@option.Key" checked="@(Model.Filter.Contains(option.Key) ? "checked" : null)" class="custom-control-input" />
+                            <label for="filter-@option.Key.ToLower()" class="custom-control-label">@option.Value</label>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    <div class="collapse border rounded px-3 py-2 mb-3 search-input-sort">
+        <div class="row text-left">
+            <div class="col-lg-4 py-2">
+                <span class="font-weight-bold"><i class="fas fa-sort-alpha-down"></i></span>
+                <label asp-for="SortBy" class="font-weight-bold">Sort by</label>
+                @if (!Model.Options.SortBy.Any())
+                {
+                    <div>
+                        <span>No options available.</span>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var option in Model.Options.SortBy)
+                    {
+                        <div class="custom-control custom-radio">
+                            <input asp-for="SortBy" type="radio" id="sort-by-@option.Key.ToLower()" name="sortBy" value="@option.Key" class="custom-control-input" />
+                            <label for="sort-by-@option.Key.ToLower()" class="custom-control-label">@option.Value</label>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="col-lg-4 py-2">
+                <span class="font-weight-bold"><i class="fas fa-sort"></i></span>
+                <label asp-for="SortDirection" class="font-weight-bold">Sort direction</label>
+                @if (!Model.Options.SortDirection.Any())
+                {
+                    <div>
+                        <span>No options available.</span>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var option in Model.Options.SortDirection)
+                    {
+                        <div class="custom-control custom-radio">
+                            <input asp-for="SortDirection" type="radio" id="sort-direction-@option.Key.ToLower()" name="sortDirection" value="@option.Key" class="custom-control-input" />
+                            <label for="sort-direction-@option.Key.ToLower()" class="custom-control-label">@option.Value</label>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="col-lg-4 py-2">
+                <span class="font-weight-bold"><i class="fas fa-hashtag"></i></span>
+                <label asp-for="ItemsPerPage" class="font-weight-bold">Items per page</label>
+                @if (!Model.Options.ItemsPerPage.Any())
+                {
+                    <div>
+                        <span>No options available.</span>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var option in Model.Options.ItemsPerPage)
+                    {
+                        <div class="custom-control custom-radio">
+                            <input asp-for="ItemsPerPage" type="radio" id="items-per-page-@option.Key" name="itemsPerPage" value="@option.Key" class="custom-control-input" />
+                            <label for="items-per-page-@option.Key" class="custom-control-label">@option.Value</label>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</form>
