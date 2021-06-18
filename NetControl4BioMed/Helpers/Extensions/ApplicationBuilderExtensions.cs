@@ -5,8 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Data.Seed;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.Extensions
@@ -42,42 +47,29 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Save it into the database.
                 await roleManager.CreateAsync(role);
             }
-            // Check if administrator users don't already exist.
-            if (!(await userManager.GetUsersInRoleAsync("Administrator")).Any())
+            // Check if the administrator user doesn't already exist.
+            if (await userManager.FindByEmailAsync(configuration.GetSection("Administrator:Email").Value) == null)
             {
-                // Get the data for the default administrator users.
-                var administratorUsers = configuration.GetSection("Administrators").GetChildren()
-                    .Select(item => new
-                    {
-                        Email = item.GetSection("Email").Value,
-                        Password = item.GetSection("Password").Value
-                    });
-                // Go over each of the users.
-                foreach (var administratorUser in administratorUsers)
+                // Define a new task.
+                var task = new UsersTask
                 {
-                    // Try to get the user with the provided e-mail.
-                    var user = await userManager.FindByEmailAsync(administratorUser.Email);
-                    // Check if the user is already defined.
-                    if (user != null)
+                    Items = new List<UserInputModel>
                     {
-                        // Add the user to the administrator role.
-                        await userManager.AddToRoleAsync(user, "Administrator");
-                        // Go to the next user.
-                        continue;
+                        new UserInputModel
+                        {
+                            Email = configuration.GetSection("Administrator:Email").Value,
+                            Type = "Password",
+                            Data = JsonSerializer.Serialize(configuration.GetSection("Administrator:Password").Value),
+                            EmailConfirmed = true
+                        }
                     }
-                    // Define a new user.
-                    user = new User()
-                    {
-                        DateTimeCreated = DateTime.UtcNow,
-                        UserName = administratorUser.Email,
-                        Email = administratorUser.Email,
-                        EmailConfirmed = true
-                    };
-                    // Save it into the database.
-                    await userManager.CreateAsync(user, administratorUser.Password);
-                    // Add the user to the administrator role.
-                    await userManager.AddToRoleAsync(user, "Administrator");
-                }
+                };
+                // Run the task.
+                await task.CreateAsync(scope.ServiceProvider, CancellationToken.None);
+                // Get the newly created user.
+                var user = await userManager.FindByEmailAsync(configuration.GetSection("Administrator:Email").Value);
+                // Add the user to the administrator role.
+                await userManager.AddToRoleAsync(user, "Administrator");
             }
             // Check if no databases exist.
             if (!context.Databases.Any())

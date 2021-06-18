@@ -55,7 +55,8 @@ namespace NetControl4BioMed
                 options.Secure = CookieSecurePolicy.SameAsRequest;
             });
             // Enable cookies for temporary data.
-            services.Configure<CookieTempDataProviderOptions>(options => {
+            services.Configure<CookieTempDataProviderOptions>(options =>
+            {
                 options.Cookie.IsEssential = true;
             });
             // Add the database context and connection.

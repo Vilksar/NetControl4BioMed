@@ -177,10 +177,10 @@ namespace NetControl4BioMed.Helpers.Services
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
-            var tos = _configuration.GetSection("Administrators").GetChildren().Select(item => new EmailAddress(item.GetSection("Email").Value, item.GetSection("Email").Value));
+            var to = new EmailAddress(_configuration.GetSection("Administrator:Email").Value, _configuration.GetSection("Administrator:Email").Value);
             var subject = "NetControl4BioMed - You have received a new message";
             var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailContactPartial", viewModel);
-            var msg = MailHelper.CreateSingleEmailToMultipleRecipients(from, tos.ToList(), subject, string.Empty, htmlContent);
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             // Send the e-mail containing the message.
             await client.SendEmailAsync(msg);
         }

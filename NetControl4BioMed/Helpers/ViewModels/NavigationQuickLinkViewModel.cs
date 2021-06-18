@@ -13,9 +13,14 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public string Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the title (displayed text) of the quick link.
+        /// Gets or sets the title in singular (displayed text) of the quick link.
         /// </summary>
-        public string Title { get; set; }
+        public string TitleSingular { get; set; }
+
+        /// <summary>
+        /// Gets or sets the title in plural (displayed text) of the quick link.
+        /// </summary>
+        public string TitlePlural { get; set; }
 
         /// <summary>
         /// Gets or sets the icon of the banner.
@@ -53,7 +58,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AdministrationUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Users",
-            Title = "User",
+            TitleSingular = "User",
+            TitlePlural = "Users",
             Color = "success",
             Icon = "fa-user",
             Width = 6,
@@ -66,7 +72,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AdministrationRolesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Roles",
-            Title = "Role",
+            TitleSingular = "Role",
+            TitlePlural = "Roles",
             Color = "success",
             Icon = "fa-tag",
             Width = 6,
@@ -79,7 +86,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AdministrationDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Databases",
-            Title = "Database",
+            TitleSingular = "Database",
+            TitlePlural = "Databases",
             Color = "info",
             Icon = "fa-database",
             Width = 6,
@@ -92,7 +100,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AdministrationProteinsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Proteins",
-            Title = "Protein",
+            TitleSingular = "Protein",
+            TitlePlural = "Proteins",
             Color = "primary",
             Icon = "fa-circle",
             Width = 6,
@@ -105,7 +114,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AdministrationInteractionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Interactions",
-            Title = "Interaction",
+            TitleSingular = "Interaction",
+            TitlePlural = "Interactions",
             Color = "primary",
             Icon = "fa-arrow-right",
             Width = 6,
@@ -118,7 +128,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AdministrationProteinCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "ProteinCollections",
-            Title = "Protein collection",
+            TitleSingular = "Protein collection",
+            TitlePlural = "Protein collections",
             Color = "info",
             Icon = "fa-folder",
             Width = 6,
@@ -131,7 +142,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AdministrationNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Networks",
-            Title = "Network",
+            TitleSingular = "Network",
+            TitlePlural = "Networks",
             Color = "secondary",
             Icon = "fa-share-alt",
             Width = 6,
@@ -144,7 +156,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AdministrationAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Analyses",
-            Title = "Analysis",
+            TitleSingular = "Analysis",
+            TitlePlural = "Analyses",
             Color = "secondary",
             Icon = "fa-desktop",
             Width = 6,
@@ -157,7 +170,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel PublicDataNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Networks",
-            Title = "Network",
+            TitleSingular = "Network",
+            TitlePlural = "Networks",
             Color = "success",
             Icon = "fa-share-alt",
             Width = 6,
@@ -170,7 +184,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel PublicDataAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Analyses",
-            Title = "Analysis",
+            TitleSingular = "Analysis",
+            TitlePlural = "Analyses",
             Color = "success",
             Icon = "fa-desktop",
             Width = 6,
@@ -183,7 +198,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel PrivateDataNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Networks",
-            Title = "Network",
+            TitleSingular = "Network",
+            TitlePlural = "Networks",
             Color = "success",
             Icon = "fa-share-alt",
             Width = 6,
@@ -196,7 +212,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel PrivateDataAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Analyses",
-            Title = "Analysis",
+            TitleSingular = "Analysis",
+            TitlePlural = "Analyses",
             Color = "success",
             Icon = "fa-desktop",
             Width = 6,
@@ -209,7 +226,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Databases",
-            Title = "Database",
+            TitleSingular = "Database",
+            TitlePlural = "Databases",
             Color = "info",
             Icon = "fa-database",
             Width = 6,
@@ -222,7 +240,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataProteinsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Proteins",
-            Title = "Protein",
+            TitleSingular = "Protein",
+            TitlePlural = "Proteins",
             Color = "primary",
             Icon = "fa-circle",
             Width = 6,
@@ -235,7 +254,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataInteractionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Interactions",
-            Title = "Interaction",
+            TitleSingular = "Interaction",
+            TitlePlural = "Interactions",
             Color = "primary",
             Icon = "fa-arrow-right",
             Width = 6,
@@ -248,7 +268,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataProteinCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "ProteinCollections",
-            Title = "Protein collection",
+            TitleSingular = "Protein collection",
+            TitlePlural = "Protein collections",
             Color = "info",
             Icon = "fa-folder",
             Width = 6,
@@ -261,7 +282,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataNetworkProteinsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Proteins",
-            Title = "Protein",
+            TitleSingular = "Protein",
+            TitlePlural = "Proteins",
             Color = "success",
             Icon = "fa-circle",
             Width = 6,
@@ -274,7 +296,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataNetworkInteractionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Interactions",
-            Title = "Interaction",
+            TitleSingular = "Interaction",
+            TitlePlural = "Interactions",
             Color = "success",
             Icon = "fa-arrow-right",
             Width = 6,
@@ -287,7 +310,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataNetworkDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Databases",
-            Title = "Database",
+            TitleSingular = "Database",
+            TitlePlural = "Databases",
             Color = "info",
             Icon = "fa-database",
             Width = 6,
@@ -300,7 +324,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataNetworkProteinCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "ProteinCollections",
-            Title = "Protein collection",
+            TitleSingular = "Protein collection",
+            TitlePlural = "Protein collections",
             Color = "info",
             Icon = "fa-folder",
             Width = 6,
@@ -313,7 +338,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataNetworkUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Users",
-            Title = "User",
+            TitleSingular = "User",
+            TitlePlural = "Users",
             Color = "primary",
             Icon = "fa-user",
             Width = 6,
@@ -326,7 +352,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataNetworkAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Analyses",
-            Title = "Analysis",
+            TitleSingular = "Analysis",
+            TitlePlural = "Analyses",
             Color = "primary",
             Icon = "fa-desktop",
             Width = 6,
@@ -339,7 +366,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataAnalysisProteinsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Proteins",
-            Title = "Protein",
+            TitleSingular = "Protein",
+            TitlePlural = "Proteins",
             Color = "success",
             Icon = "fa-circle",
             Width = 6,
@@ -352,7 +380,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataAnalysisInteractionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Interactions",
-            Title = "Interaction",
+            TitleSingular = "Interaction",
+            TitlePlural = "Interactions",
             Color = "success",
             Icon = "fa-arrow-right",
             Width = 6,
@@ -365,7 +394,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataAnalysisDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Databases",
-            Title = "Database",
+            TitleSingular = "Database",
+            TitlePlural = "Databases",
             Color = "info",
             Icon = "fa-database",
             Width = 6,
@@ -378,7 +408,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataAnalysisProteinCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "ProteinCollections",
-            Title = "Protein collection",
+            TitleSingular = "Protein collection",
+            TitlePlural = "Protein collections",
             Color = "info",
             Icon = "fa-folder",
             Width = 6,
@@ -391,7 +422,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataAnalysisUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Users",
-            Title = "User",
+            TitleSingular = "User",
+            TitlePlural = "Users",
             Color = "primary",
             Icon = "fa-user",
             Width = 6,
@@ -404,7 +436,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataAnalysisControlPathsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "ControlPaths",
-            Title = "Control paths",
+            TitleSingular = "Control path",
+            TitlePlural = "Control paths",
             Color = "primary",
             Icon = "fa-gamepad",
             Width = 6,

@@ -504,7 +504,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "AvailableData",
             Title = "AvailableData",
             Description = string.Empty,
-            Icon = "fa-database",
+            Icon = "fa-table",
             Color = "primary",
             NavigationGroups = new List<NavigationGroupViewModel>
             {
