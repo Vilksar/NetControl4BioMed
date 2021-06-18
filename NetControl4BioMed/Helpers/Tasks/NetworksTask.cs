@@ -480,7 +480,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items with the provided IDs.
                     var items = context.Networks
-                        .Include(item => item.NetworkUsers)
                         .Where(item => batchIds.Contains(item.Id));
                     // Check if there were no items found.
                     if (items == null || !items.Any())
@@ -504,6 +503,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         // Continue.
                         continue;
+                    }
+                    // Check if the network is not public.
+                    if (batchItem.IsDemonstration && !network.IsPublic)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("The network must be public in order to be a demonstration.", showExceptionItem, batchItem);
                     }
                     // Update the data.
                     network.IsDemonstration = batchItem.IsDemonstration;
@@ -556,7 +561,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items with the provided IDs.
                     var items = context.Networks
-                        .Include(item => item.NetworkUsers)
                         .Where(item => batchIds.Contains(item.Id));
                     // Check if there were no items found.
                     if (items == null || !items.Any())

@@ -51,6 +51,16 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task StopAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
+        /// Extends the time until the demonstration items are automatically deleted from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        [AutomaticRetry(Attempts = 2)]
+        [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
+        Task ExtendTimeUntilDeleteDemonstrationItemsAsync(string id, CancellationToken token);
+
+        /// <summary>
         /// Alerts the users before deleting the long-standing networks and analyses from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
@@ -69,16 +79,6 @@ namespace NetControl4BioMed.Helpers.Interfaces
         [DisableConcurrentExecution(86400)]
         [Queue("recurring")]
         Task DeleteUnconfirmedUsersAsync(string id, CancellationToken token);
-
-        /// <summary>
-        /// Deletes the long-standing unconfirmed user invitations (to a database, network, or analysis) from the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        [AutomaticRetry(Attempts = 2)]
-        [DisableConcurrentExecution(86400)]
-        [Queue("recurring")]
-        Task DeleteUnconfirmedUserInvitationsAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes the orphaned items from the database.

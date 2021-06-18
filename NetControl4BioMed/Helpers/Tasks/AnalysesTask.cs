@@ -387,6 +387,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     analysis.Name = batchItem.Name;
                     analysis.Description = batchItem.Description;
                     analysis.IsPublic = batchItem.IsPublic;
+                    analysis.IsDemonstration = false;
                     // Append a message to the log.
                     analysis.Log = analysis.AppendToLog("The analysis details have been updated.");
                     // Add the item to the list.
@@ -504,7 +505,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items with the provided IDs.
                     var items = context.Analyses
-                        .Include(item => item.AnalysisUsers)
+                        .Include(item => item.Network)
                         .Where(item => batchIds.Contains(item.Id));
                     // Check if there were no items found.
                     if (items == null || !items.Any())
@@ -528,6 +529,18 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         // Continue.
                         continue;
+                    }
+                    // Check if the analysis is not public.
+                    if (batchItem.IsDemonstration && !analysis.IsPublic)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("The analysis must be public in order to be a demonstration.", showExceptionItem, batchItem);
+                    }
+                    // Check if the corresponding network is not public and demonstration.
+                    if (batchItem.IsDemonstration && (analysis.Network == null || !analysis.Network.IsPublic || !analysis.Network.IsDemonstration))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("The corresponding network doesn't exist, or is not public or demonstration.", showExceptionItem, batchItem);
                     }
                     // Update the data.
                     analysis.IsDemonstration = batchItem.IsDemonstration;
@@ -580,7 +593,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items with the provided IDs.
                     var items = context.Analyses
-                        .Include(item => item.AnalysisUsers)
                         .Where(item => batchIds.Contains(item.Id));
                     // Check if there were no items found.
                     if (items == null || !items.Any())
@@ -814,6 +826,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                             // Reload the analysis.
                             var analysis = context.Analyses
+                                .Include(item => item.Network)
                                 .FirstOrDefault(item => item.Id == batchAnalysis.Id);
                             // Check if there was no item found.
                             if (analysis == null)
@@ -836,7 +849,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 .Where(item => item.ProteinCollectionProteins.Any(item1 => targetProteinCollectionIds.Contains(item1.ProteinCollection.Id)));
                             // Get the proteins in the analysis.
                             var proteins = availableProteins
-                                .Where(item => item.NetworkProteins.Any(item1 => analysis.NetworkId == item1.Network.Id));
+                                .Where(item => item.NetworkProteins.Any(item1 => analysis.Network.Id == item1.Network.Id));
                             // Check if there haven't been any proteins found.
                             if (proteins == null || !proteins.Any())
                             {
@@ -852,7 +865,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Get the interactions in the analysis.
                             var interactions = context.Interactions
                                 .Where(item => item.DatabaseInteractions.Any(item1 => interactionDatabaseIds.Contains(item1.Database.Id)))
-                                .Where(item => item.NetworkInteractions.Any(item1 => analysis.NetworkId == item1.Network.Id));
+                                .Where(item => item.NetworkInteractions.Any(item1 => analysis.Network.Id == item1.Network.Id));
                             // Check if there haven't been any interactions found.
                             if (interactions == null || !interactions.Any())
                             {

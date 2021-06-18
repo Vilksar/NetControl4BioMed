@@ -122,6 +122,21 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
+        /// Extends the time until the demonstration items are automatically deleted from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task ExtendTimeUntilDeleteDemonstrationItemsAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<RecurringTask>(backgroundTask);
+            // Run the task.
+            await task.ExtendTimeUntilDeleteDemonstrationItemsAsync(_serviceProvider, token);
+        }
+
+        /// <summary>
         /// Alerts the users before deleting the long-standing networks and analyses from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
@@ -149,21 +164,6 @@ namespace NetControl4BioMed.Helpers.Services
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
             await task.DeleteUnconfirmedUsersAsync(_serviceProvider, token);
-        }
-
-        /// <summary>
-        /// Deletes the long-standing unconfirmed user invitations (to a database, network, or analysis) from the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        public async Task DeleteUnconfirmedUserInvitationsAsync(string id, CancellationToken token)
-        {
-            // Get the background task with the provided ID.
-            var backgroundTask = GetBackgroundTask(id);
-            // Get the task corresponding to the background task.
-            var task = GetTask<RecurringTask>(backgroundTask);
-            // Run the task.
-            await task.DeleteUnconfirmedUserInvitationsAsync(_serviceProvider, token);
         }
 
         /// <summary>

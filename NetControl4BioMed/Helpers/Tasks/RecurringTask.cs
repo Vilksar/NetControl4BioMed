@@ -351,6 +351,57 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
+        /// Extends the time until the demonstration items are automatically deleted from the database.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task ExtendTimeUntilDeleteDemonstrationItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Define the limit date.
+            var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeAlert + 1);
+            // Define the IDs of the items to get.
+            var networkIds = new List<string>();
+            var analysisIds = new List<string>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the IDs of the items to stop.
+                networkIds = context.Networks
+                    .Where(item => item.IsDemonstration)
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => item.Id)
+                    .ToList();
+                analysisIds = context.Analyses
+                    .Where(item => item.IsDemonstration)
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => item.Id)
+                    .ToList();
+            }
+            // Define the new tasks.
+            var analysisTask = new AnalysesTask
+            {
+                Items = analysisIds
+                    .Select(item => new AnalysisInputModel
+                    {
+                        Id = item
+                    })
+            };
+            var networkTask = new NetworksTask
+            {
+                Items = networkIds
+                    .Select(item => new NetworkInputModel
+                    {
+                        Id = item
+                    })
+            };
+            // Run the tasks.
+            await networkTask.ExtendTimeUntilDeleteAsync(serviceProvider, token);
+            await analysisTask.ExtendTimeUntilDeleteAsync(serviceProvider, token);
+        }
+
+        /// <summary>
         /// Alerts the users before deleting the long-standing networks and analyses from the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
@@ -467,42 +518,7 @@ namespace NetControl4BioMed.Helpers.Tasks
             // Define the limit date.
             var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
             // Define the IDs of the items to get.
-            var itemIds = new List<string>();
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the IDs of the items to delete.
-                itemIds = context.Users
-                    .Where(item => !item.EmailConfirmed)
-                    .Where(item => item.DateTimeCreated < limitDate)
-                    .Select(item => item.Id)
-                    .ToList();
-            }
-            // Define a new task.
-            var task = new UsersTask
-            {
-                Items = itemIds
-                    .Select(item => new UserInputModel
-                    {
-                        Id = item
-                    })
-            };
-            // Run the task.
-            await task.DeleteAsync(serviceProvider, token);
-        }
-
-        /// <summary>
-        /// Deletes the long-standing unconfirmed user invitations (to a database, network, or analysis) from the database.
-        /// </summary>
-        /// <param name="serviceProvider">The application service provider.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        public async Task DeleteUnconfirmedUserInvitationsAsync(IServiceProvider serviceProvider, CancellationToken token)
-        {
-            // Define the limit date.
-            var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
-            // Define the IDs of the items to get.
+            var userIds = new List<string>();
             var databaseUserItemIds = new List<(string, string)>();
             var networkUserItemIds = new List<(string, string)>();
             var analysisUserItemIds = new List<(string, string)>();
@@ -512,6 +528,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the IDs of the items to delete.
+                userIds = context.Users
+                    .Where(item => !item.EmailConfirmed)
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => item.Id)
+                    .ToList();
                 databaseUserItemIds = context.DatabaseUsers
                     .Where(item => item.User == null)
                     .Where(item => item.DateTimeCreated < limitDate)
@@ -547,6 +568,14 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .ToList();
             }
             // Define the new tasks.
+            var userTask = new UsersTask
+            {
+                Items = userIds
+                    .Select(item => new UserInputModel
+                    {
+                        Id = item
+                    })
+            };
             var databaseUserTask = new DatabaseUsersTask
             {
                 Items = databaseUserItemIds
@@ -583,8 +612,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                         Email = item.Item2
                     })
             };
-            // Run the tasks.
+            // Run the task.
+            await userTask.DeleteAsync(serviceProvider, token);
             await databaseUserTask.DeleteAsync(serviceProvider, token);
+            await networkUserTask.DeleteAsync(serviceProvider, token);
+            await analysisUserTask.DeleteAsync(serviceProvider, token);
         }
 
         /// <summary>
