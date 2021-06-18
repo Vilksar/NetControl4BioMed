@@ -4,7 +4,6 @@ using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.ViewModels;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.Services
