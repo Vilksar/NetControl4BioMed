@@ -1,0 +1,48 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Overview";
+}
+
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetUserNavigationTitleCard(Model.View.User)" />
+<div class="card mb-3">
+    <div class="card-body text-center small utc-date" data-date="@Model.View.User.DateTimeCreated.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
+        @if (Model.View.User.EmailConfirmed)
+        {
+            <span class="text-success" title="E-mail confirmed"><i class="fas fa-check-circle"></i></span>
+        }
+        else
+        {
+            <span class="text-danger" title="E-mail not confirmed"><i class="fas fa-times-circle"></i></span>
+        }
+        <span>Account created on <span class="utc-date-date" title="@Model.View.User.DateTimeCreated.ToShortDateString()">@Model.View.User.DateTimeCreated.ToShortDateString()</span> at <span class="utc-date-time" title="@Model.View.User.DateTimeCreated.ToShortTimeString()">@Model.View.User.DateTimeCreated.ToShortTimeString()</span></span>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-bullhorn"></i></span>
+            </div>
+            <div>
+                <span>Announcements</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (string.IsNullOrEmpty(Model.View.AnnouncementMessage))
+        {
+            <div class="alert alert-success text-justify text-wrap mb-0">
+                <span><i class="fas fa-check-circle"></i></span>
+                <span>There are no announcements that currently require your attention.</span>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning text-justify text-wrap mb-0">
+                <span><i class="fas fa-exclamation-triangle"></i></span>
+                <span>@Model.View.AnnouncementMessage</span>
+            </div>
+        }
+    </div>
+</div>

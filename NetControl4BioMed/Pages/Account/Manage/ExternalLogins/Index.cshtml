@@ -1,0 +1,94 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "External logins";
+}
+
+@if (Model.View.CurrentLogins.Any())
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-user-cog"></i></span>
+                </div>
+                <div>
+                    <span>Current logins</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>Click one of the buttons below to remove one of the registered logins from your account.</span>
+            </div>
+            @foreach (var login in Model.View.CurrentLogins)
+            {
+                <form method="post" asp-page-handler="RemoveLogin" class="text-justify">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+                    <div class="form-group" hidden>
+                        <label asp-for="@login.LoginProvider" class="font-weight-bold">Login provider</label>
+                        <input asp-for="@login.LoginProvider" type="hidden" name="loginProvider" class="form-control" />
+                        <span asp-description-for="@login.LoginProvider" class="text-muted small">The provider of the external login.</span>
+                        <span asp-validation-for="@login.LoginProvider" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group" hidden>
+                        <label asp-for="@login.ProviderKey" class="font-weight-bold">Provider key</label>
+                        <input asp-for="@login.ProviderKey" type="hidden" name="providerKey" class="form-control" />
+                        <span asp-description-for="@login.ProviderKey" class="text-muted small">The key for the provider of the external login.</span>
+                        <span asp-validation-for="@login.ProviderKey" class="text-danger small"></span>
+                    </div>
+                    @if (Model.View.ShowRemoveButton)
+                    {
+                        <button type="submit" title="Remove this login from your account." class="btn btn-block btn-danger my-2">
+                            <span><i class="fab fa-@login.ProviderDisplayName.ToLower()"></i></span>
+                            <span>@login.ProviderDisplayName</span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" title="The login can't be removed, as you would be locked out of your account." class="btn btn-danger btn-success my-2" disabled>
+                            <span><i class="fab fa-@login.ProviderDisplayName.ToLower()"></i></span>
+                            <span>@login.ProviderDisplayName</span>
+                        </button>
+                    }
+                </form>
+            }
+        </div>
+    </div>
+}
+@if (Model.View.OtherLogins.Any())
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-user-cog"></i></span>
+                </div>
+                <div>
+                    <span>Available logins</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>Click one of the buttons below in order to add a service to log in.</span>
+            </div>
+            <form method="post" asp-page-handler="LinkLogin" class="text-justify">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+                @foreach (var provider in Model.View.OtherLogins)
+                {
+                    <button type="submit" title="Log in using your @provider.DisplayName account" class="btn btn-block btn-success" name="provider" value="@provider.Name">
+                        <span><i class="fab fa-@provider.DisplayName.ToLower()"></i></span>
+                        <span>@provider.DisplayName</span>
+                    </button>
+                }
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+}

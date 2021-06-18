@@ -1,0 +1,127 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Two-factor authentication";
+    var recoveryCodes = (IEnumerable<string>)TempData["RecoveryCodes"];
+}
+
+@if (recoveryCodes != null)
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-user-shield"></i></span>
+                </div>
+                <div>
+                    <span>Recovery codes</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning text-justify text-wrap">
+                <span><i class="fas fa-exclamation-triangle"></i></span>
+                <span><span class="font-weight-bold">These recovery codes will appear only once! Put these codes in a safe place.</span> If you lose your device and don't have the recovery codes you will lose access to your account.</span>
+            </div>
+            <ul class="list-group">
+                @foreach (var recoveryCode in recoveryCodes)
+                {
+                    <li class="list-group-item">
+                        <div>
+                            <code>@recoveryCode</code>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+}
+@if (Model.View.Is2faEnabled)
+{
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-user-shield"></i></span>
+                </div>
+                <div>
+                    <span>Manage authentication</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>Click one of the buttons below to manage your authentication.</span>
+            </div>
+            @if (Model.View.RecoveryCodesLeft == 0)
+            {
+                <div class="alert alert-danger text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-circle"></i></span>
+                    <span><span class="font-weight-bold">You have no recovery codes left.</span> You must <a asp-page="/Account/Manage/TwoFactorAuthentication/GenerateRecoveryCodes" class="alert-link">generate a new set of recovery codes</a> before you can log in with a recovery code.</span>
+                </div>
+            }
+            else if (Model.View.RecoveryCodesLeft <= 3)
+            {
+                <div class="alert alert-warning text-justify text-wrap">
+                    <span><i class="fas fa-exclamation-triangle"></i></span>
+                    <span><span class="font-weight-bold">You have @Model.View.RecoveryCodesLeft recovery code@(Model.View.RecoveryCodesLeft != 1 ? "s" : string.Empty) left.</span> You should <a asp-page="/Account/Manage/TwoFactorAuthentication/GenerateRecoveryCodes" class="alert-link">generate a new set of recovery codes</a>.</span>
+                </div>
+            }
+            @if (Model.View.IsMachineRemembered)
+            {
+                <form method="post" class="text-justify">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+                    <button type="submit" title="Forget this browser" class="btn btn-block btn-danger">
+                        <span><i class="fas fa-times"></i></span>
+                        <span>Forget this browser</span>
+                    </button>
+                </form>
+            }
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/DisableAuthenticator" class="btn btn-block btn-danger">
+                <span><i class="fas fa-minus"></i></span>
+                <span>Disable two-factor authentication</span>
+            </a>
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/GenerateRecoveryCodes" class="btn btn-block btn-warning">
+                <span><i class="fas fa-key"></i></span>
+                <span>Reset recovery codes</span>
+            </a>
+        </div>
+    </div>
+}
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-user-shield"></i></span>
+            </div>
+            <div>
+                <span>Manage authenticator app</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>Click one of the buttons below to manage your two-factor authenticator app.</span>
+        </div>
+        @if (!Model.View.HasAuthenticator)
+        {
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-success">
+                <span><i class="fas fa-plus"></i></span>
+                <span>Add authenticator app</span>
+            </a>
+        }
+        else
+        {
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-primary">
+                <span><i class="fas fa-cog"></i></span>
+                <span>Setup authenticator app</span>
+            </a>
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/ResetAuthenticator" class="btn btn-block btn-danger">
+                <span><i class="fas fa-sync"></i></span>
+                <span>Reset authenticator app</span>
+            </a>
+        }
+    </div>
+</div>

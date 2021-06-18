@@ -1,0 +1,35 @@
+﻿@page
+@model ResetAuthenticatorModel
+@{
+    ViewData["Title"] = "Reset authenticator key";
+}
+
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-user-shield"></i></span>
+            </div>
+            <div>
+                <span>Reset authenticator key</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger text-justify text-wrap">
+            <span><i class="fas fa-exclamation-circle"></i></span>
+            <span><span class="font-weight-bold">If you reset your authenticator key, your authenticator app will not work until you reconfigure it.</span> This process disables two-factor authentication until you verify your authenticator app. If you do not complete your authenticator app configuration, you may lose access to your account.</span>
+        </div>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <button type="submit" title="Reset authenticator key" class="btn btn-block btn-danger">
+                <span><i class="fas fa-sync"></i></span>
+                <span>Reset authenticator key</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+}
