@@ -33,6 +33,18 @@ $(window).on('load', () => {
         })();
     }
 
+    // Check if there is a QR code on the page.
+    if ($('.qr-code').length !== 0) {
+        // Load the QR generation script.
+        $.getScript('/lib/jquery-qrcode/jquery.qrcode.min.js', () => {
+            // Go over all of the QR codes on the page.
+            $('.qr-code').each((index, element) => {
+                // And generate the QR code based on the given uri.
+                $(element).qrcode($(element).data('uri'));
+            });
+        });
+    }
+
     // Check if there is a datatable on the page.
     if ($('.table-datatable').length !== 0) {
         // Go over each datatable.
@@ -126,6 +138,72 @@ $(window).on('load', () => {
                 // Update the selected items.
                 updateSelectedItems(element);
             });
+        })();
+    }
+
+    // Check if there is a Cytoscape area on the page.
+    if ($('.cytoscape-area').length !== 0) {
+        // Get the Cytoscape configuration JSON.
+        const cytoscapeJson = JSON.parse($('.cytoscape-configuration').first().text());
+        // Define the Cytoscape variable.
+        const cy = cytoscape({
+            container: $('.cytoscape-container').first().get(0),
+            elements: cytoscapeJson.elements,
+            layout: cytoscapeJson.layout,
+            style: cytoscapeJson.style
+        });
+        // Add listener for when a node is clicked.
+        cy.on('tap', 'node', (event) => {
+            // Check if there is a link.
+            if (event.target.data('href') && event.target.data('href').length !== 0) {
+                // Open a new link.
+                window.location.href = event.target.data('href');
+            }
+        });
+        // Hide the loading message.
+        $('.cytoscape-loading').prop('hidden', true);
+    }
+
+    // Check if there is a refreshable item on the page.
+    if ($('.item-refresh').length !== 0) {
+        // Define a function to refresh the details.
+        const refresh = (element) => {
+            // Get the ID of the item.
+            const id = $(element).data('id');
+            // Get the status of the item.
+            const status = $(element).data('status');
+            // Get the data for the item with the provided ID.
+            const ajaxCall = $.ajax({
+                url: `${window.location.pathname}?handler=Refresh&id=${id}`,
+                dataType: 'json',
+                success: (data) => {
+                    // Check if the status has changed.
+                    if (status !== data.status) {
+                        // Reload the page.
+                        location.reload(true);
+                    }
+                    // Go over each JSON property.
+                    $.each(data, (key, value) => {
+                        // Update the corresponding fields.
+                        $(element).find(`.item-refresh-item[data-type=${key}]`).attr('title', value);
+                        $(element).find(`.item-refresh-item[data-type=${key}]`).text(value);
+                    });
+                },
+                error: () => { }
+            });
+        };
+        // Execute the function on page load.
+        (() => {
+            // Refresh all items once.
+            $('.item-refresh').each((index, element) => refresh(element));
+            // Check if the items need to be refreshed.
+            if ($('.item-refresh[data-refresh="True"]').length !== 0) {
+                // Repeat the function every few seconds.
+                setInterval(() => {
+                    // Go over all elements in the page.
+                    $('.item-refresh[data-refresh="True"]').each((index, element) => refresh(element));
+                }, _refreshInterval);
+            }
         })();
     }
 
