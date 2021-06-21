@@ -1,0 +1,113 @@
+﻿@page
+@model DetailsModel
+@{
+    ViewData["Title"] = "Database protein field details";
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Databases/DatabaseProteinFields/Edit" asp-route-id="@Model.View.DatabaseProteinField.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Databases/DatabaseProteinFields/Delete" asp-route-ids="@Model.View.DatabaseProteinField.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div>
+                <span>Details</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseProteinField.Id" class="font-weight-bold">ID</label>
+                <input asp-for="View.DatabaseProteinField.Id" class="form-control" readonly />
+                <span asp-description-for="View.DatabaseProteinField.Id" class="text-muted small">The ID of the database protein field.</span>
+                <span asp-validation-for="View.DatabaseProteinField.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseProteinField.DateTimeCreated" class="font-weight-bold">Date</label>
+                <input asp-for="View.DatabaseProteinField.DateTimeCreated" class="form-control" readonly />
+                <span asp-description-for="View.DatabaseProteinField.DateTimeCreated" class="text-muted small">The date and time when the database protein field was created.</span>
+                <span asp-validation-for="View.DatabaseProteinField.DateTimeCreated" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseProteinField.Name" class="font-weight-bold">Name</label>
+                <input asp-for="View.DatabaseProteinField.Name" class="form-control" readonly />
+                <span asp-description-for="View.DatabaseProteinField.Name" class="text-muted small">The name of the database protein field.</span>
+                <span asp-validation-for="View.DatabaseProteinField.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseProteinField.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="View.DatabaseProteinField.Description" class="form-control" readonly></textarea>
+                <span asp-description-for="View.DatabaseProteinField.Description" class="text-muted small">The description of the database protein field.</span>
+                <span asp-validation-for="View.DatabaseProteinField.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseProteinField.Url" class="font-weight-bold">URL</label>
+                <div class="input-group">
+                    <input asp-for="View.DatabaseProteinField.Url" class="form-control" readonly />
+                    @if (!string.IsNullOrEmpty(Model.View.DatabaseProteinField.Url))
+                    {
+                        <div class="input-group-append">
+                            <a href="@Model.View.DatabaseProteinField.Url" target="_blank" rel="nofollow noopener noreferrer" class="btn btn-primary">
+                                <span><i class="fas fa-external-link-alt"></i></span>
+                            </a>
+                        </div>
+                    }
+                </div>
+                <span asp-description-for="View.DatabaseProteinField.Url" class="text-muted small">The URL of the database protein field.</span>
+                <span asp-validation-for="View.DatabaseProteinField.Url" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseProteinField.IsSearchable" class="font-weight-bold">Set the database protein field as searchable?</label>
+                <input asp-for="View.DatabaseProteinField.IsSearchable" type="text" class="form-control" readonly />
+                <span asp-description-for="View.DatabaseProteinField.IsSearchable" class="text-muted small">The possibility to identify proteins based on the database protein field.</span>
+                <span asp-validation-for="View.DatabaseProteinField.IsSearchable" class="text-danger small"></span>
+            </div>
+            <div class="form-group mb-0">
+                <label asp-for="View.DatabaseProteinField.Database.Name" class="font-weight-bold">Database</label>
+                <div class="input-group">
+                    <input asp-for="View.DatabaseProteinField.Database.Name" class="form-control" readonly />
+                    <div class="input-group-append">
+                        <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@Model.View.DatabaseProteinField.Database.Id" class="btn btn-info">
+                            <span><i class="fas fa-info-circle"></i></span>
+                        </a>
+                    </div>
+                </div>
+                <span asp-description-for="View.DatabaseProteinField.Database.Name" class="text-muted small">The database containing the database protein field.</span>
+                <span asp-validation-for="View.DatabaseProteinField.Database.Name" class="text-danger small"></span>
+            </div>
+        </form>
+    </div>
+</div><div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-circle"></i></span>
+            </div>
+            <div>
+                <span>Proteins</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The database protein field currently contains @Model.View.ProteinCount protein@(Model.View.ProteinCount != 1 ? "s" : string.Empty) with @Model.View.DatabaseProteinFieldProteinCount value@(Model.View.DatabaseProteinFieldProteinCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseProteinFieldProteins/Index" asp-route-searchString="@Model.View.DatabaseProteinField.Id" asp-route-searchIn="DatabaseProteinFieldId" class="alert-link">view the proteins</a>.</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,97 @@
+﻿@page
+@model DetailsModel
+@{
+    ViewData["Title"] = "User details";
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Accounts/Users/Edit" asp-route-id="@Model.View.User.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Accounts/Users/Delete" asp-route-ids="@Model.View.User.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div>
+                <span>Details</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label asp-for="View.User.Id" class="font-weight-bold">ID</label>
+                <input asp-for="View.User.Id" class="form-control" readonly />
+                <span asp-description-for="View.User.Id" class="text-muted small">The ID of the user.</span>
+                <span asp-validation-for="View.User.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.User.DateTimeCreated" class="font-weight-bold">Date</label>
+                <input asp-for="View.User.DateTimeCreated" class="form-control" readonly />
+                <span asp-description-for="View.User.DateTimeCreated" class="text-muted small">The date and time when the user was created or signed up for an account.</span>
+                <span asp-validation-for="View.User.DateTimeCreated" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.User.Email" class="font-weight-bold">E-mail</label>
+                <input asp-for="View.User.Email" class="form-control" readonly />
+                <span asp-description-for="View.User.Email" class="text-muted small">The e-mail of the user.</span>
+                <span asp-validation-for="View.User.Email" class="text-danger small"></span>
+            </div>
+            <div class="form-group mb-0">
+                <label asp-for="View.User.EmailConfirmed" class="font-weight-bold">Is the e-mail confirmed?</label>
+                <input asp-for="View.User.EmailConfirmed" type="text" class="form-control" readonly />
+                <span asp-description-for="View.User.EmailConfirmed" class="text-muted small">The e-mail confirmation status of the user.</span>
+                <span asp-validation-for="View.User.EmailConfirmed" class="text-danger small"></span>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-user-tag"></i></span>
+            </div>
+            <div>
+                <span>Roles</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The user is currently assigned to @Model.View.RoleCount role@(Model.View.RoleCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Accounts/UserRoles/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="alert-link">view the roles</a>, or <a asp-page="/Administration/Accounts/UserRoles/Create" asp-route-userId="@Model.View.User.Id" class="alert-link">add a new one</a>.</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-user-shield"></i></span>
+            </div>
+            <div>
+                <span>Databases</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The user is currently assigned to @Model.View.DatabaseCount database@(Model.View.DatabaseCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.User.Email" asp-route-searchIn="Email" class="alert-link">view the databases</a>, or <a asp-page="/Administration/Permissions/DatabaseUsers/Create" asp-route-userId="@Model.View.User.Email" class="alert-link">add a new one</a>.</span>
+        </div>
+    </div>
+</div>

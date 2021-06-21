@@ -1,0 +1,57 @@
+﻿@page
+@model CreateModel
+@{
+    ViewData["Title"] = "Create user";
+}
+
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-plus"></i></span>
+            </div>
+            <div>
+                <span>Create</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="post" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
+            <div class="form-group">
+                <label asp-for="Input.Email" class="font-weight-bold">E-mail</label>
+                <input asp-for="Input.Email" class="form-control" />
+                <span asp-description-for="Input.Email" class="text-muted small">The e-mail of the new user.</span>
+                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Password" class="font-weight-bold">Password</label>
+                <input asp-for="Input.Password" class="form-control" />
+                <span asp-description-for="Input.Password" class="text-muted small">The password for the new user. It needs to be at least 6 characters long, contain at least one lowercase letter, one uppercase letter, one digit and one special character.</span>
+                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.ConfirmPassword" class="font-weight-bold">Confirm password</label>
+                <input asp-for="Input.ConfirmPassword" class="form-control" />
+                <span asp-description-for="Input.ConfirmPassword" class="text-muted small">The password confirmation. It needs to be the same as the password.</span>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.EmailConfirmed" class="font-weight-bold">Set the e-mail as confirmed?</label>
+                <select asp-for="Input.EmailConfirmed" class="custom-select form-control">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+                <span asp-description-for="Input.EmailConfirmed" class="text-muted small">The e-mail confirmation status. It can be used to circumvent the need for the user to manually confirm their e-mail.</span>
+                <span asp-validation-for="Input.EmailConfirmed" class="text-danger small"></span>
+            </div>
+            <button type="submit" class="btn btn-block btn-success" title="Create">
+                <span>Create</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+}
