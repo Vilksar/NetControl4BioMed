@@ -22,7 +22,7 @@
                 <div class="collapse navbar-collapse justify-content-end">
                     <div class="navbar-nav align-items-center">
                         <a class="nav-item nav-link" asp-page="/PublicData/Index">
-                            <span><i class="fas fa-user-friends"></i></span>
+                            <span><i class="fas fa-users"></i></span>
                             <span>Public networks</span>
                         </a>
                         @if (User.Identity.IsAuthenticated)
@@ -33,7 +33,7 @@
                             </a>
                         }
                         <a class="nav-item nav-link" asp-page="/AvailableData/Index">
-                            <span><i class="fas fa-table"></i></span>
+                            <span><i class="fas fa-database"></i></span>
                             <span>Available data</span>
                         </a>
                         @if (User.Identity.IsAuthenticated)
@@ -46,7 +46,7 @@
                         @if (User.IsInRole("Administrator"))
                         {
                             <a class="nav-item nav-link" asp-page="/Administration/Index">
-                                <span><i class="fas fa-cog"></i></span>
+                                <span><i class="fas fa-toolbox"></i></span>
                                 <span>Administration</span>
                             </a>
                         }
