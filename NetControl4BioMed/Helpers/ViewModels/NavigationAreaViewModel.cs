@@ -132,7 +132,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "Administration",
             Title = "Administration",
             Description = string.Empty,
-            Icon = "fa-cog",
+            Icon = "fa-toolbox",
             Color = "primary",
             NavigationGroups = new List<NavigationGroupViewModel>
             {
@@ -199,7 +199,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "DatabaseUsers",
                             Title = "Database users",
                             Description = string.Empty,
-                            Icon = "fa-users",
+                            Icon = "fa-database",
                             Color = "light",
                             Link = "/Administration/Permissions/DatabaseUsers/Index"
                         }
@@ -363,7 +363,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Created",
                     Title = "Created",
                     Description = string.Empty,
-                    Icon = "fa-smile",
+                    Icon = "fa-hammer",
                     Color = "primary",
                     Link = "/Administration/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -393,7 +393,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Other",
                     Title = "Other",
                     Description = string.Empty,
-                    Icon = "fa-ellipsis-h",
+                    Icon = "fa-code",
                     Color = "primary",
                     Link = "/Administration/Other/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -420,7 +420,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "PublicData",
             Title = "Public networks",
             Description = string.Empty,
-            Icon = "fa-user-friends",
+            Icon = "fa-users",
             Color = "success",
             NavigationGroups = new List<NavigationGroupViewModel>
             {
@@ -504,7 +504,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "AvailableData",
             Title = "AvailableData",
             Description = string.Empty,
-            Icon = "fa-table",
+            Icon = "fa-database",
             Color = "primary",
             NavigationGroups = new List<NavigationGroupViewModel>
             {
@@ -624,7 +624,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Accounts",
                     Title = "Accounts",
                     Description = string.Empty,
-                    Icon = "fa-user-friends",
+                    Icon = "fa-users",
                     Color = "dark",
                     Link = "/AvailableData/Created/Networks/Details/Accounts/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -634,7 +634,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Users",
                             Title = "Users",
                             Description = string.Empty,
-                            Icon = "fa-user-friends",
+                            Icon = "fa-user",
                             Color = "light",
                             Link = "/AvailableData/Created/Networks/Details/Accounts/Users/Index"
                         }
@@ -705,7 +705,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Created",
                     Title = "Created",
                     Description = string.Empty,
-                    Icon = "fa-smile",
+                    Icon = "fa-hammer",
                     Color = "dark",
                     Link = "/AvailableData/Created/Networks/Details/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -750,7 +750,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Accounts",
                     Title = "Accounts",
                     Description = string.Empty,
-                    Icon = "fa-user-friends",
+                    Icon = "fa-users",
                     Color = "dark",
                     Link = "/AvailableData/Created/Analyses/Details/Accounts/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -760,7 +760,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Users",
                             Title = "Users",
                             Description = string.Empty,
-                            Icon = "fa-user-friends",
+                            Icon = "fa-user",
                             Color = "light",
                             Link = "/AvailableData/Created/Analyses/Details/Accounts/Users/Index"
                         }
@@ -831,7 +831,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Created",
                     Title = "Created",
                     Description = string.Empty,
-                    Icon = "fa-smile",
+                    Icon = "fa-hammer",
                     Color = "dark",
                     Link = "/AvailableData/Created/Analyses/Details/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>

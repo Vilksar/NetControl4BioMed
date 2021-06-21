@@ -370,40 +370,40 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 await new DatabaseUsersTask
                                 {
                                     Items = databaseUserInputs
-                                        .Where(item => item.Email == user.Email)
+                                        .Where(item => item.Email == oldEmail)
                                         .Select(item => new DatabaseUserInputModel
                                         {
                                             Database = new DatabaseInputModel
                                             {
                                                 Id = item.Database.Id
                                             },
-                                            Email = item.Email
+                                            Email = user.Email
                                         })
                                 }.CreateAsync(serviceProvider, token);
                                 await new NetworkUsersTask
                                 {
                                     Items = networkUserInputs
-                                        .Where(item => item.Email == user.Email)
+                                        .Where(item => item.Email == oldEmail)
                                         .Select(item => new NetworkUserInputModel
                                         {
                                             Network = new NetworkInputModel
                                             {
                                                 Id = item.Network.Id
                                             },
-                                            Email = item.Email
+                                            Email = user.Email
                                         })
                                 }.CreateAsync(serviceProvider, token);
                                 await new AnalysisUsersTask
                                 {
                                     Items = analysisUserInputs
-                                         .Where(item => item.Email == user.Email)
+                                         .Where(item => item.Email == oldEmail)
                                          .Select(item => new AnalysisUserInputModel
                                          {
                                              Analysis = new AnalysisInputModel
                                              {
                                                  Id = item.Analysis.Id
                                              },
-                                             Email = item.Email
+                                             Email = user.Email
                                          })
                                 }.CreateAsync(serviceProvider, token);
                                 // Delete the dependent entities.

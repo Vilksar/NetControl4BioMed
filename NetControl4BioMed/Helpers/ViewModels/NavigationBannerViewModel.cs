@@ -43,7 +43,7 @@
         {
             Id = "Administration",
             Title = "Administration",
-            Icon = "fa-cog",
+            Icon = "fa-toolbox",
             Color = "primary"
         };
 
@@ -76,7 +76,7 @@
         {
             Id = "PublicData",
             Title = "PublicData",
-            Icon = "fa-user-friends",
+            Icon = "fa-users",
             Color = "success"
         };
     }
