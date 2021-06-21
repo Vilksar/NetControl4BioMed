@@ -1,0 +1,187 @@
+﻿@page
+@model DetailsModel
+@{
+    ViewData["Title"] = "Protein details";
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Data/Proteins/Update" asp-route-type="Edit" asp-route-ids="@Model.View.Protein.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Update</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Data/Proteins/Delete" asp-route-ids="@Model.View.Protein.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div>
+                <span>Details</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label asp-for="View.Protein.Id" class="font-weight-bold">ID</label>
+                <input asp-for="View.Protein.Id" class="form-control" readonly />
+                <span asp-description-for="View.Protein.Id" class="text-muted small">The ID of the protein.</span>
+                <span asp-validation-for="View.Protein.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Protein.DateTimeCreated" class="font-weight-bold">Date</label>
+                <input asp-for="View.Protein.DateTimeCreated" class="form-control" readonly />
+                <span asp-description-for="View.Protein.DateTimeCreated" class="text-muted small">The date and time when the protein was created.</span>
+                <span asp-validation-for="View.Protein.DateTimeCreated" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Protein.Name" class="font-weight-bold">Name</label>
+                <input asp-for="View.Protein.Name" class="form-control" readonly />
+                <span asp-description-for="View.Protein.Name" class="text-muted small">The name of the protein.</span>
+                <span asp-validation-for="View.Protein.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.Protein.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="View.Protein.Description" class="form-control" readonly></textarea>
+                <span asp-description-for="View.Protein.Description" class="text-muted small">The description of the protein.</span>
+                <span asp-validation-for="View.Protein.Description" class="text-danger small"></span>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-database"></i></span>
+            </div>
+            <div>
+                <span>Databases</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The protein is currently assigned to @Model.View.DatabaseCount database@(Model.View.DatabaseCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseProteins/Index" asp-route-searchString="@Model.View.Protein.Id" asp-route-searchIn="ProteinId" class="alert-link">view the databases</a>.</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-circle"></i></span>
+            </div>
+            <div>
+                <span>Database protein fields</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The protein is currently assigned to @Model.View.DatabaseProteinFieldCount database protein field@(Model.View.DatabaseProteinFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseProteinFieldProteins/Index" asp-route-searchString="@Model.View.Protein.Id" asp-route-searchIn="ProteinId" class="alert-link">view the database protein fields</a>.</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div>
+                <span>Interactions</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The protein is currently assigned to @Model.View.InteractionCount interaction@(Model.View.InteractionCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/InteractionProteins/Index" asp-route-searchString="@Model.View.Protein.Id" asp-route-searchIn="ProteinId" class="alert-link">view the interactions</a>.</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-folder"></i></span>
+            </div>
+            <div>
+                <span>Protein collections</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The protein is currently assigned to @Model.View.ProteinCollectionCount protein collection@(Model.View.ProteinCollectionCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/ProteinCollectionProteins/Index" asp-route-searchString="@Model.View.Protein.Id" asp-route-searchIn="ProteinId" class="alert-link">view the protein collections</a>.</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-share-alt"></i></span>
+            </div>
+            <div>
+                <span>Networks</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The protein is currently assigned to @Model.View.NetworkCount network@(Model.View.NetworkCount != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-desktop"></i></span>
+            </div>
+            <div>
+                <span>Analyses</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The protein is currently assigned to @Model.View.AnalysisCount analys@(Model.View.AnalysisCount != 1 ? "e" : "i")s.</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-code-branch"></i></span>
+            </div>
+            <div>
+                <span>Paths</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The protein is currently assigned to @Model.View.PathCount path@(Model.View.PathCount != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
