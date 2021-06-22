@@ -80,5 +80,24 @@ namespace NetControl4BioMed.Helpers.Interfaces
         [AutomaticRetry(Attempts = 0)]
         [Queue("default")]
         Task SendAnalysesEndedEmailsAsync(string id, CancellationToken token);
+
+
+        /// <summary>
+        /// Extends the time until the networks are automatically deleted from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        [AutomaticRetry(Attempts = 2)]
+        [Queue("default")]
+        Task ExtendTimeUntilDeleteNetworksAsync(string id, CancellationToken token);
+
+        /// <summary>
+        /// Extends the time until the analyses are automatically deleted from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        [AutomaticRetry(Attempts = 2)]
+        [Queue("default")]
+        Task ExtendTimeUntilDeleteAnalysesAsync(string id, CancellationToken token);
     }
 }

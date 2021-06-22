@@ -355,12 +355,19 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (!batchItem.IsPublic && (network.NetworkUsers == null || !network.NetworkUsers.Any()))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no analysis users found, so the analysis must be public.", showExceptionItem, batchItem);
+                        throw new TaskException("There were no network users found, so the network must be public.", showExceptionItem, batchItem);
+                    }
+                    // Check if the network is not public.
+                    if (batchItem.IsDemonstration && !batchItem.IsPublic)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("The network must be public in order to be a demonstration.", showExceptionItem, batchItem);
                     }
                     // Update the data.
                     network.Name = batchItem.Name;
                     network.Description = batchItem.Description;
                     network.IsPublic = batchItem.IsPublic;
+                    network.IsDemonstration = batchItem.IsDemonstration;
                     // Append a message to the log.
                     network.Log = network.AppendToLog("The network details have been updated.");
                     // Add the item to the list.
@@ -436,87 +443,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkUser>(networkIds, serviceProvider, token);
                 // Delete the items.
                 await IEnumerableExtensions.DeleteAsync(networks, serviceProvider, token);
-            }
-        }
-
-        /// <summary>
-        /// Edits the demonstration status of the items.
-        /// </summary>
-        /// <param name="serviceProvider">The application service provider.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        public async Task EditDemonstrationStatusAsync(IServiceProvider serviceProvider, CancellationToken token)
-        {
-            // Check if there weren't any valid items found.
-            if (Items == null)
-            {
-                // Throw an exception.
-                throw new TaskException("No valid items could be found with the provided data.");
-            }
-            // Check if the exception item should be shown.
-            var showExceptionItem = Items.Count() > 1;
-            // Get the total number of batches.
-            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
-            // Go over each batch.
-            for (var index = 0; index < count; index++)
-            {
-                // Check if the cancellation was requested.
-                if (token.IsCancellationRequested)
-                {
-                    // Break.
-                    break;
-                }
-                // Get the items in the current batch.
-                var batchItems = Items
-                    .Skip(index * ApplicationDbContext.BatchSize)
-                    .Take(ApplicationDbContext.BatchSize);
-                // Get the IDs of the items in the current batch.
-                var batchIds = batchItems.Select(item => item.Id);
-                // Define the list of items to get.
-                var networks = new List<Network>();
-                // Use a new scope.
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    // Use a new context instance.
-                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    // Get the items with the provided IDs.
-                    var items = context.Networks
-                        .Where(item => batchIds.Contains(item.Id));
-                    // Check if there were no items found.
-                    if (items == null || !items.Any())
-                    {
-                        // Continue.
-                        continue;
-                    }
-                    // Get the items found.
-                    networks = items
-                        .ToList();
-                }
-                // Save the items to add.
-                var networksToEdit = new List<Network>();
-                // Go over each item in the current batch.
-                foreach (var batchItem in batchItems)
-                {
-                    // Get the corresponding item.
-                    var network = networks.FirstOrDefault(item => item.Id == batchItem.Id);
-                    // Check if there was no item found.
-                    if (network == null)
-                    {
-                        // Continue.
-                        continue;
-                    }
-                    // Check if the network is not public.
-                    if (batchItem.IsDemonstration && !network.IsPublic)
-                    {
-                        // Throw an exception.
-                        throw new TaskException("The network must be public in order to be a demonstration.", showExceptionItem, batchItem);
-                    }
-                    // Update the data.
-                    network.IsDemonstration = batchItem.IsDemonstration;
-                    // Add the item to the list.
-                    networksToEdit.Add(network);
-                }
-                // Edit the items.
-                await IEnumerableExtensions.EditAsync(networksToEdit, serviceProvider, token);
             }
         }
 

@@ -351,6 +351,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items with the provided IDs.
                     var items = context.Analyses
+                        .Include(item => item.Network)
                         .Include(item => item.AnalysisUsers)
                         .Where(item => batchIds.Contains(item.Id));
                     // Check if there were no items found.
@@ -383,11 +384,23 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no analysis users found, so the analysis must be public.", showExceptionItem, batchItem);
                     }
+                    // Check if the analysis is not public.
+                    if (batchItem.IsDemonstration && !batchItem.IsPublic)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("The analysis must be public in order to be a demonstration.", showExceptionItem, batchItem);
+                    }
+                    // Check if the corresponding network is not public and demonstration.
+                    if (batchItem.IsDemonstration && (analysis.Network == null || !analysis.Network.IsPublic || !analysis.Network.IsDemonstration))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("The corresponding network doesn't exist, or is not public or demonstration.", showExceptionItem, batchItem);
+                    }
                     // Update the data.
                     analysis.Name = batchItem.Name;
                     analysis.Description = batchItem.Description;
                     analysis.IsPublic = batchItem.IsPublic;
-                    analysis.IsDemonstration = false;
+                    analysis.IsDemonstration = batchItem.IsDemonstration;
                     // Append a message to the log.
                     analysis.Log = analysis.AppendToLog("The analysis details have been updated.");
                     // Add the item to the list.
@@ -461,94 +474,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisUser>(analysisIds, serviceProvider, token);
                 // Delete the items.
                 await IEnumerableExtensions.DeleteAsync(analyses, serviceProvider, token);
-            }
-        }
-
-        /// <summary>
-        /// Edits the demonstration status of the items.
-        /// </summary>
-        /// <param name="serviceProvider">The application service provider.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        public async Task EditDemonstrationStatusAsync(IServiceProvider serviceProvider, CancellationToken token)
-        {
-            // Check if there weren't any valid items found.
-            if (Items == null)
-            {
-                // Throw an exception.
-                throw new TaskException("No valid items could be found with the provided data.");
-            }
-            // Check if the exception item should be shown.
-            var showExceptionItem = Items.Count() > 1;
-            // Get the total number of batches.
-            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
-            // Go over each batch.
-            for (var index = 0; index < count; index++)
-            {
-                // Check if the cancellation was requested.
-                if (token.IsCancellationRequested)
-                {
-                    // Break.
-                    break;
-                }
-                // Get the items in the current batch.
-                var batchItems = Items
-                    .Skip(index * ApplicationDbContext.BatchSize)
-                    .Take(ApplicationDbContext.BatchSize);
-                // Get the IDs of the items in the current batch.
-                var batchIds = batchItems.Select(item => item.Id);
-                // Define the list of items to get.
-                var analyses = new List<Analysis>();
-                // Use a new scope.
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    // Use a new context instance.
-                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    // Get the items with the provided IDs.
-                    var items = context.Analyses
-                        .Include(item => item.Network)
-                        .Where(item => batchIds.Contains(item.Id));
-                    // Check if there were no items found.
-                    if (items == null || !items.Any())
-                    {
-                        // Continue.
-                        continue;
-                    }
-                    // Get the items found.
-                    analyses = items
-                        .ToList();
-                }
-                // Save the items to add.
-                var analysesToEdit = new List<Analysis>();
-                // Go over each item in the current batch.
-                foreach (var batchItem in batchItems)
-                {
-                    // Get the corresponding item.
-                    var analysis = analyses.FirstOrDefault(item => item.Id == batchItem.Id);
-                    // Check if there was no item found.
-                    if (analysis == null)
-                    {
-                        // Continue.
-                        continue;
-                    }
-                    // Check if the analysis is not public.
-                    if (batchItem.IsDemonstration && !analysis.IsPublic)
-                    {
-                        // Throw an exception.
-                        throw new TaskException("The analysis must be public in order to be a demonstration.", showExceptionItem, batchItem);
-                    }
-                    // Check if the corresponding network is not public and demonstration.
-                    if (batchItem.IsDemonstration && (analysis.Network == null || !analysis.Network.IsPublic || !analysis.Network.IsDemonstration))
-                    {
-                        // Throw an exception.
-                        throw new TaskException("The corresponding network doesn't exist, or is not public or demonstration.", showExceptionItem, batchItem);
-                    }
-                    // Update the data.
-                    analysis.IsDemonstration = batchItem.IsDemonstration;
-                    // Add the item to the list.
-                    analysesToEdit.Add(analysis);
-                }
-                // Edit the items.
-                await IEnumerableExtensions.EditAsync(analysesToEdit, serviceProvider, token);
             }
         }
 

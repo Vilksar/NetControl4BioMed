@@ -167,6 +167,40 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
+        /// Extends the time until the networks are automatically deleted from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task ExtendTimeUntilDeleteNetworksAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<NetworksTask>(backgroundTask);
+            // Run the task.
+            await task.ExtendTimeUntilDeleteAsync(_serviceProvider, token);
+            // Complete the task.
+            await DeleteBackgroundTask(backgroundTask);
+        }
+
+        /// <summary>
+        /// Extends the time until the analyses are automatically deleted from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task ExtendTimeUntilDeleteAnalysesAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<AnalysesTask>(backgroundTask);
+            // Run the task.
+            await task.ExtendTimeUntilDeleteAsync(_serviceProvider, token);
+            // Complete the task.
+            await DeleteBackgroundTask(backgroundTask);
+        }
+
+        /// <summary>
         /// Gets from the database the background task with the provided ID.
         /// </summary>
         /// <param name="id">The internal ID of the background task.</param>
