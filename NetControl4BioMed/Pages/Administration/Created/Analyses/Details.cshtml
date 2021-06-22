@@ -69,6 +69,12 @@
                 <span asp-validation-for="View.Analysis.IsPublic" class="text-danger small"></span>
             </div>
             <div class="form-group">
+                <label asp-for="View.Analysis.IsDemonstration" class="font-weight-bold">Set the analysis as demonstration?</label>
+                <input asp-for="View.Analysis.IsDemonstration" type="text" class="form-control" readonly />
+                <span asp-description-for="View.Analysis.IsDemonstration" class="text-muted small">The demonstration availability of the analysis.</span>
+                <span asp-validation-for="View.Analysis.IsDemonstration" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="View.Analysis.Status" class="font-weight-bold">Status</label>
                 <input asp-for="View.Analysis.Status" class="form-control" readonly />
                 <span asp-description-for="View.Analysis.Status" class="text-muted small">The status of the analysis.</span>
@@ -194,6 +200,24 @@
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
             <span>The analysis is currently assigned to @Model.View.ProteinCollectionCount protein collection@(Model.View.ProteinCollectionCount != 1 ? "s" : string.Empty).</span>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-share-alt"></i></span>
+            </div>
+            <div>
+                <span>Network</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The analysis is currently assigned to 1 network. You can <a asp-page="/Administration/Created/Networks/Index" asp-route-searchString="@Model.View.Analysis.Id" asp-route-searchIn="AnalysisId" class="alert-link">view the network</a>.</span>
         </div>
     </div>
 </div>
