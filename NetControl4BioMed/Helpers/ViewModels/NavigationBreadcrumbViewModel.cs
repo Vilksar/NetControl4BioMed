@@ -381,6 +381,16 @@
         };
 
         /// <summary>
+        /// Gets the navigation breadcrumb for the available data index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AvailableDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "AvailableData",
+            Title = "Available data",
+            Link = "/AvailableData/Index"
+        };
+
+        /// <summary>
         /// Gets the navigation breadcrumb for the available data data index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel AvailableDataDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
