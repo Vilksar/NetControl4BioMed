@@ -1,0 +1,22 @@
+﻿@{
+    Layout = "/Pages/AvailableData/Databases/_Layout.cshtml";
+}
+
+@section Banner {
+    @RenderSection("Banner", required: false)
+}
+
+@section Breadcrumbs {
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.AvailableDataDatabasesDatabaseInteractionFieldsNavigationBreadcrumb" />
+    @RenderSection("Breadcrumbs", required: false)
+}
+
+@section Navigation {
+    @RenderSection("Navigation", required: false)
+}
+
+@RenderBody()
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}
