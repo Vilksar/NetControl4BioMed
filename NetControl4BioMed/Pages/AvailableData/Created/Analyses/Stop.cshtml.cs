@@ -71,7 +71,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             View = new ViewModel
             {
                 Items = _context.Analyses
-                    .Where(item => item.AnalysisUsers.Any(item1 => item1.Type == AnalysisUserType.Owner && item1.User == user))
+                    .Where(item => item.AnalysisUsers.Any(item1 => item1.Type == AnalysisUserType.Owner && item1.Email == user.Email))
                     .Where(item => item.Status == AnalysisStatus.Ongoing)
                     .Where(item => ids.Contains(item.Id))
             };
@@ -111,7 +111,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             View = new ViewModel
             {
                 Items = _context.Analyses
-                    .Where(item => item.AnalysisUsers.Any(item1 => item1.Type == AnalysisUserType.Owner && item1.User == user))
+                    .Where(item => item.AnalysisUsers.Any(item1 => item1.Type == AnalysisUserType.Owner && item1.Email == user.Email))
                     .Where(item => item.Status == AnalysisStatus.Ongoing)
                     .Where(item => Input.Ids.Contains(item.Id))
             };

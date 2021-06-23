@@ -43,7 +43,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
             var user = await _userManager.GetUserAsync(User);
             // Get the item with the provided ID.
             var item = _context.Networks
-                .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.User == user))
+                .Where(item => item.IsPublic || (user != null && item.NetworkUsers.Any(item1 => item1.Email == user.Email)))
                 .Where(item => item.Id == id)
                 .FirstOrDefault();
             // Return the analysis data.

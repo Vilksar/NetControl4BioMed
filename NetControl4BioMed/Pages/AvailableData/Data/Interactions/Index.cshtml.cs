@@ -76,8 +76,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Data.Interactions
             // Start with all of the items in the non-generic databases.
             var query = _context.Interactions
                 .Where(item => item.DatabaseInteractions.Any())
-                .Where(item => item.DatabaseInteractions.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                .Where(item => item.InteractionProteins.All(item1 => item1.Protein.DatabaseProteins.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))));
+                .Where(item => item.DatabaseInteractions.Any(item1 => item1.Database.IsPublic || (user != null && item1.Database.DatabaseUsers.Any(item2 => item2.Email == user.Email))));
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||

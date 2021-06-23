@@ -49,7 +49,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Databases.Databases
             }
             // Get the item with the provided ID.
             var items = _context.Databases
-                .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.User == user))
+                .Where(item => item.IsPublic || (user != null && item.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
             if (items == null || !items.Any())

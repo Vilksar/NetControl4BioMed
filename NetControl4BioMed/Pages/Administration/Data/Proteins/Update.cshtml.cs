@@ -36,7 +36,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Proteins
         {
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            [RegularExpression("Create|Edit|Delete")]
+            [RegularExpression("Create|Edit|Delete", ErrorMessage = "The value is not valid.")]
             public string Type { get; set; }
 
             [DataType(DataType.MultilineText)]

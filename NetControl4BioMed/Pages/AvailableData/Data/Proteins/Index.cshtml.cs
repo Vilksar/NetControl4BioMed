@@ -82,7 +82,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Data.Proteins
             // Start with all of the items to which the user has access.
             var query = _context.Proteins
                 .Where(item => item.DatabaseProteins.Any())
-                .Where(item => item.DatabaseProteins.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)));
+                .Where(item => item.DatabaseProteins.Any(item1 => item1.Database.IsPublic || (user != null && item1.Database.DatabaseUsers.Any(item2 => item2.Email == user.Email))));
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||

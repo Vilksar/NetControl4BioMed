@@ -51,7 +51,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Data.Proteins
             // Get the item with the provided ID.
             var items = _context.Proteins
                 .Where(item => item.DatabaseProteins.Any())
-                .Where(item => item.DatabaseProteins.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
+                .Where(item => item.DatabaseProteins.Any(item1 => item1.Database.IsPublic || (user != null && item1.Database.DatabaseUsers.Any(item2 => item2.Email == user.Email))))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
             if (items == null || !items.Any())
@@ -69,18 +69,16 @@ namespace NetControl4BioMed.Pages.AvailableData.Data.Proteins
                 DatabaseProteins = items
                     .Select(item => item.DatabaseProteins)
                     .SelectMany(item => item)
-                    .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
                     .Include(item => item.Database),
                 DatabaseProteinFieldProteins = items
                     .Select(item => item.DatabaseProteinFieldProteins)
                     .SelectMany(item => item)
-                    .Where(item => item.DatabaseProteinField.Database.IsPublic || item.DatabaseProteinField.Database.DatabaseUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.DatabaseProteinField.Database.IsPublic || (user != null && item.DatabaseProteinField.Database.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
                     .Include(item => item.DatabaseProteinField),
                 InteractionProteins = items
                     .Select(item => item.InteractionProteins)
                     .SelectMany(item => item)
-                    .Where(item => item.Interaction.DatabaseInteractions.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                    .Where(item => item.Interaction.InteractionProteins.All(item1 => item1.Protein.DatabaseProteins.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
                     .Include(item => item.Interaction),
                 ProteinCollectionProteins = items
                     .Select(item => item.ProteinCollectionProteins)

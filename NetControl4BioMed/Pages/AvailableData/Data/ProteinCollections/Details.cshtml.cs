@@ -61,7 +61,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Data.ProteinCollections
                 ProteinCollectionProteins = items
                     .Select(item => item.ProteinCollectionProteins)
                     .SelectMany(item => item)
-                    .Where(item => item.Protein.DatabaseProteins.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
                     .Include(item => item.Protein)
             };
             // Return the page.

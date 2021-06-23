@@ -83,7 +83,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Databases.DatabaseInteractionFie
             }
             // Start with all of the items to which the user has access.
             var query = _context.DatabaseInteractionFields
-                .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user));
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item1 => item1.Email == user.Email)));
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||

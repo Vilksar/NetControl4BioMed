@@ -505,14 +505,14 @@ namespace NetControl4BioMed.Helpers.Extensions
             var databaseProteinFields = context.AnalysisDatabases
                 .Where(item => item.Analysis == analysis)
                 .Where(item => item.Type == AnalysisDatabaseType.Protein)
-                .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item => item.User == user))
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item => item.Email == user.Email)))
                 .Select(item => item.Database.DatabaseProteinFields)
                 .SelectMany(item => item)
                 .ToList();
             var databaseInteractionFields = context.AnalysisDatabases
                 .Where(item => item.Analysis == analysis)
                 .Where(item => item.Type == AnalysisDatabaseType.Interaction)
-                .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item => item.User == user))
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item => item.Email == user.Email)))
                 .Select(item => item.Database.DatabaseInteractionFields)
                 .SelectMany(item => item)
                 .ToList();
@@ -556,7 +556,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 }
             }.Concat(context.AnalysisDatabases
                 .Where(item => item.Analysis == analysis)
-                .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item => item.User == user))
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item => item.Email == user.Email)))
                 .Select(item => item.Database)
                 .Select(item => new
                 {

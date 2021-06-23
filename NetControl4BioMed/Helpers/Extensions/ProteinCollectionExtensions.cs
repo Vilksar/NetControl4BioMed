@@ -309,7 +309,7 @@ namespace NetControl4BioMed.Helpers.Extensions
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get the required data.
             var databaseProteinFields = context.DatabaseProteinFields
-                .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item => item.User == user))
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item => item.Email == user.Email)))
                 .ToList();
             // Define the rows in the first sheet.
             var worksheet1Rows = new List<List<string>>
@@ -339,7 +339,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                     "Name"
                 }
             }.Concat(context.DatabaseProteinFields
-                .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item => item.User == user))
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item => item.Email == user.Email)))
                 .Select(item => item.Database)
                 .Select(item => new
                 {

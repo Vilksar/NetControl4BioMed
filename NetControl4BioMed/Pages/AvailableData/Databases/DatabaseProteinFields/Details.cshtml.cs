@@ -44,7 +44,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Databases.DatabaseProteinFields
             }
             // Get the item with the provided ID.
             var items = _context.DatabaseProteinFields
-                .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user))
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
             if (items == null || !items.Any())

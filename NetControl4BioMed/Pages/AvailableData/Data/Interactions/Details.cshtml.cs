@@ -49,8 +49,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Data.Interactions
             // Get the item with the provided ID.
             var items = _context.Interactions
                 .Where(item => item.DatabaseInteractions.Any())
-                .Where(item => item.DatabaseInteractions.Any(item1 => item1.Database.IsPublic || item1.Database.DatabaseUsers.Any(item2 => item2.User == user)))
-                .Where(item => item.InteractionProteins.All(item1 => item1.Protein.DatabaseProteins.Any(item2 => item2.Database.IsPublic || item2.Database.DatabaseUsers.Any(item3 => item3.User == user))))
+                .Where(item => item.DatabaseInteractions.Any(item1 => item1.Database.IsPublic || (user != null && item1.Database.DatabaseUsers.Any(item2 => item2.Email == user.Email))))
                 .Where(item => item.Id == id);
             // Check if there was no item found.
             if (items == null || !items.Any())
@@ -68,12 +67,12 @@ namespace NetControl4BioMed.Pages.AvailableData.Data.Interactions
                 DatabaseInteractions = items
                     .Select(item => item.DatabaseInteractions)
                     .SelectMany(item => item)
-                    .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
                     .Include(item => item.Database),
                 DatabaseInteractionFieldInteractions = items
                     .Select(item => item.DatabaseInteractionFieldInteractions)
                     .SelectMany(item => item)
-                    .Where(item => item.DatabaseInteractionField.Database.IsPublic || item.DatabaseInteractionField.Database.DatabaseUsers.Any(item1 => item1.User == user))
+                    .Where(item => item.DatabaseInteractionField.Database.IsPublic || (user != null && item.DatabaseInteractionField.Database.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
                     .Include(item => item.DatabaseInteractionField),
                 InteractionProteins = items
                     .Select(item => item.InteractionProteins)

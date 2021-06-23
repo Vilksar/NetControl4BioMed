@@ -663,14 +663,14 @@ namespace NetControl4BioMed.Helpers.Extensions
             var databaseProteinFields = context.NetworkDatabases
                 .Where(item => item.Network == network)
                 .Where(item => item.Type == NetworkDatabaseType.Protein)
-                .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item => item.User == user))
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item => item.Email == user.Email)))
                 .Select(item => item.Database.DatabaseProteinFields)
                 .SelectMany(item => item)
                 .ToList();
             var databaseInteractionFields = context.NetworkDatabases
                 .Where(item => item.Network == network)
                 .Where(item => item.Type == NetworkDatabaseType.Interaction)
-                .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item => item.User == user))
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item => item.Email == user.Email)))
                 .Select(item => item.Database.DatabaseInteractionFields)
                 .SelectMany(item => item)
                 .ToList();
@@ -714,7 +714,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 }
             }.Concat(context.NetworkDatabases
                 .Where(item => item.Network == network)
-                .Where(item => item.Database.IsPublic || item.Database.DatabaseUsers.Any(item => item.User == user))
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item => item.Email == user.Email)))
                 .Select(item => item.Database)
                 .Select(item => new
                 {

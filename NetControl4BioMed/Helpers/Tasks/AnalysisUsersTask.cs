@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
+using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
@@ -117,6 +118,19 @@ namespace NetControl4BioMed.Helpers.Tasks
                         UserId = user?.Id,
                         Email = batchItem.Email
                     };
+                    // Try to get the type.
+                    try
+                    {
+                        // Get the type.
+                        analysisUser.Type = EnumerationExtensions.GetEnumerationValue<AnalysisUserType>(batchItem.Type);
+                    }
+                    catch (Exception exception)
+                    {
+                        // Get the exception message.
+                        var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
+                        // Throw an exception.
+                        throw new TaskException("The type couldn't be determined from the provided string." + message, showExceptionItem, batchItem);
+                    }
                     // Add the item to the list.
                     analysisUsersToAdd.Add(analysisUser);
                 }
