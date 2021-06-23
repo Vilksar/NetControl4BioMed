@@ -57,6 +57,31 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
+        /// Counts the public items in the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task CountPublicItemsAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<RecurringTask>(backgroundTask);
+            // Run the task.
+            var dictionary = await task.CountPublicItemsAsync(_serviceProvider, token);
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new configuration instance.
+            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            // Go over each entry in the dictionary.
+            foreach (var entry in dictionary)
+            {
+                // Update the counts.
+                configuration[$"Data:ItemCount:Public:{entry.Key}"] = entry.Value.ToString();
+            }
+        }
+
+        /// <summary>
         /// Counts the duplicate items in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>

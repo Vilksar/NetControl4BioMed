@@ -153,7 +153,6 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
             {
                 // Run the tasks.
                 await task.EditAsync(_serviceProvider, CancellationToken.None);
-                await task.EditDemonstrationStatusAsync(_serviceProvider, CancellationToken.None);
             }
             catch (Exception exception)
             {

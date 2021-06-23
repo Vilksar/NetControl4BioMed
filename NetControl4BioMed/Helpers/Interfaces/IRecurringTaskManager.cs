@@ -21,6 +21,16 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task CountAllItemsAsync(string id, CancellationToken token);
 
         /// <summary>
+        /// Counts the public items in the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        [AutomaticRetry(Attempts = 2)]
+        [DisableConcurrentExecution(86400)]
+        [Queue("recurring")]
+        Task CountPublicItemsAsync(string id, CancellationToken token);
+
+        /// <summary>
         /// Counts the duplicate items in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>

@@ -137,6 +137,99 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
+        /// Counts the public items in the database.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        /// <returns>A dictionary containing the number of public items in the database.</returns>
+        public async Task<Dictionary<string, int>> CountPublicItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Define the dictionary to return.
+            var dictionary = new Dictionary<string, int>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Databases"] = await context.Databases
+                    .Where(item => item.IsPublic)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["DatabaseProteinFields"] = await context.DatabaseProteinFields
+                    .Where(item => item.Database.IsPublic)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["DatabaseInteractionFields"] = await context.DatabaseInteractionFields
+                    .Where(item => item.Database.IsPublic)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Proteins"] = await context.Proteins
+                    .Where(item => item.DatabaseProteins.Any(item1 => item1.Database.IsPublic))
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Interactions"] = await context.Interactions
+                    .Where(item => item.DatabaseInteractions.Any(item1 => item1.Database.IsPublic))
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["ProteinCollections"] = await context.ProteinCollections
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Networks"] = await context.Networks
+                    .Where(item => item.IsPublic)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Analyses"] = await context.Analyses
+                    .Where(item => item.IsPublic)
+                    .CountAsync();
+            }
+            // Return the dictionary.
+            return dictionary;
+        }
+
+        /// <summary>
         /// Counts the duplicate items in the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>

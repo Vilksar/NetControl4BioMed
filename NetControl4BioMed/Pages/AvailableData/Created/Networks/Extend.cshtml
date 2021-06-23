@@ -1,12 +1,13 @@
 ﻿@page
 @model DeleteModel
+@using NetControl4BioMed.Data
 @{
     ViewData["Title"] = "Extend networks deletion time";
 }
 
 <div class="alert alert-info text-justify text-wrap">
     <span><i class="fas fa-info-circle"></i></span>
-    <span>The time until deletion for the following @Model.View.Items.Count() network@(Model.View.Items.Count() != 1 ? "s" : string.Empty) will be extended.</span>
+    <span>The time until deletion for the following @Model.View.Items.Count() network@(Model.View.Items.Count() != 1 ? "s" : string.Empty) will be extended to @((DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()).</span>
 </div>
 <form method="post" class="text-justify">
     <div class="form-group" hidden>

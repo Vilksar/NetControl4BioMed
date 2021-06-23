@@ -43,15 +43,13 @@ namespace NetControl4BioMed.Pages.Administration
         {
             public Dictionary<string, int?> AllItemCount { get; set; }
 
+            public Dictionary<string, int?> PublicItemCount { get; set; }
+
             public Dictionary<string, int?> DuplicateItemCount { get; set; }
 
             public Dictionary<string, int?> OrphanedItemCount { get; set; }
 
             public string AnnouncementMessage { get; set; }
-
-            public string DemonstrationNetworkId { get; set; }
-
-            public string DemonstrationAnalysisId { get; set; }
 
             public string DemonstrationControlPathId { get; set; }
         }
@@ -63,6 +61,12 @@ namespace NetControl4BioMed.Pages.Administration
                 .GetSection("Data")
                 .GetSection("ItemCount")
                 .GetSection("All")
+                .GetChildren()
+                .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
+            var publicItemCount = _configuration
+                .GetSection("Data")
+                .GetSection("ItemCount")
+                .GetSection("Public")
                 .GetChildren()
                 .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
             var duplicateItemCount = _configuration
@@ -78,18 +82,15 @@ namespace NetControl4BioMed.Pages.Administration
                 .GetChildren()
                 .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
             var announcementMessage = _configuration["Data:AnnouncementMessage"];
-            var demonstrationNetworkId = _configuration["Data:Demonstration:NetworkId"];
-            var demonstrationAnalysisId = _configuration["Data:Demonstration:AnalysisId"];
             var demonstrationControlPathId = _configuration["Data:Demonstration:ControlPathId"];
             // Define the view.
             View = new ViewModel
             {
                 AllItemCount = allItemCount,
+                PublicItemCount = publicItemCount,
                 DuplicateItemCount = duplicateItemCount,
                 OrphanedItemCount = orphanedItemCount,
                 AnnouncementMessage = announcementMessage,
-                DemonstrationNetworkId = demonstrationNetworkId,
-                DemonstrationAnalysisId = demonstrationAnalysisId,
                 DemonstrationControlPathId = demonstrationControlPathId
             };
             // Return the page.
@@ -186,6 +187,7 @@ namespace NetControl4BioMed.Pages.Administration
             var taskNames = new List<string>
             {
                 nameof(IRecurringTaskManager.CountAllItemsAsync),
+                nameof(IRecurringTaskManager.CountPublicItemsAsync),
                 nameof(IRecurringTaskManager.CountDuplicateItemsAsync),
                 nameof(IRecurringTaskManager.CountOrphanedItemsAsync),
                 nameof(IRecurringTaskManager.StopAnalysesAsync),
