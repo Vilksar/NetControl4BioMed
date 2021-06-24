@@ -3,6 +3,7 @@
 }
 
 @section Banner {
+    <partial name="_NavigationBannerPartial" model="@Helpers.ViewModels.NavigationBannerViewModel.AvailableDataNavigationBanner" />
     @RenderSection("Banner", required: false)
 }
 

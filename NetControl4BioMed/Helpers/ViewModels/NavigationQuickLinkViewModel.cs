@@ -189,7 +189,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "success",
             Icon = "fa-desktop",
             Width = 6,
-            Link = "/PrivateData/Analyses/Index"
+            Link = "/PublicData/Analyses/Index"
         };
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "success",
             Icon = "fa-desktop",
             Width = 6,
-            Link = "/PublicData/Analyses/Index"
+            Link = "/PrivateData/Analyses/Index"
         };
 
         /// <summary>

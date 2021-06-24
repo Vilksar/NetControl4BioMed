@@ -381,6 +381,66 @@
         };
 
         /// <summary>
+        /// Gets the navigation breadcrumb for the public data index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel PublicDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "PublicData",
+            Title = "Public networks",
+            Link = "/PublicData/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the public data networks index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel PublicDataNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Networks",
+            Title = "Networks",
+            Link = "/PublicData/Networks/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the public data analyses index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel PublicDataAnalysesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Analyses",
+            Title = "Analyses",
+            Link = "/PublicData/Analyses/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the private data index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel PrivateDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "PrivateData",
+            Title = "My networks",
+            Link = "/PrivateData/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the private data networks index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel PrivateDataNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Networks",
+            Title = "Networks",
+            Link = "/PrivateData/Networks/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the private data analyses index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel PrivateDataAnalysesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Analyses",
+            Title = "Analyses",
+            Link = "/PrivateData/Analyses/Index"
+        };
+
+        /// <summary>
         /// Gets the navigation breadcrumb for the available data index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel AvailableDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel

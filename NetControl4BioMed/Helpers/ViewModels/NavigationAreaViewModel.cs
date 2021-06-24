@@ -430,7 +430,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Title = "Overview",
                     Description = string.Empty,
                     Icon = "fa-chart-bar",
-                    Color = "primary",
+                    Color = "success",
                     Link = "/PublicData/Index"
                 },
                 new NavigationGroupViewModel
@@ -439,7 +439,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Title = "Public networks",
                     Description = string.Empty,
                     Icon = "fa-share-alt",
-                    Color = "primary",
+                    Color = "success",
                     Link = "/PublicData/Networks"
                 },
                 new NavigationGroupViewModel
@@ -448,7 +448,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Title = "Public analyses",
                     Description = string.Empty,
                     Icon = "fa-desktop",
-                    Color = "primary",
+                    Color = "success",
                     Link = "/PublicData/Analyses"
                 }
             }
@@ -472,7 +472,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Title = "Overview",
                     Description = string.Empty,
                     Icon = "fa-chart-bar",
-                    Color = "primary",
+                    Color = "success",
                     Link = "/PrivateData/Index"
                 },
                 new NavigationGroupViewModel
@@ -481,7 +481,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Title = "My networks",
                     Description = string.Empty,
                     Icon = "fa-share-alt",
-                    Color = "primary",
+                    Color = "success",
                     Link = "/PrivateData/Networks"
                 },
                 new NavigationGroupViewModel
@@ -490,7 +490,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Title = "My analyses",
                     Description = string.Empty,
                     Icon = "fa-desktop",
-                    Color = "primary",
+                    Color = "success",
                     Link = "/PrivateData/Analyses"
                 }
             }
