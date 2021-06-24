@@ -1,0 +1,18 @@
+﻿@model AnalysisUserType
+@using NetControl4BioMed.Data.Enumerations
+@using NetControl4BioMed.Helpers.Extensions
+
+<div class="text-uppercase">
+    @switch (Model)
+    {
+        case AnalysisUserType.None:
+            <span style="color: lightgray;"><i class="fas fa-user"></i></span>
+            break;
+        case AnalysisUserType.Owner:
+            <span style="color: tomato;"><i class="fas fa-user"></i></span>
+            break;
+        default:
+            break;
+    }
+    <span title="@Model.GetDisplayDescription()">@Model.GetDisplayName()</span>
+</div>
