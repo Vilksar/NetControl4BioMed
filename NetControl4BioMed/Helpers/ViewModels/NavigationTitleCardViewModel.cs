@@ -114,7 +114,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationTitleCardViewModel ControlPathNavigationTitleCard { get; } = new NavigationTitleCardViewModel
         {
             Id = "ControlPath",
-            Icon = "fa-gamepad"
+            Icon = "fa-exchange-alt"
         };
 
         /// <summary>

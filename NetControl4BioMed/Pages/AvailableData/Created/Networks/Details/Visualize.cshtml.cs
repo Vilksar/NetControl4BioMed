@@ -35,8 +35,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
-            // Get the current user.
-            var user = await _userManager.GetUserAsync(User);
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(id))
             {
@@ -45,6 +43,8 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details
                 // Redirect to the index page.
                 return RedirectToPage("/AvailableData/Created/Networks/Index");
             }
+            // Get the current user.
+            var user = await _userManager.GetUserAsync(User);
             // Get the item with the provided ID.
             var items = _context.Networks
                 .Where(item => item.IsPublic || (user != null && item.NetworkUsers.Any(item1 => item1.Email == user.Email)))

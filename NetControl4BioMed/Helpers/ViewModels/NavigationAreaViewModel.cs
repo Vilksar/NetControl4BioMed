@@ -828,31 +828,31 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "Created",
-                    Title = "Created",
+                    Id = "Results",
+                    Title = "Results",
                     Description = string.Empty,
                     Icon = "fa-hammer",
                     Color = "dark",
-                    Link = "/AvailableData/Created/Analyses/Details/Created/Index",
+                    Link = "/AvailableData/Created/Analyses/Details/Results/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Networks",
-                            Title = "Networks",
-                            Description = string.Empty,
-                            Icon = "fa-desktop",
-                            Color = "light",
-                            Link = "/AvailableData/Created/Analyses/Details/Created/Networks/Index"
-                        },
                         new NavigationPageViewModel
                         {
                             Id = "ControlPaths",
                             Title = "Control paths",
                             Description = string.Empty,
-                            Icon = "fa-gamepad",
+                            Icon = "fa-exchange-alt",
                             Color = "light",
-                            Link = "/AvailableData/Created/Analyses/Details/Created/ControlPaths/Index"
+                            Link = "/AvailableData/Created/Analyses/Details/Results/ControlPaths/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "Paths",
+                            Title = "Paths",
+                            Description = string.Empty,
+                            Icon = "fa-long-arrow-right",
+                            Color = "light",
+                            Link = "/AvailableData/Created/Analyses/Details/Results/Paths/Index"
                         }
                     }
                 }
