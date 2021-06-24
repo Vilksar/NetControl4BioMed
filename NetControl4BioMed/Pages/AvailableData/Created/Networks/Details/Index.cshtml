@@ -16,15 +16,12 @@
     </div>
 }
 <div class="row align-items-center">
-    @if (Model.View.ShowVisualization)
-    {
-        <div class="col-lg mb-3">
-            <a asp-page="/AvailableData/Created/Networks/Upload" asp-route-networkId="@Model.View.Network.Id" class="btn btn-dark btn-block" title="Copy">
-                <span><i class="fas fa-copy"></i></span>
-                <span>Copy</span>
-            </a>
-        </div>
-    }
+    <div class="col-lg mb-3">
+        <a asp-page="/AvailableData/Created/Networks/Create" asp-route-networkId="@Model.View.Network.Id" class="btn btn-dark btn-block" title="Copy">
+            <span><i class="fas fa-copy"></i></span>
+            <span>Copy</span>
+        </a>
+    </div>
     @if (Model.View.IsUserOwner)
     {
         <div class="col-lg mb-3">
@@ -41,6 +38,17 @@
         </a>
     </div>
 </div>
+@if (Model.View.Network.Status == NetworkStatus.Completed)
+{
+    <div class="row align-items-center">
+        <div class="col-lg mb-3">
+            <a asp-page="/AvailableData/Created/Analyses/Create" asp-route-networkId="@Model.View.Network.Id" class="btn btn-success btn-block" title="Create">
+                <span><i class="fas fa-desktop"></i></span>
+                <span>Create a new analysis</span>
+            </a>
+        </div>
+    </div>
+}
 <div class="card mb-3" title="Status">
     <div class="card-body text-center">
         <partial name="_NetworkStatusPartial" model="@Model.View.Network.Status" />
@@ -179,7 +187,7 @@
         {
             <div class="alert alert-danger text-justify text-wrap">
                 <span><i class="fas fa-exclamation-circle"></i></span>
-                <span>The network will be deleted automatically on @((Model.View.Network.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()). Alternatively, you can extend its time until deletion to @((DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()) or delete it now using the buttons below.</span>
+                <span>The network will be deleted automatically on @(Model.View.Network.DateTimeToDelete.ToLongDateString()). Alternatively, you can extend its time until deletion to @((DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()) or delete it now using the buttons below.</span>
             </div>
             <a asp-page="/AvailableData/Created/Networks/Extend" asp-route-ids="@Model.View.Network.Id" class="btn btn-warning btn-block mb-3" title="Extend">
                 <span><i class="fas fa-history"></i></span>
@@ -194,7 +202,7 @@
         {
             <div class="alert alert-danger text-justify text-wrap">
                 <span><i class="fas fa-exclamation-circle"></i></span>
-                <span>The network will be deleted automatically on @((Model.View.Network.DateTimeCreated.Date + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()). Alternatively, you can extend its time until deletion to @((DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()) using the button below.</span>
+                <span>The network will be deleted automatically on @(Model.View.Network.DateTimeToDelete.ToLongDateString()). Alternatively, you can extend its time until deletion to @((DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()) using the button below.</span>
             </div>
             <a asp-page="/AvailableData/Created/Networks/Extend" asp-route-ids="@Model.View.Network.Id" class="btn btn-warning btn-block" title="Extend">
                 <span><i class="fas fa-history"></i></span>

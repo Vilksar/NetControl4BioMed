@@ -333,34 +333,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the users navigation quick link for the networks index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel AvailableDataNetworkUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Users",
-            TitleSingular = "User",
-            TitlePlural = "Users",
-            Color = "primary",
-            Icon = "fa-user",
-            Width = 6,
-            Link = "/AvailableData/Created/Networks/Details/Accounts/Users/Index"
-        };
-
-        /// <summary>
-        /// Gets the analyses navigation quick link for the networks index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel AvailableDataNetworkAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Analyses",
-            TitleSingular = "Analysis",
-            TitlePlural = "Analyses",
-            Color = "primary",
-            Icon = "fa-desktop",
-            Width = 6,
-            Link = "/AvailableData/Created/Networks/Details/Created/Analyses/Index"
-        };
-
-        /// <summary>
         /// Gets the proteins navigation quick link for the analysis index page.
         /// </summary>
         public static NavigationQuickLinkViewModel AvailableDataAnalysisProteinsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
@@ -414,34 +386,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Icon = "fa-folder",
             Width = 6,
             Link = "/AvailableData/Created/Analyses/Details/Data/ProteinCollections/Index"
-        };
-
-        /// <summary>
-        /// Gets the users navigation quick link for the analysis index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel AvailableDataAnalysisUsersNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Users",
-            TitleSingular = "User",
-            TitlePlural = "Users",
-            Color = "primary",
-            Icon = "fa-user",
-            Width = 6,
-            Link = "/AvailableData/Created/Analyses/Details/Accounts/Users/Index"
-        };
-
-        /// <summary>
-        /// Gets the networks navigation quick link for the analysis index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel AvailableDataAnalysisControlPathsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "ControlPaths",
-            TitleSingular = "Control path",
-            TitlePlural = "Control paths",
-            Color = "primary",
-            Icon = "fa-gamepad",
-            Width = 6,
-            Link = "/AvailableData/Created/Analyses/Details/Results/ControlPaths/Index"
         };
 
         /// <summary>
@@ -571,8 +515,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             var networkInteractionsNavigationQuickLink = AvailableDataNetworkInteractionsNavigationQuickLink;
             var networkDatabasesNavigationQuickLink = AvailableDataNetworkDatabasesNavigationQuickLink;
             var networkProteinCollectionsNavigationQuickLink = AvailableDataNetworkProteinCollectionsNavigationQuickLink;
-            var networkUsersNavigationQuickLink = AvailableDataNetworkUsersNavigationQuickLink;
-            var networkAnalysesNavigationQuickLink = AvailableDataNetworkAnalysesNavigationQuickLink;
             // Update the count and the route ID.
             networkProteinsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Proteins", null);
             networkProteinsNavigationQuickLink.RouteId = networkId;
@@ -582,19 +524,13 @@ namespace NetControl4BioMed.Helpers.ViewModels
             networkDatabasesNavigationQuickLink.RouteId = networkId;
             networkProteinCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("ProteinCollections", null);
             networkProteinCollectionsNavigationQuickLink.RouteId = networkId;
-            networkUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
-            networkUsersNavigationQuickLink.RouteId = networkId;
-            networkAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
-            networkAnalysesNavigationQuickLink.RouteId = networkId;
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
                 networkProteinsNavigationQuickLink,
                 networkInteractionsNavigationQuickLink,
                 networkDatabasesNavigationQuickLink,
-                networkProteinCollectionsNavigationQuickLink,
-                networkUsersNavigationQuickLink,
-                networkAnalysesNavigationQuickLink
+                networkProteinCollectionsNavigationQuickLink
             };
         }
 
@@ -617,8 +553,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
             var analysisInteractionsNavigationQuickLink = AvailableDataAnalysisInteractionsNavigationQuickLink;
             var analysisDatabasesNavigationQuickLink = AvailableDataAnalysisDatabasesNavigationQuickLink;
             var analysisProteinCollectionsNavigationQuickLink = AvailableDataAnalysisProteinCollectionsNavigationQuickLink;
-            var analysisUsersNavigationQuickLink = AvailableDataAnalysisUsersNavigationQuickLink;
-            var analysisControlPathsNavigationQuickLink = AvailableDataAnalysisControlPathsNavigationQuickLink;
             // Update the count and the route ID.
             analysisProteinsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Proteins", null);
             analysisProteinsNavigationQuickLink.RouteId = analysisId;
@@ -628,19 +562,13 @@ namespace NetControl4BioMed.Helpers.ViewModels
             analysisDatabasesNavigationQuickLink.RouteId = analysisId;
             analysisProteinCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("ProteinCollections", null);
             analysisProteinCollectionsNavigationQuickLink.RouteId = analysisId;
-            analysisUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
-            analysisUsersNavigationQuickLink.RouteId = analysisId;
-            analysisControlPathsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
-            analysisControlPathsNavigationQuickLink.RouteId = analysisId;
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
                 analysisProteinsNavigationQuickLink,
                 analysisInteractionsNavigationQuickLink,
                 analysisDatabasesNavigationQuickLink,
-                analysisProteinCollectionsNavigationQuickLink,
-                analysisUsersNavigationQuickLink,
-                analysisControlPathsNavigationQuickLink
+                analysisProteinCollectionsNavigationQuickLink
             };
         }
     }

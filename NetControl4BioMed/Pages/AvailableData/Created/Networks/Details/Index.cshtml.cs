@@ -75,9 +75,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details
                     { "Proteins", items.Select(item => item.NetworkProteins).SelectMany(item => item).Count(item => item.Type == NetworkProteinType.None) },
                     { "Interactions", items.Select(item => item.NetworkInteractions).SelectMany(item => item).Count() },
                     { "Databases", items.Select(item => item.NetworkDatabases).SelectMany(item => item).Count() },
-                    { "ProteinCollections", items.Select(item => item.NetworkProteinCollections).SelectMany(item => item).Count() },
-                    { "Users", items.Select(item => item.NetworkUsers).SelectMany(item => item).Count() },
-                    { "Analyses", items.Select(item => item.Analyses).SelectMany(item => item).Count() }
+                    { "ProteinCollections", items.Select(item => item.NetworkProteinCollections).SelectMany(item => item).Count() }
                 }
             };
             // Return the page.

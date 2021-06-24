@@ -70,14 +70,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details.Account
                 // Redirect to the index page.
                 return RedirectToPage("/AvailableData/Created/Networks/Index");
             }
-            // Check if there aren't any emails provided.
-            if (emails == null || !emails.Any())
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No or invalid emails have been provided.";
-                // Redirect to the index page.
-                return RedirectToPage("/AvailableData/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
-            }
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
             // Get the items with the provided ID.
@@ -104,6 +96,14 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details.Account
                     .SelectMany(item => item)
                     .Where(item => emails.Contains(item.Email))
             };
+            // Check if there aren't any emails provided.
+            if (emails == null || !emails.Any())
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: No or invalid emails have been provided.";
+                // Redirect to the index page.
+                return RedirectToPage("/AvailableData/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
+            }
             // Check if the user does not exist or there weren't any items found.
             if (user == null || View.Items == null || !View.Items.Any() || (!View.IsUserOwner && View.Items.Any(item => item.Email != user.Email)))
             {
@@ -141,14 +141,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details.Account
                 // Redirect to the index page.
                 return RedirectToPage("/AvailableData/Created/Networks/Index");
             }
-            // Check if there aren't any emails provided.
-            if (Input.Emails == null || !Input.Emails.Any())
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No or invalid emails have been provided.";
-                // Redirect to the index page.
-                return RedirectToPage("/AvailableData/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
-            }
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
             // Get the items with the provided ID.
@@ -175,6 +167,14 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details.Account
                     .SelectMany(item => item)
                     .Where(item => Input.Emails.Contains(item.Email))
             };
+            // Check if there aren't any emails provided.
+            if (Input.Emails == null || !Input.Emails.Any())
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: No or invalid emails have been provided.";
+                // Redirect to the index page.
+                return RedirectToPage("/AvailableData/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
+            }
             // Check if the user does not exist or there weren't any items found.
             if (user == null || View.Items == null || !View.Items.Any() || (!View.IsUserOwner && View.Items.Any(item => item.Email != user.Email)))
             {
