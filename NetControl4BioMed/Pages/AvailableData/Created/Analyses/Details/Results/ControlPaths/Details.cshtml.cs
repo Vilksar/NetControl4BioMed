@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
@@ -15,11 +17,13 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Results
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public DetailsModel(UserManager<User> userManager, ApplicationDbContext context)
+        public DetailsModel(UserManager<User> userManager, ApplicationDbContext context, IConfiguration configuration)
         {
             _userManager = userManager;
             _context = context;
+            _configuration = configuration;
         }
 
         public ViewModel View { get; set; }
@@ -37,8 +41,37 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Results
             public Dictionary<Protein, int> UniqueControlProteins { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string id)
+        public async Task<IActionResult> OnGetAsync(string id, bool loadDemonstration)
         {
+            // Check if the demonstration should be loaded.
+            if (loadDemonstration)
+            {
+                // Check if there are no demonstration items configured.
+                if (string.IsNullOrEmpty(_configuration["Data:Demonstration:ControlPathId"]))
+                {
+                    // Try to get a demonstration control path.
+                    var controlPath = _context.ControlPaths
+                        .Include(item => item.Analysis)
+                            .ThenInclude(item => item.Network)
+                        .Where(item => item.Analysis.IsPublic && item.Analysis.IsDemonstration && item.Analysis.Network.IsPublic && item.Analysis.Network.IsDemonstration)
+                        .AsNoTracking()
+                        .FirstOrDefault();
+                    // Check if there was no demonstration control path found.
+                    if (controlPath == null || controlPath.Analysis == null || controlPath.Analysis.Network == null)
+                    {
+                        // Display a message.
+                        TempData["StatusMessage"] = "Error: There are no demonstration control paths available.";
+                        // Redirect to the index page.
+                        return RedirectToPage("/AvailableData/Created/Analyses/Index");
+                    }
+                    // Update the demonstration item IDs.
+                    _configuration["Data:Demonstration:NetworkId"] = controlPath.Analysis.Network.Id;
+                    _configuration["Data:Demonstration:AnalysisId"] = controlPath.Analysis.Id;
+                    _configuration["Data:Demonstration:ControlPathId"] = controlPath.Id;
+                }
+                // Get the ID of the configured demonstration item.
+                id = _configuration["Data:Demonstration:ControlPathId"];
+            }
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(id))
             {
