@@ -1,0 +1,220 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Overview";
+}
+
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetPublicDataNavigationQuickLinks(Model.View.ItemCount)" />
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-mouse-pointer"></i></span>
+            </div>
+            <div>
+                <span>Demonstration</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (Model.View.DemonstrationNetwork == null || Model.View.DemonstrationAnalysis == null)
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no demonstration networks or analyses available. You can use the navigation links to browse the available databases and their data, or to create a new network or analysis.</span>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>This is a random demonstration network together with its corresponding analysis. You can use the corresponding links to inspect them, or you can use the navigation links to browse the available databases and their data, or to create a new network or analysis.</span>
+            </div>
+            <table class="table table-hover table-bordered mb-0" data-paging="false" data-info="false" data-searching="false">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Name</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-center text-break text-nowrap">
+                            <span title="Network"><i class="fas fa-share-alt"></i></span>
+                        </td>
+                        <td class="text-left text-break">
+                            <div>
+                                <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.DemonstrationNetwork.Id" class="font-weight-bold" title="@Model.View.DemonstrationNetwork.Name">@Model.View.DemonstrationNetwork.Name</a>
+                            </div>
+                            <div>
+                                <span class="small text-muted" title="@Model.View.DemonstrationNetwork.Id">@Model.View.DemonstrationNetwork.Id</span>
+                            </div>
+                        </td>
+                        <td class="text-center text-break">
+                            <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.DemonstrationNetwork.Id" class="btn btn-info m-1" title="Details">
+                                <span><i class="fas fa-info-circle"></i></span>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center text-break text-nowrap">
+                            <span title="Analysis"><i class="fas fa-desktop"></i></span>
+                        </td>
+                        <td class="text-left text-break">
+                            <div>
+                                <a asp-page="/AvailableData/Created/Analyses/Details/Index" asp-route-id="@Model.View.DemonstrationAnalysis.Id" class="font-weight-bold" title="@Model.View.DemonstrationAnalysis.Name">@Model.View.DemonstrationAnalysis.Name</a>
+                            </div>
+                            <div>
+                                <span class="small text-muted" title="@Model.View.DemonstrationAnalysis.Id">@Model.View.DemonstrationAnalysis.Id</span>
+                            </div>
+                        </td>
+                        <td class="text-center text-break">
+                            <a asp-page="/AvailableData/Created/Analyses/Details/Index" asp-route-id="@Model.View.DemonstrationAnalysis.Id" class="btn btn-info m-1" title="Details">
+                                <span><i class="fas fa-info-circle"></i></span>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-share-alt"></i></span>
+            </div>
+            <div>
+                <span>Recent networks</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (!Model.View.RecentNetworks.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no recent public networks.</span>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>These are the most recently created public networks.</span>
+            </div>
+            <table class="table table-hover table-bordered mb-0" data-paging="false" data-info="false" data-searching="false">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-left text-break">
+                            <span>Name</span>
+                        </th>
+                        <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                            <span>Status</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.View.RecentNetworks)
+                    {
+                        <tr>
+                            <td class="text-left text-break">
+                                <div>
+                                    <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
+                                </div>
+                                <div>
+                                    <span class="small text-muted" title="@item.Id">@item.Id</span>
+                                </div>
+                            </td>
+                            <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                                <partial name="_NetworkStatusPartial" model="@item.Status" />
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                                    <span><i class="fas fa-info-circle"></i></span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-desktop"></i></span>
+            </div>
+            <div>
+                <span>Recent analyses</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (!Model.View.RecentAnalyses.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no recent public analyses.</span>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>These are the most recently created public analyses.</span>
+            </div>
+            <table class="table table-hover table-bordered mb-0" data-paging="false" data-info="false" data-searching="false">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-left text-break">
+                            <span>Name</span>
+                        </th>
+                        <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                            <span>Status</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.View.RecentAnalyses)
+                    {
+                        <tr>
+                            <td class="text-left text-break">
+                                <div>
+                                    <a asp-page="/AvailableData/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
+                                </div>
+                                <div>
+                                    <span class="small text-muted" title="@item.Id">@item.Id</span>
+                                </div>
+                            </td>
+                            <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                                <partial name="_AnalysisStatusPartial" model="@item.Status" />
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/AvailableData/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                                    <span><i class="fas fa-info-circle"></i></span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
