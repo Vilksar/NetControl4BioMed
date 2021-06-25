@@ -440,7 +440,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-share-alt",
                     Color = "success",
-                    Link = "/PublicData/Networks"
+                    Link = "/PublicData/Networks/Index"
                 },
                 new NavigationGroupViewModel
                 {
@@ -449,7 +449,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-desktop",
                     Color = "success",
-                    Link = "/PublicData/Analyses"
+                    Link = "/PublicData/Analyses/Index"
                 }
             }
         };
@@ -482,7 +482,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-share-alt",
                     Color = "success",
-                    Link = "/PrivateData/Networks"
+                    Link = "/PrivateData/Networks/Index"
                 },
                 new NavigationGroupViewModel
                 {
@@ -491,7 +491,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-desktop",
                     Color = "success",
-                    Link = "/PrivateData/Analyses"
+                    Link = "/PrivateData/Analyses/Index"
                 }
             }
         };

@@ -64,7 +64,7 @@
         public static NavigationBannerViewModel PrivateDataNavigationBanner { get; } = new NavigationBannerViewModel
         {
             Id = "PrivateData",
-            Title = "PrivateData",
+            Title = "Private data",
             Icon = "fa-user",
             Color = "success"
         };
@@ -75,7 +75,7 @@
         public static NavigationBannerViewModel PublicDataNavigationBanner { get; } = new NavigationBannerViewModel
         {
             Id = "PublicData",
-            Title = "PublicData",
+            Title = "Public data",
             Icon = "fa-users",
             Color = "success"
         };
