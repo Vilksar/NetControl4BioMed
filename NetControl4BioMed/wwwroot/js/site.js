@@ -68,6 +68,84 @@ $(window).on('load', () => {
         });
     }
 
+    // Check if there is a table group on the page.
+    if ($('.table-group').length !== 0) {
+        // Define a function to update the input.
+        const updateInput = (groupElement, rowElement) => {
+            // Get the current item ID.
+            const itemId = $(rowElement).data('id');
+            // Deserialize the value within the input element.
+            const itemIds = JSON.parse($(groupElement).find('.table-group-input').first().val());
+            // Toggle the selection class on the row and on the checkbox.
+            $(rowElement).toggleClass('table-active');
+            // Check if the row is now selected.
+            if ($(event.target).closest('.table-group-row').hasClass('table-active')) {
+                // Update the checkbox.
+                $(rowElement).find('.table-group-row-checkbox:not(checked)').prop('checked', true);
+                // Get the current index of the item.
+                const index = itemIds.indexOf(itemId);
+                // Check if the item doesn't already exist.
+                if (index === -1) {
+                    // Add it to the list.
+                    itemIds.push(itemId);
+                    // Update the input element.
+                    $(groupElement).find('.table-group-input').val(JSON.stringify(itemIds));
+                }
+            } else {
+                // Update the checkbox.
+                $(rowElement).find('.table-group-row-checkbox:checked').prop('checked', false);
+                // Get the current index of the item.
+                const index = itemIds.indexOf(itemId);
+                // Check if the item exists.
+                if (index !== -1) {
+                    // Remove it from the list.
+                    itemIds.splice(index, 1);
+                    // Update the input element.
+                    $(groupElement).find('.table-group-input').val(JSON.stringify(itemIds));
+                }
+            }
+        };
+        // Define a function to update the table.
+        const updateTable = (groupElement) => {
+            // Deserialize the value within the input element.
+            const itemIds = JSON.parse($(groupElement).find('.table-group-input').first().val());
+            // Go over each item ID.
+            for (const itemId of itemIds) {
+                // Mark the corresponding row as active.
+                $(groupElement).find(`.table-group-row[data-id="${itemId}"]`).addClass('table-active');
+                $(groupElement).find(`.table-group-row[data-id="${itemId}"]`).find('.table-group-row-checkbox').prop('checked', true);
+            }
+        }
+        // Add a listener for clicking on a row in the table.
+        $('.table-group-datatable').on('click', '.table-group-row', (event) => {
+            // Get the current group and row element.
+            const groupElement = $(event.target).closest('.table-group');
+            const rowElement = $(event.target).closest('.table-group-row');
+            // Update the input.
+            updateInput(groupElement, rowElement);
+        });
+        // Add a listener for clicking on a checkbox in the table.
+        $('.table-group-datatable').on('change', '.table-group-row-checkbox', (event) => {
+            // Get the current group and row element.
+            const groupElement = $(event.target).closest('.table-group');
+            const rowElement = $(event.target).closest('.table-group-row');
+            // Update the input.
+            updateInput(groupElement, rowElement);
+        });
+        // On page load, parse the input and check the group items.
+        (() => {
+            // Go over each table group.
+            $('.table-group').each((index, element) => {
+                // Format the table as datatable.
+                const table = $(element).find('.table-group-datatable').DataTable({
+                    'autoWidth': false
+                });
+                // Update the table.
+                updateTable($(element));
+            });
+        })();
+    }
+
     // Check if there is an item group on the page.
     if ($('.item-group').length !== 0) {
         // Define a function which gets all of the selected items and creates a JSON string array with their IDs.
