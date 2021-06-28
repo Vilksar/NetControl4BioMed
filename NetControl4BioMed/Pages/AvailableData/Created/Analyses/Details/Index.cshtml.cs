@@ -102,7 +102,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details
             View = new ViewModel
             {
                 IsUserOwner = items
-                    .Any(item => user != null && item.AnalysisUsers.Any(item1 => item1.Type == AnalysisUserType.Owner && item1.Email == user.Email)),
+                    .Any(item => user != null && item.AnalysisUsers.Any(item1 => item1.Email == user.Email)),
                 Analysis = items
                     .Include(item => item.Network)
                     .First(),

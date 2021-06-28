@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace NetControl4BioMed.Data.Migrations
 {
@@ -434,13 +434,12 @@ namespace NetControl4BioMed.Data.Migrations
                 {
                     NetworkId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
                     DateTimeCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NetworkUsers", x => new { x.NetworkId, x.Email, x.Type });
+                    table.PrimaryKey("PK_NetworkUsers", x => new { x.NetworkId, x.Email });
                     table.ForeignKey(
                         name: "FK_NetworkUsers_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -751,13 +750,12 @@ namespace NetControl4BioMed.Data.Migrations
                 {
                     AnalysisId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
                     DateTimeCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AnalysisUsers", x => new { x.AnalysisId, x.Email, x.Type });
+                    table.PrimaryKey("PK_AnalysisUsers", x => new { x.AnalysisId, x.Email });
                     table.ForeignKey(
                         name: "FK_AnalysisUsers_Analyses_AnalysisId",
                         column: x => x.AnalysisId,

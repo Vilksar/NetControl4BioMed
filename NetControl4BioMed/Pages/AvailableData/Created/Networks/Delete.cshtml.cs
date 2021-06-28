@@ -72,7 +72,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
             View = new ViewModel
             {
                 Items = _context.Networks
-                    .Where(item => item.NetworkUsers.Any(item1 => item1.Type == NetworkUserType.Owner && item1.Email == user.Email))
+                    .Where(item => item.NetworkUsers.Any(item1 => item1.Email == user.Email))
                     .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -111,7 +111,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
             View = new ViewModel
             {
                 Items = _context.Networks
-                    .Where(item => item.NetworkUsers.Any(item1 => item1.Type == NetworkUserType.Owner && item1.Email == user.Email))
+                    .Where(item => item.NetworkUsers.Any(item1 => item1.Email == user.Email))
                     .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.

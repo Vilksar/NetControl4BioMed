@@ -253,16 +253,13 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("AnalysisId", "Email", "Type");
+                    b.HasKey("AnalysisId", "Email");
 
                     b.HasIndex("UserId");
 
@@ -642,16 +639,13 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("NetworkId", "Email", "Type");
+                    b.HasKey("NetworkId", "Email");
 
                     b.HasIndex("UserId");
 

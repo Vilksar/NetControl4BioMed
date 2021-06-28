@@ -33,8 +33,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
         {
             public bool IsUserOwner { get; set; }
 
-            public AnalysisUser CurrentAnalysisUser { get; set; }
-
             public Analysis Analysis { get; set; }
 
             public SearchViewModel<AnalysisUser> Search { get; set; }
@@ -47,16 +45,11 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "IsNone", "Is of type \"None\"" },
-                    { "IsNotNone", "Is not of type \"None\"" },
-                    { "IsOwner", "Is of type \"Owner\"" },
-                    { "IsNotOwner", "Is not of type \"Owner\"" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
                     { "DateTimeCreated", "Date created" },
-                    { "Email", "E-mail" },
-                    { "Type", "Type" }
+                    { "Email", "E-mail" }
                 }
             };
         }
@@ -101,12 +94,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
             query = query
                 .Where(item => !input.SearchIn.Any() ||
                     input.SearchIn.Contains("Email") && item.Email.Contains(input.SearchString));
-            // Select the results matching the filter parameter.
-            query = query
-                .Where(item => input.Filter.Contains("IsNone") ? item.Type == AnalysisUserType.None : true)
-                .Where(item => input.Filter.Contains("IsNotNone") ? item.Type != AnalysisUserType.None : true)
-                .Where(item => input.Filter.Contains("IsOwner") ? item.Type == AnalysisUserType.Owner : true)
-                .Where(item => input.Filter.Contains("IsNotOwner") ? item.Type != AnalysisUserType.Owner : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -122,12 +109,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
                 case var sort when sort == ("Email", "Descending"):
                     query = query.OrderByDescending(item => item.Email);
                     break;
-                case var sort when sort == ("Type", "Ascending"):
-                    query = query.OrderBy(item => item.Type);
-                    break;
-                case var sort when sort == ("Type", "Descending"):
-                    query = query.OrderByDescending(item => item.Type);
-                    break;
                 default:
                     break;
             }
@@ -135,11 +116,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
             View = new ViewModel
             {
                 IsUserOwner = items
-                    .Any(item => user != null && item.AnalysisUsers.Any(item1 => item1.Type == AnalysisUserType.Owner && item1.Email == user.Email)),
-                CurrentAnalysisUser = items
-                    .Select(item => item.AnalysisUsers)
-                    .SelectMany(item => item)
-                    .FirstOrDefault(item => user != null && item.Type == AnalysisUserType.None && item.Email == user.Email),
+                    .Any(item => user != null && item.AnalysisUsers.Any(item1 => item1.Email == user.Email)),
                 Analysis = items
                     .Include(item => item.AnalysisUsers)
                     .First(),

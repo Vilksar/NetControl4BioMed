@@ -10,7 +10,7 @@ using NetControl4BioMed.Data;
 namespace NetControl4BioMed.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210618111207_Initial")]
+    [Migration("20210628123839_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -255,16 +255,13 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("AnalysisId", "Email", "Type");
+                    b.HasKey("AnalysisId", "Email");
 
                     b.HasIndex("UserId");
 
@@ -644,16 +641,13 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("NetworkId", "Email", "Type");
+                    b.HasKey("NetworkId", "Email");
 
                     b.HasIndex("UserId");
 

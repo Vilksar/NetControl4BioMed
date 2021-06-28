@@ -49,8 +49,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
 
         public class ViewModel
         {
-            public bool IsUserOwner { get; set; }
-
             public Analysis Analysis { get; set; }
 
             public IEnumerable<AnalysisUser> Items { get; set; }
@@ -60,7 +58,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
             public bool AreAllUsersSelected { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string id, string emails)
+        public async Task<IActionResult> OnGetAsync(string id, IEnumerable<string> emails)
         {
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(id))
@@ -87,15 +85,17 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
             // Define the view.
             View = new ViewModel
             {
-                IsUserOwner = items
-                    .Any(item => user != null && item.AnalysisUsers.Any(item1 => item1.Type == AnalysisUserType.Owner && item1.Email == user.Email)),
                 Analysis = items
-                    .First(),
-                Items = items
-                    .Select(item => item.AnalysisUsers)
-                    .SelectMany(item => item)
-                    .Where(item => emails.Contains(item.Email))
+                    .First()
             };
+            // Check if the user is not an owner.
+            if (user == null || !items.Any(item => item.AnalysisUsers.Any(item1 => item1.Email == user.Email)))
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: You need to be an owner of the analysis in order to remove a user.";
+                // Redirect to the index page.
+                return RedirectToPage("/AvailableData/Created/Analysis/Details/Accounts/Users/Index", new { id = View.Analysis.Id });
+            }
             // Check if there aren't any emails provided.
             if (emails == null || !emails.Any())
             {
@@ -104,8 +104,13 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
                 // Redirect to the index page.
                 return RedirectToPage("/AvailableData/Created/Analyses/Details/Accounts/Users/Index", new { id = View.Analysis.Id });
             }
-            // Check if the user does not exist or there weren't any items found.
-            if (user == null || View.Items == null || !View.Items.Any() || (!View.IsUserOwner && View.Items.Any(item => item.Email != user.Email)))
+            // Update the view.
+            View.Items = items
+                .Select(item => item.AnalysisUsers)
+                .SelectMany(item => item)
+                .Where(item => emails.Contains(item.Email));
+            // Check if there weren't any items found.
+            if (View.Items == null || !View.Items.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No users have been found with the provided e-mails or you don't have access to remove them.";
@@ -158,15 +163,17 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
             // Define the view.
             View = new ViewModel
             {
-                IsUserOwner = items
-                    .Any(item => user != null && item.AnalysisUsers.Any(item1 => item1.Type == AnalysisUserType.Owner && item1.Email == user.Email)),
                 Analysis = items
-                    .First(),
-                Items = items
-                    .Select(item => item.AnalysisUsers)
-                    .SelectMany(item => item)
-                    .Where(item => Input.Emails.Contains(item.Email))
+                    .First()
             };
+            // Check if the user is not an owner.
+            if (user == null || !items.Any(item => item.AnalysisUsers.Any(item1 => item1.Email == user.Email)))
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: You need to be an owner of the analysis in order to remove a user.";
+                // Redirect to the index page.
+                return RedirectToPage("/AvailableData/Created/Analysis/Details/Accounts/Users/Index", new { id = View.Analysis.Id });
+            }
             // Check if there aren't any emails provided.
             if (Input.Emails == null || !Input.Emails.Any())
             {
@@ -175,8 +182,13 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
                 // Redirect to the index page.
                 return RedirectToPage("/AvailableData/Created/Analyses/Details/Accounts/Users/Index", new { id = View.Analysis.Id });
             }
-            // Check if the user does not exist or there weren't any items found.
-            if (user == null || View.Items == null || !View.Items.Any() || (!View.IsUserOwner && View.Items.Any(item => item.Email != user.Email)))
+            // Update the view.
+            View.Items = items
+                .Select(item => item.AnalysisUsers)
+                .SelectMany(item => item)
+                .Where(item => Input.Emails.Contains(item.Email));
+            // Check if there weren't any items found.
+            if (View.Items == null || !View.Items.Any())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No users have been found with the provided e-mails or you don't have access to remove them.";

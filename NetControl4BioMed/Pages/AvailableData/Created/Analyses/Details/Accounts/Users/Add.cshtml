@@ -38,15 +38,6 @@
                 <span asp-description-for="Input.Email" class="text-muted small">The e-mail address of the user to add to the current analysis.</span>
                 <span asp-validation-for="Input.Email" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Input.Type" class="font-weight-bold">Type</label>
-                <select asp-for="Input.Type" class="custom-select form-control">
-                    <option value="None">None</option>
-                    <option value="Owner">Owner</option>
-                </select>
-                <span asp-description-for="Input.Type" class="text-muted small">The type of the user to be added.</span>
-                <span asp-validation-for="Input.Type" class="text-danger small"></span>
-            </div>
             <div class="form-group" hidden>
                 <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
                 <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />

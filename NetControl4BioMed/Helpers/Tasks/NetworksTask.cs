@@ -167,23 +167,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Select(item => (item.User.Id, item.Email))
                         .Distinct()
                         .Where(item => users.Any(item1 => item1.Id == item.Item1))
-                        .Select(item => new List<NetworkUser>
+                        .Select(item => new NetworkUser
                         {
-                            new NetworkUser
-                            {
-                                DateTimeCreated = DateTime.UtcNow,
-                                UserId = item.Item1,
-                                Email = item.Item2,
-                                Type = NetworkUserType.None
-                            },
-                            new NetworkUser
-                            {
-                                DateTimeCreated = DateTime.UtcNow,
-                                UserId = item.Item1,
-                                Email = item.Item2,
-                                Type = NetworkUserType.Owner
-                            }
-                        }).SelectMany(item => item);
+                            DateTimeCreated = DateTime.UtcNow,
+                            UserId = item.Item1,
+                            Email = item.Item2
+                        });
                     // Check if there were no network users found.
                     if (!batchItem.IsPublic && (networkUsers == null || !networkUsers.Any()))
                     {

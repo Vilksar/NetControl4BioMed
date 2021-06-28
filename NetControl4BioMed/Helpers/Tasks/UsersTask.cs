@@ -514,11 +514,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items found.
                     var networks = context.Networks
-                        .Where(item => item.NetworkUsers.Any(item1 => userIds.Contains(item1.User.Id) && item1.Type == NetworkUserType.Owner) && !item.NetworkUsers.Any(item1 => !userIds.Contains(item1.User.Id) && item1.Type == NetworkUserType.Owner))
+                        .Where(item => item.NetworkUsers.Any(item1 => userIds.Contains(item1.User.Id)) && !item.NetworkUsers.Any(item1 => !userIds.Contains(item1.User.Id)))
                         .Distinct();
                     // Get the IDs of the dependent items.
                     analysisInputs = context.Analyses
-                        .Where(item => item.AnalysisUsers.Any(item1 => userIds.Contains(item1.User.Id) && item1.Type == AnalysisUserType.Owner) && !item.AnalysisUsers.Any(item1 => !userIds.Contains(item1.User.Id) && item1.Type == AnalysisUserType.Owner) || networks.Contains(item.Network))
+                        .Where(item => item.AnalysisUsers.Any(item1 => userIds.Contains(item1.User.Id)) && !item.AnalysisUsers.Any(item1 => !userIds.Contains(item1.User.Id)) || networks.Contains(item.Network))
                         .Distinct()
                         .Select(item => new AnalysisInputModel
                         {

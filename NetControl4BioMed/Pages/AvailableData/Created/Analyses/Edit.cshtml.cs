@@ -83,7 +83,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             }
             // Define the query.
             var query = _context.Analyses
-                .Where(item => item.AnalysisUsers.Any(item1 => item1.Type == AnalysisUserType.Owner && item1.Email == user.Email))
+                .Where(item => item.AnalysisUsers.Any(item1 => item1.Email == user.Email))
                 .Where(item => item.Id == id);
             // Define the view.
             View = new ViewModel
@@ -133,7 +133,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             }
             // Define the query.
             var query = _context.Analyses
-                .Where(item => item.AnalysisUsers.Any(item1 => item1.Type == AnalysisUserType.Owner && item1.Email == user.Email))
+                .Where(item => item.AnalysisUsers.Any(item1 => item1.Email == user.Email))
                 .Where(item => item.Id == Input.Id);
             // Define the view.
             View = new ViewModel

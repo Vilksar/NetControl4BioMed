@@ -161,16 +161,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     // Get the analysis users.
                     var analysisUsers = batchItem.AnalysisUsers
-                        .Where(item => item.User != null)
+                        .Where(item => item.User != null && !string.IsNullOrEmpty(item.Email))
                         .Where(item => !string.IsNullOrEmpty(item.User.Id))
-                        .Select(item => item.User.Id)
+                        .Select(item => (item.User.Id, item.Email))
                         .Distinct()
-                        .Where(item => users.Any(item1 => item1.Id == item))
+                        .Where(item => users.Any(item1 => item1.Id == item.Item1))
                         .Select(item => new AnalysisUser
                         {
                             DateTimeCreated = DateTime.UtcNow,
-                            UserId = item,
-                            Type = AnalysisUserType.Owner
+                            UserId = item.Item1,
+                            Email = item.Item2
                         });
                     // Check if there were no analysis users found.
                     if (!batchItem.IsPublic && (analysisUsers == null || !analysisUsers.Any()))

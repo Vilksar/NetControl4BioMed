@@ -50,11 +50,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details.Account
             [Required(ErrorMessage = "This field is required.")]
             public string Email { get; set; }
 
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
-            [RegularExpression("None|Owner", ErrorMessage = "The value is not valid.")]
-            public string Type { get; set; }
-
             public string ReCaptchaToken { get; set; }
         }
 
@@ -94,13 +89,11 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details.Account
             // Define the view.
             View = new ViewModel
             {
-                IsUserOwner = items
-                    .Any(item => user != null && item.NetworkUsers.Any(item1 => item1.Type == NetworkUserType.Owner && item1.Email == user.Email)),
                 Network = items
                     .First()
             };
-            // Check if the user does not exist.
-            if (!View.IsUserOwner)
+            // Check if the user is not an owner.
+            if (user == null || !items.Any(item => item.NetworkUsers.Any(item1 => item1.Email == user.Email)))
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: You need to be an owner of the network in order to add a user.";
@@ -143,13 +136,11 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details.Account
             // Define the view.
             View = new ViewModel
             {
-                IsUserOwner = items
-                    .Any(item => user != null && item.NetworkUsers.Any(item1 => item1.Type == NetworkUserType.Owner && item1.Email == user.Email)),
                 Network = items
                     .First()
             };
-            // Check if the user does not exist.
-            if (!View.IsUserOwner)
+            // Check if the user is not an owner.
+            if (user == null || !items.Any(item => item.NetworkUsers.Any(item1 => item1.Email == user.Email)))
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: You need to be an owner of the network in order to add a user.";
@@ -183,17 +174,17 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details.Account
             // Define a new task.
             var task = new NetworkUsersTask
             {
-                Items = new List<string> { "None", Input.Type }
-                    .Distinct()
-                    .Select(item => new NetworkUserInputModel
+                Items = new List<NetworkUserInputModel>
+                {
+                    new NetworkUserInputModel
                     {
                         Network = new NetworkInputModel
                         {
                             Id = View.Network.Id
                         },
-                        Email = Input.Email,
-                        Type = Input.Type
-                    })
+                        Email = Input.Email
+                    }
+                }
             };
             // Try to run the task.
             try
@@ -231,7 +222,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details.Account
             // Send the defined e-mails.
             await _emailSender.SendWasAddedToNetworkEmailAsync(emailWasAddedToNetworkViewModel);
             // Display a message to the user.
-            TempData["StatusMessage"] = $"Success: 1 user of type \"{Input.Type}\" added successfully to the network.";
+            TempData["StatusMessage"] = $"Success: 1 user added successfully to the network.";
             // Redirect to the users page.
             return RedirectToPage("/AvailableData/Created/Networks/Details/Accounts/Users/Index", new { id = View.Network.Id });
         }

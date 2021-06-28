@@ -20,69 +20,12 @@
         <span description-for="network-id" class="text-muted small">The ID of the current network.</span>
         <span validation-for="network-id" class="text-danger small"></span>
     </div>
-    @if (Model.View.CurrentNetworkUser == null)
+    @if (!Model.View.IsUserOwner)
     {
         <div class="alert alert-warning text-justify text-wrap">
             <span><i class="fas fa-exclamation-triangle"></i></span>
-            <span>For security reasons, only the owners of the network can view and manage the users with access to the network.</span>
+            <span>For security reasons, only the owners of the network can view and manage the users.</span>
         </div>
-    }
-    else if (!Model.View.IsUserOwner)
-    {
-        <div class="alert alert-warning text-justify text-wrap">
-            <span><i class="fas fa-exclamation-triangle"></i></span>
-            <span>For security reasons, only the owners of the network can view and manage the users with access to the network. However, you can remove your own access to the network.</span>
-        </div>
-        <table class="table table-hover table-bordered item-group" data-paging="false" data-info="false" data-searching="false">
-            <thead class="thead-light">
-                <tr>
-                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" id="select" class="custom-control-input item-group-select" title="Select" />
-                            <label for="select" class="custom-control-label"></label>
-                        </div>
-                    </th>
-                    <th class="text-left text-break">
-                        <span>E-mail</span>
-                    </th>
-                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
-                        <span>Type</span>
-                    </th>
-                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
-                        <span>Date</span>
-                    </th>
-                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                        <span>Links</span>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="item-group-item">
-                    <td class="text-center text-break">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" id="checkbox-@Model.View.CurrentNetworkUser.Email" name="emails" value="@Model.View.CurrentNetworkUser.Email" class="custom-control-input item-group-item-checkbox" title="Select" />
-                            <label for="checkbox-@Model.View.CurrentNetworkUser.Email" class="custom-control-label"></label>
-                        </div>
-                    </td>
-                    <td class="text-left text-break">
-                        <span title="@Model.View.CurrentNetworkUser.Email" class="font-weight-bold">@Model.View.CurrentNetworkUser.Email</span>
-                    </td>
-                    <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
-                        <partial name="_NetworkUserTypePartial" model="@Model.View.CurrentNetworkUser.Type" />
-                    </td>
-                    <td class="d-none d-lg-table-cell text-center text-break text-nowrap utc-date" data-date="@Model.View.Network.DateTimeCreated.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
-                        <span class="utc-date-date" title="@Model.View.Network.DateTimeCreated.ToShortDateString()">@Model.View.Network.DateTimeCreated.ToShortDateString()</span>
-                        <br />
-                        <span class="utc-date-time" title="@Model.View.Network.DateTimeCreated.ToShortTimeString()">@Model.View.Network.DateTimeCreated.ToShortTimeString()</span>
-                    </td>
-                    <td class="text-center text-break">
-                        <a asp-page="/AvailableData/Created/Networks/Details/Accounts/Users/Remove" asp-route-id="@Model.View.Network.Id" asp-route-emails="@Model.View.CurrentNetworkUser.Email" class="btn btn-danger m-1" title="Remove">
-                            <span><i class="fas fa-user-minus"></i></span>
-                        </a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     }
     else
     {
@@ -102,7 +45,7 @@
         </div>
         <div class="alert alert-warning text-justify text-wrap">
             <span><i class="fas fa-exclamation-triangle"></i></span>
-            <span>For security reasons, only the owners of the network can view and manage the users with access to the network.</span>
+            <span>For security reasons, only the owners of the network can view and manage the users.</span>
         </div>
         @if (!Model.View.Search.Items.Any())
         {
@@ -126,9 +69,6 @@
                             <span>E-mail</span>
                         </th>
                         <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
-                            <span>Type</span>
-                        </th>
-                        <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
                             <span>Date</span>
                         </th>
                         <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -148,9 +88,6 @@
                             </td>
                             <td class="text-left text-break">
                                 <span title="@item.Email" class="font-weight-bold">@item.Email</span>
-                            </td>
-                            <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
-                                <partial name="_NetworkUserTypePartial" model="@item.Type" />
                             </td>
                             <td class="d-none d-lg-table-cell text-center text-break text-nowrap utc-date" data-date="@Model.View.Network.DateTimeCreated.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
                                 <span class="utc-date-date" title="@Model.View.Network.DateTimeCreated.ToShortDateString()">@Model.View.Network.DateTimeCreated.ToShortDateString()</span>

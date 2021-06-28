@@ -50,11 +50,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
             [Required(ErrorMessage = "This field is required.")]
             public string Email { get; set; }
 
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
-            [RegularExpression("None|Owner", ErrorMessage = "The value is not valid.")]
-            public string Type { get; set; }
-
             public string ReCaptchaToken { get; set; }
         }
 
@@ -62,8 +57,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
 
         public class ViewModel
         {
-            public bool IsUserOwner { get; set; }
-
             public Analysis Analysis { get; set; }
         }
 
@@ -94,13 +87,11 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
             // Define the view.
             View = new ViewModel
             {
-                IsUserOwner = items
-                    .Any(item => user != null && item.AnalysisUsers.Any(item1 => item1.Type == AnalysisUserType.Owner && item1.Email == user.Email)),
                 Analysis = items
                     .First()
             };
-            // Check if the user does not exist.
-            if (!View.IsUserOwner)
+            // Check if the user is not an owner.
+            if (user == null || !items.Any(item => item.AnalysisUsers.Any(item1 => item1.Email == user.Email)))
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: You need to be an owner of the analysis in order to add a user.";
@@ -143,13 +134,11 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
             // Define the view.
             View = new ViewModel
             {
-                IsUserOwner = items
-                    .Any(item => user != null && item.AnalysisUsers.Any(item1 => item1.Type == AnalysisUserType.Owner && item1.Email == user.Email)),
                 Analysis = items
                     .First()
             };
-            // Check if the user does not exist.
-            if (!View.IsUserOwner)
+            // Check if the user is not an owner.
+            if (user == null || !items.Any(item => item.AnalysisUsers.Any(item1 => item1.Email == user.Email)))
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: You need to be an owner of the analysis in order to add a user.";
@@ -183,17 +172,17 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
             // Define a new task.
             var task = new AnalysisUsersTask
             {
-                Items = new List<string> { "None", Input.Type }
-                    .Distinct()
-                    .Select(item => new AnalysisUserInputModel
+                Items = new List<AnalysisUserInputModel>
+                {
+                    new AnalysisUserInputModel
                     {
                         Analysis = new AnalysisInputModel
                         {
                             Id = View.Analysis.Id
                         },
-                        Email = Input.Email,
-                        Type = Input.Type
-                    })
+                        Email = Input.Email
+                    }
+                }
             };
             // Try to run the task.
             try
@@ -231,7 +220,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Account
             // Send the defined e-mails.
             await _emailSender.SendWasAddedToAnalysisEmailAsync(emailWasAddedToAnalysisViewModel);
             // Display a message to the user.
-            TempData["StatusMessage"] = $"Success: 1 user of type \"{Input.Type}\" added successfully to the analysis.";
+            TempData["StatusMessage"] = $"Success: 1 user added successfully to the analysis.";
             // Redirect to the users page.
             return RedirectToPage("/AvailableData/Created/Analyses/Details/Accounts/Users/Index", new { id = View.Analysis.Id });
         }

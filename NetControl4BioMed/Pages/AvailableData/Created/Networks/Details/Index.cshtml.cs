@@ -96,7 +96,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details
             View = new ViewModel
             {
                 IsUserOwner = items
-                    .Any(item => user != null && item.NetworkUsers.Any(item1 => item1.Type == NetworkUserType.Owner && item1.Email == user.Email)),
+                    .Any(item => user != null && item.NetworkUsers.Any(item1 => item1.Email == user.Email)),
                 Network = items
                     .First(),
                 ShowVisualization = items
