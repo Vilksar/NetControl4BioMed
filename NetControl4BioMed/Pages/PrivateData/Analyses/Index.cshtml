@@ -1,0 +1,124 @@
+﻿@page
+@model IndexModel
+@using NetControl4BioMed.Data.Enumerations
+@{
+    ViewData["Title"] = "Analyses";
+}
+
+<partial name="_SearchInputPartial" model="Model.View.Search.Input" />
+<partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
+<form method="get" class="text-justify">
+    <div class="row align-items-center">
+        <div class="col-lg-12 mb-3">
+            <button type="submit" asp-page="/AvailableData/Created/Analyses/Create" class="btn btn-success btn-block" title="Create">
+                <span><i class="fas fa-plus"></i></span>
+                <span>Create a new analysis</span>
+            </button>
+        </div>
+    </div>
+    <div class="row align-items-center">
+        <div class="col-lg-6 mb-3">
+            <button type="submit" asp-page="/AvailableData/Created/Analyses/Download" class="btn btn-primary btn-block item-group-button" title="Download" disabled>
+                <span><i class="fas fa-download"></i></span>
+                <span>Download</span>
+            </button>
+        </div>
+        <div class="col-lg-6 mb-3">
+            <button type="submit" asp-page="/AvailableData/Created/Analyses/Delete" class="btn btn-danger btn-block item-group-button" title="Delete" disabled>
+                <span><i class="fas fa-trash"></i></span>
+                <span>Delete</span>
+            </button>
+        </div>
+    </div>
+    @if (!Model.View.Search.Items.Any() && Model.View.Search.Filters.Any())
+    {
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>No analyses associated with your account have been found matching the applied filter(s).</span>
+        </div>
+    }
+    else if (!Model.View.Search.Items.Any())
+    {
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>There are no analyses associated with your account. You can use the button above to create a new analysis.</span>
+        </div>
+    }
+    else
+    {
+        <table class="table table-hover table-bordered item-group" data-paging="false" data-info="false" data-searching="false">
+            <thead class="thead-light">
+                <tr>
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" id="select" class="custom-control-input item-group-select" title="Select" />
+                            <label for="select" class="custom-control-label"></label>
+                        </div>
+                    </th>
+                    <th class="text-left text-break">
+                        <span>Name</span>
+                    </th>
+                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                        <span>Status</span>
+                    </th>
+                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                        <span>Progress</span>
+                    </th>
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <span>Links</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.View.Search.Items)
+                {
+                    <tr class="item-group-item item-refresh" data-id="@item.Id" data-status="@item.Status.ToString()" data-refresh="@(item.Status == AnalysisStatus.Defined || item.Status == AnalysisStatus.Generating || item.Status == AnalysisStatus.Scheduled || item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing || item.Status == AnalysisStatus.Stopping)">
+                        <td class="text-center text-break">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" id="checkbox-@item.Id" name="ids" value="@item.Id" class="custom-control-input item-group-item-checkbox" title="Select" />
+                                <label for="checkbox-@item.Id" class="custom-control-label"></label>
+                            </div>
+                        </td>
+                        <td class="text-left text-break">
+                            <div>
+                                <a asp-page="/AvailableData/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
+                            </div>
+                            <div>
+                                <span class="small text-muted" title="@item.Id">@item.Id</span>
+                            </div>
+                        </td>
+                        <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                            <partial name="_AnalysisStatusPartial" model="@item.Status" />
+                        </td>
+                        <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                            <div>
+                                <span><span class="item-refresh-item" data-type="progress"></span>%</span>
+                            </div>
+                            <div>
+                                <span><span class="item-refresh-item" data-type="progressWithoutImprovement"></span>%</span>
+                            </div>
+                        </td>
+                        <td class="text-center text-break">
+                            <a asp-page="/AvailableData/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                                <span><i class="fas fa-info-circle"></i></span>
+                            </a>
+                            <a asp-page="/AvailableData/Created/Analyses/Download" asp-route-ids="@item.Id" class="btn btn-primary m-1" title="Download">
+                                <span><i class="fas fa-download"></i></span>
+                            </a>
+                            <a asp-page="/AvailableData/Created/Analyses/Edit" asp-route-id="@item.Id" class="btn btn-warning m-1" title="Edit">
+                                <span><i class="fas fa-pencil-alt"></i></span>
+                            </a>
+                            <a asp-page="/AvailableData/Created/Analyses/Delete" asp-route-ids="@item.Id" class="btn btn-danger m-1" title="Delete">
+                                <span><i class="fas fa-trash"></i></span>
+                            </a>
+                            <a asp-page="/AvailableData/Created/Analyses/Create" asp-route-analysisId="@item.Id" class="btn btn-dark m-1" title="Copy">
+                                <span><i class="fas fa-copy"></i></span>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <partial name="_SearchPaginationPartial" model="Model.View.Search.Pagination" />
+    }
+</form>

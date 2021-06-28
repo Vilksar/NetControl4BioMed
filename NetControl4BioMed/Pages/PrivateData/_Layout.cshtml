@@ -1,0 +1,24 @@
+﻿@{
+    Layout = "/Pages/_Layout.cshtml";
+}
+
+@section Banner {
+    <partial name="_NavigationBannerPartial" model="@Helpers.ViewModels.NavigationBannerViewModel.PrivateDataNavigationBanner" />
+    @RenderSection("Banner", required: false)
+}
+
+@section Breadcrumbs {
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.PrivateDataNavigationBreadcrumb" />
+    @RenderSection("Breadcrumbs", required: false)
+}
+
+@section Navigation {
+    <partial name="_NavigationAreaPartial" model="@Helpers.ViewModels.NavigationAreaViewModel.PrivateDataNavigationArea" />
+    @RenderSection("Navigation", required: false)
+}
+
+@RenderBody()
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}
