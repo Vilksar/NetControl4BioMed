@@ -86,7 +86,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
             public IEnumerable<ProteinCollection> SeedProteinCollections { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string networkId = null, bool loadDemonstration = false)
+        public async Task<IActionResult> OnGetAsync(string networkId, bool loadDemonstration)
         {
             // Check if the demonstration should be loaded.
             if (loadDemonstration)

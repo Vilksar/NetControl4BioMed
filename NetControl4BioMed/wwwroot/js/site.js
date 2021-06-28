@@ -90,6 +90,8 @@ $(window).on('load', () => {
                     itemIds.push(itemId);
                     // Update the input element.
                     $(groupElement).find('.table-group-input').val(JSON.stringify(itemIds));
+                    // Update the value of the count.
+                    $(groupElement).find('.table-group-count').text(itemIds.length);
                 }
             } else {
                 // Update the checkbox.
@@ -102,6 +104,8 @@ $(window).on('load', () => {
                     itemIds.splice(index, 1);
                     // Update the input element.
                     $(groupElement).find('.table-group-input').val(JSON.stringify(itemIds));
+                    // Update the value of the count.
+                    $(groupElement).find('.table-group-count').text(itemIds.length);
                 }
             }
         };
@@ -109,6 +113,8 @@ $(window).on('load', () => {
         const updateTable = (groupElement) => {
             // Deserialize the value within the input element.
             const itemIds = JSON.parse($(groupElement).find('.table-group-input').first().val());
+            // Update the value of the count.
+            $(groupElement).find('.table-group-count').text(itemIds.length);
             // Go over each item ID.
             for (const itemId of itemIds) {
                 // Mark the corresponding row as active.
