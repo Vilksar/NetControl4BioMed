@@ -162,16 +162,28 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     // Get the network users.
                     var networkUsers = batchItem.NetworkUsers
-                        .Where(item => item.User != null)
+                        .Where(item => item.User != null && !string.IsNullOrEmpty(item.Email))
                         .Where(item => !string.IsNullOrEmpty(item.User.Id))
-                        .Select(item => item.User.Id)
+                        .Select(item => (item.User.Id, item.Email))
                         .Distinct()
-                        .Where(item => users.Any(item1 => item1.Id == item))
-                        .Select(item => new NetworkUser
+                        .Where(item => users.Any(item1 => item1.Id == item.Item1))
+                        .Select(item => new List<NetworkUser>
                         {
-                            DateTimeCreated = DateTime.UtcNow,
-                            UserId = item
-                        });
+                            new NetworkUser
+                            {
+                                DateTimeCreated = DateTime.UtcNow,
+                                UserId = item.Item1,
+                                Email = item.Item2,
+                                Type = NetworkUserType.None
+                            },
+                            new NetworkUser
+                            {
+                                DateTimeCreated = DateTime.UtcNow,
+                                UserId = item.Item1,
+                                Email = item.Item2,
+                                Type = NetworkUserType.Owner
+                            }
+                        }).SelectMany(item => item);
                     // Check if there were no network users found.
                     if (!batchItem.IsPublic && (networkUsers == null || !networkUsers.Any()))
                     {

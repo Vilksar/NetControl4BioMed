@@ -594,6 +594,36 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Link = "/AvailableData/Data/ProteinCollections/Index"
                         }
                     }
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Created",
+                    Title = "Created",
+                    Description = string.Empty,
+                    Icon = "fa-hammer",
+                    Color = "primary",
+                    Link = "/AvailableData/Created/Index",
+                    NavigationPages = new List<NavigationPageViewModel>
+                    {
+                        new NavigationPageViewModel
+                        {
+                            Id = "Networks",
+                            Title = "Networks",
+                            Description = string.Empty,
+                            Icon = "fa-share-alt",
+                            Color = "light",
+                            Link = "/AvailableData/Created/Networks/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "Analyses",
+                            Title = "Analyses",
+                            Description = string.Empty,
+                            Icon = "fa-desktop",
+                            Color = "light",
+                            Link = "/AvailableData/Created/Analyses/Index"
+                        }
+                    }
                 }
             }
         };

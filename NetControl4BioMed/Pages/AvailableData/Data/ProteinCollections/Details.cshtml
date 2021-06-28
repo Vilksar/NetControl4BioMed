@@ -68,17 +68,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var nodeCollectionProtein in Model.View.ProteinCollectionProteins)
+                    @foreach (var proteinCollectionProtein in Model.View.ProteinCollectionProteins)
                     {
                         <tr>
                             <td class="text-center text-break text-nowrap">
                                 <span></span>
                             </td>
                             <td class="text-left text-break">
-                                <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@nodeCollectionProtein.Protein.Id" title="@nodeCollectionProtein.Protein.Name">@nodeCollectionProtein.Protein.Name</a>
+                                <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@proteinCollectionProtein.Protein.Id" title="@proteinCollectionProtein.Protein.Name">@proteinCollectionProtein.Protein.Name</a>
                             </td>
                             <td class="text-center text-break">
-                                <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@nodeCollectionProtein.Protein.Id" title="Details">
+                                <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@proteinCollectionProtein.Protein.Id" title="Details">
                                     <span>Details</span>
                                 </a>
                             </td>
