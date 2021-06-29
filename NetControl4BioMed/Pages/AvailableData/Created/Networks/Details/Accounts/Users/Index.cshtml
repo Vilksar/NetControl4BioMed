@@ -6,13 +6,17 @@
 
 @if (Model.View.Network.IsPublic)
 {
-    <div class="alert alert-info text-justify text-wrap">
-        <span><i class="fas fa-info-circle"></i></span>
-        <span>As the network is public, in addition to the users listed below, anyone that has its ID or URL can access it.</span>
+    <div class="alert alert-warning text-justify text-wrap">
+        <span><i class="fas fa-exclamation-triangle"></i></span>
+        <span>As the network is public, in addition to the users listed below, anyone can access it.</span>
     </div>
 }
 <partial name="_SearchInputPartial" model="Model.View.Search.Input" />
 <partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
+<div class="alert alert-info text-justify text-wrap">
+    <span><i class="fas fa-info-circle"></i></span>
+    <span>For security reasons, only the users with explicit access to the network can view and manage the other users with access.</span>
+</div>
 <form method="get" class="text-justify">
     <div class="form-group" hidden>
         <label for="network-id" class="font-weight-bold">ID</label>
@@ -20,14 +24,7 @@
         <span description-for="network-id" class="text-muted small">The ID of the current network.</span>
         <span validation-for="network-id" class="text-danger small"></span>
     </div>
-    @if (!Model.View.IsUserOwner)
-    {
-        <div class="alert alert-warning text-justify text-wrap">
-            <span><i class="fas fa-exclamation-triangle"></i></span>
-            <span>For security reasons, only the owners of the network can view and manage the users.</span>
-        </div>
-    }
-    else
+    @if (Model.View.IsUserOwner)
     {
         <div class="row align-items-center">
             <div class="col-lg-6 mb-3">
@@ -42,10 +39,6 @@
                     <span>Remove selected users</span>
                 </button>
             </div>
-        </div>
-        <div class="alert alert-warning text-justify text-wrap">
-            <span><i class="fas fa-exclamation-triangle"></i></span>
-            <span>For security reasons, only the owners of the network can view and manage the users.</span>
         </div>
         @if (!Model.View.Search.Items.Any())
         {

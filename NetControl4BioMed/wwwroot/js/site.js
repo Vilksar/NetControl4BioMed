@@ -256,8 +256,8 @@ $(window).on('load', () => {
                 // Update the data to be submitted.
                 $(groupElement).find('.file-group-input').first().val(JSON.stringify(rows));
             }
-            // Check if we have edges.
-            else if (type === 'edges') {
+            // Check if we have pairs of items.
+            else if (type === 'pairs') {
                 // Split the text into different lines.
                 const rows = $(groupElement).find('.file-group-text').first().val().split(new RegExp(lineSeparator)).filter((element) => {
                     // Split the row into its composing items.
@@ -321,8 +321,8 @@ $(window).on('load', () => {
                 // Add the elements to the text.
                 $(groupElement).find('.file-group-text').first().val(data.join('\n'));
             }
-            // Check if we have edges.
-            if (type === 'edges') {
+            // Check if we have pairs of items.
+            if (type === 'pairs') {
                 // Go over all of the elements.
                 data = data.filter((element) => {
                     // Keep only the ones which are of the proper type.

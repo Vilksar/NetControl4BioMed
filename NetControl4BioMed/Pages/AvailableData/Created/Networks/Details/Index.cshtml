@@ -10,9 +10,16 @@
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetNetworkNavigationTitleCard(Model.View.Network)" />
 @if (Model.View.Network.IsPublic)
 {
+    <div class="alert alert-warning text-justify text-wrap">
+        <span><i class="fas fa-exclamation-triangle"></i></span>
+        <span><span class="font-weight-bold">The network is public and appears in the list of public networks.</span> Anyone can inspect, visualize, copy, or use the network in analyses.</span>
+    </div>
+}
+@if (Model.View.IsUserOwner)
+{
     <div class="alert alert-info text-justify text-wrap">
         <span><i class="fas fa-info-circle"></i></span>
-        <span>The network is public and will appear in the list of public networks. You can share the network ID (<span class="font-weight-bold">@Model.View.Network.Id</span>) or the current URL with other users. <span class="font-weight-bold">Anyone with the ID or the URL can access the network!</span></span>
+        <span>Only the users with explicit access can edit or delete the network. The users with access can be viewed and managed on the <a asp-page="/AvailableData/Created/Networks/Details/Accounts/Users/Index" asp-route-id="@Model.View.Network.Id" class="alert-link">corresponding page</a>.</span>
     </div>
 }
 <div class="row align-items-center">

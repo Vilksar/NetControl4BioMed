@@ -75,6 +75,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
             [Required(ErrorMessage = "This field is required.")]
             public string ReCaptchaToken { get; set; }
         }
+
         public ViewModel View { get; set; }
 
         public class ViewModel

@@ -4,6 +4,13 @@
     ViewData["Title"] = "Add analysis user";
 }
 
+@if (Model.View.Analysis.IsPublic)
+{
+    <div class="alert alert-warning text-justify text-wrap">
+        <span><i class="fas fa-exclamation-triangle"></i></span>
+        <span>As the analysis is public, anyone will still be able to access it.</span>
+    </div>
+}
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
@@ -18,11 +25,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>Use the field below to specify the e-mail address of a user to which you wish to give access for the current analysis. <span class="font-weight-bold">They will be notified of this action via an e-mail. For security reasons, you will also receive an e-mail which confirms this action.</span></span>
-            @if (Model.View.Analysis.IsPublic)
-            {
-                <span>As the current analysis is public, anyone that has its ID or URL will still be able to access it.</span>
-            }
+            <span>Use the field below to specify the e-mail address of a user to which you wish to give explicit access to the current analysis. They will be able to edit or delete the analysis, and access it even if it is private. <span class="font-weight-bold">They will be notified of this action via an e-mail. For security reasons, you will also receive an e-mail which confirms this action.</span></span>
         </div>
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
