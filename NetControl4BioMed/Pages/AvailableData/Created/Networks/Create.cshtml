@@ -42,7 +42,7 @@
                     <option value="false" selected="@(User.Identity.IsAuthenticated ? "selected" : null)">No</option>
                     <option value="true" selected="@(User.Identity.IsAuthenticated ? null : "selected")">Yes</option>
                 </select>
-                <span asp-description-for="Input.IsPublic" class="text-muted small">The availability of the network in the list of public networks. If public, anyone that has its ID or URL can access it.</span>
+                <span asp-description-for="Input.IsPublic" class="text-muted small">The availability of the network in the list of public networks. If public, anyone can access it.</span>
                 <span asp-validation-for="Input.IsPublic" class="text-danger small"></span>
             </div>
             <div class="form-group">
@@ -85,8 +85,8 @@
                 <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[1]]">
                     <thead class="thead-light">
                         <tr>
-                            <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
-                                <span>#</span>
+                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                <span></span>
                             </th>
                             <th class="text-left text-break">
                                 <span>Database</span>
@@ -140,9 +140,9 @@
                 <span>Input here the identifiers of the seed proteins to be used by the new network. You can check all of the potential identifiers <a asp-page="/AvailableData/Databases/DatabaseProteinFields/Index" asp-route-filter="IsSearchable" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
             </div>
             <div class="form-group" hidden>
-                <label asp-for="Input.SeedProteinData" class="font-weight-bold">Data</label>
+                <label asp-for="Input.SeedProteinData" class="font-weight-bold">Seed proteins</label>
                 <textarea asp-for="Input.SeedProteinData" class="form-control file-group-input"></textarea>
-                <span asp-description-for="Input.SeedProteinData" class="text-muted small">The proteins to be used as seed proteins when generating the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                <span asp-description-for="Input.SeedProteinData" class="text-muted small">The seed proteins to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
                 <span asp-validation-for="Input.SeedProteinData" class="text-danger small"></span>
             </div>
             <div class="form-group">
@@ -176,7 +176,7 @@
             </div>
         </div>
     </div>
-    <div class="card mb-3 table-group" hidden="@(!Model.View.SeedProteinCollections.Any() ? "hidden" : null)">
+    <div class="card mb-3 table-group" hidden="@(Model.View.SeedProteinCollections.Any() ? null : "hidden")">
         <div class="card-header font-weight-bold">
             <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
                 <div>
@@ -194,17 +194,17 @@
                 <span>Select here the seed collections to be used by the new network. This can be done either in addition to, or instead of the seed proteins above. You can check all of the available drug-target data <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsSource" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and all of the available cell-line data <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsTarget" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
             </div>
             <div class="form-group" hidden>
-                <label asp-for="Input.SeedProteinCollectionData" class="font-weight-bold">Interaction database IDs</label>
+                <label asp-for="Input.SeedProteinCollectionData" class="font-weight-bold">Seed protein collection IDs</label>
                 <textarea asp-for="Input.SeedProteinCollectionData" class="form-control table-group-input"></textarea>
-                <span asp-description-for="Input.SeedProteinCollectionData" class="text-muted small">The IDs of the interaction databases to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                <span asp-description-for="Input.SeedProteinCollectionData" class="text-muted small">The IDs of the seed protein collections to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
                 <span asp-validation-for="Input.SeedProteinCollectionData" class="text-danger small"></span>
             </div>
             <div class="form-group">
                 <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[1]]">
                     <thead class="thead-light">
                         <tr>
-                            <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
-                                <span>#</span>
+                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                <span></span>
                             </th>
                             <th class="text-left text-break">
                                 <span>Collection</span>

@@ -242,7 +242,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         MaximumIterations = batchItem.MaximumIterations,
                         MaximumIterationsWithoutImprovement = batchItem.MaximumIterationsWithoutImprovement,
                         Parameters = batchItem.Parameters,
-                        Network = network,
+                        NetworkId = network.Id,
                         AnalysisUsers = analysisUsers.ToList(),
                         AnalysisDatabases = proteinAnalysisDatabases
                             .Concat(interactionAnalysisDatabases)
@@ -760,21 +760,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 continue;
                             }
                             // Get the available proteins.
-                            var availableProteins = context.Proteins
-                                .Where(item => item.DatabaseProteins.Any(item1 => proteinDatabaseIds.Contains(item1.Database.Id)));
-                            // Get the proteins by identifier.
-                            var sourceProteinsByIdentifier = availableProteins
-                                .Where(item => sourceProteinIdentifiers.Contains(item.Id) || item.DatabaseProteinFieldProteins.Any(item1 => item1.DatabaseProteinField.IsSearchable && sourceProteinIdentifiers.Contains(item1.Value)));
-                            var targetProteinsByIdentifier = availableProteins
-                                .Where(item => targetProteinIdentifiers.Contains(item.Id) || item.DatabaseProteinFieldProteins.Any(item1 => item1.DatabaseProteinField.IsSearchable && targetProteinIdentifiers.Contains(item1.Value)));
-                            // Get the proteins by protein collection.
-                            var sourceProteinsByProteinCollection = availableProteins
-                                .Where(item => item.ProteinCollectionProteins.Any(item1 => sourceProteinCollectionIds.Contains(item1.ProteinCollection.Id)));
-                            var targetProteinsByProteinCollection = availableProteins
-                                .Where(item => item.ProteinCollectionProteins.Any(item1 => targetProteinCollectionIds.Contains(item1.ProteinCollection.Id)));
-                            // Get the proteins in the analysis.
-                            var proteins = availableProteins
-                                .Where(item => item.NetworkProteins.Any(item1 => analysis.Network.Id == item1.Network.Id));
+                            var proteins = context.Proteins
+                                .Where(item => item.NetworkProteins.Any(item1 => item1.Network.Id == analysis.Network.Id));
                             // Check if there haven't been any proteins found.
                             if (proteins == null || !proteins.Any())
                             {
@@ -787,10 +774,19 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 // Continue.
                                 continue;
                             }
+                            // Get the proteins by identifier.
+                            var sourceProteinsByIdentifier = proteins
+                                .Where(item => sourceProteinIdentifiers.Contains(item.Id) || sourceProteinIdentifiers.Contains(item.Name) || item.DatabaseProteinFieldProteins.Any(item1 => item1.DatabaseProteinField.IsSearchable && sourceProteinIdentifiers.Contains(item1.Value)));
+                            var targetProteinsByIdentifier = proteins
+                                .Where(item => targetProteinIdentifiers.Contains(item.Id) || targetProteinIdentifiers.Contains(item.Name) || item.DatabaseProteinFieldProteins.Any(item1 => item1.DatabaseProteinField.IsSearchable && targetProteinIdentifiers.Contains(item1.Value)));
+                            // Get the proteins by protein collection.
+                            var sourceProteinsByProteinCollection = proteins
+                                .Where(item => item.ProteinCollectionProteins.Any(item1 => sourceProteinCollectionIds.Contains(item1.ProteinCollection.Id)));
+                            var targetProteinsByProteinCollection = proteins
+                                .Where(item => item.ProteinCollectionProteins.Any(item1 => targetProteinCollectionIds.Contains(item1.ProteinCollection.Id)));
                             // Get the interactions in the analysis.
                             var interactions = context.Interactions
-                                .Where(item => item.DatabaseInteractions.Any(item1 => interactionDatabaseIds.Contains(item1.Database.Id)))
-                                .Where(item => item.NetworkInteractions.Any(item1 => analysis.Network.Id == item1.Network.Id));
+                                .Where(item => item.NetworkInteractions.Any(item1 => item1.Network.Id == analysis.Network.Id));
                             // Check if there haven't been any interactions found.
                             if (interactions == null || !interactions.Any())
                             {

@@ -131,11 +131,11 @@
     <div class="card-body">
         <div class="alert alert-primary text-justify text-wrap">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>You can use the button below to go to the corresponding network (<span class="font-weight-bold">@Model.View.Analysis.Network.Name</span>).</span>
+            <span>The analysis uses the network "<a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.Analysis.Network.Id" class="alert-link" title="@Model.View.Analysis.Network.Name">@Model.View.Analysis.Network.Name</a>". If you would like to create a new analysis using the same network, you can copy this analysis, or navigate to the network page.</span>
         </div>
-        <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.Analysis.Network.Id" class="btn btn-info btn-block">
+        <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.Analysis.Network.Id" class="btn btn-primary btn-block" title="View network">
             <span><i class="fas fa-share-alt"></i></span>
-            <span>Go to network</span>
+            <span>View network</span>
         </a>
     </div>
 </div>
@@ -547,8 +547,8 @@
         }
         else
         {
-            <div class="alert alert-danger text-justify text-wrap">
-                <span><i class="fas fa-exclamation-circle"></i></span>
+            <div class="alert alert-warning text-justify text-wrap">
+                <span><i class="fas fa-exclamation-triangle"></i></span>
                 <span>The network will be deleted automatically on @(Model.View.Analysis.DateTimeToDelete.ToLongDateString()). Alternatively, you can extend its time until deletion to @((DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()) using the button below.</span>
             </div>
             <a asp-page="/AvailableData/Created/Analyses/Extend" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-warning btn-block" title="Extend">

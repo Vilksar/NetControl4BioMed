@@ -34,7 +34,7 @@
                 <thead class="thead-light">
                     <tr>
                         <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
-                            <span>#</span>
+                            <span></span>
                         </th>
                         <th class="text-left text-break">
                             <span>Name</span>
@@ -114,6 +114,9 @@
             <table class="table table-hover table-bordered mb-0" data-paging="false" data-info="false" data-searching="false">
                 <thead class="thead-light">
                     <tr>
+                        <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
                         <th class="text-left text-break">
                             <span>Name</span>
                         </th>
@@ -126,9 +129,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.View.RecentNetworks)
+                    @foreach (var (item, index) in Model.View.RecentNetworks.Select((item, index) => (item, index + 1)))
                     {
                         <tr>
+                            <td class="text-center text-break text-nowrap">
+                                <span>@index</span>
+                            </td>
                             <td class="text-left text-break">
                                 <div>
                                     <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
@@ -180,6 +186,9 @@
             <table class="table table-hover table-bordered mb-0" data-paging="false" data-info="false" data-searching="false">
                 <thead class="thead-light">
                     <tr>
+                        <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
                         <th class="text-left text-break">
                             <span>Name</span>
                         </th>
@@ -192,9 +201,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.View.RecentAnalyses)
+                    @foreach (var (item, index) in Model.View.RecentAnalyses.Select((item, index) => (item, index + 1)))
                     {
                         <tr>
+                            <td class="text-center text-break text-nowrap">
+                                <span>@index</span>
+                            </td>
                             <td class="text-left text-break">
                                 <div>
                                     <a asp-page="/AvailableData/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>

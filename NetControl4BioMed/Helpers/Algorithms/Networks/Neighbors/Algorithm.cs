@@ -159,7 +159,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Neighbors
                 }
                 // Get the seed proteins.
                 var seedProteinsByIdentifier = availableProteins
-                    .Where(item => seedProteinIdentifiers.Contains(item.Id) || item.DatabaseProteinFieldProteins.Any(item1 => item1.DatabaseProteinField.IsSearchable && seedProteinIdentifiers.Contains(item1.Value)));
+                    .Where(item => seedProteinIdentifiers.Contains(item.Id) || seedProteinIdentifiers.Contains(item.Name) || item.DatabaseProteinFieldProteins.Any(item1 => item1.DatabaseProteinField.IsSearchable && seedProteinIdentifiers.Contains(item1.Value)));
                 var seedProteinsByProteinCollection = availableProteins
                     .Where(item => item.ProteinCollectionProteins.Any(item1 => seedProteinCollectionIds.Contains(item1.ProteinCollection.Id)));
                 seedProteinIds = seedProteinsByIdentifier
