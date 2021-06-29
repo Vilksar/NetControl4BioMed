@@ -80,11 +80,18 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
 
         public class ViewModel
         {
-            public IEnumerable<Database> ProteinDatabases { get; set; }
+            public IEnumerable<ItemModel> ProteinDatabases { get; set; }
 
-            public IEnumerable<Database> InteractionDatabases { get; set; }
+            public IEnumerable<ItemModel> InteractionDatabases { get; set; }
 
-            public IEnumerable<ProteinCollection> SeedProteinCollections { get; set; }
+            public IEnumerable<ItemModel> SeedProteinCollections { get; set; }
+        }
+
+        public class ItemModel
+        {
+            public string Id { get; set; }
+
+            public string Name { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string networkId, bool loadDemonstration)
@@ -125,12 +132,27 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
             {
                 ProteinDatabases = _context.Databases
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.Email == user.Email))
-                    .Where(item => item.DatabaseProteins.Any()),
+                    .Where(item => item.DatabaseProteins.Any())
+                    .Select(item => new ItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name
+                    }),
                 InteractionDatabases = _context.Databases
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.Email == user.Email))
-                    .Where(item => item.DatabaseInteractions.Any()),
+                    .Where(item => item.DatabaseInteractions.Any())
+                    .Select(item => new ItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name
+                    }),
                 SeedProteinCollections = _context.ProteinCollections
                     .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Seed))
+                    .Select(item => new ItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name
+                    })
             };
             // Check if there weren't any protein databases available.
             if (View.ProteinDatabases == null || !View.ProteinDatabases.Any())
@@ -186,9 +208,9 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
                     InteractionDatabaseData = JsonSerializer.Serialize(networks
                         .Select(item => item.NetworkDatabases)
                         .SelectMany(item => item)
-                        .Select(item => item.Database)
-                        .Intersect(View.InteractionDatabases)
-                        .Select(item => item.Id)),
+                        .Select(item => item.Database.Id)
+                        .AsEnumerable()
+                        .Intersect(View.InteractionDatabases.Select(item => item.Id))),
                     SeedProteinData = JsonSerializer.Serialize(networks
                         .Select(item => item.NetworkProteins)
                         .SelectMany(item => item)
@@ -197,9 +219,9 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
                     SeedProteinCollectionData = JsonSerializer.Serialize(networks
                         .Select(item => item.NetworkProteinCollections)
                         .SelectMany(item => item)
-                        .Select(item => item.ProteinCollection)
-                        .Intersect(View.SeedProteinCollections)
-                        .Select(item => item.Id))
+                        .Select(item => item.ProteinCollection.Id)
+                        .AsEnumerable()
+                        .Intersect(View.SeedProteinCollections.Select(item => item.Id)))
                 };
                 // Display a message.
                 TempData["StatusMessage"] = "Success: The network has been loaded successfully.";
@@ -228,12 +250,27 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
             {
                 ProteinDatabases = _context.Databases
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.Email == user.Email))
-                    .Where(item => item.DatabaseProteins.Any()),
+                    .Where(item => item.DatabaseProteins.Any())
+                    .Select(item => new ItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name
+                    }),
                 InteractionDatabases = _context.Databases
                     .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.Email == user.Email))
-                    .Where(item => item.DatabaseInteractions.Any()),
+                    .Where(item => item.DatabaseInteractions.Any())
+                    .Select(item => new ItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name
+                    }),
                 SeedProteinCollections = _context.ProteinCollections
                     .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Seed))
+                    .Select(item => new ItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name
+                    })
             };
             // Check if there weren't any protein databases available.
             if (View.ProteinDatabases == null || !View.ProteinDatabases.Any())

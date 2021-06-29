@@ -51,6 +51,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Results
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsInControlPath", "Is in the selected control path" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -64,7 +65,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Results
             };
         }
 
-        public async Task<IActionResult> OnGetAsync(string id, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
+        public async Task<IActionResult> OnGetAsync(string id, string controlPathId = null, string searchString = null, IEnumerable<string> searchIn = null, IEnumerable<string> filter = null, string sortBy = null, string sortDirection = null, int? itemsPerPage = null, int? currentPage = 1)
         {
             // Check if there isn't any ID provided.
             if (string.IsNullOrEmpty(id))
@@ -77,14 +78,14 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Results
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
             // Get the items with the provided ID.
-            var items = _context.Paths
-                .Where(item => item.ControlPath.Analysis.IsPublic || (user != null && item.ControlPath.Analysis.AnalysisUsers.Any(item1 => item1.Email == user.Email)))
-                .Where(item => item.ControlPath.Id == id);
+            var items = _context.Analyses
+                .Where(item => item.IsPublic || (user != null && item.AnalysisUsers.Any(item1 => item1.Email == user.Email)))
+                .Where(item => item.Id == id);
             // Check if there were no items found.
-            if (items == null || !items.Any())
+            if (items == null || items.Count() != 1)
             {
                 // Display a message.
-                TempData["StatusMessage"] = "Error: No control path has been found with the provided ID, or you don't have access to it.";
+                TempData["StatusMessage"] = "Error: No item has been found with the provided ID, or you don't have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/AvailableData/Created/Analyses/Index");
             }
@@ -94,11 +95,14 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Results
             if (input.NeedsRedirect)
             {
                 // Redirect to the page where they are all explicitly defined.
-                return RedirectToPage(new { id = input.Id, searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
+                return RedirectToPage(new { id = input.Id, controlPathId = controlPathId, searchString = input.SearchString, searchIn = input.SearchIn, filter = input.Filter, sortBy = input.SortBy, sortDirection = input.SortDirection, itemsPerPage = input.ItemsPerPage, currentPage = input.CurrentPage });
             }
             // Start with all of the items.
             var query = items
-                .Where(item => true);
+                .Select(item => item.ControlPaths)
+                .SelectMany(item => item)
+                .Select(item => item.Paths)
+                .SelectMany(item => item);
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
@@ -111,6 +115,9 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Results
                     input.SearchIn.Contains("TargetProteinName") && item.PathProteins.Where(item1 => item1.Type == PathProteinType.Target).Any(item1 => item1.Protein.Name.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("InteractionId") && item.PathInteractions.Any(item1 => item1.Interaction.Id.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("InteractionName") && item.PathInteractions.Any(item1 => item1.Interaction.Name.Contains(input.SearchString)));
+            // Select the results matching the filter parameter.
+            query = query
+                .Where(item => input.Filter.Contains("IsInControlPath") ? !string.IsNullOrEmpty(controlPathId) && item.ControlPath.Id == controlPathId : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -161,7 +168,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Results
             View = new ViewModel
             {
                 Analysis = items
-                    .Select(item => item.ControlPath.Analysis)
                     .First(),
                 Search = new SearchViewModel<Path>(_linkGenerator, HttpContext, input, query)
             };

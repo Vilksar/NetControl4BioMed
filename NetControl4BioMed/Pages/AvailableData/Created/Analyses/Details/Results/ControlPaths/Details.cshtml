@@ -31,7 +31,7 @@
             <span><i class="fas fa-info-circle"></i></span>
             <span>Click the button below to see the list of paths forming the current control path.</span>
         </div>
-        <a asp-page="/AvailableData/Created/Analyses/Details/Results/Paths/Index" asp-route-id="@Model.View.ControlPath.Id" class="btn btn-success btn-block">
+        <a asp-page="/AvailableData/Created/Analyses/Details/Results/Paths/Index" asp-route-id="@Model.View.Analysis.Id" asp-route-controlPathId="@Model.View.ControlPath.Id" asp-route-filter="IsInControlPath" class="btn btn-success btn-block">
             <span><i class="fas fa-long-arrow-alt-right"></i></span>
             <span>View paths</span>
         </a>
@@ -145,10 +145,10 @@
                             </a>
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
-                            <a asp-page="/AvailableData/Created/Analyses/Details/Results/Paths/Index" asp-route-id="@Model.View.ControlPath.Id" asp-route-searchIn="SourceProteinId" asp-route-searchString="@uniqueControlProtein.Key.Id" title="@uniqueControlProtein.Value">@uniqueControlProtein.Value</a>
+                            <a asp-page="/AvailableData/Created/Analyses/Details/Results/Paths/Index" asp-route-id="@Model.View.Analysis.Id" asp-route-controlPathId="@Model.View.ControlPath.Id" asp-route-searchIn="SourceProteinId" asp-route-searchString="@uniqueControlProtein.Key.Id" asp-route-filter="IsInControlPath" title="@uniqueControlProtein.Value">@uniqueControlProtein.Value</a>
                         </td>
                         <td class="text-center text-break">
-                            <a asp-page="/AvailableData/Created/Analyses/Details/Results/Paths/Index" asp-route-id="@Model.View.ControlPath.Id" asp-route-searchIn="SourceProteinId" asp-route-searchString="@uniqueControlProtein.Key.Id" title="View">
+                            <a asp-page="/AvailableData/Created/Analyses/Details/Results/Paths/Index" asp-route-id="@Model.View.Analysis.Id" asp-route-controlPathId="@Model.View.ControlPath.Id" asp-route-searchIn="SourceProteinId" asp-route-searchString="@uniqueControlProtein.Key.Id" asp-route-filter="IsInControlPath" title="View">
                                 <span>View</span>
                             </a>
                         </td>

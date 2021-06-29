@@ -880,7 +880,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Paths",
                             Title = "Paths",
                             Description = string.Empty,
-                            Icon = "fa-long-arrow-right",
+                            Icon = "fa-long-arrow-alt-right",
                             Color = "light",
                             Link = "/AvailableData/Created/Analyses/Details/Results/Paths/Index"
                         }
