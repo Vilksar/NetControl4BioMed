@@ -392,6 +392,226 @@ $(window).on('load', () => {
         })();
     }
 
+    // Check if there is a parameter group on the page.
+    if ($('.parameter-group').length !== 0) {
+        // Define the HTML of an optgroup.
+        const heuristicGroupOptgroupHTML = `<optgroup></optgroup>`;
+        // Define a function which updates the parameters.
+        const updateParameters = (groupElement) => {
+            // Get the selected algorithm.
+            const algorithm = $(groupElement).find('.parameter-group-select').first().val();
+            // Get the corresponding template.
+            const template = $(groupElement).find(`.parameter-group-template[data-algorithm="${algorithm}"]`).html();
+            // Replace the current parameters with the template.
+            $(groupElement).find('.parameter-group-parameters').empty().html(template);
+        };
+        // Define a function which updates the heuristics based on the input data.
+        const heuristicGroupUpdateHeuristics = (groupElement) => {
+            // Define a variable for the input data.
+            let data = undefined;
+            // Try to parse the input data.
+            try {
+                // Get the input data.
+                data = JSON.parse($(groupElement).find('.heuristics-group-input').first().val());
+            }
+            catch (error) {
+                // Return from the function.
+                return;
+            }
+            // Check if there isn't any data.
+            if (typeof data === 'undefined') {
+                // Return from the function.
+                return;
+            }
+            // Get the possible heuristics element.
+            const possibleHeuristicsElement = $(groupElement).find('.heuristics-group-possible');
+            // Get the current heuristics element.
+            const currentHeuristicsElement = $(groupElement).find('.heuristics-group-current');
+            // Clear the current heuristics element.
+            $(currentHeuristicsElement).html('');
+            // Go over each optgroup in the input data.
+            jQuery.each(data, (index1, item1) => {
+                // Add a new optgroup to the current heuristics.
+                $(currentHeuristicsElement).append(heuristicGroupOptgroupHTML);
+                // Go over each option within the optgroup.
+                jQuery.each(item1, (index2, item2) => {
+                    // Append a clone of the corresponding possible option element to the current heuristics.
+                    $(currentHeuristicsElement).children().last().append($(possibleHeuristicsElement).children(`option[value="${item2}"]`).clone());
+                });
+            });
+        };
+        // Define a function which updates the data to be submitted.
+        const heuristicGroupUpdateText = (groupElement) => {
+            // Parse the current heuristics into a JSON object and add it to the input data.
+            $(groupElement).find('.heuristics-group-input').val(JSON.stringify($.map($(groupElement).find('.heuristics-group-current').children(), (element1, index1) => [$.map($(element1).children(), (element2, index2) => $(element2).val())])))
+        };
+        // Define a function which updates the current heuristics, by updating the group index numbers.
+        const heuristicGroupUpdateCurrentHeuristics = (groupElement) => {
+            // Remove the empty optgroups.
+            $(groupElement).find('.heuristics-group-current').children().filter((index, element) => $(element).children().length === 0).remove();
+            // Go over each optgroup in the current heuristics of the group element.
+            $(groupElement).find('.heuristics-group-current').children().each((index1, element1) => {
+                // Get the new text of the element.
+                const text = `Group ${index1 + 1}`;
+                // Update the label of the element.
+                $(element1).prop('label', text);
+                // Update the title of the element.
+                $(element1).prop('title', text);
+                // Define an array to store the unique values.
+                let unique = [];
+                // Go over each option in the optgroup.
+                $(element1).children().each((index2, element2) => {
+                    // Get the value of the option.
+                    const value = $(element2).val();
+                    // Check if the value already appears in the array.
+                    if (unique.includes(value)) {
+                        // Remove the element.
+                        $(element2).remove();
+                    } else {
+                        // Add the value to the array.
+                        unique.push(value)
+                    }
+                });
+            });
+        };
+        // Add a listener for changing the algorithm.
+        $('.parameter-group').on('change', '.parameter-group-select', (event) => {
+            // Get the actual group which was clicked.
+            const groupElement = $(event.target).closest('.parameter-group');
+            // Update the selected items.
+            updateParameters(groupElement);
+            // Get the corresponding heuristics group.
+            const heuristicsGroupElement = $(groupElement).find('.heuristics-group').first();
+            // Check if any element was found.
+            if ($(heuristicsGroupElement).length !== 0) {
+                // Update the heuristics.
+                heuristicGroupUpdateHeuristics(heuristicsGroupElement);
+                // Update the current heuristics.
+                heuristicGroupUpdateCurrentHeuristics(heuristicsGroupElement);
+                // Update the input text.
+                heuristicGroupUpdateText(heuristicsGroupElement);
+            }
+        });
+        // Add a listener for changing the algorithm.
+        $('.parameter-group').on('change', '.parameter-group-checkbox', (event) => {
+            // Get the actual group which was clicked.
+            const groupElement = $(event.target).closest('.parameter-group');
+            // Check if the checkbox is checked or not.
+            if ($(groupElement).find('.parameter-group-checkbox').prop('checked')) {
+                // Reset the parameters just like when selecting a new algorithm.
+                updateParameters(groupElement);
+                // Get the corresponding heuristics group.
+                const heuristicsGroupElement = $(groupElement).find('.heuristics-group').first();
+                // Check if any element was found.
+                if ($(heuristicsGroupElement).length !== 0) {
+                    // Update the heuristics.
+                    heuristicGroupUpdateHeuristics(heuristicsGroupElement);
+                    // Update the current heuristics.
+                    heuristicGroupUpdateCurrentHeuristics(heuristicsGroupElement);
+                    // Update the input text.
+                    heuristicGroupUpdateText(heuristicsGroupElement);
+                }
+                // Hide the parameters.
+                $(groupElement).find('.parameter-group-values').prop('hidden', true);
+            } else {
+                // Display the parameters.
+                $(groupElement).find('.parameter-group-values').prop('hidden', false);
+            }
+            // Update the selected items.
+            updateParameters(groupElement);
+            // Get the corresponding heuristics group.
+            const heuristicsGroupElement = $(groupElement).find('.heuristics-group').first();
+            // Check if any element was found.
+            if ($(heuristicsGroupElement).length !== 0) {
+                // Update the heuristics.
+                heuristicGroupUpdateHeuristics(heuristicsGroupElement);
+                // Update the current heuristics.
+                heuristicGroupUpdateCurrentHeuristics(heuristicsGroupElement);
+                // Update the input text.
+                heuristicGroupUpdateText(heuristicsGroupElement);
+            }
+        });
+        // Add a listener for if the add heuristics button was clicked.
+        $('.parameter-group').on('click', '.heuristics-group-add', (event) => {
+            // Get the actual group which was clicked.
+            const groupElement = $(event.target).closest('.heuristics-group');
+            // Get the current heuristics element.
+            const currentHeuristicsElement = $(groupElement).find('.heuristics-group-current');
+            // Get a clone of the selected possible heuristics options.
+            const options = $(groupElement).find('.heuristics-group-possible').children('option:selected').clone();
+            // Check if the option to add a new group is selected.
+            if ($(options).filter((index, element) => $(element).val() === '').length !== 0) {
+                // Define the optgroups to be updated.
+                let optgroups;
+                // Check if there are any selected current heuristics optgroups.
+                if ($(currentHeuristicsElement).find('option:selected').length !== 0) {
+                    // Add a new optgroup after each selected current heuristics optgroup.
+                    $(currentHeuristicsElement).children().filter((index, element) => $(element).children('option:selected').length !== 0).after(heuristicGroupOptgroupHTML);
+                    // Update the selected optgroups.
+                    optgroups = $(currentHeuristicsElement).children().filter((index, element) => $(element).children().length === 0);
+                } else {
+                    // Add a new optgroup to the current heuristics.
+                    $(currentHeuristicsElement).append(heuristicGroupOptgroupHTML);
+                    // Update the selected optgroups.
+                    optgroups = $(currentHeuristicsElement).children().last();
+                }
+                // Append to them the clones of the selected possible heurstics options, except for the new group.
+                $(optgroups).append($(options).filter((index, element) => $(element).val() !== ''));
+
+            } else {
+                // Define the optgroups to be updated.
+                let optgroups;
+                // Check if there doesn't exist any optgroup.
+                if ($(currentHeuristicsElement).children().length === 0) {
+                    // Add a new optgroup to the current heuristics.
+                    $(currentHeuristicsElement).append(heuristicGroupOptgroupHTML);
+                }
+                // Check if there are any selected current heuristics optgroups.
+                if ($(currentHeuristicsElement).find('option:selected').length !== 0) {
+                    // Update the selected optgroups.
+                    optgroups = $(currentHeuristicsElement).children().filter((index, element) => $(element).children('option:selected').length !== 0);
+                } else {
+                    // Update the selected optgroups.
+                    optgroups = $(currentHeuristicsElement).children().last();
+                }
+                // Append to them the clones of the selected possible heurstics options.
+                $(optgroups).append(options);
+            }
+            // Update the current heuristics.
+            heuristicGroupUpdateCurrentHeuristics(groupElement);
+            // Update the input text.
+            heuristicGroupUpdateText(groupElement);
+        });
+        // Add a listener for if the remove heuristics button was clicked.
+        $('.parameter-group').on('click', '.heuristics-group-remove', (event) => {
+            // Get the actual group which was clicked.
+            const groupElement = $(event.target).closest('.heuristics-group');
+            // Remove the selected current heuristics options.
+            $(groupElement).find('.heuristics-group-current').find('option:selected').remove();
+            // Update the current heuristics.
+            heuristicGroupUpdateCurrentHeuristics(groupElement);
+            // Update the input text.
+            heuristicGroupUpdateText(groupElement);
+        });
+        // Execute the function on page load.
+        (() => {
+            // Go over all of the groups.
+            $('.parameter-group').each((index, groupElement) => {
+                // Update the parameters.
+                updateParameters(groupElement);
+            });
+            // Go over all of the groups.
+            $('.heuristics-group').each((index, groupElement) => {
+                // Update the heuristics.
+                heuristicGroupUpdateHeuristics(groupElement);
+                // Update the current heuristics.
+                heuristicGroupUpdateCurrentHeuristics(groupElement);
+                // Update the input text.
+                heuristicGroupUpdateText(groupElement);
+            });
+        })();
+    }
+
     // Check if there is a Cytoscape area on the page.
     if ($('.cytoscape-area').length !== 0) {
         // Get the Cytoscape configuration JSON.

@@ -89,9 +89,9 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             [Required(ErrorMessage = "This field is required.")]
             public string Algorithm { get; set; }
 
-            [DataType(DataType.MultilineText)]
-            [Required(ErrorMessage = "This field is required.")]
-            public string Parameters { get; set; }
+            public GreedyAlgorithm.Parameters GreedyAlgorithmParameters { get; set; }
+
+            public GeneticAlgorithm.Parameters GeneticAlgorithmParameters { get; set; }
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
@@ -103,35 +103,35 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 if (Algorithm == AnalysisAlgorithm.Greedy.ToString())
                 {
                     // Check if the parameters don't match the algorithm.
-                    if (!Parameters.TryDeserializeJsonObject<GreedyAlgorithm.Parameters>(out var parameters))
+                    if (GreedyAlgorithmParameters == null)
                     {
                         // Return an error.
                         yield return new ValidationResult("The parameters do not match the chosen algorithm.", new List<string> { string.Empty });
                     }
                     // Get the validation results for the parameters.
-                    var validationResults = parameters.Validate(validationContext);
+                    var validationResults = GreedyAlgorithmParameters.Validate(validationContext);
                     // Go over each validation error.
                     foreach (var validationResult in validationResults)
                     {
                         // Return an error.
-                        yield return new ValidationResult(validationResult.ErrorMessage, validationResult.MemberNames.Select(item => $"Input.Parameters.{Algorithm}.{item}"));
+                        yield return new ValidationResult(validationResult.ErrorMessage, validationResult.MemberNames.Select(item => $"Input.{nameof(GreedyAlgorithmParameters)}.{item}"));
                     }
                 }
                 else if (Algorithm == AnalysisAlgorithm.Genetic.ToString())
                 {
                     // Check if the parameters don't match the algorithm.
-                    if (!Parameters.TryDeserializeJsonObject<GeneticAlgorithm.Parameters>(out var parameters))
+                    if (GeneticAlgorithmParameters == null)
                     {
                         // Return an error.
                         yield return new ValidationResult("The parameters do not match the chosen algorithm.", new List<string> { string.Empty });
                     }
                     // Get the validation results for the parameters.
-                    var validationResults = parameters.Validate(validationContext);
+                    var validationResults = GeneticAlgorithmParameters.Validate(validationContext);
                     // Go over each validation error.
                     foreach (var validationResult in validationResults)
                     {
                         // Return an error.
-                        yield return new ValidationResult(validationResult.ErrorMessage, validationResult.MemberNames.Select(item => $"Input.Parameters.{Algorithm}.{item}"));
+                        yield return new ValidationResult(validationResult.ErrorMessage, validationResult.MemberNames.Select(item => $"Input.{nameof(GeneticAlgorithmParameters)}.{item}"));
                     }
                 }
             }
@@ -287,11 +287,11 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                     Algorithm = analyses
                         .Select(item => item.Algorithm)
                         .FirstOrDefault()
-                        .ToString(),
-                    Parameters = analyses
-                        .Select(item => item.Parameters)
-                        .FirstOrDefault()
+                        .ToString()
                 };
+                // Update the parameters.
+                Input.GreedyAlgorithmParameters = Input.Algorithm == AnalysisAlgorithm.Greedy.ToString() ? JsonSerializer.Deserialize<GreedyAlgorithm.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : new GreedyAlgorithm.Parameters();
+                Input.GeneticAlgorithmParameters = Input.Algorithm == AnalysisAlgorithm.Genetic.ToString() ? JsonSerializer.Deserialize<GeneticAlgorithm.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : new GeneticAlgorithm.Parameters();
                 // Display a message.
                 TempData["StatusMessage"] = "Success: The analysis has been loaded successfully.";
                 // Return the page.
@@ -337,7 +337,8 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 MaximumIterations = 100,
                 MaximumIterationsWithoutImprovement = 25,
                 Algorithm = AnalysisAlgorithm.Greedy.ToString(),
-                Parameters = JsonSerializer.Serialize(new GreedyAlgorithm.Parameters())
+                GreedyAlgorithmParameters = new GreedyAlgorithm.Parameters(),
+                GeneticAlgorithmParameters = new GeneticAlgorithm.Parameters()
             };
             // Return the page.
             return Page();
@@ -385,6 +386,9 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 .FirstOrDefault();
             View.HasNetworkDatabases = _context.NetworkDatabases
                 .Any(item => item.Network.Id == View.Network.Id);
+            // Update the parameters.
+            Input.GreedyAlgorithmParameters = Input.GreedyAlgorithmParameters ?? new GreedyAlgorithm.Parameters();
+            Input.GeneticAlgorithmParameters = Input.GeneticAlgorithmParameters ?? new GeneticAlgorithm.Parameters();
             // Check if there wasn't any network found.
             if (View.Network == null)
             {
@@ -519,7 +523,9 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                         MaximumIterations = Input.MaximumIterations,
                         MaximumIterationsWithoutImprovement = Input.MaximumIterationsWithoutImprovement,
                         Algorithm = Input.Algorithm,
-                        Parameters = Input.Parameters,
+                        Parameters = Input.Algorithm == AnalysisAlgorithm.Greedy.ToString() ? JsonSerializer.Serialize(Input.GreedyAlgorithmParameters) :
+                            Input.Algorithm == AnalysisAlgorithm.Genetic.ToString() ? JsonSerializer.Serialize(Input.GeneticAlgorithmParameters) :
+                            null,
                         Network = new NetworkInputModel
                         {
                             Id = Input.NetworkId
@@ -560,6 +566,10 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                     }
                 }
             };
+            // Display a message.
+            TempData["StatusMessage"] = $"Success: {task.Items.First().Parameters}";
+            // Redirect to the index page.
+            return Page();
             // Define the IDs of the created items.
             var ids = Enumerable.Empty<string>();
             // Try to run the task.
