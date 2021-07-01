@@ -33,6 +33,8 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details.Data.In
         {
             public Network Network { get; set; }
 
+            public bool HasNetworkDatabases { get; set; }
+
             public SearchViewModel<NetworkInteraction> Search { get; set; }
 
             public static SearchOptionsViewModel SearchOptions { get; } = new SearchOptionsViewModel
@@ -158,6 +160,9 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Details.Data.In
                     .First(),
                 Search = new SearchViewModel<NetworkInteraction>(_linkGenerator, HttpContext, input, query)
             };
+            // Update the view.
+            View.HasNetworkDatabases = _context.NetworkDatabases
+                .Any(item => item.Network.Id == View.Network.Id);
             // Return the page.
             return Page();
         }

@@ -35,6 +35,11 @@ label {
     min-height: 25rem !important;
 }
 
+/* Style for the heuristic groups. */
+.heuristics-group-possible, .heuristics-group-current {
+    overflow-x: scroll;
+}
+
 /* Style for the figures. */
 .figure-group {
     counter-reset: figures;

@@ -54,7 +54,9 @@ $(window).on('load', () => {
         $('.table-datatable').each((index, element) => {
             // Format the table as datatable.
             const table = $(element).DataTable({
-                'autoWidth': false
+                'autoWidth': false,
+                'processing': true,
+                'pageLength': 5
             });
             // Get the index of the index column.
             const columnIndex = table.column('index:name').index();
@@ -145,12 +147,14 @@ $(window).on('load', () => {
         (() => {
             // Go over each table group.
             $('.table-group').each((index, element) => {
-                // Format the table as datatable.
-                const table = $(element).find('.table-group-datatable').DataTable({
-                    'autoWidth': false
-                });
                 // Update the table.
                 updateTable($(element));
+                // Format the table as datatable.
+                const table = $(element).find('.table-group-datatable').DataTable({
+                    'autoWidth': false,
+                    'processing': true,
+                    'pageLength': 5
+                });
             });
         })();
     }

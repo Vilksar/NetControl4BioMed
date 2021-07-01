@@ -192,23 +192,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
             // Define the view.
-            View = new ViewModel
-            {
-                SourceProteinCollections = _context.ProteinCollections
-                    .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Source))
-                    .Select(item => new ItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name
-                    }),
-                TargetProteinCollections = _context.ProteinCollections
-                    .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Target))
-                    .Select(item => new ItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name
-                    })
-            };
+            View = new ViewModel { };
             // Check if there was an analysis provided.
             if (!string.IsNullOrEmpty(analysisId))
             {
@@ -235,6 +219,20 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                     .FirstOrDefault();
                 View.HasNetworkDatabases = _context.NetworkDatabases
                     .Any(item => item.Network.Id == View.Network.Id);
+                View.SourceProteinCollections = View.HasNetworkDatabases ? _context.ProteinCollections
+                    .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Source))
+                    .Select(item => new ItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name
+                    }) : Enumerable.Empty<ItemModel>();
+                View.TargetProteinCollections = View.HasNetworkDatabases ? _context.ProteinCollections
+                    .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Target))
+                    .Select(item => new ItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name
+                    }) : Enumerable.Empty<ItemModel>();
                 // Check if there wasn't any network found.
                 if (View.Network == null)
                 {
@@ -317,6 +315,20 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 .FirstOrDefault();
             View.HasNetworkDatabases = _context.NetworkDatabases
                 .Any(item => item.Network.Id == View.Network.Id);
+            View.SourceProteinCollections = View.HasNetworkDatabases ? _context.ProteinCollections
+                .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Source))
+                .Select(item => new ItemModel
+                {
+                    Id = item.Id,
+                    Name = item.Name
+                }) : Enumerable.Empty<ItemModel>();
+            View.TargetProteinCollections = View.HasNetworkDatabases ? _context.ProteinCollections
+                .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Target))
+                .Select(item => new ItemModel
+                {
+                    Id = item.Id,
+                    Name = item.Name
+                }) : Enumerable.Empty<ItemModel>();
             // Check if there wasn't any network found.
             if (View.Network == null)
             {
@@ -386,6 +398,20 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 .FirstOrDefault();
             View.HasNetworkDatabases = _context.NetworkDatabases
                 .Any(item => item.Network.Id == View.Network.Id);
+            View.SourceProteinCollections = View.HasNetworkDatabases ? _context.ProteinCollections
+                .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Source))
+                .Select(item => new ItemModel
+                {
+                    Id = item.Id,
+                    Name = item.Name
+                }) : Enumerable.Empty<ItemModel>();
+            View.TargetProteinCollections = View.HasNetworkDatabases ? _context.ProteinCollections
+                .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Target))
+                .Select(item => new ItemModel
+                {
+                    Id = item.Id,
+                    Name = item.Name
+                }) : Enumerable.Empty<ItemModel>();
             // Update the parameters.
             Input.GreedyAlgorithmParameters = Input.GreedyAlgorithmParameters ?? new GreedyAlgorithm.Parameters();
             Input.GeneticAlgorithmParameters = Input.GeneticAlgorithmParameters ?? new GeneticAlgorithm.Parameters();
@@ -566,10 +592,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                     }
                 }
             };
-            // Display a message.
-            TempData["StatusMessage"] = $"Success: {task.Items.First().Parameters}";
-            // Redirect to the index page.
-            return Page();
             // Define the IDs of the created items.
             var ids = Enumerable.Empty<string>();
             // Try to run the task.

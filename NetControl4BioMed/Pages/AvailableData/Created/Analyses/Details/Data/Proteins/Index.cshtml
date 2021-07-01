@@ -27,9 +27,12 @@ else
                 <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
                     <span>Type</span>
                 </th>
-                <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                    <span>Links</span>
-                </th>
+                @if (Model.View.HasNetworkDatabases)
+                {
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <span>Links</span>
+                    </th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -41,7 +44,14 @@ else
                     </td>
                     <td class="text-left text-break">
                         <div>
-                            <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@item.Protein.Id" class="font-weight-bold" title="@item.Protein.Name">@item.Protein.Name</a>
+                            @if (Model.View.HasNetworkDatabases)
+                            {
+                                <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@item.Protein.Id" class="font-weight-bold" title="@item.Protein.Name">@item.Protein.Name</a>
+                            }
+                            else
+                            {
+                                <span class="font-weight-bold" title="@item.Protein.Name">@item.Protein.Name</span>
+                            }
                         </div>
                         <div>
                             <span class="small text-muted" title="@item.Protein.Id">@item.Protein.Id</span>
@@ -50,11 +60,14 @@ else
                     <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
                         <partial name="_AnalysisProteinTypePartial" model="@item.Type" />
                     </td>
-                    <td class="text-center text-break">
-                        <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@item.Protein.Id" class="btn btn-info m-1" title="Details">
-                            <span><i class="fas fa-info-circle"></i></span>
-                        </a>
-                    </td>
+                    @if (Model.View.HasNetworkDatabases)
+                    {
+                        <td class="text-center text-break">
+                            <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@item.Protein.Id" class="btn btn-info m-1" title="Details">
+                                <span><i class="fas fa-info-circle"></i></span>
+                            </a>
+                        </td>
+                    }
                 </tr>
             }
         </tbody>

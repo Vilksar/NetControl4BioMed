@@ -852,7 +852,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
-                            Link = "/AvailableData/Analyses/Details/Data/ProteinCollections/Index"
+                            Link = "/AvailableData/Created/Analyses/Details/Data/ProteinCollections/Index"
                         }
                     }
                 },

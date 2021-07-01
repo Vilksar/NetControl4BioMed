@@ -24,9 +24,12 @@ else
                 <th class="text-left text-break">
                     <span>Name</span>
                 </th>
-                <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                    <span>Links</span>
-                </th>
+                @if (Model.View.HasNetworkDatabases)
+                {
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <span>Links</span>
+                    </th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -38,17 +41,27 @@ else
                     </td>
                     <td class="text-left text-break">
                         <div>
-                            <a asp-page="/AvailableData/Data/Interactions/Details" asp-route-id="@item.Interaction.Id" class="font-weight-bold" title="@item.Interaction.Name">@item.Interaction.Name</a>
+                            @if (Model.View.HasNetworkDatabases)
+                            {
+                                <a asp-page="/AvailableData/Data/Interactions/Details" asp-route-id="@item.Interaction.Id" class="font-weight-bold" title="@item.Interaction.Name">@item.Interaction.Name</a>
+                            }
+                            else
+                            {
+                                <span class="font-weight-bold" title="@item.Interaction.Name">@item.Interaction.Name</span>
+                            }
                         </div>
                         <div>
                             <span class="small text-muted" title="@item.Interaction.Id">@item.Interaction.Id</span>
                         </div>
                     </td>
-                    <td class="text-center text-break">
-                        <a asp-page="/AvailableData/Data/Interactions/Details" asp-route-id="@item.Interaction.Id" class="btn btn-info m-1" title="Details">
-                            <span><i class="fas fa-info-circle"></i></span>
-                        </a>
-                    </td>
+                    @if (Model.View.HasNetworkDatabases)
+                    {
+                        <td class="text-center text-break">
+                            <a asp-page="/AvailableData/Data/Interactions/Details" asp-route-id="@item.Interaction.Id" class="btn btn-info m-1" title="Details">
+                                <span><i class="fas fa-info-circle"></i></span>
+                            </a>
+                        </td>
+                    }
                 </tr>
             }
         </tbody>
