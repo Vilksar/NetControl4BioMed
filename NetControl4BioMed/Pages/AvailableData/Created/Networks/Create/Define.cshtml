@@ -1,9 +1,13 @@
 ﻿@page
 @model DefineModel
 @{
-    ViewData["Title"] = "Create network";
+    ViewData["Title"] = "Define network";
 }
 
+<div class="alert alert-primary text-wrap text-justify">
+    <span><i class="fas fa-info-circle"></i></span>
+    <span>In order to define a network, the interactions in the network need to be specified. The network will be defined as-is and can be afterwards inspected and analyzed, but it will not be automatically integrated with the internal databases or data.</span>
+</div>
 <form method="post" class="text-justify">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
     <div class="card mb-3">

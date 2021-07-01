@@ -6,6 +6,10 @@
     ViewData["Title"] = "Create analysis";
 }
 
+<div class="alert alert-primary text-wrap text-justify">
+    <span><i class="fas fa-info-circle"></i></span>
+    <span>In order to create an analysis, the set of target proteins needs to be specified, optionally together with a set of preferred input proteins. All specified proteins must appear in the corresponding network. The analysis will be defined and started in the background, and its results can be afterwards inspected.</span>
+</div>
 <form method="post" class="text-justify">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
     <div class="card mb-3">

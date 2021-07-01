@@ -3,9 +3,13 @@
 @using NetControl4BioMed.Data.Enumerations
 @using NetControl4BioMed.Helpers.Extensions
 @{
-    ViewData["Title"] = "Create network";
+    ViewData["Title"] = "Build network";
 }
 
+<div class="alert alert-primary text-wrap text-justify">
+    <span><i class="fas fa-info-circle"></i></span>
+    <span>In order to build a network, the seed proteins and the databases in which to look for the interactions need to be specified. The network will be built in the background and automatically integrated with the internal databases and data, and can be afterwards inspected and analyzed.</span>
+</div>
 <form method="post" class="text-justify">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
     <div class="card mb-3">
