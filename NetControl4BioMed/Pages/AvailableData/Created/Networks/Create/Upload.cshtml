@@ -1,0 +1,94 @@
+﻿@page
+@model UploadModel
+@{
+    ViewData["Title"] = "Upload network";
+}
+
+<div class="alert alert-primary text-wrap text-justify">
+    <span><i class="fas fa-info-circle"></i></span>
+    <span>In order to upload a network, a file type and a corresponding file need to be specified. The network will be uploaded as-is and can be afterwards inspected and analyzed, but it will not be automatically integrated with the internal databases or data. The available file formats are:</span>
+    <ul class="mb-0">
+        <li>
+            <span><span class="font-weight-bold">Cytoscape.js JSON</span>, which represents a JSON file that can be readily imported in Cytoscape.js.</span>
+        </li>
+    </ul>
+</div>
+<form method="post" class="text-justify">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
+    <div class="card mb-3" hidden="@(User.Identity.IsAuthenticated ? null : "hidden")">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-info-circle"></i></span>
+                </div>
+                <div>
+                    <span>Details</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>Input here the general details of the new network.</span>
+            </div>
+            <div class="form-group" hidden="@(User.Identity.IsAuthenticated ? null : "hidden")">
+                <label asp-for="Input.IsPublic" class="font-weight-bold">Set the network as public?</label>
+                <select asp-for="Input.IsPublic" class="custom-select form-control">
+                    <option value="false" selected="@(User.Identity.IsAuthenticated ? "selected" : null)">No</option>
+                    <option value="true" selected="@(User.Identity.IsAuthenticated ? null : "selected")">Yes</option>
+                </select>
+                <span asp-description-for="Input.IsPublic" class="text-muted small">The availability of the network in the list of public networks. If public, anyone can access it.</span>
+                <span asp-validation-for="Input.IsPublic" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-file"></i></span>
+                </div>
+                <div>
+                    <span>File</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label asp-for="Input.Type" class="font-weight-bold">Type</label>
+                <select asp-for="Input.Type" class="custom-select form-control">
+                    <option value="cyjs">Cytoscape.js JSON (*.cyjs)</option>
+                </select>
+                <span asp-description-for="Input.Type" class="text-muted small">The type of the file that will be uploaded. The data will be processed differently based on this value.</span>
+                <span asp-validation-for="Input.Type" class="text-danger small"></span>
+            </div>
+            <div class="file-group">
+                <div class="form-group">
+                    <label asp-for="Input.Data" class="font-weight-bold">Data</label>
+                    <textarea asp-for="Input.Data" class="form-control file-group-text" rows="10"></textarea>
+                    <div class="custom-file mt-2">
+                        <input type="file" class="custom-file-input file-group-file-upload" />
+                        <label class="custom-file-label file-group-file-label">Choose file</label>
+                    </div>
+                    <span asp-description-for="Input.Data" class="text-muted small">The data of the file. Once a file is selected, its content will appear, unchanged, above.</span>
+                    <span asp-validation-for="Input.Data" class="text-danger small"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group" hidden>
+        <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+        <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+        <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+        <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+    </div>
+    <button type="submit" class="btn btn-block btn-success" title="Create">
+        <span><i class="fas fa-plus"></i></span>
+        <span>Create</span>
+    </button>
+</form>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+    <partial name="_ScriptsReCaptchaPartial" />
+}
