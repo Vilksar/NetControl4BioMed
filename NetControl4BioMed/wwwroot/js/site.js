@@ -56,7 +56,8 @@ $(window).on('load', () => {
             const table = $(element).DataTable({
                 'autoWidth': false,
                 'processing': true,
-                'pageLength': 5
+                'pageLength': 5,
+                'lengthMenu': [5, 10, 25, 50]
             });
             // Get the index of the index column.
             const columnIndex = table.column('index:name').index();
@@ -153,7 +154,8 @@ $(window).on('load', () => {
                 const table = $(element).find('.table-group-datatable').DataTable({
                     'autoWidth': false,
                     'processing': true,
-                    'pageLength': 5
+                    'pageLength': 5,
+                    'lengthMenu': [5, 10, 25, 50]
                 });
             });
         })();
