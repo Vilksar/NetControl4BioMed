@@ -1,15 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
@@ -17,25 +8,29 @@ using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Tasks;
-using EnumerationProteinCollectionType = NetControl4BioMed.Data.Enumerations.ProteinCollectionType;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
+namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
 {
     [RequestFormLimits(ValueLengthLimit = 16 * 1024 * 1024)]
-    public class UploadModel : PageModel
+    public class DefineModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
-        private readonly IConfiguration _configuration;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public UploadModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, IConfiguration configuration, IReCaptchaChecker reCaptchaChecker)
+        public DefineModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
         {
             _serviceProvider = serviceProvider;
             _userManager = userManager;
             _context = context;
-            _configuration = configuration;
             _reCaptchaChecker = reCaptchaChecker;
         }
 
@@ -71,37 +66,8 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
             public string TargetNode { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string networkId, bool loadDemonstration)
+        public async Task<IActionResult> OnGetAsync(string networkId)
         {
-            // Check if the demonstration should be loaded.
-            if (loadDemonstration)
-            {
-                // Check if there are no demonstration items configured.
-                if (string.IsNullOrEmpty(_configuration["Data:Demonstration:NetworkId"]))
-                {
-                    // Try to get a demonstration control path.
-                    var controlPath = _context.ControlPaths
-                        .Include(item => item.Analysis)
-                            .ThenInclude(item => item.Network)
-                        .Where(item => item.Analysis.IsPublic && item.Analysis.IsDemonstration && item.Analysis.Network.IsPublic && item.Analysis.Network.IsDemonstration)
-                        .AsNoTracking()
-                        .FirstOrDefault();
-                    // Check if there was no demonstration control path found.
-                    if (controlPath == null || controlPath.Analysis == null || controlPath.Analysis.Network == null)
-                    {
-                        // Display a message.
-                        TempData["StatusMessage"] = "Error: There are no demonstration networks available.";
-                        // Redirect to the index page.
-                        return RedirectToPage("/AvailableData/Created/Networks/Index");
-                    }
-                    // Update the demonstration item IDs.
-                    _configuration["Data:Demonstration:NetworkId"] = controlPath.Analysis.Network.Id;
-                    _configuration["Data:Demonstration:AnalysisId"] = controlPath.Analysis.Id;
-                    _configuration["Data:Demonstration:ControlPathId"] = controlPath.Id;
-                }
-                // Get the ID of the configured demonstration item.
-                networkId = _configuration["Data:Demonstration:NetworkId"];
-            }
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
             // Check if there was a network provided.
@@ -123,7 +89,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
                 if (networks.Select(item => item.NetworkDatabases).SelectMany(item => item).Any())
                 {
                     // Redirect to the create page.
-                    return RedirectToPage("/AvailableData/Created/Networks/Create", new { networkId = networkId });
+                    return RedirectToPage("/AvailableData/Created/Networks/Create/Build", new { networkId = networkId });
                 }
                 // Define the input.
                 Input = new InputModel

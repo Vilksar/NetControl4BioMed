@@ -1,0 +1,62 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Create network";
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-12 mb-3">
+        <div class="card bg-success text-white text-center">
+            <div class="card-body d-flex flex-row align-items-center justify-content-around">
+                <span><i class="fas fa-hammer fa-3x"></i></span>
+            </div>
+            <div class="card-footer d-flex flex-column align-items-center justify-content-center">
+                <a asp-page="/AvailableData/Created/Networks/Create/Build" class="btn btn-outline-light btn-block" title="Build">
+                    <span>Create a network by constructing around seeds</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row align-items-center">
+    <div class="col-lg-12 mb-3">
+        <div class="card bg-success text-white text-center">
+            <div class="card-body d-flex flex-row align-items-center justify-content-around">
+                <span><i class="fas fa-exchange-alt fa-3x"></i></span>
+            </div>
+            <div class="card-footer d-flex flex-column align-items-center justify-content-center">
+                <a asp-page="/AvailableData/Created/Networks/Create/Define" class="btn btn-outline-light btn-block" title="Build">
+                    <span>Create a network by defining interactions</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row align-items-center">
+    <div class="col-lg-12 mb-3">
+        <div class="card bg-success text-white text-center">
+            <div class="card-body d-flex flex-row align-items-center justify-content-around">
+                <span><i class="fas fa-upload fa-3x"></i></span>
+            </div>
+            <div class="card-footer d-flex flex-column align-items-center justify-content-center">
+                <a asp-page="/AvailableData/Created/Networks/Create/Upload" class="btn btn-outline-light btn-block disabled" title="Build">
+                    <span>Create a network by uploading a file</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row align-items-center">
+    <div class="col-lg-12 mb-3">
+        <div class="card bg-success text-white text-center">
+            <div class="card-body d-flex flex-row align-items-center justify-content-around">
+                <span><i class="fas fa-file-import fa-3x"></i></span>
+            </div>
+            <div class="card-footer d-flex flex-column align-items-center justify-content-center">
+                <a asp-page="/AvailableData/Created/Networks/Create/Import" class="btn btn-outline-light btn-block disabled" title="Build">
+                    <span>Create a network by importing from an external service</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
