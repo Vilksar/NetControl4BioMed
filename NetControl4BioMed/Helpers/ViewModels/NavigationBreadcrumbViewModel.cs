@@ -551,6 +551,16 @@
         };
 
         /// <summary>
+        /// Gets the navigation breadcrumb for the available data created analyses create index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AvailableDataCreatedAnalysesCreateNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Create",
+            Title = "Create",
+            Link = "/AvailableData/Created/Analyses/Create/Index"
+        };
+
+        /// <summary>
         /// Gets the navigation breadcrumb for the available data created analyses details index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel AvailableDataCreatedAnalysesDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
@@ -568,6 +578,16 @@
             Id = "Networks",
             Title = "Networks",
             Link = "/AvailableData/Created/Networks/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the available data created networks create index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel AvailableDataCreatedNetworksCreateNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Create",
+            Title = "Create",
+            Link = "/AvailableData/Created/Networks/Create/Index"
         };
 
         /// <summary>

@@ -1,12 +1,12 @@
 ﻿@page
-@model DeleteModel
+@model ExtendModel
 @using NetControl4BioMed.Data
 @{
     ViewData["Title"] = "Extend analyses deletion time";
 }
 
-<div class="alert alert-info text-justify text-wrap">
-    <span><i class="fas fa-info-circle"></i></span>
+<div class="alert alert-warning text-justify text-wrap">
+    <span><i class="fas fa-exclamation-triangle"></i></span>
     <span>The time until deletion for the following @Model.View.Items.Count() analys@(Model.View.Items.Count() != 1 ? "e" : "i")s will be extended to @((DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()).</span>
 </div>
 <form method="post" class="text-justify">
@@ -16,7 +16,7 @@
         <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
         <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
     </div>
-    <button type="submit" class="btn btn-info btn-block item-group-button mb-3" title="Extend">
+    <button type="submit" class="btn btn-warning btn-block item-group-button mb-3" title="Extend">
         <span><i class="fas fa-history"></i></span>
         <span>Extend</span>
     </button>

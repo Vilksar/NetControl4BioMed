@@ -128,8 +128,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AdministrationProteinCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "ProteinCollections",
-            TitleSingular = "Protein collection",
-            TitlePlural = "Protein collections",
+            TitleSingular = "Collection",
+            TitlePlural = "Collections",
             Color = "info",
             Icon = "fa-folder",
             Width = 6,
@@ -268,8 +268,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataProteinCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "ProteinCollections",
-            TitleSingular = "Protein collection",
-            TitlePlural = "Protein collections",
+            TitleSingular = "Collection",
+            TitlePlural = "Collections",
             Color = "info",
             Icon = "fa-folder",
             Width = 6,
@@ -324,8 +324,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataNetworkProteinCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "ProteinCollections",
-            TitleSingular = "Protein collection",
-            TitlePlural = "Protein collections",
+            TitleSingular = "Collection",
+            TitlePlural = "Collections",
             Color = "info",
             Icon = "fa-folder",
             Width = 6,
@@ -380,8 +380,8 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationQuickLinkViewModel AvailableDataAnalysisProteinCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "ProteinCollections",
-            TitleSingular = "Protein collection",
-            TitlePlural = "Protein collections",
+            TitleSingular = "Collection",
+            TitlePlural = "Collections",
             Color = "info",
             Icon = "fa-folder",
             Width = 6,
