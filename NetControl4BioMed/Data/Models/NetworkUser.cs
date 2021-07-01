@@ -1,5 +1,4 @@
-﻿using NetControl4BioMed.Data.Enumerations;
-using NetControl4BioMed.Data.Interfaces;
+﻿using NetControl4BioMed.Data.Interfaces;
 using System;
 
 namespace NetControl4BioMed.Data.Models
