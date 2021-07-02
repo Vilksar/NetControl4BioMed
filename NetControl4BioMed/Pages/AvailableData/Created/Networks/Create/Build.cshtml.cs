@@ -100,7 +100,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
             View = new ViewModel
             {
                 ProteinDatabases = _context.Databases
-                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.Email == user.Email))
+                    .Where(item => item.IsPublic || (user != null && item.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
                     .Where(item => item.DatabaseProteins.Any())
                     .Select(item => new ItemModel
                     {
@@ -108,7 +108,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                         Name = item.Name
                     }),
                 InteractionDatabases = _context.Databases
-                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.Email == user.Email))
+                    .Where(item => item.IsPublic || (user != null && item.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
                     .Where(item => item.DatabaseInteractions.Any())
                     .Select(item => new ItemModel
                     {
@@ -144,7 +144,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
             {
                 // Try to get the network with the provided ID.
                 var networks = _context.Networks
-                    .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.Email == user.Email))
+                    .Where(item => item.IsPublic || (user != null && item.NetworkUsers.Any(item1 => item1.Email == user.Email)))
                     .Where(item => item.Id == networkId);
                 // Check if there was an ID provided, but there was no network found.
                 if (networks == null || !networks.Any())
@@ -218,7 +218,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
             View = new ViewModel
             {
                 ProteinDatabases = _context.Databases
-                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.Email == user.Email))
+                    .Where(item => item.IsPublic || (user != null && item.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
                     .Where(item => item.DatabaseProteins.Any())
                     .Select(item => new ItemModel
                     {
@@ -226,7 +226,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                         Name = item.Name
                     }),
                 InteractionDatabases = _context.Databases
-                    .Where(item => item.IsPublic || item.DatabaseUsers.Any(item1 => item1.Email == user.Email))
+                    .Where(item => item.IsPublic || (user != null && item.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
                     .Where(item => item.DatabaseInteractions.Any())
                     .Select(item => new ItemModel
                     {

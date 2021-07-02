@@ -59,14 +59,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
             }
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if there isn't any user found.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the index page.
-                return RedirectToPage("/AvailableData/Created/Networks/Index");
-            }
             // Define the view.
             View = new ViewModel
             {
@@ -98,14 +90,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
             }
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Check if there isn't any user found.
-            if (user == null)
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
-                // Redirect to the index page.
-                return RedirectToPage("/AvailableData/Created/Networks/Index");
-            }
             // Define the view.
             View = new ViewModel
             {

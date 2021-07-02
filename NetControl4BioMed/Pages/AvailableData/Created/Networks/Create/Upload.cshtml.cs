@@ -67,19 +67,12 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
 
         public async Task<IActionResult> OnGetAsync()
         {
-            // Define the JSON serializer options.
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                IgnoreNullValues = true
-            };
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
             // Define the input.
             Input = new InputModel
             {
-                IsPublic = user == null,
-                Data = JsonSerializer.Serialize(new { }, jsonSerializerOptions)
+                IsPublic = user == null
             };
             // Return the page.
             return Page();
@@ -130,14 +123,26 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                     // Redisplay the page.
                     return Page();
                 }
-                // Get the protein dictionary from the data.
-                var proteinDictionary = viewModel.Elements.Nodes.ToDictionary(item => item.Data.Id, item => item.Data.Name);
-                // Get the interactions from the data.
-                var interactions = viewModel.Elements.Edges.Select(item => new ItemModel
+                // Get the proteins from the data.
+                var proteins = viewModel.Elements?.Nodes?
+                    .Where(item => item.Data != null && !string.IsNullOrEmpty(item.Data.Id) && !string.IsNullOrEmpty(item.Data.Name))
+                    .ToDictionary(item => item.Data.Id, item => item.Data.Name);
+                // Check if there were no proteins found within the data.
+                if (proteins == null || !proteins.Any())
                 {
-                    SourceNode = proteinDictionary.GetValueOrDefault(item.Data.Source),
-                    TargetNode = proteinDictionary.GetValueOrDefault(item.Data.Target)
-                })
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, "The provided file does not contain any valid proteins.");
+                    // Redisplay the page.
+                    return Page();
+                }
+                // Get the interactions from the data.
+                var interactions = viewModel.Elements?.Edges?
+                    .Where(item => item.Data != null && !string.IsNullOrEmpty(item.Data.Source) && !string.IsNullOrEmpty(item.Data.Target))
+                    .Select(item => new ItemModel
+                    {
+                        SourceNode = proteins.GetValueOrDefault(item.Data.Source),
+                        TargetNode = proteins.GetValueOrDefault(item.Data.Target)
+                    })
                     .Where(item => !string.IsNullOrEmpty(item.SourceNode) && !string.IsNullOrEmpty(item.TargetNode));
                 // Check if there were no interactions found within the data.
                 if (interactions == null || !interactions.Any())

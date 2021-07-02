@@ -198,7 +198,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             {
                 // Try to get the analysis with the provided ID.
                 var analyses = _context.Analyses
-                    .Where(item => item.IsPublic || item.AnalysisUsers.Any(item1 => item1.Email == user.Email))
+                    .Where(item => item.IsPublic || (user != null && item.AnalysisUsers.Any(item1 => item1.Email == user.Email)))
                     .Where(item => item.Id == analysisId);
                 // Check if there was an ID provided, but there was no analysis found.
                 if (analyses == null || !analyses.Any())

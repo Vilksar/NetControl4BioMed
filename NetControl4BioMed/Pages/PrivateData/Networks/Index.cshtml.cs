@@ -118,6 +118,14 @@ namespace NetControl4BioMed.Pages.PrivateData.Networks
             }
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
+            // Check if there isn't any user found.
+            if (user == null)
+            {
+                // Display a message.
+                TempData["StatusMessage"] = "Error: An error occured while trying to load the user data. If you are already logged in, please log out and try again.";
+                // Redirect to the index page.
+                return RedirectToPage("/PrivateData/Networks/Index");
+            }
             // Start with all of the items to which the user has access.
             var query = _context.Networks
                 .Where(item => item.NetworkUsers.Any(item1 => item1.Email == user.Email));

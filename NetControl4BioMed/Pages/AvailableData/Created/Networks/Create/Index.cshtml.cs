@@ -61,7 +61,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                 var user = await _userManager.GetUserAsync(User);
                 // Try to get the network with the provided ID.
                 var networks = _context.Networks
-                    .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.Email == user.Email))
+                    .Where(item => item.IsPublic || (user != null && item.NetworkUsers.Any(item1 => item1.Email == user.Email)))
                     .Where(item => item.Id == networkId);
                 // Check if there was an ID provided, but there was no network found.
                 if (networks == null || !networks.Any())
