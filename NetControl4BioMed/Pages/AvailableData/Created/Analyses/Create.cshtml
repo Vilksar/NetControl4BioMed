@@ -65,7 +65,7 @@
         <div class="card-body">
             <div class="alert alert-primary text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The analysis will use the network "<a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.Network.Id" class="alert-link" target="_blank" rel="nofollow noopener noreferrer" title="@Model.View.Network.Name">@Model.View.Network.Name</a>". If you would like to choose a different network, you can navigate to its corresponding page.</span>
+                <span>The analysis will use the network <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.Network.Id" class="alert-link" target="_blank" rel="nofollow noopener noreferrer" title="@Model.View.Network.Name">@Model.View.Network.Name</a>. If you would like to choose a different network, you can navigate to its corresponding page.</span>
                 <span>You can find all of the public networks <a asp-page="/PublicData/Networks/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 @if (User.Identity.IsAuthenticated)
                 {
