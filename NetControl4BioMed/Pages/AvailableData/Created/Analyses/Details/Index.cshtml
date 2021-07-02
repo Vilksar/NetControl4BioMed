@@ -54,14 +54,6 @@
         </div>
     }
 </div>
-<div class="row align-items-center">
-    <div class="col-lg mb-3">
-        <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.Analysis.Network.Id" class="btn btn-secondary btn-block" title="Network">
-            <span><i class="fas fa-share-alt"></i></span>
-            <span>View network</span>
-        </a>
-    </div>
-</div>
 @if (Model.View.Analysis.Status == AnalysisStatus.Stopped || Model.View.Analysis.Status == AnalysisStatus.Completed)
 {
     <div class="row align-items-center">
@@ -134,7 +126,28 @@
     </div>
 }
 <partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAvailableDataAnalysisNavigationQuickLinks(Model.View.Analysis.Id, Model.View.ItemCount)" />
-
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-share-alt"></i></span>
+            </div>
+            <div>
+                <span>Network</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-primary text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The analysis uses the network "<a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.Analysis.Network.Id" class="alert-link" title="@Model.View.Analysis.Network.Name">@Model.View.Analysis.Network.Name</a>". If you would like to create a new analysis using the same network, you can copy this analysis, or navigate to the network page.</span>
+        </div>
+        <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.Analysis.Network.Id" class="btn btn-primary btn-block" title="View network">
+            <span><i class="fas fa-share-alt"></i></span>
+            <span>View network</span>
+        </a>
+    </div>
+</div>
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">

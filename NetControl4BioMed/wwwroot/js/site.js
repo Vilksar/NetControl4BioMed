@@ -165,12 +165,27 @@ $(window).on('load', () => {
     if ($('.hidden-group').length !== 0) {
         // Define a function which toggles the hidden group display.
         const toggleDisplay = (groupElement) => {
-            // Toggle the display of the hidden group.
-            $(groupElement).find('.hidden-group-display').prop('hidden', !$(groupElement).find('.hidden-group-display').prop('hidden'));
+            // Get the display of the hidden group.
+            const display = $(groupElement).find('.hidden-group-display').first();
+            // Toggle the display.
+            $(display).prop('hidden', !$(display).prop('hidden'));
         };
+        // Add a listener for when the checkbox gets clicked.
+        $('.hidden-group-checkbox').on('change', (event) => {
+            // Get the current hidden group.
+            const groupElement = $(event.target).closest('.hidden-group');
+            // Get the state of the checkbox and of the display.
+            const isChecked = $(groupElement).find('.hidden-group-checkbox').first().prop('checked');
+            const isDisplayed = !$(groupElement).find('.hidden-group-display').first().prop('hidden');
+            // Check if the display should be toggled.
+            if ((isChecked && !isDisplayed) || (!isChecked && isDisplayed)) {
+                // Toggle the display.
+                toggleDisplay(groupElement);
+            }
+        });
         // Add a listener for when the toggler gets clicked.
         $('.hidden-group-toggle').on('click', (event) => {
-            // Get the current list group.
+            // Get the current hidden group.
             const groupElement = $(event.target).closest('.hidden-group');
             // Toggle the display.
             toggleDisplay(groupElement);
