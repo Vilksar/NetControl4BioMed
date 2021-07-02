@@ -24,14 +24,12 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
-        private readonly ApplicationDbContext _context;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public UploadModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, IReCaptchaChecker reCaptchaChecker)
+        public UploadModel(IServiceProvider serviceProvider, UserManager<User> userManager, IReCaptchaChecker reCaptchaChecker)
         {
             _serviceProvider = serviceProvider;
             _userManager = userManager;
-            _context = context;
             _reCaptchaChecker = reCaptchaChecker;
         }
 
@@ -42,7 +40,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
         {
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            [RegularExpression("cyjs", ErrorMessage = "The value is not valid.")]
+            [RegularExpression("cyjs|cx", ErrorMessage = "The value is not valid.")]
             public string Type { get; set; }
 
             [DataType(DataType.Text)]
@@ -116,13 +114,17 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
             if (Input.Type == "cyjs")
             {
                 // Try to deserialize the data.
-                if (!Input.Data.TryDeserializeJsonObject<CytoscapeViewModel>(out var viewModel) || viewModel == null)
+                if (!Input.Data.TryDeserializeJsonObject<FileCyjsViewModel>(out var viewModel) || viewModel == null)
                 {
                     // Add an error to the model.
                     ModelState.AddModelError(string.Empty, "The provided file does not have the required format.");
                     // Redisplay the page.
                     return Page();
                 }
+                // Get the network details.
+                var networkDetails = viewModel.Data;
+                var networkName = networkDetails?.Name;
+                var networkDescription = networkDetails?.Description;
                 // Get the proteins from the data.
                 var proteins = viewModel.Elements?.Nodes?
                     .Where(item => item.Data != null && !string.IsNullOrEmpty(item.Data.Id) && !string.IsNullOrEmpty(item.Data.Name))
@@ -184,8 +186,105 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                 {
                     new NetworkInputModel
                     {
-                        Name = viewModel.Data.Name,
-                        Description = viewModel.Data.Description,
+                        Name = !string.IsNullOrEmpty(networkName) ? networkName : $"Network from CytoscapeJS on {DateTime.Now:yyyy-MM-dd} at {DateTime.Now:HH-mm-ss}",
+                        Description = !string.IsNullOrEmpty(networkDescription) ? networkDescription : $"This network was uploaded from a CytoscapeJS file on {DateTime.Now:D} at {DateTime.Now:T}.",
+                        IsPublic = Input.IsPublic,
+                        Algorithm = NetworkAlgorithm.None.ToString(),
+                        Data = data,
+                        NetworkUsers = user != null ?
+                            new List<NetworkUserInputModel>
+                            {
+                                new NetworkUserInputModel
+                                {
+                                    User = new UserInputModel
+                                    {
+                                        Id = user.Id
+                                    },
+                                    Email = user.Email
+                                }
+                            } :
+                            new List<NetworkUserInputModel>()
+                    }
+                };
+            }
+            // Check the type of the file that was provided.
+            else if (Input.Type == "cx")
+            {
+                // Try to deserialize the data.
+                if (!Input.Data.TryDeserializeJsonObject<IEnumerable<FileCxViewModel.CxBaseObject>>(out var viewModel) || viewModel == null)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, "The provided file does not have the required format.");
+                    // Redisplay the page.
+                    return Page();
+                }
+                // Get the network details.
+                var networkDetails = viewModel.FirstOrDefault(item => item.NetworkAttributes != null)?.NetworkAttributes;
+                var networkName = networkDetails?.FirstOrDefault(item => item != null && item.Name == "name")?.Value;
+                var networkDescription = networkDetails?.FirstOrDefault(item => item != null && item.Name == "description")?.Value;
+                // Get the proteins from the data.
+                var proteins = viewModel.FirstOrDefault(item => item.Nodes != null)?.Nodes
+                    .Where(item => item != null && !string.IsNullOrEmpty(item.Name))
+                    .ToDictionary(item => item.Id, item => item.Name);
+                // Check if there were no proteins found within the data.
+                if (proteins == null || !proteins.Any())
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, "The provided file does not contain any valid proteins.");
+                    // Redisplay the page.
+                    return Page();
+                }
+                // Get the interactions from the data.
+                var interactions = viewModel.FirstOrDefault(item => item.Edges != null)?.Edges
+                    .Where(item => item != null)
+                    .Select(item => new ItemModel
+                    {
+                        SourceNode = proteins.GetValueOrDefault(item.Source),
+                        TargetNode = proteins.GetValueOrDefault(item.Target)
+                    })
+                    .Where(item => !string.IsNullOrEmpty(item.SourceNode) && !string.IsNullOrEmpty(item.TargetNode));
+                // Check if there were no interactions found within the data.
+                if (interactions == null || !interactions.Any())
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, "The provided file does not contain any valid interactions.");
+                    // Redisplay the page.
+                    return Page();
+                }
+                // Serialize the seed data.
+                var data = JsonSerializer.Serialize(interactions
+                    .Select(item => new NetworkInteractionInputModel
+                    {
+                        Interaction = new InteractionInputModel
+                        {
+                            InteractionProteins = new List<InteractionProteinInputModel>
+                            {
+                                new InteractionProteinInputModel
+                                {
+                                    Protein = new ProteinInputModel
+                                    {
+                                        Id = item.SourceNode
+                                    },
+                                    Type = "Source"
+                                },
+                                new InteractionProteinInputModel
+                                {
+                                    Protein = new ProteinInputModel
+                                    {
+                                        Id = item.TargetNode
+                                    },
+                                    Type = "Target"
+                                }
+                            }
+                        }
+                    }));
+                // Define a new task.
+                task.Items = new List<NetworkInputModel>
+                {
+                    new NetworkInputModel
+                    {
+                        Name = !string.IsNullOrEmpty(networkName) ? networkName : $"Network from CX on {DateTime.Now:yyyy-MM-dd} at {DateTime.Now:HH-mm-ss}",
+                        Description = !string.IsNullOrEmpty(networkDescription) ? networkDescription : $"This network was uploaded from a CX file on {DateTime.Now:D} at {DateTime.Now:T}.",
                         IsPublic = Input.IsPublic,
                         Algorithm = NetworkAlgorithm.None.ToString(),
                         Data = data,

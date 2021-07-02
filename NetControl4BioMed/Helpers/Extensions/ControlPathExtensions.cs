@@ -97,7 +97,7 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <param name="linkGenerator">The link generator.</param>
         /// <param name="context">The application database context.</param>
         /// <returns>Returns the Cytoscape view model corresponding to the provided control path.</returns>
-        public static CytoscapeViewModel GetCytoscapeViewModel(this ControlPath controlPath, HttpContext httpContext, LinkGenerator linkGenerator, ApplicationDbContext context)
+        public static FileCyjsViewModel GetCytoscapeViewModel(this ControlPath controlPath, HttpContext httpContext, LinkGenerator linkGenerator, ApplicationDbContext context)
         {
             // Get the control data.
             var analysis = context.ControlPaths
@@ -124,9 +124,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                 .Where(item => !string.IsNullOrEmpty(item))
                 .ToHashSet();
             // Return the view model.
-            return new CytoscapeViewModel
+            return new FileCyjsViewModel
             {
-                Elements = new CytoscapeViewModel.CytoscapeElements
+                Elements = new FileCyjsViewModel.CyjsElements
                 {
                     Nodes = context.PathProteins
                         .Where(item => item.Path.ControlPath == controlPath)
@@ -141,9 +141,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                                 .Select(item1 => item1.Type.ToString().ToLower())
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeNode
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsNode
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeNode.CytoscapeNodeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsNode.CyjsNodeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
@@ -172,9 +172,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                                 .FirstOrDefault()
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsEdge
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge.CytoscapeEdgeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsEdge.CyjsEdgeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
@@ -185,8 +185,8 @@ namespace NetControl4BioMed.Helpers.Extensions
                             Classes = controlInteractions.Contains(item.Id) ? new List<string> { "control" } : new List<string> { }
                         })
                 },
-                Layout = CytoscapeViewModel.DefaultLayout,
-                Styles = CytoscapeViewModel.DefaultStyles.Concat(CytoscapeViewModel.DefaultAnalysisStyles).Concat(CytoscapeViewModel.DefaultControlPathStyles)
+                Layout = FileCyjsViewModel.DefaultLayout,
+                Styles = FileCyjsViewModel.DefaultStyles.Concat(FileCyjsViewModel.DefaultAnalysisStyles).Concat(FileCyjsViewModel.DefaultControlPathStyles)
             };
         }
 
@@ -413,15 +413,15 @@ namespace NetControl4BioMed.Helpers.Extensions
                 .Where(item => !string.IsNullOrEmpty(item))
                 .ToHashSet();
             // Return the view model.
-            var data = new CytoscapeViewModel
+            var data = new FileCyjsViewModel
             {
-                Data = new CytoscapeViewModel.CytoscapeData
+                Data = new FileCyjsViewModel.CyjsData
                 {
                     Id = controlPath.Id,
                     Name = $"{controlPath.Analysis.Name} - Control Path",
                     Description = controlPath.Analysis.Description
                 },
-                Elements = new CytoscapeViewModel.CytoscapeElements
+                Elements = new FileCyjsViewModel.CyjsElements
                 {
                     Nodes = context.PathProteins
                         .Where(item => item.Path.ControlPath == controlPath)
@@ -436,9 +436,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                                 .Select(item1 => item1.Type.ToString().ToLower())
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeNode
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsNode
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeNode.CytoscapeNodeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsNode.CyjsNodeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
@@ -466,9 +466,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                                 .FirstOrDefault()
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsEdge
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge.CytoscapeEdgeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsEdge.CyjsEdgeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,

@@ -181,12 +181,12 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <param name="linkGenerator">The link generator.</param>
         /// <param name="context">The application database context.</param>
         /// <returns>The Cytoscape view model corresponding to the provided network.</returns>
-        public static CytoscapeViewModel GetCytoscapeViewModel(this Analysis analysis, HttpContext httpContext, LinkGenerator linkGenerator, ApplicationDbContext context)
+        public static FileCyjsViewModel GetCytoscapeViewModel(this Analysis analysis, HttpContext httpContext, LinkGenerator linkGenerator, ApplicationDbContext context)
         {
             // Return the view model.
-            return new CytoscapeViewModel
+            return new FileCyjsViewModel
             {
-                Elements = new CytoscapeViewModel.CytoscapeElements
+                Elements = new FileCyjsViewModel.CyjsElements
                 {
                     Nodes = context.AnalysisProteins
                         .Where(item => item.Analysis == analysis)
@@ -201,9 +201,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                                 .Select(item1 => item1.Type.ToString().ToLower())
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeNode
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsNode
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeNode.CytoscapeNodeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsNode.CyjsNodeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
@@ -232,9 +232,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                                 .FirstOrDefault()
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsEdge
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge.CytoscapeEdgeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsEdge.CyjsEdgeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
@@ -244,8 +244,8 @@ namespace NetControl4BioMed.Helpers.Extensions
                             }
                         })
                 },
-                Layout = CytoscapeViewModel.DefaultLayout,
-                Styles = CytoscapeViewModel.DefaultStyles.Concat(CytoscapeViewModel.DefaultAnalysisStyles)
+                Layout = FileCyjsViewModel.DefaultLayout,
+                Styles = FileCyjsViewModel.DefaultStyles.Concat(FileCyjsViewModel.DefaultAnalysisStyles)
             };
         }
 
@@ -430,15 +430,15 @@ namespace NetControl4BioMed.Helpers.Extensions
             // Use a new context instance.
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Return the view model.
-            var data = new CytoscapeViewModel
+            var data = new FileCyjsViewModel
             {
-                Data = new CytoscapeViewModel.CytoscapeData
+                Data = new FileCyjsViewModel.CyjsData
                 {
                     Id = analysis.Id,
                     Name = analysis.Name,
                     Description = analysis.Description
                 },
-                Elements = new CytoscapeViewModel.CytoscapeElements
+                Elements = new FileCyjsViewModel.CyjsElements
                 {
                     Nodes = context.AnalysisProteins
                         .Where(item => item.Analysis == analysis)
@@ -453,9 +453,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                                 .Select(item => item.Type.ToString().ToLower())
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeNode
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsNode
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeNode.CytoscapeNodeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsNode.CyjsNodeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
@@ -483,9 +483,9 @@ namespace NetControl4BioMed.Helpers.Extensions
                                 .FirstOrDefault()
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsEdge
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge.CytoscapeEdgeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsEdge.CyjsEdgeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,

@@ -6,36 +6,36 @@ namespace NetControl4BioMed.Helpers.ViewModels
     /// <summary>
     /// Represents the model of a JSON file to be rendered in Cytoscape and CytoscapeJS.
     /// </summary>
-    public class CytoscapeViewModel
+    public class FileCyjsViewModel
     {
         /// <summary>
         /// Represents the details of the data.
         /// </summary>
         [JsonPropertyName("data")]
-        public CytoscapeData Data { get; set; }
+        public CyjsData Data { get; set; }
 
         /// <summary>
         /// Represents the elements of the data.
         /// </summary>
         [JsonPropertyName("elements")]
-        public CytoscapeElements Elements { get; set; }
+        public CyjsElements Elements { get; set; }
 
         /// <summary>
         /// Represents the layout of the data.
         /// </summary>
         [JsonPropertyName("layout")]
-        public CytoscapeLayout Layout { get; set; }
+        public CyjsLayout Layout { get; set; }
 
         /// <summary>
         /// Represents the style of the data.
         /// </summary>
         [JsonPropertyName("style")]
-        public IEnumerable<CytoscapeStyle> Styles { get; set; }
+        public IEnumerable<CyjsStyle> Styles { get; set; }
 
         /// <summary>
         /// Represents the model of the data.
         /// </summary>
-        public class CytoscapeData
+        public class CyjsData
         {
             /// <summary>
             /// Represents the ID of the data.
@@ -59,30 +59,30 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Represents the model of the elements of the data.
         /// </summary>
-        public class CytoscapeElements
+        public class CyjsElements
         {
             /// <summary>
             /// Represents the node elements.
             /// </summary>
             [JsonPropertyName("nodes")]
-            public IEnumerable<CytoscapeNode> Nodes { get; set; }
+            public IEnumerable<CyjsNode> Nodes { get; set; }
 
             /// <summary>
             /// Represents the edge elements.
             /// </summary>
             [JsonPropertyName("edges")]
-            public IEnumerable<CytoscapeEdge> Edges { get; set; }
+            public IEnumerable<CyjsEdge> Edges { get; set; }
 
             /// <summary>
             /// Represents the model of a node element.
             /// </summary>
-            public class CytoscapeNode
+            public class CyjsNode
             {
                 /// <summary>
                 /// Represents the data of the node.
                 /// </summary>
                 [JsonPropertyName("data")]
-                public CytoscapeNodeData Data { get; set; }
+                public CyjsNodeData Data { get; set; }
 
                 /// <summary>
                 /// Represents the classes of the node.
@@ -93,7 +93,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 /// <summary>
                 /// Represents the model of the data.
                 /// </summary>
-                public class CytoscapeNodeData
+                public class CyjsNodeData
                 {
                     /// <summary>
                     /// Represents the ID of the node.
@@ -124,13 +124,13 @@ namespace NetControl4BioMed.Helpers.ViewModels
             /// <summary>
             /// Represents the model of an edge element.
             /// </summary>
-            public class CytoscapeEdge
+            public class CyjsEdge
             {
                 /// <summary>
                 /// Represents the data of the edge.
                 /// </summary>
                 [JsonPropertyName("data")]
-                public CytoscapeEdgeData Data { get; set; }
+                public CyjsEdgeData Data { get; set; }
 
                 /// <summary>
                 /// Represents the classes of the edge.
@@ -141,7 +141,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 /// <summary>
                 /// Represents the model of the data.
                 /// </summary>
-                public class CytoscapeEdgeData
+                public class CyjsEdgeData
                 {
                     /// <summary>
                     /// Represents the ID of the edge.
@@ -185,7 +185,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Represents the model of the layout of the data.
         /// </summary>
-        public class CytoscapeLayout
+        public class CyjsLayout
         {
             /// <summary>
             /// Represents the name of the layout.
@@ -197,7 +197,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Represents the model of a style of the data.
         /// </summary>
-        public class CytoscapeStyle
+        public class CyjsStyle
         {
             /// <summary>
             /// Represents the selector of the style.
@@ -209,12 +209,12 @@ namespace NetControl4BioMed.Helpers.ViewModels
             /// Represents the CSS of the style.
             /// </summary>
             [JsonPropertyName("css")]
-            public CytoscapeCSS Css { get; set; }
+            public CyjsCSS Css { get; set; }
 
             /// <summary>
             /// Represents the model for the CSS of the style.
             /// </summary>
-            public class CytoscapeCSS
+            public class CyjsCSS
             {
                 /// <summary>
                 /// Represents the text of an element.
@@ -257,7 +257,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets the default layout of the data.
         /// </summary>
-        public static CytoscapeLayout DefaultLayout { get; } = new CytoscapeLayout
+        public static CyjsLayout DefaultLayout { get; } = new CyjsLayout
         {
             Name = "cose"
         };
@@ -265,21 +265,21 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets the default style of the data.
         /// </summary>
-        public static IEnumerable<CytoscapeStyle> DefaultStyles { get; } = new List<CytoscapeStyle>
+        public static IEnumerable<CyjsStyle> DefaultStyles { get; } = new List<CyjsStyle>
         {
-            new CytoscapeStyle
+            new CyjsStyle
             {
                 Selector = "node",
-                Css = new CytoscapeStyle.CytoscapeCSS
+                Css = new CyjsStyle.CyjsCSS
                 {
                     Content = "data(name)",
                     BackgroundColor = "lightgray"
                 }
             },
-            new CytoscapeStyle
+            new CyjsStyle
             {
                 Selector = "edge",
-                Css = new CytoscapeStyle.CytoscapeCSS
+                Css = new CyjsStyle.CyjsCSS
                 {
                     TargetArrowColor = "lightgray",
                     TargetArrowShape = "triangle",
@@ -292,12 +292,12 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets the default style of the network-specific data.
         /// </summary>
-        public static IEnumerable<CytoscapeStyle> DefaultNetworkStyles { get; } = new List<CytoscapeStyle>
+        public static IEnumerable<CyjsStyle> DefaultNetworkStyles { get; } = new List<CyjsStyle>
         {
-            new CytoscapeStyle
+            new CyjsStyle
             {
                 Selector = "node.seed",
-                Css = new CytoscapeStyle.CytoscapeCSS
+                Css = new CyjsStyle.CyjsCSS
                 {
                     BackgroundColor = "tomato"
                 }
@@ -307,28 +307,28 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets the default style of the analysis-specific data.
         /// </summary>
-        public static IEnumerable<CytoscapeStyle> DefaultAnalysisStyles { get; } = new List<CytoscapeStyle>
+        public static IEnumerable<CyjsStyle> DefaultAnalysisStyles { get; } = new List<CyjsStyle>
         {
-            new CytoscapeStyle
+            new CyjsStyle
             {
                 Selector = "node.source",
-                Css = new CytoscapeStyle.CytoscapeCSS
+                Css = new CyjsStyle.CyjsCSS
                 {
                     BackgroundColor = "lightpink"
                 }
             },
-            new CytoscapeStyle
+            new CyjsStyle
             {
                 Selector = "node.target",
-                Css = new CytoscapeStyle.CytoscapeCSS
+                Css = new CyjsStyle.CyjsCSS
                 {
                     BackgroundColor = "cornflowerblue"
                 }
             },
-            new CytoscapeStyle
+            new CyjsStyle
             {
                 Selector = "node.source.target",
-                Css = new CytoscapeStyle.CytoscapeCSS
+                Css = new CyjsStyle.CyjsCSS
                 {
                     BackgroundColor = "mediumpurple"
                 }
@@ -338,44 +338,44 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets the default style of the control-path-specific data.
         /// </summary>
-        public static IEnumerable<CytoscapeStyle> DefaultControlPathStyles { get; } = new List<CytoscapeStyle>
+        public static IEnumerable<CyjsStyle> DefaultControlPathStyles { get; } = new List<CyjsStyle>
         {
-            new CytoscapeStyle
+            new CyjsStyle
             {
                 Selector = "node.control",
-                Css = new CytoscapeStyle.CytoscapeCSS
+                Css = new CyjsStyle.CyjsCSS
                 {
                     BackgroundColor = "forestgreen"
                 }
             },
-            new CytoscapeStyle
+            new CyjsStyle
             {
                 Selector = "node.source.control",
-                Css = new CytoscapeStyle.CytoscapeCSS
+                Css = new CyjsStyle.CyjsCSS
                 {
                     BackgroundColor = "deeppink"
                 }
             },
-            new CytoscapeStyle
+            new CyjsStyle
             {
                 Selector = "node.target.control",
-                Css = new CytoscapeStyle.CytoscapeCSS
+                Css = new CyjsStyle.CyjsCSS
                 {
                     BackgroundColor = "aquamarine"
                 }
             },
-            new CytoscapeStyle
+            new CyjsStyle
             {
                 Selector = "node.source.target.control",
-                Css = new CytoscapeStyle.CytoscapeCSS
+                Css = new CyjsStyle.CyjsCSS
                 {
                     BackgroundColor = "darkgoldenrod"
                 }
             },
-            new CytoscapeStyle
+            new CyjsStyle
             {
                 Selector = "edge.control",
-                Css = new CytoscapeStyle.CytoscapeCSS
+                Css = new CyjsStyle.CyjsCSS
                 {
                     TargetArrowColor = "black",
                     LineColor = "black"

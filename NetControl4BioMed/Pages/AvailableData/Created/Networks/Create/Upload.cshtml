@@ -6,10 +6,13 @@
 
 <div class="alert alert-primary text-wrap text-justify">
     <span><i class="fas fa-info-circle"></i></span>
-    <span>In order to upload a network, a file type needs to be specified and a corresponding file selected. The network will be uploaded as-is and can be afterwards inspected and analyzed, but it will not be automatically integrated with the internal databases or data. The available file formats are:</span>
+    <span>In order to upload a network, a file type needs to be specified and a corresponding file selected. The network will be uploaded as-is and can be afterwards inspected and analyzed, but it will not be automatically integrated with the internal databases or data. The available file types are:</span>
     <ul class="mb-0">
         <li>
-            <span><span class="font-weight-bold">Cytoscape.js JSON</span>, which represents a JSON file that can be readily imported in Cytoscape.js.</span>
+            <span><span class="font-weight-bold">Cytoscape.js JSON</span>, which represents a simple JSON file that can be readily imported in Cytoscape and Cytoscape.js.</span>
+        </li>
+        <li>
+            <span><span class="font-weight-bold">Cytoscape CX</span>, which represents a JSON-based file that enables diverse services to exchange networks while preserving all network-related information.</span>
         </li>
     </ul>
 </div>
@@ -62,6 +65,7 @@
                 <label asp-for="Input.Type" class="font-weight-bold">Type</label>
                 <select asp-for="Input.Type" class="custom-select form-control">
                     <option value="cyjs">Cytoscape.js JSON (*.cyjs)</option>
+                    <option value="cx">Cytoscape CX (*.cx)</option>
                 </select>
                 <span asp-description-for="Input.Type" class="text-muted small">The type of the file to be uploaded.</span>
                 <span asp-validation-for="Input.Type" class="text-danger small"></span>
