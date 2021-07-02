@@ -35,6 +35,11 @@ label {
     min-height: 25rem !important;
 }
 
+/* Style for the hidden groups. */
+.hidden-group-toggle {
+    cursor: pointer;
+}
+
 /* Style for the heuristic groups. */
 .heuristics-group-possible, .heuristics-group-current {
     overflow-x: scroll;

@@ -32,6 +32,8 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Results
         {
             public Analysis Analysis { get; set; }
 
+            public bool HasNetworkDatabases { get; set; }
+
             public bool ShowVisualization { get; set; }
 
             public ControlPath ControlPath { get; set; }
@@ -127,6 +129,9 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Results
                     .GroupBy(item => item)
                     .ToDictionary(item => item.Key, item => item.Count())
             };
+            // Update the view.
+            View.HasNetworkDatabases = _context.NetworkDatabases
+                .Any(item => item.Network.Id == View.Analysis.NetworkId);
             // Return the page.
             return Page();
         }

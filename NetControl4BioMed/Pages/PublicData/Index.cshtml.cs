@@ -27,9 +27,7 @@ namespace NetControl4BioMed.Pages.PublicData
         {
             public Dictionary<string, int?> ItemCount { get; set; }
 
-            public Network DemonstrationNetwork { get; set; }
-
-            public Analysis DemonstrationAnalysis { get; set; }
+            public IEnumerable<(Networks.IndexModel.ItemModel, Analyses.IndexModel.ItemModel)> Demonstrations { get; set; }
 
             public IEnumerable<Networks.IndexModel.ItemModel> RecentNetworks { get; set; }
 
@@ -45,22 +43,32 @@ namespace NetControl4BioMed.Pages.PublicData
                 .GetSection("Public")
                 .GetChildren()
                 .ToDictionary(item => item.Key, item => int.TryParse(item.Value, out var result) ? (int?)result : null);
-            // Get a random demonstration analysis.
-            var randomDemonstrationAnalysis = _context.Analyses
-                .Include(item => item.Network)
-                .Where(item => item.IsDemonstration)
-                .OrderBy(item => Guid.NewGuid())
-                .FirstOrDefault();
             // Define the view.
             View = new ViewModel
             {
                 ItemCount = publicItemCount,
-                DemonstrationNetwork = randomDemonstrationAnalysis?.Network,
-                DemonstrationAnalysis = randomDemonstrationAnalysis,
+                Demonstrations = _context.Analyses
+                    .Include(item => item.Network)
+                    .Where(item => item.IsDemonstration)
+                    .OrderBy(item => item.DateTimeCreated)
+                    .Take(3)
+                    .AsNoTracking()
+                    .AsEnumerable()
+                    .Select(item => (new Networks.IndexModel.ItemModel
+                        {
+                            Id = item.Network.Id,
+                            Name = item.Network.Name
+                        },
+                        new Analyses.IndexModel.ItemModel
+                        {
+                            Id = item.Id,
+                            Name = item.Name
+                        })),
                 RecentNetworks = _context.Networks
                     .Where(item => item.IsPublic)
                     .OrderByDescending(item => item.DateTimeCreated)
                     .Take(5)
+                    .AsNoTracking()
                     .Select(item => new Networks.IndexModel.ItemModel
                     {
                         Id = item.Id,
@@ -71,6 +79,7 @@ namespace NetControl4BioMed.Pages.PublicData
                     .Where(item => item.IsPublic)
                     .OrderByDescending(item => item.DateTimeCreated)
                     .Take(5)
+                    .AsNoTracking()
                     .Select(item => new Analyses.IndexModel.ItemModel
                     {
                         Id = item.Id,

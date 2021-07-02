@@ -161,6 +161,22 @@ $(window).on('load', () => {
         })();
     }
 
+    // Check if there is a hidden group on the page.
+    if ($('.hidden-group').length !== 0) {
+        // Define a function which toggles the hidden group display.
+        const toggleDisplay = (groupElement) => {
+            // Toggle the display of the hidden group.
+            $(groupElement).find('.hidden-group-display').prop('hidden', !$(groupElement).find('.hidden-group-display').prop('hidden'));
+        };
+        // Add a listener for when the toggler gets clicked.
+        $('.hidden-group-toggle').on('click', (event) => {
+            // Get the current list group.
+            const groupElement = $(event.target).closest('.hidden-group');
+            // Toggle the display.
+            toggleDisplay(groupElement);
+        });
+    }
+
     // Check if there is an item group on the page.
     if ($('.item-group').length !== 0) {
         // Define a function which gets all of the selected items and creates a JSON string array with their IDs.

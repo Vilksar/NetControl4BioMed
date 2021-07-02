@@ -29,6 +29,8 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Results
         {
             public Analysis Analysis { get; set; }
 
+            public bool HasNetworkDatabases { get; set; }
+
             public bool ShowVisualization { get; set; }
 
             public Path Path { get; set; }
@@ -86,6 +88,9 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses.Details.Results
                     .Include(item => item.Interaction)
                     .OrderBy(item => item.Index)
             };
+            // Update the view.
+            View.HasNetworkDatabases = _context.NetworkDatabases
+                .Any(item => item.Network.Id == View.Analysis.NetworkId);
             // Return the page.
             return Page();
         }

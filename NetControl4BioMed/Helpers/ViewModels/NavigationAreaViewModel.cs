@@ -382,7 +382,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Analyses",
                             Title = "Analyses",
                             Description = string.Empty,
-                            Icon = "fa-desktop",
+                            Icon = "fa-code-branch",
                             Color = "light",
                             Link = "/Administration/Created/Analyses/Index"
                         }
@@ -447,7 +447,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Analyses",
                     Title = "Public analyses",
                     Description = string.Empty,
-                    Icon = "fa-desktop",
+                    Icon = "fa-code-branch",
                     Color = "success",
                     Link = "/PublicData/Analyses/Index"
                 }
@@ -489,7 +489,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Analyses",
                     Title = "My analyses",
                     Description = string.Empty,
-                    Icon = "fa-desktop",
+                    Icon = "fa-code-branch",
                     Color = "success",
                     Link = "/PrivateData/Analyses/Index"
                 }
@@ -619,7 +619,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Analyses",
                             Title = "Analyses",
                             Description = string.Empty,
-                            Icon = "fa-desktop",
+                            Icon = "fa-code-branch",
                             Color = "light",
                             Link = "/AvailableData/Created/Analyses/Index"
                         }
@@ -745,7 +745,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Analyses",
                             Title = "Analyses",
                             Description = string.Empty,
-                            Icon = "fa-desktop",
+                            Icon = "fa-code-branch",
                             Color = "light",
                             Link = "/AvailableData/Created/Networks/Details/Created/Analyses/Index"
                         }
@@ -762,7 +762,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "Analysis",
             Title = "Analysis",
             Description = string.Empty,
-            Icon = "fa-desktop",
+            Icon = "fa-code-branch",
             Color = "dark",
             NavigationGroups = new List<NavigationGroupViewModel>
             {
@@ -861,7 +861,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Results",
                     Title = "Results",
                     Description = string.Empty,
-                    Icon = "fa-hammer",
+                    Icon = "fa-code-branch",
                     Color = "dark",
                     Link = "/AvailableData/Created/Analyses/Details/Results/Index",
                     NavigationPages = new List<NavigationPageViewModel>

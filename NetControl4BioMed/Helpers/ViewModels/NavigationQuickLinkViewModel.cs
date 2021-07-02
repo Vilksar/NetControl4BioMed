@@ -159,7 +159,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             TitleSingular = "Analysis",
             TitlePlural = "Analyses",
             Color = "secondary",
-            Icon = "fa-desktop",
+            Icon = "fa-code-branch",
             Width = 6,
             Link = "/Administration/Created/Analyses/Index"
         };
@@ -187,7 +187,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             TitleSingular = "Analysis",
             TitlePlural = "Analyses",
             Color = "success",
-            Icon = "fa-desktop",
+            Icon = "fa-code-branch",
             Width = 6,
             Link = "/PublicData/Analyses/Index"
         };
@@ -215,7 +215,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             TitleSingular = "Analysis",
             TitlePlural = "Analyses",
             Color = "success",
-            Icon = "fa-desktop",
+            Icon = "fa-code-branch",
             Width = 6,
             Link = "/PrivateData/Analyses/Index"
         };
@@ -230,7 +230,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             TitlePlural = "Databases",
             Color = "info",
             Icon = "fa-database",
-            Width = 6,
+            Width = 12,
             Link = "/AvailableData/Databases/Databases/Index"
         };
 
@@ -242,9 +242,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "Proteins",
             TitleSingular = "Protein",
             TitlePlural = "Proteins",
-            Color = "primary",
+            Color = "secondary",
             Icon = "fa-circle",
-            Width = 6,
+            Width = 12,
             Link = "/AvailableData/Data/Proteins/Index"
         };
 
@@ -256,9 +256,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "Interactions",
             TitleSingular = "Interaction",
             TitlePlural = "Interactions",
-            Color = "primary",
+            Color = "secondary",
             Icon = "fa-arrow-right",
-            Width = 6,
+            Width = 12,
             Link = "/AvailableData/Data/Interactions/Index"
         };
 
@@ -272,7 +272,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             TitlePlural = "Collections",
             Color = "info",
             Icon = "fa-folder",
-            Width = 6,
+            Width = 12,
             Link = "/AvailableData/Data/ProteinCollections/Index"
         };
 

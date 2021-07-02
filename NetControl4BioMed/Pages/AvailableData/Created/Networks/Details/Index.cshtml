@@ -8,7 +8,7 @@
 }
 
 <partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetNetworkNavigationTitleCard(Model.View.Network)" />
-@if (Model.View.Network.IsPublic)
+@if (Model.View.Network.IsPublic && User.Identity.IsAuthenticated)
 {
     <div class="alert alert-warning text-justify text-wrap">
         <span><i class="fas fa-exclamation-triangle"></i></span>
@@ -44,16 +44,27 @@
             <span>Download</span>
         </a>
     </div>
-    @if (Model.View.Network.Status == NetworkStatus.Completed)
+    @if (Model.View.ShowVisualization)
     {
         <div class="col-lg mb-3">
-            <a asp-page="/AvailableData/Created/Analyses/Create" asp-route-networkId="@Model.View.Network.Id" class="btn btn-success btn-block" title="Analyze">
-                <span><i class="fas fa-desktop"></i></span>
-                <span>Analyze</span>
+            <a asp-page="/AvailableData/Created/Networks/Details/Visualize" asp-route-id="@Model.View.Network.Id" class="btn btn-info btn-block" title="Visualize">
+                <span><i class="fas fa-eye"></i></span>
+                <span>Visualize</span>
             </a>
         </div>
     }
 </div>
+@if (Model.View.Network.Status == NetworkStatus.Completed)
+{
+    <div class="row align-items-center">
+        <div class="col-lg mb-3">
+            <a asp-page="/AvailableData/Created/Analyses/Create" asp-route-networkId="@Model.View.Network.Id" class="btn btn-success btn-block" title="Analyze">
+                <span><i class="fas fa-code-branch"></i></span>
+                <span>Analyze</span>
+            </a>
+        </div>
+    </div>
+}
 <div class="card mb-3" title="Status">
     <div class="card-body text-center">
         <partial name="_NetworkStatusPartial" model="@Model.View.Network.Status" />
@@ -74,73 +85,13 @@
 </div>
 @if (!string.IsNullOrEmpty(Model.View.Network.Description))
 {
-    <div class="card mb-3">
+    <div class="card mb-3" title="Description">
         <div class="card-body text-center small">
-            <span title="Description">@Model.View.Network.Description</span>
+            <span>@Model.View.Network.Description</span>
         </div>
     </div>
 }
 <partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAvailableDataNetworkNavigationQuickLinks(Model.View.Network.Id, Model.View.ItemCount)" />
-@if (Model.View.ShowVisualization)
-{
-    <div class="card mb-3">
-        <div class="card-header font-weight-bold">
-            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                <div>
-                    <span><i class="fas fa-eye"></i></span>
-                </div>
-                <div>
-                    <span>Visualize</span>
-                </div>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>As the network is relatively small, you can click the button below to visualize it in browser.</span>
-            </div>
-            <a asp-page="/AvailableData/Created/Networks/Details/Visualize" asp-route-id="@Model.View.Network.Id" class="btn btn-info btn-block">
-                <span><i class="fas fa-eye"></i></span>
-                <span>Visualize</span>
-            </a>
-        </div>
-    </div>
-}
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-code"></i></span>
-            </div>
-            <div>
-                <span>Parameters</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The parameters used by the algorithm corresponding to the network are displayed below.</span>
-        </div>
-        <div class="row">
-            <div class="col-lg-12 order-3 order-lg-1 align-self-center">
-                <label asp-for="View.Network.Algorithm" class="font-weight-bold">Algorithm</label>
-            </div>
-            <div class="col-lg-12 order-3 order-lg-2">
-                <select asp-for="View.Network.Algorithm" class="custom-select" title="@Model.View.Network.Algorithm.GetDisplayDescription()" disabled>
-                    @foreach (var item in Enum.GetValues(typeof(NetworkAlgorithm)).Cast<NetworkAlgorithm>())
-                    {
-                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
-                    }
-                </select>
-            </div>
-            <div class="col-lg-12 order-4 order-lg-3">
-                <span asp-description-for="View.Network.Algorithm" class="text-muted small">The algorithm used in generating the network.</span>
-                <span asp-validation-for="View.Network.Algorithm" class="text-danger small"></span>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
@@ -148,51 +99,64 @@
                 <span><i class="fas fa-list"></i></span>
             </div>
             <div>
-                <span>Log</span>
+                <span>Advanced options</span>
             </div>
         </div>
     </div>
     <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The log messages of the network are displayed below.</span>
+        <div class="hidden-group">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>You can click <a class="alert-link hidden-group-toggle">here</a> to display or hide the algorithm used by the network.</span>
+            </div>
+            <div class="hidden-group-display" hidden>
+                <div class="col-lg-12 order-3 order-lg-1 align-self-center">
+                    <label asp-for="View.Network.Algorithm" class="font-weight-bold">Algorithm</label>
+                </div>
+                <div class="col-lg-12 order-3 order-lg-2">
+                    <select asp-for="View.Network.Algorithm" class="custom-select" title="@Model.View.Network.Algorithm.GetDisplayDescription()" disabled>
+                        @foreach (var item in Enum.GetValues(typeof(NetworkAlgorithm)).Cast<NetworkAlgorithm>())
+                        {
+                            <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-lg-12 order-4 order-lg-3 mb-3">
+                    <span asp-description-for="View.Network.Algorithm" class="text-muted small">The algorithm used in generating the network.</span>
+                    <span asp-validation-for="View.Network.Algorithm" class="text-danger small"></span>
+                </div>
+            </div>
         </div>
         @if (Model.View.Network.Log.TryDeserializeJsonObject<IEnumerable<NetControl4BioMed.Helpers.ViewModels.LogEntryViewModel>>(out var logEntries))
         {
-            <ul class="mb-0">
-                @foreach (var logEntry in logEntries)
-                {
-                    <li class="utc-date" data-date="@logEntry.DateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
-                        <div>
-                            <span class="utc-date-date" title="@logEntry.DateTime.ToShortDateString()">@logEntry.DateTime.ToShortDateString()</span>
-                            <span class="utc-date-time" title="@logEntry.DateTime.ToShortTimeString()">@logEntry.DateTime.ToShortTimeString()</span>
-                        </div>
-                        <div>
-                            <span>@logEntry.Message</span>
-                        </div>
-                    </li>
-                }
-            </ul>
+            <div class="hidden-group">
+                <div class="alert alert-info text-justify text-wrap">
+                    <span><i class="fas fa-info-circle"></i></span>
+                    <span>You can click <a class="alert-link hidden-group-toggle">here</a> to display or hide the log messages of the network.</span>
+                </div>
+                <div class="hidden-group-display" hidden>
+                    <ul class="">
+                        @foreach (var logEntry in logEntries)
+                        {
+                            <li class="utc-date" data-date="@logEntry.DateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
+                                <div>
+                                    <span class="utc-date-date" title="@logEntry.DateTime.ToShortDateString()">@logEntry.DateTime.ToShortDateString()</span>
+                                    <span class="utc-date-time" title="@logEntry.DateTime.ToShortTimeString()">@logEntry.DateTime.ToShortTimeString()</span>
+                                </div>
+                                <div>
+                                    <span>@logEntry.Message</span>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
         }
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-trash"></i></span>
-            </div>
-            <div>
-                <span>Delete</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
         @if (Model.View.IsUserOwner)
         {
             <div class="alert alert-danger text-justify text-wrap">
                 <span><i class="fas fa-exclamation-circle"></i></span>
-                <span>The network will be deleted automatically on @(Model.View.Network.DateTimeToDelete.ToLongDateString()). Alternatively, you can extend its time until deletion to @((DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()), or delete it now using the buttons below.</span>
+                <span>The network will be deleted automatically on @(Model.View.Network.DateTimeToDelete.ToLongDateString()). Alternatively, you can extend its time until deletion to @ApplicationDbContext.DaysBeforeDelete days from today, or delete it now using the buttons below.</span>
             </div>
             <a asp-page="/AvailableData/Created/Networks/Extend" asp-route-ids="@Model.View.Network.Id" class="btn btn-warning btn-block mb-3" title="Extend">
                 <span><i class="fas fa-history"></i></span>
@@ -207,7 +171,7 @@
         {
             <div class="alert alert-warning text-justify text-wrap">
                 <span><i class="fas fa-exclamation-triangle"></i></span>
-                <span>The network will be deleted automatically on @(Model.View.Network.DateTimeToDelete.ToLongDateString()). Alternatively, you can extend its time until deletion to @((DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete)).ToLongDateString()) using the button below.</span>
+                <span>The network will be deleted automatically on @(Model.View.Network.DateTimeToDelete.ToLongDateString()). Alternatively, you can extend its time until deletion to @ApplicationDbContext.DaysBeforeDelete days from today using the button below.</span>
             </div>
             <a asp-page="/AvailableData/Created/Networks/Extend" asp-route-ids="@Model.View.Network.Id" class="btn btn-warning btn-block" title="Extend">
                 <span><i class="fas fa-history"></i></span>

@@ -105,7 +105,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationTitleCardViewModel AnalysisNavigationTitleCard { get; } = new NavigationTitleCardViewModel
         {
             Id = "Analysis",
-            Icon = "fa-desktop"
+            Icon = "fa-code-branch"
         };
 
         /// <summary>
