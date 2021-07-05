@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -55,10 +53,10 @@ namespace NetControl4BioMed.Pages.PublicData
                     .AsNoTracking()
                     .AsEnumerable()
                     .Select(item => (new Networks.IndexModel.ItemModel
-                        {
-                            Id = item.Network.Id,
-                            Name = item.Network.Name
-                        },
+                    {
+                        Id = item.Network.Id,
+                        Name = item.Network.Name
+                    },
                         new Analyses.IndexModel.ItemModel
                         {
                             Id = item.Id,
