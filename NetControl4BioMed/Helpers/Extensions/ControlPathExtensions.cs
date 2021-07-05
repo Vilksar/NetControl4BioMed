@@ -484,6 +484,192 @@ namespace NetControl4BioMed.Helpers.Extensions
         }
 
         /// <summary>
+        /// Gets the content of a JSON file to download corresponding to the provided network.
+        /// </summary>
+        /// <param name="controlPath">The current control path.</param>
+        /// <param name="stream">The stream to which to write to.</param>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <returns>The content of the JSON file corresponding to the provided network.</returns>
+        public static async Task WriteToStreamCxFileContent(this ControlPath controlPath, Stream stream, IServiceProvider serviceProvider)
+        {
+            // Use a new scope.
+            using var scope = serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Get the control data.
+            var analysis = context.ControlPaths
+                .Where(item => item == controlPath)
+                .Select(item => item.Analysis)
+                .First();
+            var controlProteins = context.ControlPaths
+                .Where(item => item == controlPath)
+                .Select(item => item.Paths)
+                .SelectMany(item => item)
+                .Select(item => item.PathProteins)
+                .SelectMany(item => item)
+                .Where(item => item.Type == PathProteinType.Source)
+                .Select(item => item.Protein.Id)
+                .Where(item => !string.IsNullOrEmpty(item))
+                .ToHashSet();
+            // Get the related protein data.
+            var proteinList = context.PathProteins
+                .Where(item => item.Path.ControlPath == controlPath)
+                .Where(item => item.Type == PathProteinType.None)
+                .Select(item => item.Protein)
+                .OrderBy(item => item.Id)
+                .Select(item => new
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Types = item.AnalysisProteins
+                        .Where(item1 => item1.Analysis == analysis)
+                        .Select(item => item.Type.ToString().ToLower())
+                })
+                .AsEnumerable()
+                .Select((item, index) => new
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Index = index + 1,
+                    Types = item.Types
+                });
+            var proteinListCount = proteinList.Count();
+            // Get the related interaction data.
+            var interactionList = context.PathInteractions
+                .Where(item => item.Path.ControlPath == controlPath)
+                .Select(item => item.Interaction)
+                .OrderBy(item => item.Id)
+                .Select(item => new
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    SourceProteinId = item.InteractionProteins
+                        .Where(item1 => item1.Type == InteractionProteinType.Source)
+                        .Select(item1 => item1.Protein)
+                        .Where(item1 => item1 != null)
+                        .Select(item1 => item1.Id)
+                        .FirstOrDefault(),
+                    TargetProteinId = item.InteractionProteins
+                        .Where(item1 => item1.Type == InteractionProteinType.Target)
+                        .Select(item1 => item1.Protein)
+                        .Where(item1 => item1 != null)
+                        .Select(item1 => item1.Id)
+                        .FirstOrDefault()
+                })
+                .Where(item => !string.IsNullOrEmpty(item.SourceProteinId) && !string.IsNullOrEmpty(item.TargetProteinId))
+                .AsEnumerable()
+                .Select((item, index) => new
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Index = index + proteinListCount + 1,
+                    SourceProteinId = item.SourceProteinId,
+                    TargetProteinId = item.TargetProteinId
+                });
+            // Get the related additional data.
+            var proteinIdDictionary = proteinList.ToDictionary(item => item.Id, item => item);
+            // Get the required data.
+            var data = new List<FileCxViewModel.CxBaseObject>
+            {
+                new FileCxViewModel.CxBaseObject
+                {
+                    NetworkAttributes = new List<FileCxViewModel.CxBaseObject.CxNetworkAttribute>
+                    {
+                        new FileCxViewModel.CxBaseObject.CxNetworkAttribute
+                        {
+                            Name = "name",
+                            Value = $"Control Path for {analysis.Name}"
+                        },
+                        new FileCxViewModel.CxBaseObject.CxNetworkAttribute
+                        {
+                            Name = "description",
+                            Value = analysis.Description
+                        },
+                        new FileCxViewModel.CxBaseObject.CxNetworkAttribute
+                        {
+                            Name = "source",
+                            Value = "NetControl4BioMed"
+                        }
+                    }
+                },
+                new FileCxViewModel.CxBaseObject
+                {
+                    Nodes = proteinList
+                        .Select(item => new FileCxViewModel.CxBaseObject.CxNode
+                        {
+                            Id = item.Index,
+                            Name = item.Name
+                        })
+                },
+                new FileCxViewModel.CxBaseObject
+                {
+                    NodeAttributes = proteinList
+                        .Select(item => new FileCxViewModel.CxBaseObject.CxNodeAttribute
+                        {
+                            Id = item.Index,
+                            Name = "type",
+                            Value = string.Join(",", item.Types.Concat(controlProteins.Contains(item.Id) ? new List<string> { "control" } : new List<string> { }).OrderBy(item => item))
+                        })
+                },
+                new FileCxViewModel.CxBaseObject
+                {
+                    Edges = interactionList
+                        .Select(item => new
+                        {
+                            Id = item.Index,
+                            Source = proteinIdDictionary.GetValueOrDefault(item.SourceProteinId),
+                            Target = proteinIdDictionary.GetValueOrDefault(item.TargetProteinId)
+                        })
+                        .Where(item => item.Source != null && item.Target != null)
+                        .Select(item => new FileCxViewModel.CxBaseObject.CxEdge
+                        {
+                            Id = item.Id,
+                            Source = item.Source.Index,
+                            Target = item.Target.Index,
+                            Type = "interacts with"
+                        })
+                        .Where(item => item.Source != 0 && item.Target != 0)
+                },
+                new FileCxViewModel.CxBaseObject
+                {
+                    EdgeAttributes = interactionList
+                        .Select(item => new
+                        {
+                            Id = item.Index,
+                            Source = proteinIdDictionary.GetValueOrDefault(item.SourceProteinId),
+                            Target = proteinIdDictionary.GetValueOrDefault(item.TargetProteinId)
+                        })
+                        .Where(item => item.Source != null && item.Target != null)
+                        .Select(item => new FileCxViewModel.CxBaseObject.CxEdgeAttribute
+                        {
+                            Id = item.Id,
+                            Name = "name",
+                            Value = $"{item.Source.Name} (interacts with) {item.Target.Name}"
+                        })
+                },
+                new FileCxViewModel.CxBaseObject
+                {
+                    CytoscapeTableColumns = FileCxViewModel.DefaultCytoscapeTableColumns
+                },
+                new FileCxViewModel.CxBaseObject
+                {
+                    Status = new List<FileCxViewModel.CxBaseObject.CxStatus>
+                    {
+                        new FileCxViewModel.CxBaseObject.CxStatus
+                        {
+                            ErrorMessage = string.Empty,
+                            IsSuccessful = true
+                        }
+                    }
+                }
+            };
+            // Update the meta data.
+            FileCxViewModel.AddMetaData(data);
+            // Write the data corresponding to the file.
+            await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { IgnoreNullValues = true });
+        }
+
+        /// <summary>
         /// Gets the content of an Excel file to download corresponding to the provided control path.
         /// </summary>
         /// <param name="controlPath">The current control path.</param>

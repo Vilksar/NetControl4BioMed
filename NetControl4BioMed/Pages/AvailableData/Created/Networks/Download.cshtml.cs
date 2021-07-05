@@ -40,7 +40,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
         {
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            [RegularExpression("txt|sif|json|cyjs|xlsx", ErrorMessage = "The value is not valid.")]
+            [RegularExpression("txt|sif|json|cyjs|cx|xlsx", ErrorMessage = "The value is not valid.")]
             public string FileFormat { get; set; }
 
             public string ReCaptchaToken { get; set; }
@@ -185,6 +185,17 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks
                         using var stream = archive.CreateEntry($"Network-{network.Name.Replace(" ", "-")}-{network.Id}.cyjs", CompressionLevel.Fastest).Open();
                         // Write to the entry the corresponding file content.
                         await network.WriteToStreamCyjsFileContent(stream, _serviceProvider);
+                    }
+                }
+                else if (Input.FileFormat == "cx")
+                {
+                    // Go over each of the networks to download.
+                    foreach (var network in View.Items)
+                    {
+                        // Create a new entry in the archive and open it.
+                        using var stream = archive.CreateEntry($"Network-{network.Name.Replace(" ", "-")}-{network.Id}.cx", CompressionLevel.Fastest).Open();
+                        // Write to the entry the corresponding file content.
+                        await network.WriteToStreamCxFileContent(stream, _serviceProvider);
                     }
                 }
                 else if (Input.FileFormat == "xlsx")

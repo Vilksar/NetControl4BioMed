@@ -40,7 +40,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
         {
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
-            [RegularExpression("txt|sif|json|cyjs|xlsx", ErrorMessage = "The value is not valid.")]
+            [RegularExpression("txt|sif|json|cyjs|cx|xlsx", ErrorMessage = "The value is not valid.")]
             public string FileFormat { get; set; }
 
             public string ReCaptchaToken { get; set; }
@@ -185,6 +185,17 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                         using var stream = archive.CreateEntry($"Analysis-{analysis.Name.Replace(" ", "-")}-{analysis.Id}.cyjs", CompressionLevel.Fastest).Open();
                         // Write to the entry the corresponding file content.
                         await analysis.WriteToStreamCyjsFileContent(stream, _serviceProvider);
+                    }
+                }
+                else if (Input.FileFormat == "cx")
+                {
+                    // Go over each of the analyses to download.
+                    foreach (var analysis in View.Items)
+                    {
+                        // Create a new entry in the archive and open it.
+                        using var stream = archive.CreateEntry($"Analysis-{analysis.Name.Replace(" ", "-")}-{analysis.Id}.cx", CompressionLevel.Fastest).Open();
+                        // Write to the entry the corresponding file content.
+                        await analysis.WriteToStreamCxFileContent(stream, _serviceProvider);
                     }
                 }
                 else if (Input.FileFormat == "xlsx")
