@@ -61,17 +61,25 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             [Required(ErrorMessage = "This field is required.")]
             public string NetworkId { get; set; }
 
+            public bool UseSourceProteinData { get; set; }
+
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
             public string SourceProteinData { get; set; }
+
+            public bool UseSourceProteinCollectionData { get; set; }
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
             public string SourceProteinCollectionData { get; set; }
 
+            public bool UseTargetProteinData { get; set; }
+
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
             public string TargetProteinData { get; set; }
+
+            public bool UseTargetProteinCollectionData { get; set; }
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
@@ -252,11 +260,21 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                         .FirstOrDefault(),
                     IsPublic = user == null,
                     NetworkId = View.Network.Id,
+                    UseSourceProteinData = analyses
+                        .Select(item => item.AnalysisProteins)
+                        .SelectMany(item => item)
+                        .Where(item => item.Type == AnalysisProteinType.Source)
+                        .Any(),
                     SourceProteinData = JsonSerializer.Serialize(analyses
                         .Select(item => item.AnalysisProteins)
                         .SelectMany(item => item)
                         .Where(item => item.Type == AnalysisProteinType.Source)
                         .Select(item => item.Protein.Name)),
+                    UseSourceProteinCollectionData = analyses
+                        .Select(item => item.AnalysisProteinCollections)
+                        .SelectMany(item => item)
+                        .Where(item => item.Type == AnalysisProteinCollectionType.Source)
+                        .Any(),
                     SourceProteinCollectionData = JsonSerializer.Serialize(analyses
                         .Select(item => item.AnalysisProteinCollections)
                         .SelectMany(item => item)
@@ -264,11 +282,21 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                         .Select(item => item.ProteinCollection.Id)
                         .AsEnumerable()
                         .Intersect(View.SourceProteinCollections.Select(item => item.Id))),
+                    UseTargetProteinData = analyses
+                        .Select(item => item.AnalysisProteins)
+                        .SelectMany(item => item)
+                        .Where(item => item.Type == AnalysisProteinType.Target)
+                        .Any(),
                     TargetProteinData = JsonSerializer.Serialize(analyses
                         .Select(item => item.AnalysisProteins)
                         .SelectMany(item => item)
                         .Where(item => item.Type == AnalysisProteinType.Target)
                         .Select(item => item.Protein.Name)),
+                    UseTargetProteinCollectionData = analyses
+                        .Select(item => item.AnalysisProteinCollections)
+                        .SelectMany(item => item)
+                        .Where(item => item.Type == AnalysisProteinCollectionType.Target)
+                        .Any(),
                     TargetProteinCollectionData = JsonSerializer.Serialize(analyses
                         .Select(item => item.AnalysisProteinCollections)
                         .SelectMany(item => item)
@@ -342,9 +370,13 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             {
                 IsPublic = user == null,
                 NetworkId = View.Network.Id,
+                UseSourceProteinData = false,
                 SourceProteinData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
+                UseSourceProteinCollectionData = false,
                 SourceProteinCollectionData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
+                UseTargetProteinData = View.HasNetworkDatabases ? false : true,
                 TargetProteinData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
+                UseTargetProteinCollectionData = View.HasNetworkDatabases ? true : false,
                 TargetProteinCollectionData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                 MaximumIterations = 100,
                 MaximumIterationsWithoutImprovement = 25,
@@ -455,6 +487,14 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 // Redisplay the page.
                 return Page();
             }
+            // Check if no target data providing method was selected.
+            if (!Input.UseTargetProteinData && !Input.UseTargetProteinCollectionData)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "At least one method for providing target proteins needs to be selected.");
+                // Redisplay the page.
+                return Page();
+            }
             // Try to get the algorithm.
             try
             {
@@ -468,40 +508,62 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 // Redisplay the page.
                 return Page();
             }
-            // Try to deserialize the source data.
-            if (!Input.SourceProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out var sourceProteins) || sourceProteins == null)
+            // Define the items to be used.
+            var sourceProteins = Enumerable.Empty<string>();
+            var sourceProteinCollectionIds = Enumerable.Empty<string>();
+            // Check if source proteins should be used.
+            if (Input.UseSourceProteinData)
             {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided source data could not be deserialized.");
-                // Redisplay the page.
-                return Page();
+                // Try to deserialize the source data.
+                if (!Input.SourceProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out sourceProteins) || sourceProteins == null)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, "The provided source data could not be deserialized.");
+                    // Redisplay the page.
+                    return Page();
+                }
             }
-            // Try to deserialize the source protein collection data.
-            if (!Input.SourceProteinCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out var sourceProteinCollectionIds) || sourceProteinCollectionIds == null)
+            // Check if source protein collection data should be used.
+            if (Input.UseSourceProteinCollectionData)
             {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided source protein collection data could not be deserialized.");
-                // Redisplay the page.
-                return Page();
+                // Try to deserialize the source protein collection data.
+                if (!Input.SourceProteinCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out sourceProteinCollectionIds) || sourceProteinCollectionIds == null)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, "The provided source protein collection data could not be deserialized.");
+                    // Redisplay the page.
+                    return Page();
+                }
             }
             // Try to get the source protein collections with the provided IDs.
             var sourceProteinCollections = View.SourceProteinCollections
                 .Where(item => sourceProteinCollectionIds.Contains(item.Id));
-            // Try to deserialize the target data.
-            if (!Input.TargetProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out var targetProteins) || targetProteins == null)
+            // Define the items to be used.
+            var targetProteins = Enumerable.Empty<string>();
+            var targetProteinCollectionIds = Enumerable.Empty<string>();
+            // Check if target proteins should be used.
+            if (Input.UseTargetProteinData)
             {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided target data could not be deserialized.");
-                // Redisplay the page.
-                return Page();
+                // Try to deserialize the target data.
+                if (!Input.TargetProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out targetProteins) || targetProteins == null)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, "The provided target data could not be deserialized.");
+                    // Redisplay the page.
+                    return Page();
+                }
             }
-            // Try to deserialize the target protein collection data.
-            if (!Input.TargetProteinCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out var targetProteinCollectionIds) || targetProteinCollectionIds == null)
+            // Check if target protein collection data should be used.
+            if (Input.UseTargetProteinCollectionData)
             {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided target protein collection data could not be deserialized.");
-                // Redisplay the page.
-                return Page();
+                // Try to deserialize the target protein collection data.
+                if (!Input.TargetProteinCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out targetProteinCollectionIds) || targetProteinCollectionIds == null)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, "The provided target protein collection data could not be deserialized.");
+                    // Redisplay the page.
+                    return Page();
+                }
             }
             // Try to get the target protein collections with the provided IDs.
             var targetProteinCollections = View.TargetProteinCollections
@@ -510,7 +572,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             if (!targetProteins.Any() && !targetProteinCollections.Any())
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No target data has been provided or none of the target protein collections could be found.");
+                ModelState.AddModelError(string.Empty, "No target proteins could be found within the provided target data or the selected target protein collections.");
                 // Redisplay the page.
                 return Page();
             }

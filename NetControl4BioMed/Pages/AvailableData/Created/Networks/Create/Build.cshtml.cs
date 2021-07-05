@@ -61,9 +61,13 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
             [Required(ErrorMessage = "This field is required.")]
             public string InteractionDatabaseData { get; set; }
 
+            public bool UseSeedProteinData { get; set; }
+
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
             public string SeedProteinData { get; set; }
+
+            public bool UseSeedProteinCollectionData { get; set; }
 
             [DataType(DataType.MultilineText)]
             [Required(ErrorMessage = "This field is required.")]
@@ -180,11 +184,20 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                         .Select(item => item.Database.Id)
                         .AsEnumerable()
                         .Intersect(View.InteractionDatabases.Select(item => item.Id))),
+                    UseSeedProteinData = networks
+                        .Select(item => item.NetworkProteins)
+                        .SelectMany(item => item)
+                        .Where(item => item.Type == NetworkProteinType.Seed)
+                        .Any(),
                     SeedProteinData = JsonSerializer.Serialize(networks
                         .Select(item => item.NetworkProteins)
                         .SelectMany(item => item)
                         .Where(item => item.Type == NetworkProteinType.Seed)
                         .Select(item => item.Protein.Name)),
+                    UseSeedProteinCollectionData = networks
+                        .Select(item => item.NetworkProteinCollections)
+                        .SelectMany(item => item)
+                        .Any(),
                     SeedProteinCollectionData = JsonSerializer.Serialize(networks
                         .Select(item => item.NetworkProteinCollections)
                         .SelectMany(item => item)
@@ -203,7 +216,9 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                 IsPublic = user == null,
                 Algorithm = null,
                 InteractionDatabaseData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
+                UseSeedProteinData = false,
                 SeedProteinData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
+                UseSeedProteinCollectionData = true,
                 SeedProteinCollectionData = JsonSerializer.Serialize(Enumerable.Empty<string>())
             };
             // Return the page.
@@ -281,6 +296,14 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                 // Redisplay the page.
                 return Page();
             }
+            // Check if no seed data providing method was selected.
+            if (!Input.UseSeedProteinData && !Input.UseSeedProteinCollectionData)
+            {
+                // Add an error to the model.
+                ModelState.AddModelError(string.Empty, "At least one method for providing seed proteins needs to be selected.");
+                // Redisplay the page.
+                return Page();
+            }
             // Try to get the algorithm.
             try
             {
@@ -329,35 +352,46 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                 // Redisplay the page.
                 return Page();
             }
-            // Try to deserialize the seed protein collection data.
-            if (!Input.SeedProteinCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out var seedProteinCollectionIds) || seedProteinCollectionIds == null)
+            // Define the items to be used.
+            var seedProteins = Enumerable.Empty<string>();
+            var seedProteinCollectionIds = Enumerable.Empty<string>();
+            // Check if seed proteins should be used.
+            if (Input.UseSeedProteinData)
             {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided seed protein collection data could not be deserialized.");
-                // Redisplay the page.
-                return Page();
+                // Try to deserialize the seed data.
+                if (!Input.SeedProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out seedProteins) || seedProteins == null)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, "The provided seed data could not be deserialized.");
+                    // Redisplay the page.
+                    return Page();
+                }
+            }
+            // Check if seed protein collection data should be used.
+            if (Input.UseSeedProteinCollectionData)
+            {
+                // Try to deserialize the seed protein collection data.
+                if (!Input.SeedProteinCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out seedProteinCollectionIds) || seedProteinCollectionIds == null)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, "The provided seed protein collection data could not be deserialized.");
+                    // Redisplay the page.
+                    return Page();
+                }
             }
             // Try to get the seed protein collections with the provided IDs.
             var seedProteinCollections = View.SeedProteinCollections
                 .Where(item => seedProteinCollectionIds.Contains(item.Id));
-            // Try to deserialize the seed data.
-            if (!Input.SeedProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out var items) || items == null)
-            {
-                // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided seed data could not be deserialized.");
-                // Redisplay the page.
-                return Page();
-            }
             // Check if there weren't any items found.
-            if (!items.Any() && !seedProteinCollections.Any())
+            if (!seedProteins.Any() && !seedProteinCollections.Any())
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "No items could be found within the provided seed data or the selected seed protein collections.");
+                ModelState.AddModelError(string.Empty, "No seed proteins could be found within the provided seed data or the selected seed protein collections.");
                 // Redisplay the page.
                 return Page();
             }
             // Serialize the seed data.
-            var data = JsonSerializer.Serialize(items
+            var data = JsonSerializer.Serialize(seedProteins
                 .Select(item => new NetworkProteinInputModel
                 {
                     Protein = new ProteinInputModel

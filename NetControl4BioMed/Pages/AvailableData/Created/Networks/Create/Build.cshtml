@@ -126,121 +126,157 @@
             </div>
         </div>
     </div>
-    <div class="card mb-3 file-group" data-type="items">
-        <div class="card-header font-weight-bold">
-            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                <div>
-                    <span><i class="fas fa-list"></i></span>
+    <div class="hidden-group">
+        <div class="card mb-3">
+            <div class="card-header font-weight-bold">
+                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                    <div>
+                        <span><i class="fas fa-check-square"></i></span>
+                    </div>
+                    <div>
+                        <span>Seed data</span>
+                    </div>
                 </div>
-                <div>
-                    <span>Seed proteins</span>
-                    <span class="badge badge-dark file-group-count">0</span>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info text-justify text-wrap">
+                    <span><i class="fas fa-info-circle"></i></span>
+                    <span>Select here the methods in which the seed proteins will be provided. At least one option needs to be selected.</span>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" asp-for="Input.UseSeedProteinData" class="custom-control-input hidden-group-checkbox" data-type="seed-proteins" />
+                        <label asp-for="Input.UseSeedProteinData" class="custom-control-label">Use a manually provided list of seed proteins.</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" asp-for="Input.UseSeedProteinCollectionData" class="custom-control-input hidden-group-checkbox" data-type="seed-protein-collections" />
+                        <label asp-for="Input.UseSeedProteinCollectionData" class="custom-control-label">Use one or more precompiled collections of seed proteins.</label>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="card-body">
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>Input here the identifiers of the seed proteins to be used by the new network. You can check all of the potential identifiers <a asp-page="/AvailableData/Databases/DatabaseProteinFields/Index" asp-route-filter="IsSearchable" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
-            </div>
-            <div class="form-group" hidden>
-                <label asp-for="Input.SeedProteinData" class="font-weight-bold">Seed proteins</label>
-                <textarea asp-for="Input.SeedProteinData" class="form-control file-group-input"></textarea>
-                <span asp-description-for="Input.SeedProteinData" class="text-muted small">The seed proteins to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                <span asp-validation-for="Input.SeedProteinData" class="text-danger small"></span>
-            </div>
-            <div class="form-group">
-                <div class="row align-items-center mb-2">
-                    <div class="col-lg-4">
-                        <label for="data-textarea-seed-protein" class="font-weight-bold mb-0">Seed protein identifiers</label>
-                    </div>
-                    <div class="col-lg-8">
-                        <div class="row align-items-center">
-                            <div class="col-6 col-form-label-sm text-right">
-                                <label for="data-line-separator-seed" class="font-weight-normal mb-0">Line separator:</label>
-                            </div>
-                            <div class="col-6 text-left">
-                                <select id="data-line-separator-seed" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
-                                    <option value=",">comma (",")</option>
-                                    <option value=";">semicolon (";")</option>
-                                    <option value="\t">tab ("\t")</option>
-                                    <option value="\s">space (" ")</option>
-                                    <option value="\n" selected>new line ("\n")</option>
-                                </select>
-                            </div>
+        <div class="hidden-group-display" data-type="seed-proteins" hidden="@(Model.Input.UseSeedProteinData ? null : "hidden")">
+            <div class="card mb-3 file-group" data-type="items">
+                <div class="card-header font-weight-bold">
+                    <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                        <div>
+                            <span><i class="fas fa-list"></i></span>
+                        </div>
+                        <div>
+                            <span>Seed proteins</span>
+                            <span class="badge badge-dark file-group-count">0</span>
                         </div>
                     </div>
                 </div>
-                <textarea id="data-textarea-seed-protein" class="form-control file-group-text mb-2"></textarea>
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input file-group-file-upload" />
-                    <label class="custom-file-label file-group-file-label">Choose file</label>
-                </div>
-                <span class="text-muted small">The seed proteins to be used by the new network. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
-            </div>
-        </div>
-    </div>
-    <div class="card mb-3 table-group" hidden="@(Model.View.SeedProteinCollections.Any() ? null : "hidden")">
-        <div class="card-header font-weight-bold">
-            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                <div>
-                    <span><i class="fas fa-folder"></i></span>
-                </div>
-                <div>
-                    <span>Additional seed proteins</span>
-                    <span class="badge badge-dark table-group-count">0</span>
-                </div>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>Select here the seed collections to be used by the new network. This can be done either in addition to, or instead of the seed proteins above. You can check all of the available drug-target data <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsSource" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and all of the available cell-line data <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsTarget" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
-            </div>
-            <div class="form-group" hidden>
-                <label asp-for="Input.SeedProteinCollectionData" class="font-weight-bold">Seed protein collection IDs</label>
-                <textarea asp-for="Input.SeedProteinCollectionData" class="form-control table-group-input"></textarea>
-                <span asp-description-for="Input.SeedProteinCollectionData" class="text-muted small">The IDs of the seed protein collections to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                <span asp-validation-for="Input.SeedProteinCollectionData" class="text-danger small"></span>
-            </div>
-            <div class="form-group">
-                <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[1]]">
-                    <thead class="thead-light">
-                        <tr>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                                <span></span>
-                            </th>
-                            <th class="text-left text-break">
-                                <span>Collection</span>
-                            </th>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                                <span>Links</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var seedProteinCollection in Model.View.SeedProteinCollections)
-                        {
-                            <tr class="table-group-row" data-id="@seedProteinCollection.Id">
-                                <td class="text-center text-break">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="checkbox-seed-protein-collection-@seedProteinCollection.Id" class="custom-control-input table-group-row-checkbox" title="Select" />
-                                        <label for="checkbox-seed-protein-collection-@seedProteinCollection.Id" class="custom-control-label"></label>
+                <div class="card-body">
+                    <div class="alert alert-info text-justify text-wrap">
+                        <span><i class="fas fa-info-circle"></i></span>
+                        <span>Input here the identifiers of the seed proteins to be used by the new network. You can check all of the potential identifiers <a asp-page="/AvailableData/Databases/DatabaseProteinFields/Index" asp-route-filter="IsSearchable" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    </div>
+                    <div class="form-group" hidden>
+                        <label asp-for="Input.SeedProteinData" class="font-weight-bold">Seed proteins</label>
+                        <textarea asp-for="Input.SeedProteinData" class="form-control file-group-input"></textarea>
+                        <span asp-description-for="Input.SeedProteinData" class="text-muted small">The seed proteins to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                        <span asp-validation-for="Input.SeedProteinData" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="row align-items-center mb-2">
+                            <div class="col-lg-4">
+                                <label for="data-textarea-seed-protein" class="font-weight-bold mb-0">Seed protein identifiers</label>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="row align-items-center">
+                                    <div class="col-6 col-form-label-sm text-right">
+                                        <label for="data-line-separator-seed" class="font-weight-normal mb-0">Line separator:</label>
                                     </div>
-                                    <span></span>
-                                </td>
-                                <td class="text-left text-break">
-                                    <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@seedProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="@seedProteinCollection.Name">@seedProteinCollection.Name</a>
-                                </td>
-                                <td class="text-center text-break">
-                                    <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@seedProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
-                                        <span>Details</span>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                    <div class="col-6 text-left">
+                                        <select id="data-line-separator-seed" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                            <option value=",">comma (",")</option>
+                                            <option value=";">semicolon (";")</option>
+                                            <option value="\t">tab ("\t")</option>
+                                            <option value="\s">space (" ")</option>
+                                            <option value="\n" selected>new line ("\n")</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <textarea id="data-textarea-seed-protein" class="form-control file-group-text mb-2"></textarea>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input file-group-file-upload" />
+                            <label class="custom-file-label file-group-file-label">Choose file</label>
+                        </div>
+                        <span class="text-muted small">The seed proteins to be used by the new network. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden-group-display" data-type="seed-protein-collections" hidden="@(Model.Input.UseSeedProteinCollectionData ? null : "hidden")">
+            <div class="card mb-3 table-group">
+                <div class="card-header font-weight-bold">
+                    <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                        <div>
+                            <span><i class="fas fa-folder"></i></span>
+                        </div>
+                        <div>
+                            <span>Additional seed proteins</span>
+                            <span class="badge badge-dark table-group-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info text-justify text-wrap">
+                        <span><i class="fas fa-info-circle"></i></span>
+                        <span>Select here the seed collections to be used by the new network. You can check all of the available drug-target data <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsSource" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a> and all of the available cell-line data <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsTarget" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    </div>
+                    <div class="form-group" hidden>
+                        <label asp-for="Input.SeedProteinCollectionData" class="font-weight-bold">Seed protein collection IDs</label>
+                        <textarea asp-for="Input.SeedProteinCollectionData" class="form-control table-group-input"></textarea>
+                        <span asp-description-for="Input.SeedProteinCollectionData" class="text-muted small">The IDs of the seed protein collections to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                        <span asp-validation-for="Input.SeedProteinCollectionData" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[1]]">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                        <span></span>
+                                    </th>
+                                    <th class="text-left text-break">
+                                        <span>Collection</span>
+                                    </th>
+                                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                        <span>Links</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var seedProteinCollection in Model.View.SeedProteinCollections)
+                                {
+                                    <tr class="table-group-row" data-id="@seedProteinCollection.Id">
+                                        <td class="text-center text-break">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" id="checkbox-seed-protein-collection-@seedProteinCollection.Id" class="custom-control-input table-group-row-checkbox" title="Select" />
+                                                <label for="checkbox-seed-protein-collection-@seedProteinCollection.Id" class="custom-control-label"></label>
+                                            </div>
+                                            <span></span>
+                                        </td>
+                                        <td class="text-left text-break">
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@seedProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="@seedProteinCollection.Name">@seedProteinCollection.Name</a>
+                                        </td>
+                                        <td class="text-center text-break">
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@seedProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
+                                                <span>Details</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

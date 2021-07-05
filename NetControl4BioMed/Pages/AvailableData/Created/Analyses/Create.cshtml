@@ -84,247 +84,319 @@
             </a>
         </div>
     </div>
-    <div class="card mb-3 file-group" data-type="items">
-        <div class="card-header font-weight-bold">
-            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                <div>
-                    <span><i class="fas fa-list"></i></span>
+    <div class="hidden-group">
+        <div class="card mb-3">
+            <div class="card-header font-weight-bold">
+                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                    <div>
+                        <span><i class="fas fa-check-square"></i></span>
+                    </div>
+                    <div>
+                        <span>Source data</span>
+                    </div>
                 </div>
-                <div>
-                    <span>Source proteins</span>
-                    <span class="badge badge-dark file-group-count">0</span>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info text-justify text-wrap">
+                    <span><i class="fas fa-info-circle"></i></span>
+                    <span>Select here the methods in which the source proteins (to be used as preferred control inputs) will be provided. This is optional, and no option needs to be selected.</span>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" asp-for="Input.UseSourceProteinData" class="custom-control-input hidden-group-checkbox" data-type="source-proteins" />
+                        <label asp-for="Input.UseSourceProteinData" class="custom-control-label">Use a manually provided list of source proteins.</label>
+                    </div>
+                </div>
+                <div class="form-group" hidden="@(Model.View.HasNetworkDatabases ? null : "hidden")">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" asp-for="Input.UseSourceProteinCollectionData" class="custom-control-input hidden-group-checkbox" data-type="source-protein-collections" />
+                        <label asp-for="Input.UseSourceProteinCollectionData" class="custom-control-label">Use one or more precompiled collections of source proteins.</label>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="card-body">
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>Input here the identifiers of the source proteins (preferred control inputs) to be used by the new analysis.</span>
-                @if (Model.View.HasNetworkDatabases)
-                {
-                    <span>You can check all of the potential identifiers <a asp-page="/AvailableData/Databases/DatabaseProteinFields/Index" asp-route-filter="IsSearchable" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
-                }
-            </div>
-            <div class="form-group" hidden>
-                <label asp-for="Input.SourceProteinData" class="font-weight-bold">Source proteins</label>
-                <textarea asp-for="Input.SourceProteinData" class="form-control file-group-input"></textarea>
-                <span asp-description-for="Input.SourceProteinData" class="text-muted small">The source proteins to be used by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                <span asp-validation-for="Input.SourceProteinData" class="text-danger small"></span>
-            </div>
-            <div class="form-group">
-                <div class="row align-items-center mb-2">
-                    <div class="col-lg-4">
-                        <label for="data-textarea-source-protein" class="font-weight-bold mb-0">Source protein identifiers</label>
-                    </div>
-                    <div class="col-lg-8">
-                        <div class="row align-items-center">
-                            <div class="col-6 col-form-label-sm text-right">
-                                <label for="data-line-separator-source" class="font-weight-normal mb-0">Line separator:</label>
-                            </div>
-                            <div class="col-6 text-left">
-                                <select id="data-line-separator-source" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
-                                    <option value=",">comma (",")</option>
-                                    <option value=";">semicolon (";")</option>
-                                    <option value="\t">tab ("\t")</option>
-                                    <option value="\s">space (" ")</option>
-                                    <option value="\n" selected>new line ("\n")</option>
-                                </select>
-                            </div>
+        <div class="hidden-group-display" data-type="source-proteins" hidden="@(Model.Input.UseSourceProteinData ? null : "hidden")">
+            <div class="card mb-3 file-group" data-type="items">
+                <div class="card-header font-weight-bold">
+                    <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                        <div>
+                            <span><i class="fas fa-list"></i></span>
+                        </div>
+                        <div>
+                            <span>Source proteins</span>
+                            <span class="badge badge-dark file-group-count">0</span>
                         </div>
                     </div>
                 </div>
-                <textarea id="data-textarea-source-protein" class="form-control file-group-text mb-2"></textarea>
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input file-group-file-upload" />
-                    <label class="custom-file-label file-group-file-label">Choose file</label>
-                </div>
-                <span class="text-muted small">The source proteins to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
-            </div>
-        </div>
-    </div>
-    <div class="card mb-3 table-group" hidden="@(Model.View.HasNetworkDatabases && Model.View.SourceProteinCollections.Any() ? null : "hidden")">
-        <div class="card-header font-weight-bold">
-            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                <div>
-                    <span><i class="fas fa-folder"></i></span>
-                </div>
-                <div>
-                    <span>Additional source proteins</span>
-                    <span class="badge badge-dark table-group-count">0</span>
-                </div>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>Select here the source collections to be used by the new network. This can be done either in addition to, or instead of the source proteins above. You can check all of the available drug-target data <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsSource" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
-            </div>
-            <div class="form-group" hidden>
-                <label asp-for="Input.SourceProteinCollectionData" class="font-weight-bold">Source protein collection IDs</label>
-                <textarea asp-for="Input.SourceProteinCollectionData" class="form-control table-group-input"></textarea>
-                <span asp-description-for="Input.SourceProteinCollectionData" class="text-muted small">The IDs of the source protein collections to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                <span asp-validation-for="Input.SourceProteinCollectionData" class="text-danger small"></span>
-            </div>
-            <div class="form-group">
-                <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[1]]">
-                    <thead class="thead-light">
-                        <tr>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
-                                <span></span>
-                            </th>
-                            <th class="text-left text-break">
-                                <span>Collection</span>
-                            </th>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                                <span>Links</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var sourceProteinCollection in Model.View.SourceProteinCollections)
+                <div class="card-body">
+                    <div class="alert alert-info text-justify text-wrap">
+                        <span><i class="fas fa-info-circle"></i></span>
+                        <span>Input here the identifiers of the source proteins (preferred control inputs) to be used by the new analysis.</span>
+                        @if (Model.View.HasNetworkDatabases)
                         {
-                            <tr class="table-group-row" data-id="@sourceProteinCollection.Id">
-                                <td class="text-center text-break">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="checkbox-source-protein-collection-@sourceProteinCollection.Id" class="custom-control-input table-group-row-checkbox" title="Select" />
-                                        <label for="checkbox-source-protein-collection-@sourceProteinCollection.Id" class="custom-control-label"></label>
-                                    </div>
-                                    <span></span>
-                                </td>
-                                <td class="text-left text-break">
-                                    <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@sourceProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="@sourceProteinCollection.Name">@sourceProteinCollection.Name</a>
-                                </td>
-                                <td class="text-center text-break">
-                                    <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@sourceProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
-                                        <span>Details</span>
-                                    </a>
-                                </td>
-                            </tr>
+                            <span>You can check all of the potential identifiers <a asp-page="/AvailableData/Databases/DatabaseProteinFields/Index" asp-route-filter="IsSearchable" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                         }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="card mb-3 file-group" data-type="items">
-        <div class="card-header font-weight-bold">
-            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                <div>
-                    <span><i class="fas fa-list"></i></span>
-                </div>
-                <div>
-                    <span>Target proteins</span>
-                    <span class="badge badge-dark file-group-count">0</span>
-                </div>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>Input here the identifiers of the target proteins to be used by the new analysis.</span>
-                @if (Model.View.HasNetworkDatabases)
-                {
-                    <span>You can check all of the potential identifiers <a asp-page="/AvailableData/Databases/DatabaseProteinFields/Index" asp-route-filter="IsSearchable" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
-                }
-            </div>
-            <div class="form-group" hidden>
-                <label asp-for="Input.TargetProteinData" class="font-weight-bold">Target proteins</label>
-                <textarea asp-for="Input.TargetProteinData" class="form-control file-group-input"></textarea>
-                <span asp-description-for="Input.TargetProteinData" class="text-muted small">The target proteins to be used by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                <span asp-validation-for="Input.TargetProteinData" class="text-danger small"></span>
-            </div>
-            <div class="form-group">
-                <div class="row align-items-center mb-2">
-                    <div class="col-lg-4">
-                        <label for="data-textarea-target-protein" class="font-weight-bold mb-0">Target protein identifiers</label>
                     </div>
-                    <div class="col-lg-8">
-                        <div class="row align-items-center">
-                            <div class="col-6 col-form-label-sm text-right">
-                                <label for="data-line-separator-target" class="font-weight-normal mb-0">Line separator:</label>
+                    <div class="form-group" hidden>
+                        <label asp-for="Input.SourceProteinData" class="font-weight-bold">Source proteins</label>
+                        <textarea asp-for="Input.SourceProteinData" class="form-control file-group-input"></textarea>
+                        <span asp-description-for="Input.SourceProteinData" class="text-muted small">The source proteins to be used by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                        <span asp-validation-for="Input.SourceProteinData" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="row align-items-center mb-2">
+                            <div class="col-lg-4">
+                                <label for="data-textarea-source-protein" class="font-weight-bold mb-0">Source protein identifiers</label>
                             </div>
-                            <div class="col-6 text-left">
-                                <select id="data-line-separator-target" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
-                                    <option value=",">comma (",")</option>
-                                    <option value=";">semicolon (";")</option>
-                                    <option value="\t">tab ("\t")</option>
-                                    <option value="\s">space (" ")</option>
-                                    <option value="\n" selected>new line ("\n")</option>
-                                </select>
+                            <div class="col-lg-8">
+                                <div class="row align-items-center">
+                                    <div class="col-6 col-form-label-sm text-right">
+                                        <label for="data-line-separator-source" class="font-weight-normal mb-0">Line separator:</label>
+                                    </div>
+                                    <div class="col-6 text-left">
+                                        <select id="data-line-separator-source" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                            <option value=",">comma (",")</option>
+                                            <option value=";">semicolon (";")</option>
+                                            <option value="\t">tab ("\t")</option>
+                                            <option value="\s">space (" ")</option>
+                                            <option value="\n" selected>new line ("\n")</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+                        <textarea id="data-textarea-source-protein" class="form-control file-group-text mb-2"></textarea>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input file-group-file-upload" />
+                            <label class="custom-file-label file-group-file-label">Choose file</label>
+                        </div>
+                        <span class="text-muted small">The source proteins to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden-group-display" data-type="source-protein-collections" hidden="@(Model.Input.UseSourceProteinCollectionData ? null : "hidden")">
+            <div class="card mb-3 table-group">
+                <div class="card-header font-weight-bold">
+                    <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                        <div>
+                            <span><i class="fas fa-folder"></i></span>
+                        </div>
+                        <div>
+                            <span>Additional source proteins</span>
+                            <span class="badge badge-dark table-group-count">0</span>
                         </div>
                     </div>
                 </div>
-                <textarea id="data-textarea-target-protein" class="form-control file-group-text mb-2"></textarea>
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input file-group-file-upload" />
-                    <label class="custom-file-label file-group-file-label">Choose file</label>
+                <div class="card-body">
+                    <div class="alert alert-info text-justify text-wrap">
+                        <span><i class="fas fa-info-circle"></i></span>
+                        <span>Select here the source collections to be used by the new network. This can be done either in addition to, or instead of the source proteins above. You can check all of the available drug-target data <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsSource" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    </div>
+                    <div class="form-group" hidden>
+                        <label asp-for="Input.SourceProteinCollectionData" class="font-weight-bold">Source protein collection IDs</label>
+                        <textarea asp-for="Input.SourceProteinCollectionData" class="form-control table-group-input"></textarea>
+                        <span asp-description-for="Input.SourceProteinCollectionData" class="text-muted small">The IDs of the source protein collections to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                        <span asp-validation-for="Input.SourceProteinCollectionData" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[1]]">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                                        <span></span>
+                                    </th>
+                                    <th class="text-left text-break">
+                                        <span>Collection</span>
+                                    </th>
+                                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                        <span>Links</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var sourceProteinCollection in Model.View.SourceProteinCollections)
+                                {
+                                    <tr class="table-group-row" data-id="@sourceProteinCollection.Id">
+                                        <td class="text-center text-break">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" id="checkbox-source-protein-collection-@sourceProteinCollection.Id" class="custom-control-input table-group-row-checkbox" title="Select" />
+                                                <label for="checkbox-source-protein-collection-@sourceProteinCollection.Id" class="custom-control-label"></label>
+                                            </div>
+                                            <span></span>
+                                        </td>
+                                        <td class="text-left text-break">
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@sourceProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="@sourceProteinCollection.Name">@sourceProteinCollection.Name</a>
+                                        </td>
+                                        <td class="text-center text-break">
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@sourceProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
+                                                <span>Details</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <span class="text-muted small">The target proteins to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
             </div>
         </div>
     </div>
-    <div class="card mb-3 table-group" hidden="@(Model.View.HasNetworkDatabases && Model.View.TargetProteinCollections.Any() ? null : "hidden")">
-        <div class="card-header font-weight-bold">
-            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-                <div>
-                    <span><i class="fas fa-folder"></i></span>
+    <div class="hidden-group">
+        <div class="card mb-3">
+            <div class="card-header font-weight-bold">
+                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                    <div>
+                        <span><i class="fas fa-check-square"></i></span>
+                    </div>
+                    <div>
+                        <span>Target data</span>
+                    </div>
                 </div>
-                <div>
-                    <span>Additional target proteins</span>
-                    <span class="badge badge-dark table-group-count">0</span>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info text-justify text-wrap">
+                    <span><i class="fas fa-info-circle"></i></span>
+                    <span>Select here the methods in which the target proteins will be provided. At least one option needs to be selected.</span>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" asp-for="Input.UseTargetProteinData" class="custom-control-input hidden-group-checkbox" data-type="target-proteins" />
+                        <label asp-for="Input.UseTargetProteinData" class="custom-control-label">Use a manually provided list of target proteins.</label>
+                    </div>
+                </div>
+                <div class="form-group" hidden="@(Model.View.HasNetworkDatabases ? null : "hidden")">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" asp-for="Input.UseTargetProteinCollectionData" class="custom-control-input hidden-group-checkbox" data-type="target-protein-collections" />
+                        <label asp-for="Input.UseTargetProteinCollectionData" class="custom-control-label">Use one or more precompiled collections of target proteins.</label>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="card-body">
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>Select here the target collections to be used by the new network. This can be done either in addition to, or instead of the target proteins above. You can check all of the available cell-line data <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsTarget" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
-            </div>
-            <div class="form-group" hidden>
-                <label asp-for="Input.TargetProteinCollectionData" class="font-weight-bold">Target protein collection IDs</label>
-                <textarea asp-for="Input.TargetProteinCollectionData" class="form-control table-group-input"></textarea>
-                <span asp-description-for="Input.TargetProteinCollectionData" class="text-muted small">The IDs of the target protein collections to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                <span asp-validation-for="Input.TargetProteinCollectionData" class="text-danger small"></span>
-            </div>
-            <div class="form-group">
-                <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[1]]">
-                    <thead class="thead-light">
-                        <tr>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
-                                <span></span>
-                            </th>
-                            <th class="text-left text-break">
-                                <span>Collection</span>
-                            </th>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                                <span>Links</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var targetProteinCollection in Model.View.TargetProteinCollections)
+        <div class="hidden-group-display" data-type="target-proteins" hidden="@(Model.Input.UseTargetProteinData ? null : "hidden")">
+            <div class="card mb-3 file-group" data-type="items">
+                <div class="card-header font-weight-bold">
+                    <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                        <div>
+                            <span><i class="fas fa-list"></i></span>
+                        </div>
+                        <div>
+                            <span>Target proteins</span>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info text-justify text-wrap">
+                        <span><i class="fas fa-info-circle"></i></span>
+                        <span>Input here the identifiers of the target proteins to be used by the new analysis.</span>
+                        @if (Model.View.HasNetworkDatabases)
                         {
-                            <tr class="table-group-row" data-id="@targetProteinCollection.Id">
-                                <td class="text-center text-break">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="checkbox-target-protein-collection-@targetProteinCollection.Id" class="custom-control-input table-group-row-checkbox" title="Select" />
-                                        <label for="checkbox-target-protein-collection-@targetProteinCollection.Id" class="custom-control-label"></label>
-                                    </div>
-                                    <span></span>
-                                </td>
-                                <td class="text-left text-break">
-                                    <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@targetProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="@targetProteinCollection.Name">@targetProteinCollection.Name</a>
-                                </td>
-                                <td class="text-center text-break">
-                                    <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@targetProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
-                                        <span>Details</span>
-                                    </a>
-                                </td>
-                            </tr>
+                            <span>You can check all of the potential identifiers <a asp-page="/AvailableData/Databases/DatabaseProteinFields/Index" asp-route-filter="IsSearchable" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                         }
-                    </tbody>
-                </table>
+                    </div>
+                    <div class="form-group" hidden>
+                        <label asp-for="Input.TargetProteinData" class="font-weight-bold">Target proteins</label>
+                        <textarea asp-for="Input.TargetProteinData" class="form-control file-group-input"></textarea>
+                        <span asp-description-for="Input.TargetProteinData" class="text-muted small">The target proteins to be used by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                        <span asp-validation-for="Input.TargetProteinData" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="row align-items-center mb-2">
+                            <div class="col-lg-4">
+                                <label for="data-textarea-target-protein" class="font-weight-bold mb-0">Target protein identifiers</label>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="row align-items-center">
+                                    <div class="col-6 col-form-label-sm text-right">
+                                        <label for="data-line-separator-target" class="font-weight-normal mb-0">Line separator:</label>
+                                    </div>
+                                    <div class="col-6 text-left">
+                                        <select id="data-line-separator-target" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                            <option value=",">comma (",")</option>
+                                            <option value=";">semicolon (";")</option>
+                                            <option value="\t">tab ("\t")</option>
+                                            <option value="\s">space (" ")</option>
+                                            <option value="\n" selected>new line ("\n")</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <textarea id="data-textarea-target-protein" class="form-control file-group-text mb-2"></textarea>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input file-group-file-upload" />
+                            <label class="custom-file-label file-group-file-label">Choose file</label>
+                        </div>
+                        <span class="text-muted small">The target proteins to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden-group-display" data-type="target-protein-collections" hidden="@(Model.Input.UseTargetProteinCollectionData ? null : "hidden")">
+            <div class="card mb-3 table-group">
+                <div class="card-header font-weight-bold">
+                    <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                        <div>
+                            <span><i class="fas fa-folder"></i></span>
+                        </div>
+                        <div>
+                            <span>Additional target proteins</span>
+                            <span class="badge badge-dark table-group-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info text-justify text-wrap">
+                        <span><i class="fas fa-info-circle"></i></span>
+                        <span>Select here the target collections to be used by the new network. This can be done either in addition to, or instead of the target proteins above. You can check all of the available cell-line data <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsTarget" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    </div>
+                    <div class="form-group" hidden>
+                        <label asp-for="Input.TargetProteinCollectionData" class="font-weight-bold">Target protein collection IDs</label>
+                        <textarea asp-for="Input.TargetProteinCollectionData" class="form-control table-group-input"></textarea>
+                        <span asp-description-for="Input.TargetProteinCollectionData" class="text-muted small">The IDs of the target protein collections to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                        <span asp-validation-for="Input.TargetProteinCollectionData" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[1]]">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
+                                        <span></span>
+                                    </th>
+                                    <th class="text-left text-break">
+                                        <span>Collection</span>
+                                    </th>
+                                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                        <span>Links</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var targetProteinCollection in Model.View.TargetProteinCollections)
+                                {
+                                    <tr class="table-group-row" data-id="@targetProteinCollection.Id">
+                                        <td class="text-center text-break">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" id="checkbox-target-protein-collection-@targetProteinCollection.Id" class="custom-control-input table-group-row-checkbox" title="Select" />
+                                                <label for="checkbox-target-protein-collection-@targetProteinCollection.Id" class="custom-control-label"></label>
+                                            </div>
+                                            <span></span>
+                                        </td>
+                                        <td class="text-left text-break">
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@targetProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="@targetProteinCollection.Name">@targetProteinCollection.Name</a>
+                                        </td>
+                                        <td class="text-center text-break">
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@targetProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
+                                                <span>Details</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -362,30 +434,30 @@
                 </div>
             </div>
             <div class="parameter-group-values" hidden>
-                <div class="row">
-                    <div class="col-lg-6 order-1 order-lg-1 align-self-center">
-                        <label asp-for="Input.MaximumIterations" class="font-weight-bold">Maximum iterations</label>
-                    </div>
-                    <div class="col-lg-6 order-1 order-lg-2">
-                        <input asp-for="Input.MaximumIterations" class="form-control" />
-                    </div>
-                    <div class="col-lg-6 order-1 order-lg-3 mb-3">
-                        <span asp-description-for="Input.MaximumIterations" class="text-muted small">The maximum number of iterations for which the analysis to run.</span>
-                        <span asp-validation-for="Input.MaximumIterations" class="text-danger small"></span>
-                    </div>
-                    <div class="col-lg-6 order-2 order-lg-1 align-self-center">
-                        <label asp-for="Input.MaximumIterationsWithoutImprovement" class="font-weight-bold">Maximum iterations without improvement</label>
-                    </div>
-                    <div class="col-lg-6 order-2 order-lg-2">
-                        <input asp-for="Input.MaximumIterationsWithoutImprovement" class="form-control" />
-                    </div>
-                    <div class="col-lg-6 order-2 order-lg-3 mb-3">
-                        <span asp-description-for="Input.MaximumIterationsWithoutImprovement" class="text-muted small">The maximum number of iterations without improvement in the size of the best solution for which the analysis to run.</span>
-                        <span asp-validation-for="Input.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
-                    </div>
-                </div>
                 <div class="parameter-group-parameters"></div>
                 <template class="parameter-group-template" data-algorithm="@AnalysisAlgorithm.Greedy.ToString()">
+                    <div class="row">
+                        <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                            <label asp-for="Input.MaximumIterations" class="font-weight-bold">Maximum iterations</label>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-2">
+                            <input asp-for="Input.MaximumIterations" class="form-control" />
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                            <span asp-description-for="Input.MaximumIterations" class="text-muted small">The maximum number of iterations for which the analysis to run.</span>
+                            <span asp-validation-for="Input.MaximumIterations" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                            <label asp-for="Input.MaximumIterationsWithoutImprovement" class="font-weight-bold">Maximum iterations without improvement</label>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-2">
+                            <input asp-for="Input.MaximumIterationsWithoutImprovement" class="form-control" />
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                            <span asp-description-for="Input.MaximumIterationsWithoutImprovement" class="text-muted small">The maximum number of iterations without improvement in the size of the best solution for which the analysis to run.</span>
+                            <span asp-validation-for="Input.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-lg-6 order-1 order-lg-1 align-self-center">
                             <label asp-for="Input.GreedyAlgorithmParameters.RandomSeed" class="font-weight-bold">Random seed</label>
@@ -471,6 +543,28 @@
                     </div>
                 </template>
                 <template class="parameter-group-template" data-algorithm="@AnalysisAlgorithm.Genetic.ToString()">
+                    <div class="row">
+                        <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                            <label asp-for="Input.MaximumIterations" class="font-weight-bold">Maximum iterations</label>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-2">
+                            <input asp-for="Input.MaximumIterations" class="form-control" />
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                            <span asp-description-for="Input.MaximumIterations" class="text-muted small">The maximum number of iterations for which the analysis to run.</span>
+                            <span asp-validation-for="Input.MaximumIterations" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                            <label asp-for="Input.MaximumIterationsWithoutImprovement" class="font-weight-bold">Maximum iterations without improvement</label>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-2">
+                            <input asp-for="Input.MaximumIterationsWithoutImprovement" class="form-control" />
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                            <span asp-description-for="Input.MaximumIterationsWithoutImprovement" class="text-muted small">The maximum number of iterations without improvement in the size of the best solution for which the analysis to run.</span>
+                            <span asp-validation-for="Input.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-lg-6 order-1 order-lg-1 align-self-center">
                             <label asp-for="Input.GeneticAlgorithmParameters.RandomSeed" class="font-weight-bold">Random seed</label>

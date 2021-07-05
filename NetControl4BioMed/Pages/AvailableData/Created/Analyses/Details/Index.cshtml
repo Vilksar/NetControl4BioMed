@@ -159,304 +159,298 @@
             </div>
         </div>
     </div>
-    <div class="card-body">
-        <div class="hidden-group">
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>You can click <a class="alert-link hidden-group-toggle">here</a> to display or hide the detailed progress data of the analysis.</span>
-            </div>
-            <div class="hidden-group-display" hidden>
-                <div class="row">
-                    <div class="col-lg-6 order-1 order-lg-1 align-self-center">
-                        <label asp-for="View.Analysis.CurrentIteration" class="font-weight-bold">Current iteration</label>
-                    </div>
-                    <div class="col-lg-6 order-1 order-lg-2">
-                        <input asp-for="View.Analysis.CurrentIteration" class="form-control" disabled />
-                    </div>
-                    <div class="col-lg-6 order-1 order-lg-3 mb-3">
-                        <span asp-description-for="View.Analysis.CurrentIteration" class="text-muted small">The number of iterations for which the analysis has ran so far.</span>
-                        <span asp-validation-for="View.Analysis.CurrentIteration" class="text-danger small"></span>
-                    </div>
-                    <div class="col-lg-6 order-2 order-lg-1 align-self-center">
-                        <label asp-for="View.Analysis.CurrentIterationWithoutImprovement" class="font-weight-bold">Current iteration without improvement</label>
-                    </div>
-                    <div class="col-lg-6 order-2 order-lg-2">
-                        <input asp-for="View.Analysis.CurrentIterationWithoutImprovement" class="form-control" disabled />
-                    </div>
-                    <div class="col-lg-6 order-2 order-lg-3 mb-3">
-                        <span asp-description-for="View.Analysis.CurrentIterationWithoutImprovement" class="text-muted small">The number of iterations without improvement for which the analysis has ran so far.</span>
-                        <span asp-validation-for="View.Analysis.CurrentIterationWithoutImprovement" class="text-danger small"></span>
-                    </div>
+    <div class="card-body hidden-group">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>You can click <a class="alert-link hidden-group-toggle" data-type="progress">here</a> to display or hide the detailed progress data of the analysis.</span>
+        </div>
+        <div class="hidden-group-display" data-type="progress" hidden>
+            <div class="row">
+                <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                    <label asp-for="View.Analysis.CurrentIteration" class="font-weight-bold">Current iteration</label>
                 </div>
-                <div class="row">
-                    <div class="col-lg-6 order-1 order-lg-1 align-self-center">
-                        <label asp-for="View.Analysis.MaximumIterations" class="font-weight-bold">Maximum iterations</label>
-                    </div>
-                    <div class="col-lg-6 order-1 order-lg-2">
-                        <input asp-for="View.Analysis.MaximumIterations" class="form-control" disabled />
-                    </div>
-                    <div class="col-lg-6 order-1 order-lg-3 mb-3">
-                        <span asp-description-for="View.Analysis.MaximumIterations" class="text-muted small">The maximum number of iterations for which the analysis to run.</span>
-                        <span asp-validation-for="View.Analysis.MaximumIterations" class="text-danger small"></span>
-                    </div>
-                    <div class="col-lg-6 order-2 order-lg-1 align-self-center">
-                        <label asp-for="View.Analysis.MaximumIterationsWithoutImprovement" class="font-weight-bold">Maximum iterations without improvement</label>
-                    </div>
-                    <div class="col-lg-6 order-2 order-lg-2">
-                        <input asp-for="View.Analysis.MaximumIterationsWithoutImprovement" class="form-control" disabled />
-                    </div>
-                    <div class="col-lg-6 order-2 order-lg-3 mb-3">
-                        <span asp-description-for="View.Analysis.MaximumIterationsWithoutImprovement" class="text-muted small">The maximum number of iterations without improvement in the size of the best solution for which the analysis to run.</span>
-                        <span asp-validation-for="View.Analysis.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
-                    </div>
+                <div class="col-lg-6 order-1 order-lg-2">
+                    <input asp-for="View.Analysis.CurrentIteration" class="form-control" disabled />
+                </div>
+                <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                    <span asp-description-for="View.Analysis.CurrentIteration" class="text-muted small">The number of iterations for which the analysis has ran so far.</span>
+                    <span asp-validation-for="View.Analysis.CurrentIteration" class="text-danger small"></span>
+                </div>
+                <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                    <label asp-for="View.Analysis.CurrentIterationWithoutImprovement" class="font-weight-bold">Current iteration without improvement</label>
+                </div>
+                <div class="col-lg-6 order-2 order-lg-2">
+                    <input asp-for="View.Analysis.CurrentIterationWithoutImprovement" class="form-control" disabled />
+                </div>
+                <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                    <span asp-description-for="View.Analysis.CurrentIterationWithoutImprovement" class="text-muted small">The number of iterations without improvement for which the analysis has ran so far.</span>
+                    <span asp-validation-for="View.Analysis.CurrentIterationWithoutImprovement" class="text-danger small"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                    <label asp-for="View.Analysis.MaximumIterations" class="font-weight-bold">Maximum iterations</label>
+                </div>
+                <div class="col-lg-6 order-1 order-lg-2">
+                    <input asp-for="View.Analysis.MaximumIterations" class="form-control" disabled />
+                </div>
+                <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                    <span asp-description-for="View.Analysis.MaximumIterations" class="text-muted small">The maximum number of iterations for which the analysis to run.</span>
+                    <span asp-validation-for="View.Analysis.MaximumIterations" class="text-danger small"></span>
+                </div>
+                <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                    <label asp-for="View.Analysis.MaximumIterationsWithoutImprovement" class="font-weight-bold">Maximum iterations without improvement</label>
+                </div>
+                <div class="col-lg-6 order-2 order-lg-2">
+                    <input asp-for="View.Analysis.MaximumIterationsWithoutImprovement" class="form-control" disabled />
+                </div>
+                <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                    <span asp-description-for="View.Analysis.MaximumIterationsWithoutImprovement" class="text-muted small">The maximum number of iterations without improvement in the size of the best solution for which the analysis to run.</span>
+                    <span asp-validation-for="View.Analysis.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
                 </div>
             </div>
         </div>
-        <div class="hidden-group parameter-group">
-            <div class="alert alert-info text-justify text-wrap">
-                <span><i class="fas fa-info-circle"></i></span>
-                <span>You can click <a class="alert-link hidden-group-toggle">here</a> to display or hide the algorithm used by the analysis and its parameters.</span>
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>You can click <a class="alert-link hidden-group-toggle" data-type="algorithm">here</a> to display or hide the algorithm used by the analysis and its parameters.</span>
+        </div>
+        <div class="parameter-group hidden-group-display" data-type="algorithm" hidden>
+            <div class="row">
+                <div class="col-lg-12 order-3 order-lg-1 align-self-center">
+                    <label asp-for="View.Analysis.Algorithm" class="font-weight-bold">Algorithm</label>
+                </div>
+                <div class="col-lg-12 order-3 order-lg-2">
+                    <select asp-for="View.Analysis.Algorithm" class="custom-select" title="@Model.View.Analysis.Algorithm.GetDisplayDescription()" disabled>
+                        @foreach (var item in Enum.GetValues(typeof(AnalysisAlgorithm)).Cast<AnalysisAlgorithm>())
+                        {
+                            <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-lg-12 order-4 order-lg-3 mb-3">
+                    <span asp-description-for="View.Analysis.Algorithm" class="text-muted small">The algorithm used by the analysis.</span>
+                    <span asp-validation-for="View.Analysis.Algorithm" class="text-danger small"></span>
+                </div>
             </div>
-            <div class="hidden-group-display" hidden>
+            @if (Model.View.GreedyAlgorithmParameters != null)
+            {
                 <div class="row">
-                    <div class="col-lg-12 order-3 order-lg-1 align-self-center">
-                        <label asp-for="View.Analysis.Algorithm" class="font-weight-bold">Algorithm</label>
+                    <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                        <label asp-for="View.GreedyAlgorithmParameters.RandomSeed" class="font-weight-bold">Random seed</label>
                     </div>
-                    <div class="col-lg-12 order-3 order-lg-2">
-                        <select asp-for="View.Analysis.Algorithm" class="custom-select" title="@Model.View.Analysis.Algorithm.GetDisplayDescription()" disabled>
-                            @foreach (var item in Enum.GetValues(typeof(AnalysisAlgorithm)).Cast<AnalysisAlgorithm>())
+                    <div class="col-lg-6 order-1 order-lg-2">
+                        <input asp-for="View.GreedyAlgorithmParameters.RandomSeed" class="form-control" disabled />
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                        <span asp-description-for="View.GreedyAlgorithmParameters.RandomSeed" class="text-muted small">The random seed to be used throughout the algorithm.</span>
+                        <span asp-validation-for="View.GreedyAlgorithmParameters.RandomSeed" class="text-danger small"></span>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                        <label asp-for="View.GreedyAlgorithmParameters.MaximumPathLength" class="font-weight-bold">Maximum path length</label>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-2">
+                        <input asp-for="View.GreedyAlgorithmParameters.MaximumPathLength" class="form-control" disabled />
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                        <span asp-description-for="View.GreedyAlgorithmParameters.MaximumPathLength" class="text-muted small">The maximum length of any path between a source node and a target node.</span>
+                        <span asp-validation-for="View.GreedyAlgorithmParameters.MaximumPathLength" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="row" hidden>
+                    <div class="col-lg-12 order-1 order-lg-1 align-self-center">
+                        <label asp-for="View.GreedyAlgorithmParameters.Repeats" class="font-weight-bold">Repeats</label>
+                    </div>
+                    <div class="col-lg-12 order-1 order-lg-2">
+                        <input asp-for="View.GreedyAlgorithmParameters.Repeats" class="form-control" disabled />
+                    </div>
+                    <div class="col-lg-12 order-1 order-lg-3 mb-3">
+                        <span asp-description-for="View.GreedyAlgorithmParameters.Repeats" class="text-muted small">The number of times that each heuristic will be repeated in one iteration.</span>
+                        <span asp-validation-for="View.GreedyAlgorithmParameters.Repeats" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="heuristics-group">
+                    <div class="row" hidden>
+                        <div class="col-lg-12 order-1 order-lg-1 align-self-center">
+                            <label asp-for="View.GreedyAlgorithmParameters.Heuristics" class="font-weight-bold">Heuristics</label>
+                        </div>
+                        <div class="col-lg-12 order-1 order-lg-2">
+                            <textarea asp-for="View.GreedyAlgorithmParameters.Heuristics" class="form-control heuristics-group-input"></textarea>
+                        </div>
+                        <div class="col-lg-12 order-1 order-lg-3 mb-3">
+                            <span asp-description-for="View.GreedyAlgorithmParameters.Heuristics" class="text-muted small">The search heuristics for the algorithm. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                            <span asp-validation-for="View.GreedyAlgorithmParameters.Heuristics" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="d-none col-lg-12 order-1 order-lg-1 align-self-center">
+                            <label for="heuristics-group-possible" class="font-weight-bold">Possible heuristics</label>
+                        </div>
+                        <div class="d-none col-lg-12 order-1 order-lg-2">
+                            <select id="heuristics-group-possible" class="custom-select heuristics-group-possible" size="10" multiple title="Current heuristics">
+                                <option value="" title="New group">--- New group ---</option>
+                                @foreach (var item in Helpers.Algorithms.Analyses.Greedy.Parameters.PossibleHeuristics)
+                                {
+                                    <option value="@item.Key" title="@item.Value">@item.Value</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="d-none col-lg-12 order-2 order-lg-1 align-self-center"></div>
+                        <div class="d-none col-lg-12 order-2 order-lg-2 align-self-center">
+                            <button type="button" class="btn btn-dark btn-block heuristics-group-add my-2" title="Add heuristic">
+                                <span class="d-none d-lg-block"><i class="fas fa-angle-right"></i></span>
+                                <span class="d-block d-lg-none"><i class="fas fa-angle-down"></i></span>
+                            </button>
+                            <button type="button" class="btn btn-dark btn-block heuristics-group-remove my-2" title="Remove heuristic">
+                                <span class="d-none d-lg-block"><i class="fas fa-angle-left"></i></span>
+                                <span class="d-block d-lg-none"><i class="fas fa-angle-up"></i></span>
+                            </button>
+                        </div>
+                        <div class="col-lg-12 order-3 order-lg-1 align-self-center">
+                            <label for="heuristics-group-current" class="font-weight-bold">Heuristics</label>
+                        </div>
+                        <div class="col-lg-12 order-3 order-lg-2">
+                            <select id="heuristics-group-current" class="custom-select heuristics-group-current" size="10" title="Heuristics" disabled></select>
+                        </div>
+                        <div class="col-lg-12 order-4 order-lg-3 mb-3">
+                            <span description-for="heuristics-group-current" class="text-muted small">The search heuristics for the algorithm.</span>
+                            <span validation-for="heuristics-group-current" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (Model.View.GeneticAlgorithmParameters != null)
+            {
+                <div class="row">
+                    <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                        <label asp-for="View.GeneticAlgorithmParameters.RandomSeed" class="font-weight-bold">Random seed</label>
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-2">
+                        <input asp-for="View.GeneticAlgorithmParameters.RandomSeed" class="form-control" disabled />
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                        <span asp-description-for="View.GeneticAlgorithmParameters.RandomSeed" class="text-muted small">The random seed to be used throughout the algorithm.</span>
+                        <span asp-validation-for="View.GeneticAlgorithmParameters.RandomSeed" class="text-danger small"></span>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                        <label asp-for="View.GeneticAlgorithmParameters.MaximumPathLength" class="font-weight-bold">Maximum path length</label>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-2">
+                        <input asp-for="View.GeneticAlgorithmParameters.MaximumPathLength" class="form-control" disabled />
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                        <span asp-description-for="View.GeneticAlgorithmParameters.MaximumPathLength" class="text-muted small">The maximum length of any path between a source node and a target node.</span>
+                        <span asp-validation-for="View.GeneticAlgorithmParameters.MaximumPathLength" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                        <label asp-for="View.GeneticAlgorithmParameters.PopulationSize" class="font-weight-bold">Population size</label>
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-2">
+                        <input asp-for="View.GeneticAlgorithmParameters.PopulationSize" class="form-control" disabled />
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                        <span asp-description-for="View.GeneticAlgorithmParameters.PopulationSize" class="text-muted small">The number of chromosomes in each population.</span>
+                        <span asp-validation-for="View.GeneticAlgorithmParameters.PopulationSize" class="text-danger small"></span>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                        <label asp-for="View.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="font-weight-bold">Random genes per chromosome</label>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-2">
+                        <input asp-for="View.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="form-control" disabled />
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                        <span asp-description-for="View.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="text-muted small">The maximum number of genes whose value can be simultaneously randomly generated.</span>
+                        <span asp-validation-for="View.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 order-1 order-lg-1 align-self-center">
+                        <label asp-for="View.GeneticAlgorithmParameters.PercentageRandom" class="font-weight-bold">Percentage random</label>
+                    </div>
+                    <div class="col-lg-4 order-1 order-lg-2">
+                        <input asp-for="View.GeneticAlgorithmParameters.PercentageRandom" class="form-control" disabled />
+                    </div>
+                    <div class="col-lg-4 order-1 order-lg-3 mb-3">
+                        <span asp-description-for="View.GeneticAlgorithmParameters.PercentageRandom" class="text-muted small">The percentage of a population which is composed of randomly generated chromosomes.</span>
+                        <span asp-validation-for="View.GeneticAlgorithmParameters.PercentageRandom" class="text-danger small"></span>
+                    </div>
+                    <div class="col-lg-4 order-2 order-lg-1 align-self-center">
+                        <label asp-for="View.GeneticAlgorithmParameters.PercentageElite" class="font-weight-bold">Percentage elite</label>
+                    </div>
+                    <div class="col-lg-4 order-2 order-lg-2">
+                        <input asp-for="View.GeneticAlgorithmParameters.PercentageElite" class="form-control" disabled />
+                    </div>
+                    <div class="col-lg-4 order-2 order-lg-3 mb-3">
+                        <span asp-description-for="View.GeneticAlgorithmParameters.PercentageElite" class="text-muted small">The percentage of a population which is composed of the elite chromosomes of the previous population.</span>
+                        <span asp-validation-for="View.GeneticAlgorithmParameters.PercentageElite" class="text-danger small"></span>
+                    </div>
+                    <div class="col-lg-4 order-3 order-lg-1 align-self-center">
+                        <label asp-for="View.GeneticAlgorithmParameters.ProbabilityMutation" class="font-weight-bold">Probability of mutation</label>
+                    </div>
+                    <div class="col-lg-4 order-3 order-lg-2">
+                        <input asp-for="View.GeneticAlgorithmParameters.ProbabilityMutation" class="form-control" disabled />
+                    </div>
+                    <div class="col-lg-4 order-3 order-lg-3 mb-3">
+                        <span asp-description-for="View.GeneticAlgorithmParameters.ProbabilityMutation" class="text-muted small">The probability of mutation for each gene of a chromosome.</span>
+                        <span asp-validation-for="View.GeneticAlgorithmParameters.ProbabilityMutation" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                        <label asp-for="View.GeneticAlgorithmParameters.CrossoverType" class="font-weight-bold">Crossover algorithm</label>
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-2">
+                        <select asp-for="View.GeneticAlgorithmParameters.CrossoverType" class="custom-select" title="@Model.View.GeneticAlgorithmParameters.CrossoverType.GetDisplayDescription()" disabled>
+                            @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Analyses.Genetic.CrossoverType)).Cast<Helpers.Algorithms.Analyses.Genetic.CrossoverType>())
                             {
                                 <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
                             }
                         </select>
                     </div>
-                    <div class="col-lg-12 order-4 order-lg-3 mb-3">
-                        <span asp-description-for="View.Analysis.Algorithm" class="text-muted small">The algorithm used by the analysis.</span>
-                        <span asp-validation-for="View.Analysis.Algorithm" class="text-danger small"></span>
+                    <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                        <span asp-description-for="View.GeneticAlgorithmParameters.CrossoverType" class="text-muted small">The crossover algorithm to be used.</span>
+                        <span asp-validation-for="View.GeneticAlgorithmParameters.CrossoverType" class="text-danger small"></span>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                        <label asp-for="View.GeneticAlgorithmParameters.MutationType" class="font-weight-bold">Mutation algorithm</label>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-2">
+                        <select asp-for="View.GeneticAlgorithmParameters.MutationType" class="custom-select" title="@Model.View.GeneticAlgorithmParameters.MutationType.GetDisplayDescription()" disabled>
+                            @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Analyses.Genetic.MutationType)).Cast<Helpers.Algorithms.Analyses.Genetic.MutationType>())
+                            {
+                                <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                        <span asp-description-for="View.GeneticAlgorithmParameters.MutationType" class="text-muted small">The mutation algorithm to be used.</span>
+                        <span asp-validation-for="View.GeneticAlgorithmParameters.MutationType" class="text-danger small"></span>
                     </div>
                 </div>
-                @if (Model.View.GreedyAlgorithmParameters != null)
-                {
-                    <div class="row">
-                        <div class="col-lg-6 order-1 order-lg-1 align-self-center">
-                            <label asp-for="View.GreedyAlgorithmParameters.RandomSeed" class="font-weight-bold">Random seed</label>
-                        </div>
-                        <div class="col-lg-6 order-1 order-lg-2">
-                            <input asp-for="View.GreedyAlgorithmParameters.RandomSeed" class="form-control" disabled />
-                        </div>
-                        <div class="col-lg-6 order-1 order-lg-3 mb-3">
-                            <span asp-description-for="View.GreedyAlgorithmParameters.RandomSeed" class="text-muted small">The random seed to be used throughout the algorithm.</span>
-                            <span asp-validation-for="View.GreedyAlgorithmParameters.RandomSeed" class="text-danger small"></span>
-                        </div>
-                        <div class="col-lg-6 order-2 order-lg-1 align-self-center">
-                            <label asp-for="View.GreedyAlgorithmParameters.MaximumPathLength" class="font-weight-bold">Maximum path length</label>
-                        </div>
-                        <div class="col-lg-6 order-2 order-lg-2">
-                            <input asp-for="View.GreedyAlgorithmParameters.MaximumPathLength" class="form-control" disabled />
-                        </div>
-                        <div class="col-lg-6 order-2 order-lg-3 mb-3">
-                            <span asp-description-for="View.GreedyAlgorithmParameters.MaximumPathLength" class="text-muted small">The maximum length of any path between a source node and a target node.</span>
-                            <span asp-validation-for="View.GreedyAlgorithmParameters.MaximumPathLength" class="text-danger small"></span>
-                        </div>
-                    </div>
-                    <div class="row" hidden>
-                        <div class="col-lg-12 order-1 order-lg-1 align-self-center">
-                            <label asp-for="View.GreedyAlgorithmParameters.Repeats" class="font-weight-bold">Repeats</label>
-                        </div>
-                        <div class="col-lg-12 order-1 order-lg-2">
-                            <input asp-for="View.GreedyAlgorithmParameters.Repeats" class="form-control" disabled />
-                        </div>
-                        <div class="col-lg-12 order-1 order-lg-3 mb-3">
-                            <span asp-description-for="View.GreedyAlgorithmParameters.Repeats" class="text-muted small">The number of times that each heuristic will be repeated in one iteration.</span>
-                            <span asp-validation-for="View.GreedyAlgorithmParameters.Repeats" class="text-danger small"></span>
-                        </div>
-                    </div>
-                    <div class="heuristics-group">
-                        <div class="row" hidden>
-                            <div class="col-lg-12 order-1 order-lg-1 align-self-center">
-                                <label asp-for="View.GreedyAlgorithmParameters.Heuristics" class="font-weight-bold">Heuristics</label>
-                            </div>
-                            <div class="col-lg-12 order-1 order-lg-2">
-                                <textarea asp-for="View.GreedyAlgorithmParameters.Heuristics" class="form-control heuristics-group-input"></textarea>
-                            </div>
-                            <div class="col-lg-12 order-1 order-lg-3 mb-3">
-                                <span asp-description-for="View.GreedyAlgorithmParameters.Heuristics" class="text-muted small">The search heuristics for the algorithm. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
-                                <span asp-validation-for="View.GreedyAlgorithmParameters.Heuristics" class="text-danger small"></span>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="d-none col-lg-12 order-1 order-lg-1 align-self-center">
-                                <label for="heuristics-group-possible" class="font-weight-bold">Possible heuristics</label>
-                            </div>
-                            <div class="d-none col-lg-12 order-1 order-lg-2">
-                                <select id="heuristics-group-possible" class="custom-select heuristics-group-possible" size="10" multiple title="Current heuristics">
-                                    <option value="" title="New group">--- New group ---</option>
-                                    @foreach (var item in Helpers.Algorithms.Analyses.Greedy.Parameters.PossibleHeuristics)
-                                    {
-                                        <option value="@item.Key" title="@item.Value">@item.Value</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="d-none col-lg-12 order-2 order-lg-1 align-self-center"></div>
-                            <div class="d-none col-lg-12 order-2 order-lg-2 align-self-center">
-                                <button type="button" class="btn btn-dark btn-block heuristics-group-add my-2" title="Add heuristic">
-                                    <span class="d-none d-lg-block"><i class="fas fa-angle-right"></i></span>
-                                    <span class="d-block d-lg-none"><i class="fas fa-angle-down"></i></span>
-                                </button>
-                                <button type="button" class="btn btn-dark btn-block heuristics-group-remove my-2" title="Remove heuristic">
-                                    <span class="d-none d-lg-block"><i class="fas fa-angle-left"></i></span>
-                                    <span class="d-block d-lg-none"><i class="fas fa-angle-up"></i></span>
-                                </button>
-                            </div>
-                            <div class="col-lg-12 order-3 order-lg-1 align-self-center">
-                                <label for="heuristics-group-current" class="font-weight-bold">Heuristics</label>
-                            </div>
-                            <div class="col-lg-12 order-3 order-lg-2">
-                                <select id="heuristics-group-current" class="custom-select heuristics-group-current" size="10" title="Heuristics" disabled></select>
-                            </div>
-                            <div class="col-lg-12 order-4 order-lg-3 mb-3">
-                                <span description-for="heuristics-group-current" class="text-muted small">The search heuristics for the algorithm.</span>
-                                <span validation-for="heuristics-group-current" class="text-danger small"></span>
-                            </div>
-                        </div>
-                    </div>
-                }
-                else if (Model.View.GeneticAlgorithmParameters != null)
-                {
-                    <div class="row">
-                        <div class="col-lg-6 order-1 order-lg-1 align-self-center">
-                            <label asp-for="View.GeneticAlgorithmParameters.RandomSeed" class="font-weight-bold">Random seed</label>
-                        </div>
-                        <div class="col-lg-6 order-1 order-lg-2">
-                            <input asp-for="View.GeneticAlgorithmParameters.RandomSeed" class="form-control" disabled />
-                        </div>
-                        <div class="col-lg-6 order-1 order-lg-3 mb-3">
-                            <span asp-description-for="View.GeneticAlgorithmParameters.RandomSeed" class="text-muted small">The random seed to be used throughout the algorithm.</span>
-                            <span asp-validation-for="View.GeneticAlgorithmParameters.RandomSeed" class="text-danger small"></span>
-                        </div>
-                        <div class="col-lg-6 order-2 order-lg-1 align-self-center">
-                            <label asp-for="View.GeneticAlgorithmParameters.MaximumPathLength" class="font-weight-bold">Maximum path length</label>
-                        </div>
-                        <div class="col-lg-6 order-2 order-lg-2">
-                            <input asp-for="View.GeneticAlgorithmParameters.MaximumPathLength" class="form-control" disabled />
-                        </div>
-                        <div class="col-lg-6 order-2 order-lg-3 mb-3">
-                            <span asp-description-for="View.GeneticAlgorithmParameters.MaximumPathLength" class="text-muted small">The maximum length of any path between a source node and a target node.</span>
-                            <span asp-validation-for="View.GeneticAlgorithmParameters.MaximumPathLength" class="text-danger small"></span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6 order-1 order-lg-1 align-self-center">
-                            <label asp-for="View.GeneticAlgorithmParameters.PopulationSize" class="font-weight-bold">Population size</label>
-                        </div>
-                        <div class="col-lg-6 order-1 order-lg-2">
-                            <input asp-for="View.GeneticAlgorithmParameters.PopulationSize" class="form-control" disabled />
-                        </div>
-                        <div class="col-lg-6 order-1 order-lg-3 mb-3">
-                            <span asp-description-for="View.GeneticAlgorithmParameters.PopulationSize" class="text-muted small">The number of chromosomes in each population.</span>
-                            <span asp-validation-for="View.GeneticAlgorithmParameters.PopulationSize" class="text-danger small"></span>
-                        </div>
-                        <div class="col-lg-6 order-2 order-lg-1 align-self-center">
-                            <label asp-for="View.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="font-weight-bold">Random genes per chromosome</label>
-                        </div>
-                        <div class="col-lg-6 order-2 order-lg-2">
-                            <input asp-for="View.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="form-control" disabled />
-                        </div>
-                        <div class="col-lg-6 order-2 order-lg-3 mb-3">
-                            <span asp-description-for="View.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="text-muted small">The maximum number of genes whose value can be simultaneously randomly generated.</span>
-                            <span asp-validation-for="View.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="text-danger small"></span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4 order-1 order-lg-1 align-self-center">
-                            <label asp-for="View.GeneticAlgorithmParameters.PercentageRandom" class="font-weight-bold">Percentage random</label>
-                        </div>
-                        <div class="col-lg-4 order-1 order-lg-2">
-                            <input asp-for="View.GeneticAlgorithmParameters.PercentageRandom" class="form-control" disabled />
-                        </div>
-                        <div class="col-lg-4 order-1 order-lg-3 mb-3">
-                            <span asp-description-for="View.GeneticAlgorithmParameters.PercentageRandom" class="text-muted small">The percentage of a population which is composed of randomly generated chromosomes.</span>
-                            <span asp-validation-for="View.GeneticAlgorithmParameters.PercentageRandom" class="text-danger small"></span>
-                        </div>
-                        <div class="col-lg-4 order-2 order-lg-1 align-self-center">
-                            <label asp-for="View.GeneticAlgorithmParameters.PercentageElite" class="font-weight-bold">Percentage elite</label>
-                        </div>
-                        <div class="col-lg-4 order-2 order-lg-2">
-                            <input asp-for="View.GeneticAlgorithmParameters.PercentageElite" class="form-control" disabled />
-                        </div>
-                        <div class="col-lg-4 order-2 order-lg-3 mb-3">
-                            <span asp-description-for="View.GeneticAlgorithmParameters.PercentageElite" class="text-muted small">The percentage of a population which is composed of the elite chromosomes of the previous population.</span>
-                            <span asp-validation-for="View.GeneticAlgorithmParameters.PercentageElite" class="text-danger small"></span>
-                        </div>
-                        <div class="col-lg-4 order-3 order-lg-1 align-self-center">
-                            <label asp-for="View.GeneticAlgorithmParameters.ProbabilityMutation" class="font-weight-bold">Probability of mutation</label>
-                        </div>
-                        <div class="col-lg-4 order-3 order-lg-2">
-                            <input asp-for="View.GeneticAlgorithmParameters.ProbabilityMutation" class="form-control" disabled />
-                        </div>
-                        <div class="col-lg-4 order-3 order-lg-3 mb-3">
-                            <span asp-description-for="View.GeneticAlgorithmParameters.ProbabilityMutation" class="text-muted small">The probability of mutation for each gene of a chromosome.</span>
-                            <span asp-validation-for="View.GeneticAlgorithmParameters.ProbabilityMutation" class="text-danger small"></span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6 order-1 order-lg-1 align-self-center">
-                            <label asp-for="View.GeneticAlgorithmParameters.CrossoverType" class="font-weight-bold">Crossover algorithm</label>
-                        </div>
-                        <div class="col-lg-6 order-1 order-lg-2">
-                            <select asp-for="View.GeneticAlgorithmParameters.CrossoverType" class="custom-select" title="@Model.View.GeneticAlgorithmParameters.CrossoverType.GetDisplayDescription()" disabled>
-                                @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Analyses.Genetic.CrossoverType)).Cast<Helpers.Algorithms.Analyses.Genetic.CrossoverType>())
-                                {
-                                    <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-lg-6 order-1 order-lg-3 mb-3">
-                            <span asp-description-for="View.GeneticAlgorithmParameters.CrossoverType" class="text-muted small">The crossover algorithm to be used.</span>
-                            <span asp-validation-for="View.GeneticAlgorithmParameters.CrossoverType" class="text-danger small"></span>
-                        </div>
-                        <div class="col-lg-6 order-2 order-lg-1 align-self-center">
-                            <label asp-for="View.GeneticAlgorithmParameters.MutationType" class="font-weight-bold">Mutation algorithm</label>
-                        </div>
-                        <div class="col-lg-6 order-2 order-lg-2">
-                            <select asp-for="View.GeneticAlgorithmParameters.MutationType" class="custom-select" title="@Model.View.GeneticAlgorithmParameters.MutationType.GetDisplayDescription()" disabled>
-                                @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Analyses.Genetic.MutationType)).Cast<Helpers.Algorithms.Analyses.Genetic.MutationType>())
-                                {
-                                    <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-lg-6 order-2 order-lg-3 mb-3">
-                            <span asp-description-for="View.GeneticAlgorithmParameters.MutationType" class="text-muted small">The mutation algorithm to be used.</span>
-                            <span asp-validation-for="View.GeneticAlgorithmParameters.MutationType" class="text-danger small"></span>
-                        </div>
-                    </div>
-                }
-            </div>
+            }
         </div>
         @if (Model.View.Analysis.Log.TryDeserializeJsonObject<IEnumerable<NetControl4BioMed.Helpers.ViewModels.LogEntryViewModel>>(out var logEntries))
         {
-            <div class="hidden-group">
-                <div class="alert alert-info text-justify text-wrap">
-                    <span><i class="fas fa-info-circle"></i></span>
-                    <span>You can click <a class="alert-link hidden-group-toggle">here</a> to display or hide the log messages of the analysis.</span>
-                </div>
-                <div class="hidden-group-display" hidden>
-                    <ul class="">
-                        @foreach (var logEntry in logEntries)
-                        {
-                            <li class="utc-date" data-date="@logEntry.DateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
-                                <div>
-                                    <span class="utc-date-date" title="@logEntry.DateTime.ToShortDateString()">@logEntry.DateTime.ToShortDateString()</span>
-                                    <span class="utc-date-time" title="@logEntry.DateTime.ToShortTimeString()">@logEntry.DateTime.ToShortTimeString()</span>
-                                </div>
-                                <div>
-                                    <span>@logEntry.Message</span>
-                                </div>
-                            </li>
-                        }
-                    </ul>
-                </div>
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>You can click <a class="alert-link hidden-group-toggle" data-type="log">here</a> to display or hide the log messages of the analysis.</span>
+            </div>
+            <div class="hidden-group-display" data-type="log" hidden>
+                <ul class="">
+                    @foreach (var logEntry in logEntries)
+                    {
+                        <li class="utc-date" data-date="@logEntry.DateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
+                            <div>
+                                <span class="utc-date-date" title="@logEntry.DateTime.ToShortDateString()">@logEntry.DateTime.ToShortDateString()</span>
+                                <span class="utc-date-time" title="@logEntry.DateTime.ToShortTimeString()">@logEntry.DateTime.ToShortTimeString()</span>
+                            </div>
+                            <div>
+                                <span>@logEntry.Message</span>
+                            </div>
+                        </li>
+                    }
+                </ul>
             </div>
         }
         @if (Model.View.IsUserOwner && Model.View.Analysis.Status == AnalysisStatus.Ongoing)

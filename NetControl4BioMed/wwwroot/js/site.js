@@ -164,31 +164,33 @@ $(window).on('load', () => {
     // Check if there is a hidden group on the page.
     if ($('.hidden-group').length !== 0) {
         // Define a function which toggles the hidden group display.
-        const toggleDisplay = (groupElement) => {
+        const toggleDisplay = (groupElement, type) => {
             // Get the display of the hidden group.
-            const display = $(groupElement).find('.hidden-group-display').first();
+            const display = $(groupElement).find(`.hidden-group-display[data-type="${type}"]`).first();
             // Toggle the display.
             $(display).prop('hidden', !$(display).prop('hidden'));
         };
         // Add a listener for when the checkbox gets clicked.
         $('.hidden-group-checkbox').on('change', (event) => {
-            // Get the current hidden group.
+            // Get the current hidden group and the type.
             const groupElement = $(event.target).closest('.hidden-group');
+            const type = $(event.target).data('type');
             // Get the state of the checkbox and of the display.
-            const isChecked = $(groupElement).find('.hidden-group-checkbox').first().prop('checked');
-            const isDisplayed = !$(groupElement).find('.hidden-group-display').first().prop('hidden');
+            const isChecked = $(groupElement).find(`.hidden-group-checkbox[data-type="${type}"]`).first().prop('checked');
+            const isDisplayed = !$(groupElement).find(`.hidden-group-display[data-type="${type}"]`).first().prop('hidden');
             // Check if the display should be toggled.
             if ((isChecked && !isDisplayed) || (!isChecked && isDisplayed)) {
                 // Toggle the display.
-                toggleDisplay(groupElement);
+                toggleDisplay(groupElement, type);
             }
         });
         // Add a listener for when the toggler gets clicked.
         $('.hidden-group-toggle').on('click', (event) => {
-            // Get the current hidden group.
+            // Get the current hidden group and the type.
             const groupElement = $(event.target).closest('.hidden-group');
+            const type = $(event.target).data('type');
             // Toggle the display.
-            toggleDisplay(groupElement);
+            toggleDisplay(groupElement, type);
         });
     }
 

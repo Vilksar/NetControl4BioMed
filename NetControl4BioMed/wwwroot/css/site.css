@@ -25,6 +25,19 @@ th, td {
     vertical-align: middle !important;
 }
 
+/* Style for the DataTables. */
+.dataTables_wrapper label {
+    margin-bottom: 0;
+}
+
+.dataTables_wrapper .row {
+    align-items: center;
+}
+
+.dataTables_wrapper .dataTables_info {
+    padding-top: 0 !important;
+}
+
 /* Style for the forms. */
 label {
     text-align: left;
