@@ -62,7 +62,7 @@
             </div>
         </div>
     </div>
-    <div class="card mb-3 table-group">
+    <div class="card mb-3 table-group" data-url="InteractionDatabases">
         <div class="card-header font-weight-bold">
             <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
                 <div>
@@ -86,13 +86,13 @@
                 <span asp-validation-for="Input.InteractionDatabaseData" class="text-danger small"></span>
             </div>
             <div class="form-group">
-                <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[1]]">
+                <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[0]]">
                     <thead class="thead-light">
                         <tr>
-                            <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <th class="text-center text-break" data-name="IsSelected">
                                 <span></span>
                             </th>
-                            <th class="text-left text-break">
+                            <th class="text-left text-break" data-name="Name">
                                 <span>Database</span>
                             </th>
                             <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -101,26 +101,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var interactionDatabase in Model.View.InteractionDatabases)
-                        {
-                            <tr class="table-group-row" data-id="@interactionDatabase.Id">
-                                <td class="text-center text-break">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="checkbox-interaction-database-@interactionDatabase.Id" class="custom-control-input table-group-row-checkbox" title="Select" />
-                                        <label for="checkbox-interaction-database-@interactionDatabase.Id" class="custom-control-label"></label>
-                                    </div>
-                                    <span></span>
-                                </td>
-                                <td class="text-left text-break">
-                                    <a asp-page="/AvailableData/Databases/Databases/Details" asp-route-id="@interactionDatabase.Id" target="_blank" rel="nofollow noopener noreferrer" title="@interactionDatabase.Name">@interactionDatabase.Name</a>
-                                </td>
-                                <td class="text-center text-break">
-                                    <a asp-page="/AvailableData/Databases/Databases/Details" asp-route-id="@interactionDatabase.Id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
-                                        <span>Details</span>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
+                        <template class="table-group-row-template">
+                            <td class="text-center text-break" data-order="@@isSelected">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" id="checkbox-interaction-database-@@id" class="custom-control-input table-group-row-checkbox" title="Select" />
+                                    <label for="checkbox-interaction-database-@@id" class="custom-control-label"></label>
+                                </div>
+                            </td>
+                            <td class="text-left text-break">
+                                <a asp-page="/AvailableData/Databases/Databases/Details" asp-route-id="@@id" target="_blank" rel="nofollow noopener noreferrer" title="@@name">@@name</a>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/AvailableData/Databases/Databases/Details" asp-route-id="@@id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </template>
                     </tbody>
                 </table>
             </div>
@@ -214,14 +210,14 @@
             </div>
         </div>
         <div class="hidden-group-display" data-type="seed-protein-collections" hidden="@(Model.Input.UseSeedProteinCollectionData ? null : "hidden")">
-            <div class="card mb-3 table-group">
+            <div class="card mb-3 table-group" data-url="SeedProteinCollections">
                 <div class="card-header font-weight-bold">
                     <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
                         <div>
                             <span><i class="fas fa-folder"></i></span>
                         </div>
                         <div>
-                            <span>Additional seed proteins</span>
+                            <span>Seed protein collections</span>
                             <span class="badge badge-dark table-group-count">0</span>
                         </div>
                     </div>
@@ -238,13 +234,13 @@
                         <span asp-validation-for="Input.SeedProteinCollectionData" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
-                        <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[1]]">
+                        <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[0]]">
                             <thead class="thead-light">
                                 <tr>
-                                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                    <th class="text-center text-break" data-name="IsSelected">
                                         <span></span>
                                     </th>
-                                    <th class="text-left text-break">
+                                    <th class="text-left text-break" data-name="Name">
                                         <span>Collection</span>
                                     </th>
                                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -253,26 +249,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var seedProteinCollection in Model.View.SeedProteinCollections)
-                                {
-                                    <tr class="table-group-row" data-id="@seedProteinCollection.Id">
-                                        <td class="text-center text-break">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" id="checkbox-seed-protein-collection-@seedProteinCollection.Id" class="custom-control-input table-group-row-checkbox" title="Select" />
-                                                <label for="checkbox-seed-protein-collection-@seedProteinCollection.Id" class="custom-control-label"></label>
-                                            </div>
-                                            <span></span>
-                                        </td>
-                                        <td class="text-left text-break">
-                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@seedProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="@seedProteinCollection.Name">@seedProteinCollection.Name</a>
-                                        </td>
-                                        <td class="text-center text-break">
-                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@seedProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
-                                                <span>Details</span>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                }
+                                <template class="table-group-row-template">
+                                    <td class="text-center text-break" data-order="@@isSelected">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" id="checkbox-seed-protein-collection-@@id" class="custom-control-input table-group-row-checkbox" title="Select" />
+                                            <label for="checkbox-seed-protein-collection-@@id" class="custom-control-label"></label>
+                                        </div>
+                                    </td>
+                                    <td class="text-left text-break">
+                                        <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@@id" target="_blank" rel="nofollow noopener noreferrer" title="@@name">@@name</a>
+                                    </td>
+                                    <td class="text-center text-break">
+                                        <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@@id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
+                                            <span>Details</span>
+                                        </a>
+                                    </td>
+                                </template>
                             </tbody>
                         </table>
                     </div>

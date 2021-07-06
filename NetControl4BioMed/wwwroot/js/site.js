@@ -82,10 +82,10 @@ $(window).on('load', () => {
             const itemId = $(rowElement).data('id');
             // Deserialize the value within the input element.
             const itemIds = JSON.parse($(groupElement).find('.table-group-input').first().val());
-            // Toggle the selection class on the row and on the checkbox.
+            // Toggle the selection class on the row.
             $(rowElement).toggleClass('table-active');
             // Check if the row is now selected.
-            if ($(event.target).closest('.table-group-row').hasClass('table-active')) {
+            if ($(rowElement).hasClass('table-active')) {
                 // Update the checkbox.
                 $(rowElement).find('.table-group-row-checkbox:not(checked)').prop('checked', true);
                 // Get the current index of the item.
@@ -115,19 +115,6 @@ $(window).on('load', () => {
                 }
             }
         };
-        // Define a function to update the table.
-        const updateTable = (groupElement) => {
-            // Deserialize the value within the input element.
-            const itemIds = JSON.parse($(groupElement).find('.table-group-input').first().val());
-            // Update the value of the count.
-            $(groupElement).find('.table-group-count').text(itemIds.length);
-            // Go over each item ID.
-            for (const itemId of itemIds) {
-                // Mark the corresponding row as active.
-                $(groupElement).find(`.table-group-row[data-id="${itemId}"]`).addClass('table-active');
-                $(groupElement).find(`.table-group-row[data-id="${itemId}"]`).find('.table-group-row-checkbox').prop('checked', true);
-            }
-        }
         // Add a listener for clicking on a row in the table.
         $('.table-group-datatable').on('click', '.table-group-row', (event) => {
             // Get the current group and row element.
@@ -148,14 +135,44 @@ $(window).on('load', () => {
         (() => {
             // Go over each table group.
             $('.table-group').each((index, element) => {
-                // Update the table.
-                updateTable($(element));
+                // Get the row template.
+                const template = $(element).find('.table-group-row-template').first();
+                // Get the input element.
+                const input = $(element).find('.table-group-input').first();
+                // Update the value of the count.
+                $(element).find('.table-group-count').text(JSON.parse($(input).val()).length);
                 // Format the table as datatable.
                 const table = $(element).find('.table-group-datatable').DataTable({
                     'autoWidth': false,
                     'processing': true,
+                    'serverSide': true,
                     'pageLength': 5,
-                    'lengthMenu': [5, 10, 25, 50]
+                    'lengthMenu': [5, 10, 25, 50],
+                    'ajax': {
+                        'url': `${window.location.pathname}?handler=${$(element).data('url')}`,
+                        'method': 'GET',
+                        'dataType': 'json',
+                        'data': (data) => {
+                            // Get the already selected items.
+                            const selectedItems = JSON.parse($(input).val());
+                            // Go over each index of the selected items.
+                            for (let index = 0; index < selectedItems.length; index++) {
+                                // Add the corresponding item to the submitted data.
+                                data[`selectedItems[${index}]`] = selectedItems[index];
+                            }
+                        }
+                    },
+                    'createdRow': (row, data) => {
+                        // Get the new row content.
+                        const content = $(template).html().replaceAll('@id', data[0]).replaceAll('@name', data[1]).replaceAll('@isSelected', data[2]);
+                        // Add and configure the row.
+                        $(row).attr('data-id', data[0]).addClass('table-group-row').html(content);
+                        // Check if the row should be selected.
+                        if (data[2] === 'True') {
+                            // Update the input.
+                            updateInput(element, row);
+                        }
+                    }
                 });
             });
         })();

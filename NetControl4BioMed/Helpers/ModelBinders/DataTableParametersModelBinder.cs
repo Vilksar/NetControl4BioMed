@@ -27,6 +27,7 @@ namespace NetControl4BioMed.Helpers.ModelBinders
                 Draw = Convert.ToInt32(request.Query["draw"]),
                 Start = Convert.ToInt32(request.Query["start"]),
                 Length = Convert.ToInt32(request.Query["length"]),
+                SelectedItems = new List<string>(),
                 Search = new DataTableParametersViewModel.DataTableSearchViewModel
                 {
                     Value = request.Query["search[value]"],
@@ -35,6 +36,16 @@ namespace NetControl4BioMed.Helpers.ModelBinders
                 Order = new List<DataTableParametersViewModel.DataTableColumnOrderViewModel>(),
                 Columns = new List<DataTableParametersViewModel.DataTableColumnViewModel>()
             };
+            // Get the selected item values.
+            var selectedItemCount = 0;
+            // Check whether the current count exists in the query.
+            while (!string.IsNullOrEmpty(request.Query[$"selectedItems[{selectedItemCount}]"]))
+            {
+                // Add a new item to the selected items.
+                parameters.SelectedItems.Add(request.Query[$"selectedItems[{selectedItemCount}]"]);
+                // Increment the count.
+                selectedItemCount++;
+            }
             // Get the order values.
             var orderCount = 0;
             // Check whether the current count exists in the query.
@@ -46,7 +57,7 @@ namespace NetControl4BioMed.Helpers.ModelBinders
                     Column = Convert.ToInt32(request.Query[$"order[{orderCount}][column]"]),
                     Direction = request.Query[$"order[{orderCount}][dir]"] == "asc" ? "Ascending" : "Descending"
                 });
-                // Increment the order count.
+                // Increment the count.
                 orderCount++;
             }
             // Get the column values.
@@ -67,7 +78,7 @@ namespace NetControl4BioMed.Helpers.ModelBinders
                         Regex = Convert.ToBoolean(request.Query[$"columns[{columnCount}][search][regex]"])
                     }
                 });
-                // Increment the order count.
+                // Increment the count.
                 columnCount++;
             }
             // Bind the parameters as successful.

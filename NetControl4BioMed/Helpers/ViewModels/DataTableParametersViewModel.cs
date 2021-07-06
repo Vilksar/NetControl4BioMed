@@ -26,6 +26,11 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public int Length { get; set; }
 
         /// <summary>
+        /// Represents the selected items parameter.
+        /// </summary>
+        public List<string> SelectedItems { get; set; }
+
+        /// <summary>
         /// Represents the search details.
         /// </summary>
         public DataTableSearchViewModel Search { get; set; }

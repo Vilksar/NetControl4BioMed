@@ -10,6 +10,7 @@ using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Tasks;
+using NetControl4BioMed.Helpers.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -149,20 +150,11 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
 
         public class ViewModel
         {
-            public ItemModel Network { get; set; }
+            public string NetworkId { get; set; }
+
+            public string NetworkName { get; set; }
 
             public bool HasNetworkDatabases { get; set; }
-
-            public IEnumerable<ItemModel> SourceProteinCollections { get; set; }
-
-            public IEnumerable<ItemModel> TargetProteinCollections { get; set; }
-        }
-
-        public class ItemModel
-        {
-            public string Id { get; set; }
-
-            public string Name { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string networkId, string analysisId, bool loadDemonstration)
@@ -216,39 +208,50 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                     // Redirect to the index page.
                     return RedirectToPage("/AvailableData/Created/Analyses/Index");
                 }
-                // Update the view.
-                View.Network = analyses
+                // Get the network item.
+                var analysisNetworkItem = analyses
                     .Select(item => item.Network)
-                    .Select(item => new ItemModel
+                    .Where(item => item.IsPublic || (user != null && item.NetworkUsers.Any(item1 => item1.Email == user.Email)))
+                    .Select(item => new
                     {
                         Id = item.Id,
-                        Name = item.Name
+                        Name = item.Name,
+                        HasNetworkDatabases = item.NetworkDatabases.Any()
                     })
                     .FirstOrDefault();
-                View.HasNetworkDatabases = _context.NetworkDatabases
-                    .Any(item => item.Network.Id == View.Network.Id);
-                View.SourceProteinCollections = View.HasNetworkDatabases ? _context.ProteinCollections
-                    .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Source))
-                    .Select(item => new ItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name
-                    }) : Enumerable.Empty<ItemModel>();
-                View.TargetProteinCollections = View.HasNetworkDatabases ? _context.ProteinCollections
-                    .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Target))
-                    .Select(item => new ItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name
-                    }) : Enumerable.Empty<ItemModel>();
                 // Check if there wasn't any network found.
-                if (View.Network == null)
+                if (analysisNetworkItem == null)
                 {
                     // Display a message.
                     TempData["StatusMessage"] = "Error: The network corresponding to the specified analysis could not be found, or you do not have access to it.";
                     // Redirect to the index page.
                     return RedirectToPage("/AvailableData/Created/Analyses/Index");
                 }
+                // Update the view.
+                View.NetworkId = analysisNetworkItem.Id;
+                View.NetworkName = analysisNetworkItem.Name;
+                View.HasNetworkDatabases = analysisNetworkItem.HasNetworkDatabases;
+                // Get the related data.
+                var sourceProteinNames = _context.AnalysisProteins
+                    .Where(item => item.Type == AnalysisProteinType.Source && item.Analysis.Id == analysisId)
+                    .Select(item => item.Protein.Name)
+                    .AsNoTracking()
+                    .AsEnumerable();
+                var sourceProteinCollectionIds = _context.AnalysisProteinCollections
+                    .Where(item => item.Type == AnalysisProteinCollectionType.Source && item.Analysis.Id == analysisId)
+                    .Select(item => item.ProteinCollection.Id)
+                    .AsNoTracking()
+                    .AsEnumerable();
+                var targetProteinNames = _context.AnalysisProteins
+                    .Where(item => item.Type == AnalysisProteinType.Target && item.Analysis.Id == analysisId)
+                    .Select(item => item.Protein.Name)
+                    .AsNoTracking()
+                    .AsEnumerable();
+                var targetProteinCollectionIds = _context.AnalysisProteinCollections
+                    .Where(item => item.Type == AnalysisProteinCollectionType.Target && item.Analysis.Id == analysisId)
+                    .Select(item => item.ProteinCollection.Id)
+                    .AsNoTracking()
+                    .AsEnumerable();
                 // Define the input.
                 Input = new InputModel
                 {
@@ -259,51 +262,15 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                         .Select(item => item.Description)
                         .FirstOrDefault(),
                     IsPublic = user == null,
-                    NetworkId = View.Network.Id,
-                    UseSourceProteinData = analyses
-                        .Select(item => item.AnalysisProteins)
-                        .SelectMany(item => item)
-                        .Where(item => item.Type == AnalysisProteinType.Source)
-                        .Any(),
-                    SourceProteinData = JsonSerializer.Serialize(analyses
-                        .Select(item => item.AnalysisProteins)
-                        .SelectMany(item => item)
-                        .Where(item => item.Type == AnalysisProteinType.Source)
-                        .Select(item => item.Protein.Name)),
-                    UseSourceProteinCollectionData = analyses
-                        .Select(item => item.AnalysisProteinCollections)
-                        .SelectMany(item => item)
-                        .Where(item => item.Type == AnalysisProteinCollectionType.Source)
-                        .Any(),
-                    SourceProteinCollectionData = JsonSerializer.Serialize(analyses
-                        .Select(item => item.AnalysisProteinCollections)
-                        .SelectMany(item => item)
-                        .Where(item => item.Type == AnalysisProteinCollectionType.Source)
-                        .Select(item => item.ProteinCollection.Id)
-                        .AsEnumerable()
-                        .Intersect(View.SourceProteinCollections.Select(item => item.Id))),
-                    UseTargetProteinData = analyses
-                        .Select(item => item.AnalysisProteins)
-                        .SelectMany(item => item)
-                        .Where(item => item.Type == AnalysisProteinType.Target)
-                        .Any(),
-                    TargetProteinData = JsonSerializer.Serialize(analyses
-                        .Select(item => item.AnalysisProteins)
-                        .SelectMany(item => item)
-                        .Where(item => item.Type == AnalysisProteinType.Target)
-                        .Select(item => item.Protein.Name)),
-                    UseTargetProteinCollectionData = analyses
-                        .Select(item => item.AnalysisProteinCollections)
-                        .SelectMany(item => item)
-                        .Where(item => item.Type == AnalysisProteinCollectionType.Target)
-                        .Any(),
-                    TargetProteinCollectionData = JsonSerializer.Serialize(analyses
-                        .Select(item => item.AnalysisProteinCollections)
-                        .SelectMany(item => item)
-                        .Where(item => item.Type == AnalysisProteinCollectionType.Target)
-                        .Select(item => item.ProteinCollection.Id)
-                        .AsEnumerable()
-                        .Intersect(View.TargetProteinCollections.Select(item => item.Id))),
+                    NetworkId = View.NetworkId,
+                    UseSourceProteinData = sourceProteinNames != null && sourceProteinNames.Any(),
+                    SourceProteinData = JsonSerializer.Serialize(sourceProteinNames),
+                    UseSourceProteinCollectionData = sourceProteinCollectionIds != null && sourceProteinCollectionIds.Any(),
+                    SourceProteinCollectionData = JsonSerializer.Serialize(sourceProteinCollectionIds),
+                    UseTargetProteinData = targetProteinNames != null && targetProteinNames.Any(),
+                    TargetProteinData = JsonSerializer.Serialize(targetProteinNames),
+                    UseTargetProteinCollectionData = targetProteinCollectionIds != null && targetProteinCollectionIds.Any(),
+                    TargetProteinCollectionData = JsonSerializer.Serialize(targetProteinCollectionIds),
                     MaximumIterations = analyses
                         .Select(item => item.MaximumIterations)
                         .FirstOrDefault(),
@@ -331,45 +298,34 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 // Redirect to the index page.
                 return RedirectToPage("/AvailableData/Created/Analyses/Index");
             }
-            // Update the view.
-            View.Network = _context.Networks
-                .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.Email == user.Email))
+            // Get the network item.
+            var networkItem = _context.Networks
+                .Where(item => item.IsPublic || (user != null && item.NetworkUsers.Any(item1 => item1.Email == user.Email)))
                 .Where(item => item.Id == networkId)
-                .Select(item => new ItemModel
+                .Select(item => new
                 {
                     Id = item.Id,
-                    Name = item.Name
+                    Name = item.Name,
+                    HasNetworkDatabases = item.NetworkDatabases.Any()
                 })
                 .FirstOrDefault();
-            View.HasNetworkDatabases = _context.NetworkDatabases
-                .Any(item => item.Network.Id == View.Network.Id);
-            View.SourceProteinCollections = View.HasNetworkDatabases ? _context.ProteinCollections
-                .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Source))
-                .Select(item => new ItemModel
-                {
-                    Id = item.Id,
-                    Name = item.Name
-                }) : Enumerable.Empty<ItemModel>();
-            View.TargetProteinCollections = View.HasNetworkDatabases ? _context.ProteinCollections
-                .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Target))
-                .Select(item => new ItemModel
-                {
-                    Id = item.Id,
-                    Name = item.Name
-                }) : Enumerable.Empty<ItemModel>();
             // Check if there wasn't any network found.
-            if (View.Network == null)
+            if (networkItem == null)
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: The specified network could not be found, or you do not have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/AvailableData/Created/Analyses/Index");
             }
+            // Update the view.
+            View.NetworkId = networkItem.Id;
+            View.NetworkName = networkItem.Name;
+            View.HasNetworkDatabases = networkItem.HasNetworkDatabases;
             // Define the input.
             Input = new InputModel
             {
                 IsPublic = user == null,
-                NetworkId = View.Network.Id,
+                NetworkId = View.NetworkId,
                 UseSourceProteinData = false,
                 SourceProteinData = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                 UseSourceProteinCollectionData = false,
@@ -392,24 +348,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
         {
             // Get the current user.
             var user = await _userManager.GetUserAsync(User);
-            // Define the view.
-            View = new ViewModel
-            {
-                SourceProteinCollections = _context.ProteinCollections
-                    .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Source))
-                    .Select(item => new ItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name
-                    }),
-                TargetProteinCollections = _context.ProteinCollections
-                    .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Target))
-                    .Select(item => new ItemModel
-                    {
-                        Id = item.Id,
-                        Name = item.Name
-                    })
-            };
             // Check if there wasn't a network provided.
             if (string.IsNullOrEmpty(Input.NetworkId))
             {
@@ -418,43 +356,37 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 // Redirect to the index page.
                 return RedirectToPage("/AvailableData/Created/Analyses/Index");
             }
-            // Update the view.
-            View.Network = _context.Networks
-                .Where(item => item.IsPublic || item.NetworkUsers.Any(item1 => item1.Email == user.Email))
+            // Get the network item.
+            var networkItem = _context.Networks
+                .Where(item => item.IsPublic || (user != null && item.NetworkUsers.Any(item1 => item1.Email == user.Email)))
                 .Where(item => item.Id == Input.NetworkId)
-                .Select(item => new ItemModel
+                .Select(item => new
                 {
                     Id = item.Id,
-                    Name = item.Name
+                    Name = item.Name,
+                    HasNetworkDatabases = item.NetworkDatabases.Any()
                 })
                 .FirstOrDefault();
-            View.HasNetworkDatabases = _context.NetworkDatabases
-                .Any(item => item.Network.Id == View.Network.Id);
-            View.SourceProteinCollections = View.HasNetworkDatabases ? _context.ProteinCollections
-                .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Source))
-                .Select(item => new ItemModel
-                {
-                    Id = item.Id,
-                    Name = item.Name
-                }) : Enumerable.Empty<ItemModel>();
-            View.TargetProteinCollections = View.HasNetworkDatabases ? _context.ProteinCollections
-                .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Target))
-                .Select(item => new ItemModel
-                {
-                    Id = item.Id,
-                    Name = item.Name
-                }) : Enumerable.Empty<ItemModel>();
-            // Update the parameters.
-            Input.GreedyAlgorithmParameters = Input.GreedyAlgorithmParameters ?? new GreedyAlgorithm.Parameters();
-            Input.GeneticAlgorithmParameters = Input.GeneticAlgorithmParameters ?? new GeneticAlgorithm.Parameters();
             // Check if there wasn't any network found.
-            if (View.Network == null)
+            if (networkItem == null)
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: The specified network could not be found, or you do not have access to it.";
                 // Redirect to the index page.
                 return RedirectToPage("/AvailableData/Created/Analyses/Index");
             }
+            // Update the view.
+            // Define the view.
+            View = new ViewModel
+            {
+
+                NetworkId = networkItem.Id,
+                NetworkName = networkItem.Name,
+                HasNetworkDatabases = networkItem.HasNetworkDatabases
+            };
+            // Update the parameters.
+            Input.GreedyAlgorithmParameters = Input.GreedyAlgorithmParameters ?? new GreedyAlgorithm.Parameters();
+            Input.GeneticAlgorithmParameters = Input.GeneticAlgorithmParameters ?? new GeneticAlgorithm.Parameters();
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
             {
@@ -508,14 +440,14 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 // Redisplay the page.
                 return Page();
             }
-            // Define the items to be used.
-            var sourceProteins = Enumerable.Empty<string>();
+            // Define the related data.
+            var sourceProteinIdentifiers = Enumerable.Empty<string>();
             var sourceProteinCollectionIds = Enumerable.Empty<string>();
             // Check if source proteins should be used.
             if (Input.UseSourceProteinData)
             {
                 // Try to deserialize the source data.
-                if (!Input.SourceProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out sourceProteins) || sourceProteins == null)
+                if (!Input.SourceProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out sourceProteinIdentifiers) || sourceProteinIdentifiers == null)
                 {
                     // Add an error to the model.
                     ModelState.AddModelError(string.Empty, "The provided source data could not be deserialized.");
@@ -534,18 +466,21 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                     // Redisplay the page.
                     return Page();
                 }
+                // Keep only the valid IDs.
+                sourceProteinCollectionIds = _context.ProteinCollections
+                    .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Source))
+                    .Where(item => sourceProteinCollectionIds.Contains(item.Id))
+                    .Select(item => item.Id)
+                    .AsEnumerable();
             }
-            // Try to get the source protein collections with the provided IDs.
-            var sourceProteinCollections = View.SourceProteinCollections
-                .Where(item => sourceProteinCollectionIds.Contains(item.Id));
-            // Define the items to be used.
-            var targetProteins = Enumerable.Empty<string>();
+            // Define the related data.
+            var targetProteinIdentifiers = Enumerable.Empty<string>();
             var targetProteinCollectionIds = Enumerable.Empty<string>();
             // Check if target proteins should be used.
             if (Input.UseTargetProteinData)
             {
                 // Try to deserialize the target data.
-                if (!Input.TargetProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out targetProteins) || targetProteins == null)
+                if (!Input.TargetProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out targetProteinIdentifiers) || targetProteinIdentifiers == null)
                 {
                     // Add an error to the model.
                     ModelState.AddModelError(string.Empty, "The provided target data could not be deserialized.");
@@ -564,12 +499,15 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                     // Redisplay the page.
                     return Page();
                 }
+                // Keep only the valid IDs.
+                targetProteinCollectionIds = _context.ProteinCollections
+                    .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Target))
+                    .Where(item => targetProteinCollectionIds.Contains(item.Id))
+                    .Select(item => item.Id)
+                    .AsEnumerable();
             }
-            // Try to get the target protein collections with the provided IDs.
-            var targetProteinCollections = View.TargetProteinCollections
-                .Where(item => targetProteinCollectionIds.Contains(item.Id));
-            // Check if there wasn't any target data found.
-            if (!targetProteins.Any() && !targetProteinCollections.Any())
+            // Check if there weren't any target items found.
+            if (!targetProteinIdentifiers.Any() && !targetProteinCollectionIds.Any())
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "No target proteins could be found within the provided target data or the selected target protein collections.");
@@ -577,7 +515,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 return Page();
             }
             // Serialize the seed data.
-            var data = JsonSerializer.Serialize(sourceProteins
+            var data = JsonSerializer.Serialize(sourceProteinIdentifiers
                 .Select(item => new AnalysisProteinInputModel
                 {
                     Protein = new ProteinInputModel
@@ -586,7 +524,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                     },
                     Type = "Source"
                 })
-                .Concat(targetProteins
+                .Concat(targetProteinIdentifiers
                     .Select(item => new AnalysisProteinInputModel
                     {
                         Protein = new ProteinInputModel
@@ -631,8 +569,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                                 }
                             } :
                             new List<AnalysisUserInputModel>(),
-                        AnalysisProteinCollections = sourceProteinCollections
-                            .Select(item => item.Id)
+                        AnalysisProteinCollections = sourceProteinCollectionIds
                             .Select(item => new AnalysisProteinCollectionInputModel
                             {
                                 ProteinCollection = new ProteinCollectionInputModel
@@ -641,8 +578,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                                 },
                                 Type = "Source"
                             })
-                            .Concat(targetProteinCollections
-                                .Select(item => item.Id)
+                            .Concat(targetProteinCollectionIds
                                 .Select(item => new AnalysisProteinCollectionInputModel
                                 {
                                     ProteinCollection = new ProteinCollectionInputModel
@@ -681,6 +617,132 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             TempData["StatusMessage"] = $"Success: 1 analysis defined successfully with the ID \"{ids.First()}\" and scheduled for generation.";
             // Redirect to the index page.
             return RedirectToPage("/AvailableData/Created/Analyses/Details/Index", new { id = ids.First() });
+        }
+
+        public IActionResult OnGetSourceProteinCollections(DataTableParametersViewModel parameters)
+        {
+            // Start with all of the items to which the user has access.
+            var query = _context.ProteinCollections
+                .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Source));
+            // Get the total count.
+            var totalCount = query.Count();
+            // Check if there is search applied.
+            if (parameters.Search != null && !string.IsNullOrEmpty(parameters.Search.Value))
+            {
+                // Select the results matching the search string.
+                query = query
+                    .Where(item => item.Id.Contains(parameters.Search.Value) || item.Name.Contains(parameters.Search.Value));
+            }
+            // Check if there is sorting applied.
+            if (parameters.Order != null && parameters.Order.Any())
+            {
+                // Get the sorting column and direction.
+                var column = parameters.Columns.ElementAtOrDefault(parameters.Order.FirstOrDefault()?.Column ?? -1)?.Name;
+                var direction = parameters.Order.FirstOrDefault()?.Direction;
+                // Switch based on the ordering parameters.
+                switch ((column, direction))
+                {
+                    case var sort when sort == ("IsSelected", "Ascending"):
+                        query = query.OrderBy(item => parameters.SelectedItems.Contains(item.Id));
+                        break;
+                    case var sort when sort == ("IsSelected", "Descending"):
+                        query = query.OrderByDescending(item => parameters.SelectedItems.Contains(item.Id));
+                        break;
+                    case var sort when sort == ("Name", "Ascending"):
+                        query = query.OrderBy(item => item.Name);
+                        break;
+                    case var sort when sort == ("Name", "Descending"):
+                        query = query.OrderByDescending(item => item.Name);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            // Get the filtered count.
+            var filteredCount = query.Count();
+            // Take only the results on the current page.
+            query = query
+                .Skip(parameters.Start)
+                .Take(parameters.Length)
+                .AsNoTracking();
+            // Return the JSON response.
+            return new JsonResult(new DataTableResponseViewModel
+            {
+                Data = query
+                    .Select(item => new List<string>
+                    {
+                        item.Id,
+                        item.Name,
+                        parameters.SelectedItems.Contains(item.Id).ToString()
+                    })
+                    .ToList(),
+                Draw = parameters.Draw,
+                RecordsFiltered = filteredCount,
+                RecordsTotal = totalCount
+            });
+        }
+
+        public IActionResult OnGetTargetProteinCollections(DataTableParametersViewModel parameters)
+        {
+            // Start with all of the items to which the user has access.
+            var query = _context.ProteinCollections
+                .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Target));
+            // Get the total count.
+            var totalCount = query.Count();
+            // Check if there is search applied.
+            if (parameters.Search != null && !string.IsNullOrEmpty(parameters.Search.Value))
+            {
+                // Select the results matching the search string.
+                query = query
+                    .Where(item => item.Id.Contains(parameters.Search.Value) || item.Name.Contains(parameters.Search.Value));
+            }
+            // Check if there is sorting applied.
+            if (parameters.Order != null && parameters.Order.Any())
+            {
+                // Get the sorting column and direction.
+                var column = parameters.Columns.ElementAtOrDefault(parameters.Order.FirstOrDefault()?.Column ?? -1)?.Name;
+                var direction = parameters.Order.FirstOrDefault()?.Direction;
+                // Switch based on the ordering parameters.
+                switch ((column, direction))
+                {
+                    case var sort when sort == ("IsSelected", "Ascending"):
+                        query = query.OrderBy(item => parameters.SelectedItems.Contains(item.Id));
+                        break;
+                    case var sort when sort == ("IsSelected", "Descending"):
+                        query = query.OrderByDescending(item => parameters.SelectedItems.Contains(item.Id));
+                        break;
+                    case var sort when sort == ("Name", "Ascending"):
+                        query = query.OrderBy(item => item.Name);
+                        break;
+                    case var sort when sort == ("Name", "Descending"):
+                        query = query.OrderByDescending(item => item.Name);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            // Get the filtered count.
+            var filteredCount = query.Count();
+            // Take only the results on the current page.
+            query = query
+                .Skip(parameters.Start)
+                .Take(parameters.Length)
+                .AsNoTracking();
+            // Return the JSON response.
+            return new JsonResult(new DataTableResponseViewModel
+            {
+                Data = query
+                    .Select(item => new List<string>
+                    {
+                        item.Id,
+                        item.Name,
+                        parameters.SelectedItems.Contains(item.Id).ToString()
+                    })
+                    .ToList(),
+                Draw = parameters.Draw,
+                RecordsFiltered = filteredCount,
+                RecordsTotal = totalCount
+            });
         }
     }
 }

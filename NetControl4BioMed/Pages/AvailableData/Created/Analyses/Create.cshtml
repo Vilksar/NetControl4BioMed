@@ -65,7 +65,7 @@
         <div class="card-body">
             <div class="alert alert-primary text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>The analysis will use the network <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.Network.Id" class="alert-link" target="_blank" rel="nofollow noopener noreferrer" title="@Model.View.Network.Name">@Model.View.Network.Name</a>. If you would like to choose a different network, you can navigate to its corresponding page.</span>
+                <span>The analysis will use the network <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.NetworkId" class="alert-link" target="_blank" rel="nofollow noopener noreferrer" title="@Model.View.NetworkName">@Model.View.NetworkName</a>. If you would like to choose a different network, you can navigate to its corresponding page.</span>
                 <span>You can find all of the public networks <a asp-page="/PublicData/Networks/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
                 @if (User.Identity.IsAuthenticated)
                 {
@@ -78,7 +78,7 @@
                 <span asp-description-for="Input.NetworkId" class="text-muted small">The ID of the network to be used by the new analysis.</span>
                 <span asp-validation-for="Input.NetworkId" class="text-danger small"></span>
             </div>
-            <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.Network.Id" class="btn btn-primary btn-block" target="_blank" rel="nofollow noopener noreferrer" title="View network">
+            <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@Model.View.NetworkId" class="btn btn-primary btn-block" target="_blank" rel="nofollow noopener noreferrer" title="View network">
                 <span><i class="fas fa-share-alt"></i></span>
                 <span>View network</span>
             </a>
@@ -176,14 +176,14 @@
             </div>
         </div>
         <div class="hidden-group-display" data-type="source-protein-collections" hidden="@(Model.Input.UseSourceProteinCollectionData ? null : "hidden")">
-            <div class="card mb-3 table-group">
+            <div class="card mb-3 table-group" data-url="SourceProteinCollections">
                 <div class="card-header font-weight-bold">
                     <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
                         <div>
                             <span><i class="fas fa-folder"></i></span>
                         </div>
                         <div>
-                            <span>Additional source proteins</span>
+                            <span>Source protein collections</span>
                             <span class="badge badge-dark table-group-count">0</span>
                         </div>
                     </div>
@@ -200,43 +200,42 @@
                         <span asp-validation-for="Input.SourceProteinCollectionData" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
-                        <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[1]]">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
-                                        <span></span>
-                                    </th>
-                                    <th class="text-left text-break">
-                                        <span>Collection</span>
-                                    </th>
-                                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                                        <span>Links</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var sourceProteinCollection in Model.View.SourceProteinCollections)
-                                {
-                                    <tr class="table-group-row" data-id="@sourceProteinCollection.Id">
-                                        <td class="text-center text-break">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" id="checkbox-source-protein-collection-@sourceProteinCollection.Id" class="custom-control-input table-group-row-checkbox" title="Select" />
-                                                <label for="checkbox-source-protein-collection-@sourceProteinCollection.Id" class="custom-control-label"></label>
-                                            </div>
+                        @if (Model.View.HasNetworkDatabases)
+                        {
+                            <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[0]]">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-center text-break" data-name="IsSelected">
                                             <span></span>
+                                        </th>
+                                        <th class="text-left text-break" data-name="Name">
+                                            <span>Collection</span>
+                                        </th>
+                                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                            <span>Links</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template class="table-group-row-template">
+                                        <td class="text-center text-break" data-order="@@isSelected">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" id="checkbox-source-protein-collection-@@id" class="custom-control-input table-group-row-checkbox" title="Select" />
+                                                <label for="checkbox-source-protein-collection-@@id" class="custom-control-label"></label>
+                                            </div>
                                         </td>
                                         <td class="text-left text-break">
-                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@sourceProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="@sourceProteinCollection.Name">@sourceProteinCollection.Name</a>
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@@id" target="_blank" rel="nofollow noopener noreferrer" title="@@name">@@name</a>
                                         </td>
                                         <td class="text-center text-break">
-                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@sourceProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@@id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
                                                 <span>Details</span>
                                             </a>
                                         </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                                    </template>
+                                </tbody>
+                            </table>
+                        }
                     </div>
                 </div>
             </div>
@@ -334,14 +333,14 @@
             </div>
         </div>
         <div class="hidden-group-display" data-type="target-protein-collections" hidden="@(Model.Input.UseTargetProteinCollectionData ? null : "hidden")">
-            <div class="card mb-3 table-group">
+            <div class="card mb-3 table-group" data-url="TargetProteinCollections">
                 <div class="card-header font-weight-bold">
                     <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
                         <div>
                             <span><i class="fas fa-folder"></i></span>
                         </div>
                         <div>
-                            <span>Additional target proteins</span>
+                            <span>Target protein collections</span>
                             <span class="badge badge-dark table-group-count">0</span>
                         </div>
                     </div>
@@ -358,43 +357,42 @@
                         <span asp-validation-for="Input.TargetProteinCollectionData" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
-                        <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[1]]">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th class="text-center text-break" data-orderable="false" data-searchable="false" data-name="index">
-                                        <span></span>
-                                    </th>
-                                    <th class="text-left text-break">
-                                        <span>Collection</span>
-                                    </th>
-                                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                                        <span>Links</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var targetProteinCollection in Model.View.TargetProteinCollections)
-                                {
-                                    <tr class="table-group-row" data-id="@targetProteinCollection.Id">
-                                        <td class="text-center text-break">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" id="checkbox-target-protein-collection-@targetProteinCollection.Id" class="custom-control-input table-group-row-checkbox" title="Select" />
-                                                <label for="checkbox-target-protein-collection-@targetProteinCollection.Id" class="custom-control-label"></label>
-                                            </div>
+                        @if (Model.View.HasNetworkDatabases)
+                        {
+                            <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[0]]">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-center text-break" data-name="IsSelected">
                                             <span></span>
+                                        </th>
+                                        <th class="text-left text-break" data-name="Name">
+                                            <span>Collection</span>
+                                        </th>
+                                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                            <span>Links</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template class="table-group-row-template">
+                                        <td class="text-center text-break" data-order="@@isSelected">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" id="checkbox-target-protein-collection-@@id" class="custom-control-input table-group-row-checkbox" title="Select" />
+                                                <label for="checkbox-target-protein-collection-@@id" class="custom-control-label"></label>
+                                            </div>
                                         </td>
                                         <td class="text-left text-break">
-                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@targetProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="@targetProteinCollection.Name">@targetProteinCollection.Name</a>
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@@id" target="_blank" rel="nofollow noopener noreferrer" title="@@name">@@name</a>
                                         </td>
                                         <td class="text-center text-break">
-                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@targetProteinCollection.Id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@@id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
                                                 <span>Details</span>
                                             </a>
                                         </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                                    </template>
+                                </tbody>
+                            </table>
+                        }
                     </div>
                 </div>
             </div>
