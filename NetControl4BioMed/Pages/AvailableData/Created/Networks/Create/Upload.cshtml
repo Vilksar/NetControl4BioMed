@@ -6,17 +6,17 @@
 
 <div class="alert alert-primary text-wrap text-justify">
     <span><i class="fas fa-info-circle"></i></span>
-    <span>In order to upload a network, a file type needs to be specified and a corresponding file selected. The network will be uploaded as-is and can be afterwards inspected and analyzed, but it will not be automatically integrated with the internal databases or data. The available file types are:</span>
+    <span>In order to upload a network, a file type needs to be specified and a corresponding file selected. The network will be uploaded as-is and can be afterwards inspected and analyzed, but it will not be automatically integrated with the internal databases or data. <span class="font-weight-bold">The maximum allowed file size is 16 MB.</span> The available file types are:</span>
     <ul class="mb-0">
         <li>
-            <span><span class="font-weight-bold">Cytoscape.js JSON</span>, which represents a simple JSON file that can be readily imported in Cytoscape and Cytoscape.js.</span>
+            <span><span class="font-weight-bold">Cytoscape.js JSON (*.cyjs)</span>, which represents a simple JSON file that can be readily imported in Cytoscape and Cytoscape.js.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">Cytoscape CX</span>, which represents a JSON-based file that enables diverse services to exchange networks while preserving all network-related information.</span>
+            <span><span class="font-weight-bold">Cytoscape CX (*.cx)</span>, which represents a JSON-based file that enables diverse services to exchange networks while preserving all network-related information.</span>
         </li>
     </ul>
 </div>
-<form method="post" class="text-justify">
+<form method="post" class="text-justify" enctype="multipart/form-data">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
     <div class="card mb-3" hidden="@(User.Identity.IsAuthenticated ? null : "hidden")">
         <div class="card-header font-weight-bold">
@@ -59,26 +59,16 @@
         <div class="card-body">
             <div class="alert alert-info text-justify text-wrap">
                 <span><i class="fas fa-info-circle"></i></span>
-                <span>Input here the details of the file to be uploaded. The data in the file will be processed differently based on the selected file type.</span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.Type" class="font-weight-bold">Type</label>
-                <select asp-for="Input.Type" class="custom-select form-control">
-                    <option value="cyjs">Cytoscape.js JSON (*.cyjs)</option>
-                    <option value="cx">Cytoscape CX (*.cx)</option>
-                </select>
-                <span asp-description-for="Input.Type" class="text-muted small">The type of the file to be uploaded.</span>
-                <span asp-validation-for="Input.Type" class="text-danger small"></span>
+                <span>Input here the file to be uploaded. The file will be processed differently based on its extension.</span>
             </div>
             <div class="form-group">
                 <label class="font-weight-bold">File</label>
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input file-group-file-upload" />
-                    <label class="custom-file-label file-group-file-label">Choose file</label>
+                <div class="custom-file file-selector">
+                    <input asp-for="Input.FormFile" class="custom-file-input file-selector-input" />
+                    <label asp-for="Input.FormFile" class="custom-file-label file-selector-label">Choose file</label>
                 </div>
-                <textarea asp-for="Input.Data" class="form-control file-group-text mt-2" rows="10" hidden></textarea>
-                <span asp-description-for="Input.Data" class="text-muted small">The file to be uploaded.</span>
-                <span asp-validation-for="Input.Data" class="text-danger small"></span>
+                <span asp-description-for="Input.FormFile" class="text-muted small">The file to be uploaded.</span>
+                <span asp-validation-for="Input.FormFile" class="text-danger small"></span>
             </div>
         </div>
     </div>

@@ -1,9 +1,9 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Tasks;
@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
 {
-    [RequestFormLimits(ValueLengthLimit = 16 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 16 * 1024 * 1024)]
     public class UploadModel : PageModel
     {
         private readonly IServiceProvider _serviceProvider;
@@ -35,24 +35,41 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
         [BindProperty]
         public InputModel Input { get; set; }
 
-        public class InputModel
+        public class InputModel : IValidatableObject
         {
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
-            [RegularExpression("cyjs|cx", ErrorMessage = "The value is not valid.")]
-            public string Type { get; set; }
-
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
             public bool IsPublic { get; set; }
 
-            [DataType(DataType.MultilineText)]
+            [DataType(DataType.Upload)]
             [Required(ErrorMessage = "This field is required.")]
-            public string Data { get; set; }
+            public IFormFile FormFile { get; set; }
 
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
             public string ReCaptchaToken { get; set; }
+
+            public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+            {
+                // Check if there is no file selected.
+                if (FormFile == null)
+                {
+                    // Return an error.
+                    yield return new ValidationResult("The provided file could not be found.", new List<string> { string.Empty });
+                }
+                // Check if the file does not have an allowed extension.
+                if (!new List<string> { ".cyjs", ".cx" }.Contains(System.IO.Path.GetExtension(FormFile.FileName).ToLower()))
+                {
+                    // Return an error.
+                    yield return new ValidationResult($"The provided file does not have a valid extension.", new List<string> { string.Empty });
+                }
+                // Check if the file is larger than the maximum size.
+                if (16 * 1024 * 1024 < FormFile.Length)
+                {
+                    // Return an error.
+                    yield return new ValidationResult("The provided file is too large.", new List<string> { string.Empty });
+                }
+            }
         }
 
         public class ItemModel
@@ -90,8 +107,16 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
             {
+                // Get the validation errors.
+                var validationErrors = ModelState.Values.Select(item => item.Errors).SelectMany(item => item).ToList();
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "An error has been encountered. Please check again the input fields.");
+                // Go over each validation error.
+                foreach (var validationError in validationErrors)
+                {
+                    // Add an error to the model.
+                    ModelState.AddModelError(string.Empty, validationError.ErrorMessage);
+                }
                 // Redisplay the page.
                 return Page();
             }
@@ -103,6 +128,8 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                 // Redisplay the page.
                 return Page();
             }
+            // Get the extension of the file and its memory stream.
+            var extension = System.IO.Path.GetExtension(Input.FormFile.FileName).ToLower();
             // Define the task to create.
             var task = new NetworksTask
             {
@@ -110,13 +137,29 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                 HostValue = HttpContext.Request.Host.Value
             };
             // Check the type of the file that was provided.
-            if (Input.Type == "cyjs")
+            if (extension == ".cyjs")
             {
+                // Define the new object.
+                var viewModel = new FileCyjsViewModel();
                 // Try to deserialize the data.
-                if (!Input.Data.TryDeserializeJsonObject<FileCyjsViewModel>(out var viewModel) || viewModel == null)
+                try
                 {
+                    // Get the deserialized object and assign the output value.
+                    viewModel = await JsonSerializer.DeserializeAsync<FileCyjsViewModel>(Input.FormFile.OpenReadStream());
+                }
+                catch (Exception exception)
+                {
+                    // Define the messages to return.
+                    var messages = new List<string> { "An error occurred while reading the file." };
+                    // Build the exception message.
+                    while (exception != null)
+                    {
+                        // Update the messages and the exception.
+                        messages.Add(exception.Message);
+                        exception = exception.InnerException;
+                    }
                     // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "The provided file does not have the required format.");
+                    ModelState.AddModelError(string.Empty, string.Join(" ", messages.Where(item => !string.IsNullOrEmpty(item))));
                     // Redisplay the page.
                     return Page();
                 }
@@ -207,13 +250,29 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                 };
             }
             // Check the type of the file that was provided.
-            else if (Input.Type == "cx")
+            else if (extension == ".cx")
             {
+                // Define the new object.
+                var viewModel = new List<FileCxViewModel.CxBaseObject>();
                 // Try to deserialize the data.
-                if (!Input.Data.TryDeserializeJsonObject<List<FileCxViewModel.CxBaseObject>>(out var viewModel) || viewModel == null)
+                try
                 {
+                    // Get the deserialized object and assign the output value.
+                    viewModel = await JsonSerializer.DeserializeAsync<List<FileCxViewModel.CxBaseObject>>(Input.FormFile.OpenReadStream());
+                }
+                catch (Exception exception)
+                {
+                    // Define the messages to return.
+                    var messages = new List<string> { "An error occurred while reading the file." };
+                    // Build the exception message.
+                    while (exception != null)
+                    {
+                        // Update the messages and the exception.
+                        messages.Add(exception.Message);
+                        exception = exception.InnerException;
+                    }
                     // Add an error to the model.
-                    ModelState.AddModelError(string.Empty, "The provided file does not have the required format.");
+                    ModelState.AddModelError(string.Empty, string.Join(" ", messages.Where(item => !string.IsNullOrEmpty(item))));
                     // Redisplay the page.
                     return Page();
                 }
@@ -307,7 +366,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
             else
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, "The provided file type is not valid.");
+                ModelState.AddModelError(string.Empty, "The provided file extension is not valid.");
                 // Redisplay the page.
                 return Page();
             }
