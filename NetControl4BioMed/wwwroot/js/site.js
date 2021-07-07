@@ -175,7 +175,7 @@ $(window).on('load', () => {
                     },
                     'createdRow': (row, data) => {
                         // Get the new row content.
-                        const content = $(template).html().replaceAll('@id', data[0]).replaceAll('@name', data[1]).replaceAll('@isSelected', data[2]);
+                        const content = $(template).html().replaceAll('@id', data[0]).replaceAll('@name', data[1]);
                         // Add and configure the row.
                         $(row).attr('data-id', data[0]).addClass('table-group-row').html(content);
                         // Check if the row should be selected.
