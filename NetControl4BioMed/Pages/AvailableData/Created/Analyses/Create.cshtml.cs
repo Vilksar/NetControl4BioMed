@@ -236,22 +236,22 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                     .Where(item => item.Type == AnalysisProteinType.Source && item.Analysis.Id == analysisId)
                     .Select(item => item.Protein.Name)
                     .AsNoTracking()
-                    .AsEnumerable();
+                    .ToList();
                 var sourceProteinCollectionIds = _context.AnalysisProteinCollections
                     .Where(item => item.Type == AnalysisProteinCollectionType.Source && item.Analysis.Id == analysisId)
                     .Select(item => item.ProteinCollection.Id)
                     .AsNoTracking()
-                    .AsEnumerable();
+                    .ToList();
                 var targetProteinNames = _context.AnalysisProteins
                     .Where(item => item.Type == AnalysisProteinType.Target && item.Analysis.Id == analysisId)
                     .Select(item => item.Protein.Name)
                     .AsNoTracking()
-                    .AsEnumerable();
+                    .ToList();
                 var targetProteinCollectionIds = _context.AnalysisProteinCollections
                     .Where(item => item.Type == AnalysisProteinCollectionType.Target && item.Analysis.Id == analysisId)
                     .Select(item => item.ProteinCollection.Id)
                     .AsNoTracking()
-                    .AsEnumerable();
+                    .ToList();
                 // Define the input.
                 Input = new InputModel
                 {
@@ -441,13 +441,13 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 return Page();
             }
             // Define the related data.
-            var sourceProteinIdentifiers = Enumerable.Empty<string>();
-            var sourceProteinCollectionIds = Enumerable.Empty<string>();
+            var sourceProteinIdentifiers = new List<string>();
+            var sourceProteinCollectionIds = new List<string>();
             // Check if source proteins should be used.
             if (Input.UseSourceProteinData)
             {
                 // Try to deserialize the source data.
-                if (!Input.SourceProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out sourceProteinIdentifiers) || sourceProteinIdentifiers == null)
+                if (!Input.SourceProteinData.TryDeserializeJsonObject<List<string>>(out sourceProteinIdentifiers) || sourceProteinIdentifiers == null)
                 {
                     // Add an error to the model.
                     ModelState.AddModelError(string.Empty, "The provided source data could not be deserialized.");
@@ -459,7 +459,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             if (Input.UseSourceProteinCollectionData)
             {
                 // Try to deserialize the source protein collection data.
-                if (!Input.SourceProteinCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out sourceProteinCollectionIds) || sourceProteinCollectionIds == null)
+                if (!Input.SourceProteinCollectionData.TryDeserializeJsonObject<List<string>>(out sourceProteinCollectionIds) || sourceProteinCollectionIds == null)
                 {
                     // Add an error to the model.
                     ModelState.AddModelError(string.Empty, "The provided source protein collection data could not be deserialized.");
@@ -471,16 +471,16 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                     .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Source))
                     .Where(item => sourceProteinCollectionIds.Contains(item.Id))
                     .Select(item => item.Id)
-                    .AsEnumerable();
+                    .ToList();
             }
             // Define the related data.
-            var targetProteinIdentifiers = Enumerable.Empty<string>();
-            var targetProteinCollectionIds = Enumerable.Empty<string>();
+            var targetProteinIdentifiers = new List<string>();
+            var targetProteinCollectionIds = new List<string>();
             // Check if target proteins should be used.
             if (Input.UseTargetProteinData)
             {
                 // Try to deserialize the target data.
-                if (!Input.TargetProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out targetProteinIdentifiers) || targetProteinIdentifiers == null)
+                if (!Input.TargetProteinData.TryDeserializeJsonObject<List<string>>(out targetProteinIdentifiers) || targetProteinIdentifiers == null)
                 {
                     // Add an error to the model.
                     ModelState.AddModelError(string.Empty, "The provided target data could not be deserialized.");
@@ -492,7 +492,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
             if (Input.UseTargetProteinCollectionData)
             {
                 // Try to deserialize the target protein collection data.
-                if (!Input.TargetProteinCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out targetProteinCollectionIds) || targetProteinCollectionIds == null)
+                if (!Input.TargetProteinCollectionData.TryDeserializeJsonObject<List<string>>(out targetProteinCollectionIds) || targetProteinCollectionIds == null)
                 {
                     // Add an error to the model.
                     ModelState.AddModelError(string.Empty, "The provided target protein collection data could not be deserialized.");
@@ -504,7 +504,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                     .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Target))
                     .Where(item => targetProteinCollectionIds.Contains(item.Id))
                     .Select(item => item.Id)
-                    .AsEnumerable();
+                    .ToList();
             }
             // Check if there weren't any target items found.
             if (!targetProteinIdentifiers.Any() && !targetProteinCollectionIds.Any())

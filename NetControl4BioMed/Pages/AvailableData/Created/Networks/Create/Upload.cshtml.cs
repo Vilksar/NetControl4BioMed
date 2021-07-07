@@ -210,7 +210,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
             else if (Input.Type == "cx")
             {
                 // Try to deserialize the data.
-                if (!Input.Data.TryDeserializeJsonObject<IEnumerable<FileCxViewModel.CxBaseObject>>(out var viewModel) || viewModel == null)
+                if (!Input.Data.TryDeserializeJsonObject<List<FileCxViewModel.CxBaseObject>>(out var viewModel) || viewModel == null)
                 {
                     // Add an error to the model.
                     ModelState.AddModelError(string.Empty, "The provided file does not have the required format.");

@@ -79,17 +79,6 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
             public string ReCaptchaToken { get; set; }
         }
 
-        //public ViewModel View { get; set; }
-
-        //public class ViewModel
-        //{
-        //    public IEnumerable<string> ProteinDatabaseIds { get; set; }
-
-        //    public IEnumerable<string> InteractionDatabaseIds { get; set; }
-
-        //    public IEnumerable<string> SeedProteinCollectionIds { get; set; }
-        //}
-
         public async Task<IActionResult> OnGetAsync(string networkId)
         {
             // Get the current user.
@@ -146,17 +135,17 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                     .Where(item => item.Database.DatabaseInteractions.Any())
                     .Select(item => item.Database.Id)
                     .AsNoTracking()
-                    .AsEnumerable();
+                    .ToList();
                 var seedProteinNames = _context.NetworkProteins
                     .Where(item => item.Type == NetworkProteinType.Seed && item.Network.Id == networkId)
                     .Select(item => item.Protein.Name)
                     .AsNoTracking()
-                    .AsEnumerable();
+                    .ToList();
                 var seedProteinCollectionIds = _context.NetworkProteinCollections
                     .Where(item => item.Type == NetworkProteinCollectionType.Seed && item.Network.Id == networkId)
                     .Select(item => item.ProteinCollection.Id)
                     .AsNoTracking()
-                    .AsEnumerable();
+                    .ToList();
                 // Define the input.
                 Input = new InputModel
                 {
@@ -279,7 +268,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                 return Page();
             }
             // Try to deserialize the interaction database data.
-            if (!Input.InteractionDatabaseData.TryDeserializeJsonObject<IEnumerable<string>>(out var interactionDatabaseIds) || interactionDatabaseIds == null)
+            if (!Input.InteractionDatabaseData.TryDeserializeJsonObject<List<string>>(out var interactionDatabaseIds) || interactionDatabaseIds == null)
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The provided interaction database data could not be deserialized.");
@@ -299,7 +288,8 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                 .Where(item => item.IsPublic || (user != null && item.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
                 .Where(item => item.DatabaseInteractions.Any())
                 .Where(item => interactionDatabaseIds.Contains(item.Id))
-                .Select(item => item.Id);
+                .Select(item => item.Id)
+                .ToList();
             // Check if there weren't any interaction databases found.
             if (interactionDatabaseIds == null || !interactionDatabaseIds.Any())
             {
@@ -309,13 +299,13 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                 return Page();
             }
             // Define the related data.
-            var seedProteinIdentifiers = Enumerable.Empty<string>();
-            var seedProteinCollectionIds = Enumerable.Empty<string>();
+            var seedProteinIdentifiers = new List<string>();
+            var seedProteinCollectionIds = new List<string>();
             // Check if seed proteins should be used.
             if (Input.UseSeedProteinData)
             {
                 // Try to deserialize the seed data.
-                if (!Input.SeedProteinData.TryDeserializeJsonObject<IEnumerable<string>>(out seedProteinIdentifiers) || seedProteinIdentifiers == null)
+                if (!Input.SeedProteinData.TryDeserializeJsonObject<List<string>>(out seedProteinIdentifiers) || seedProteinIdentifiers == null)
                 {
                     // Add an error to the model.
                     ModelState.AddModelError(string.Empty, "The provided seed data could not be deserialized.");
@@ -327,7 +317,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
             if (Input.UseSeedProteinCollectionData)
             {
                 // Try to deserialize the seed protein collection data.
-                if (!Input.SeedProteinCollectionData.TryDeserializeJsonObject<IEnumerable<string>>(out seedProteinCollectionIds) || seedProteinCollectionIds == null)
+                if (!Input.SeedProteinCollectionData.TryDeserializeJsonObject<List<string>>(out seedProteinCollectionIds) || seedProteinCollectionIds == null)
                 {
                     // Add an error to the model.
                     ModelState.AddModelError(string.Empty, "The provided seed protein collection data could not be deserialized.");
@@ -339,7 +329,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                     .Where(item => item.ProteinCollectionTypes.Any(item1 => item1.Type == EnumerationProteinCollectionType.Seed))
                     .Where(item => seedProteinCollectionIds.Contains(item.Id))
                     .Select(item => item.Id)
-                    .AsEnumerable();
+                    .ToList();
             }
             // Check if there weren't any items found.
             if (!seedProteinIdentifiers.Any() && !seedProteinCollectionIds.Any())
@@ -352,7 +342,7 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
             // Get the related data.
             var proteinDatabaseIds = proteinDatabases
                 .Select(item => item.Id)
-                .AsEnumerable();
+                .ToList();
             // Serialize the seed data.
             var data = JsonSerializer.Serialize(seedProteinIdentifiers
                 .Select(item => new NetworkProteinInputModel
