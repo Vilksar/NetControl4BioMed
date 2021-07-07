@@ -433,10 +433,10 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Analyses
                 // Get the algorithm.
                 var algorithm = EnumerationExtensions.GetEnumerationValue<AnalysisAlgorithm>(Input.Algorithm);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, $"The analysis algorithm couldn't be determined from the provided string.");
+                ModelState.AddModelError(string.Empty, exception.Message);
                 // Redisplay the page.
                 return Page();
             }

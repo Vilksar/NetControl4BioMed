@@ -257,10 +257,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     catch (Exception exception)
                     {
-                        // Get the exception message.
-                        var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
                         // Throw a new exception.
-                        throw new TaskException("The algorithm couldn't be determined from the provided string." + message, showExceptionItem, batchItem);
+                        throw new TaskException(exception.Message, showExceptionItem, batchItem);
                     }
                     // Append a message to the log.
                     analysis.Log = analysis.AppendToLog("The analysis has been defined and stored in the database.");

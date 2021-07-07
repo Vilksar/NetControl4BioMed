@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
@@ -260,10 +259,10 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                     return Page();
                 }
             }
-            catch (Exception)
+            catch (Exception exception)
             {
                 // Add an error to the model.
-                ModelState.AddModelError(string.Empty, $"The network generation algorithm couldn't be determined from the provided string.");
+                ModelState.AddModelError(string.Empty, exception.Message);
                 // Redisplay the page.
                 return Page();
             }

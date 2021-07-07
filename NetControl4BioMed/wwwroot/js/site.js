@@ -48,6 +48,17 @@ $(window).on('load', () => {
         });
     }
 
+    // Check if there is a file selector on the page.
+    if ($('.file-selector').length !== 0) {
+        // Add a listener for if the selection has changed.
+        $('.file-selector-input').on('change', (event) => {
+            // Get the current file.
+            const file = event.target.files[0];
+            // Set the filename in the label.
+            $(event.target).siblings('.file-selector-label').html(file.name);
+        });
+    }
+
     // Check if there is a datatable on the page.
     if ($('.table-datatable').length !== 0) {
         // Go over each datatable.

@@ -10,6 +10,7 @@ using NetControl4BioMed.Helpers.Tasks;
 using NetControl4BioMed.Helpers.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,16 +22,14 @@ namespace NetControl4BioMed.Pages.Identity
         private readonly IServiceProvider _serviceProvider;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Role> _roleManager;
         private readonly ISendGridEmailSender _emailSender;
         private readonly LinkGenerator _linkGenerator;
 
-        public ChangeEmailModel(IServiceProvider serviceProvider, SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator)
+        public ChangeEmailModel(IServiceProvider serviceProvider, SignInManager<User> signInManager, UserManager<User> userManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator)
         {
             _serviceProvider = serviceProvider;
             _signInManager = signInManager;
             _userManager = userManager;
-            _roleManager = roleManager;
             _emailSender = emailSender;
             _linkGenerator = linkGenerator;
         }
@@ -94,10 +93,21 @@ namespace NetControl4BioMed.Pages.Identity
                 // Run the task.
                 await usersTask.EditAsync(_serviceProvider, CancellationToken.None);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                // Display an error.
-                TempData["StatusMessage"] = "Error: There was an error with setting the new e-mail address.";
+                // Log out the user.
+                await _signInManager.SignOutAsync();
+                // Define the messages to return.
+                var messages = new List<string> { "An error occurred while setting the new e-mail address." };
+                // Build the exception message.
+                while (exception != null)
+                {
+                    // Update the messages and the exception.
+                    messages.Add(exception.Message);
+                    exception = exception.InnerException;
+                }
+                // Display a message to the user.
+                TempData["StatusMessage"] = $"Error: {string.Join(" ", messages.Where(item => !string.IsNullOrEmpty(item)))}";
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }

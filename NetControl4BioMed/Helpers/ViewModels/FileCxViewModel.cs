@@ -149,7 +149,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 /// Represents the value of the attribute for the current node.
                 /// </summary>
                 [JsonPropertyName("v")]
-                public string Value { get; set; }
+                public object Value { get; set; }
 
                 /// <summary>
                 /// Represents the data type of the attribute.
@@ -209,7 +209,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 /// Represents the value of the attribute for the current edge.
                 /// </summary>
                 [JsonPropertyName("v")]
-                public string Value { get; set; }
+                public object Value { get; set; }
 
                 /// <summary>
                 /// Represents the data type of the attribute.

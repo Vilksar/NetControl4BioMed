@@ -137,12 +137,21 @@ namespace NetControl4BioMed.Pages.Account.Manage.PersonalData
                 // Run the task.
                 await task.DeleteAsync(_serviceProvider, CancellationToken.None);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
                 // Log out the user.
                 await _signInManager.SignOutAsync();
+                // Define the messages to return.
+                var messages = new List<string> { "An error occurred while removing the data associated with your account." };
+                // Build the exception message.
+                while (exception != null)
+                {
+                    // Update the messages and the exception.
+                    messages.Add(exception.Message);
+                    exception = exception.InnerException;
+                }
                 // Display a message to the user.
-                TempData["StatusMessage"] = $"Error: There was an error removing some of the data associated with your account.";
+                TempData["StatusMessage"] = $"Error: {string.Join(" ", messages.Where(item => !string.IsNullOrEmpty(item)))}";
                 // Redirect to the home page.
                 return RedirectToPage("/Index");
             }

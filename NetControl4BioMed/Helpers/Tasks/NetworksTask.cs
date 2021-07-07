@@ -233,10 +233,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     catch (Exception exception)
                     {
-                        // Get the exception message.
-                        var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
-                        // Throw an exception.
-                        throw new TaskException("The algorithm couldn't be determined from the provided string." + message, showExceptionItem, batchItem);
+                        // Throw a new exception.
+                        throw new TaskException(exception.Message, showExceptionItem, batchItem);
                     }
                     // Append a message to the log.
                     network.Log = network.AppendToLog("The network has been defined and stored in the database.");
