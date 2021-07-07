@@ -7,11 +7,7 @@
 
 <div class="alert alert-warning text-justify text-wrap">
     <span><i class="fas fa-exclamation-triangle"></i></span>
-    <span>Please note that downloading a control path will only download details on corresponding control proteins and target proteins. You can download separately the network corresponding to the analysis from its details page.</span>
-</div>
-<div class="alert alert-warning text-justify text-wrap">
-    <span><i class="fas fa-exclamation-triangle"></i></span>
-    <span>Please check that the name of the analysis does not contain any invalid characters (&lt; &gt; \ / | : " * ?), or you might encounter an error when unarchiving. You can rename the analysis  from its details page.</span>
+    <span>Please note that downloading a control path will only download the control paths from the control inputs to their controlled targets. The corresponding network can be downloaded separately for each analysis.</span>
 </div>
 <div class="alert alert-primary text-justify text-wrap">
     <span><i class="fas fa-info-circle"></i></span>
@@ -24,16 +20,16 @@
             <span><span class="font-weight-bold">SIF</span>, which contains the list of interactions in the control path as pairs of proteins, together with the type of the relationship between them. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">JSON</span>, which contains the complete control path details, together with the list of paths.</span>
+            <span><span class="font-weight-bold">Cytoscape.js JSON</span>, which contains the control path data required for visualization. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>, where it can be used together with the available <a href="~/files/NetControl4BioMed.xml" download="NetControl4BioMed.xml" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">style file</a> <span><i class="fas fa-file-download"></i></span>.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">Cytoscape.js JSON</span>, which contains the control path data required for visualization. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>. It can be used together with the available <a href="~/files/NetControl4BioMed.xml" download="NetControl4BioMed.xml" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">style file</a> <span><i class="fas fa-file-download"></i></span>.</span>
+            <span><span class="font-weight-bold">Cytoscape CX</span>, which contains the control path data required for exchanging networks within diverse services while preserving all network-related information. This file can be imported directly into <a href="https://ndexbio.org" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">NDEx</a> <span><i class="fas fa-external-link-alt"></i></span>, or into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>, where it can be used together with the available <a href="~/files/NetControl4BioMed.xml" download="NetControl4BioMed.xml" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">style file</a> <span><i class="fas fa-file-download"></i></span>.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">Cytoscape CX</span>, which contains the control path data required for exchanging networks within diverse services while preserving all network-related information. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
+            <span><span class="font-weight-bold">JSON</span>, which contains the complete control path data, including the control path details and the list of proteins and interactions in the control path.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">Excel</span>, which contains the complete control path data.</span>
+            <span><span class="font-weight-bold">Excel</span>, which contains the complete control path data, including the control path details and the list of proteins and interactions in the control path.</span>
         </li>
     </ul>
 </div>
@@ -94,13 +90,26 @@
                             <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
                                 <span>#</span>
                             </th>
-                            <th class="text-center text-break">
-                                <span>Control nodes</span>
+                            <th class="text-left text-break">
+                                <span>Control path</span>
+                            </th>
+                            <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                                <div>
+                                    <span>Number of</span>
+                                </div>
+                                <div>
+                                    <span>control inputs</span>
+                                </div>
                             </th>
                             @if (Model.View.SourceProteins.Any())
                             {
                                 <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
-                                    <span>Source nodes</span>
+                                    <div>
+                                        <span>Number of preferred</span>
+                                    </div>
+                                    <div>
+                                        <span>control inputs</span>
+                                    </div>
                                 </th>
                             }
                             <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -136,8 +145,11 @@
                                 <td class="text-center text-break text-nowrap">
                                     <span></span>
                                 </td>
-                                <td class="text-center text-break">
-                                    <a asp-page="/AvailableData/Created/Analyses/Details/Results/ControlPaths/Details" asp-route-id="@item.Id" class="font-weight-bold" title="@controlProteinCount">@controlProteinCount</a>
+                                <td class="text-left text-break">
+                                    <a asp-page="/AvailableData/Created/Analyses/Details/Results/ControlPaths/Details" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Id">@item.Id</a>
+                                </td>
+                                <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                                    <span title="@controlProteinCount">@controlProteinCount</span>
                                 </td>
                                 @if (Model.View.SourceProteins.Any())
                                 {

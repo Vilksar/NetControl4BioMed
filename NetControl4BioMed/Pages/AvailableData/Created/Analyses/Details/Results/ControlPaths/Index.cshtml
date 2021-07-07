@@ -1,6 +1,6 @@
 ﻿@page
 @model IndexModel
-@using NetControl4BioMed.Data.Enumerations 
+@using NetControl4BioMed.Data.Enumerations
 @{
     ViewData["Title"] = "Analysis control paths";
 }
@@ -35,12 +35,25 @@
                         </div>
                     </th>
                     <th class="text-left text-break">
-                        <span>Control proteins</span>
+                        <span>Control path</span>
+                    </th>
+                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                        <div>
+                            <span>Number of</span>
+                        </div>
+                        <div>
+                            <span>control inputs</span>
+                        </div>
                     </th>
                     @if (Model.View.SourceProteins.Any())
                     {
                         <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
-                            <span>Source proteins</span>
+                            <div>
+                                <span>Number of preferred</span>
+                            </div>
+                            <div>
+                                <span>control inputs</span>
+                            </div>
                         </th>
                     }
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -75,11 +88,14 @@
                         </td>
                         <td class="text-left text-break">
                             <div>
-                                <a asp-page="/AvailableData/Created/Analyses/Details/Results/ControlPaths/Details" asp-route-id="@item.Id" class="font-weight-bold" title="@controlProteinCount">@controlProteinCount</a>
+                                <a asp-page="/AvailableData/Created/Analyses/Details/Results/ControlPaths/Details" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Id">@item.Id</a>
                             </div>
                             <div>
                                 <span class="small text-muted" title="@item.Id">@item.Id</span>
                             </div>
+                        </td>
+                        <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                            <span title="@controlProteinCount">@controlProteinCount</span>
                         </td>
                         @if (Model.View.SourceProteins.Any())
                         {

@@ -62,25 +62,16 @@
                         <span>#</span>
                     </th>
                     <th class="text-left text-break">
-                        <span>Protein</span>
+                        <span>Control input</span>
                     </th>
                     @if (Model.View.SourceProteins.Any())
                     {
                         <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
-                            <span>Source</span>
-                        </th>
-                    }
-                    @if (Model.View.HasNetworkDatabases)
-                    {
-                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                            <span>Links</span>
+                            <span>Is preferred</span>
                         </th>
                     }
                     <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
-                        <span>Controlled proteins</span>
-                    </th>
-                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
-                        <span>Links</span>
+                        <span>Controlled targets</span>
                     </th>
                 </tr>
             </thead>
@@ -119,21 +110,8 @@
                                 </div>
                             </td>
                         }
-                        @if (Model.View.HasNetworkDatabases)
-                        {
-                            <td class="text-center text-break">
-                                <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@uniqueControlProtein.Key.Id" title="Details">
-                                    <span>Details</span>
-                                </a>
-                            </td>
-                        }
                         <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
                             <a asp-page="/AvailableData/Created/Analyses/Details/Results/Paths/Index" asp-route-id="@Model.View.Analysis.Id" asp-route-controlPathId="@Model.View.ControlPath.Id" asp-route-searchIn="SourceProteinId" asp-route-searchString="@uniqueControlProtein.Key.Id" asp-route-filter="IsInControlPath" title="@uniqueControlProtein.Value">@uniqueControlProtein.Value</a>
-                        </td>
-                        <td class="text-center text-break">
-                            <a asp-page="/AvailableData/Created/Analyses/Details/Results/Paths/Index" asp-route-id="@Model.View.Analysis.Id" asp-route-controlPathId="@Model.View.ControlPath.Id" asp-route-searchIn="SourceProteinId" asp-route-searchString="@uniqueControlProtein.Key.Id" asp-route-filter="IsInControlPath" title="View">
-                                <span>View</span>
-                            </a>
                         </td>
                     </tr>
                 }

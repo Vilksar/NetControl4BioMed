@@ -9,7 +9,7 @@
 <partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
 <div class="alert alert-success text-justify text-wrap">
     <span><i class="fas fa-info-circle"></i></span>
-    <span>You can create a new network analysis starting from the corresponding network. You can find all of the public networks <a asp-page="/PublicData/Networks/Index" class="alert-link">here</a>.</span>
+    <span>You can create a new analysis starting from the corresponding network. You can find all of the public networks <a asp-page="/PublicData/Networks/Index" class="alert-link">here</a>.</span>
 </div>
 <form method="get" class="text-justify">
     <div class="row align-items-center">
@@ -81,10 +81,10 @@
                             <partial name="_AnalysisStatusPartial" model="@item.Status" />
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
-                            <div>
+                            <div title="Search progress">
                                 <span><span class="item-refresh-item" data-type="progress"></span>%</span>
                             </div>
-                            <div>
+                            <div title="Early stopping (no improvement)">
                                 <span><span class="item-refresh-item" data-type="progressWithoutImprovement"></span>%</span>
                             </div>
                         </td>

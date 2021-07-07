@@ -361,7 +361,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Created",
-                    Title = "Created",
+                    Title = "Networks / Analyses",
                     Description = string.Empty,
                     Icon = "fa-hammer",
                     Color = "primary",
@@ -598,7 +598,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Created",
-                    Title = "Created",
+                    Title = "Networks / Analyses",
                     Description = string.Empty,
                     Icon = "fa-hammer",
                     Color = "primary",

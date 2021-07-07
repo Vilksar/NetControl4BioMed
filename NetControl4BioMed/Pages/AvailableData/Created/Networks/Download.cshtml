@@ -4,13 +4,9 @@
     ViewData["Title"] = "Download networks";
 }
 
-<div class="alert alert-warning text-justify text-wrap">
-    <span><i class="fas fa-exclamation-triangle"></i></span>
-    <span>Please check that the names of the networks do not contain any invalid characters (&lt; &gt; \ / | : " * ?), or you might encounter an error when unarchiving. You can rename a network from its corresponding details page.</span>
-</div>
 <div class="alert alert-primary text-justify text-wrap">
     <span><i class="fas fa-info-circle"></i></span>
-    <span>Please select a file format, then click the button to download the @Model.View.Items.Count() listed network@(Model.View.Items.Count() != 1 ? "s" : string.Empty) in a <a href="https://en.wikipedia.org/wiki/Zip_(file_format)" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">ZIP archive</a> <span><i class="fas fa-external-link-alt"></i></span>. The available file formats are:</span>
+    <span>Please select a file format, then click the button to download the listed network@(Model.View.Items.Count() != 1 ? "s" : string.Empty) in a <a href="https://en.wikipedia.org/wiki/Zip_(file_format)" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">ZIP archive</a> <span><i class="fas fa-external-link-alt"></i></span>. The available file formats are:</span>
     <ul class="mt-1 mb-0">
         <li>
             <span><span class="font-weight-bold">Text</span>, which contains the list of interactions in the network as pairs of proteins. This file can be used to directly specify the interactions when uploading a network in the application.</span>
@@ -19,16 +15,16 @@
             <span><span class="font-weight-bold">SIF</span>, which contains the list of interactions in the network as pairs of proteinss, together with the type of the relationship between them. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">JSON</span>, which contains the complete network details, together with the list of proteins and interactions.</span>
+            <span><span class="font-weight-bold">Cytoscape.js JSON</span>, which contains the network data required for visualization. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>, where it can be used together with the available <a href="~/files/NetControl4BioMed.xml" download="NetControl4BioMed.xml" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">style file</a> <span><i class="fas fa-file-download"></i></span>.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">Cytoscape.js JSON</span>, which contains the network data required for visualization. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>. It can be used together with the available <a href="~/files/NetControl4BioMed.xml" download="NetControl4BioMed.xml" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">style file</a> <span><i class="fas fa-file-download"></i></span>.</span>
+            <span><span class="font-weight-bold">Cytoscape CX</span>, which contains the network data required for exchanging networks within diverse services while preserving all network-related information. This file can be imported directly into <a href="https://ndexbio.org" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">NDEx</a> <span><i class="fas fa-external-link-alt"></i></span>, or into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>, where it can be used together with the available <a href="~/files/NetControl4BioMed.xml" download="NetControl4BioMed.xml" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">style file</a> <span><i class="fas fa-file-download"></i></span>.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">Cytoscape CX</span>, which contains the network data required for exchanging networks within diverse services while preserving all network-related information. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
+            <span><span class="font-weight-bold">JSON</span>, which contains the complete network data, including the network details and the list of proteins and interactions in the network.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">Excel</span>, which contains the complete network data.</span>
+            <span><span class="font-weight-bold">Excel</span>, which contains the complete network data, including the network details and the list of proteins and interactions in the network.</span>
         </li>
     </ul>
 </div>

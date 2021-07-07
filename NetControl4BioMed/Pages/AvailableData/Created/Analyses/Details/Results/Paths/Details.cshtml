@@ -53,9 +53,6 @@
                     <th class="text-center text-break text-nowrap" hidden>
                         <span>Index</span>
                     </th>
-                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap" hidden>
-                        <span>Type</span>
-                    </th>
                     @if (Model.View.HasNetworkDatabases)
                     {
                         <th class="text-center text-break" data-orderable="false" data-searchable="false">
@@ -83,9 +80,6 @@
                         </td>
                         <td class="text-center text-break text-nowrap" hidden>
                             <span title="@pathProtein.Index">@pathProtein.Index</span>
-                        </td>
-                        <td class="d-none d-lg-table-cell text-center text-break text-nowrap" hidden>
-                            <partial name="_PathProteinTypePartial" model="pathProtein.Type" />
                         </td>
                         @if (Model.View.HasNetworkDatabases)
                         {

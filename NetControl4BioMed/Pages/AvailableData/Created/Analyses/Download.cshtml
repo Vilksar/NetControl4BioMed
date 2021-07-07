@@ -6,11 +6,7 @@
 
 <div class="alert alert-warning text-justify text-wrap">
     <span><i class="fas fa-exclamation-triangle"></i></span>
-    <span>Please note that downloading an analysis will only download the corresponding network. You can download separately specific identified control paths for each analysis.</span>
-</div>
-<div class="alert alert-warning text-justify text-wrap">
-    <span><i class="fas fa-exclamation-triangle"></i></span>
-    <span>Please check that the names of the analyses do not contain any invalid characters (&lt; &gt; \ / | : " * ?), or you might encounter an error when unarchiving. You can rename an analysis from its corresponding details page.</span>
+    <span>Please note that downloading an analysis will only download its corresponding network, together with its source and target data. The detailed control paths from the control inputs to their controlled targets can be downloaded separately for each analysis.</span>
 </div>
 <div class="alert alert-primary text-justify text-wrap">
     <span><i class="fas fa-info-circle"></i></span>
@@ -23,16 +19,16 @@
             <span><span class="font-weight-bold">SIF</span>, which contains the list of interactions in the network corresponding to the analysis as pairs of proteins, together with the type of the relationship between them. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">JSON</span>, which contains the complete analysis details, together with the list of proteins and interactions in the corresponding network.</span>
+            <span><span class="font-weight-bold">Cytoscape.js JSON</span>, which contains the analysis data required for visualization. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>, where it can be used together with the available <a href="~/files/NetControl4BioMed.xml" download="NetControl4BioMed.xml" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">style file</a> <span><i class="fas fa-file-download"></i></span>.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">Cytoscape.js JSON</span>, which contains the analysis data required for visualization. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>. It can be used together with the available <a href="~/files/NetControl4BioMed.xml" download="NetControl4BioMed.xml" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">style file</a> <span><i class="fas fa-file-download"></i></span>.</span>
+            <span><span class="font-weight-bold">Cytoscape CX</span>, which contains the analysis data required for exchanging networks within diverse services while preserving all network-related information. This file can be imported directly into <a href="https://ndexbio.org" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">NDEx</a> <span><i class="fas fa-external-link-alt"></i></span>, or into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>, where it can be used together with the available <a href="~/files/NetControl4BioMed.xml" download="NetControl4BioMed.xml" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">style file</a> <span><i class="fas fa-file-download"></i></span>.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">Cytoscape CX</span>, which contains the analysis data required for exchanging networks within diverse services while preserving all network-related information. This file can be imported directly into <a href="https://cytoscape.org/" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span><i class="fas fa-external-link-alt"></i></span>.</span>
+            <span><span class="font-weight-bold">JSON</span>, which contains the complete analysis data, including the analysis details and the list of proteins and interactions in the analysis.</span>
         </li>
         <li>
-            <span><span class="font-weight-bold">Excel</span>, which contains the complete analysis data.</span>
+            <span><span class="font-weight-bold">Excel</span>, which contains the complete analysis data, including the analysis details and the list of proteins and interactions in the analysis.</span>
         </li>
     </ul>
 </div>
