@@ -275,7 +275,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "ProteinCollections",
-                            Title = "Collections",
+                            Title = "Protein collections",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
@@ -594,36 +594,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Link = "/AvailableData/Data/ProteinCollections/Index"
                         }
                     }
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Created",
-                    Title = "Networks / Analyses",
-                    Description = string.Empty,
-                    Icon = "fa-hammer",
-                    Color = "primary",
-                    Link = "/AvailableData/Created/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Networks",
-                            Title = "Networks",
-                            Description = string.Empty,
-                            Icon = "fa-share-alt",
-                            Color = "light",
-                            Link = "/AvailableData/Created/Networks/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "Analyses",
-                            Title = "Analyses",
-                            Description = string.Empty,
-                            Icon = "fa-code-branch",
-                            Color = "light",
-                            Link = "/AvailableData/Created/Analyses/Index"
-                        }
-                    }
                 }
             }
         };
@@ -643,7 +613,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Index",
-                    Title = "Overview",
+                    Title = "Network overview",
                     Description = string.Empty,
                     Icon = "fa-chart-bar",
                     Color = "dark",
@@ -652,7 +622,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Accounts",
-                    Title = "Accounts",
+                    Title = "Network access",
                     Description = string.Empty,
                     Icon = "fa-users",
                     Color = "dark",
@@ -673,7 +643,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Databases",
-                    Title = "Databases",
+                    Title = "Network databases",
                     Description = string.Empty,
                     Icon = "fa-database",
                     Color = "dark",
@@ -694,7 +664,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Data",
-                    Title = "Data",
+                    Title = "Network data",
                     Description = string.Empty,
                     Icon = "fa-table",
                     Color = "dark",
@@ -722,7 +692,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "ProteinCollections",
-                            Title = "Collections",
+                            Title = "Protein collections",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
@@ -733,9 +703,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Created",
-                    Title = "Created",
+                    Title = "Network analyses",
                     Description = string.Empty,
-                    Icon = "fa-hammer",
+                    Icon = "fa-code-branch",
                     Color = "dark",
                     Link = "/AvailableData/Created/Networks/Details/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -769,7 +739,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Index",
-                    Title = "Overview",
+                    Title = "Analysis overview",
                     Description = string.Empty,
                     Icon = "fa-chart-bar",
                     Color = "dark",
@@ -778,7 +748,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Accounts",
-                    Title = "Accounts",
+                    Title = "Analysis access",
                     Description = string.Empty,
                     Icon = "fa-users",
                     Color = "dark",
@@ -799,7 +769,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Databases",
-                    Title = "Databases",
+                    Title = "Analysis databases",
                     Description = string.Empty,
                     Icon = "fa-database",
                     Color = "dark",
@@ -820,7 +790,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Data",
-                    Title = "Data",
+                    Title = "Analysis data",
                     Description = string.Empty,
                     Icon = "fa-table",
                     Color = "dark",
@@ -848,7 +818,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         new NavigationPageViewModel
                         {
                             Id = "ProteinCollections",
-                            Title = "Collections",
+                            Title = "Protein collections",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
@@ -859,7 +829,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Results",
-                    Title = "Results",
+                    Title = "Analysis results",
                     Description = string.Empty,
                     Icon = "fa-code-branch",
                     Color = "dark",

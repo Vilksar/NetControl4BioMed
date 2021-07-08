@@ -278,8 +278,8 @@ namespace NetControl4BioMed.Pages.AvailableData.Created.Networks.Create
                 }
                 // Get the network details.
                 var networkDetails = viewModel.FirstOrDefault(item => item.NetworkAttributes != null)?.NetworkAttributes;
-                var networkName = networkDetails?.FirstOrDefault(item => item != null && item.Name == "name")?.Value;
-                var networkDescription = networkDetails?.FirstOrDefault(item => item != null && item.Name == "description")?.Value;
+                var networkName = networkDetails?.FirstOrDefault(item => item != null && item.Name == "name")?.Value.ToString();
+                var networkDescription = networkDetails?.FirstOrDefault(item => item != null && item.Name == "description")?.Value.ToString();
                 // Get the proteins from the data.
                 var proteins = viewModel.FirstOrDefault(item => item.Nodes != null)?.Nodes
                     .Where(item => item != null && !string.IsNullOrEmpty(item.Name))

@@ -15,18 +15,11 @@
         <span><span class="font-weight-bold">The network is public and appears in the list of public networks.</span> Anyone can inspect, visualize, copy, or use the network in analyses.</span>
     </div>
 }
-@if (Model.View.IsUserOwner)
-{
-    <div class="alert alert-info text-justify text-wrap">
-        <span><i class="fas fa-info-circle"></i></span>
-        <span>Only the users with explicit access can edit or delete the network. The users with access can be viewed and managed on the <a asp-page="/AvailableData/Created/Networks/Details/Accounts/Users/Index" asp-route-id="@Model.View.Network.Id" class="alert-link">corresponding page</a>.</span>
-    </div>
-}
 <div class="row align-items-center">
     <div class="col-lg mb-3">
-        <a asp-page="/AvailableData/Created/Networks/Create/Index" asp-route-networkId="@Model.View.Network.Id" class="btn btn-dark btn-block" title="Copy">
+        <a asp-page="/AvailableData/Created/Networks/Create/Index" asp-route-networkId="@Model.View.Network.Id" class="btn btn-dark btn-block" title="Re-Create">
             <span><i class="fas fa-copy"></i></span>
-            <span>Copy</span>
+            <span>Re-Create</span>
         </a>
     </div>
     @if (Model.View.IsUserOwner)
