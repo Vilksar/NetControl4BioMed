@@ -56,12 +56,11 @@ namespace NetControl4BioMed.Pages.PublicData
                     {
                         Id = item.Network.Id,
                         Name = item.Network.Name
-                    },
-                        new Analyses.IndexModel.ItemModel
-                        {
-                            Id = item.Id,
-                            Name = item.Name
-                        })),
+                    }, new Analyses.IndexModel.ItemModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name
+                    })),
                 RecentNetworks = _context.Networks
                     .Where(item => item.IsPublic)
                     .OrderByDescending(item => item.DateTimeCreated)

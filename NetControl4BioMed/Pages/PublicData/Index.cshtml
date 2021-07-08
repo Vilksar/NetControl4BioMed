@@ -161,7 +161,7 @@
         </div>
     </div>
     <div class="card-body">
-        @if (Model.View.Demonstrations == null || Model.View.Demonstrations == null)
+        @if (Model.View.Demonstrations == null || !Model.View.Demonstrations.Any())
         {
             <div class="alert alert-info text-justify text-wrap mb-0">
                 <span><i class="fas fa-info-circle"></i></span>
