@@ -29,6 +29,8 @@ namespace NetControl4BioMed.Pages.AvailableData.Data.Proteins
 
             public IEnumerable<DatabaseProtein> DatabaseProteins { get; set; }
 
+            public IEnumerable<DatabaseProteinFieldProtein> DrugDatabaseProteinFieldProteins { get; set; }
+
             public IEnumerable<DatabaseProteinFieldProtein> DatabaseProteinFieldProteins { get; set; }
 
             public IEnumerable<InteractionProtein> InteractionProteins { get; set; }
@@ -75,6 +77,12 @@ namespace NetControl4BioMed.Pages.AvailableData.Data.Proteins
                     .Select(item => item.DatabaseProteinFieldProteins)
                     .SelectMany(item => item)
                     .Where(item => item.DatabaseProteinField.Database.IsPublic || (user != null && item.DatabaseProteinField.Database.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
+                    .Include(item => item.DatabaseProteinField),
+                DrugDatabaseProteinFieldProteins = items
+                    .Select(item => item.DatabaseProteinFieldProteins)
+                    .SelectMany(item => item)
+                    .Where(item => item.DatabaseProteinField.Database.IsPublic || (user != null && item.DatabaseProteinField.Database.DatabaseUsers.Any(item1 => item1.Email == user.Email)))
+                    .Where(item => item.DatabaseProteinField.Database.Name.Contains("drug") || item.DatabaseProteinField.Database.Description.Contains("drug"))
                     .Include(item => item.DatabaseProteinField),
                 InteractionProteins = items
                     .Select(item => item.InteractionProteins)
