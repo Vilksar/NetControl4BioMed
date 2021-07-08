@@ -14,19 +14,19 @@
 <form method="get" class="text-justify">
     <div class="row align-items-center">
         <div class="col-lg-4 mb-3">
-            <button type="submit" asp-page="/AvailableData/Created/Analyses/Download" class="btn btn-primary btn-block item-group-button" title="Download" disabled>
+            <button type="submit" asp-page="/CreatedData/Analyses/Download" class="btn btn-primary btn-block item-group-button" title="Download" disabled>
                 <span><i class="fas fa-download"></i></span>
                 <span>Download</span>
             </button>
         </div>
         <div class="col-lg-4 mb-3">
-            <button type="submit" asp-page="/AvailableData/Created/Analyses/Stop" class="btn btn-secondary btn-block item-group-button" title="Stop" disabled>
+            <button type="submit" asp-page="/CreatedData/Analyses/Stop" class="btn btn-secondary btn-block item-group-button" title="Stop" disabled>
                 <span><i class="fas fa-stop"></i></span>
                 <span>Stop</span>
             </button>
         </div>
         <div class="col-lg-4 mb-3">
-            <button type="submit" asp-page="/AvailableData/Created/Analyses/Delete" class="btn btn-danger btn-block item-group-button" title="Delete" disabled>
+            <button type="submit" asp-page="/CreatedData/Analyses/Delete" class="btn btn-danger btn-block item-group-button" title="Delete" disabled>
                 <span><i class="fas fa-trash"></i></span>
                 <span>Delete</span>
             </button>
@@ -83,7 +83,7 @@
                         </td>
                         <td class="text-left text-break">
                             <div>
-                                <a asp-page="/AvailableData/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
+                                <a asp-page="/CreatedData/Analyses/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
                             </div>
                             <div>
                                 <span class="small text-muted" title="@item.Id">@item.Id</span>
@@ -101,25 +101,25 @@
                             </div>
                         </td>
                         <td class="text-center text-break">
-                            <a asp-page="/AvailableData/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                            <a asp-page="/CreatedData/Analyses/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
                                 <span><i class="fas fa-info-circle"></i></span>
                             </a>
-                            <a asp-page="/AvailableData/Created/Analyses/Download" asp-route-ids="@item.Id" class="btn btn-primary m-1" title="Download">
+                            <a asp-page="/CreatedData/Analyses/Download" asp-route-ids="@item.Id" class="btn btn-primary m-1" title="Download">
                                 <span><i class="fas fa-download"></i></span>
                             </a>
-                            <a asp-page="/AvailableData/Created/Analyses/Edit" asp-route-id="@item.Id" class="btn btn-warning m-1" title="Edit">
+                            <a asp-page="/CreatedData/Analyses/Edit" asp-route-id="@item.Id" class="btn btn-warning m-1" title="Edit">
                                 <span><i class="fas fa-pencil-alt"></i></span>
                             </a>
                             @if (item.Status == AnalysisStatus.Ongoing)
                             {
-                                <a asp-page="/AvailableData/Created/Analyses/Stop" asp-route-ids="@item.Id" class="btn btn-secondary m-1" title="Stop">
+                                <a asp-page="/CreatedData/Analyses/Stop" asp-route-ids="@item.Id" class="btn btn-secondary m-1" title="Stop">
                                     <span><i class="fas fa-stop"></i></span>
                                 </a>
                             }
-                            <a asp-page="/AvailableData/Created/Analyses/Delete" asp-route-ids="@item.Id" class="btn btn-danger m-1" title="Delete">
+                            <a asp-page="/CreatedData/Analyses/Delete" asp-route-ids="@item.Id" class="btn btn-danger m-1" title="Delete">
                                 <span><i class="fas fa-trash"></i></span>
                             </a>
-                            <a asp-page="/AvailableData/Created/Analyses/Create" asp-route-analysisId="@item.Id" class="btn btn-dark m-1" title="Re-Run">
+                            <a asp-page="/CreatedData/Analyses/Create" asp-route-analysisId="@item.Id" class="btn btn-dark m-1" title="Re-Run">
                                 <span><i class="fas fa-copy"></i></span>
                             </a>
                         </td>

@@ -381,66 +381,6 @@
         };
 
         /// <summary>
-        /// Gets the navigation breadcrumb for the public data index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel PublicDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "PublicData",
-            Title = "Public networks",
-            Link = "/PublicData/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the public data networks index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel PublicDataNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Networks",
-            Title = "Networks",
-            Link = "/PublicData/Networks/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the public data analyses index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel PublicDataAnalysesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Analyses",
-            Title = "Analyses",
-            Link = "/PublicData/Analyses/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the private data index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel PrivateDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "PrivateData",
-            Title = "My networks",
-            Link = "/PrivateData/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the private data networks index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel PrivateDataNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Networks",
-            Title = "Networks",
-            Link = "/PrivateData/Networks/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the private data analyses index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel PrivateDataAnalysesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Analyses",
-            Title = "Analyses",
-            Link = "/PrivateData/Analyses/Index"
-        };
-
-        /// <summary>
         /// Gets the navigation breadcrumb for the available data index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel AvailableDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
@@ -531,73 +471,113 @@
         };
 
         /// <summary>
-        /// Gets the navigation breadcrumb for the available data created index page.
+        /// Gets the navigation breadcrumb for the public data index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel AvailableDataCreatedNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel PublicDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
-            Id = "Created",
-            Title = "Created",
-            Link = "/AvailableData/Created/Index"
+            Id = "PublicData",
+            Title = "Public data",
+            Link = "/PublicData/Index"
         };
 
         /// <summary>
-        /// Gets the navigation breadcrumb for the available data created analyses index page.
+        /// Gets the navigation breadcrumb for the public data networks index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel AvailableDataCreatedAnalysesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Analyses",
-            Title = "Analyses",
-            Link = "/AvailableData/Created/Analyses/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the available data created analyses create index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel AvailableDataCreatedAnalysesCreateNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Create",
-            Title = "Create",
-            Link = "/AvailableData/Created/Analyses/Create/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the available data created analyses details index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel AvailableDataCreatedAnalysesDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
-        {
-            Id = "Details",
-            Title = "Details",
-            Link = "/AvailableData/Created/Analyses/Details/Index"
-        };
-
-        /// <summary>
-        /// Gets the navigation breadcrumb for the available data created networks index page.
-        /// </summary>
-        public static NavigationBreadcrumbViewModel AvailableDataCreatedNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel PublicDataNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Networks",
             Title = "Networks",
-            Link = "/AvailableData/Created/Networks/Index"
+            Link = "/PublicData/Networks/Index"
         };
 
         /// <summary>
-        /// Gets the navigation breadcrumb for the available data created networks create index page.
+        /// Gets the navigation breadcrumb for the public data analyses index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel AvailableDataCreatedNetworksCreateNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel PublicDataAnalysesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
-            Id = "Create",
-            Title = "Create",
-            Link = "/AvailableData/Created/Networks/Create/Index"
+            Id = "Analyses",
+            Title = "Analyses",
+            Link = "/PublicData/Analyses/Index"
         };
 
         /// <summary>
-        /// Gets the navigation breadcrumb for the available data created network details index page.
+        /// Gets the navigation breadcrumb for the private data index page.
         /// </summary>
-        public static NavigationBreadcrumbViewModel AvailableDataCreatedNetworksDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        public static NavigationBreadcrumbViewModel PrivateDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "PrivateData",
+            Title = "Private data",
+            Link = "/PrivateData/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the private data networks index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel PrivateDataNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Networks",
+            Title = "Networks",
+            Link = "/PrivateData/Networks/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the private data analyses index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel PrivateDataAnalysesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Analyses",
+            Title = "Analyses",
+            Link = "/PrivateData/Analyses/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the created data index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel CreatedDataNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "CreatedData",
+            Title = "Created data",
+            Link = "/CreatedData/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the created data networks index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel CreatedDataNetworksNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Networks",
+            Title = "Networks",
+            Link = "/CreatedData/Networks/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the created data networks details index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel CreatedDataNetworksDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
         {
             Id = "Details",
-            Title = "Details",
-            Link = "/AvailableData/Created/Networks/Details/Index"
+            Title = "Network details",
+            Link = "/CreatedData/Networks/Details/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the created data analyses index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel CreatedDataAnalysesNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Analyses",
+            Title = "Analyses",
+            Link = "/CreatedData/Analyses/Index"
+        };
+
+        /// <summary>
+        /// Gets the navigation breadcrumb for the created data analyses details index page.
+        /// </summary>
+        public static NavigationBreadcrumbViewModel CreatedDataAnalysesDetailsNavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
+        {
+            Id = "Details",
+            Title = "Analysis details",
+            Link = "/CreatedData/Analyses/Details/Index"
         };
     }
 }

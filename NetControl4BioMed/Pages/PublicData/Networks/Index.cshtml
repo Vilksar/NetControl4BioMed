@@ -10,7 +10,7 @@
 <form method="get" class="text-justify">
     <div class="row align-items-center">
         <div class="col-lg-12 mb-3">
-            <button type="submit" asp-page="/AvailableData/Created/Networks/Create/Index" class="btn btn-success btn-block" title="Create">
+            <button type="submit" asp-page="/CreatedData/Networks/Create" class="btn btn-success btn-block" title="Create">
                 <span><i class="fas fa-plus"></i></span>
                 <span>Create a new network</span>
             </button>
@@ -18,7 +18,7 @@
     </div>
     <div class="row align-items-center">
         <div class="col-lg-12 mb-3">
-            <button type="submit" asp-page="/AvailableData/Created/Networks/Download" class="btn btn-primary btn-block item-group-button" title="Download" disabled>
+            <button type="submit" asp-page="/CreatedData/Networks/Download" class="btn btn-primary btn-block item-group-button" title="Download" disabled>
                 <span><i class="fas fa-download"></i></span>
                 <span>Download</span>
             </button>
@@ -72,7 +72,7 @@
                         </td>
                         <td class="text-left text-break">
                             <div>
-                                <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
+                                <a asp-page="/CreatedData/Networks/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
                             </div>
                             <div>
                                 <span class="small text-muted" title="@item.Id">@item.Id</span>
@@ -82,16 +82,16 @@
                             <partial name="_NetworkStatusPartial" model="@item.Status" />
                         </td>
                         <td class="text-center text-break">
-                            <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                            <a asp-page="/CreatedData/Networks/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
                                 <span><i class="fas fa-info-circle"></i></span>
                             </a>
-                            <a asp-page="/AvailableData/Created/Networks/Download" asp-route-ids="@item.Id" class="btn btn-primary m-1" title="Download">
+                            <a asp-page="/CreatedData/Networks/Download" asp-route-ids="@item.Id" class="btn btn-primary m-1" title="Download">
                                 <span><i class="fas fa-download"></i></span>
                             </a>
-                            <a asp-page="/AvailableData/Created/Networks/Create/Index" asp-route-networkId="@item.Id" class="btn btn-dark m-1" title="Re-Create">
+                            <a asp-page="/CreatedData/Networks/Create" asp-route-networkId="@item.Id" class="btn btn-dark m-1" title="Re-Create">
                                 <span><i class="fas fa-copy"></i></span>
                             </a>
-                            <a asp-page="/AvailableData/Created/Analyses/Create" asp-route-networkId="@item.Id" class="btn btn-success m-1" title="Analyze">
+                            <a asp-page="/CreatedData/Analyses/Create" asp-route-networkId="@item.Id" class="btn btn-success m-1" title="Analyze">
                                 <span><i class="fas fa-code-branch"></i></span>
                             </a>
                         </td>

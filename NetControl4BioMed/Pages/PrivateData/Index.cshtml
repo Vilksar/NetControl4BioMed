@@ -56,7 +56,7 @@
                             </td>
                             <td class="text-left text-break">
                                 <div>
-                                    <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
+                                    <a asp-page="/CreatedData/Networks/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
                                 </div>
                                 <div>
                                     <span class="small text-muted" title="@item.Id">@item.Id</span>
@@ -66,7 +66,7 @@
                                 <partial name="_NetworkStatusPartial" model="@item.Status" />
                             </td>
                             <td class="text-center text-break">
-                                <a asp-page="/AvailableData/Created/Networks/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                                <a asp-page="/CreatedData/Networks/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
                                     <span><i class="fas fa-info-circle"></i></span>
                                 </a>
                             </td>
@@ -128,7 +128,7 @@
                             </td>
                             <td class="text-left text-break">
                                 <div>
-                                    <a asp-page="/AvailableData/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
+                                    <a asp-page="/CreatedData/Analyses/Details/Index" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
                                 </div>
                                 <div>
                                     <span class="small text-muted" title="@item.Id">@item.Id</span>
@@ -138,7 +138,7 @@
                                 <partial name="_AnalysisStatusPartial" model="@item.Status" />
                             </td>
                             <td class="text-center text-break">
-                                <a asp-page="/AvailableData/Created/Analyses/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                                <a asp-page="/CreatedData/Analyses/Details/Index" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
                                     <span><i class="fas fa-info-circle"></i></span>
                                 </a>
                             </td>

@@ -413,90 +413,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the navigation area for the public data pages.
-        /// </summary>
-        public static NavigationAreaViewModel PublicDataNavigationArea { get; } = new NavigationAreaViewModel
-        {
-            Id = "PublicData",
-            Title = "Public networks",
-            Description = string.Empty,
-            Icon = "fa-users",
-            Color = "success",
-            NavigationGroups = new List<NavigationGroupViewModel>
-            {
-                new NavigationGroupViewModel
-                {
-                    Id = "Index",
-                    Title = "Overview",
-                    Description = string.Empty,
-                    Icon = "fa-chart-bar",
-                    Color = "success",
-                    Link = "/PublicData/Index"
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Networks",
-                    Title = "Public networks",
-                    Description = string.Empty,
-                    Icon = "fa-share-alt",
-                    Color = "success",
-                    Link = "/PublicData/Networks/Index"
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Analyses",
-                    Title = "Public analyses",
-                    Description = string.Empty,
-                    Icon = "fa-code-branch",
-                    Color = "success",
-                    Link = "/PublicData/Analyses/Index"
-                }
-            }
-        };
-
-        /// <summary>
-        /// Gets the navigation area for the private data pages.
-        /// </summary>
-        public static NavigationAreaViewModel PrivateDataNavigationArea { get; } = new NavigationAreaViewModel
-        {
-            Id = "PrivateData",
-            Title = "My networks",
-            Description = string.Empty,
-            Icon = "fa-user",
-            Color = "success",
-            NavigationGroups = new List<NavigationGroupViewModel>
-            {
-                new NavigationGroupViewModel
-                {
-                    Id = "Index",
-                    Title = "Overview",
-                    Description = string.Empty,
-                    Icon = "fa-chart-bar",
-                    Color = "success",
-                    Link = "/PrivateData/Index"
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Networks",
-                    Title = "My networks",
-                    Description = string.Empty,
-                    Icon = "fa-share-alt",
-                    Color = "success",
-                    Link = "/PrivateData/Networks/Index"
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Analyses",
-                    Title = "My analyses",
-                    Description = string.Empty,
-                    Icon = "fa-code-branch",
-                    Color = "success",
-                    Link = "/PrivateData/Analyses/Index"
-                }
-            }
-        };
-
-        /// <summary>
         /// Gets the navigation area for the available data pages.
         /// </summary>
         public static NavigationAreaViewModel AvailableDataNavigationArea { get; } = new NavigationAreaViewModel
@@ -599,12 +515,96 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the navigation area for the available data network pages.
+        /// Gets the navigation area for the public data pages.
         /// </summary>
-        public static NavigationAreaViewModel AvailableDataNetworkNavigationArea { get; } = new NavigationAreaViewModel
+        public static NavigationAreaViewModel PublicDataNavigationArea { get; } = new NavigationAreaViewModel
         {
-            Id = "Network",
-            Title = "Network",
+            Id = "PublicData",
+            Title = "Public networks",
+            Description = string.Empty,
+            Icon = "fa-users",
+            Color = "success",
+            NavigationGroups = new List<NavigationGroupViewModel>
+            {
+                new NavigationGroupViewModel
+                {
+                    Id = "Index",
+                    Title = "Overview",
+                    Description = string.Empty,
+                    Icon = "fa-chart-bar",
+                    Color = "success",
+                    Link = "/PublicData/Index"
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Networks",
+                    Title = "Public networks",
+                    Description = string.Empty,
+                    Icon = "fa-share-alt",
+                    Color = "success",
+                    Link = "/PublicData/Networks/Index"
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Analyses",
+                    Title = "Public analyses",
+                    Description = string.Empty,
+                    Icon = "fa-code-branch",
+                    Color = "success",
+                    Link = "/PublicData/Analyses/Index"
+                }
+            }
+        };
+
+        /// <summary>
+        /// Gets the navigation area for the private data pages.
+        /// </summary>
+        public static NavigationAreaViewModel PrivateDataNavigationArea { get; } = new NavigationAreaViewModel
+        {
+            Id = "PrivateData",
+            Title = "My networks",
+            Description = string.Empty,
+            Icon = "fa-user",
+            Color = "success",
+            NavigationGroups = new List<NavigationGroupViewModel>
+            {
+                new NavigationGroupViewModel
+                {
+                    Id = "Index",
+                    Title = "Overview",
+                    Description = string.Empty,
+                    Icon = "fa-chart-bar",
+                    Color = "success",
+                    Link = "/PrivateData/Index"
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Networks",
+                    Title = "My networks",
+                    Description = string.Empty,
+                    Icon = "fa-share-alt",
+                    Color = "success",
+                    Link = "/PrivateData/Networks/Index"
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Analyses",
+                    Title = "My analyses",
+                    Description = string.Empty,
+                    Icon = "fa-code-branch",
+                    Color = "success",
+                    Link = "/PrivateData/Analyses/Index"
+                }
+            }
+        };
+
+        /// <summary>
+        /// Gets the navigation area for the created data networks details pages.
+        /// </summary>
+        public static NavigationAreaViewModel CreatedDataNetworksDetailsNavigationArea { get; } = new NavigationAreaViewModel
+        {
+            Id = "Details",
+            Title = "Network details",
             Description = string.Empty,
             Icon = "fa-share-alt",
             Color = "dark",
@@ -617,7 +617,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-chart-bar",
                     Color = "dark",
-                    Link = "/AvailableData/Created/Networks/Details/Index"
+                    Link = "/CreatedData/Networks/Details/Index"
                 },
                 new NavigationGroupViewModel
                 {
@@ -626,7 +626,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-users",
                     Color = "dark",
-                    Link = "/AvailableData/Created/Networks/Details/Accounts/Index",
+                    Link = "/CreatedData/Networks/Details/Accounts/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
@@ -636,7 +636,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-user",
                             Color = "light",
-                            Link = "/AvailableData/Created/Networks/Details/Accounts/Users/Index"
+                            Link = "/CreatedData/Networks/Details/Accounts/Users/Index"
                         }
                     }
                 },
@@ -647,7 +647,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-database",
                     Color = "dark",
-                    Link = "/AvailableData/Created/Networks/Details/Databases/Index",
+                    Link = "/CreatedData/Networks/Details/Databases/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
@@ -657,7 +657,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-database",
                             Color = "light",
-                            Link = "/AvailableData/Created/Networks/Details/Databases/Databases/Index"
+                            Link = "/CreatedData/Networks/Details/Databases/Databases/Index"
                         }
                     }
                 },
@@ -668,7 +668,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-table",
                     Color = "dark",
-                    Link = "/AvailableData/Created/Networks/Details/Data/Index",
+                    Link = "/CreatedData/Networks/Details/Data/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
@@ -678,7 +678,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
-                            Link = "/AvailableData/Created/Networks/Details/Data/Proteins/Index"
+                            Link = "/CreatedData/Networks/Details/Data/Proteins/Index"
                         },
                         new NavigationPageViewModel
                         {
@@ -687,7 +687,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
-                            Link = "/AvailableData/Created/Networks/Details/Data/Interactions/Index"
+                            Link = "/CreatedData/Networks/Details/Data/Interactions/Index"
                         },
                         new NavigationPageViewModel
                         {
@@ -696,7 +696,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
-                            Link = "/AvailableData/Created/Networks/Details/Data/ProteinCollections/Index"
+                            Link = "/CreatedData/Networks/Details/Data/ProteinCollections/Index"
                         }
                     }
                 },
@@ -707,7 +707,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-code-branch",
                     Color = "dark",
-                    Link = "/AvailableData/Created/Networks/Details/Created/Index",
+                    Link = "/CreatedData/Networks/Details/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
@@ -717,7 +717,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-code-branch",
                             Color = "light",
-                            Link = "/AvailableData/Created/Networks/Details/Created/Analyses/Index"
+                            Link = "/CreatedData/Networks/Details/Created/Analyses/Index"
                         }
                     }
                 }
@@ -725,12 +725,12 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the navigation area for the available data analysis pages.
+        /// Gets the navigation area for the created data analyses details pages.
         /// </summary>
-        public static NavigationAreaViewModel AvailableDataAnalysisNavigationArea { get; } = new NavigationAreaViewModel
+        public static NavigationAreaViewModel CreatedDataAnalysesDetailsNavigationArea { get; } = new NavigationAreaViewModel
         {
-            Id = "Analysis",
-            Title = "Analysis",
+            Id = "Details",
+            Title = "Analysis details",
             Description = string.Empty,
             Icon = "fa-code-branch",
             Color = "dark",
@@ -743,7 +743,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-chart-bar",
                     Color = "dark",
-                    Link = "/AvailableData/Created/Analyses/Details/Index"
+                    Link = "/CreatedData/Analyses/Details/Index"
                 },
                 new NavigationGroupViewModel
                 {
@@ -752,7 +752,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-users",
                     Color = "dark",
-                    Link = "/AvailableData/Created/Analyses/Details/Accounts/Index",
+                    Link = "/CreatedData/Analyses/Details/Accounts/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
@@ -762,7 +762,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-user",
                             Color = "light",
-                            Link = "/AvailableData/Created/Analyses/Details/Accounts/Users/Index"
+                            Link = "/CreatedData/Analyses/Details/Accounts/Users/Index"
                         }
                     }
                 },
@@ -773,7 +773,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-database",
                     Color = "dark",
-                    Link = "/AvailableData/Created/Analyses/Details/Databases/Index",
+                    Link = "/CreatedData/Analyses/Details/Databases/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
@@ -783,7 +783,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-database",
                             Color = "light",
-                            Link = "/AvailableData/Created/Analyses/Details/Databases/Databases/Index"
+                            Link = "/CreatedData/Analyses/Details/Databases/Databases/Index"
                         }
                     }
                 },
@@ -794,7 +794,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-table",
                     Color = "dark",
-                    Link = "/AvailableData/Created/Analyses/Details/Data/Index",
+                    Link = "/CreatedData/Analyses/Details/Data/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
@@ -804,7 +804,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
-                            Link = "/AvailableData/Created/Analyses/Details/Data/Proteins/Index"
+                            Link = "/CreatedData/Analyses/Details/Data/Proteins/Index"
                         },
                         new NavigationPageViewModel
                         {
@@ -813,7 +813,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
-                            Link = "/AvailableData/Created/Analyses/Details/Data/Interactions/Index"
+                            Link = "/CreatedData/Analyses/Details/Data/Interactions/Index"
                         },
                         new NavigationPageViewModel
                         {
@@ -822,7 +822,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
-                            Link = "/AvailableData/Created/Analyses/Details/Data/ProteinCollections/Index"
+                            Link = "/CreatedData/Analyses/Details/Data/ProteinCollections/Index"
                         }
                     }
                 },
@@ -833,7 +833,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-code-branch",
                     Color = "dark",
-                    Link = "/AvailableData/Created/Analyses/Details/Results/Index",
+                    Link = "/CreatedData/Analyses/Details/Results/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
@@ -843,7 +843,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-exchange-alt",
                             Color = "light",
-                            Link = "/AvailableData/Created/Analyses/Details/Results/ControlPaths/Index"
+                            Link = "/CreatedData/Analyses/Details/Results/ControlPaths/Index"
                         },
                         new NavigationPageViewModel
                         {
@@ -852,7 +852,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Description = string.Empty,
                             Icon = "fa-long-arrow-alt-right",
                             Color = "light",
-                            Link = "/AvailableData/Created/Analyses/Details/Results/Paths/Index"
+                            Link = "/CreatedData/Analyses/Details/Results/Paths/Index"
                         }
                     }
                 }
@@ -864,10 +864,10 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// </summary>
         /// <param name="network">Represents the current network.</param>
         /// <returns>The navigation area for the network pages.</returns>
-        public static NavigationAreaViewModel GetAvailableDataNetworkNavigationArea(Network network)
+        public static NavigationAreaViewModel GetCreatedDataNetworksDetailsNavigationArea(Network network)
         {
             // Get the corresponding navigation area.
-            var navigationArea = AvailableDataNetworkNavigationArea;
+            var navigationArea = CreatedDataNetworksDetailsNavigationArea;
             // Update the route ID.
             navigationArea.RouteId = network.Id;
             // Return the navigation area.
@@ -879,10 +879,10 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// </summary>
         /// <param name="analysis">Represents the current analysis.</param>
         /// <returns>The navigation area for the analysis pages.</returns>
-        public static NavigationAreaViewModel GetAvailableDataAnalysisNavigationArea(Analysis analysis)
+        public static NavigationAreaViewModel GetCreatedDataAnalysesDetailsNavigationArea(Analysis analysis)
         {
             // Get the corresponding navigation area.
-            var navigationArea = AvailableDataAnalysisNavigationArea;
+            var navigationArea = CreatedDataAnalysesDetailsNavigationArea;
             // Update the route ID.
             navigationArea.RouteId = analysis.Id;
             // Return the navigation area.

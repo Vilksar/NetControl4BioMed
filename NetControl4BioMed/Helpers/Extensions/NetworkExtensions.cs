@@ -415,7 +415,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                     Name = item.Name
                 })
                 .AsEnumerable()
-                .Select(item => $"{item.Name} - {linkGenerator.GetUriByPage($"/AvailableData/Created/Networks/Details/Index", handler: null, values: new { id = item.Id }, scheme: scheme, host: host)}")));
+                .Select(item => $"{item.Name} - {linkGenerator.GetUriByPage($"/CreatedData/Networks/Details/Index", handler: null, values: new { id = item.Id }, scheme: scheme, host: host)}")));
             // Write the data to the stream.
             await streamWriter.WriteAsync(data);
         }

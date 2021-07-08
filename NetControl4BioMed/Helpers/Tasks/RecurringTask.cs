@@ -565,7 +565,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             {
                                 Id = item1.Id,
                                 Name = item1.Name,
-                                Url = linkGenerator.GetUriByPage($"/AvailableData/Created/Networks/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
+                                Url = linkGenerator.GetUriByPage($"/CreatedData/Networks/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
                             }),
                         AnalysisItems = alertAnalyses
                             .Where(item1 => item1.Emails.Contains(item))
@@ -573,7 +573,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             {
                                 Id = item1.Id,
                                 Name = item1.Name,
-                                Url = linkGenerator.GetUriByPage($"/AvailableData/Created/Analyses/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
+                                Url = linkGenerator.GetUriByPage($"/CreatedData/Analyses/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
                             })
                     })
                     .ToList();

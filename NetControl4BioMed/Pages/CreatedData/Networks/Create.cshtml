@@ -1,0 +1,54 @@
+﻿@page
+@model CreateModel
+@{
+    ViewData["Title"] = "Create network";
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-12 mb-3">
+        <div class="card bg-light text-dark text-center">
+            <div class="card-body row align-items-center justify-content-around">
+                <div class="col-lg-4 my-2 my-lg-0">
+                    <span><i class="fas fa-hammer fa-3x"></i></span>
+                </div>
+                <div class="col-lg-8 my-2 my-lg-0">
+                    <a asp-page="/CreatedData/Networks/Build" class="btn btn-outline-dark btn-block" title="Build">
+                        <span>Build network around seed proteins</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row align-items-center">
+    <div class="col-lg-12 mb-3">
+        <div class="card bg-light text-dark text-center">
+            <div class="card-body row align-items-center justify-content-around">
+                <div class="col-lg-4 my-2 my-lg-0">
+                    <span><i class="fas fa-exchange-alt fa-3x"></i></span>
+                </div>
+                <div class="col-lg-8 my-2 my-lg-0">
+                    <a asp-page="/CreatedData/Networks/Define" class="btn btn-outline-dark btn-block" title="Define">
+                        <span>Input network interactions</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row align-items-center">
+    <div class="col-lg-12 mb-3">
+        <div class="card bg-light text-dark text-center">
+            <div class="card-body row align-items-center justify-content-around">
+                <div class="col-lg-4 my-2 my-lg-0">
+                    <span><i class="fas fa-upload fa-3x"></i></span>
+                </div>
+                <div class="col-lg-8 my-2 my-lg-0">
+                    <a asp-page="/CreatedData/Networks/Upload" class="btn btn-outline-dark btn-block" title="Upload">
+                        <span>Upload network from file</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -883,7 +883,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             Id = network.Id,
                             Name = network.Name,
                             Status = network.Status.GetDisplayName(),
-                            Url = linkGenerator.GetUriByPage($"/AvailableData/Created/Networks/Details/Index", handler: null, values: new { id = network.Id }, scheme: Scheme, host: host),
+                            Url = linkGenerator.GetUriByPage($"/CreatedData/Networks/Details/Index", handler: null, values: new { id = network.Id }, scheme: Scheme, host: host),
                             ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
                         });
                     }

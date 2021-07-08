@@ -79,5 +79,27 @@
             Icon = "fa-users",
             Color = "success"
         };
+
+        /// <summary>
+        /// Gets the navigation banner for the created data networks pages.
+        /// </summary>
+        public static NavigationBannerViewModel CreatedDataNetworksNavigationBanner { get; } = new NavigationBannerViewModel
+        {
+            Id = "Networks",
+            Title = "Networks",
+            Icon = "fa-share-alt",
+            Color = "success"
+        };
+
+        /// <summary>
+        /// Gets the navigation banner for the created data analyses pages.
+        /// </summary>
+        public static NavigationBannerViewModel CreatedDataAnalysesNavigationBanner { get; } = new NavigationBannerViewModel
+        {
+            Id = "Analyses",
+            Title = "Analyses",
+            Icon = "fa-code-branch",
+            Color = "success"
+        };
     }
 }

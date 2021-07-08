@@ -1489,7 +1489,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             Id = analysis.Id,
                             Name = analysis.Name,
                             Status = analysis.Status.GetDisplayName(),
-                            Url = linkGenerator.GetUriByPage($"/AvailableData/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }, scheme: Scheme, host: host),
+                            Url = linkGenerator.GetUriByPage($"/CreatedData/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }, scheme: Scheme, host: host),
                             ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
                         });
                     }

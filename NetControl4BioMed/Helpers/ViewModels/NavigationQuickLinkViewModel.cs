@@ -287,7 +287,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "success",
             Icon = "fa-circle",
             Width = 6,
-            Link = "/AvailableData/Created/Networks/Details/Data/Proteins/Index"
+            Link = "/CreatedData/Networks/Details/Data/Proteins/Index"
         };
 
         /// <summary>
@@ -301,7 +301,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "success",
             Icon = "fa-arrow-right",
             Width = 6,
-            Link = "/AvailableData/Created/Networks/Details/Data/Interactions/Index"
+            Link = "/CreatedData/Networks/Details/Data/Interactions/Index"
         };
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "info",
             Icon = "fa-database",
             Width = 6,
-            Link = "/AvailableData/Created/Networks/Details/Databases/Databases/Index"
+            Link = "/CreatedData/Networks/Details/Databases/Databases/Index"
         };
 
         /// <summary>
@@ -329,7 +329,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "info",
             Icon = "fa-folder",
             Width = 6,
-            Link = "/AvailableData/Created/Networks/Details/Data/ProteinCollections/Index"
+            Link = "/CreatedData/Networks/Details/Data/ProteinCollections/Index"
         };
 
         /// <summary>
@@ -343,7 +343,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "success",
             Icon = "fa-circle",
             Width = 6,
-            Link = "/AvailableData/Created/Analyses/Details/Data/Proteins/Index"
+            Link = "/CreatedData/Analyses/Details/Data/Proteins/Index"
         };
 
         /// <summary>
@@ -357,7 +357,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "success",
             Icon = "fa-arrow-right",
             Width = 6,
-            Link = "/AvailableData/Created/Analyses/Details/Data/Interactions/Index"
+            Link = "/CreatedData/Analyses/Details/Data/Interactions/Index"
         };
 
         /// <summary>
@@ -371,7 +371,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "info",
             Icon = "fa-database",
             Width = 6,
-            Link = "/AvailableData/Created/Analyses/Details/Databases/Databases/Index"
+            Link = "/CreatedData/Analyses/Details/Databases/Databases/Index"
         };
 
         /// <summary>
@@ -385,7 +385,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Color = "info",
             Icon = "fa-folder",
             Width = 6,
-            Link = "/AvailableData/Created/Analyses/Details/Data/ProteinCollections/Index"
+            Link = "/CreatedData/Analyses/Details/Data/ProteinCollections/Index"
         };
 
         /// <summary>
