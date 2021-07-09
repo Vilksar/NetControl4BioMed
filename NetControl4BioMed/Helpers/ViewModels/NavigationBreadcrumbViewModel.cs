@@ -21,6 +21,11 @@
         public string Link { get; set; }
 
         /// <summary>
+        /// Gets or sets the route ID of the breadcrumb.
+        /// </summary>
+        public string RouteId { get; set; }
+
+        /// <summary>
         /// Gets the navigation breadcrumb for the index page.
         /// </summary>
         public static NavigationBreadcrumbViewModel NavigationBreadcrumb { get; } = new NavigationBreadcrumbViewModel
@@ -579,5 +584,35 @@
             Title = "Analysis details",
             Link = "/CreatedData/Analyses/Details/Index"
         };
+
+        /// <summary>
+        /// Gets the updated navigation breadcrumb for the created data networks details pages.
+        /// </summary>
+        /// <param name="networkId">The ID of the current network.</param>
+        /// <returns>The navigation area for the network pages.</returns>
+        public static NavigationBreadcrumbViewModel GetCreatedDataNetworksDetailsNavigationBreadcrumb(string networkId = null)
+        {
+            // Get the corresponding navigation breadcrumb.
+            var navigationBreadcrumb = CreatedDataNetworksDetailsNavigationBreadcrumb;
+            // Update the route ID.
+            navigationBreadcrumb.RouteId = networkId;
+            // Return the breadcrumb area.
+            return navigationBreadcrumb;
+        }
+
+        /// <summary>
+        /// Gets the updated navigation breadcrumb for the created data analyses details pages.
+        /// </summary>
+        /// <param name="analysisId">The ID of the current analysis.</param>
+        /// <returns>The navigation area for the analysis pages.</returns>
+        public static NavigationBreadcrumbViewModel GetCreatedDataAnalysesDetailsNavigationBreadcrumb(string analysisId = null)
+        {
+            // Get the corresponding breadcrumb area.
+            var navigationBreadcrumb = CreatedDataAnalysesDetailsNavigationBreadcrumb;
+            // Update the route ID.
+            navigationBreadcrumb.RouteId = analysisId;
+            // Return the breadcrumb area.
+            return navigationBreadcrumb;
+        }
     }
 }

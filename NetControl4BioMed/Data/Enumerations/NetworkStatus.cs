@@ -16,7 +16,7 @@ namespace NetControl4BioMed.Data.Enumerations
         /// <summary>
         /// Represents a network which has been defined.
         /// </summary>
-        [Display(Name = "Defined", Description = "The network has been defined.")]
+        [Display(Name = "Defined", Description = "The network has been defined and is scheduled for generation.")]
         Defined,
 
         /// <summary>

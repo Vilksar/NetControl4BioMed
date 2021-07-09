@@ -61,6 +61,7 @@
 <div class="card mb-3" title="Status">
     <div class="card-body text-center">
         <partial name="_NetworkStatusPartial" model="@Model.View.Network.Status" />
+        <span class="small text-muted">@Model.View.Network.Status.GetDisplayDescription()</span>
     </div>
 </div>
 <div class="item-refresh" data-id="@Model.View.Network.Id" data-status="@Model.View.Network.Status.ToString()" data-refresh="@(Model.View.Network.Status == NetworkStatus.Defined || Model.View.Network.Status == NetworkStatus.Generating)">
@@ -84,7 +85,7 @@
         </div>
     </div>
 }
-<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAvailableDataNetworkNavigationQuickLinks(Model.View.Network.Id, Model.View.ItemCount)" />
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetCreatedDataNetworksDetailsNavigationQuickLinks(Model.View.Network.Id, Model.View.ItemCount)" />
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">

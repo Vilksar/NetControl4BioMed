@@ -37,7 +37,7 @@
             <div class="form-group">
                 <label asp-for="Input.Description" class="font-weight-bold">Description</label>
                 <textarea asp-for="Input.Description" class="form-control"></textarea>
-                <span asp-description-for="Input.Description" class="text-muted small">The description of the new network.</span>
+                <span asp-description-for="Input.Description" class="text-muted small">The description of the new network. This field is optional.</span>
                 <span asp-validation-for="Input.Description" class="text-danger small"></span>
             </div>
             <div class="form-group" hidden="@(User.Identity.IsAuthenticated ? null : "hidden")">
@@ -278,10 +278,16 @@
         <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
         <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
     </div>
-    <button type="submit" class="btn btn-block btn-success" title="Create">
-        <span><i class="fas fa-plus"></i></span>
-        <span>Create</span>
-    </button>
+    <div class="loading-group">
+        <button type="submit" class="btn btn-block btn-success loading-group-button" title="Create">
+            <span><i class="fas fa-plus"></i></span>
+            <span>Create</span>
+        </button>
+        <template class="loading-group-template">
+            <span><i class="fas fa-spinner fa-spin"></i></span>
+            <span>Please wait...</span>
+        </template>
+    </div>
 </form>
 
 @section Scripts {

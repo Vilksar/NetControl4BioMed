@@ -189,6 +189,17 @@ $(window).on('load', () => {
         })();
     }
 
+    // Check if there is a loading group on the page.
+    if ($('.loading-group').length !== 0) {
+        // Add a listener for if the button was clicked.
+        $('.loading-group-button').on('click', (event) => {
+            // Get the corresponding group element.
+            const groupElement = $(event.target).closest('.loading-group');
+            // Replace the content of the button with the template.
+            $(event.target).html($(groupElement).find('.loading-group-template').first().html());
+        });
+    }
+
     // Check if there is a hidden group on the page.
     if ($('.hidden-group').length !== 0) {
         // Define a function which toggles the hidden group display.

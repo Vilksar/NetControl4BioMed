@@ -165,62 +165,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the networks navigation quick link for the public data index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel PublicDataNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Networks",
-            TitleSingular = "Network",
-            TitlePlural = "Networks",
-            Color = "success",
-            Icon = "fa-share-alt",
-            Width = 6,
-            Link = "/PublicData/Networks/Index"
-        };
-
-        /// <summary>
-        /// Gets the analyses navigation quick link for the public data index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel PublicDataAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Analyses",
-            TitleSingular = "Analysis",
-            TitlePlural = "Analyses",
-            Color = "success",
-            Icon = "fa-code-branch",
-            Width = 6,
-            Link = "/PublicData/Analyses/Index"
-        };
-
-        /// <summary>
-        /// Gets the networks navigation quick link for the private data index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel PrivateDataNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Networks",
-            TitleSingular = "Network",
-            TitlePlural = "Networks",
-            Color = "success",
-            Icon = "fa-share-alt",
-            Width = 6,
-            Link = "/PrivateData/Networks/Index"
-        };
-
-        /// <summary>
-        /// Gets the analyses navigation quick link for the private data index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel PrivateDataAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Analyses",
-            TitleSingular = "Analysis",
-            TitlePlural = "Analyses",
-            Color = "success",
-            Icon = "fa-code-branch",
-            Width = 6,
-            Link = "/PrivateData/Analyses/Index"
-        };
-
-        /// <summary>
         /// Gets the databases navigation quick link for the administration index page.
         /// </summary>
         public static NavigationQuickLinkViewModel AvailableDataDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
@@ -277,37 +221,65 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the proteins navigation quick link for the networks index page.
+        /// Gets the networks navigation quick link for the public data index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel AvailableDataNetworkProteinsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel PublicDataNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
-            Id = "Proteins",
-            TitleSingular = "Protein",
-            TitlePlural = "Proteins",
+            Id = "Networks",
+            TitleSingular = "Network",
+            TitlePlural = "Networks",
             Color = "success",
-            Icon = "fa-circle",
+            Icon = "fa-share-alt",
             Width = 6,
-            Link = "/CreatedData/Networks/Details/Data/Proteins/Index"
+            Link = "/PublicData/Networks/Index"
         };
 
         /// <summary>
-        /// Gets the interactions navigation quick link for the networks index page.
+        /// Gets the analyses navigation quick link for the public data index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel AvailableDataNetworkInteractionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel PublicDataAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
-            Id = "Interactions",
-            TitleSingular = "Interaction",
-            TitlePlural = "Interactions",
+            Id = "Analyses",
+            TitleSingular = "Analysis",
+            TitlePlural = "Analyses",
             Color = "success",
-            Icon = "fa-arrow-right",
+            Icon = "fa-code-branch",
             Width = 6,
-            Link = "/CreatedData/Networks/Details/Data/Interactions/Index"
+            Link = "/PublicData/Analyses/Index"
         };
 
         /// <summary>
-        /// Gets the databases navigation quick link for the networks index page.
+        /// Gets the networks navigation quick link for the private data index page.
         /// </summary>
-        public static NavigationQuickLinkViewModel AvailableDataNetworkDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel PrivateDataNetworksNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Networks",
+            TitleSingular = "Network",
+            TitlePlural = "Networks",
+            Color = "success",
+            Icon = "fa-share-alt",
+            Width = 6,
+            Link = "/PrivateData/Networks/Index"
+        };
+
+        /// <summary>
+        /// Gets the analyses navigation quick link for the private data index page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel PrivateDataAnalysesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Analyses",
+            TitleSingular = "Analysis",
+            TitlePlural = "Analyses",
+            Color = "success",
+            Icon = "fa-code-branch",
+            Width = 6,
+            Link = "/PrivateData/Analyses/Index"
+        };
+
+        /// <summary>
+        /// Gets the databases navigation quick link for the created data networks details page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel CreatedDataNetworksDetailsDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Databases",
             TitleSingular = "Database",
@@ -319,9 +291,37 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the protein collections navigation quick link for the networks index page.
+        /// Gets the proteins navigation quick link for the created data networks details page.
         /// </summary>
-        public static NavigationQuickLinkViewModel AvailableDataNetworkProteinCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel CreatedDataNetworksDetailsProteinsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Proteins",
+            TitleSingular = "Protein",
+            TitlePlural = "Proteins",
+            Color = "success",
+            Icon = "fa-circle",
+            Width = 6,
+            Link = "/CreatedData/Networks/Details/Data/Proteins/Index"
+        };
+
+        /// <summary>
+        /// Gets the interactions navigation quick link for the created data networks details page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel CreatedDataNetworksDetailsInteractionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Interactions",
+            TitleSingular = "Interaction",
+            TitlePlural = "Interactions",
+            Color = "success",
+            Icon = "fa-arrow-right",
+            Width = 6,
+            Link = "/CreatedData/Networks/Details/Data/Interactions/Index"
+        };
+
+        /// <summary>
+        /// Gets the protein collections navigation quick link for the created data networks details page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel CreatedDataNetworksDetailsProteinCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "ProteinCollections",
             TitleSingular = "Collection",
@@ -333,37 +333,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the proteins navigation quick link for the analysis index page.
+        /// Gets the databases navigation quick link for the created data analyses details page.
         /// </summary>
-        public static NavigationQuickLinkViewModel AvailableDataAnalysisProteinsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Proteins",
-            TitleSingular = "Protein",
-            TitlePlural = "Proteins",
-            Color = "success",
-            Icon = "fa-circle",
-            Width = 6,
-            Link = "/CreatedData/Analyses/Details/Data/Proteins/Index"
-        };
-
-        /// <summary>
-        /// Gets the interactions navigation quick link for the analysis index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel AvailableDataAnalysisInteractionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
-        {
-            Id = "Interactions",
-            TitleSingular = "Interaction",
-            TitlePlural = "Interactions",
-            Color = "success",
-            Icon = "fa-arrow-right",
-            Width = 6,
-            Link = "/CreatedData/Analyses/Details/Data/Interactions/Index"
-        };
-
-        /// <summary>
-        /// Gets the databases navigation quick link for the analysis index page.
-        /// </summary>
-        public static NavigationQuickLinkViewModel AvailableDataAnalysisDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel CreatedDataAnalysesDetailsDatabasesNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "Databases",
             TitleSingular = "Database",
@@ -375,9 +347,37 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the protein collections navigation quick link for the analysis index page.
+        /// Gets the proteins navigation quick link for the created data analyses details page.
         /// </summary>
-        public static NavigationQuickLinkViewModel AvailableDataAnalysisProteinCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        public static NavigationQuickLinkViewModel CreatedDataAnalysesDetailsProteinsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Proteins",
+            TitleSingular = "Protein",
+            TitlePlural = "Proteins",
+            Color = "success",
+            Icon = "fa-circle",
+            Width = 6,
+            Link = "/CreatedData/Analyses/Details/Data/Proteins/Index"
+        };
+
+        /// <summary>
+        /// Gets the interactions navigation quick link for the created data analyses details page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel CreatedDataAnalysesDetailsInteractionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
+        {
+            Id = "Interactions",
+            TitleSingular = "Interaction",
+            TitlePlural = "Interactions",
+            Color = "success",
+            Icon = "fa-arrow-right",
+            Width = 6,
+            Link = "/CreatedData/Analyses/Details/Data/Interactions/Index"
+        };
+
+        /// <summary>
+        /// Gets the protein collections navigation quick link for the created data analyses details page.
+        /// </summary>
+        public static NavigationQuickLinkViewModel CreatedDataAnalysesDetailsProteinCollectionsNavigationQuickLink { get; } = new NavigationQuickLinkViewModel
         {
             Id = "ProteinCollections",
             TitleSingular = "Collection",
@@ -396,76 +396,34 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static IEnumerable<NavigationQuickLinkViewModel> GetAdministrationNavigationQuickLinks(Dictionary<string, int?> count = null)
         {
             // Get the corresponding navigation quick links.
-            var administrationUsersNavigationQuickLink = AdministrationUsersNavigationQuickLink;
-            var administrationRolesNavigationQuickLink = AdministrationRolesNavigationQuickLink;
-            var administrationDatabasesNavigationQuickLink = AdministrationDatabasesNavigationQuickLink;
-            var administrationProteinCollectionsNavigationQuickLink = AdministrationProteinCollectionsNavigationQuickLink;
-            var administrationProteinsNavigationQuickLink = AdministrationProteinsNavigationQuickLink;
-            var administrationInteractionsNavigationQuickLink = AdministrationInteractionsNavigationQuickLink;
-            var administrationNetworksNavigationQuickLink = AdministrationNetworksNavigationQuickLink;
-            var administrationAnalysesNavigationQuickLink = AdministrationAnalysesNavigationQuickLink;
+            var usersNavigationQuickLink = AdministrationUsersNavigationQuickLink;
+            var rolesNavigationQuickLink = AdministrationRolesNavigationQuickLink;
+            var databasesNavigationQuickLink = AdministrationDatabasesNavigationQuickLink;
+            var proteinCollectionsNavigationQuickLink = AdministrationProteinCollectionsNavigationQuickLink;
+            var proteinsNavigationQuickLink = AdministrationProteinsNavigationQuickLink;
+            var interactionsNavigationQuickLink = AdministrationInteractionsNavigationQuickLink;
+            var networksNavigationQuickLink = AdministrationNetworksNavigationQuickLink;
+            var analysesNavigationQuickLink = AdministrationAnalysesNavigationQuickLink;
             // Update the count and the route ID.
-            administrationUsersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
-            administrationRolesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Roles", null);
-            administrationDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
-            administrationProteinCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("ProteinCollections", null);
-            administrationProteinsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Proteins", null);
-            administrationInteractionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Interactions", null);
-            administrationNetworksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
-            administrationAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
+            usersNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Users", null);
+            rolesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Roles", null);
+            databasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
+            proteinCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("ProteinCollections", null);
+            proteinsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Proteins", null);
+            interactionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Interactions", null);
+            networksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
+            analysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
-                administrationUsersNavigationQuickLink,
-                administrationRolesNavigationQuickLink,
-                administrationDatabasesNavigationQuickLink,
-                administrationProteinCollectionsNavigationQuickLink,
-                administrationProteinsNavigationQuickLink,
-                administrationInteractionsNavigationQuickLink,
-                administrationNetworksNavigationQuickLink,
-                administrationAnalysesNavigationQuickLink
-            };
-        }
-
-        /// <summary>
-        /// Gets the navigation quick links for the public data index page.
-        /// </summary>
-        /// <param name="count">The dictionary containing the current counts.</param>
-        /// <returns>The navigation quick links for the content index page.</returns>
-        public static IEnumerable<NavigationQuickLinkViewModel> GetPublicDataNavigationQuickLinks(Dictionary<string, int?> count = null)
-        {
-            // Get the corresponding navigation quick links.
-            var publicDataNetworksNavigationQuickLink = PublicDataNetworksNavigationQuickLink;
-            var publicDataAnalysesNavigationQuickLink = PublicDataAnalysesNavigationQuickLink;
-            // Update the count and the route ID.
-            publicDataNetworksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
-            publicDataAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
-            // Return the navigation quick links.
-            return new List<NavigationQuickLinkViewModel>
-            {
-                publicDataNetworksNavigationQuickLink,
-                publicDataAnalysesNavigationQuickLink
-            };
-        }
-
-        /// <summary>
-        /// Gets the navigation quick links for the public data index page.
-        /// </summary>
-        /// <param name="count">The dictionary containing the current counts.</param>
-        /// <returns>The navigation quick links for the content index page.</returns>
-        public static IEnumerable<NavigationQuickLinkViewModel> GetPrivateDataNavigationQuickLinks(Dictionary<string, int?> count = null)
-        {
-            // Get the corresponding navigation quick links.
-            var privateDataNetworksNavigationQuickLink = PrivateDataNetworksNavigationQuickLink;
-            var privateDataAnalysesNavigationQuickLink = PrivateDataAnalysesNavigationQuickLink;
-            // Update the count and the route ID.
-            privateDataNetworksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
-            privateDataAnalysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
-            // Return the navigation quick links.
-            return new List<NavigationQuickLinkViewModel>
-            {
-                privateDataNetworksNavigationQuickLink,
-                privateDataAnalysesNavigationQuickLink
+                usersNavigationQuickLink,
+                rolesNavigationQuickLink,
+                databasesNavigationQuickLink,
+                proteinCollectionsNavigationQuickLink,
+                proteinsNavigationQuickLink,
+                interactionsNavigationQuickLink,
+                networksNavigationQuickLink,
+                analysesNavigationQuickLink
             };
         }
 
@@ -477,98 +435,128 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static IEnumerable<NavigationQuickLinkViewModel> GetAvailableDataNavigationQuickLinks(Dictionary<string, int?> count = null)
         {
             // Get the corresponding navigation quick links.
-            var availableDataDatabasesNavigationQuickLink = AvailableDataDatabasesNavigationQuickLink;
-            var availableDataProteinCollectionsNavigationQuickLink = AvailableDataProteinCollectionsNavigationQuickLink;
-            var availableDataProteinsNavigationQuickLink = AvailableDataProteinsNavigationQuickLink;
-            var availableDataInteractionsNavigationQuickLink = AvailableDataInteractionsNavigationQuickLink;
+            var databasesNavigationQuickLink = AvailableDataDatabasesNavigationQuickLink;
+            var proteinCollectionsNavigationQuickLink = AvailableDataProteinCollectionsNavigationQuickLink;
+            var proteinsNavigationQuickLink = AvailableDataProteinsNavigationQuickLink;
+            var interactionsNavigationQuickLink = AvailableDataInteractionsNavigationQuickLink;
             // Update the count and the route ID.
-            availableDataDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
-            availableDataProteinCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("ProteinCollections", null);
-            availableDataProteinsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Proteins", null);
-            availableDataInteractionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Interactions", null);
+            databasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
+            proteinCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("ProteinCollections", null);
+            proteinsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Proteins", null);
+            interactionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Interactions", null);
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
-                availableDataDatabasesNavigationQuickLink,
-                availableDataProteinCollectionsNavigationQuickLink,
-                availableDataProteinsNavigationQuickLink,
-                availableDataInteractionsNavigationQuickLink
+                databasesNavigationQuickLink,
+                proteinCollectionsNavigationQuickLink,
+                proteinsNavigationQuickLink,
+                interactionsNavigationQuickLink
             };
         }
 
         /// <summary>
-        /// Gets the navigation quick links for the network index page.
+        /// Gets the navigation quick links for the public data index page.
+        /// </summary>
+        /// <param name="count">The dictionary containing the current counts.</param>
+        /// <returns>The navigation quick links for the content index page.</returns>
+        public static IEnumerable<NavigationQuickLinkViewModel> GetPublicDataNavigationQuickLinks(Dictionary<string, int?> count = null)
+        {
+            // Get the corresponding navigation quick links.
+            var networksNavigationQuickLink = PublicDataNetworksNavigationQuickLink;
+            var analysesNavigationQuickLink = PublicDataAnalysesNavigationQuickLink;
+            // Update the count and the route ID.
+            networksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
+            analysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
+            // Return the navigation quick links.
+            return new List<NavigationQuickLinkViewModel>
+            {
+                networksNavigationQuickLink,
+                analysesNavigationQuickLink
+            };
+        }
+
+        /// <summary>
+        /// Gets the navigation quick links for the public data index page.
+        /// </summary>
+        /// <param name="count">The dictionary containing the current counts.</param>
+        /// <returns>The navigation quick links for the content index page.</returns>
+        public static IEnumerable<NavigationQuickLinkViewModel> GetPrivateDataNavigationQuickLinks(Dictionary<string, int?> count = null)
+        {
+            // Get the corresponding navigation quick links.
+            var networksNavigationQuickLink = PrivateDataNetworksNavigationQuickLink;
+            var analysesNavigationQuickLink = PrivateDataAnalysesNavigationQuickLink;
+            // Update the count and the route ID.
+            networksNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Networks", null);
+            analysesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Analyses", null);
+            // Return the navigation quick links.
+            return new List<NavigationQuickLinkViewModel>
+            {
+                networksNavigationQuickLink,
+                analysesNavigationQuickLink
+            };
+        }
+
+        /// <summary>
+        /// Gets the navigation quick links for the created data networks details page.
         /// </summary>
         /// <param name="networkId">The ID of the current network.</param>
         /// <param name="count">The dictionary containing the current counts.</param>
         /// <returns>The navigation quick links for the network index page.</returns>
-        public static IEnumerable<NavigationQuickLinkViewModel> GetAvailableDataNetworkNavigationQuickLinks(string networkId = null, Dictionary<string, int?> count = null)
+        public static IEnumerable<NavigationQuickLinkViewModel> GetCreatedDataNetworksDetailsNavigationQuickLinks(string networkId = null, Dictionary<string, int?> count = null)
         {
-            // Check if there is no network ID provided.
-            if (string.IsNullOrEmpty(networkId))
-            {
-                // Assign the empty string to it.
-                networkId = string.Empty;
-            }
             // Get the corresponding navigation quick links.
-            var networkProteinsNavigationQuickLink = AvailableDataNetworkProteinsNavigationQuickLink;
-            var networkInteractionsNavigationQuickLink = AvailableDataNetworkInteractionsNavigationQuickLink;
-            var networkDatabasesNavigationQuickLink = AvailableDataNetworkDatabasesNavigationQuickLink;
-            var networkProteinCollectionsNavigationQuickLink = AvailableDataNetworkProteinCollectionsNavigationQuickLink;
+            var databasesNavigationQuickLink = CreatedDataNetworksDetailsDatabasesNavigationQuickLink;
+            var proteinsNavigationQuickLink = CreatedDataNetworksDetailsProteinsNavigationQuickLink;
+            var interactionsNavigationQuickLink = CreatedDataNetworksDetailsInteractionsNavigationQuickLink;
+            var proteinCollectionsNavigationQuickLink = CreatedDataNetworksDetailsProteinCollectionsNavigationQuickLink;
             // Update the count and the route ID.
-            networkProteinsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Proteins", null);
-            networkProteinsNavigationQuickLink.RouteId = networkId;
-            networkInteractionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Interactions", null);
-            networkInteractionsNavigationQuickLink.RouteId = networkId;
-            networkDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
-            networkDatabasesNavigationQuickLink.RouteId = networkId;
-            networkProteinCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("ProteinCollections", null);
-            networkProteinCollectionsNavigationQuickLink.RouteId = networkId;
+            databasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
+            databasesNavigationQuickLink.RouteId = networkId;
+            proteinsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Proteins", null);
+            proteinsNavigationQuickLink.RouteId = networkId;
+            interactionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Interactions", null);
+            interactionsNavigationQuickLink.RouteId = networkId;
+            proteinCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("ProteinCollections", null);
+            proteinCollectionsNavigationQuickLink.RouteId = networkId;
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
-                networkProteinsNavigationQuickLink,
-                networkInteractionsNavigationQuickLink,
-                networkDatabasesNavigationQuickLink,
-                networkProteinCollectionsNavigationQuickLink
+                proteinsNavigationQuickLink,
+                interactionsNavigationQuickLink,
+                databasesNavigationQuickLink,
+                proteinCollectionsNavigationQuickLink
             };
         }
 
         /// <summary>
-        /// Gets the navigation quick links for the analysis index page.
+        /// Gets the navigation quick links for the created data analyses details page.
         /// </summary>
         /// <param name="analysisId">The ID of the current analysis.</param>
         /// <param name="count">The dictionary containing the current counts.</param>
         /// <returns>The navigation quick links for the analysis index page.</returns>
-        public static IEnumerable<NavigationQuickLinkViewModel> GetAvailableDataAnalysisNavigationQuickLinks(string analysisId = null, Dictionary<string, int?> count = null)
+        public static IEnumerable<NavigationQuickLinkViewModel> GetCreatedDataAnalysesDetailsNavigationQuickLinks(string analysisId = null, Dictionary<string, int?> count = null)
         {
-            // Check if there is no analysis ID provided.
-            if (string.IsNullOrEmpty(analysisId))
-            {
-                // Assign the empty string to it.
-                analysisId = string.Empty;
-            }
             // Get the corresponding navigation quick links.
-            var analysisProteinsNavigationQuickLink = AvailableDataAnalysisProteinsNavigationQuickLink;
-            var analysisInteractionsNavigationQuickLink = AvailableDataAnalysisInteractionsNavigationQuickLink;
-            var analysisDatabasesNavigationQuickLink = AvailableDataAnalysisDatabasesNavigationQuickLink;
-            var analysisProteinCollectionsNavigationQuickLink = AvailableDataAnalysisProteinCollectionsNavigationQuickLink;
+            var databasesNavigationQuickLink = CreatedDataAnalysesDetailsDatabasesNavigationQuickLink;
+            var proteinsNavigationQuickLink = CreatedDataAnalysesDetailsProteinsNavigationQuickLink;
+            var interactionsNavigationQuickLink = CreatedDataAnalysesDetailsInteractionsNavigationQuickLink;
+            var proteinCollectionsNavigationQuickLink = CreatedDataAnalysesDetailsProteinCollectionsNavigationQuickLink;
             // Update the count and the route ID.
-            analysisProteinsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Proteins", null);
-            analysisProteinsNavigationQuickLink.RouteId = analysisId;
-            analysisInteractionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Interactions", null);
-            analysisInteractionsNavigationQuickLink.RouteId = analysisId;
-            analysisDatabasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
-            analysisDatabasesNavigationQuickLink.RouteId = analysisId;
-            analysisProteinCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("ProteinCollections", null);
-            analysisProteinCollectionsNavigationQuickLink.RouteId = analysisId;
+            databasesNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Databases", null);
+            databasesNavigationQuickLink.RouteId = analysisId;
+            proteinsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Proteins", null);
+            proteinsNavigationQuickLink.RouteId = analysisId;
+            interactionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("Interactions", null);
+            interactionsNavigationQuickLink.RouteId = analysisId;
+            proteinCollectionsNavigationQuickLink.ItemCount = count?.GetValueOrDefault("ProteinCollections", null);
+            proteinCollectionsNavigationQuickLink.RouteId = analysisId;
             // Return the navigation quick links.
             return new List<NavigationQuickLinkViewModel>
             {
-                analysisProteinsNavigationQuickLink,
-                analysisInteractionsNavigationQuickLink,
-                analysisDatabasesNavigationQuickLink,
-                analysisProteinCollectionsNavigationQuickLink
+                proteinsNavigationQuickLink,
+                interactionsNavigationQuickLink,
+                databasesNavigationQuickLink,
+                proteinCollectionsNavigationQuickLink
             };
         }
     }

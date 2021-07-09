@@ -61,6 +61,7 @@
 <div class="card mb-3" title="Status">
     <div class="card-body text-center">
         <partial name="_AnalysisStatusPartial" model="@Model.View.Analysis.Status" />
+        <span class="small text-muted">@Model.View.Analysis.Status.GetDisplayDescription()</span>
     </div>
 </div>
 <div class="item-refresh" data-id="@Model.View.Analysis.Id" data-status="@Model.View.Analysis.Status.ToString()" data-refresh="@(Model.View.Analysis.Status == AnalysisStatus.Defined || Model.View.Analysis.Status == AnalysisStatus.Generating || Model.View.Analysis.Status == AnalysisStatus.Scheduled || Model.View.Analysis.Status == AnalysisStatus.Initializing || Model.View.Analysis.Status == AnalysisStatus.Ongoing || Model.View.Analysis.Status == AnalysisStatus.Stopping)">
@@ -120,7 +121,7 @@
         </div>
     </div>
 }
-<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAvailableDataAnalysisNavigationQuickLinks(Model.View.Analysis.Id, Model.View.ItemCount)" />
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetCreatedDataAnalysesDetailsNavigationQuickLinks(Model.View.Analysis.Id, Model.View.ItemCount)" />
 <div class="card mb-3">
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">

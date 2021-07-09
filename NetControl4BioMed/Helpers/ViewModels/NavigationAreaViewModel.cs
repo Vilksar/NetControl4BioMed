@@ -1,5 +1,4 @@
-﻿using NetControl4BioMed.Data.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace NetControl4BioMed.Helpers.ViewModels
 {
@@ -860,31 +859,31 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the updated navigation area for the available data network pages.
+        /// Gets the updated navigation area for the created data networks details pages.
         /// </summary>
-        /// <param name="network">Represents the current network.</param>
+        /// <param name="networkId">The ID of the current network.</param>
         /// <returns>The navigation area for the network pages.</returns>
-        public static NavigationAreaViewModel GetCreatedDataNetworksDetailsNavigationArea(Network network)
+        public static NavigationAreaViewModel GetCreatedDataNetworksDetailsNavigationArea(string networkId = null)
         {
             // Get the corresponding navigation area.
             var navigationArea = CreatedDataNetworksDetailsNavigationArea;
             // Update the route ID.
-            navigationArea.RouteId = network.Id;
+            navigationArea.RouteId = networkId;
             // Return the navigation area.
             return navigationArea;
         }
 
         /// <summary>
-        /// Gets the updated navigation area for the content PPI analysis pages.
+        /// Gets the updated navigation area for the created data analyses details pages.
         /// </summary>
-        /// <param name="analysis">Represents the current analysis.</param>
+        /// <param name="analysisId">The ID of the current analysis.</param>
         /// <returns>The navigation area for the analysis pages.</returns>
-        public static NavigationAreaViewModel GetCreatedDataAnalysesDetailsNavigationArea(Analysis analysis)
+        public static NavigationAreaViewModel GetCreatedDataAnalysesDetailsNavigationArea(string analysisId = null)
         {
             // Get the corresponding navigation area.
             var navigationArea = CreatedDataAnalysesDetailsNavigationArea;
             // Update the route ID.
-            navigationArea.RouteId = analysis.Id;
+            navigationArea.RouteId = analysisId;
             // Return the navigation area.
             return navigationArea;
         }

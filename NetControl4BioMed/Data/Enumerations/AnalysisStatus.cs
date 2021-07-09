@@ -16,7 +16,7 @@ namespace NetControl4BioMed.Data.Enumerations
         /// <summary>
         /// Represents an analysis which has been defined.
         /// </summary>
-        [Display(Name = "Defined", Description = "The analysis has been defined.")]
+        [Display(Name = "Defined", Description = "The analysis has been defined and is scheduled for generation.")]
         Defined,
 
         /// <summary>
