@@ -55,6 +55,8 @@ namespace NetControl4BioMed.Pages.PrivateData.Networks
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsPublic", "Is public" },
+                    { "IsNotPublic", "Is not public" },
                     { "HasStatusError", "Has status \"Error\"" },
                     { "HasNotStatusError", "Does not have status \"Error\"" },
                     { "HasStatusDefined", "Has status \"Defined\"" },
@@ -63,6 +65,8 @@ namespace NetControl4BioMed.Pages.PrivateData.Networks
                     { "HasNotStatusGenerating", "Does not have status \"Generating\"" },
                     { "HasStatusCompleted", "Has status \"Completed\"" },
                     { "HasNotStatusCompleted", "Does not have status \"Completed\"" },
+                    { "UsesAlgorithmNone", "Was provided by user" },
+                    { "UsesNotAlgorithmNone", "Was not provided by user" },
                     { "UsesAlgorithmNeighbors", "Was generated using \"Neighbors\" algorithm" },
                     { "UsesNotAlgorithmNeighbors", "Was not generated using \"Neighbors\" algorithm" },
                     { "UsesAlgorithmGap0", "Was generated using \"Gap 0\" algorithm" },
@@ -147,6 +151,8 @@ namespace NetControl4BioMed.Pages.PrivateData.Networks
                     input.SearchIn.Contains("AnalysisName") && item.Analyses.Any(item1 => item1.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
+                .Where(item => input.Filter.Contains("IsPublic") ? item.IsPublic : true)
+                .Where(item => input.Filter.Contains("IsNotPublic") ? !item.IsPublic : true)
                 .Where(item => input.Filter.Contains("HasStatusError") ? item.Status == NetworkStatus.Error : true)
                 .Where(item => input.Filter.Contains("HasNotStatusError") ? item.Status != NetworkStatus.Error : true)
                 .Where(item => input.Filter.Contains("HasStatusDefined") ? item.Status == NetworkStatus.Defined : true)
@@ -155,6 +161,8 @@ namespace NetControl4BioMed.Pages.PrivateData.Networks
                 .Where(item => input.Filter.Contains("HasNotStatusGenerating") ? item.Status != NetworkStatus.Generating : true)
                 .Where(item => input.Filter.Contains("HasStatusCompleted") ? item.Status == NetworkStatus.Completed : true)
                 .Where(item => input.Filter.Contains("HasNotStatusCompleted") ? item.Status != NetworkStatus.Completed : true)
+                .Where(item => input.Filter.Contains("UsesAlgorithmNone") ? item.Algorithm == NetworkAlgorithm.None : true)
+                .Where(item => input.Filter.Contains("UsesNotAlgorithmNone") ? item.Algorithm != NetworkAlgorithm.None : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmNeighbors") ? item.Algorithm == NetworkAlgorithm.Neighbors : true)
                 .Where(item => input.Filter.Contains("UsesNotAlgorithmNeighbors") ? item.Algorithm != NetworkAlgorithm.Neighbors : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmGap0") ? item.Algorithm == NetworkAlgorithm.Gap0 : true)

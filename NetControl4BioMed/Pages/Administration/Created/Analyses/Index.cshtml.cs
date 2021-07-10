@@ -47,24 +47,28 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "IsError", "Is error" },
-                    { "IsNotError", "Is not error" },
-                    { "IsDefined", "Is defined" },
-                    { "IsNotDefined", "Is not defined" },
-                    { "IsGenerating", "Is generating" },
-                    { "IsNotGenerating", "Is not generating" },
-                    { "IsScheduled", "Is scheduled" },
-                    { "IsNotScheduled", "Is not scheduled" },
-                    { "IsInitializing", "Is initializing" },
-                    { "IsNotInitializing", "Is not initializing" },
-                    { "IsOngoing", "Is ongoing" },
-                    { "IsNotOngoing", "Is not ongoing" },
-                    { "IsStopping", "Is stopping" },
-                    { "IsNotStopping", "Is not stopping" },
-                    { "IsStopped", "Is stopped" },
-                    { "IsNotStopped", "Is not stopped" },
-                    { "IsCompleted", "Is completed" },
-                    { "IsNotCompleted", "Is not completed" },
+                    { "IsPublic", "Is public" },
+                    { "IsNotPublic", "Is not public" },
+                    { "IsDemonstration", "Is demonstration" },
+                    { "IsNotDemonstration", "Is not demonstration" },
+                    { "HasStatusError", "Has status \"Error\"" },
+                    { "HasNotStatusError", "Does not have status \"Error\"" },
+                    { "HasStatusDefined", "Has status \"Defined\"" },
+                    { "HasNotStatusDefined", "Does not have status \"Defined\"" },
+                    { "HasStatusGenerating", "Has status \"Generating\"" },
+                    { "HasNotStatusGenerating", "Does not have status \"Generating\"" },
+                    { "HasStatusScheduled", "Has status \"Scheduled\"" },
+                    { "HasNotStatusScheduled", "Does not have status \"Scheduled\"" },
+                    { "HasStatusInitializing", "Has status \"Initializing\"" },
+                    { "HasNotStatusInitializing", "Does not have status \"Initializing\"" },
+                    { "HasStatusOngoing", "Has status \"Ongoing\"" },
+                    { "HasNotStatusOngoing", "Does not have status \"Ongoing\"" },
+                    { "HasStatusStopping", "Has status \"Stopping\"" },
+                    { "HasNotStatusStopping", "Does not have status \"Stopping\"" },
+                    { "HasStatusStopped", "Has status \"Stopped\"" },
+                    { "HasNotStatusStopped", "Does not have status \"Stopped\"" },
+                    { "HasStatusCompleted", "Has status \"Completed\"" },
+                    { "HasNotStatusCompleted", "Does not have status \"Completed\"" },
                     { "UsesGreedyAlgorithm", "Uses the greedy algorithm" },
                     { "UsesNotGreedyAlgorithm", "Doesn't use the greedy algorithm" },
                     { "UsesGeneticAlgorithm", "Uses the genetic algorithm" },
@@ -126,24 +130,28 @@ namespace NetControl4BioMed.Pages.Administration.Created.Analyses
                     input.SearchIn.Contains("ProteinCollectionName") && item.AnalysisProteinCollections.Any(item1 => item1.ProteinCollection.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
-                .Where(item => input.Filter.Contains("IsError") ? item.Status == AnalysisStatus.Error : true)
-                .Where(item => input.Filter.Contains("IsNotError") ? item.Status != AnalysisStatus.Error : true)
-                .Where(item => input.Filter.Contains("IsDefined") ? item.Status == AnalysisStatus.Defined : true)
-                .Where(item => input.Filter.Contains("IsNotDefined") ? item.Status != AnalysisStatus.Defined : true)
-                .Where(item => input.Filter.Contains("IsGenerating") ? item.Status == AnalysisStatus.Generating : true)
-                .Where(item => input.Filter.Contains("IsNotGenerating") ? item.Status != AnalysisStatus.Generating : true)
-                .Where(item => input.Filter.Contains("IsScheduled") ? item.Status == AnalysisStatus.Scheduled : true)
-                .Where(item => input.Filter.Contains("IsNotScheduled") ? item.Status != AnalysisStatus.Scheduled : true)
-                .Where(item => input.Filter.Contains("IsInitializing") ? item.Status == AnalysisStatus.Initializing : true)
-                .Where(item => input.Filter.Contains("IsNotInitializing") ? item.Status != AnalysisStatus.Initializing : true)
-                .Where(item => input.Filter.Contains("IsOngoing") ? item.Status == AnalysisStatus.Ongoing : true)
-                .Where(item => input.Filter.Contains("IsNotOngoing") ? item.Status != AnalysisStatus.Ongoing : true)
-                .Where(item => input.Filter.Contains("IsStopping") ? item.Status == AnalysisStatus.Stopping : true)
-                .Where(item => input.Filter.Contains("IsNotStopping") ? item.Status != AnalysisStatus.Stopping : true)
-                .Where(item => input.Filter.Contains("IsStopped") ? item.Status == AnalysisStatus.Stopped : true)
-                .Where(item => input.Filter.Contains("IsNotStopped") ? item.Status != AnalysisStatus.Stopped : true)
-                .Where(item => input.Filter.Contains("IsCompleted") ? item.Status == AnalysisStatus.Completed : true)
-                .Where(item => input.Filter.Contains("IsNotCompleted") ? item.Status != AnalysisStatus.Completed : true)
+                .Where(item => input.Filter.Contains("IsPublic") ? item.IsPublic : true)
+                .Where(item => input.Filter.Contains("IsNotPublic") ? !item.IsPublic : true)
+                .Where(item => input.Filter.Contains("IsDemonstration") ? item.IsDemonstration : true)
+                .Where(item => input.Filter.Contains("IsNotDemonstration") ? !item.IsDemonstration : true)
+                .Where(item => input.Filter.Contains("HasStatusError") ? item.Status == AnalysisStatus.Error : true)
+                .Where(item => input.Filter.Contains("HasNotStatusError") ? item.Status != AnalysisStatus.Error : true)
+                .Where(item => input.Filter.Contains("HasStatusDefined") ? item.Status == AnalysisStatus.Defined : true)
+                .Where(item => input.Filter.Contains("HasNotStatusDefined") ? item.Status != AnalysisStatus.Defined : true)
+                .Where(item => input.Filter.Contains("HasStatusGenerating") ? item.Status == AnalysisStatus.Generating : true)
+                .Where(item => input.Filter.Contains("HasNotStatusGenerating") ? item.Status != AnalysisStatus.Generating : true)
+                .Where(item => input.Filter.Contains("HasStatusScheduled") ? item.Status == AnalysisStatus.Scheduled : true)
+                .Where(item => input.Filter.Contains("HasNotStatusScheduled") ? item.Status != AnalysisStatus.Scheduled : true)
+                .Where(item => input.Filter.Contains("HasStatusInitializing") ? item.Status == AnalysisStatus.Initializing : true)
+                .Where(item => input.Filter.Contains("HasNotStatusInitializing") ? item.Status != AnalysisStatus.Initializing : true)
+                .Where(item => input.Filter.Contains("HasStatusOngoing") ? item.Status == AnalysisStatus.Ongoing : true)
+                .Where(item => input.Filter.Contains("HasNotStatusOngoing") ? item.Status != AnalysisStatus.Ongoing : true)
+                .Where(item => input.Filter.Contains("HasStatusStopping") ? item.Status == AnalysisStatus.Stopping : true)
+                .Where(item => input.Filter.Contains("HasNotStatusStopping") ? item.Status != AnalysisStatus.Stopping : true)
+                .Where(item => input.Filter.Contains("HasStatusStopped") ? item.Status == AnalysisStatus.Stopped : true)
+                .Where(item => input.Filter.Contains("HasNotStatusStopped") ? item.Status != AnalysisStatus.Stopped : true)
+                .Where(item => input.Filter.Contains("HasStatusCompleted") ? item.Status == AnalysisStatus.Completed : true)
+                .Where(item => input.Filter.Contains("HasNotStatusCompleted") ? item.Status != AnalysisStatus.Completed : true)
                 .Where(item => input.Filter.Contains("UsesGreedyAlgorithm") ? item.Algorithm == AnalysisAlgorithm.Greedy : true)
                 .Where(item => input.Filter.Contains("UsesNotGreedyAlgorithm") ? item.Algorithm != AnalysisAlgorithm.Greedy : true)
                 .Where(item => input.Filter.Contains("UsesGeneticAlgorithm") ? item.Algorithm == AnalysisAlgorithm.Genetic : true)

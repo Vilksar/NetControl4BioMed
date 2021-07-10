@@ -48,6 +48,8 @@ namespace NetControl4BioMed.Pages.PublicData.Analyses
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsDemonstration", "Is demonstration" },
+                    { "IsNotDemonstration", "Is not demonstration" },
                     { "HasStatusError", "Has status \"Error\"" },
                     { "HasNotStatusError", "Does not have status \"Error\"" },
                     { "HasStatusDefined", "Has status \"Defined\"" },
@@ -127,6 +129,8 @@ namespace NetControl4BioMed.Pages.PublicData.Analyses
                     input.SearchIn.Contains("NetworkName") && item.Network.Name.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
+                .Where(item => input.Filter.Contains("IsDemonstration") ? item.IsDemonstration : true)
+                .Where(item => input.Filter.Contains("IsNotDemonstration") ? !item.IsDemonstration : true)
                 .Where(item => input.Filter.Contains("HasStatusError") ? item.Status == AnalysisStatus.Error : true)
                 .Where(item => input.Filter.Contains("HasNotStatusError") ? item.Status != AnalysisStatus.Error : true)
                 .Where(item => input.Filter.Contains("HasStatusDefined") ? item.Status == AnalysisStatus.Defined : true)

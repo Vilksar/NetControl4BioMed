@@ -55,6 +55,8 @@ namespace NetControl4BioMed.Pages.PrivateData.Analyses
                 },
                 Filter = new Dictionary<string, string>
                 {
+                    { "IsPublic", "Is public" },
+                    { "IsNotPublic", "Is not public" },
                     { "HasStatusError", "Has status \"Error\"" },
                     { "HasNotStatusError", "Does not have status \"Error\"" },
                     { "HasStatusDefined", "Has status \"Defined\"" },
@@ -63,6 +65,8 @@ namespace NetControl4BioMed.Pages.PrivateData.Analyses
                     { "HasNotStatusGenerating", "Does not have status \"Generating\"" },
                     { "HasStatusScheduled", "Has status \"Scheduled\"" },
                     { "HasNotStatusScheduled", "Does not have status \"Scheduled\"" },
+                    { "HasStatusInitializing", "Has status \"Initializing\"" },
+                    { "HasNotStatusInitializing", "Does not have status \"Initializing\"" },
                     { "HasStatusOngoing", "Has status \"Ongoing\"" },
                     { "HasNotStatusOngoing", "Does not have status \"Ongoing\"" },
                     { "HasStatusStopping", "Has status \"Stopping\"" },
@@ -144,6 +148,8 @@ namespace NetControl4BioMed.Pages.PrivateData.Analyses
                     input.SearchIn.Contains("NetworkName") && item.Network.Name.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
+                .Where(item => input.Filter.Contains("IsPublic") ? item.IsPublic : true)
+                .Where(item => input.Filter.Contains("IsNotPublic") ? !item.IsPublic : true)
                 .Where(item => input.Filter.Contains("HasStatusError") ? item.Status == AnalysisStatus.Error : true)
                 .Where(item => input.Filter.Contains("HasNotStatusError") ? item.Status != AnalysisStatus.Error : true)
                 .Where(item => input.Filter.Contains("HasStatusDefined") ? item.Status == AnalysisStatus.Defined : true)
