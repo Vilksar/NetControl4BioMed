@@ -98,6 +98,8 @@ namespace NetControl4BioMed.Pages.CreatedData.Analyses
             [Required(ErrorMessage = "This field is required.")]
             public string Algorithm { get; set; }
 
+            public bool UseDefaultAlgorithmParameters { get; set; }
+
             public GreedyAlgorithm.Parameters GreedyAlgorithmParameters { get; set; }
 
             public GeneticAlgorithm.Parameters GeneticAlgorithmParameters { get; set; }
@@ -280,7 +282,8 @@ namespace NetControl4BioMed.Pages.CreatedData.Analyses
                     Algorithm = analyses
                         .Select(item => item.Algorithm)
                         .FirstOrDefault()
-                        .ToString()
+                        .ToString(),
+                    UseDefaultAlgorithmParameters = false
                 };
                 // Update the parameters.
                 Input.GreedyAlgorithmParameters = Input.Algorithm == AnalysisAlgorithm.Greedy.ToString() ? JsonSerializer.Deserialize<GreedyAlgorithm.Parameters>(analyses.Select(item => item.Parameters).FirstOrDefault()) : new GreedyAlgorithm.Parameters();
@@ -337,6 +340,7 @@ namespace NetControl4BioMed.Pages.CreatedData.Analyses
                 MaximumIterations = 100,
                 MaximumIterationsWithoutImprovement = 25,
                 Algorithm = AnalysisAlgorithm.Greedy.ToString(),
+                UseDefaultAlgorithmParameters = true,
                 GreedyAlgorithmParameters = new GreedyAlgorithm.Parameters(),
                 GeneticAlgorithmParameters = new GeneticAlgorithm.Parameters()
             };
@@ -375,18 +379,13 @@ namespace NetControl4BioMed.Pages.CreatedData.Analyses
                 // Redirect to the index page.
                 return RedirectToPage("/CreatedData/Analyses/Index");
             }
-            // Update the view.
             // Define the view.
             View = new ViewModel
             {
-
                 NetworkId = networkItem.Id,
                 NetworkName = networkItem.Name,
                 HasNetworkDatabases = networkItem.HasNetworkDatabases
             };
-            // Update the parameters.
-            Input.GreedyAlgorithmParameters = Input.GreedyAlgorithmParameters ?? new GreedyAlgorithm.Parameters();
-            Input.GeneticAlgorithmParameters = Input.GeneticAlgorithmParameters ?? new GeneticAlgorithm.Parameters();
             // Check if the reCaptcha is valid.
             if (!await _reCaptchaChecker.IsValid(Input.ReCaptchaToken))
             {
@@ -394,6 +393,19 @@ namespace NetControl4BioMed.Pages.CreatedData.Analyses
                 ModelState.AddModelError(string.Empty, "The reCaptcha verification failed.");
                 // Return the page.
                 return Page();
+            }
+            // Check if the default parameters should be used.
+            if (Input.UseDefaultAlgorithmParameters)
+            {
+                // Update the parameters.
+                Input.MaximumIterations = 100;
+                Input.MaximumIterationsWithoutImprovement = 25;
+                Input.GreedyAlgorithmParameters = new GreedyAlgorithm.Parameters();
+                Input.GeneticAlgorithmParameters = new GeneticAlgorithm.Parameters();
+                // Clear the current model state.
+                ModelState.Clear();
+                // Revalidate the model state.
+                TryValidateModel(Input);
             }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)

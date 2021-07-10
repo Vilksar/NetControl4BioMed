@@ -12,7 +12,7 @@
 </div>
 <form method="post" class="text-justify">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
-    <div class="card mb-3">
+    <div class="card mb-3 modal-group">
         <div class="card-header font-weight-bold">
             <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
                 <div>
@@ -49,16 +49,63 @@
                 <span asp-description-for="Input.IsPublic" class="text-muted small">The availability of the network in the list of public networks. If public, anyone can access it.</span>
                 <span asp-validation-for="Input.IsPublic" class="text-danger small"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group modal-group-item">
                 <label asp-for="Input.Algorithm" class="font-weight-bold">Algorithm</label>
-                <select asp-for="Input.Algorithm" class="custom-select">
-                    @foreach (var item in Enum.GetValues(typeof(NetworkAlgorithm)).Cast<NetworkAlgorithm>().Where(item => item != NetworkAlgorithm.None))
-                    {
-                        <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
-                    }
-                </select>
+                <div class="input-group">
+                    <select asp-for="Input.Algorithm" class="custom-select">
+                        @foreach (var item in Enum.GetValues(typeof(NetworkAlgorithm)).Cast<NetworkAlgorithm>().Where(item => item != NetworkAlgorithm.None))
+                        {
+                            <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                        }
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                            <span><i class="fas fa-question-circle"></i></span>
+                        </button>
+                    </div>
+                </div>
                 <span asp-description-for="Input.Algorithm" class="text-muted small">The algorithm to be used in generating the new network.</span>
                 <span asp-validation-for="Input.Algorithm" class="text-danger small"></span>
+                <template class="modal-group-item-template">
+                    <div class="mb-2">
+                        <span>There are several algorithms available:</span>
+                    </div>
+                    <ul class="mb-0">
+                        <li class="mb-2">
+                            <span><span class="font-weight-bold">Neighbors</span>: The network will contain all interactions involving at least one seed protein.</span>
+                        </li>
+                        <li class="mb-2">
+                            <span><span class="font-weight-bold">Gap 0</span>: The network will contain only the interactions between the seed proteins.</span>
+                        </li>
+                        <li class="mb-2">
+                            <span><span class="font-weight-bold">Gap 1</span>: The network will contain the interactions between the seed proteins, with at most one additional protein in-between.</span>
+                        </li>
+                        <li class="mb-2">
+                            <span><span class="font-weight-bold">Gap 2</span>: The network will contain the interactions between the seed proteins, with at most two additional protein in-between.</span>
+                        </li>
+                        <li class="mb-2">
+                            <span><span class="font-weight-bold">Gap 3</span>: The network will contain the interactions between the seed proteins, with at most three additional protein in-between.</span>
+                        </li>
+                        <li class="mb-2">
+                            <span><span class="font-weight-bold">Gap 4</span>: The network will contain the interactions between the seed proteins, with at most four additional protein in-between.</span>
+                        </li>
+                    </ul>
+                </template>
+            </div>
+        </div>
+        <div class="modal fade modal-group-modal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-title font-weight-bold">
+                            <span>Details</span>
+                        </div>
+                        <button type="button" class="btn close" data-dismiss="modal">
+                            <span><i class="fas fa-times"></i></span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-justify"></div>
+                </div>
             </div>
         </div>
     </div>

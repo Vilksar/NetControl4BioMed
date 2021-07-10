@@ -55,7 +55,7 @@ $(window).on('load', () => {
             // Get the current file.
             const file = event.target.files[0];
             // Set the filename in the label.
-            $(event.target).siblings('.file-selector-label').html(file.name);
+            $(event.target).closest('.file-selector-input').siblings('.file-selector-label').html(file.name);
         });
     }
 
@@ -189,6 +189,21 @@ $(window).on('load', () => {
         })();
     }
 
+    // Check if there is a modal group on the page.
+    if ($('.modal-group').length !== 0) {
+        // Add a listener for if the button was clicked.
+        $('.modal-group').on('click', '.modal-group-item-button', (event) => {
+            // Get the corresponding button element.
+            const buttonElement = $(event.target).closest('.modal-group-item-button');
+            // Get the corresponding item element.
+            const itemElement = $(buttonElement).closest('.modal-group-item');
+            // Get the corresponding modal element.
+            const modalElement = $(buttonElement).closest('.modal-group').find('.modal-group-modal').first();
+            // Replace the body of the modal with the template.
+            $(modalElement).find('.modal-body').html($(itemElement).find('.modal-group-item-template').first().html());
+        });
+    }
+
     // Check if there is a loading group on the page.
     if ($('.loading-group').length !== 0) {
         // Add a listener for if the button was clicked.
@@ -196,7 +211,7 @@ $(window).on('load', () => {
             // Get the corresponding group element.
             const groupElement = $(event.target).closest('.loading-group');
             // Replace the content of the button with the template.
-            $(event.target).html($(groupElement).find('.loading-group-template').first().html());
+            $(event.target).closest('.loading-group-button').html($(groupElement).find('.loading-group-template').first().html());
         });
     }
 
@@ -213,7 +228,7 @@ $(window).on('load', () => {
         $('.hidden-group-checkbox').on('change', (event) => {
             // Get the current hidden group and the type.
             const groupElement = $(event.target).closest('.hidden-group');
-            const type = $(event.target).data('type');
+            const type = $(event.target).closest('.hidden-group-checkbox').data('type');
             // Get the state of the checkbox and of the display.
             const isChecked = $(groupElement).find(`.hidden-group-checkbox[data-type="${type}"]`).first().prop('checked');
             const isDisplayed = !$(groupElement).find(`.hidden-group-display[data-type="${type}"]`).first().prop('hidden');
@@ -227,7 +242,7 @@ $(window).on('load', () => {
         $('.hidden-group-toggle').on('click', (event) => {
             // Get the current hidden group and the type.
             const groupElement = $(event.target).closest('.hidden-group');
-            const type = $(event.target).data('type');
+            const type = $(event.target).closest('.hidden-group-toggle').data('type');
             // Toggle the display.
             toggleDisplay(groupElement, type);
         });
@@ -286,7 +301,7 @@ $(window).on('load', () => {
             // Get the current list group.
             const groupElement = $(event.target).closest('.item-group');
             // Check if the checkbox is currently checked.
-            if ($(event.target).prop('checked')) {
+            if ($(event.target).closest('.item-group-select').prop('checked')) {
                 // Check all of the checkboxes on the page.
                 $(groupElement).find('.item-group-item-checkbox').prop('checked', true);
             } else {
@@ -443,7 +458,7 @@ $(window).on('load', () => {
             // Get the current file.
             const file = event.target.files[0];
             // Set the filename in the label.
-            $(event.target).siblings('.file-group-file-label').html(file.name);
+            $(event.target).closest('.file-group-file-upload').siblings('.file-group-file-label').html(file.name);
             // Define the file reader and the variable for storing its content.
             let fileReader = new FileReader();
             // Define what happens when we read the file.
@@ -482,6 +497,25 @@ $(window).on('load', () => {
             const template = $(groupElement).find(`.parameter-group-template[data-algorithm="${algorithm}"]`).html();
             // Replace the current parameters with the template.
             $(groupElement).find('.parameter-group-parameters').empty().html(template);
+            // Check if the checkbox is checked or not.
+            if ($(groupElement).find('.parameter-group-checkbox').prop('checked')) {
+                // Hide the parameters.
+                $(groupElement).find('.parameter-group-values').prop('hidden', true);
+            } else {
+                // Display the parameters.
+                $(groupElement).find('.parameter-group-values').prop('hidden', false);
+            }
+            // Get the corresponding heuristics group.
+            const heuristicsGroupElement = $(groupElement).find('.heuristics-group').first();
+            // Check if any element was found.
+            if ($(heuristicsGroupElement).length !== 0) {
+                // Update the heuristics.
+                heuristicGroupUpdateHeuristics(heuristicsGroupElement);
+                // Update the current heuristics.
+                heuristicGroupUpdateCurrentHeuristics(heuristicsGroupElement);
+                // Update the input text.
+                heuristicGroupUpdateText(heuristicsGroupElement);
+            }
         };
         // Define a function which updates the heuristics based on the input data.
         const heuristicGroupUpdateHeuristics = (groupElement) => {
@@ -558,56 +592,13 @@ $(window).on('load', () => {
             const groupElement = $(event.target).closest('.parameter-group');
             // Update the selected items.
             updateParameters(groupElement);
-            // Get the corresponding heuristics group.
-            const heuristicsGroupElement = $(groupElement).find('.heuristics-group').first();
-            // Check if any element was found.
-            if ($(heuristicsGroupElement).length !== 0) {
-                // Update the heuristics.
-                heuristicGroupUpdateHeuristics(heuristicsGroupElement);
-                // Update the current heuristics.
-                heuristicGroupUpdateCurrentHeuristics(heuristicsGroupElement);
-                // Update the input text.
-                heuristicGroupUpdateText(heuristicsGroupElement);
-            }
         });
         // Add a listener for changing the algorithm.
         $('.parameter-group').on('change', '.parameter-group-checkbox', (event) => {
             // Get the actual group which was clicked.
             const groupElement = $(event.target).closest('.parameter-group');
-            // Check if the checkbox is checked or not.
-            if ($(groupElement).find('.parameter-group-checkbox').prop('checked')) {
-                // Reset the parameters just like when selecting a new algorithm.
-                updateParameters(groupElement);
-                // Get the corresponding heuristics group.
-                const heuristicsGroupElement = $(groupElement).find('.heuristics-group').first();
-                // Check if any element was found.
-                if ($(heuristicsGroupElement).length !== 0) {
-                    // Update the heuristics.
-                    heuristicGroupUpdateHeuristics(heuristicsGroupElement);
-                    // Update the current heuristics.
-                    heuristicGroupUpdateCurrentHeuristics(heuristicsGroupElement);
-                    // Update the input text.
-                    heuristicGroupUpdateText(heuristicsGroupElement);
-                }
-                // Hide the parameters.
-                $(groupElement).find('.parameter-group-values').prop('hidden', true);
-            } else {
-                // Display the parameters.
-                $(groupElement).find('.parameter-group-values').prop('hidden', false);
-            }
-            // Update the selected items.
+            // Reset the parameters just like when selecting a new algorithm.
             updateParameters(groupElement);
-            // Get the corresponding heuristics group.
-            const heuristicsGroupElement = $(groupElement).find('.heuristics-group').first();
-            // Check if any element was found.
-            if ($(heuristicsGroupElement).length !== 0) {
-                // Update the heuristics.
-                heuristicGroupUpdateHeuristics(heuristicsGroupElement);
-                // Update the current heuristics.
-                heuristicGroupUpdateCurrentHeuristics(heuristicsGroupElement);
-                // Update the input text.
-                heuristicGroupUpdateText(heuristicsGroupElement);
-            }
         });
         // Add a listener for if the add heuristics button was clicked.
         $('.parameter-group').on('click', '.heuristics-group-add', (event) => {
@@ -677,15 +668,6 @@ $(window).on('load', () => {
             $('.parameter-group').each((index, groupElement) => {
                 // Update the parameters.
                 updateParameters(groupElement);
-            });
-            // Go over all of the groups.
-            $('.heuristics-group').each((index, groupElement) => {
-                // Update the heuristics.
-                heuristicGroupUpdateHeuristics(groupElement);
-                // Update the current heuristics.
-                heuristicGroupUpdateCurrentHeuristics(groupElement);
-                // Update the input text.
-                heuristicGroupUpdateText(groupElement);
             });
         })();
     }
