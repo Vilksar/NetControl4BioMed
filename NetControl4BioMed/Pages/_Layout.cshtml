@@ -21,31 +21,31 @@
                 </button>
                 <div class="collapse navbar-collapse justify-content-end">
                     <div class="navbar-nav align-items-center">
-                        <a class="nav-item nav-link" asp-page="/PublicData/Index">
+                        <a class="nav-item nav-link" asp-page="/PublicData/Index" title="Public networks">
                             <span><i class="fas fa-users"></i></span>
                             <span>Public networks</span>
                         </a>
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <a class="nav-item nav-link" asp-page="/PrivateData/Index">
+                            <a class="nav-item nav-link" asp-page="/PrivateData/Index" title="My networks">
                                 <span><i class="fas fa-user"></i></span>
                                 <span>My networks</span>
                             </a>
                         }
-                        <a class="nav-item nav-link" asp-page="/AvailableData/Index">
+                        <a class="nav-item nav-link" asp-page="/AvailableData/Index" title="Available data">
                             <span><i class="fas fa-database"></i></span>
                             <span>Available data</span>
                         </a>
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <a class="nav-item nav-link" asp-page="/Account/Index">
+                            <a class="nav-item nav-link" asp-page="/Account/Index" title="Account">
                                 <span><i class="fas fa-user-circle"></i></span>
                                 <span>Account</span>
                             </a>
                         }
                         @if (User.IsInRole("Administrator"))
                         {
-                            <a class="nav-item nav-link" asp-page="/Administration/Index">
+                            <a class="nav-item nav-link" asp-page="/Administration/Index" title="Administration">
                                 <span><i class="fas fa-toolbox"></i></span>
                                 <span>Administration</span>
                             </a>
@@ -61,7 +61,7 @@
                         }
                         else
                         {
-                            <a class="nav-item nav-link" asp-page="/Identity/Login">
+                            <a class="nav-item nav-link" asp-page="/Identity/Login" title="Log in">
                                 <span><i class="fas fa-sign-in-alt"></i></span>
                                 <span>Log in</span>
                             </a>
@@ -110,19 +110,19 @@
                     </span>
                 </div>
                 <div class="navbar-nav align-items-center">
-                    <a class="nav-item nav-link" asp-page="/About">
+                    <a class="nav-item nav-link" asp-page="/About" title="About">
                         <span>About</span>
                     </a>
-                    <a class="nav-item nav-link" asp-page="/Tutorial">
+                    <a class="nav-item nav-link" asp-page="/Tutorial" title="Tutorial">
                         <span>Tutorial</span>
                     </a>
-                    <a class="nav-item nav-link" asp-page="/PrivacyPolicy">
+                    <a class="nav-item nav-link" asp-page="/PrivacyPolicy" title="Privacy policy">
                         <span>Privacy policy</span>
                     </a>
-                    <a class="nav-item nav-link" asp-page="/TermsOfService">
+                    <a class="nav-item nav-link" asp-page="/TermsOfService" title="Terms of service">
                         <span>Terms of service</span>
                     </a>
-                    <a class="nav-item nav-link" asp-page="/Contact">
+                    <a class="nav-item nav-link" asp-page="/Contact" title="Contact">
                         <span>Contact</span>
                     </a>
                 </div>
