@@ -3,14 +3,14 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "cytoscape@3.19.0",
+      "library": "cytoscape@3.19.1",
       "destination": "wwwroot/lib/cytoscape/",
       "files": [
         "cytoscape.min.js"
       ]
     },
     {
-      "library": "font-awesome@5.15.3",
+      "library": "font-awesome@5.15.4",
       "destination": "wwwroot/lib/font-awesome/",
       "files": [
         "css/all.min.css",
