@@ -1,8 +1,6 @@
 ﻿using NetControl4BioMed.Data.Enumerations;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Data.Models
 {
@@ -22,6 +20,11 @@ namespace NetControl4BioMed.Data.Models
         public DateTime DateTimeCreated { get; set; }
 
         /// <summary>
+        /// Gets or sets the date when the network will be automatically deleted.
+        /// </summary>
+        public DateTime DateTimeToDelete { get; set; }
+
+        /// <summary>
         /// Gets or sets the name of the network.
         /// </summary>
         public string Name { get; set; }
@@ -35,6 +38,11 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the public availability of the network.
         /// </summary>
         public bool IsPublic { get; set; }
+
+        /// <summary>
+        /// Gets or sets the demonstration availability of the network.
+        /// </summary>
+        public bool IsDemonstration { get; set; }
 
         /// <summary>
         /// Gets or sets the status the network.
@@ -62,33 +70,28 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<NetworkUser> NetworkUsers { get; set; }
 
         /// <summary>
-        /// Gets or sets the unregistered users that will have access to the network after registration.
-        /// </summary>
-        public ICollection<NetworkUserInvitation> NetworkUserInvitations { get; set; }
-
-        /// <summary>
         /// Gets or sets the databases which are used by the network.
         /// </summary>
         public ICollection<NetworkDatabase> NetworkDatabases { get; set; }
 
         /// <summary>
-        /// Gets or sets the nodes which appear in the network.
+        /// Gets or sets the proteins which appear in the network.
         /// </summary>
-        public ICollection<NetworkNode> NetworkNodes { get; set; }
+        public ICollection<NetworkProtein> NetworkProteins { get; set; }
 
         /// <summary>
-        /// Gets or sets the edges which appear in the network.
+        /// Gets or sets the interactions which appear in the network.
         /// </summary>
-        public ICollection<NetworkEdge> NetworkEdges { get; set; }
+        public ICollection<NetworkInteraction> NetworkInteractions { get; set; }
 
         /// <summary>
-        /// Gets or sets the node collections which are used by the network.
+        /// Gets or sets the protein collections which are used by the network.
         /// </summary>
-        public ICollection<NetworkNodeCollection> NetworkNodeCollections { get; set; }
+        public ICollection<NetworkProteinCollection> NetworkProteinCollections { get; set; }
 
         /// <summary>
-        /// Gets or sets the analyses which use the network.
+        /// Gets ir sets the analyses which use the network.
         /// </summary>
-        public ICollection<AnalysisNetwork> AnalysisNetworks { get; set; }
+        public ICollection<Analysis> Analyses { get; set; }
     }
 }

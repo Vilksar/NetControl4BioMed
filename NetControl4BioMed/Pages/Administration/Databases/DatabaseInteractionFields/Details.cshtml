@@ -1,0 +1,114 @@
+﻿@page
+@model DetailsModel
+@{
+    ViewData["Title"] = "Database interaction field details";
+}
+
+<div class="row align-items-center">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Databases/DatabaseInteractionFields/Edit" asp-route-id="@Model.View.DatabaseInteractionField.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Databases/DatabaseInteractionFields/Delete" asp-route-ids="@Model.View.DatabaseInteractionField.Id" class="btn btn-danger btn-block" title="Delete">
+            <span><i class="fas fa-trash"></i></span>
+            <span>Delete</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-info-circle"></i></span>
+            </div>
+            <div>
+                <span>Details</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get" class="text-justify">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseInteractionField.Id" class="font-weight-bold">ID</label>
+                <input asp-for="View.DatabaseInteractionField.Id" class="form-control" readonly />
+                <span asp-description-for="View.DatabaseInteractionField.Id" class="text-muted small">The ID of the database interaction field.</span>
+                <span asp-validation-for="View.DatabaseInteractionField.Id" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseInteractionField.DateTimeCreated" class="font-weight-bold">Date</label>
+                <input asp-for="View.DatabaseInteractionField.DateTimeCreated" class="form-control" readonly />
+                <span asp-description-for="View.DatabaseInteractionField.DateTimeCreated" class="text-muted small">The date and time when the database interaction field was created.</span>
+                <span asp-validation-for="View.DatabaseInteractionField.DateTimeCreated" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseInteractionField.Name" class="font-weight-bold">Name</label>
+                <input asp-for="View.DatabaseInteractionField.Name" class="form-control" readonly />
+                <span asp-description-for="View.DatabaseInteractionField.Name" class="text-muted small">The name of the database interaction field.</span>
+                <span asp-validation-for="View.DatabaseInteractionField.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseInteractionField.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="View.DatabaseInteractionField.Description" class="form-control" readonly></textarea>
+                <span asp-description-for="View.DatabaseInteractionField.Description" class="text-muted small">The description of the database interaction field.</span>
+                <span asp-validation-for="View.DatabaseInteractionField.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseInteractionField.Url" class="font-weight-bold">URL</label>
+                <div class="input-group">
+                    <input asp-for="View.DatabaseInteractionField.Url" class="form-control" readonly />
+                    @if (!string.IsNullOrEmpty(Model.View.DatabaseInteractionField.Url))
+                    {
+                        <div class="input-group-append">
+                            <a href="@Model.View.DatabaseInteractionField.Url" target="_blank" rel="nofollow noopener noreferrer" class="btn btn-primary">
+                                <span><i class="fas fa-external-link-alt"></i></span>
+                            </a>
+                        </div>
+                    }
+                </div>
+                <span asp-description-for="View.DatabaseInteractionField.Url" class="text-muted small">The URL of the database interaction field.</span>
+                <span asp-validation-for="View.DatabaseInteractionField.Url" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="View.DatabaseInteractionField.IsSearchable" class="font-weight-bold">Set the database interaction field as searchable?</label>
+                <input asp-for="View.DatabaseInteractionField.IsSearchable" type="text" class="form-control" readonly />
+                <span asp-description-for="View.DatabaseInteractionField.IsSearchable" class="text-muted small">The possibility to identify interactions based on the database interaction field.</span>
+                <span asp-validation-for="View.DatabaseInteractionField.IsSearchable" class="text-danger small"></span>
+            </div>
+            <div class="form-group mb-0">
+                <label asp-for="View.DatabaseInteractionField.Database.Name" class="font-weight-bold">Database</label>
+                <div class="input-group">
+                    <input asp-for="View.DatabaseInteractionField.Database.Name" class="form-control" readonly />
+                    <div class="input-group-append">
+                        <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@Model.View.DatabaseInteractionField.Database.Id" class="btn btn-info">
+                            <span><i class="fas fa-info-circle"></i></span>
+                        </a>
+                    </div>
+                </div>
+                <span asp-description-for="View.DatabaseInteractionField.Database.Name" class="text-muted small">The database containing the database interaction field.</span>
+                <span asp-validation-for="View.DatabaseInteractionField.Database.Name" class="text-danger small"></span>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div>
+                <span>Interactions</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap mb-0">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>The database interaction field currently contains @Model.View.InteractionCount interaction@(Model.View.InteractionCount != 1 ? "s" : string.Empty) with @Model.View.DatabaseInteractionFieldInteractionCount value@(Model.View.DatabaseInteractionFieldInteractionCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseInteractionFieldInteractions/Index" asp-route-searchString="@Model.View.DatabaseInteractionField.Id" asp-route-searchIn="DatabaseInteractionFieldId" class="alert-link">view the interactions</a>.</span>
+        </div>
+    </div>
+</div>

@@ -1,15 +1,14 @@
 ﻿using NetControl4BioMed.Data.Enumerations;
+using NetControl4BioMed.Data.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Data.Models
 {
     /// <summary>
     /// Represents the database model of an analysis.
     /// </summary>
-    public class Analysis
+    public class Analysis : INetworkDependent
     {
         /// <summary>
         /// Gets or sets the unique internal ID of the analysis.
@@ -32,6 +31,11 @@ namespace NetControl4BioMed.Data.Models
         public DateTime? DateTimeEnded { get; set; }
 
         /// <summary>
+        /// Gets or sets the date when the network will be automatically deleted.
+        /// </summary>
+        public DateTime DateTimeToDelete { get; set; }
+
+        /// <summary>
         /// Gets or sets the name of the analysis.
         /// </summary>
         public string Name { get; set; }
@@ -45,6 +49,11 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the public availability of the analysis.
         /// </summary>
         public bool IsPublic { get; set; }
+
+        /// <summary>
+        /// Gets or sets the demonstration availability of the analysis.
+        /// </summary>
+        public bool IsDemonstration { get; set; }
 
         /// <summary>
         /// Gets or sets the current status of the analysis.
@@ -92,14 +101,19 @@ namespace NetControl4BioMed.Data.Models
         public string Parameters { get; set; }
 
         /// <summary>
+        /// Gets or sets the network ID used by the analysis.
+        /// </summary>
+        public string NetworkId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the network used by the analysis.
+        /// </summary>
+        public Network Network { get; set; }
+
+        /// <summary>
         /// Gets or sets the registered users that have access to the analysis.
         /// </summary>
         public ICollection<AnalysisUser> AnalysisUsers { get; set; }
-
-        /// <summary>
-        /// Gets or sets the unregistered users that will have access to the analysis after registration.
-        /// </summary>
-        public ICollection<AnalysisUserInvitation> AnalysisUserInvitations { get; set; }
 
         /// <summary>
         /// Gets or sets the databases which are used by the analysis.
@@ -107,24 +121,19 @@ namespace NetControl4BioMed.Data.Models
         public ICollection<AnalysisDatabase> AnalysisDatabases { get; set; }
 
         /// <summary>
-        /// Gets or sets the nodes which appear in the network corresponding to the analysis.
+        /// Gets or sets the proteins which appear in the network corresponding to the analysis.
         /// </summary>
-        public ICollection<AnalysisNode> AnalysisNodes { get; set; }
+        public ICollection<AnalysisProtein> AnalysisProteins { get; set; }
 
         /// <summary>
-        /// Gets or sets the edges which appear in the network corresponding to the analysis.
+        /// Gets or sets the interactions which appear in the network corresponding to the analysis.
         /// </summary>
-        public ICollection<AnalysisEdge> AnalysisEdges { get; set; }
+        public ICollection<AnalysisInteraction> AnalysisInteractions { get; set; }
 
         /// <summary>
-        /// Gets or sets the node collections which are used by the analysis.
+        /// Gets or sets the protein collections which are used by the analysis.
         /// </summary>
-        public ICollection<AnalysisNodeCollection> AnalysisNodeCollections { get; set; }
-
-        /// <summary>
-        /// Gets or sets the networks which form the network corresponding to the analysis.
-        /// </summary>
-        public ICollection<AnalysisNetwork> AnalysisNetworks { get; set; }
+        public ICollection<AnalysisProteinCollection> AnalysisProteinCollections { get; set; }
 
         /// <summary>
         /// Gets or sets the control paths found by the analysis.

@@ -90,99 +90,92 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <param name="path">The current path.</param>
         /// <param name="linkGenerator">Represents the link generator.</param>
         /// <returns>Returns the Cytoscape view model corresponding to the provided path.</returns>
-        public static CytoscapeViewModel GetCytoscapeViewModel(this Path path, HttpContext httpContext, LinkGenerator linkGenerator, ApplicationDbContext context)
+        public static FileCyjsViewModel GetCytoscapeViewModel(this Path path, HttpContext httpContext, LinkGenerator linkGenerator, ApplicationDbContext context)
         {
-            // Get the default values.
-            var databaseTypeName = context.Paths
-                .Where(item => item == path)
-                .Select(item => item.ControlPath.Analysis.AnalysisDatabases)
-                .SelectMany(item => item)
-                .Select(item => item.Database.DatabaseType.Name)
-                .First();
             // Get the control data.
             var analysis = context.Paths
                 .Where(item => item == path)
                 .Select(item => item.ControlPath.Analysis)
                 .FirstOrDefault();
-            var controlNodes = context.Paths
+            var controlProteins = context.Paths
                 .Where(item => item == path)
-                .Select(item => item.PathNodes)
+                .Select(item => item.PathProteins)
                 .SelectMany(item => item)
-                .Where(item => item.Type == PathNodeType.Source)
-                .Select(item => item.Node.Id)
+                .Where(item => item.Type == PathProteinType.Source)
+                .Select(item => item.Protein.Id)
                 .Where(item => !string.IsNullOrEmpty(item))
                 .ToHashSet();
-            var controlEdges = context.Paths
+            var controlInteractions = context.Paths
                 .Where(item => item == path)
-                .Select(item => item.PathEdges)
+                .Select(item => item.PathInteractions)
                 .SelectMany(item => item)
-                .Select(item => item.Edge.Id)
+                .Select(item => item.Interaction.Id)
                 .Where(item => !string.IsNullOrEmpty(item))
                 .ToHashSet();
             // Return the view model.
-            return new CytoscapeViewModel
+            return new FileCyjsViewModel
             {
-                Elements = new CytoscapeViewModel.CytoscapeElements
+                Elements = new FileCyjsViewModel.CyjsElements
                 {
-                    Nodes = context.PathNodes
+                    Nodes = context.PathProteins
                         .Where(item => item.Path == path)
-                        .Where(item => item.Type == PathNodeType.None)
-                        .Select(item => item.Node)
+                        .Where(item => item.Type == PathProteinType.None)
+                        .Select(item => item.Protein)
                         .Select(item => new
                         {
                             Id = item.Id,
                             Name = item.Name,
-                            Classes = item.AnalysisNodes
+                            Classes = item.AnalysisProteins
                                 .Where(item1 => item1.Analysis == analysis)
                                 .Select(item1 => item1.Type.ToString().ToLower())
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeNode
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsNode
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeNode.CytoscapeNodeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsNode.CyjsNodeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
-                                Href = linkGenerator.GetUriByPage(httpContext, $"/Content/DatabaseTypes/{databaseTypeName}/Data/Nodes/Details", handler: null, values: new { id = item.Id })
+                                Href = linkGenerator.GetUriByPage(httpContext, $"/AvailableData/Data/Proteins/Details", handler: null, values: new { id = item.Id })
                             },
-                            Classes = item.Classes.Concat(controlNodes.Contains(item.Id) ? new List<string> { "control" } : new List<string> { })
+                            Classes = item.Classes.Concat(controlProteins.Contains(item.Id) ? new List<string> { "control" } : new List<string> { })
                         }),
-                    Edges = context.PathEdges
+                    Edges = context.PathInteractions
                         .Where(item => item.Path == path)
-                        .Select(item => item.Edge)
+                        .Select(item => item.Interaction)
                         .Select(item => new
                         {
                             Id = item.Id,
                             Name = item.Name,
-                            SourceNodeId = item.EdgeNodes
-                                .Where(item1 => item1.Type == EdgeNodeType.Source)
-                                .Select(item1 => item1.Node)
+                            SourceProteinId = item.InteractionProteins
+                                .Where(item1 => item1.Type == InteractionProteinType.Source)
+                                .Select(item1 => item1.Protein)
                                 .Where(item1 => item1 != null)
                                 .Select(item1 => item1.Id)
                                 .FirstOrDefault(),
-                            TargetNodeId = item.EdgeNodes
-                                .Where(item1 => item1.Type == EdgeNodeType.Target)
-                                .Select(item1 => item1.Node)
+                            TargetProteinId = item.InteractionProteins
+                                .Where(item1 => item1.Type == InteractionProteinType.Target)
+                                .Select(item1 => item1.Protein)
                                 .Where(item1 => item1 != null)
                                 .Select(item1 => item1.Id)
                                 .FirstOrDefault()
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsEdge
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge.CytoscapeEdgeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsEdge.CyjsEdgeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
-                                Href = linkGenerator.GetUriByPage(httpContext, $"/Content/DatabaseTypes/{databaseTypeName}/Data/Edges/Details", handler: null, values: new { id = item.Id }),
-                                Source = item.SourceNodeId,
-                                Target = item.TargetNodeId
+                                Href = linkGenerator.GetUriByPage(httpContext, $"/AvailableData/Data/Interactions/Details", handler: null, values: new { id = item.Id }),
+                                Source = item.SourceProteinId,
+                                Target = item.TargetProteinId
                             },
-                            Classes = controlEdges.Contains(item.Id) ? new List<string> { "control" } : new List<string> { }
+                            Classes = controlInteractions.Contains(item.Id) ? new List<string> { "control" } : new List<string> { }
                         })
                 },
-                Layout = CytoscapeViewModel.DefaultLayout,
-                Styles = CytoscapeViewModel.DefaultStyles.Concat(CytoscapeViewModel.DefaultAnalysisStyles).Concat(CytoscapeViewModel.DefaultControlPathStyles)
+                Layout = FileCyjsViewModel.DefaultLayout,
+                Styles = FileCyjsViewModel.DefaultStyles.Concat(FileCyjsViewModel.DefaultAnalysisStyles).Concat(FileCyjsViewModel.DefaultControlPathStyles)
             };
         }
     }

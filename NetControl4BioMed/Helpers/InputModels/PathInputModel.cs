@@ -13,18 +13,18 @@ namespace NetControl4BioMed.Helpers.InputModels
         public string Id { get; set; }
 
         /// <summary>
-        /// Represents the description of the edge.
+        /// Represents the control path of the path.
         /// </summary>
         public ControlPathInputModel ControlPath { get; set; }
 
         /// <summary>
-        /// Gets or sets the nodes which appear in the path.
+        /// Represents the proteins of the path.
         /// </summary>
-        public IEnumerable<PathNodeInputModel> PathNodes { get; set; }
+        public IEnumerable<PathProteinInputModel> PathProteins { get; set; }
 
         /// <summary>
-        /// Gets or sets the edges which appear in the path.
+        /// Represents the interactions of the path.
         /// </summary>
-        public IEnumerable<PathEdgeInputModel> PathEdges { get; set; }
+        public IEnumerable<PathInteractionInputModel> PathInteractions { get; set; }
     }
 }

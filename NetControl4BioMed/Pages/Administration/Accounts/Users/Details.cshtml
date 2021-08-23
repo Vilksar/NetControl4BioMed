@@ -50,7 +50,7 @@
                 <span asp-description-for="View.User.Email" class="text-muted small">The e-mail of the user.</span>
                 <span asp-validation-for="View.User.Email" class="text-danger small"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-0">
                 <label asp-for="View.User.EmailConfirmed" class="font-weight-bold">Is the e-mail confirmed?</label>
                 <input asp-for="View.User.EmailConfirmed" type="text" class="form-control" readonly />
                 <span asp-description-for="View.User.EmailConfirmed" class="text-muted small">The e-mail confirmation status of the user.</span>
@@ -91,7 +91,7 @@
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The user is currently assigned to @Model.View.DatabaseCount database@(Model.View.DatabaseCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.User.Id" asp-route-searchIn="UserId" class="alert-link">view the databases</a>, or <a asp-page="/Administration/Permissions/DatabaseUsers/Create" asp-route-userId="@Model.View.User.Id" class="alert-link">add a new one</a>.</span>
+            <span>The user is currently assigned to @Model.View.DatabaseCount database@(Model.View.DatabaseCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUsers/Index" asp-route-searchString="@Model.View.User.Email" asp-route-searchIn="Email" class="alert-link">view the databases</a>, or <a asp-page="/Administration/Permissions/DatabaseUsers/Create" asp-route-userId="@Model.View.User.Email" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>

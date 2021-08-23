@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NetControl4BioMed.Pages.Administration.Created.Networks
 {
@@ -29,15 +26,13 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
 
             public int UserCount { get; set; }
 
-            public int UserInvitationCount { get; set; }
-
             public int DatabaseCount { get; set; }
 
-            public int NodeCount { get; set; }
+            public int ProteinCount { get; set; }
 
-            public int EdgeCount { get; set; }
+            public int InteractionCount { get; set; }
 
-            public int NodeCollectionCount { get; set; }
+            public int ProteinCollectionCount { get; set; }
 
             public int AnalysisCount { get; set; }
         }
@@ -66,40 +61,33 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                     .Select(item => item.User)
                     .Distinct()
                     .Count(),
-                UserInvitationCount = query
-                    .Select(item => item.NetworkUserInvitations)
-                    .SelectMany(item => item)
-                    .Select(item => item.Email)
-                    .Distinct()
-                    .Count(),
                 DatabaseCount = query
                     .Select(item => item.NetworkDatabases)
                     .SelectMany(item => item)
                     .Select(item => item.Database)
                     .Distinct()
                     .Count(),
-                NodeCount = query
-                    .Select(item => item.NetworkNodes)
+                ProteinCount = query
+                    .Select(item => item.NetworkProteins)
                     .SelectMany(item => item)
-                    .Select(item => item.Node)
+                    .Select(item => item.Protein)
                     .Distinct()
                     .Count(),
-                EdgeCount = query
-                    .Select(item => item.NetworkEdges)
+                InteractionCount = query
+                    .Select(item => item.NetworkInteractions)
                     .SelectMany(item => item)
-                    .Select(item => item.Edge)
+                    .Select(item => item.Interaction)
                     .Distinct()
                     .Count(),
-                NodeCollectionCount = query
-                    .Select(item => item.NetworkNodeCollections)
+                ProteinCollectionCount = query
+                    .Select(item => item.NetworkProteinCollections)
                     .SelectMany(item => item)
-                    .Select(item => item.NodeCollection)
+                    .Select(item => item.ProteinCollection)
                     .Distinct()
                     .Count(),
                 AnalysisCount = query
-                    .Select(item => item.AnalysisNetworks)
+                    .Select(item => item.Analyses)
                     .SelectMany(item => item)
-                    .Select(item => item.Analysis)
                     .Distinct()
                     .Count()
             };

@@ -14,5 +14,10 @@
         /// Represents the user of the analysis user.
         /// </summary>
         public UserInputModel User { get; set; }
+
+        /// <summary>
+        /// Represents the e-mail of the analysis user.
+        /// </summary>
+        public string Email { get; set; }
     }
 }

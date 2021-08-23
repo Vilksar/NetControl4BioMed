@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
 {
@@ -35,23 +34,25 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
             {
                 SearchIn = new Dictionary<string, string>
                 {
-                    { "UserId", "User ID" },
-                    { "UserEmail", "User e-mail" },
                     { "DatabaseId", "Database ID" },
-                    { "DatabaseName", "Database name" }
+                    { "DatabaseName", "Database name" },
+                    { "UserId", "User ID" },
+                    { "Email", "E-mail" },
                 },
                 Filter = new Dictionary<string, string>
                 {
                     { "IsDatabasePublic", "Database is public" },
-                    { "IsNotDatabasePublic", "Database is not public" }
+                    { "IsNotDatabasePublic", "Database is not public" },
+                    { "IsUserRegistered", "User is registered" },
+                    { "IsNotUserRegistered", "User is not registered" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
-                    { "UserId", "User ID" },
-                    { "UserEmail", "User e-mail" },
+                    { "DateTimeCreated", "Date created" },
                     { "DatabaseId", "Database ID" },
                     { "DatabaseName", "Database name" },
-                    { "DateTimeCreated", "Date created" }
+                    { "UserId", "User ID" },
+                    { "Email", "E-mail" }
                 }
             };
         }
@@ -72,28 +73,24 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
             // Select the results matching the search string.
             query = query
                 .Where(item => !input.SearchIn.Any() ||
-                    input.SearchIn.Contains("UserId") && item.User.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("UserEmail") && item.User.Email.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseId") && item.Database.Id.Contains(input.SearchString) ||
-                    input.SearchIn.Contains("DatabaseName") && item.Database.Name.Contains(input.SearchString));
+                    input.SearchIn.Contains("DatabaseName") && item.Database.Name.Contains(input.SearchString) ||
+                    input.SearchIn.Contains("UserId") && item.User.Id.Contains(input.SearchString) ||
+                    input.SearchIn.Contains("Email") && item.Email.Contains(input.SearchString));
             // Select the results matching the filter parameter.
             query = query
                 .Where(item => input.Filter.Contains("IsDatabasePublic") ? item.Database.IsPublic : true)
-                .Where(item => input.Filter.Contains("IsNotDatabasePublic") ? !item.Database.IsPublic : true);
+                .Where(item => input.Filter.Contains("IsNotDatabasePublic") ? !item.Database.IsPublic : true)
+                .Where(item => input.Filter.Contains("IsUserRegistered") ? item.User != null : true)
+                .Where(item => input.Filter.Contains("IsNotUserRegistered") ? item.User == null : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
-                case var sort when sort == ("UserId", "Ascending"):
-                    query = query.OrderBy(item => item.User.Id);
+                case var sort when sort == ("DateTimeCreated", "Ascending"):
+                    query = query.OrderBy(item => item.DateTimeCreated);
                     break;
-                case var sort when sort == ("UserId", "Descending"):
-                    query = query.OrderByDescending(item => item.User.Id);
-                    break;
-                case var sort when sort == ("UserEmail", "Ascending"):
-                    query = query.OrderBy(item => item.User.Email);
-                    break;
-                case var sort when sort == ("UserEmail", "Descending"):
-                    query = query.OrderByDescending(item => item.User.Email);
+                case var sort when sort == ("DateTimeCreated", "Descending"):
+                    query = query.OrderByDescending(item => item.DateTimeCreated);
                     break;
                 case var sort when sort == ("DatabaseId", "Ascending"):
                     query = query.OrderBy(item => item.Database.Id);
@@ -107,19 +104,25 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
                 case var sort when sort == ("DatabaseName", "Descending"):
                     query = query.OrderByDescending(item => item.Database.Name);
                     break;
-                case var sort when sort == ("DateTimeCreated", "Ascending"):
-                    query = query.OrderBy(item => item.DateTimeCreated);
+                case var sort when sort == ("UserId", "Ascending"):
+                    query = query.OrderBy(item => item.User.Id);
                     break;
-                case var sort when sort == ("DateTimeCreated", "Descending"):
-                    query = query.OrderByDescending(item => item.DateTimeCreated);
+                case var sort when sort == ("UserId", "Descending"):
+                    query = query.OrderByDescending(item => item.User.Id);
+                    break;
+                case var sort when sort == ("Email", "Ascending"):
+                    query = query.OrderBy(item => item.Email);
+                    break;
+                case var sort when sort == ("Email", "Descending"):
+                    query = query.OrderByDescending(item => item.Email);
                     break;
                 default:
                     break;
             }
             // Include the related entitites.
             query = query
-                .Include(item => item.User)
-                .Include(item => item.Database);
+                .Include(item => item.Database)
+                .Include(item => item.User);
             // Define the view.
             View = new ViewModel
             {

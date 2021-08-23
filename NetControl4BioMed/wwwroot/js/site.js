@@ -17,6 +17,25 @@ $(window).on('load', () => {
         });
     }
 
+    // Check if there is a UTC date on the page.
+    if ($('.utc-date').length !== 0) {
+        // Define a function to update an element containing a UTC date.
+        const updateDate = (element) => {
+            // Get the date in UTC format.
+            const date = new Date($(element).data('date'));
+            // Update the UTC date to the local date.
+            $(element).find('.utc-date-date').attr('title', date.toLocaleDateString());
+            $(element).find('.utc-date-date').text(date.toLocaleDateString());
+            $(element).find('.utc-date-time').attr('title', date.toLocaleTimeString());
+            $(element).find('.utc-date-time').text(date.toLocaleTimeString());
+        };
+        // Execute the function on page load.
+        (() => {
+            // Update all elements containing UTC dates.
+            $('.utc-date').each((index, element) => updateDate(element));
+        })();
+    }
+
     // Check if there is a QR code on the page.
     if ($('.qr-code').length !== 0) {
         // Load the QR generation script.
@@ -29,13 +48,27 @@ $(window).on('load', () => {
         });
     }
 
+    // Check if there is a file selector on the page.
+    if ($('.file-selector').length !== 0) {
+        // Add a listener for if the selection has changed.
+        $('.file-selector-input').on('change', (event) => {
+            // Get the current file.
+            const file = event.target.files[0];
+            // Set the filename in the label.
+            $(event.target).closest('.file-selector-input').siblings('.file-selector-label').html(file.name);
+        });
+    }
+
     // Check if there is a datatable on the page.
     if ($('.table-datatable').length !== 0) {
         // Go over each datatable.
         $('.table-datatable').each((index, element) => {
             // Format the table as datatable.
             const table = $(element).DataTable({
-                'autoWidth': false
+                'autoWidth': false,
+                'processing': true,
+                'pageLength': 5,
+                'lengthMenu': [5, 10, 25, 50]
             });
             // Get the index of the index column.
             const columnIndex = table.column('index:name').index();
@@ -49,19 +82,169 @@ $(window).on('load', () => {
                     });
                 }).draw();
             }
-            // Get the enclosing form.
-            const form = $(element).closest('form');
-            // Check if there is an enclosing form.
-            if (form.length !== 0) {
-                // Add a listener for the form submission.
-                $(form).on('submit', (event) => {
-                    // Iterate over all the checkboxes in the table that are checked, but don't exist in DOM.
-                    table.$('input[type="checkbox"]').filter((index, element) => !$.contains(document, element)).filter((index, element) => element.checked).each((index, element) => {
-                        // Create a hidden element and append it to the form.
-                        $(form).append($('<input>').attr('type', 'hidden').attr('id', $(element).attr('id')).attr('name', $(element).attr('name')).val($(element).val()))
-                    });
-                });
+        });
+    }
+
+    // Check if there is a table group on the page.
+    if ($('.table-group').length !== 0) {
+        // Define a function to update the input.
+        const updateInput = (groupElement, rowElement) => {
+            // Get the current item ID.
+            const itemId = $(rowElement).data('id');
+            // Deserialize the value within the input element.
+            const itemIds = JSON.parse($(groupElement).find('.table-group-input').first().val());
+            // Toggle the selection class on the row.
+            $(rowElement).toggleClass('table-active');
+            // Check if the row is now selected.
+            if ($(rowElement).hasClass('table-active')) {
+                // Update the checkbox.
+                $(rowElement).find('.table-group-row-checkbox:not(checked)').prop('checked', true);
+                // Get the current index of the item.
+                const index = itemIds.indexOf(itemId);
+                // Check if the item doesn't already exist.
+                if (index === -1) {
+                    // Add it to the list.
+                    itemIds.push(itemId);
+                    // Update the input element.
+                    $(groupElement).find('.table-group-input').val(JSON.stringify(itemIds));
+                    // Update the value of the count.
+                    $(groupElement).find('.table-group-count').text(itemIds.length);
+                }
+            } else {
+                // Update the checkbox.
+                $(rowElement).find('.table-group-row-checkbox:checked').prop('checked', false);
+                // Get the current index of the item.
+                const index = itemIds.indexOf(itemId);
+                // Check if the item exists.
+                if (index !== -1) {
+                    // Remove it from the list.
+                    itemIds.splice(index, 1);
+                    // Update the input element.
+                    $(groupElement).find('.table-group-input').val(JSON.stringify(itemIds));
+                    // Update the value of the count.
+                    $(groupElement).find('.table-group-count').text(itemIds.length);
+                }
             }
+        };
+        // Add a listener for clicking on a row in the table.
+        $('.table-group-datatable').on('click', '.table-group-row', (event) => {
+            // Get the current group and row element.
+            const groupElement = $(event.target).closest('.table-group');
+            const rowElement = $(event.target).closest('.table-group-row');
+            // Update the input.
+            updateInput(groupElement, rowElement);
+        });
+        // Add a listener for clicking on a checkbox in the table.
+        $('.table-group-datatable').on('change', '.table-group-row-checkbox', (event) => {
+            // Get the current group and row element.
+            const groupElement = $(event.target).closest('.table-group');
+            const rowElement = $(event.target).closest('.table-group-row');
+            // Update the input.
+            updateInput(groupElement, rowElement);
+        });
+        // On page load, parse the input and check the group items.
+        (() => {
+            // Go over each table group.
+            $('.table-group').each((index, element) => {
+                // Get the row template.
+                const template = $(element).find('.table-group-row-template').first();
+                // Get the input element.
+                const input = $(element).find('.table-group-input').first();
+                // Update the value of the count.
+                $(element).find('.table-group-count').text(JSON.parse($(input).val()).length);
+                // Format the table as datatable.
+                const table = $(element).find('.table-group-datatable').DataTable({
+                    'autoWidth': false,
+                    'processing': true,
+                    'serverSide': true,
+                    'pageLength': 5,
+                    'lengthMenu': [5, 10, 25, 50],
+                    'ajax': {
+                        'url': `${window.location.pathname}?handler=${$(element).data('url')}`,
+                        'method': 'GET',
+                        'dataType': 'json',
+                        'data': (data) => {
+                            // Get the already selected items.
+                            const selectedItems = JSON.parse($(input).val());
+                            // Go over each index of the selected items.
+                            for (let index = 0; index < selectedItems.length; index++) {
+                                // Add the corresponding item to the submitted data.
+                                data[`selectedItems[${index}]`] = selectedItems[index];
+                            }
+                        }
+                    },
+                    'createdRow': (row, data) => {
+                        // Get the new row content.
+                        const content = $(template).html().replaceAll('@id', data[0]).replaceAll('@name', data[1]);
+                        // Add and configure the row.
+                        $(row).attr('data-id', data[0]).addClass('table-group-row').html(content);
+                        // Check if the row should be selected.
+                        if (data[2] === 'True') {
+                            // Update the input.
+                            updateInput(element, row);
+                        }
+                    }
+                });
+            });
+        })();
+    }
+
+    // Check if there is a modal group on the page.
+    if ($('.modal-group').length !== 0) {
+        // Add a listener for if the button was clicked.
+        $('.modal-group').on('click', '.modal-group-item-button', (event) => {
+            // Get the corresponding button element.
+            const buttonElement = $(event.target).closest('.modal-group-item-button');
+            // Get the corresponding item element.
+            const itemElement = $(buttonElement).closest('.modal-group-item');
+            // Get the corresponding modal element.
+            const modalElement = $(buttonElement).closest('.modal-group').find('.modal-group-modal').first();
+            // Replace the body of the modal with the template.
+            $(modalElement).find('.modal-body').html($(itemElement).find('.modal-group-item-template').first().html());
+        });
+    }
+
+    // Check if there is a loading group on the page.
+    if ($('.loading-group').length !== 0) {
+        // Add a listener for if the button was clicked.
+        $('.loading-group-button').on('click', (event) => {
+            // Get the corresponding group element.
+            const groupElement = $(event.target).closest('.loading-group');
+            // Replace the content of the button with the template.
+            $(event.target).closest('.loading-group-button').html($(groupElement).find('.loading-group-template').first().html());
+        });
+    }
+
+    // Check if there is a hidden group on the page.
+    if ($('.hidden-group').length !== 0) {
+        // Define a function which toggles the hidden group display.
+        const toggleDisplay = (groupElement, type) => {
+            // Get the display of the hidden group.
+            const display = $(groupElement).find(`.hidden-group-display[data-type="${type}"]`).first();
+            // Toggle the display.
+            $(display).prop('hidden', !$(display).prop('hidden'));
+        };
+        // Add a listener for when the checkbox gets clicked.
+        $('.hidden-group-checkbox').on('change', (event) => {
+            // Get the current hidden group and the type.
+            const groupElement = $(event.target).closest('.hidden-group');
+            const type = $(event.target).closest('.hidden-group-checkbox').data('type');
+            // Get the state of the checkbox and of the display.
+            const isChecked = $(groupElement).find(`.hidden-group-checkbox[data-type="${type}"]`).first().prop('checked');
+            const isDisplayed = !$(groupElement).find(`.hidden-group-display[data-type="${type}"]`).first().prop('hidden');
+            // Check if the display should be toggled.
+            if ((isChecked && !isDisplayed) || (!isChecked && isDisplayed)) {
+                // Toggle the display.
+                toggleDisplay(groupElement, type);
+            }
+        });
+        // Add a listener for when the toggler gets clicked.
+        $('.hidden-group-toggle').on('click', (event) => {
+            // Get the current hidden group and the type.
+            const groupElement = $(event.target).closest('.hidden-group');
+            const type = $(event.target).closest('.hidden-group-toggle').data('type');
+            // Toggle the display.
+            toggleDisplay(groupElement, type);
         });
     }
 
@@ -118,7 +301,7 @@ $(window).on('load', () => {
             // Get the current list group.
             const groupElement = $(event.target).closest('.item-group');
             // Check if the checkbox is currently checked.
-            if ($(event.target).prop('checked')) {
+            if ($(event.target).closest('.item-group-select').prop('checked')) {
                 // Check all of the checkboxes on the page.
                 $(groupElement).find('.item-group-item-checkbox').prop('checked', true);
             } else {
@@ -139,151 +322,9 @@ $(window).on('load', () => {
     }
 
     // Check if there is a file group on the page.
-    if ($('.form-file-group').length !== 0 || $('.file-group').length !== 0 || $('.heuristics-group').length !== 0) {
-        // Define the HTML of an optgroup.
-        const heuristicGroupOptgroupHTML = `<optgroup></optgroup>`;
-        // Define a function which shows the alert of the specified type, with the specified text.
-        const formFileGroupShowAlert = (groupElement, alertType, alertIcon, alertText) => {
-            // Get the alert.
-            const alertElement = $(groupElement).find('.form-file-group-alert').first();
-            // Toggle the corresponding classes.
-            $(alertElement).removeClass((index, classes) => (classes.match(/(^|\s)alert-\S+/g) || []).join(' ')).addClass(`alert-${alertType}`);
-            $(alertElement).find('.form-file-group-alert-icon').html('').append($('<i>').addClass(`fas fa-${alertIcon}`));
-            $(alertElement).find(`.form-file-group-alert-text`).text(alertText);
-            // Show the alert.
-            $(alertElement).removeAttr('hidden');
-        };
-        // Define a function which parses the data and fills in the form.
-        const formFileGroupUpdateInputs = (groupElement) => {
-            // Define a variable for the input data.
-            let data = undefined;
-            // Try to parse the input data.
-            try {
-                // Get the input data.
-                data = JSON.parse($(groupElement).find('.form-file-group-text').first().val());
-            }
-            catch (error) {
-                // Show an error.
-                formFileGroupShowAlert(groupElement, 'danger', 'exclamation-circle', `The error \"${error}\" occurred while reading the content of the file. Please make sure that the file has the correct format.`);
-                // Return from the function.
-                return;
-            }
-            // Get the type of the form file group.
-            const type = $(groupElement).data('type');
-            // Check if the provided type doesn't match the data.
-            if (!data.hasOwnProperty('Type') || typeof(data['Type']) !== 'string' || data['Type'].toLowerCase() !== type) {
-                // Show an error.
-                formFileGroupShowAlert(groupElement, 'danger', 'exclamation-circle', `The file does not have the required type \"${type}\". Please make sure that the right file was selected, and that the file has the correct format.`);
-                // Return from the function.
-                return;
-            }
-            // Get the database type of the form file group.
-            const databaseType = $(groupElement).data('database-type');
-            // Check if the provided database type doesn't match the data.
-            if (!data.hasOwnProperty('DatabaseType') || typeof (data['DatabaseType']) !== 'string' || data['DatabaseType'].toLowerCase() !== databaseType) {
-                // Show an error.
-                formFileGroupShowAlert(groupElement, 'danger', 'exclamation-circle', `The file does not have the required database type \"${databaseType}\". Please make sure that the right file was selected, and that the file has the correct format.`);
-                // Return from the function.
-                return;
-            }
-            // Get the form.
-            const formElement = $(groupElement).closest('form');
-            // Check if we have a network.
-            if (type === 'network') {
-                // Define the required fields.
-                const requiredFields = ['Name', 'Description', 'IsPublic', 'Algorithm', 'NodeDatabaseData', 'EdgeDatabaseData', 'SeedNodeData', 'SeedNodeCollectionData', 'SeedEdgeData'];
-                // Get the fields that do not appear in the data.
-                const missingFields = requiredFields.filter(item => !Object.keys(data).includes(item));
-                // Check if there are any missing fields.
-                if (missingFields.length !== 0) {
-                    // Show an error.
-                    formFileGroupShowAlert(groupElement, 'danger', 'exclamation-circle', `The file is not in a valid format. The following required fields are missing: \"${missingFields.join('\", \"')}\".`);
-                    // Return from the function.
-                    return;
-                }
-                // Go over each required field.
-                for (let field of requiredFields) {
-                    // Get the value of the data.
-                    const value = typeof (data[field]) !== 'object' ? data[field].toString() : JSON.stringify(data[field]);
-                    // Get the current input.
-                    const inputElement = $(formElement).find(`[name="Input.${field}"]`);
-                    // Update its value.
-                    $(inputElement).val(value);
-                    // Try to get its file group.
-                    const fileGroup = $(inputElement).closest('.file-group');
-                    // Check if the file group exists.
-                    if ($(fileGroup).length !== 0) {
-                        // Update its text.
-                        fileGroupUpdateText(fileGroup);
-                        fileGroupUpdateInput(fileGroup);
-                    }
-                }
-            } else if (type === 'analysis') {
-                // Get the algorithm of the form file group.
-                const algorithm = $(groupElement).data('algorithm');
-                // Check if the provided database type doesn't match the data.
-                if (!data.hasOwnProperty('Algorithm') || typeof (data['Algorithm']) !== 'string' || data['Algorithm'].toLowerCase() !== algorithm) {
-                    // Show an error.
-                    formFileGroupShowAlert(groupElement, 'danger', 'exclamation-circle', `The file does not have the required algorithm \"${algorithm}\". Please make sure that the right file was selected, and that the file has the correct format.`);
-                    // Return from the function.
-                    return;
-                }
-                // Define the required fields.
-                const requiredFields = ['Name', 'Description', 'IsPublic', 'Algorithm', 'NetworkData', 'SourceNodeData', 'SourceNodeCollectionData', 'TargetNodeData', 'TargetNodeCollectionData', 'MaximumIterations', 'MaximumIterationsWithoutImprovement', 'AlgorithmParameters'];
-                // Get the fields that do not appear in the data.
-                const missingFields = requiredFields.filter(item => !Object.keys(data).includes(item));
-                // Check if there are any missing fields.
-                if (missingFields.length !== 0) {
-                    // Show an error.
-                    formFileGroupShowAlert(groupElement, 'danger', 'exclamation-circle', `The file is not in a valid format. The following required fields are missing: \"${missingFields.join('\", \"')}\".`);
-                    // Return from the function.
-                    return;
-                }
-                // Go over each key in the data.
-                for (let field of requiredFields.slice(0, -1)) {
-                    // Get the value of the data.
-                    const value = typeof (data[field]) !== 'object' ? data[field].toString() : JSON.stringify(data[field]);
-                    // Get the current input.
-                    const inputElement = $(formElement).find(`[name="Input.${field}"]`);
-                    // Update its value.
-                    $(inputElement).val(value);
-                    // Try to get its file group.
-                    const fileGroup = $(inputElement).closest('.file-group');
-                    // Check if the file group exists.
-                    if ($(fileGroup).length !== 0) {
-                        // Update its text.
-                        fileGroupUpdateText(fileGroup);
-                        fileGroupUpdateInput(fileGroup);
-                    }
-                }
-                // Get the algorithm parameters.
-                const algorithmParameters = JSON.parse(data['AlgorithmParameters']);
-                // Go over each parameter.
-                for (let parameterKey of Object.keys(algorithmParameters)) {
-                    // Get the value of the data.
-                    const value = typeof (algorithmParameters[parameterKey]) !== 'object' ? algorithmParameters[parameterKey].toString() : JSON.stringify(algorithmParameters[parameterKey]);
-                    // Get the current input.
-                    const inputElement = $(formElement).find(`[name="Input.${data['Algorithm']}AlgorithmParameters.${parameterKey}"]`);
-                    // Update its value.
-                    $(inputElement).val(value);
-                    // Try to get its heuristic group.
-                    const heuristicGroup = $(inputElement).closest('.heuristics-group');
-                    // Check if the heuristic group exists.
-                    if ($(heuristicGroup).length !== 0) {
-                        // Update the heuristics.
-                        heuristicGroupUpdateHeuristics(heuristicGroup);
-                        // Update the current heuristics.
-                        heuristicGroupUpdateCurrentHeuristics(heuristicGroup);
-                        // Update the input text.
-                        heuristicGroupUpdateText(heuristicGroup);
-                    }
-                }
-            }
-            // Show a success message.
-            formFileGroupShowAlert(groupElement, 'success', 'check-circle', `The file has been read successfully. Please check carefully all of the fields before continuing.`);
-        };
+    if ($('.file-group').length !== 0) {
         // Define a function which updates the data to be submitted.
-        const fileGroupUpdateInput = (groupElement) => {
+        const updateInput = (groupElement) => {
             // Check if the text is empty.
             if (!$.trim($(groupElement).find('.file-group-text').first().val())) {
                 // Update the value of the count.
@@ -311,8 +352,8 @@ $(window).on('load', () => {
                 // Update the data to be submitted.
                 $(groupElement).find('.file-group-input').first().val(JSON.stringify(rows));
             }
-            // Check if we have edges.
-            else if (type === 'edges') {
+            // Check if we have pairs of items.
+            else if (type === 'pairs') {
                 // Split the text into different lines.
                 const rows = $(groupElement).find('.file-group-text').first().val().split(new RegExp(lineSeparator)).filter((element) => {
                     // Split the row into its composing items.
@@ -342,7 +383,7 @@ $(window).on('load', () => {
             }
         };
         // Define a function which updates the displayed text.
-        const fileGroupUpdateText = (groupElement) => {
+        const updateText = (groupElement) => {
             // Get the type of the file group.
             const type = $(groupElement).data('type');
             // Define a variable for the input data.
@@ -376,8 +417,8 @@ $(window).on('load', () => {
                 // Add the elements to the text.
                 $(groupElement).find('.file-group-text').first().val(data.join('\n'));
             }
-            // Check if we have edges.
-            if (type === 'edges') {
+            // Check if we have pairs of items.
+            if (type === 'pairs') {
                 // Go over all of the elements.
                 data = data.filter((element) => {
                     // Keep only the ones which are of the proper type.
@@ -396,6 +437,84 @@ $(window).on('load', () => {
                 });
                 // Add the elements to the text.
                 $(groupElement).find('.file-group-text').first().val(data.join('\n'));
+            }
+        };
+        // Add a listener for typing into the text area.
+        $('.file-group-text').on('keyup', (event) => {
+            // Get the actual group which was clicked.
+            const groupElement = $(event.target).closest('.file-group');
+            // Update the selected items.
+            updateInput(groupElement);
+        });
+        // Add a listener for changing one of the separators.
+        $('.file-group').on('change', '.file-group-separator', (event) => {
+            // Get the actual group which was clicked.
+            const groupElement = $(event.target).closest('.file-group');
+            // Update the selected items.
+            updateInput(groupElement);
+        });
+        // Add a listener for if the upload button was clicked.
+        $('.file-group-file-upload').on('change', (event) => {
+            // Get the current file.
+            const file = event.target.files[0];
+            // Set the filename in the label.
+            $(event.target).closest('.file-group-file-upload').siblings('.file-group-file-label').html(file.name);
+            // Define the file reader and the variable for storing its content.
+            let fileReader = new FileReader();
+            // Define what happens when we read the file.
+            fileReader.onload = (e) => {
+                // Write the content of the file to the text area.
+                $(event.target).closest('.file-group').find('.file-group-text').first().val(e.target.result);
+                // Get the actual group which was clicked.
+                const groupElement = $(event.target).closest('.file-group');
+                // Update the selected items.
+                updateInput(groupElement);
+            };
+            // Read the file.
+            fileReader.readAsText(file);
+        });
+        // Execute the function on page load.
+        (() => {
+            // Go over all of the groups.
+            $('.file-group').each((index, groupElement) => {
+                // Update the text.
+                updateText(groupElement);
+                // Update the selected items.
+                updateInput(groupElement);
+            });
+        })();
+    }
+
+    // Check if there is a parameter group on the page.
+    if ($('.parameter-group').length !== 0) {
+        // Define the HTML of an optgroup.
+        const heuristicGroupOptgroupHTML = `<optgroup></optgroup>`;
+        // Define a function which updates the parameters.
+        const updateParameters = (groupElement) => {
+            // Get the selected algorithm.
+            const algorithm = $(groupElement).find('.parameter-group-select').first().val();
+            // Get the corresponding template.
+            const template = $(groupElement).find(`.parameter-group-template[data-algorithm="${algorithm}"]`).html();
+            // Replace the current parameters with the template.
+            $(groupElement).find('.parameter-group-parameters').empty().html(template);
+            // Check if the checkbox is checked or not.
+            if ($(groupElement).find('.parameter-group-checkbox').prop('checked')) {
+                // Hide the parameters.
+                $(groupElement).find('.parameter-group-values').prop('hidden', true);
+            } else {
+                // Display the parameters.
+                $(groupElement).find('.parameter-group-values').prop('hidden', false);
+            }
+            // Get the corresponding heuristics group.
+            const heuristicsGroupElement = $(groupElement).find('.heuristics-group').first();
+            // Check if any element was found.
+            if ($(heuristicsGroupElement).length !== 0) {
+                // Update the heuristics.
+                heuristicGroupUpdateHeuristics(heuristicsGroupElement);
+                // Update the current heuristics.
+                heuristicGroupUpdateCurrentHeuristics(heuristicsGroupElement);
+                // Update the input text.
+                heuristicGroupUpdateText(heuristicsGroupElement);
             }
         };
         // Define a function which updates the heuristics based on the input data.
@@ -467,62 +586,22 @@ $(window).on('load', () => {
                 });
             });
         };
-        // Add a listener for if the upload button was clicked.
-        $('.form-file-group-file-upload').on('change', (event) => {
-            // Get the current file.
-            const file = event.target.files[0];
-            // Set the filename in the label.
-            $(event.target).siblings('.form-file-group-file-label').html(file.name);
-            // Define the file reader and the variable for storing its content.
-            let fileReader = new FileReader();
-            // Define what happens when we read the file.
-            fileReader.onload = (e) => {
-                // Get the actual group which was clicked.
-                const groupElement = $(event.target).closest('.form-file-group');
-                // Write the content of the file to the text area.
-                $(groupElement).find('.form-file-group-text').first().val(e.target.result);
-                // Parse the uploaded text.
-                formFileGroupUpdateInputs(groupElement);
-            };
-            // Read the file.
-            fileReader.readAsText(file);
-        });
-        // Add a listener for typing into the text area.
-        $('.file-group-text').on('keyup', (event) => {
+        // Add a listener for changing the algorithm.
+        $('.parameter-group').on('change', '.parameter-group-select', (event) => {
             // Get the actual group which was clicked.
-            const groupElement = $(event.target).closest('.file-group');
+            const groupElement = $(event.target).closest('.parameter-group');
             // Update the selected items.
-            fileGroupUpdateInput(groupElement);
+            updateParameters(groupElement);
         });
-        // Add a listener for changing one of the separators.
-        $('.file-group').on('change', '.file-group-separator', (event) => {
+        // Add a listener for changing the algorithm.
+        $('.parameter-group').on('change', '.parameter-group-checkbox', (event) => {
             // Get the actual group which was clicked.
-            const groupElement = $(event.target).closest('.file-group');
-            // Update the selected items.
-            fileGroupUpdateInput(groupElement);
+            const groupElement = $(event.target).closest('.parameter-group');
+            // Reset the parameters just like when selecting a new algorithm.
+            updateParameters(groupElement);
         });
-        // Add a listener for if the upload button was clicked.
-        $('.file-group-file-upload').on('change', (event) => {
-            // Get the current file.
-            const file = event.target.files[0];
-            // Set the filename in the label.
-            $(event.target).siblings('.file-group-file-label').html(file.name);
-            // Define the file reader and the variable for storing its content.
-            let fileReader = new FileReader();
-            // Define what happens when we read the file.
-            fileReader.onload = (e) => {
-                // Write the content of the file to the text area.
-                $(event.target).closest('.file-group').find('.file-group-text').first().val(e.target.result);
-                // Get the actual group which was clicked.
-                const groupElement = $(event.target).closest('.file-group');
-                // Update the selected items.
-                fileGroupUpdateInput(groupElement);
-            };
-            // Read the file.
-            fileReader.readAsText(file);
-        });
-        // Add a listener for if the add button was clicked.
-        $('.heuristics-group-add').on('click', (event) => {
+        // Add a listener for if the add heuristics button was clicked.
+        $('.parameter-group').on('click', '.heuristics-group-add', (event) => {
             // Get the actual group which was clicked.
             const groupElement = $(event.target).closest('.heuristics-group');
             // Get the current heuristics element.
@@ -572,8 +651,8 @@ $(window).on('load', () => {
             // Update the input text.
             heuristicGroupUpdateText(groupElement);
         });
-        // Add a listener for if the remove button was clicked.
-        $('.heuristics-group-remove').on('click', (event) => {
+        // Add a listener for if the remove heuristics button was clicked.
+        $('.parameter-group').on('click', '.heuristics-group-remove', (event) => {
             // Get the actual group which was clicked.
             const groupElement = $(event.target).closest('.heuristics-group');
             // Remove the selected current heuristics options.
@@ -585,39 +664,12 @@ $(window).on('load', () => {
         });
         // Execute the function on page load.
         (() => {
-            // Go over all of the form groups.
-            $('.form-file-group').each((index, groupElement) => {
-                // Clear any existing text.
-                $(groupElement).find('.form-file-group-text').val('');
-            });
             // Go over all of the groups.
-            $('.file-group').each((index, groupElement) => {
-                // Update the text.
-                fileGroupUpdateText(groupElement);
-                // Update the selected items.
-                fileGroupUpdateInput(groupElement);
-            });
-            // Go over all of the groups.
-            $('.heuristics-group').each((index, groupElement) => {
-                // Update the heuristics.
-                heuristicGroupUpdateHeuristics(groupElement);
-                // Update the current heuristics.
-                heuristicGroupUpdateCurrentHeuristics(groupElement);
-                // Update the input text.
-                heuristicGroupUpdateText(groupElement);
+            $('.parameter-group').each((index, groupElement) => {
+                // Update the parameters.
+                updateParameters(groupElement);
             });
         })();
-    }
-
-    // Check if there is a copy group on the page.
-    if ($('.copy-group').length !== 0) {
-        // Add a listener for clicking the button.
-        $('.copy-group-button').on('click', (event) => {
-            // Get the actual group which was clicked.
-            const groupElement = $(event.target).closest('.copy-group');
-            // Select all of the corresponding data.
-            $(groupElement).find('.copy-group-data').first().select();
-        });
     }
 
     // Check if there is a Cytoscape area on the page.
@@ -683,25 +735,6 @@ $(window).on('load', () => {
                     $('.item-refresh[data-refresh="True"]').each((index, element) => refresh(element));
                 }, _refreshInterval);
             }
-        })();
-    }
-
-    // Check if there is a UTC date on the page.
-    if ($('.utc-date').length !== 0) {
-        // Define a function to update an element containing a UTC date.
-        const updateDate = (element) => {
-            // Get the date in UTC format.
-            const date = new Date($(element).data('date'));
-            // Update the UTC date to the local date.
-            $(element).find('.utc-date-date').attr('title', date.toLocaleDateString());
-            $(element).find('.utc-date-date').text(date.toLocaleDateString());
-            $(element).find('.utc-date-time').attr('title', date.toLocaleTimeString());
-            $(element).find('.utc-date-time').text(date.toLocaleTimeString());
-        };
-        // Execute the function on page load.
-        (() => {
-            // Update all elements containing UTC dates.
-            $('.utc-date').each((index, element) => updateDate(element));
         })();
     }
 

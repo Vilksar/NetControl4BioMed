@@ -1,8 +1,4 @@
-﻿using NetControl4BioMed.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace NetControl4BioMed.Helpers.ViewModels
 {
@@ -54,7 +50,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "Account",
             Title = "Account",
             Description = string.Empty,
-            Icon = "fa-user",
+            Icon = "fa-user-circle",
             Color = "info",
             NavigationGroups = new List<NavigationGroupViewModel>
             {
@@ -135,7 +131,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
             Id = "Administration",
             Title = "Administration",
             Description = string.Empty,
-            Icon = "fa-cog",
+            Icon = "fa-toolbox",
             Color = "primary",
             NavigationGroups = new List<NavigationGroupViewModel>
             {
@@ -205,15 +201,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Icon = "fa-database",
                             Color = "light",
                             Link = "/Administration/Permissions/DatabaseUsers/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "DatabaseUserInvitations",
-                            Title = "Database user invitations",
-                            Description = string.Empty,
-                            Icon = "fa-envelope-open",
-                            Color = "light",
-                            Link = "/Administration/Permissions/DatabaseUserInvitations/Index"
                         }
                     }
                 },
@@ -229,15 +216,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "DatabaseTypes",
-                            Title = "Database types",
-                            Description = string.Empty,
-                            Icon = "fa-font",
-                            Color = "light",
-                            Link = "/Administration/Databases/DatabaseTypes/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
                             Id = "Databases",
                             Title = "Databases",
                             Description = string.Empty,
@@ -247,21 +225,21 @@ namespace NetControl4BioMed.Helpers.ViewModels
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "DatabaseNodeFields",
-                            Title = "Database node fields",
+                            Id = "DatabaseProteinFields",
+                            Title = "Database protein fields",
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
-                            Link = "/Administration/Databases/DatabaseNodeFields/Index"
+                            Link = "/Administration/Databases/DatabaseProteinFields/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "DatabaseEdgeFields",
-                            Title = "Database edge fields",
+                            Id = "DatabaseInteractionFields",
+                            Title = "Database interaction fields",
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
-                            Link = "/Administration/Databases/DatabaseEdgeFields/Index"
+                            Link = "/Administration/Databases/DatabaseInteractionFields/Index"
                         }
                     }
                 },
@@ -277,39 +255,30 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "Nodes",
-                            Title = "Nodes",
+                            Id = "Proteins",
+                            Title = "Proteins",
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
-                            Link = "/Administration/Data/Nodes/Index"
+                            Link = "/Administration/Data/Proteins/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "Edges",
-                            Title = "Edges",
+                            Id = "Interactions",
+                            Title = "Interactions",
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
-                            Link = "/Administration/Data/Edges/Index"
+                            Link = "/Administration/Data/Interactions/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "NodeCollections",
-                            Title = "Node collections",
+                            Id = "ProteinCollections",
+                            Title = "Protein collections",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
-                            Link = "/Administration/Data/NodeCollections/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "Samples",
-                            Title = "Samples",
-                            Description = string.Empty,
-                            Icon = "fa-paste",
-                            Color = "light",
-                            Link = "/Administration/Data/Samples/Index"
+                            Link = "/Administration/Data/ProteinCollections/Index"
                         }
                     }
                 },
@@ -325,93 +294,75 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "DatabaseNodes",
-                            Title = "Database nodes",
+                            Id = "DatabaseProteins",
+                            Title = "Database proteins",
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
-                            Link = "/Administration/Relationships/DatabaseNodes/Index"
+                            Link = "/Administration/Relationships/DatabaseProteins/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "DatabaseNodeFieldNodes",
-                            Title = "Database node field nodes",
+                            Id = "DatabaseProteinFieldProteins",
+                            Title = "Database protein field proteins",
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
-                            Link = "/Administration/Relationships/DatabaseNodeFieldNodes/Index"
+                            Link = "/Administration/Relationships/DatabaseProteinFieldProteins/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "DatabaseEdges",
-                            Title = "Database edges",
+                            Id = "DatabaseInteractions",
+                            Title = "Database interactions",
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
-                            Link = "/Administration/Relationships/DatabaseEdges/Index"
+                            Link = "/Administration/Relationships/DatabaseInteractions/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "DatabaseEdgeFieldEdges",
-                            Title = "Database edge field edges",
+                            Id = "DatabaseInteractionFieldInteractions",
+                            Title = "Database interaction field interactions",
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
-                            Link = "/Administration/Relationships/DatabaseEdgeFieldEdges/Index"
+                            Link = "/Administration/Relationships/DatabaseInteractionFieldInteractions/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "EdgeNodes",
-                            Title = "Edge nodes",
+                            Id = "InteractionProteins",
+                            Title = "Interaction proteins",
                             Description = string.Empty,
                             Icon = "fa-arrow-circle-right",
                             Color = "light",
-                            Link = "/Administration/Relationships/EdgeNodes/Index"
+                            Link = "/Administration/Relationships/InteractionProteins/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "NodeCollectionTypes",
-                            Title = "Node collection types",
+                            Id = "ProteinCollectionTypes",
+                            Title = "Protein collection types",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
-                            Link = "/Administration/Relationships/NodeCollectionTypes/Index"
+                            Link = "/Administration/Relationships/ProteinCollectionTypes/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "NodeCollectionDatabases",
-                            Title = "Node collection databases",
+                            Id = "ProteinCollectionProteins",
+                            Title = "Protein collection proteins",
                             Description = string.Empty,
                             Icon = "fa-folder",
                             Color = "light",
-                            Link = "/Administration/Relationships/NodeCollectionDatabases/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "NodeCollectionNodes",
-                            Title = "Node collection nodes",
-                            Description = string.Empty,
-                            Icon = "fa-folder",
-                            Color = "light",
-                            Link = "/Administration/Relationships/NodeCollectionNodes/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "SampleDatabases",
-                            Title = "Sample databases",
-                            Description = string.Empty,
-                            Icon = "fa-paste",
-                            Color = "light",
-                            Link = "/Administration/Relationships/SampleDatabases/Index"
+                            Link = "/Administration/Relationships/ProteinCollectionProteins/Index"
                         }
                     }
                 },
                 new NavigationGroupViewModel
                 {
                     Id = "Created",
-                    Title = "Created",
+                    Title = "Networks / Analyses",
                     Description = string.Empty,
-                    Icon = "fa-smile",
+                    Icon = "fa-hammer",
                     Color = "primary",
                     Link = "/Administration/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -430,7 +381,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Analyses",
                             Title = "Analyses",
                             Description = string.Empty,
-                            Icon = "fa-desktop",
+                            Icon = "fa-code-branch",
                             Color = "light",
                             Link = "/Administration/Created/Analyses/Index"
                         }
@@ -441,7 +392,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Id = "Other",
                     Title = "Other",
                     Description = string.Empty,
-                    Icon = "fa-ellipsis-h",
+                    Icon = "fa-code",
                     Color = "primary",
                     Link = "/Administration/Other/Index",
                     NavigationPages = new List<NavigationPageViewModel>
@@ -461,14 +412,116 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the navigation area for the content pages.
+        /// Gets the navigation area for the available data pages.
         /// </summary>
-        public static NavigationAreaViewModel ContentNavigationArea { get; } = new NavigationAreaViewModel
+        public static NavigationAreaViewModel AvailableDataNavigationArea { get; } = new NavigationAreaViewModel
         {
-            Id = "Content",
-            Title = "Content",
+            Id = "AvailableData",
+            Title = "AvailableData",
             Description = string.Empty,
-            Icon = "fa-box-open",
+            Icon = "fa-database",
+            Color = "primary",
+            NavigationGroups = new List<NavigationGroupViewModel>
+            {
+                new NavigationGroupViewModel
+                {
+                    Id = "Index",
+                    Title = "Overview",
+                    Description = string.Empty,
+                    Icon = "fa-chart-bar",
+                    Color = "primary",
+                    Link = "/AvailableData/Index"
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Databases",
+                    Title = "Available databases",
+                    Description = string.Empty,
+                    Icon = "fa-database",
+                    Color = "primary",
+                    Link = "/AvailableData/Databases/Index",
+                    NavigationPages = new List<NavigationPageViewModel>
+                    {
+                        new NavigationPageViewModel
+                        {
+                            Id = "Databases",
+                            Title = "Databases",
+                            Description = string.Empty,
+                            Icon = "fa-database",
+                            Color = "light",
+                            Link = "/AvailableData/Databases/Databases/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "DatabaseProteinFields",
+                            Title = "Protein data",
+                            Description = string.Empty,
+                            Icon = "fa-circle",
+                            Color = "light",
+                            Link = "/AvailableData/Databases/DatabaseProteinFields/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "DatabaseInteractionFields",
+                            Title = "Interaction data",
+                            Description = string.Empty,
+                            Icon = "fa-arrow-right",
+                            Color = "light",
+                            Link = "/AvailableData/Databases/DatabaseInteractionFields/Index"
+                        }
+                    }
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Data",
+                    Title = "Browse data",
+                    Description = string.Empty,
+                    Icon = "fa-table",
+                    Color = "primary",
+                    Link = "/AvailableData/Data/Index",
+                    NavigationPages = new List<NavigationPageViewModel>
+                    {
+                        new NavigationPageViewModel
+                        {
+                            Id = "Proteins",
+                            Title = "Proteins",
+                            Description = string.Empty,
+                            Icon = "fa-circle",
+                            Color = "light",
+                            Link = "/AvailableData/Data/Proteins/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "Interactions",
+                            Title = "Interactions",
+                            Description = string.Empty,
+                            Icon = "fa-arrow-right",
+                            Color = "light",
+                            Link = "/AvailableData/Data/Interactions/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "ProteinCollections",
+                            Title = "Protein collections",
+                            Description = string.Empty,
+                            Icon = "fa-folder",
+                            Color = "light",
+                            Link = "/AvailableData/Data/ProteinCollections/Index"
+                        }
+                    }
+                }
+            }
+        };
+
+        /// <summary>
+        /// Gets the navigation area for the public data pages.
+        /// </summary>
+        public static NavigationAreaViewModel PublicDataNavigationArea { get; } = new NavigationAreaViewModel
+        {
+            Id = "PublicData",
+            Title = "Public networks",
+            Description = string.Empty,
+            Icon = "fa-users",
             Color = "success",
             NavigationGroups = new List<NavigationGroupViewModel>
             {
@@ -479,51 +532,39 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Description = string.Empty,
                     Icon = "fa-chart-bar",
                     Color = "success",
-                    Link = "/Content/Index"
+                    Link = "/PublicData/Index"
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "DatabaseTypes",
-                    Title = "Network types",
+                    Id = "Networks",
+                    Title = "Public networks",
                     Description = string.Empty,
-                    Icon = "fa-list",
+                    Icon = "fa-share-alt",
                     Color = "success",
-                    Link = "/Content/DatabaseTypes/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "PPI",
-                            Title = "PPI networks",
-                            Description = string.Empty,
-                            Icon = "fa-dna",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "Generic",
-                            Title = "Generic networks",
-                            Description = string.Empty,
-                            Icon = "fa-circle",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Index"
-                        }
-                    }
+                    Link = "/PublicData/Networks/Index"
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Analyses",
+                    Title = "Public analyses",
+                    Description = string.Empty,
+                    Icon = "fa-code-branch",
+                    Color = "success",
+                    Link = "/PublicData/Analyses/Index"
                 }
             }
         };
 
         /// <summary>
-        /// Gets the navigation area for the content generic pages.
+        /// Gets the navigation area for the private data pages.
         /// </summary>
-        public static NavigationAreaViewModel ContentGenericNavigationArea { get; } = new NavigationAreaViewModel
+        public static NavigationAreaViewModel PrivateDataNavigationArea { get; } = new NavigationAreaViewModel
         {
-            Id = "Generic",
-            Title = "Generic",
+            Id = "PrivateData",
+            Title = "My networks",
             Description = string.Empty,
-            Icon = "fa-circle",
-            Color = "warning",
+            Icon = "fa-user",
+            Color = "success",
             NavigationGroups = new List<NavigationGroupViewModel>
             {
                 new NavigationGroupViewModel
@@ -532,49 +573,37 @@ namespace NetControl4BioMed.Helpers.ViewModels
                     Title = "Overview",
                     Description = string.Empty,
                     Icon = "fa-chart-bar",
-                    Color = "warning",
-                    Link = "/Content/DatabaseTypes/Generic/Index"
+                    Color = "success",
+                    Link = "/PrivateData/Index"
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "Created",
-                    Title = "My data",
+                    Id = "Networks",
+                    Title = "My networks",
                     Description = string.Empty,
-                    Icon = "fa-user",
-                    Color = "warning",
-                    Link = "/Content/DatabaseTypes/Generic/Created/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Networks",
-                            Title = "Networks",
-                            Description = string.Empty,
-                            Icon = "fa-share-alt",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "Analyses",
-                            Title = "Analyses",
-                            Description = string.Empty,
-                            Icon = "fa-desktop",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Index"
-                        }
-                    }
+                    Icon = "fa-share-alt",
+                    Color = "success",
+                    Link = "/PrivateData/Networks/Index"
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Analyses",
+                    Title = "My analyses",
+                    Description = string.Empty,
+                    Icon = "fa-code-branch",
+                    Color = "success",
+                    Link = "/PrivateData/Analyses/Index"
                 }
             }
         };
 
         /// <summary>
-        /// Gets the navigation area for the generic network pages.
+        /// Gets the navigation area for the created data networks details pages.
         /// </summary>
-        public static NavigationAreaViewModel ContentGenericNetworkNavigationArea { get; } = new NavigationAreaViewModel
+        public static NavigationAreaViewModel CreatedDataNetworksDetailsNavigationArea { get; } = new NavigationAreaViewModel
         {
-            Id = "Network",
-            Title = "Network",
+            Id = "Details",
+            Title = "Network details",
             Description = string.Empty,
             Icon = "fa-share-alt",
             Color = "dark",
@@ -583,20 +612,20 @@ namespace NetControl4BioMed.Helpers.ViewModels
                 new NavigationGroupViewModel
                 {
                     Id = "Index",
-                    Title = "Overview",
+                    Title = "Network overview",
                     Description = string.Empty,
                     Icon = "fa-chart-bar",
                     Color = "dark",
-                    Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Index"
+                    Link = "/CreatedData/Networks/Details/Index"
                 },
                 new NavigationGroupViewModel
                 {
                     Id = "Accounts",
-                    Title = "Accounts",
+                    Title = "Network access",
                     Description = string.Empty,
-                    Icon = "fa-user-friends",
+                    Icon = "fa-users",
                     Color = "dark",
-                    Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Accounts/Index",
+                    Link = "/CreatedData/Networks/Details/Accounts/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
@@ -604,50 +633,80 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Users",
                             Title = "Users",
                             Description = string.Empty,
-                            Icon = "fa-user-friends",
+                            Icon = "fa-user",
                             Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Accounts/Users/Index"
+                            Link = "/CreatedData/Networks/Details/Accounts/Users/Index"
+                        }
+                    }
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Databases",
+                    Title = "Network databases",
+                    Description = string.Empty,
+                    Icon = "fa-database",
+                    Color = "dark",
+                    Link = "/CreatedData/Networks/Details/Databases/Index",
+                    NavigationPages = new List<NavigationPageViewModel>
+                    {
+                        new NavigationPageViewModel
+                        {
+                            Id = "Databases",
+                            Title = "Databases",
+                            Description = string.Empty,
+                            Icon = "fa-database",
+                            Color = "light",
+                            Link = "/CreatedData/Networks/Details/Databases/Databases/Index"
                         }
                     }
                 },
                 new NavigationGroupViewModel
                 {
                     Id = "Data",
-                    Title = "Data",
+                    Title = "Network data",
                     Description = string.Empty,
                     Icon = "fa-table",
                     Color = "dark",
-                    Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Data/Index",
+                    Link = "/CreatedData/Networks/Details/Data/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "Nodes",
-                            Title = "Nodes",
+                            Id = "Proteins",
+                            Title = "Proteins",
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Data/Nodes/Index"
+                            Link = "/CreatedData/Networks/Details/Data/Proteins/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "Edges",
-                            Title = "Edges",
+                            Id = "Interactions",
+                            Title = "Interactions",
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Data/Edges/Index"
+                            Link = "/CreatedData/Networks/Details/Data/Interactions/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "ProteinCollections",
+                            Title = "Protein collections",
+                            Description = string.Empty,
+                            Icon = "fa-folder",
+                            Color = "light",
+                            Link = "/CreatedData/Networks/Details/Data/ProteinCollections/Index"
                         }
                     }
                 },
                 new NavigationGroupViewModel
                 {
                     Id = "Created",
-                    Title = "My data",
+                    Title = "Network analyses",
                     Description = string.Empty,
-                    Icon = "fa-user",
+                    Icon = "fa-code-branch",
                     Color = "dark",
-                    Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Created/Index",
+                    Link = "/CreatedData/Networks/Details/Created/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
@@ -655,9 +714,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Analyses",
                             Title = "Analyses",
                             Description = string.Empty,
-                            Icon = "fa-desktop",
+                            Icon = "fa-code-branch",
                             Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Networks/Details/Created/Analyses/Index"
+                            Link = "/CreatedData/Networks/Details/Created/Analyses/Index"
                         }
                     }
                 }
@@ -665,34 +724,34 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the navigation area for the generic analysis pages.
+        /// Gets the navigation area for the created data analyses details pages.
         /// </summary>
-        public static NavigationAreaViewModel ContentGenericAnalysisNavigationArea { get; } = new NavigationAreaViewModel
+        public static NavigationAreaViewModel CreatedDataAnalysesDetailsNavigationArea { get; } = new NavigationAreaViewModel
         {
-            Id = "Analysis",
-            Title = "Analysis",
+            Id = "Details",
+            Title = "Analysis details",
             Description = string.Empty,
-            Icon = "fa-share-alt",
+            Icon = "fa-code-branch",
             Color = "dark",
             NavigationGroups = new List<NavigationGroupViewModel>
             {
                 new NavigationGroupViewModel
                 {
                     Id = "Index",
-                    Title = "Overview",
+                    Title = "Analysis overview",
                     Description = string.Empty,
                     Icon = "fa-chart-bar",
                     Color = "dark",
-                    Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Index"
+                    Link = "/CreatedData/Analyses/Details/Index"
                 },
                 new NavigationGroupViewModel
                 {
                     Id = "Accounts",
-                    Title = "Accounts",
+                    Title = "Analysis access",
                     Description = string.Empty,
-                    Icon = "fa-user-friends",
+                    Icon = "fa-users",
                     Color = "dark",
-                    Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Accounts/Index",
+                    Link = "/CreatedData/Analyses/Details/Accounts/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
@@ -700,69 +759,99 @@ namespace NetControl4BioMed.Helpers.ViewModels
                             Id = "Users",
                             Title = "Users",
                             Description = string.Empty,
-                            Icon = "fa-user-friends",
+                            Icon = "fa-user",
                             Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Accounts/Users/Index"
+                            Link = "/CreatedData/Analyses/Details/Accounts/Users/Index"
+                        }
+                    }
+                },
+                new NavigationGroupViewModel
+                {
+                    Id = "Databases",
+                    Title = "Analysis databases",
+                    Description = string.Empty,
+                    Icon = "fa-database",
+                    Color = "dark",
+                    Link = "/CreatedData/Analyses/Details/Databases/Index",
+                    NavigationPages = new List<NavigationPageViewModel>
+                    {
+                        new NavigationPageViewModel
+                        {
+                            Id = "Databases",
+                            Title = "Databases",
+                            Description = string.Empty,
+                            Icon = "fa-database",
+                            Color = "light",
+                            Link = "/CreatedData/Analyses/Details/Databases/Databases/Index"
                         }
                     }
                 },
                 new NavigationGroupViewModel
                 {
                     Id = "Data",
-                    Title = "Data",
+                    Title = "Analysis data",
                     Description = string.Empty,
                     Icon = "fa-table",
                     Color = "dark",
-                    Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Data/Index",
+                    Link = "/CreatedData/Analyses/Details/Data/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
                         new NavigationPageViewModel
                         {
-                            Id = "Nodes",
-                            Title = "Nodes",
+                            Id = "Proteins",
+                            Title = "Proteins",
                             Description = string.Empty,
                             Icon = "fa-circle",
                             Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Data/Nodes/Index"
+                            Link = "/CreatedData/Analyses/Details/Data/Proteins/Index"
                         },
                         new NavigationPageViewModel
                         {
-                            Id = "Edges",
-                            Title = "Edges",
+                            Id = "Interactions",
+                            Title = "Interactions",
                             Description = string.Empty,
                             Icon = "fa-arrow-right",
                             Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Data/Edges/Index"
+                            Link = "/CreatedData/Analyses/Details/Data/Interactions/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "ProteinCollections",
+                            Title = "Protein collections",
+                            Description = string.Empty,
+                            Icon = "fa-folder",
+                            Color = "light",
+                            Link = "/CreatedData/Analyses/Details/Data/ProteinCollections/Index"
                         }
                     }
                 },
                 new NavigationGroupViewModel
                 {
-                    Id = "Created",
-                    Title = "My data",
+                    Id = "Results",
+                    Title = "Analysis results",
                     Description = string.Empty,
-                    Icon = "fa-user",
+                    Icon = "fa-code-branch",
                     Color = "dark",
-                    Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Created/Index",
+                    Link = "/CreatedData/Analyses/Details/Results/Index",
                     NavigationPages = new List<NavigationPageViewModel>
                     {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Networks",
-                            Title = "Networks",
-                            Description = string.Empty,
-                            Icon = "fa-desktop",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Created/Networks/Index"
-                        },
                         new NavigationPageViewModel
                         {
                             Id = "ControlPaths",
                             Title = "Control paths",
                             Description = string.Empty,
-                            Icon = "fa-gamepad",
+                            Icon = "fa-exchange-alt",
                             Color = "light",
-                            Link = "/Content/DatabaseTypes/Generic/Created/Analyses/Details/Created/ControlPaths/Index"
+                            Link = "/CreatedData/Analyses/Details/Results/ControlPaths/Index"
+                        },
+                        new NavigationPageViewModel
+                        {
+                            Id = "Paths",
+                            Title = "Paths",
+                            Description = string.Empty,
+                            Icon = "fa-long-arrow-alt-right",
+                            Color = "light",
+                            Link = "/CreatedData/Analyses/Details/Results/Paths/Index"
                         }
                     }
                 }
@@ -770,454 +859,31 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the navigation area for the content PPI pages.
+        /// Gets the updated navigation area for the created data networks details pages.
         /// </summary>
-        public static NavigationAreaViewModel ContentPPINavigationArea { get; } = new NavigationAreaViewModel
-        {
-            Id = "PPI",
-            Title = "PPI",
-            Description = string.Empty,
-            Icon = "fa-dna",
-            Color = "warning",
-            NavigationGroups = new List<NavigationGroupViewModel>
-            {
-                new NavigationGroupViewModel
-                {
-                    Id = "Index",
-                    Title = "Overview",
-                    Description = string.Empty,
-                    Icon = "fa-chart-bar",
-                    Color = "warning",
-                    Link = "/Content/DatabaseTypes/PPI/Index"
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Databases",
-                    Title = "Available databases",
-                    Description = string.Empty,
-                    Icon = "fa-database",
-                    Color = "warning",
-                    Link = "/Content/DatabaseTypes/PPI/Databases/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Databases",
-                            Title = "Databases",
-                            Description = string.Empty,
-                            Icon = "fa-database",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Databases/Databases/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "DatabaseNodeFields",
-                            Title = "Protein data",
-                            Description = string.Empty,
-                            Icon = "fa-circle",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Databases/DatabaseNodeFields/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "DatabaseEdgeFields",
-                            Title = "Interaction data",
-                            Description = string.Empty,
-                            Icon = "fa-arrow-right",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Databases/DatabaseEdgeFields/Index"
-                        }
-                    }
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Data",
-                    Title = "Browse data",
-                    Description = string.Empty,
-                    Icon = "fa-table",
-                    Color = "warning",
-                    Link = "/Content/DatabaseTypes/PPI/Data/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Nodes",
-                            Title = "Proteins",
-                            Description = string.Empty,
-                            Icon = "fa-circle",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Data/Nodes/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "Edges",
-                            Title = "Interactions",
-                            Description = string.Empty,
-                            Icon = "fa-arrow-right",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Data/Edges/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "NodeCollections",
-                            Title = "Collections",
-                            Description = string.Empty,
-                            Icon = "fa-folder",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Data/NodeCollections/Index"
-                        }
-                    }
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Created",
-                    Title = "My data",
-                    Description = string.Empty,
-                    Icon = "fa-user",
-                    Color = "warning",
-                    Link = "/Content/DatabaseTypes/PPI/Created/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Networks",
-                            Title = "Networks",
-                            Description = string.Empty,
-                            Icon = "fa-share-alt",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "Analyses",
-                            Title = "Analyses",
-                            Description = string.Empty,
-                            Icon = "fa-desktop",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Index"
-                        }
-                    }
-                }
-            }
-        };
-
-        /// <summary>
-        /// Gets the navigation area for the PPI network pages.
-        /// </summary>
-        public static NavigationAreaViewModel ContentPPINetworkNavigationArea { get; } = new NavigationAreaViewModel
-        {
-            Id = "Network",
-            Title = "Network",
-            Description = string.Empty,
-            Icon = "fa-share-alt",
-            Color = "dark",
-            NavigationGroups = new List<NavigationGroupViewModel>
-            {
-                new NavigationGroupViewModel
-                {
-                    Id = "Index",
-                    Title = "Overview",
-                    Description = string.Empty,
-                    Icon = "fa-chart-bar",
-                    Color = "dark",
-                    Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Index"
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Accounts",
-                    Title = "Accounts",
-                    Description = string.Empty,
-                    Icon = "fa-user-friends",
-                    Color = "dark",
-                    Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Accounts/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Users",
-                            Title = "Users",
-                            Description = string.Empty,
-                            Icon = "fa-user-friends",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Accounts/Users/Index"
-                        }
-                    }
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Databases",
-                    Title = "Databases",
-                    Description = string.Empty,
-                    Icon = "fa-database",
-                    Color = "dark",
-                    Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Databases/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Databases",
-                            Title = "Databases",
-                            Description = string.Empty,
-                            Icon = "fa-database",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Databases/Databases/Index"
-                        }
-                    }
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Data",
-                    Title = "Data",
-                    Description = string.Empty,
-                    Icon = "fa-table",
-                    Color = "dark",
-                    Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Data/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Nodes",
-                            Title = "Proteins",
-                            Description = string.Empty,
-                            Icon = "fa-circle",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Data/Nodes/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "Edges",
-                            Title = "Interactions",
-                            Description = string.Empty,
-                            Icon = "fa-arrow-right",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Data/Edges/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "NodeCollections",
-                            Title = "Collections",
-                            Description = string.Empty,
-                            Icon = "fa-folder",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Data/NodeCollections/Index"
-                        }
-                    }
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Created",
-                    Title = "My data",
-                    Description = string.Empty,
-                    Icon = "fa-user",
-                    Color = "dark",
-                    Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Created/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Analyses",
-                            Title = "Analyses",
-                            Description = string.Empty,
-                            Icon = "fa-desktop",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Networks/Details/Created/Analyses/Index"
-                        }
-                    }
-                }
-            }
-        };
-
-        /// <summary>
-        /// Gets the navigation area for the PPI analysis pages.
-        /// </summary>
-        public static NavigationAreaViewModel ContentPPIAnalysisNavigationArea { get; } = new NavigationAreaViewModel
-        {
-            Id = "Analysis",
-            Title = "Analysis",
-            Description = string.Empty,
-            Icon = "fa-share-alt",
-            Color = "dark",
-            NavigationGroups = new List<NavigationGroupViewModel>
-            {
-                new NavigationGroupViewModel
-                {
-                    Id = "Index",
-                    Title = "Overview",
-                    Description = string.Empty,
-                    Icon = "fa-chart-bar",
-                    Color = "dark",
-                    Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Index"
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Accounts",
-                    Title = "Accounts",
-                    Description = string.Empty,
-                    Icon = "fa-user-friends",
-                    Color = "dark",
-                    Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Accounts/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Users",
-                            Title = "Users",
-                            Description = string.Empty,
-                            Icon = "fa-user-friends",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Accounts/Users/Index"
-                        }
-                    }
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Databases",
-                    Title = "Databases",
-                    Description = string.Empty,
-                    Icon = "fa-database",
-                    Color = "dark",
-                    Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Databases/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Databases",
-                            Title = "Databases",
-                            Description = string.Empty,
-                            Icon = "fa-database",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Databases/Databases/Index"
-                        }
-                    }
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Data",
-                    Title = "Data",
-                    Description = string.Empty,
-                    Icon = "fa-table",
-                    Color = "dark",
-                    Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Data/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Nodes",
-                            Title = "Proteins",
-                            Description = string.Empty,
-                            Icon = "fa-circle",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Data/Nodes/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "Edges",
-                            Title = "Interactions",
-                            Description = string.Empty,
-                            Icon = "fa-arrow-right",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Data/Edges/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "NodeCollections",
-                            Title = "Collections",
-                            Description = string.Empty,
-                            Icon = "fa-folder",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Data/NodeCollections/Index"
-                        }
-                    }
-                },
-                new NavigationGroupViewModel
-                {
-                    Id = "Created",
-                    Title = "My data",
-                    Description = string.Empty,
-                    Icon = "fa-user",
-                    Color = "dark",
-                    Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Created/Index",
-                    NavigationPages = new List<NavigationPageViewModel>
-                    {
-                        new NavigationPageViewModel
-                        {
-                            Id = "Networks",
-                            Title = "Networks",
-                            Description = string.Empty,
-                            Icon = "fa-desktop",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Created/Networks/Index"
-                        },
-                        new NavigationPageViewModel
-                        {
-                            Id = "ControlPaths",
-                            Title = "Control paths",
-                            Description = string.Empty,
-                            Icon = "fa-gamepad",
-                            Color = "light",
-                            Link = "/Content/DatabaseTypes/PPI/Created/Analyses/Details/Created/ControlPaths/Index"
-                        }
-                    }
-                }
-            }
-        };
-
-        /// <summary>
-        /// Gets the updated navigation area for the content generic network pages.
-        /// </summary>
-        /// <param name="network">Represents the current network.</param>
+        /// <param name="networkId">The ID of the current network.</param>
         /// <returns>The navigation area for the network pages.</returns>
-        public static NavigationAreaViewModel GetContentGenericNetworkNavigationArea(Network network)
+        public static NavigationAreaViewModel GetCreatedDataNetworksDetailsNavigationArea(string networkId = null)
         {
             // Get the corresponding navigation area.
-            var navigationArea = ContentGenericNetworkNavigationArea;
+            var navigationArea = CreatedDataNetworksDetailsNavigationArea;
             // Update the route ID.
-            navigationArea.RouteId = network.Id;
+            navigationArea.RouteId = networkId;
             // Return the navigation area.
             return navigationArea;
         }
 
         /// <summary>
-        /// Gets the updated navigation area for the content PPI network pages.
+        /// Gets the updated navigation area for the created data analyses details pages.
         /// </summary>
-        /// <param name="network">Represents the current network.</param>
-        /// <returns>The navigation area for the network pages.</returns>
-        public static NavigationAreaViewModel GetContentPPINetworkNavigationArea(Network network)
-        {
-            // Get the corresponding navigation area.
-            var navigationArea = ContentPPINetworkNavigationArea;
-            // Update the route ID.
-            navigationArea.RouteId = network.Id;
-            // Return the navigation area.
-            return navigationArea;
-        }
-
-        /// <summary>
-        /// Gets the updated navigation area for the content generic analysis pages.
-        /// </summary>
-        /// <param name="analysis">Represents the current analysis.</param>
+        /// <param name="analysisId">The ID of the current analysis.</param>
         /// <returns>The navigation area for the analysis pages.</returns>
-        public static NavigationAreaViewModel GetContentGenericAnalysisNavigationArea(Analysis analysis)
+        public static NavigationAreaViewModel GetCreatedDataAnalysesDetailsNavigationArea(string analysisId = null)
         {
             // Get the corresponding navigation area.
-            var navigationArea = ContentGenericAnalysisNavigationArea;
+            var navigationArea = CreatedDataAnalysesDetailsNavigationArea;
             // Update the route ID.
-            navigationArea.RouteId = analysis.Id;
-            // Return the navigation area.
-            return navigationArea;
-        }
-
-        /// <summary>
-        /// Gets the updated navigation area for the content PPI analysis pages.
-        /// </summary>
-        /// <param name="analysis">Represents the current analysis.</param>
-        /// <returns>The navigation area for the analysis pages.</returns>
-        public static NavigationAreaViewModel GetContentPPIAnalysisNavigationArea(Analysis analysis)
-        {
-            // Get the corresponding navigation area.
-            var navigationArea = ContentPPIAnalysisNavigationArea;
-            // Update the route ID.
-            navigationArea.RouteId = analysis.Id;
+            navigationArea.RouteId = analysisId;
             // Return the navigation area.
             return navigationArea;
         }

@@ -74,18 +74,18 @@
                                 </td>
                                 <td class="text-left text-break">
                                     <div>
-                                        <span title="@item.User.Email" class="font-weight-bold">@item.User.Email</span>
+                                        <a asp-page="/Administration/Accounts/Users/Details" asp-route-id="@item.User.Id" class="font-weight-bold" title="@item.User.Email">@item.User.Email</a>
                                     </div>
                                     <div>
-                                        <span title="@item.User.Id" class="small">@item.User.Id</span>
+                                        <span class="small" title="@item.User.Id">@item.User.Id</span>
                                     </div>
                                 </td>
                                 <td class="text-left text-break">
                                     <div>
-                                        <span title="@item.Role.Name" class="font-weight-bold">@item.Role.Name</span>
+                                        <a asp-page="/Administration/Accounts/Roles/Details" asp-route-id="@item.Role.Id" class="font-weight-bold" title="@item.Role.Name">@item.Role.Name</a>
                                     </div>
                                     <div>
-                                        <span title="@item.Role.Id" class="small">@item.Role.Id</span>
+                                        <span class="small" title="@item.Role.Id">@item.Role.Id</span>
                                     </div>
                                 </td>
                             </tr>

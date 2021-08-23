@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NetControl4BioMed.Pages.Administration.Databases.Databases
 {
@@ -48,16 +47,16 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     { "HasNoDatabaseUsers", "Does not have database users" },
                     { "HasDatabasesUserInvitations", "Has database user invitations" },
                     { "HasNoDatabaseUserInvitations", "Does not have database user invitations" },
-                    { "HasDatabaseNodeFields", "Has database node fields" },
-                    { "HasNoDatabaseNodeFields", "Does not have database node fields" },
-                    { "HasDatabaseEdgeFields", "Has database edge fields" },
-                    { "HasNoDatabaseEdgeFields", "Does not have database edge fields" },
-                    { "HasDatabaseNodes", "Has database nodes" },
-                    { "HasNoDatabaseNodes", "Does not have database nodes" },
-                    { "HasDatabaseEdges", "Has database edges" },
-                    { "HasNoDatabaseEdges", "Does not have database edges" },
-                    { "HasNodeCollectionDatabases", "Has node collection databases" },
-                    { "HasNoNodeCollectionDatabases", "Does not have node collection databases" },
+                    { "HasDatabaseProteinFields", "Has database protein fields" },
+                    { "HasNoDatabaseProteinFields", "Does not have database protein fields" },
+                    { "HasDatabaseInteractionFields", "Has database interaction fields" },
+                    { "HasNoDatabaseInteractionFields", "Does not have database interaction fields" },
+                    { "HasDatabaseProteins", "Has database proteins" },
+                    { "HasNoDatabaseProteins", "Does not have database proteins" },
+                    { "HasDatabaseInteractions", "Has database interactions" },
+                    { "HasNoDatabaseInteractions", "Does not have database interactions" },
+                    { "HasProteinCollectionDatabases", "Has protein collection databases" },
+                    { "HasNoProteinCollectionDatabases", "Does not have protein collection databases" },
                     { "HasNetworkDatabases", "Has network databases" },
                     { "HasNoNetworkDatabases", "Does not have network databases" },
                     { "HasAnalysisDatabases", "Has analysis databases" },
@@ -68,15 +67,11 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     { "Id", "ID" },
                     { "DateTimeCreated", "Date created" },
                     { "Name", "Name" },
-                    { "DatabaseTypeId", "Database type ID" },
-                    { "DatabaseTypeName", "Database type name" },
                     { "DatabaseUserCount", "Number of database users" },
-                    { "DatabaseUserInvitationCount", "Number of database user invitations" },
-                    { "DatabaseNodeFieldCount", "Number of database node fields" },
-                    { "DatabaseEdgeFieldCount", "Number of database edge fields" },
-                    { "DatabaseNodeCount", "Number of database nodes" },
-                    { "DatabaseEdgeCount", "Number of database edges" },
-                    { "NodeCollectionDatabaseCount", "Number of node collection databases" },
+                    { "DatabaseProteinFieldCount", "Number of database protein fields" },
+                    { "DatabaseInteractionFieldCount", "Number of database interaction fields" },
+                    { "DatabaseProteinCount", "Number of database proteins" },
+                    { "DatabaseInteractionCount", "Number of database interactions" },
                     { "NetworkDatabaseCount", "Number of network databases" },
                     { "AnalysisDatabaseCount", "Number of analysis databases" }
                 }
@@ -109,18 +104,14 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 .Where(item => input.Filter.Contains("IsNotPublic") ? !item.IsPublic : true)
                 .Where(item => input.Filter.Contains("HasDatabaseUsers") ? item.DatabaseUsers.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoDatabaseUsers") ? !item.DatabaseUsers.Any() : true)
-                .Where(item => input.Filter.Contains("HasDatabaseUserInvitations") ? item.DatabaseUserInvitations.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoDatabaseUserInvitations") ? !item.DatabaseUserInvitations.Any() : true)
-                .Where(item => input.Filter.Contains("HasDatabaseNodeFields") ? item.DatabaseNodeFields.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoDatabaseNodeFields") ? !item.DatabaseNodeFields.Any() : true)
-                .Where(item => input.Filter.Contains("HasDatabaseEdgeFields") ? item.DatabaseEdgeFields.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoDatabaseEdgeFields") ? !item.DatabaseEdgeFields.Any() : true)
-                .Where(item => input.Filter.Contains("HasDatabaseNodes") ? item.DatabaseNodes.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoDatabaseNodes") ? !item.DatabaseNodes.Any() : true)
-                .Where(item => input.Filter.Contains("HasDatabaseEdges") ? item.DatabaseEdges.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoDatabaseEdges") ? !item.DatabaseEdges.Any() : true)
-                .Where(item => input.Filter.Contains("HasNodeCollectionDatabases") ? !item.NodeCollectionDatabases.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoNodeCollectionDatabases") ? !item.NodeCollectionDatabases.Any() : true)
+                .Where(item => input.Filter.Contains("HasDatabaseProteinFields") ? item.DatabaseProteinFields.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseProteinFields") ? !item.DatabaseProteinFields.Any() : true)
+                .Where(item => input.Filter.Contains("HasDatabaseInteractionFields") ? item.DatabaseInteractionFields.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseInteractionFields") ? !item.DatabaseInteractionFields.Any() : true)
+                .Where(item => input.Filter.Contains("HasDatabaseProteins") ? item.DatabaseProteins.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseProteins") ? !item.DatabaseProteins.Any() : true)
+                .Where(item => input.Filter.Contains("HasDatabaseInteractions") ? item.DatabaseInteractions.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoDatabaseInteractions") ? !item.DatabaseInteractions.Any() : true)
                 .Where(item => input.Filter.Contains("HasNetworkDatabases") ? !item.NetworkDatabases.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoNetworkDatabases") ? !item.NetworkDatabases.Any() : true)
                 .Where(item => input.Filter.Contains("HasAnalysisDatabases") ? !item.AnalysisDatabases.Any() : true)
@@ -146,59 +137,35 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                 case var sort when sort == ("Name", "Descending"):
                     query = query.OrderByDescending(item => item.Name);
                     break;
-                case var sort when sort == ("DatabaseTypeId", "Ascending"):
-                    query = query.OrderBy(item => item.DatabaseType.Id);
-                    break;
-                case var sort when sort == ("DatabaseTypeId", "Descending"):
-                    query = query.OrderByDescending(item => item.DatabaseType.Id);
-                    break;
-                case var sort when sort == ("DatabaseTypeName", "Ascending"):
-                    query = query.OrderBy(item => item.DatabaseType.Name);
-                    break;
-                case var sort when sort == ("DatabaseTypeName", "Descending"):
-                    query = query.OrderByDescending(item => item.DatabaseType.Name);
-                    break;
                 case var sort when sort == ("DatabaseUserCount", "Ascending"):
                     query = query.OrderBy(item => item.DatabaseUsers.Count());
                     break;
                 case var sort when sort == ("DatabaseUserCount", "Descending"):
                     query = query.OrderByDescending(item => item.DatabaseUsers.Count());
                     break;
-                case var sort when sort == ("DatabaseUserInvitationCount", "Ascending"):
-                    query = query.OrderBy(item => item.DatabaseUserInvitations.Count());
+                case var sort when sort == ("DatabaseProteinFieldCount", "Ascending"):
+                    query = query.OrderBy(item => item.DatabaseProteinFields.Count());
                     break;
-                case var sort when sort == ("DatabaseUserInvitationCount", "Descending"):
-                    query = query.OrderByDescending(item => item.DatabaseUserInvitations.Count());
+                case var sort when sort == ("DatabaseProteinFieldCount", "Descending"):
+                    query = query.OrderByDescending(item => item.DatabaseProteinFields.Count());
                     break;
-                case var sort when sort == ("DatabaseNodeFieldCount", "Ascending"):
-                    query = query.OrderBy(item => item.DatabaseNodeFields.Count());
+                case var sort when sort == ("DatabaseInteractionFieldCount", "Ascending"):
+                    query = query.OrderBy(item => item.DatabaseInteractionFields.Count());
                     break;
-                case var sort when sort == ("DatabaseNodeFieldCount", "Descending"):
-                    query = query.OrderByDescending(item => item.DatabaseNodeFields.Count());
+                case var sort when sort == ("DatabaseInteractionFieldCount", "Descending"):
+                    query = query.OrderByDescending(item => item.DatabaseInteractionFields.Count());
                     break;
-                case var sort when sort == ("DatabaseEdgeFieldCount", "Ascending"):
-                    query = query.OrderBy(item => item.DatabaseEdgeFields.Count());
+                case var sort when sort == ("DatabaseProteinCount", "Ascending"):
+                    query = query.OrderBy(item => item.DatabaseProteins.Count());
                     break;
-                case var sort when sort == ("DatabaseEdgeFieldCount", "Descending"):
-                    query = query.OrderByDescending(item => item.DatabaseEdgeFields.Count());
+                case var sort when sort == ("DatabaseProteinCount", "Descending"):
+                    query = query.OrderByDescending(item => item.DatabaseProteins.Count());
                     break;
-                case var sort when sort == ("DatabaseNodeCount", "Ascending"):
-                    query = query.OrderBy(item => item.DatabaseNodes.Count());
+                case var sort when sort == ("DatabaseInteractionCount", "Ascending"):
+                    query = query.OrderBy(item => item.DatabaseInteractions.Count());
                     break;
-                case var sort when sort == ("DatabaseNodeCount", "Descending"):
-                    query = query.OrderByDescending(item => item.DatabaseNodes.Count());
-                    break;
-                case var sort when sort == ("DatabaseEdgeCount", "Ascending"):
-                    query = query.OrderBy(item => item.DatabaseEdges.Count());
-                    break;
-                case var sort when sort == ("DatabaseEdgeCount", "Descending"):
-                    query = query.OrderByDescending(item => item.DatabaseEdges.Count());
-                    break;
-                case var sort when sort == ("NodeCollectionDatabaseCount", "Ascending"):
-                    query = query.OrderBy(item => item.NodeCollectionDatabases.Count());
-                    break;
-                case var sort when sort == ("NodeCollectionDatabaseCount", "Descending"):
-                    query = query.OrderByDescending(item => item.NodeCollectionDatabases.Count());
+                case var sort when sort == ("DatabaseInteractionCount", "Descending"):
+                    query = query.OrderByDescending(item => item.DatabaseInteractions.Count());
                     break;
                 case var sort when sort == ("NetworkDatabaseCount", "Ascending"):
                     query = query.OrderBy(item => item.NetworkDatabases.Count());

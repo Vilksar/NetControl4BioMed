@@ -1,0 +1,168 @@
+﻿@page
+@model DetailsModel
+@using NetControl4BioMed.Data.Enumerations
+@using Helpers.Extensions
+@{
+    ViewData["Title"] = "Analysis path details";
+}
+
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetPathNavigationTitleCard(Model.View.Path)" />
+@if (Model.View.Analysis.Algorithm == AnalysisAlgorithm.Genetic)
+{
+    <div class="alert alert-warning text-justify text-wrap">
+        <span><i class="fas fa-exclamation-triangle"></i></span>
+        <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control proteins, and not control paths. Thus, all displayed paths are the shortest paths between a control protein and its corresponding controlled target proteins, instead of the actual control path.</span>
+    </div>
+}
+<div class="row align-items-center">
+    @if (Model.View.ShowVisualization)
+    {
+        <div class="col-lg mb-3">
+            <a asp-page="/CreatedData/Analyses/Details/Results/Paths/Visualize" asp-route-id="@Model.View.Path.Id" class="btn btn-info btn-block" title="Visualize">
+                <span><i class="fas fa-eye"></i></span>
+                <span>Visualize</span>
+            </a>
+        </div>
+    }
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-circle"></i></span>
+            </div>
+            <div>
+                <span>Path proteins</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>This section contains the proteins in the path.</span>
+        </div>
+        <table class="table table-hover table-bordered table-datatable" data-order="[[2, &quot;asc&quot;]]">
+            <thead class="thead-light">
+                <tr>
+                    <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
+                        <span>#</span>
+                    </th>
+                    <th class="text-left text-break">
+                        <span>Protein</span>
+                    </th>
+                    <th class="text-center text-break text-nowrap" hidden>
+                        <span>Index</span>
+                    </th>
+                    @if (Model.View.HasNetworkDatabases)
+                    {
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pathProtein in Model.View.PathProteins)
+                {
+                    <tr>
+                        <td class="text-center text-break text-nowrap">
+                            <span></span>
+                        </td>
+                        <td class="text-left text-break">
+                            @if (Model.View.HasNetworkDatabases)
+                            {
+                                <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@pathProtein.Protein.Id" title="@pathProtein.Protein.Name">@pathProtein.Protein.Name</a>
+                            }
+                            else
+                            {
+                                <span title="@pathProtein.Protein.Name">@pathProtein.Protein.Name</span>
+                            }
+                        </td>
+                        <td class="text-center text-break text-nowrap" hidden>
+                            <span title="@pathProtein.Index">@pathProtein.Index</span>
+                        </td>
+                        @if (Model.View.HasNetworkDatabases)
+                        {
+                            <td class="text-center text-break">
+                                <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@pathProtein.Protein.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div>
+                <span>Path interactions</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>This section contains the interactions in the path.</span>
+        </div>
+        <table class="table table-hover table-bordered table-datatable" data-order="[[2, &quot;asc&quot;]]">
+            <thead class="thead-light">
+                <tr>
+                    <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
+                        <span>#</span>
+                    </th>
+                    <th class="text-left text-break">
+                        <span>Interaction</span>
+                    </th>
+                    <th class="text-center text-break text-nowrap" hidden>
+                        <span>Index</span>
+                    </th>
+                    @if (Model.View.HasNetworkDatabases)
+                    {
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pathInteraction in Model.View.PathInteractions)
+                {
+                    <tr>
+                        <td class="text-center text-break text-nowrap">
+                            <span></span>
+                        </td>
+                        <td class="text-left text-break">
+
+                            @if (Model.View.HasNetworkDatabases)
+                            {
+                                <a asp-page="/AvailableData/Data/Interactions/Details" asp-route-id="@pathInteraction.Interaction.Id" title="@pathInteraction.Interaction.Name">@pathInteraction.Interaction.Name</a>
+                            }
+                            else
+                            {
+                                <span title="@pathInteraction.Interaction.Name">@pathInteraction.Interaction.Name</span>
+                            }
+                        </td>
+                        <td class="text-center text-break text-nowrap" hidden>
+                            <span title="@pathInteraction.Index">@pathInteraction.Index</span>
+                        </td>
+                        @if (Model.View.HasNetworkDatabases)
+                        {
+                            <td class="text-center text-break">
+                                <a asp-page="/AvailableData/Data/Interactions/Details" asp-route-id="@pathInteraction.Interaction.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

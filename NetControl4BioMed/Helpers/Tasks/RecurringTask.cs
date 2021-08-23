@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
-using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.ViewModels;
@@ -65,18 +64,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["DatabaseTypes"] = await context.DatabaseTypes
-                    .Where(item => item.Name != "Generic")
-                    .CountAsync();
-            }
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the items with the provided IDs.
                 dictionary["Databases"] = await context.Databases
-                    .Where(item => item.DatabaseType.Name != "Generic")
                     .CountAsync();
             }
             // Use a new scope.
@@ -85,8 +73,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["DatabaseNodeFields"] = await context.DatabaseNodeFields
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                dictionary["DatabaseProteinFields"] = await context.DatabaseProteinFields
                     .CountAsync();
             }
             // Use a new scope.
@@ -95,8 +82,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["DatabaseEdgeFields"] = await context.DatabaseEdgeFields
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                dictionary["DatabaseInteractionFields"] = await context.DatabaseInteractionFields
                     .CountAsync();
             }
             // Use a new scope.
@@ -105,8 +91,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["Nodes"] = await context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                dictionary["Proteins"] = await context.Proteins
+                    .Where(item => item.DatabaseProteins.Any())
                     .CountAsync();
             }
             // Use a new scope.
@@ -115,8 +101,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["Edges"] = await context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                dictionary["Interactions"] = await context.Interactions
+                    .Where(item => item.DatabaseInteractions.Any())
                     .CountAsync();
             }
             // Use a new scope.
@@ -125,28 +111,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["GenericNodes"] = await context.Nodes
-                    .Where(item => item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .CountAsync();
-            }
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the items with the provided IDs.
-                dictionary["GenericEdges"] = await context.Edges
-                    .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .CountAsync();
-            }
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the items with the provided IDs.
-                dictionary["NodeCollections"] = await context.NodeCollections
-                    .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                dictionary["ProteinCollections"] = await context.ProteinCollections
                     .CountAsync();
             }
             // Use a new scope.
@@ -172,6 +137,99 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
+        /// Counts the public items in the database.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        /// <returns>A dictionary containing the number of public items in the database.</returns>
+        public async Task<Dictionary<string, int>> CountPublicItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Define the dictionary to return.
+            var dictionary = new Dictionary<string, int>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Databases"] = await context.Databases
+                    .Where(item => item.IsPublic)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["DatabaseProteinFields"] = await context.DatabaseProteinFields
+                    .Where(item => item.Database.IsPublic)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["DatabaseInteractionFields"] = await context.DatabaseInteractionFields
+                    .Where(item => item.Database.IsPublic)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Proteins"] = await context.Proteins
+                    .Where(item => item.DatabaseProteins.Any(item1 => item1.Database.IsPublic))
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Interactions"] = await context.Interactions
+                    .Where(item => item.DatabaseInteractions.Any(item1 => item1.Database.IsPublic))
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["ProteinCollections"] = await context.ProteinCollections
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Networks"] = await context.Networks
+                    .Where(item => item.IsPublic)
+                    .CountAsync();
+            }
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the items with the provided IDs.
+                dictionary["Analyses"] = await context.Analyses
+                    .Where(item => item.IsPublic)
+                    .CountAsync();
+            }
+            // Return the dictionary.
+            return dictionary;
+        }
+
+        /// <summary>
         /// Counts the duplicate items in the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
@@ -187,21 +245,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["DatabaseTypes"] = await context.DatabaseTypes
-                    .Where(item => item.Name != "Generic")
-                    .GroupBy(item => item.Name)
-                    .Where(item => item.Count() > 1)
-                    .Select(item => item.Key)
-                    .CountAsync();
-            }
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the items with the provided IDs.
                 dictionary["Databases"] = await context.Databases
-                    .Where(item => item.DatabaseType.Name != "Generic")
                     .GroupBy(item => item.Name)
                     .Where(item => item.Count() > 1)
                     .Select(item => item.Key)
@@ -213,8 +257,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["DatabaseNodeFields"] = await context.DatabaseNodeFields
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                dictionary["DatabaseProteinFields"] = await context.DatabaseProteinFields
                     .GroupBy(item => item.Name)
                     .Where(item => item.Count() > 1)
                     .Select(item => item.Key)
@@ -226,8 +269,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["DatabaseEdgeFields"] = await context.DatabaseEdgeFields
-                    .Where(item => item.Database.DatabaseType.Name != "Generic")
+                dictionary["DatabaseInteractionFields"] = await context.DatabaseInteractionFields
                     .GroupBy(item => item.Name)
                     .Where(item => item.Count() > 1)
                     .Select(item => item.Key)
@@ -239,10 +281,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["DatabaseNodeFieldNodes"] = await context.DatabaseNodeFieldNodes
-                    .Where(item => item.DatabaseNodeField.Database.DatabaseType.Name != "Generic")
-                    .Where(item => item.DatabaseNodeField.IsSearchable)
-                    .GroupBy(item => new { item.DatabaseNodeFieldId, item.Value })
+                dictionary["DatabaseProteinFieldProteins"] = await context.DatabaseProteinFieldProteins
+                    .Where(item => item.DatabaseProteinField.IsSearchable)
+                    .GroupBy(item => new { item.DatabaseProteinFieldId, item.Value })
                     .Where(item => item.Count() > 1)
                     .Select(item => item.Key)
                     .CountAsync();
@@ -253,10 +294,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["DatabaseEdgeFieldEdges"] = await context.DatabaseEdgeFieldEdges
-                    .Where(item => item.DatabaseEdgeField.Database.DatabaseType.Name != "Generic")
-                    .Where(item => item.DatabaseEdgeField.IsSearchable)
-                    .GroupBy(item => new { item.DatabaseEdgeFieldId, item.Value })
+                dictionary["DatabaseInteractionFieldInteractions"] = await context.DatabaseInteractionFieldInteractions
+                    .Where(item => item.DatabaseInteractionField.IsSearchable)
+                    .GroupBy(item => new { item.DatabaseInteractionFieldId, item.Value })
                     .Where(item => item.Count() > 1)
                     .Select(item => item.Key)
                     .CountAsync();
@@ -267,8 +307,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["Nodes"] = await context.Nodes
-                    .Where(item => !item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                dictionary["Proteins"] = await context.Proteins
+                    .Where(item => item.DatabaseProteins.Any())
                     .GroupBy(item => item.Name)
                     .Where(item => item.Count() > 1)
                     .Select(item => item.Key)
@@ -280,8 +320,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["Edges"] = await context.Edges
-                    .Where(item => !item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                dictionary["Interactions"] = await context.Interactions
+                    .Where(item => item.DatabaseInteractions.Any())
                     .GroupBy(item => item.Name)
                     .Where(item => item.Count() > 1)
                     .Select(item => item.Key)
@@ -293,8 +333,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["NodeCollections"] = await context.NodeCollections
-                    .Where(item => !item.NodeCollectionDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
+                dictionary["ProteinCollections"] = await context.ProteinCollections
                     .GroupBy(item => item.Name)
                     .Where(item => item.Count() > 1)
                     .Select(item => item.Key)
@@ -320,8 +359,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["Nodes"] = await context.Nodes
-                    .Where(item => !item.DatabaseNodeFieldNodes.Any())
+                dictionary["Proteins"] = await context.Proteins
+                    .Where(item => !item.DatabaseProteins.Any() && !item.NetworkProteins.Any())
                     .CountAsync();
             }
             // Use a new scope.
@@ -330,8 +369,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["Edges"] = await context.Edges
-                    .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
+                dictionary["Interactions"] = await context.Interactions
+                    .Where(item => (!item.DatabaseInteractions.Any() && !item.NetworkInteractions.Any()) || item.InteractionProteins.Count() < 2)
                     .CountAsync();
             }
             // Use a new scope.
@@ -340,30 +379,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
-                dictionary["GenericNodes"] = await context.Nodes
-                    .Where(item => item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => !item.NetworkNodes.Any())
-                    .CountAsync();
-            }
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the items with the provided IDs.
-                dictionary["GenericEdges"] = await context.Edges
-                    .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => !item.NetworkEdges.Any())
-                    .CountAsync();
-            }
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the items with the provided IDs.
-                dictionary["NodeCollections"] = await context.NodeCollections
-                    .Where(item => !item.NodeCollectionNodes.Any())
+                dictionary["ProteinCollections"] = await context.ProteinCollections
+                    .Where(item => !item.ProteinCollectionProteins.Any())
                     .CountAsync();
             }
             // Use a new scope.
@@ -373,7 +390,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
                 dictionary["Networks"] = await context.Networks
-                    .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any())
+                    .Where(item => !item.NetworkProteins.Any() || !item.NetworkInteractions.Any())
                     .CountAsync();
             }
             // Use a new scope.
@@ -383,71 +400,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items with the provided IDs.
                 dictionary["Analyses"] = await context.Analyses
-                    .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any())
-                    .CountAsync();
-            }
-            // Return the dictionary.
-            return dictionary;
-        }
-
-        /// <summary>
-        /// Counts the inconsistent items in the database.
-        /// </summary>
-        /// <param name="serviceProvider">The application service provider.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        /// <returns>A dictionary containing the number of inconsistent items in the database.</returns>
-        public async Task<Dictionary<string, int>> CountInconsistentItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
-        {
-            // Define the dictionary to return.
-            var dictionary = new Dictionary<string, int>(5);
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the items with the provided IDs.
-                dictionary["Nodes"] = await context.Nodes
-                    .Where(item => item.DatabaseNodes.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .CountAsync();
-            }
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the items with the provided IDs.
-                dictionary["Edges"] = await context.Edges
-                    .Where(item => item.DatabaseEdges.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .CountAsync();
-            }
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the items with the provided IDs.
-                dictionary["NodeCollections"] = await context.NodeCollections
-                    .Where(item => item.NodeCollectionNodes.Select(item1 => item1.Node.DatabaseNodes).SelectMany(item1 => item1).Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .CountAsync();
-            }
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the items with the provided IDs.
-                dictionary["Networks"] = await context.Networks
-                    .Where(item => item.NetworkDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
-                    .CountAsync();
-            }
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the items with the provided IDs.
-                dictionary["Analyses"] = await context.Analyses
-                    .Where(item => item.AnalysisDatabases.Select(item1 => item1.Database.DatabaseType).Distinct().Count() > 1)
+                    .Where(item => !item.AnalysisProteins.Any() || !item.AnalysisInteractions.Any() || item.Network == null)
                     .CountAsync();
             }
             // Return the dictionary.
@@ -491,6 +444,57 @@ namespace NetControl4BioMed.Helpers.Tasks
         }
 
         /// <summary>
+        /// Extends the time until the demonstration items are automatically deleted from the database.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task ExtendTimeUntilDeleteDemonstrationItemsAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Define the limit date.
+            var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeAlert + 1);
+            // Define the IDs of the items to get.
+            var networkIds = new List<string>();
+            var analysisIds = new List<string>();
+            // Use a new scope.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                // Use a new context instance.
+                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Get the IDs of the items to stop.
+                networkIds = context.Networks
+                    .Where(item => item.IsDemonstration)
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => item.Id)
+                    .ToList();
+                analysisIds = context.Analyses
+                    .Where(item => item.IsDemonstration)
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => item.Id)
+                    .ToList();
+            }
+            // Define the new tasks.
+            var analysisTask = new AnalysesTask
+            {
+                Items = analysisIds
+                    .Select(item => new AnalysisInputModel
+                    {
+                        Id = item
+                    })
+            };
+            var networkTask = new NetworksTask
+            {
+                Items = networkIds
+                    .Select(item => new NetworkInputModel
+                    {
+                        Id = item
+                    })
+            };
+            // Run the tasks.
+            await networkTask.ExtendTimeUntilDeleteAsync(serviceProvider, token);
+            await analysisTask.ExtendTimeUntilDeleteAsync(serviceProvider, token);
+        }
+
+        /// <summary>
         /// Alerts the users before deleting the long-standing networks and analyses from the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
@@ -500,8 +504,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             // Define the host.
             var host = new HostString(HostValue);
             // Define the limit dates.
-            var limitDateStart = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeAlert);
-            var limitDateEnd = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeAlert - 1);
+            var limitDateStart = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete - ApplicationDbContext.DaysBeforeAlert);
+            var limitDateEnd = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete - ApplicationDbContext.DaysBeforeAlert + 1);
             // Define the items to get.
             var alertNetworks = new List<AlertItemModel>();
             var alertAnalyses = new List<AlertItemModel>();
@@ -512,39 +516,30 @@ namespace NetControl4BioMed.Helpers.Tasks
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the networks and analyses.
                 alertNetworks = context.Networks
-                    .Where(item => limitDateStart < item.DateTimeCreated && item.DateTimeCreated < limitDateEnd)
+                    .Where(item => limitDateStart < item.DateTimeToDelete && item.DateTimeToDelete < limitDateEnd)
                     .Select(item => new AlertItemModel
                     {
                         Id = item.Id,
                         Name = item.Name,
-                        DatabaseTypeName = item.NetworkDatabases
-                            .Select(item1 => item1.Database.DatabaseType.Name)
-                            .FirstOrDefault(),
                         Emails = item.NetworkUsers
                             .Select(item1 => item1.User.Email)
                     })
-                    .Where(item => !string.IsNullOrEmpty(item.DatabaseTypeName))
                     .ToList();
                 alertAnalyses = context.Analyses
                     .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
-                    .Where(item => limitDateStart < item.DateTimeEnded && item.DateTimeEnded < limitDateEnd)
+                    .Where(item => limitDateStart < item.DateTimeToDelete && item.DateTimeToDelete < limitDateEnd)
                     .Concat(context.Networks
-                        .Where(item => limitDateStart < item.DateTimeCreated && item.DateTimeCreated < limitDateEnd)
-                        .Select(item => item.AnalysisNetworks)
-                        .SelectMany(item => item)
-                        .Select(item => item.Analysis))
+                        .Where(item => limitDateStart < item.DateTimeToDelete && item.DateTimeToDelete < limitDateEnd)
+                        .Select(item => item.Analyses)
+                        .SelectMany(item => item))
                     .Distinct()
                     .Select(item => new AlertItemModel
                     {
                         Id = item.Id,
                         Name = item.Name,
-                        DatabaseTypeName = item.AnalysisDatabases
-                            .Select(item1 => item1.Database.DatabaseType.Name)
-                            .FirstOrDefault(),
                         Emails = item.AnalysisUsers
                             .Select(item1 => item1.User.Email)
                     })
-                    .Where(item => !string.IsNullOrEmpty(item.DatabaseTypeName))
                     .ToList();
             }
             // Define the user items to get.
@@ -570,7 +565,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             {
                                 Id = item1.Id,
                                 Name = item1.Name,
-                                Url = linkGenerator.GetUriByPage($"/Content/DatabaseTypes/{item1.DatabaseTypeName}/Created/Networks/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
+                                Url = linkGenerator.GetUriByPage($"/CreatedData/Networks/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
                             }),
                         AnalysisItems = alertAnalyses
                             .Where(item1 => item1.Emails.Contains(item))
@@ -578,7 +573,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             {
                                 Id = item1.Id,
                                 Name = item1.Name,
-                                Url = linkGenerator.GetUriByPage($"/Content/DatabaseTypes/{item1.DatabaseTypeName}/Created/Analyses/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
+                                Url = linkGenerator.GetUriByPage($"/CreatedData/Analyses/Details/Index", handler: null, values: new { id = item1.Id }, scheme: Scheme, host: host)
                             })
                     })
                     .ToList();
@@ -616,34 +611,109 @@ namespace NetControl4BioMed.Helpers.Tasks
             // Define the limit date.
             var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
             // Define the IDs of the items to get.
-            var itemIds = new List<string>();
+            var userIds = new List<string>();
+            var databaseUserItemIds = new List<(string, string)>();
+            var networkUserItemIds = new List<(string, string)>();
+            var analysisUserItemIds = new List<(string, string)>();
             // Use a new scope.
             using (var scope = serviceProvider.CreateScope())
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the IDs of the items to delete.
-                itemIds = context.Users
+                userIds = context.Users
                     .Where(item => !item.EmailConfirmed)
                     .Where(item => item.DateTimeCreated < limitDate)
                     .Select(item => item.Id)
                     .ToList();
+                databaseUserItemIds = context.DatabaseUsers
+                    .Where(item => item.User == null)
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => new
+                    {
+                        DatabaseId = item.Database.Id,
+                        Email = item.Email
+                    })
+                    .AsEnumerable()
+                    .Select(item => (item.DatabaseId, item.Email))
+                    .ToList();
+                networkUserItemIds = context.NetworkUsers
+                    .Where(item => item.User == null)
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => new
+                    {
+                        NetworkId = item.Network.Id,
+                        Email = item.Email
+                    })
+                    .AsEnumerable()
+                    .Select(item => (item.NetworkId, item.Email))
+                    .ToList();
+                analysisUserItemIds = context.AnalysisUsers
+                    .Where(item => item.User == null)
+                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Select(item => new
+                    {
+                        AnalysisId = item.Analysis.Id,
+                        Email = item.Email
+                    })
+                    .AsEnumerable()
+                    .Select(item => (item.AnalysisId, item.Email))
+                    .ToList();
             }
-            // Define a new task.
-            var task = new UsersTask
+            // Define the new tasks.
+            var userTask = new UsersTask
             {
-                Items = itemIds
+                Items = userIds
                     .Select(item => new UserInputModel
                     {
                         Id = item
                     })
             };
+            var databaseUserTask = new DatabaseUsersTask
+            {
+                Items = databaseUserItemIds
+                    .Select(item => new DatabaseUserInputModel
+                    {
+                        Database = new DatabaseInputModel
+                        {
+                            Id = item.Item1
+                        },
+                        Email = item.Item2
+                    })
+            };
+            var networkUserTask = new NetworkUsersTask
+            {
+                Items = networkUserItemIds
+                    .Select(item => new NetworkUserInputModel
+                    {
+                        Network = new NetworkInputModel
+                        {
+                            Id = item.Item1
+                        },
+                        Email = item.Item2
+                    })
+            };
+            var analysisUserTask = new AnalysisUsersTask
+            {
+                Items = analysisUserItemIds
+                    .Select(item => new AnalysisUserInputModel
+                    {
+                        Analysis = new AnalysisInputModel
+                        {
+                            Id = item.Item1
+                        },
+                        Email = item.Item2
+                    })
+            };
             // Run the task.
-            await task.DeleteAsync(serviceProvider, token);
+            await userTask.DeleteAsync(serviceProvider, token);
+            await databaseUserTask.DeleteAsync(serviceProvider, token);
+            await networkUserTask.DeleteAsync(serviceProvider, token);
+            await analysisUserTask.DeleteAsync(serviceProvider, token);
         }
 
         /// <summary>
-        /// Deletes the long-standing analyses from the database.
+        /// Deletes the orphaned items from the database.
         /// </summary>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
@@ -655,15 +725,15 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the input models of the items to delete.
-                var itemInputModels = context.Nodes
-                    .Where(item => !item.DatabaseNodeFieldNodes.Any())
-                    .Select(item => new NodeInputModel
+                var itemInputModels = context.Proteins
+                    .Where(item => !item.DatabaseProteins.Any() && !item.NetworkProteins.Any())
+                    .Select(item => new ProteinInputModel
                     {
                         Id = item.Id
                     })
                     .ToList();
                 // Run a new task.
-                await new NodesTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
+                await new ProteinsTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
             }
             // Use a new scope.
             using (var scope = serviceProvider.CreateScope())
@@ -671,15 +741,15 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the input models of the items to delete.
-                var itemInputModels = context.Edges
-                    .Where(item => !item.DatabaseEdges.Any() || item.EdgeNodes.Count() < 2)
-                    .Select(item => new EdgeInputModel
+                var itemInputModels = context.Interactions
+                    .Where(item => (!item.DatabaseInteractions.Any() && !item.NetworkInteractions.Any()) || item.InteractionProteins.Count() < 2)
+                    .Select(item => new InteractionInputModel
                     {
                         Id = item.Id
                     })
                     .ToList();
                 // Run a new task.
-                await new EdgesTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
+                await new InteractionsTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
             }
             // Use a new scope.
             using (var scope = serviceProvider.CreateScope())
@@ -687,49 +757,15 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the input models of the items to delete.
-                var itemInputModels = context.Nodes
-                    .Where(item => item.DatabaseNodes.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => !item.NetworkNodes.Any())
-                    .Select(item => new NodeInputModel
+                var itemInputModels = context.ProteinCollections
+                    .Where(item => !item.ProteinCollectionProteins.Any())
+                    .Select(item => new ProteinCollectionInputModel
                     {
                         Id = item.Id
                     })
                     .ToList();
                 // Run a new task.
-                await new NodesTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
-            }
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the input models of the items to delete.
-                var itemInputModels = context.Edges
-                    .Where(item => item.DatabaseEdges.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Where(item => !item.NetworkEdges.Any())
-                    .Select(item => new EdgeInputModel
-                    {
-                        Id = item.Id
-                    })
-                    .ToList();
-                // Run a new task.
-                await new EdgesTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
-            }
-            // Use a new scope.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Use a new context instance.
-                using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the input models of the items to delete.
-                var itemInputModels = context.NodeCollections
-                    .Where(item => !item.NodeCollectionNodes.Any())
-                    .Select(item => new NodeCollectionInputModel
-                    {
-                        Id = item.Id
-                    })
-                    .ToList();
-                // Run a new task.
-                await new NodeCollectionsTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
+                await new ProteinCollectionsTask { Items = itemInputModels }.DeleteAsync(serviceProvider, token);
             }
             // Use a new scope.
             using (var scope = serviceProvider.CreateScope())
@@ -738,7 +774,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the input models of the items to delete.
                 var itemInputModels = context.Networks
-                    .Where(item => !item.NetworkDatabases.Any() || !item.NetworkNodes.Any() || !item.NetworkEdges.Any())
+                    .Where(item => !item.NetworkProteins.Any() || !item.NetworkInteractions.Any())
                     .Select(item => new NetworkInputModel
                     {
                         Id = item.Id
@@ -754,7 +790,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the input models of the items to delete.
                 var itemInputModels = context.Analyses
-                    .Where(item => !item.AnalysisDatabases.Any() || !item.AnalysisNodes.Any() || !item.AnalysisEdges.Any() || !item.AnalysisNetworks.Any())
+                    .Where(item => !item.AnalysisProteins.Any() || !item.AnalysisInteractions.Any() || item.Network == null)
                     .Select(item => new AnalysisInputModel
                     {
                         Id = item.Id
@@ -773,7 +809,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         public async Task DeleteNetworksAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Define the limit date.
-            var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
+            var limitDate = DateTime.Today;
             // Define the IDs of the items to get.
             var itemIds = new List<string>();
             // Use a new scope.
@@ -783,7 +819,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the IDs of the items to delete.
                 itemIds = context.Networks
-                    .Where(item => item.DateTimeCreated < limitDate)
+                    .Where(item => item.DateTimeToDelete < limitDate)
                     .Select(item => item.Id)
                     .ToList();
             }
@@ -808,7 +844,7 @@ namespace NetControl4BioMed.Helpers.Tasks
         public async Task DeleteAnalysesAsync(IServiceProvider serviceProvider, CancellationToken token)
         {
             // Define the limit date.
-            var limitDate = DateTime.Today - TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
+            var limitDate = DateTime.Today;
             // Define the IDs of the items to get.
             var itemIds = new List<string>();
             // Use a new scope.
@@ -819,7 +855,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the IDs of the items to delete.
                 itemIds = context.Analyses
                     .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
-                    .Where(item => item.DateTimeEnded < limitDate)
+                    .Where(item => item.DateTimeToDelete < limitDate)
                     .Select(item => item.Id)
                     .ToList();
             }
@@ -850,11 +886,6 @@ namespace NetControl4BioMed.Helpers.Tasks
             /// Represents the name of the alert item.
             /// </summary>
             public string Name { get; set; }
-
-            /// <summary>
-            /// Represents the name of the database type of the alert item.
-            /// </summary>
-            public string DatabaseTypeName { get; set; }
 
             /// <summary>
             /// Represents the e-mails of the alert item.

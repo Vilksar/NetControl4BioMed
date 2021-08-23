@@ -1,12 +1,10 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Tasks;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,7 +39,7 @@ namespace NetControl4BioMed.Helpers.Services
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
-           // Get the task corresponding to the background task.
+            // Get the task corresponding to the background task.
             var task = GetTask<NetworksTask>(backgroundTask);
             // Run the task.
             await task.DeleteAsync(_serviceProvider, token);
@@ -58,7 +56,7 @@ namespace NetControl4BioMed.Helpers.Services
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
-           // Get the task corresponding to the background task.
+            // Get the task corresponding to the background task.
             var task = GetTask<AnalysesTask>(backgroundTask);
             // Run the task.
             await task.DeleteAsync(_serviceProvider, token);
@@ -109,7 +107,7 @@ namespace NetControl4BioMed.Helpers.Services
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
-           // Get the task corresponding to the background task.
+            // Get the task corresponding to the background task.
             var task = GetTask<AnalysesTask>(backgroundTask);
             // Run the task.
             await task.StartAsync(_serviceProvider, token);
@@ -164,6 +162,40 @@ namespace NetControl4BioMed.Helpers.Services
             var task = GetTask<AnalysesTask>(backgroundTask);
             // Run the task.
             await task.SendEndedEmailsAsync(_serviceProvider, token);
+            // Complete the task.
+            await DeleteBackgroundTask(backgroundTask);
+        }
+
+        /// <summary>
+        /// Extends the time until the networks are automatically deleted from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task ExtendTimeUntilDeleteNetworksAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<NetworksTask>(backgroundTask);
+            // Run the task.
+            await task.ExtendTimeUntilDeleteAsync(_serviceProvider, token);
+            // Complete the task.
+            await DeleteBackgroundTask(backgroundTask);
+        }
+
+        /// <summary>
+        /// Extends the time until the analyses are automatically deleted from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task ExtendTimeUntilDeleteAnalysesAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<AnalysesTask>(backgroundTask);
+            // Run the task.
+            await task.ExtendTimeUntilDeleteAsync(_serviceProvider, token);
             // Complete the task.
             await DeleteBackgroundTask(backgroundTask);
         }

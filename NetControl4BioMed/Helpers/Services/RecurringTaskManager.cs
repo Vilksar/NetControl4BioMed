@@ -6,7 +6,6 @@ using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Tasks;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,6 +53,31 @@ namespace NetControl4BioMed.Helpers.Services
             {
                 // Update the counts.
                 configuration[$"Data:ItemCount:All:{entry.Key}"] = entry.Value.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Counts the public items in the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task CountPublicItemsAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<RecurringTask>(backgroundTask);
+            // Run the task.
+            var dictionary = await task.CountPublicItemsAsync(_serviceProvider, token);
+            // Create a new scope.
+            using var scope = _serviceProvider.CreateScope();
+            // Use a new configuration instance.
+            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            // Go over each entry in the dictionary.
+            foreach (var entry in dictionary)
+            {
+                // Update the counts.
+                configuration[$"Data:ItemCount:Public:{entry.Key}"] = entry.Value.ToString();
             }
         }
 
@@ -108,31 +132,6 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
-        /// Counts the inconsistent items in the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        public async Task CountInconsistentItemsAsync(string id, CancellationToken token)
-        {
-            // Get the background task with the provided ID.
-            var backgroundTask = GetBackgroundTask(id);
-            // Get the task corresponding to the background task.
-            var task = GetTask<RecurringTask>(backgroundTask);
-            // Run the task.
-            var dictionary = await task.CountInconsistentItemsAsync(_serviceProvider, token);
-            // Create a new scope.
-            using var scope = _serviceProvider.CreateScope();
-            // Use a new configuration instance.
-            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-            // Go over each entry in the dictionary.
-            foreach (var entry in dictionary)
-            {
-                // Update the counts.
-                configuration[$"Data:ItemCount:Inconsistent:{entry.Key}"] = entry.Value.ToString();
-            }
-        }
-
-        /// <summary>
         /// Stops the long-running analyses in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
@@ -148,6 +147,21 @@ namespace NetControl4BioMed.Helpers.Services
         }
 
         /// <summary>
+        /// Extends the time until the demonstration items are automatically deleted from the database.
+        /// </summary>
+        /// <param name="id">The ID of the background task.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task ExtendTimeUntilDeleteDemonstrationItemsAsync(string id, CancellationToken token)
+        {
+            // Get the background task with the provided ID.
+            var backgroundTask = GetBackgroundTask(id);
+            // Get the task corresponding to the background task.
+            var task = GetTask<RecurringTask>(backgroundTask);
+            // Run the task.
+            await task.ExtendTimeUntilDeleteDemonstrationItemsAsync(_serviceProvider, token);
+        }
+
+        /// <summary>
         /// Alerts the users before deleting the long-standing networks and analyses from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
@@ -156,7 +170,7 @@ namespace NetControl4BioMed.Helpers.Services
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
-           // Get the task corresponding to the background task.
+            // Get the task corresponding to the background task.
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
             await task.AlertUsersAsync(_serviceProvider, token);
@@ -201,7 +215,7 @@ namespace NetControl4BioMed.Helpers.Services
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
-           // Get the task corresponding to the background task.
+            // Get the task corresponding to the background task.
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
             await task.DeleteNetworksAsync(_serviceProvider, token);
@@ -216,7 +230,7 @@ namespace NetControl4BioMed.Helpers.Services
         {
             // Get the background task with the provided ID.
             var backgroundTask = GetBackgroundTask(id);
-           // Get the task corresponding to the background task.
+            // Get the task corresponding to the background task.
             var task = GetTask<RecurringTask>(backgroundTask);
             // Run the task.
             await task.DeleteAnalysesAsync(_serviceProvider, token);

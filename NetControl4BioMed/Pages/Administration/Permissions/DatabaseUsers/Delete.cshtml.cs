@@ -1,20 +1,19 @@
+using Hangfire;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using NetControl4BioMed.Data;
+using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Hangfire;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Helpers.InputModels;
-using NetControl4BioMed.Helpers.Interfaces;
-using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
 {
@@ -35,9 +34,9 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
 
         public class InputModel
         {
-            public IEnumerable<string> UserIds { get; set; }
-
             public IEnumerable<string> DatabaseIds { get; set; }
+
+            public IEnumerable<string> Emails { get; set; }
         }
 
         public ViewModel View { get; set; }
@@ -47,27 +46,27 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
             public IEnumerable<DatabaseUser> Items { get; set; }
         }
 
-        public IActionResult OnGet(IEnumerable<string> userIds, IEnumerable<string> databaseIds)
+        public IActionResult OnGet(IEnumerable<string> databaseIds, IEnumerable<string> emails)
         {
-            // Check if there aren't any e-mails or IDs provided.
-            if (userIds == null || databaseIds == null || !userIds.Any() || !databaseIds.Any() || userIds.Count() != databaseIds.Count())
+            // Check if there aren't any IDs or e-mails provided.
+            if (databaseIds == null || emails == null || !databaseIds.Any() || !emails.Any() || databaseIds.Count() != emails.Count())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Permissions/DatabaseUsers/Index");
             }
-            // Get the IDs of all selected users and databases.
-            var ids = userIds.Zip(databaseIds);
+            // Get the IDs of all selected databases and e-mails.
+            var ids = databaseIds.Zip(emails);
             // Define the view.
             View = new ViewModel
             {
                 Items = _context.DatabaseUsers
-                    .Where(item => userIds.Contains(item.User.Id) && databaseIds.Contains(item.Database.Id))
-                    .Include(item => item.User)
+                    .Where(item => databaseIds.Contains(item.Database.Id) && emails.Contains(item.Email))
                     .Include(item => item.Database)
+                    .Include(item => item.User)
                     .AsEnumerable()
-                    .Where(item => ids.Contains((item.User.Id, item.Database.Id)))
+                    .Where(item => ids.Contains((item.Database.Id, item.Email)))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -83,25 +82,25 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
 
         public async Task<IActionResult> OnPost()
         {
-            // Check if there aren't any e-mails or IDs provided.
-            if (Input.UserIds == null || Input.DatabaseIds == null || !Input.UserIds.Any() || !Input.DatabaseIds.Any() || Input.UserIds.Count() != Input.DatabaseIds.Count())
+            // Check if there aren't any IDs or e-mails provided.
+            if (Input.DatabaseIds == null || Input.Emails == null || !Input.DatabaseIds.Any() || !Input.Emails.Any() || Input.DatabaseIds.Count() != Input.Emails.Count())
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No or invalid IDs have been provided.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Permissions/DatabaseUsers/Index");
             }
-            // Get the IDs of all selected users and databases.
-            var ids = Input.UserIds.Zip(Input.DatabaseIds);
+            // Get the IDs of all selected databases and e-mails.
+            var ids = Input.DatabaseIds.Zip(Input.Emails);
             // Define the view.
             View = new ViewModel
             {
                 Items = _context.DatabaseUsers
-                    .Where(item => Input.UserIds.Contains(item.User.Id) && Input.DatabaseIds.Contains(item.Database.Id))
-                    .Include(item => item.User)
+                    .Where(item => Input.DatabaseIds.Contains(item.Database.Id) && Input.Emails.Contains(item.Email))
                     .Include(item => item.Database)
+                    .Include(item => item.User)
                     .AsEnumerable()
-                    .Where(item => ids.Contains((item.User.Id, item.Database.Id)))
+                    .Where(item => ids.Contains((item.Database.Id, item.Email)))
             };
             // Check if there weren't any items found.
             if (View.Items == null || !View.Items.Any())
@@ -135,10 +134,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
                         {
                             Id = item.Database.Id
                         },
-                        User = new UserInputModel
-                        {
-                            Id = item.User.Id
-                        }
+                        Email = item.Email
                     })
                 }, new JsonSerializerOptions { IgnoreNullValues = true })
             };

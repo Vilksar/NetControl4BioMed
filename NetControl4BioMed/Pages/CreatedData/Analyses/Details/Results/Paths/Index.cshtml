@@ -1,0 +1,118 @@
+﻿@page
+@model IndexModel
+@using NetControl4BioMed.Data.Enumerations
+@using Helpers.Extensions
+@{
+    ViewData["Title"] = "Analysis paths";
+}
+
+@if (Model.View.Analysis.Status != AnalysisStatus.Stopped && Model.View.Analysis.Status != AnalysisStatus.Completed)
+{
+    <div class="alert alert-warning text-justify text-wrap">
+        <span><i class="fas fa-exclamation-triangle"></i></span>
+        <span>Results are available only for stopped or completed analyses.</span>
+    </div>
+}
+else
+{
+    @if (Model.View.Analysis.Algorithm == AnalysisAlgorithm.Genetic)
+    {
+        <div class="alert alert-warning text-justify text-wrap">
+            <span><i class="fas fa-exclamation-triangle"></i></span>
+            <span>The algorithm "@AnalysisAlgorithm.Genetic.GetDisplayName()" returns only control proteins, and not control paths. Thus, all displayed path lengths correspond to the shortest paths between a control protein and its corresponding controlled target proteins, instead of the actual control path.</span>
+        </div>
+    }
+    <partial name="_SearchInputPartial" model="Model.View.Search.Input" />
+    <partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
+    @if (!Model.View.Search.Items.Any())
+    {
+        <div class="alert alert-info text-justify text-wrap">
+            <span><i class="fas fa-info-circle"></i></span>
+            <span>No paths have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
+        </div>
+    }
+    else
+    {
+        <table class="table table-hover table-bordered" data-paging="false" data-info="false" data-searching="false">
+            <thead class="thead-light">
+                <tr>
+                    <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
+                        <span>#</span>
+                    </th>
+                    <th class="text-left text-break">
+                        <span>Control input</span>
+                    </th>
+                    <th class="text-left text-break">
+                        <span>Controlled target</span>
+                    </th>
+                    <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                        <span>Length</span>
+                    </th>
+                    <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                        <span>Links</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var (item, index) in Model.View.Search.Items.Select((item, index) => (item, index)))
+                {
+                    var sourceProtein = item.PathProteins
+                        .Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathProteinType.Source)
+                        .Select(item => item.Protein)
+                        .First();
+                    var targetProtein = item.PathProteins
+                        .Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathProteinType.Target)
+                        .Select(item => item.Protein)
+                        .First();
+                    var pathLength = item.PathProteins
+                        .Where(item => item.Type == NetControl4BioMed.Data.Enumerations.PathProteinType.None)
+                        .Count() - 1;
+                    <tr>
+                        <td class="text-center text-break text-nowrap">
+                            <span>@(Model.View.Search.Pagination.ItemsPerPageFirst + index)</span>
+                        </td>
+                        <td class="text-left text-break">
+                            <div>
+                                @if (Model.View.HasNetworkDatabases)
+                                {
+                                    <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@sourceProtein.Id" class="font-weight-bold" title="@sourceProtein.Name">@sourceProtein.Name</a>
+                                }
+                                else
+                                {
+                                    <span class="font-weight-bold" title="@sourceProtein.Name">@sourceProtein.Name</span>
+                                }
+                            </div>
+                            <div>
+                                <span class="small text-muted" title="@sourceProtein.Id">@sourceProtein.Id</span>
+                            </div>
+                        </td>
+                        <td class="text-left text-break">
+                            <div>
+                                @if (Model.View.HasNetworkDatabases)
+                                {
+                                    <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@targetProtein.Id" class="font-weight-bold" title="@targetProtein.Name">@targetProtein.Name</a>
+                                }
+                                else
+                                {
+                                    <span class="font-weight-bold" title="@targetProtein.Name">@targetProtein.Name</span>
+                                }
+                            </div>
+                            <div>
+                                <span class="small text-muted" title="@targetProtein.Id">@targetProtein.Id</span>
+                            </div>
+                        </td>
+                        <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                            <span title="@pathLength">@pathLength</span>
+                        </td>
+                        <td class="text-center text-break">
+                            <a asp-page="/CreatedData/Analyses/Details/Results/Paths/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                                <span><i class="fas fa-info-circle"></i></span>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <partial name="_SearchPaginationPartial" model="Model.View.Search.Pagination" />
+    }
+}

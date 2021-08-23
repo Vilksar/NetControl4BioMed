@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NetControl4BioMed.Helpers.ModelBinders;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.ViewModels
 {
@@ -27,6 +24,11 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// Represents the length parameter.
         /// </summary>
         public int Length { get; set; }
+
+        /// <summary>
+        /// Represents the selected items parameter.
+        /// </summary>
+        public List<string> SelectedItems { get; set; }
 
         /// <summary>
         /// Represents the search details.

@@ -7,7 +7,6 @@ using NetControl4BioMed.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,10 +27,10 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
         public static async Task Run(string analysisId, IServiceProvider serviceProvider, CancellationToken token)
         {
             // Define the required data.
-            var analysisNodeIds = new List<string>();
-            var analysisEdgeIds = new List<(string, string, string)>();
-            var nodes = new List<string>();
-            var edges = new List<(string, string)>();
+            var analysisProteinIds = new List<string>();
+            var analysisInteractionIds = new List<(string, string, string)>();
+            var proteins = new List<string>();
+            var interactions = new List<(string, string)>();
             var sources = new List<string>();
             var targets = new List<string>();
             var parameters = new Parameters();
@@ -52,52 +51,52 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
                     return;
                 }
                 // Get the required data.
-                analysisNodeIds = context.AnalysisNodes
+                analysisProteinIds = context.AnalysisProteins
                     .Where(item => item.Analysis == analysis)
-                    .Where(item => item.Type == AnalysisNodeType.None)
-                    .Select(item => item.Node.Id)
+                    .Where(item => item.Type == AnalysisProteinType.None)
+                    .Select(item => item.Protein.Id)
                     .ToList();
-                analysisEdgeIds = context.AnalysisEdges
+                analysisInteractionIds = context.AnalysisInteractions
                     .Where(item => item.Analysis == analysis)
-                    .Select(item => item.Edge)
+                    .Select(item => item.Interaction)
                     .Select(item => new
                     {
-                        Edge = item.Id,
-                        SourceNodeId = item.EdgeNodes
-                            .Where(item1 => item1.Type == EdgeNodeType.Source)
-                            .Select(item1 => item1.Node.Id)
+                        Interaction = item.Id,
+                        SourceProteinId = item.InteractionProteins
+                            .Where(item1 => item1.Type == InteractionProteinType.Source)
+                            .Select(item1 => item1.Protein.Id)
                             .FirstOrDefault(),
-                        TargetNodeId = item.EdgeNodes
-                            .Where(item1 => item1.Type == EdgeNodeType.Target)
-                            .Select(item1 => item1.Node.Id)
+                        TargetProteinId = item.InteractionProteins
+                            .Where(item1 => item1.Type == InteractionProteinType.Target)
+                            .Select(item1 => item1.Protein.Id)
                             .FirstOrDefault()
                     })
-                    .Where(item => !string.IsNullOrEmpty(item.SourceNodeId) && !string.IsNullOrEmpty(item.TargetNodeId))
+                    .Where(item => !string.IsNullOrEmpty(item.SourceProteinId) && !string.IsNullOrEmpty(item.TargetProteinId))
                     .AsEnumerable()
-                    .Select(item => (item.SourceNodeId, item.TargetNodeId, item.Edge))
+                    .Select(item => (item.SourceProteinId, item.TargetProteinId, item.Interaction))
                     .Distinct()
                     .ToList();
-                // Get the nodes, edges, target nodes and source (preferred) nodes.
-                nodes = analysisNodeIds
+                // Get the proteins, interactions, target proteins and source (preferred) proteins.
+                proteins = analysisProteinIds
                     .ToList();
-                edges = analysisEdgeIds
+                interactions = analysisInteractionIds
                     .Select(item => (item.Item1, item.Item2))
                     .ToList();
-                sources = context.AnalysisNodes
+                sources = context.AnalysisProteins
                     .Where(item => item.Analysis == analysis)
-                    .Where(item => item.Type == AnalysisNodeType.Source)
-                    .Select(item => item.Node.Id)
+                    .Where(item => item.Type == AnalysisProteinType.Source)
+                    .Select(item => item.Protein.Id)
                     .ToList();
-                targets = context.AnalysisNodes
+                targets = context.AnalysisProteins
                     .Where(item => item.Analysis == analysis)
-                    .Where(item => item.Type == AnalysisNodeType.Target)
-                    .Select(item => item.Node.Id)
+                    .Where(item => item.Type == AnalysisProteinType.Target)
+                    .Select(item => item.Protein.Id)
                     .ToList();
-                // Check if there is any node in an edge that does not appear in the list of nodes.
-                if (edges.Select(item => item.Item1).Concat(edges.Select(item => item.Item2)).Distinct().Except(nodes).Any())
+                // Check if there is any protein in an interaction that does not appear in the list of proteins.
+                if (interactions.Select(item => item.Item1).Concat(interactions.Select(item => item.Item2)).Distinct().Except(proteins).Any())
                 {
                     // Update the analysis with an error message.
-                    analysis.Log = analysis.AppendToLog("There are edges which contain unknown nodes.");
+                    analysis.Log = analysis.AppendToLog("There are interactions which contain unknown proteins.");
                     // Update the analysis status.
                     analysis.Status = AnalysisStatus.Error;
                     // Update the analysis end time.
@@ -107,11 +106,11 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
                     // End the function.
                     return;
                 }
-                // Check if there is any target node that does not appear in the list of nodes.
-                if (targets.Except(nodes).Any())
+                // Check if there is any target protein that does not appear in the list of proteins.
+                if (targets.Except(proteins).Any())
                 {
                     // Update the analysis with an error message.
-                    analysis.Log = analysis.AppendToLog("There are unknown target nodes.");
+                    analysis.Log = analysis.AppendToLog("There are unknown target proteins.");
                     // Update the analysis status.
                     analysis.Status = AnalysisStatus.Error;
                     // Update the analysis end time.
@@ -121,11 +120,11 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
                     // End the function.
                     return;
                 }
-                // Check if there is any source node that does not appear in the list of nodes.
-                if (sources.Except(nodes).Any())
+                // Check if there is any source protein that does not appear in the list of proteins.
+                if (sources.Except(proteins).Any())
                 {
                     // Update the analysis with an error message.
-                    analysis.Log = analysis.AppendToLog("There are unknown source nodes.");
+                    analysis.Log = analysis.AppendToLog("There are unknown source proteins.");
                     // Update the analysis status.
                     analysis.Status = AnalysisStatus.Error;
                     // Update the analysis end time.
@@ -154,13 +153,13 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
                 maximumIterationsWithoutImprovement = analysis.MaximumIterationsWithoutImprovement;
             }
             // Get the additional needed variables.
-            var nodeIndex = nodes.Select((item, index) => (item, index)).ToDictionary(item => item.item, item => item.index);
-            var nodeIsPreferred = nodes.ToDictionary(item => item, item => sources.Contains(item));
-            var matrixA = GetMatrixA(nodeIndex, edges);
-            var matrixC = GetMatrixC(nodeIndex, targets);
+            var proteinIndex = proteins.Select((item, index) => (item, index)).ToDictionary(item => item.item, item => item.index);
+            var proteinIsPreferred = proteins.ToDictionary(item => item, item => sources.Contains(item));
+            var matrixA = GetMatrixA(proteinIndex, interactions);
+            var matrixC = GetMatrixC(proteinIndex, targets);
             var powersMatrixA = GetPowersMatrixA(matrixA, parameters.MaximumPathLength);
             var powersMatrixCA = GetPowersMatrixCA(matrixC, powersMatrixA);
-            var targetAncestors = GetTargetAncestors(powersMatrixA, targets, nodeIndex);
+            var targetAncestors = GetTargetAncestors(powersMatrixA, targets, proteinIndex);
             // Use a new scope.
             using (var scope = serviceProvider.CreateScope())
             {
@@ -221,7 +220,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
                 var random = new Random(parameters.RandomSeed);
                 var bestSolutionSize = 0.0;
                 // Initialize a new population.
-                var population = new Population(nodeIndex, targets, targetAncestors, powersMatrixCA, nodeIsPreferred, parameters, random);
+                var population = new Population(proteinIndex, targets, targetAncestors, powersMatrixCA, proteinIsPreferred, parameters, random);
                 // Run as long as the analysis exists and the final iteration hasn't been reached.
                 while (analysisStillExists && analysisStatus == AnalysisStatus.Ongoing && currentIteration < maximumIterations && currentIterationWithoutImprovement < maximumIterationsWithoutImprovement && !token.IsCancellationRequested)
                 {
@@ -229,7 +228,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
                     currentIteration += 1;
                     currentIterationWithoutImprovement += 1;
                     // Move on to the next population.
-                    population = new Population(population, nodeIndex, targets, targetAncestors, powersMatrixCA, nodeIsPreferred, parameters, random);
+                    population = new Population(population, proteinIndex, targets, targetAncestors, powersMatrixCA, proteinIsPreferred, parameters, random);
                     // Get the best fitness of the current solution.
                     var currentSolutionSize = population.GetFitnessList().Max();
                     // Check if the current solution is better than the previously obtained best solutions.
@@ -242,19 +241,19 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
                     }
                 }
                 // Get the control paths.
-                controlPaths = population.GetControlPaths(nodeIndex, nodes, edges).Select(item => new ControlPath
+                controlPaths = population.GetControlPaths(proteinIndex, proteins, interactions).Select(item => new ControlPath
                 {
                     Paths = item.Values.Select(item1 =>
                     {
-                        // Get the nodes and edges in the path.
-                        var pathNodes = item1
-                            .Select(item2 => analysisNodeIds.FirstOrDefault(item3 => item3 == item2))
+                        // Get the proteins and interactions in the path.
+                        var pathProteins = item1
+                            .Select(item2 => analysisProteinIds.FirstOrDefault(item3 => item3 == item2))
                             .Where(item2 => item2 != null)
                             .Reverse()
                             .ToList();
-                        var pathEdges = item1
+                        var pathInteractions = item1
                             .Zip(item1.Skip(1), (item2, item3) => (item3.ToString(), item2.ToString()))
-                            .Select(item2 => analysisEdgeIds.FirstOrDefault(item3 => item3.Item1 == item2.Item1 && item3.Item2 == item2.Item2))
+                            .Select(item2 => analysisInteractionIds.FirstOrDefault(item3 => item3.Item1 == item2.Item1 && item3.Item2 == item2.Item2))
                             .Select(item2 => item2.Item3)
                             .Where(item2 => !string.IsNullOrEmpty(item2))
                             .Reverse()
@@ -262,11 +261,11 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
                         // Return the path.
                         return new Path
                         {
-                            PathNodes = pathNodes.Select((item2, index) => new PathNode { NodeId = item2, Type = PathNodeType.None, Index = index })
-                                .Append(new PathNode { NodeId = pathNodes.First(), Type = PathNodeType.Source, Index = -1 })
-                                .Append(new PathNode { NodeId = pathNodes.Last(), Type = PathNodeType.Target, Index = pathNodes.Count() })
+                            PathProteins = pathProteins.Select((item2, index) => new PathProtein { ProteinId = item2, Type = PathProteinType.None, Index = index })
+                                .Append(new PathProtein { ProteinId = pathProteins.First(), Type = PathProteinType.Source, Index = -1 })
+                                .Append(new PathProtein { ProteinId = pathProteins.Last(), Type = PathProteinType.Target, Index = pathProteins.Count() })
                                 .ToList(),
-                            PathEdges = pathEdges.Select((item2, index) => new PathEdge { EdgeId = item2, Index = index }).ToList()
+                            PathInteractions = pathInteractions.Select((item2, index) => new PathInteraction { InteractionId = item2, Index = index }).ToList()
                         };
                     }).ToList()
                 }).ToList();
@@ -301,38 +300,38 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
         /// <summary>
         /// Computes the A matrix (corresponding to the adjacency matrix).
         /// </summary>
-        /// <param name="nodeIndices">The dictionary containing, for each node, its index in the node list.</param>
-        /// <param name="edges">The edges of the graph.</param>
+        /// <param name="proteinIndices">The dictionary containing, for each protein, its index in the protein list.</param>
+        /// <param name="interactions">The interactions of the graph.</param>
         /// <returns>The A matrix (corresponding to the adjacency matrix).</returns>
-        private static Matrix<double> GetMatrixA(Dictionary<string, int> nodeIndices, List<(string, string)> edges)
+        private static Matrix<double> GetMatrixA(Dictionary<string, int> proteinIndices, List<(string, string)> interactions)
         {
             // Initialize the adjacency matrix with zero.
-            var matrixA = Matrix<double>.Build.DenseDiagonal(nodeIndices.Count(), nodeIndices.Count(), 0.0);
-            // Go over each of the edges.
-            foreach (var edge in edges)
+            var matrixA = Matrix<double>.Build.DenseDiagonal(proteinIndices.Count(), proteinIndices.Count(), 0.0);
+            // Go over each of the interactions.
+            foreach (var interaction in interactions)
             {
-                // Set to 1.0 the corresponding entry in the matrix (source nodes are on the columns, target nodes are on the rows).
-                matrixA[nodeIndices[edge.Item2], nodeIndices[edge.Item1]] = 1.0;
+                // Set to 1.0 the corresponding entry in the matrix (source proteins are on the columns, target proteins are on the rows).
+                matrixA[proteinIndices[interaction.Item2], proteinIndices[interaction.Item1]] = 1.0;
             }
             // Return the matrix.
             return matrixA;
         }
 
         /// <summary>
-        /// Computes the C matrix (corresponding to the target nodes).
+        /// Computes the C matrix (corresponding to the target proteins).
         /// </summary>
-        /// <param name="nodeIndex">The dictionary containing, for each node, its index in the node list.</param>
-        /// <param name="targets">The target nodes for the algorithm.</param>
-        /// <returns>The C matrix (corresponding to the target nodes).</returns>
-        private static Matrix<double> GetMatrixC(Dictionary<string, int> nodeIndex, List<string> targets)
+        /// <param name="proteinIndex">The dictionary containing, for each protein, its index in the protein list.</param>
+        /// <param name="targets">The target proteins for the algorithm.</param>
+        /// <returns>The C matrix (corresponding to the target proteins).</returns>
+        private static Matrix<double> GetMatrixC(Dictionary<string, int> proteinIndex, List<string> targets)
         {
             // Initialize the C matrix with zero.
-            var matrixC = Matrix<double>.Build.Dense(targets.Count(), nodeIndex.Count());
-            // Go over each target node,
+            var matrixC = Matrix<double>.Build.Dense(targets.Count(), proteinIndex.Count());
+            // Go over each target protein,
             for (int index = 0; index < targets.Count(); index++)
             {
                 // Set to 1.0 the corresponding entry in the matrix.
-                matrixC[index, nodeIndex[targets[index]]] = 1.0;
+                matrixC[index, proteinIndex[targets[index]]] = 1.0;
             }
             // And we return the matrix.
             return matrixC;
@@ -364,7 +363,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
         /// <summary>
         /// Computes the powers of the combination between the target matrix C and the adjacency matrix A.
         /// </summary>
-        /// <param name="matrixC">The matrix corresponding to the target nodes in the graph.</param>
+        /// <param name="matrixC">The matrix corresponding to the target proteins in the graph.</param>
         /// <param name="powersMatrixA">The list of powers of the adjacency matrix A.</param>
         /// <returns>The powers of the combination between the target matrix C and the adjacency matrix A.</returns>
         private static List<Matrix<double>> GetPowersMatrixCA(Matrix<double> matrixC, List<Matrix<double>> powersMatrixA)
@@ -382,26 +381,26 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
         }
 
         /// <summary>
-        /// Computes, for every target node, the list of nodes from which it can be reached.
+        /// Computes, for every target protein, the list of proteins from which it can be reached.
         /// </summary>
         /// <param name="powersMatrixA">The list of powers of the adjacency matrix A.</param>
-        /// <param name="targets">The target nodes for the algorithm.</param>
-        /// <param name="nodeIndex">The dictionary containing, for each node, its index in the node list.</param>
-        /// <returns>The list of nodes from which every target node can be reached.</returns>
-        private static Dictionary<string, List<string>> GetTargetAncestors(List<Matrix<double>> powersMatrixA, List<string> targets, Dictionary<string, int> nodeIndex)
+        /// <param name="targets">The target proteins for the algorithm.</param>
+        /// <param name="proteinIndex">The dictionary containing, for each protein, its index in the protein list.</param>
+        /// <returns>The list of proteins from which every target protein can be reached.</returns>
+        private static Dictionary<string, List<string>> GetTargetAncestors(List<Matrix<double>> powersMatrixA, List<string> targets, Dictionary<string, int> proteinIndex)
         {
-            // Initialize the path dictionary with an empty list for each target node.
+            // Initialize the path dictionary with an empty list for each target protein.
             var dictionary = targets.ToDictionary(item => item, item => new List<string>());
             // For every power of the adjacency matrix.
             for (int index1 = 0; index1 < powersMatrixA.Count(); index1++)
             {
-                // For every target node.
+                // For every target protein.
                 for (int index2 = 0; index2 < targets.Count(); index2++)
                 {
-                    // Add to the target node all of the nodes corresponding to the non-zero entries in the proper row of the matrix.
+                    // Add to the target protein all of the proteins corresponding to the non-zero entries in the proper row of the matrix.
                     dictionary[targets[index2]].AddRange(powersMatrixA[index1]
-                        .Row(nodeIndex[targets[index2]])
-                        .Select((value, index) => value != 0 ? nodeIndex.FirstOrDefault(item => item.Value == index).Key : null)
+                        .Row(proteinIndex[targets[index2]])
+                        .Select((value, index) => value != 0 ? proteinIndex.FirstOrDefault(item => item.Value == index).Key : null)
                         .Where(item => !string.IsNullOrEmpty(item))
                         .ToList());
                 }
@@ -409,7 +408,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Genetic
             // For each item in the dictionary.
             foreach (var item in dictionary.Keys.ToList())
             {
-                // Remove all duplicate nodes.
+                // Remove all duplicate proteins.
                 dictionary[item] = dictionary[item].Distinct().ToList();
             }
             // Return the dictionary.

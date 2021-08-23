@@ -19,24 +19,24 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Neighbors
     public static class Algorithm
     {
         /// <summary>
-        /// Represents the model of the required database data for an edge.
+        /// Represents the model of the required database data for an interaction.
         /// </summary>
-        private class EdgeItemModel
+        private class InteractionItemModel
         {
             /// <summary>
-            /// Represents the ID of the edge.
+            /// Represents the ID of the interaction.
             /// </summary>
-            public string EdgeId { get; set; }
+            public string InteractionId { get; set; }
 
             /// <summary>
-            /// Represents the ID of the source node of the edge.
+            /// Represents the ID of the source protein of the interaction.
             /// </summary>
-            public string SourceNodeId { get; set; }
+            public string SourceProteinId { get; set; }
 
             /// <summary>
-            /// Represents the ID of the target node of the edge.
+            /// Represents the ID of the target protein of the interaction.
             /// </summary>
-            public string TargetNodeId { get; set; }
+            public string TargetProteinId { get; set; }
         }
 
         /// <summary>
@@ -49,11 +49,10 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Neighbors
         public static async Task Run(string networkId, IServiceProvider serviceProvider, CancellationToken token)
         {
             // Define the required data.
-            var data = new List<NetworkNodeInputModel>();
-            var databaseTypeName = string.Empty;
-            var nodeDatabaseIds = new List<string>();
-            var edgeDatabaseIds = new List<string>();
-            var seedNodeCollectionIds = new List<string>();
+            var data = new List<NetworkProteinInputModel>();
+            var proteinDatabaseIds = new List<string>();
+            var interactionDatabaseIds = new List<string>();
+            var seedProteinCollectionIds = new List<string>();
             // Use a new scope.
             using (var scope = serviceProvider.CreateScope())
             {
@@ -68,62 +67,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Neighbors
                     // Return.
                     return;
                 }
-                // Get the related data.
-                var databaseTypes = context.NetworkDatabases
-                    .Where(item => item.Network == network)
-                    .Select(item => item.Database.DatabaseType);
-                // Check if there was any error in retrieving related data from the database.
-                if (databaseTypes == null)
-                {
-                    // Update the status of the item.
-                    network.Status = NetworkStatus.Error;
-                    // Add a message to the log.
-                    network.Log = network.AppendToLog("There was an error in retrieving related data from the database.");
-                    // Edit the network.
-                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
-                    // End the function.
-                    return;
-                }
-                // Check if there weren't any database types found.
-                if (!databaseTypes.Any())
-                {
-                    // Update the status of the item.
-                    network.Status = NetworkStatus.Error;
-                    // Add a message to the log.
-                    network.Log = network.AppendToLog("No database types corresponding to the network databases could be found.");
-                    // Edit the network.
-                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
-                    // End the function.
-                    return;
-                }
-                // Check if the database types are different.
-                if (databaseTypes.Distinct().Count() > 1)
-                {
-                    // Update the status of the item.
-                    network.Status = NetworkStatus.Error;
-                    // Add a message to the log.
-                    network.Log = network.AppendToLog("The database types corresponding to the network databases are different.");
-                    // Edit the network.
-                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
-                    // End the function.
-                    return;
-                }
-                // Check if the database types are not valid.
-                if (databaseTypes.Any(item => item.Name == "Generic"))
-                {
-                    // Update the status of the item.
-                    network.Status = NetworkStatus.Error;
-                    // Add a message to the log.
-                    network.Log = network.AppendToLog("The database type corresponding to the network databases and the network algorithm don't match.");
-                    // Edit the network.
-                    await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
-                    // End the function.
-                    return;
-                }
-                // Get the database type name.
-                databaseTypeName = databaseTypes.Select(item => item.Name).First();
                 // Try to deserialize the data.
-                if (!network.Data.TryDeserializeJsonObject<List<NetworkNodeInputModel>>(out data) || data == null)
+                if (!network.Data.TryDeserializeJsonObject<List<NetworkProteinInputModel>>(out data) || data == null)
                 {
                     // Update the status of the item.
                     network.Status = NetworkStatus.Error;
@@ -135,41 +80,38 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Neighbors
                     return;
                 }
                 // Get the IDs of the required related data.
-                nodeDatabaseIds = context.NetworkDatabases
+                proteinDatabaseIds = context.NetworkDatabases
                     .Where(item => item.Network == network)
-                    .Where(item => item.Type == NetworkDatabaseType.Node)
+                    .Where(item => item.Type == NetworkDatabaseType.Protein)
                     .Select(item => item.Database)
                     .Distinct()
                     .Select(item => item.Id)
                     .ToList();
-                edgeDatabaseIds = context.NetworkDatabases
+                interactionDatabaseIds = context.NetworkDatabases
                     .Where(item => item.Network == network)
-                    .Where(item => item.Type == NetworkDatabaseType.Edge)
+                    .Where(item => item.Type == NetworkDatabaseType.Interaction)
                     .Select(item => item.Database)
                     .Distinct()
                     .Select(item => item.Id)
                     .ToList();
-                seedNodeCollectionIds = context.NetworkNodeCollections
+                seedProteinCollectionIds = context.NetworkProteinCollections
                     .Where(item => item.Network == network)
-                    .Where(item => item.Type == NetworkNodeCollectionType.Seed)
-                    .Select(item => item.NodeCollection)
+                    .Where(item => item.Type == NetworkProteinCollectionType.Seed)
+                    .Select(item => item.ProteinCollection)
                     .Distinct()
                     .Select(item => item.Id)
                     .ToList();
             }
-            // Get the related data.
-            var nodeTitle = databaseTypeName == "PPI" ? "Protein" : "Node";
-            var edgeTitle = databaseTypeName == "PPI" ? "Interaction" : "Edge";
-            // Get the node identifiers from the data.
-            var seedNodeIdentifiers = data
+            // Get the protein identifiers from the data.
+            var seedProteinIdentifiers = data
                 .Where(item => item.Type == "Seed")
-                .Select(item => item.Node)
+                .Select(item => item.Protein)
                 .Where(item => item != null)
                 .Select(item => item.Id)
                 .Where(item => !string.IsNullOrEmpty(item))
                 .Distinct();
             // Define the required data.
-            var seedNodeIds = new List<string>();
+            var seedProteinIds = new List<string>();
             // Use a new scope.
             using (var scope = serviceProvider.CreateScope())
             {
@@ -184,92 +126,92 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Neighbors
                     // Return.
                     return;
                 }
-                // Get the available nodes.
-                var availableNodes = context.Nodes
-                    .Where(item => item.DatabaseNodes.Any(item1 => nodeDatabaseIds.Contains(item1.Database.Id)));
-                // Check if there haven't been any available nodes found.
-                if (availableNodes == null || !availableNodes.Any())
+                // Get the available proteins.
+                var availableProteins = context.Proteins
+                    .Where(item => item.DatabaseProteins.Any(item1 => proteinDatabaseIds.Contains(item1.Database.Id)));
+                // Check if there haven't been any available proteins found.
+                if (availableProteins == null || !availableProteins.Any())
                 {
                     // Update the status of the item.
                     network.Status = NetworkStatus.Error;
                     // Add a message to the log.
-                    network.Log = network.AppendToLog($"No available {nodeTitle.ToLower()}s could be found in the selected databases.");
+                    network.Log = network.AppendToLog($"No available proteins could be found in the selected databases.");
                     // Edit the network.
                     await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     // End the function.
                     return;
                 }
-                // Get the available edges.
-                var availableEdges = context.Edges
-                    .Where(item => item.DatabaseEdges.Any(item1 => edgeDatabaseIds.Contains(item1.Database.Id)))
-                    .Where(item => item.EdgeNodes.All(item1 => availableNodes.Contains(item1.Node)));
-                // Check if there haven't been any available edges found.
-                if (availableEdges == null || !availableEdges.Any())
+                // Get the available interactions.
+                var availableInteractions = context.Interactions
+                    .Where(item => item.DatabaseInteractions.Any(item1 => interactionDatabaseIds.Contains(item1.Database.Id)))
+                    .Where(item => item.InteractionProteins.All(item1 => availableProteins.Contains(item1.Protein)));
+                // Check if there haven't been any available interactions found.
+                if (availableInteractions == null || !availableInteractions.Any())
                 {
                     // Update the status of the item.
                     network.Status = NetworkStatus.Error;
                     // Add a message to the log.
-                    network.Log = network.AppendToLog($"No available {edgeTitle.ToLower()}s could be found in the selected databases.");
+                    network.Log = network.AppendToLog($"No available interactions could be found in the selected databases.");
                     // Edit the network.
                     await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     // End the function.
                     return;
                 }
-                // Get the seed nodes.
-                var seedNodesByIdentifier = availableNodes
-                    .Where(item => seedNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.IsSearchable && seedNodeIdentifiers.Contains(item1.Value)));
-                var seedNodesByNodeCollection = availableNodes
-                    .Where(item => item.NodeCollectionNodes.Any(item1 => seedNodeCollectionIds.Contains(item1.NodeCollection.Id)));
-                seedNodeIds = seedNodesByIdentifier
-                    .Concat(seedNodesByNodeCollection)
+                // Get the seed proteins.
+                var seedProteinsByIdentifier = availableProteins
+                    .Where(item => seedProteinIdentifiers.Contains(item.Id) || seedProteinIdentifiers.Contains(item.Name) || item.DatabaseProteinFieldProteins.Any(item1 => item1.DatabaseProteinField.IsSearchable && seedProteinIdentifiers.Contains(item1.Value)));
+                var seedProteinsByProteinCollection = availableProteins
+                    .Where(item => item.ProteinCollectionProteins.Any(item1 => seedProteinCollectionIds.Contains(item1.ProteinCollection.Id)));
+                seedProteinIds = seedProteinsByIdentifier
+                    .Concat(seedProteinsByProteinCollection)
                     .Distinct()
                     .Select(item => item.Id)
                     .ToList();
-                // Check if there haven't been any seed nodes found.
-                if (seedNodeIds == null || !seedNodeIds.Any())
+                // Check if there haven't been any seed proteins found.
+                if (seedProteinIds == null || !seedProteinIds.Any())
                 {
                     // Update the status of the item.
                     network.Status = NetworkStatus.Error;
                     // Add a message to the log.
-                    network.Log = network.AppendToLog($"No seed {nodeTitle.ToLower()}s could be found with the provided seed data.");
+                    network.Log = network.AppendToLog($"No seed proteins could be found with the provided seed data.");
                     // Edit the network.
                     await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                     // End the function.
                     return;
                 }
             }
-            // Define the list to store the edges.
-            var currentEdgeList = new List<EdgeItemModel>();
+            // Define the list to store the interactions.
+            var currentInteractionList = new List<InteractionItemModel>();
             // Use a new scope.
             using (var scope = serviceProvider.CreateScope())
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Get the available nodes.
-                var availableNodes = context.Nodes
-                    .Where(item => item.DatabaseNodes.Any(item1 => nodeDatabaseIds.Contains(item1.Database.Id)));
-                // Define the edges of the network.
-                currentEdgeList = context.Edges
-                    .Where(item => item.DatabaseEdges.Any(item1 => edgeDatabaseIds.Contains(item1.Database.Id)))
-                    .Where(item => item.EdgeNodes.All(item1 => availableNodes.Contains(item1.Node)))
-                    .Where(item => item.EdgeNodes.Any(item1 => seedNodeIds.Contains(item1.Node.Id)))
-                    .Select(item => new EdgeItemModel
+                // Get the available proteins.
+                var availableProteins = context.Proteins
+                    .Where(item => item.DatabaseProteins.Any(item1 => proteinDatabaseIds.Contains(item1.Database.Id)));
+                // Define the interactions of the network.
+                currentInteractionList = context.Interactions
+                    .Where(item => item.DatabaseInteractions.Any(item1 => interactionDatabaseIds.Contains(item1.Database.Id)))
+                    .Where(item => item.InteractionProteins.All(item1 => availableProteins.Contains(item1.Protein)))
+                    .Where(item => item.InteractionProteins.Any(item1 => seedProteinIds.Contains(item1.Protein.Id)))
+                    .Select(item => new InteractionItemModel
                     {
-                        EdgeId = item.Id,
-                        SourceNodeId = item.EdgeNodes
-                            .Where(item => item.Type == EdgeNodeType.Source)
-                            .Select(item => item.Node.Id)
+                        InteractionId = item.Id,
+                        SourceProteinId = item.InteractionProteins
+                            .Where(item => item.Type == InteractionProteinType.Source)
+                            .Select(item => item.Protein.Id)
                             .FirstOrDefault(),
-                        TargetNodeId = item.EdgeNodes
-                            .Where(item => item.Type == EdgeNodeType.Target)
-                            .Select(item => item.Node.Id)
+                        TargetProteinId = item.InteractionProteins
+                            .Where(item => item.Type == InteractionProteinType.Target)
+                            .Select(item => item.Protein.Id)
                             .FirstOrDefault()
                     })
-                    .Where(item => !string.IsNullOrEmpty(item.EdgeId) && !string.IsNullOrEmpty(item.SourceNodeId) && !string.IsNullOrEmpty(item.TargetNodeId))
+                    .Where(item => !string.IsNullOrEmpty(item.InteractionId) && !string.IsNullOrEmpty(item.SourceProteinId) && !string.IsNullOrEmpty(item.TargetProteinId))
                     .ToList();
             }
-            // Check if there haven't been any edges found.
-            if (currentEdgeList == null || !currentEdgeList.Any())
+            // Check if there haven't been any interactions found.
+            if (currentInteractionList == null || !currentInteractionList.Any())
             {
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
@@ -288,47 +230,47 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Neighbors
                     // Update the status of the item.
                     network.Status = NetworkStatus.Error;
                     // Add a message to the log.
-                    network.Log = network.AppendToLog($"No {edgeTitle.ToLower()}s could be found with the provided data using the provided algorithm.");
+                    network.Log = network.AppendToLog($"No interactions could be found with the provided data using the provided algorithm.");
                     // Edit the network.
                     await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
                 }
                 // End the function.
                 return;
             }
-            // Define the edges of the network.
-            var edgeIds = currentEdgeList
-                .Select(item => item.EdgeId)
+            // Define the interactions of the network.
+            var interactionIds = currentInteractionList
+                .Select(item => item.InteractionId)
                 .Distinct()
                 .ToList();
-            // Get all of the nodes used by the found edges.
-            var nodeIds = currentEdgeList
-                .Select(item => item.SourceNodeId)
-                .Concat(currentEdgeList
-                    .Select(item => item.TargetNodeId))
+            // Get all of the proteins used by the found interactions.
+            var proteinIds = currentInteractionList
+                .Select(item => item.SourceProteinId)
+                .Concat(currentInteractionList
+                    .Select(item => item.TargetProteinId))
                 .Distinct()
                 .ToList();
-            // Update the seed node IDs.
-            seedNodeIds = seedNodeIds
-                .Intersect(nodeIds)
+            // Update the seed protein IDs.
+            seedProteinIds = seedProteinIds
+                .Intersect(proteinIds)
                 .ToList();
             // Define the related entities.
-            var networkNodes = nodeIds
-                .Select(item => new NetworkNode
+            var networkProteins = proteinIds
+                .Select(item => new NetworkProtein
                 {
-                    NodeId = item,
-                    Type = NetworkNodeType.None
+                    ProteinId = item,
+                    Type = NetworkProteinType.None
                 })
-                .Concat(seedNodeIds
-                    .Select(item => new NetworkNode
+                .Concat(seedProteinIds
+                    .Select(item => new NetworkProtein
                     {
-                        NodeId = item,
-                        Type = NetworkNodeType.Seed
+                        ProteinId = item,
+                        Type = NetworkProteinType.Seed
                     }))
                 .ToList();
-            var networkEdges = edgeIds
-                .Select(item => new NetworkEdge
+            var networkInteractions = interactionIds
+                .Select(item => new NetworkInteraction
                 {
-                    EdgeId = item
+                    InteractionId = item
                 })
                 .ToList();
             // Use a new scope.
@@ -346,8 +288,8 @@ namespace NetControl4BioMed.Helpers.Algorithms.Networks.Neighbors
                     return;
                 }
                 // Define the related entities.
-                network.NetworkNodes = networkNodes;
-                network.NetworkEdges = networkEdges;
+                network.NetworkProteins = networkProteins;
+                network.NetworkInteractions = networkInteractions;
                 // Edit the network.
                 await IEnumerableExtensions.EditAsync(network.Yield(), serviceProvider, token);
             }

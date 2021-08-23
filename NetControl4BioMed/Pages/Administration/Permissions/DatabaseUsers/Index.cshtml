@@ -40,10 +40,10 @@
                         </div>
                     </th>
                     <th class="text-left text-break">
-                        <span>User</span>
+                        <span>Database</span>
                     </th>
                     <th class="text-left text-break">
-                        <span>Database</span>
+                        <span>E-mail</span>
                     </th>
                     <th class="text-center text-break" data-orderable="false" data-searchable="false">
                         <span>Actions</span>
@@ -56,26 +56,48 @@
                     <tr class="item-group-item">
                         <td class="text-center text-break">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" id="checkbox-@item.User.Id-@item.Database.Id" class="custom-control-input item-group-item-checkbox" title="Select" />
-                                <label for="checkbox-@item.User.Id-@item.Database.Id" class="custom-control-label"></label>
+                                <input type="checkbox" id="checkbox-@item.Database.Id-@item.Email" class="custom-control-input item-group-item-checkbox" title="Select" />
+                                <label for="checkbox-@item.Database.Id-@item.Email" class="custom-control-label"></label>
                             </div>
                             <div class="custom-control custom-checkbox" hidden>
-                                <input type="checkbox" id="checkbox-1-@item.User.Id-@item.Database.Id" name="userIds" value="@item.User.Id" class="custom-control-input" title="Select" />
-                                <label for="checkbox-1-@item.User.Id-@item.Database.Id" class="custom-control-label"></label>
+                                <input type="checkbox" id="checkbox-1-@item.Database.Id-@item.Email" name="databaseIds" value="@item.Database.Id" class="custom-control-input" title="Select" />
+                                <label for="checkbox-1-@item.Database.Id-@item.Email" class="custom-control-label"></label>
                             </div>
                             <div class="custom-control custom-checkbox" hidden>
-                                <input type="checkbox" id="checkbox-2-@item.User.Id-@item.Database.Id" name="databaseIds" value="@item.Database.Id" class="custom-control-input" title="Select" />
-                                <label for="checkbox-2-@item.User.Id-@item.Database.Id" class="custom-control-label"></label>
+                                <input type="checkbox" id="checkbox-2-@item.Database.Id-@item.Email" name="emails" value="@item.Email" class="custom-control-input" title="Select" />
+                                <label for="checkbox-2-@item.Database.Id-@item.Email" class="custom-control-label"></label>
                             </div>
                         </td>
                         <td class="text-left text-break">
-                            <a asp-page="/Administration/Accounts/Users/Details" asp-route-id="@item.User.Id" class="btn btn-outline-dark" title="@item.User.Email">@item.User.Email</a>
+                            <div>
+                                <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@item.Database.Id" class="font-weight-bold" title="@item.Database.Name">@item.Database.Name</a>
+                            </div>
+                            <div>
+                                <span class="small" title="@item.Database.Id">@item.Database.Id</span>
+                            </div>
                         </td>
                         <td class="text-left text-break">
-                            <a asp-page="/Administration/Databases/Databases/Details" asp-route-id="@item.Database.Id" class="btn btn-outline-dark" title="@item.Database.Name">@item.Database.Name</a>
+                            @if (item.User == null)
+                            {
+                                <div>
+                                    <span class="font-weight-bold" title="@item.Email">@item.Email</span>
+                                </div>
+                                <div>
+                                    <span class="small" title="-">-</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div>
+                                    <a asp-page="/Administration/Accounts/Users/Details" asp-route-id="@item.User.Id" class="font-weight-bold" title="@item.Email">@item.Email</a>
+                                </div>
+                                <div>
+                                    <span class="small" title="@item.User.Id">@item.User.Id</span>
+                                </div>
+                            }
                         </td>
                         <td class="text-center text-break">
-                            <a asp-page="/Administration/Permissions/DatabaseUsers/Delete" asp-route-userIds="@item.User.Id" asp-route-databaseIds="@item.Database.Id" class="btn btn-danger m-1" title="Delete">
+                            <a asp-page="/Administration/Permissions/DatabaseUsers/Delete" asp-route-databaseIds="@item.Database.Id" asp-route-emails="@item.Email" class="btn btn-danger m-1" title="Delete">
                                 <span><i class="fas fa-trash"></i></span>
                             </a>
                         </td>

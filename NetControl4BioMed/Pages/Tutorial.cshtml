@@ -1,0 +1,244 @@
+﻿@page
+@model TutorialModel
+@{
+    ViewData["Title"] = "Tutorial";
+}
+
+<div class="text-left mt-3">
+    <div class="h4 mb-3">
+        <span>Tutorial</span>
+    </div>
+</div>
+<div class="text-justify">
+    <div class="mb-3">
+        <div class="mb-1">
+            <span>This page provides a tutorial for using the web application.</span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <div class="font-weight-bold mb-2">
+            <span>Table of contents</span>
+        </div>
+        <ol class="">
+            <li class="">
+                <a href="#introduction">Introduction</a>
+            </li>
+            <li class="">
+                <a href="#video-tutorial">Video tutorial</a>
+            </li>
+            <li class="">
+                <a href="#text-tutorial">Text tutorial</a>
+            </li>
+        </ol>
+    </div>
+    <div id="introduction" class="mb-3">
+        <div class="font-weight-bold mb-2">
+            <span>Introduction</span>
+        </div>
+        <div class="mb-1">
+            <span>We will present the steps for the generation and analysis of a personalized SARS-CoV-2-based protein-protein interaction network. Central to this case study are the host factors identified by Daniolski et al. (in the study available at <a href="https://doi.org/10.1016/j.cell.2020.10.030" target="_blank" rel="nofollow noopener noreferrer">doi.org/10.1016/j.cell.2020.10.030</a> <span class=""><i class="fas fa-external-link-alt"></i></span>) as being essential for the SARS-CoV-2 infection.</span>
+        </div>
+        <div class="mb-1">
+            <div class="mb-0">
+                <span>More specifically, we will follow the steps:</span>
+            </div>
+            <ul class="mb-0">
+                <li class="">
+                    <span>Before starting, we selected for further use the set of 44 host factors that appear in the intersection of the top 200 identified in each of the two experiments of cell survivability performed in the study, at both low and high multiplicity of infection.</span>
+                </li>
+                <li class="">
+                    <span>We will begin by building a custom network around these selected host factors, by using interactions from the OmniPath and SIGNOR databases. Additionally, we will also use in this step the drug-targets of the approved drugs in DrugBank.</span>
+                </li>
+                <li class="">
+                    <span>Then, we will continue with a structural target controllability analysis of the generated network, using as preferred inputs the same drug-targets of the DrugBank-approved drugs, and as targets the selected host factors.</span>
+                </li>
+                <li class="">
+                    <span>Lastly, we will perform a very brief analysis of the results.</span>
+                </li>
+            </ul>
+        </div>
+        <div class="mb-1">
+            <span>The <a asp-page="/CreatedData/Networks/Details/Index" asp-route-id="8d459b8a-960c-48de-a2aa-a7b6b38ba71e" target="_blank" rel="nofollow noopener noreferrer">generated network</a>, its <a asp-page="/CreatedData/Analyses/Details/Index" asp-route-id="da7f4d78-047b-4a23-ac01-57c38b4a4f8b" target="_blank" rel="nofollow noopener noreferrer">corresponding analysis</a> and the <a asp-page="/CreatedData/Analyses/Details/Results/ControlPaths/Details" asp-route-id="d385a9ea-8272-4883-be17-a3169370d57b" target="_blank" rel="nofollow noopener noreferrer">obtained control paths</a> are publicly available.</span>
+        </div>
+    </div>
+    <div id="video-tutorial" class="figure-group mb-3">
+        <div class="font-weight-bold mb-2">
+            <span>Video tutorial</span>
+        </div>
+        <div class="mb-1 text-center">
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe class="embed-responsive-item" src="https://www.youtube-nocookie.com/embed/RGbR3UvZ5Sw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+    <div id="text-tutorial" class="figure-group mb-3">
+        <div class="font-weight-bold mb-2">
+            <span>Text tutorial</span>
+        </div>
+        <div class="mb-1">
+            <span>We start by navigating to the <a asp-page="/CreatedData/Networks/Build" target="_blank" rel="nofollow noopener noreferrer">network building page</a>. Alternatively, we can navigate to the page of an already created network and choose to re-create it, such that the form fields will be automatically filled in.</span>
+        </div>
+        <div class="mb-1">
+            <span>We first need to provide a few details about the new network. We need to give it a name (which doesn't have to be unique, as a unique identifier will be automatically assigned to the network) and, optionally, a suitable description. If we are logged in, we can also make the network private, such that only the users we manually assign can access it. Unregistered users can only create and access public networks. The actual interactions which will be included in the network depend on the chosen generation algorithm. Brief descriptions for each algorithm are available.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-network-details.png" class="figure-img img-fluid  border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the details of the new network.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>The first data-specific inputs that we need to provide consists of the databases in which to look for the interactions of the network. The same interaction can appear in multiple databases, and they will be automatically matched. All available databases can be found <a asp-page="/AvailableData/Databases/Databases/Index" asp-route-filter="HasDatabaseInteractions" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-network-interaction-databases.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Choosing from the available interaction databases for the new network.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>Then, we need to specify how we will provide the seed proteins around which to build the network. We can input them manually by typing in their identifiers, or select one or more collections of seed proteins, and they will be automatically matched. In this case, we will provide both, by typing manually the set of selected host factors and by selecting the collection of drug-targets corresponding to the approved drugs in DrugBank. All available potential protein identifiers can be found <a asp-page="/AvailableData/Databases/DatabaseProteinFields/Index" asp-route-filter="IsSearchable" target="_blank" rel="nofollow noopener noreferrer">here</a>, and all available collections of seed proteins can be found <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsSeed" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-network-seed-proteins.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Choosing how to provide the seed proteins for the new network.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-network-seed-protein-identifiers.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the identifiers of the seed proteins for the new network.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-network-seed-protein-collections.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Choosing from the available seed protein collections for the new network.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>Once all of the inputs have been successfully filled in, we can create the network.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-network-create.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Submitting the data to create the new network.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>An error will immediately be returned if any of the required data is missing, and we will be prompted to change the corresponding inputs. Otherwise, the network will be defined and we will be redirected to its corresponding page. The next step is the actual network generation, which will be performed automatically in the background. We can check the current status of the network at all times. If an error would occur at any point, it would be shown in the message log at the bottom of the page. Otherwise, the network will be successfully generated and can be inspected, shared, and analyzed.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-network-overview.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Checking the completed network.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>We can download the completed network in a variety of formats for offline processing and visualization (for example, using <a href="https://cytoscape.org/" target="_blank" rel="nofollow noopener noreferrer">Cytoscape</a> <span class=""><i class="fas fa-external-link-alt"></i></span>). Additionally, if the network is relatively small (for performance reasons), we can also visualize it in the browser. However, this can quickly become overwhelming even for smaller networks.</span>
+        </div>
+        <div class="mb-1">
+            <span>Once a network has been successfully generated, we can analyze it by choosing the corresponding option from its main page.</span>
+        </div>
+        <div class="mb-1">
+            <span>Similarly, we first need to provide a few details about the new analysis. Thus, we need to give it a name (which again doesn't have to be unique, as a unique identifier will be automatically assigned to the analysis) and, optionally, a suitable description. Once more, if we are logged in, we can make the analysis private, such that only the users we manually assign can access it. Unregistered users can only create and access public analyses.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-analysis-details.png" class="figure-img img-fluid  border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the details of the new analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>We can optionally choose to provide the source proteins to be used as preferred inputs in the analysis. Just like for seeds, we can input them manually by typing in their identifiers, or select one or more collections of source proteins. In this case, we will select the collection of drug-targets corresponding to the approved drugs in DrugBank. All available collections of source proteins can be found <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsSource" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-analysis-source-proteins.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Choosing how to provide the source proteins for the new analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-analysis-source-protein-collections.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Choosing from the available source protein collections for the new analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>In the same manner, we need to specify how we will provide the target proteins to be controlled in the analysis. As before, we can input them manually by typing in their identifiers, or select one or more collections of target proteins. In this case, we will type manually the set of selected host factors. All available collections of target proteins can be found <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsTarget" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-analysis-target-proteins.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Choosing how to provide the target proteins for the new analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-analysis-target-protein-identifiers.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Inputting the identifiers of the target proteins for the new analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>The controllability analysis can use the greedy algorithm described <a href="https://doi.org/10.1109/TCBB.2018.2797271" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span> or the genetic algorithm described <a href="https://arxiv.org/abs/2007.04853" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span>. Each algorithm has different parameter requirements and each parameter can be configured, with default values preloaded. Brief descriptions for each algorithm and for each parameter are available.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-analysis-algorithm.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Choosing the algorithm for the new analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>Once all of the inputs have been successfully filled in, we can create the analysis.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-analysis-create.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Submitting the data to create the new analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>An error will immediately be returned if any of the required data is missing, and we will be prompted to change the corresponding inputs. Otherwise, the analysis will be defined and we will be redirected to its corresponding page. The next step is the actual analysis run, which will be performed automatically in the background. We can check the current status of the analysis at all times. If an error would occur at any point, it would be shown in the message log at the bottom of the page. Otherwise, the analysis will be successfully completed and can be inspected, and shared.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-analysis-overview.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Checking the completed analysis.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>As before, we can download the completed analysis in a variety of formats for offline processing and visualization, and, if the corresponding network is relatively small, we can also visualize it in the browser.</span>
+        </div>
+        <div class="mb-1">
+            <span>The output of the controllability analysis consists of one or more sets of controlling inputs which are able to control all of the provided targets. These controlling sets can be separately inspected, visualized, and downloaded.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-control-path-overview.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Checking the returned control path.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-control-path-visualization.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Visualizing the returned control path.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1">
+            <span>Furthermore, we can view more details about each of the control inputs, such as the complete set of targets that it controls by clicking on the corresponding number, or the potential drugs targeting it by clicking on its name.</span>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-control-path-controlled-targets.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Checking the set of targets controlled by a control input.</figcaption>
+            </figure>
+        </div>
+        <div class="mb-1 text-center">
+            <figure class="figure">
+                <img src="~/img/screenshots/tutorial-control-path-targeting-drugs.png" class="figure-img img-fluid border p-2 m-2 rounded" />
+                <figcaption class="figure-caption">Checking the potential drugs targeting a control input.</figcaption>
+            </figure>
+        </div>
+    </div>
+</div>

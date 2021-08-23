@@ -1,8 +1,4 @@
-﻿using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Helpers.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using NetControl4BioMed.Helpers.ViewModels;
 using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.Interfaces

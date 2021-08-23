@@ -1,20 +1,19 @@
+using Hangfire;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using NetControl4BioMed.Data;
+using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Interfaces;
+using NetControl4BioMed.Helpers.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Hangfire;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Helpers.InputModels;
-using NetControl4BioMed.Helpers.Interfaces;
-using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Databases.Databases
 {
@@ -59,7 +58,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             View = new ViewModel
             {
                 Items = _context.Databases
-                    .Include(item => item.DatabaseType)
                     .Where(item => ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -67,14 +65,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No items have been found with the provided IDs.";
-                // Redirect to the index page.
-                return RedirectToPage("/Administration/Databases/Databases/Index");
-            }
-            // Check if the generic database is among the items to be deleted.
-            if (View.Items.Any(item => item.DatabaseType.Name == "Generic"))
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: The generic database can't be deleted.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/Databases/Index");
             }
@@ -96,7 +86,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             View = new ViewModel
             {
                 Items = _context.Databases
-                    .Include(item => item.DatabaseType)
                     .Where(item => Input.Ids.Contains(item.Id))
             };
             // Check if there weren't any items found.
@@ -104,14 +93,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             {
                 // Display a message.
                 TempData["StatusMessage"] = "Error: No items have been found with the provided IDs.";
-                // Redirect to the index page.
-                return RedirectToPage("/Administration/Databases/Databases/Index");
-            }
-            // Check if the generic database is among the items to be deleted.
-            if (View.Items.Any(item => item.DatabaseType.Name == "Generic"))
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: The generic database can't be deleted.";
                 // Redirect to the index page.
                 return RedirectToPage("/Administration/Databases/Databases/Index");
             }

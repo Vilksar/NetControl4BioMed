@@ -72,13 +72,13 @@
             {
                 <form method="post" class="text-justify">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
-                    <button type="submit" title="Forget this browser" class="btn btn-block btn-danger">
+                    <button type="submit" title="Forget this browser" class="btn btn-block btn-danger mb-3">
                         <span><i class="fas fa-times"></i></span>
                         <span>Forget this browser</span>
                     </button>
                 </form>
             }
-            <a asp-page="/Account/Manage/TwoFactorAuthentication/DisableAuthenticator" class="btn btn-block btn-danger">
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/DisableAuthenticator" class="btn btn-block btn-danger mb-3">
                 <span><i class="fas fa-minus"></i></span>
                 <span>Disable two-factor authentication</span>
             </a>
@@ -114,7 +114,7 @@
         }
         else
         {
-            <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-primary">
+            <a asp-page="/Account/Manage/TwoFactorAuthentication/EnableAuthenticator" class="btn btn-block btn-primary mb-3">
                 <span><i class="fas fa-cog"></i></span>
                 <span>Setup authenticator app</span>
             </a>

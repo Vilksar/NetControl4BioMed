@@ -1,0 +1,1039 @@
+﻿@page
+@model CreateModel
+@using NetControl4BioMed.Data.Enumerations
+@using NetControl4BioMed.Helpers.Extensions
+@{
+    ViewData["Title"] = "Create analysis";
+}
+
+<div class="alert alert-primary text-wrap text-justify">
+    <span><i class="fas fa-info-circle"></i></span>
+    <span>In order to create an analysis, the set of target proteins needs to be specified, optionally together with a set of preferred input proteins. All specified proteins must appear in the corresponding network. The analysis will be defined and started in the background, and its results can be afterwards inspected.</span>
+</div>
+<form method="post" class="text-justify">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-info-circle"></i></span>
+                </div>
+                <div>
+                    <span>Details</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>Input here the general details of the new analysis.</span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Name" class="font-weight-bold">Name</label>
+                <input asp-for="Input.Name" class="form-control" />
+                <span asp-description-for="Input.Name" class="text-muted small">The name of the new analysis.</span>
+                <span asp-validation-for="Input.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="Input.Description" class="form-control"></textarea>
+                <span asp-description-for="Input.Description" class="text-muted small">The description of the new analysis. This field is optional.</span>
+                <span asp-validation-for="Input.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group" hidden="@(User.Identity.IsAuthenticated ? null : "hidden")">
+                <label asp-for="Input.IsPublic" class="font-weight-bold">Set the analysis as public?</label>
+                <select asp-for="Input.IsPublic" class="custom-select form-control">
+                    <option value="false" selected="@(User.Identity.IsAuthenticated ? "selected" : null)">No</option>
+                    <option value="true" selected="@(User.Identity.IsAuthenticated ? null : "selected")">Yes</option>
+                </select>
+                <span asp-description-for="Input.IsPublic" class="text-muted small">The availability of the analysis in the list of public analysis. If public, anyone can access it.</span>
+                <span asp-validation-for="Input.IsPublic" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-share-alt"></i></span>
+                </div>
+                <div>
+                    <span>Network</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-primary text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>The analysis will use the network <a asp-page="/CreatedData/Networks/Details/Index" asp-route-id="@Model.View.NetworkId" class="alert-link" target="_blank" rel="nofollow noopener noreferrer" title="@Model.View.NetworkName">@Model.View.NetworkName</a>. If you would like to choose a different network, you can navigate to its corresponding page.</span>
+                <span>You can find all of the public networks <a asp-page="/PublicData/Networks/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <span>You can find all of the networks associated with your account <a asp-page="/PrivateData/Networks/Index" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                }
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="Input.NetworkId" class="font-weight-bold">Network ID</label>
+                <input asp-for="Input.NetworkId" class="form-control" />
+                <span asp-description-for="Input.NetworkId" class="text-muted small">The ID of the network to be used by the new analysis.</span>
+                <span asp-validation-for="Input.NetworkId" class="text-danger small"></span>
+            </div>
+            <a asp-page="/CreatedData/Networks/Details/Index" asp-route-id="@Model.View.NetworkId" class="btn btn-primary btn-block" target="_blank" rel="nofollow noopener noreferrer" title="View network">
+                <span><i class="fas fa-share-alt"></i></span>
+                <span>View network</span>
+            </a>
+        </div>
+    </div>
+    <div class="hidden-group">
+        <div class="card mb-3">
+            <div class="card-header font-weight-bold">
+                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                    <div>
+                        <span><i class="fas fa-check-square"></i></span>
+                    </div>
+                    <div>
+                        <span>Source data</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info text-justify text-wrap">
+                    <span><i class="fas fa-info-circle"></i></span>
+                    <span>Select here the methods in which the source proteins (to be used as preferred control inputs) will be provided. This is optional, and no option needs to be selected.</span>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" asp-for="Input.UseSourceProteinData" class="custom-control-input hidden-group-checkbox" data-type="source-proteins" />
+                        <label asp-for="Input.UseSourceProteinData" class="custom-control-label">Use a manually provided list of source proteins.</label>
+                    </div>
+                </div>
+                <div class="form-group" hidden="@(Model.View.HasNetworkDatabases ? null : "hidden")">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" asp-for="Input.UseSourceProteinCollectionData" class="custom-control-input hidden-group-checkbox" data-type="source-protein-collections" />
+                        <label asp-for="Input.UseSourceProteinCollectionData" class="custom-control-label">Use one or more precompiled collections of source proteins.</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden-group-display" data-type="source-proteins" hidden="@(Model.Input.UseSourceProteinData ? null : "hidden")">
+            <div class="card mb-3 file-group" data-type="items">
+                <div class="card-header font-weight-bold">
+                    <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                        <div>
+                            <span><i class="fas fa-list"></i></span>
+                        </div>
+                        <div>
+                            <span>Source proteins</span>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info text-justify text-wrap">
+                        <span><i class="fas fa-info-circle"></i></span>
+                        <span>Input here the identifiers of the source proteins (preferred control inputs) to be used by the new analysis.</span>
+                        @if (Model.View.HasNetworkDatabases)
+                        {
+                            <span>You can check all of the potential identifiers <a asp-page="/AvailableData/Databases/DatabaseProteinFields/Index" asp-route-filter="IsSearchable" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                        }
+                    </div>
+                    <div class="form-group" hidden>
+                        <label asp-for="Input.SourceProteinData" class="font-weight-bold">Source proteins</label>
+                        <textarea asp-for="Input.SourceProteinData" class="form-control file-group-input"></textarea>
+                        <span asp-description-for="Input.SourceProteinData" class="text-muted small">The source proteins to be used by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                        <span asp-validation-for="Input.SourceProteinData" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="row align-items-center mb-2">
+                            <div class="col-lg-4">
+                                <label for="data-textarea-source-protein" class="font-weight-bold mb-0">Source protein identifiers</label>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="row align-items-center">
+                                    <div class="col-6 col-form-label-sm text-right">
+                                        <label for="data-line-separator-source" class="font-weight-normal mb-0">Line separator:</label>
+                                    </div>
+                                    <div class="col-6 text-left">
+                                        <select id="data-line-separator-source" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                            <option value=",">comma (",")</option>
+                                            <option value=";">semicolon (";")</option>
+                                            <option value="\t">tab ("\t")</option>
+                                            <option value="\s">space (" ")</option>
+                                            <option value="\n" selected>new line ("\n")</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <textarea id="data-textarea-source-protein" class="form-control file-group-text mb-2"></textarea>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input file-group-file-upload" />
+                            <label class="custom-file-label file-group-file-label">Choose file</label>
+                        </div>
+                        <span class="text-muted small">The source proteins to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden-group-display" data-type="source-protein-collections" hidden="@(Model.Input.UseSourceProteinCollectionData ? null : "hidden")">
+            <div class="card mb-3 table-group" data-url="SourceProteinCollections">
+                <div class="card-header font-weight-bold">
+                    <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                        <div>
+                            <span><i class="fas fa-folder"></i></span>
+                        </div>
+                        <div>
+                            <span>Source protein collections</span>
+                            <span class="badge badge-dark table-group-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info text-justify text-wrap">
+                        <span><i class="fas fa-info-circle"></i></span>
+                        <span>Select here the source collections to be used by the new network. This can be done either in addition to, or instead of the source proteins above. You can check all of the available drug-target data <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsSource" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    </div>
+                    <div class="form-group" hidden>
+                        <label asp-for="Input.SourceProteinCollectionData" class="font-weight-bold">Source protein collection IDs</label>
+                        <textarea asp-for="Input.SourceProteinCollectionData" class="form-control table-group-input"></textarea>
+                        <span asp-description-for="Input.SourceProteinCollectionData" class="text-muted small">The IDs of the source protein collections to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                        <span asp-validation-for="Input.SourceProteinCollectionData" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        @if (Model.View.HasNetworkDatabases)
+                        {
+                            <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[0]]">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-center text-break" data-name="IsSelected">
+                                            <span></span>
+                                        </th>
+                                        <th class="text-left text-break" data-name="Name">
+                                            <span>Collection</span>
+                                        </th>
+                                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                            <span>Links</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template class="table-group-row-template">
+                                        <td class="text-center text-break">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" id="checkbox-source-protein-collection-@@id" class="custom-control-input table-group-row-checkbox" title="Select" />
+                                                <label for="checkbox-source-protein-collection-@@id" class="custom-control-label"></label>
+                                            </div>
+                                        </td>
+                                        <td class="text-left text-break">
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@@id" target="_blank" rel="nofollow noopener noreferrer" title="@@name">@@name</a>
+                                        </td>
+                                        <td class="text-center text-break">
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@@id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
+                                                <span>Details</span>
+                                            </a>
+                                        </td>
+                                    </template>
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hidden-group">
+        <div class="card mb-3">
+            <div class="card-header font-weight-bold">
+                <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                    <div>
+                        <span><i class="fas fa-check-square"></i></span>
+                    </div>
+                    <div>
+                        <span>Target data</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info text-justify text-wrap">
+                    <span><i class="fas fa-info-circle"></i></span>
+                    <span>Select here the methods in which the target proteins will be provided. At least one option needs to be selected.</span>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" asp-for="Input.UseTargetProteinData" class="custom-control-input hidden-group-checkbox" data-type="target-proteins" />
+                        <label asp-for="Input.UseTargetProteinData" class="custom-control-label">Use a manually provided list of target proteins.</label>
+                    </div>
+                </div>
+                <div class="form-group" hidden="@(Model.View.HasNetworkDatabases ? null : "hidden")">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" asp-for="Input.UseTargetProteinCollectionData" class="custom-control-input hidden-group-checkbox" data-type="target-protein-collections" />
+                        <label asp-for="Input.UseTargetProteinCollectionData" class="custom-control-label">Use one or more precompiled collections of target proteins.</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden-group-display" data-type="target-proteins" hidden="@(Model.Input.UseTargetProteinData ? null : "hidden")">
+            <div class="card mb-3 file-group" data-type="items">
+                <div class="card-header font-weight-bold">
+                    <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                        <div>
+                            <span><i class="fas fa-list"></i></span>
+                        </div>
+                        <div>
+                            <span>Target proteins</span>
+                            <span class="badge badge-dark file-group-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info text-justify text-wrap">
+                        <span><i class="fas fa-info-circle"></i></span>
+                        <span>Input here the identifiers of the target proteins to be used by the new analysis.</span>
+                        @if (Model.View.HasNetworkDatabases)
+                        {
+                            <span>You can check all of the potential identifiers <a asp-page="/AvailableData/Databases/DatabaseProteinFields/Index" asp-route-filter="IsSearchable" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                        }
+                    </div>
+                    <div class="form-group" hidden>
+                        <label asp-for="Input.TargetProteinData" class="font-weight-bold">Target proteins</label>
+                        <textarea asp-for="Input.TargetProteinData" class="form-control file-group-input"></textarea>
+                        <span asp-description-for="Input.TargetProteinData" class="text-muted small">The target proteins to be used by the new analysis, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                        <span asp-validation-for="Input.TargetProteinData" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="row align-items-center mb-2">
+                            <div class="col-lg-4">
+                                <label for="data-textarea-target-protein" class="font-weight-bold mb-0">Target protein identifiers</label>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="row align-items-center">
+                                    <div class="col-6 col-form-label-sm text-right">
+                                        <label for="data-line-separator-target" class="font-weight-normal mb-0">Line separator:</label>
+                                    </div>
+                                    <div class="col-6 text-left">
+                                        <select id="data-line-separator-target" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                            <option value=",">comma (",")</option>
+                                            <option value=";">semicolon (";")</option>
+                                            <option value="\t">tab ("\t")</option>
+                                            <option value="\s">space (" ")</option>
+                                            <option value="\n" selected>new line ("\n")</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <textarea id="data-textarea-target-protein" class="form-control file-group-text mb-2"></textarea>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input file-group-file-upload" />
+                            <label class="custom-file-label file-group-file-label">Choose file</label>
+                        </div>
+                        <span class="text-muted small">The target proteins to be used by the new analysis. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden-group-display" data-type="target-protein-collections" hidden="@(Model.Input.UseTargetProteinCollectionData ? null : "hidden")">
+            <div class="card mb-3 table-group" data-url="TargetProteinCollections">
+                <div class="card-header font-weight-bold">
+                    <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                        <div>
+                            <span><i class="fas fa-folder"></i></span>
+                        </div>
+                        <div>
+                            <span>Target protein collections</span>
+                            <span class="badge badge-dark table-group-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info text-justify text-wrap">
+                        <span><i class="fas fa-info-circle"></i></span>
+                        <span>Select here the target collections to be used by the new network. This can be done either in addition to, or instead of the target proteins above. You can check all of the available cell-line data <a asp-page="/AvailableData/Data/ProteinCollections/Index" asp-route-filter="IsTarget" class="alert-link" target="_blank" rel="nofollow noopener noreferrer">here</a>.</span>
+                    </div>
+                    <div class="form-group" hidden>
+                        <label asp-for="Input.TargetProteinCollectionData" class="font-weight-bold">Target protein collection IDs</label>
+                        <textarea asp-for="Input.TargetProteinCollectionData" class="form-control table-group-input"></textarea>
+                        <span asp-description-for="Input.TargetProteinCollectionData" class="text-muted small">The IDs of the target protein collections to be used by the new network, formatted as a JSON string array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                        <span asp-validation-for="Input.TargetProteinCollectionData" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        @if (Model.View.HasNetworkDatabases)
+                        {
+                            <table class="table table-hover table-striped table-bordered table-group-datatable" data-order="[[0]]">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-center text-break" data-name="IsSelected">
+                                            <span></span>
+                                        </th>
+                                        <th class="text-left text-break" data-name="Name">
+                                            <span>Collection</span>
+                                        </th>
+                                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                                            <span>Links</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template class="table-group-row-template">
+                                        <td class="text-center text-break">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" id="checkbox-target-protein-collection-@@id" class="custom-control-input table-group-row-checkbox" title="Select" />
+                                                <label for="checkbox-target-protein-collection-@@id" class="custom-control-label"></label>
+                                            </div>
+                                        </td>
+                                        <td class="text-left text-break">
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@@id" target="_blank" rel="nofollow noopener noreferrer" title="@@name">@@name</a>
+                                        </td>
+                                        <td class="text-center text-break">
+                                            <a asp-page="/AvailableData/Data/ProteinCollections/Details" asp-route-id="@@id" target="_blank" rel="nofollow noopener noreferrer" title="Details">
+                                                <span>Details</span>
+                                            </a>
+                                        </td>
+                                    </template>
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3 parameter-group modal-group" data-type="items">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-code"></i></span>
+                </div>
+                <div>
+                    <span>Parameters</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>Input here the parameters of the algorithm to be used by the new analysis.</span>
+            </div>
+            <div class="form-group modal-group-item">
+                <label asp-for="Input.Algorithm" class="font-weight-bold">Algorithm</label>
+                <div class="input-group">
+                    <select asp-for="Input.Algorithm" class="custom-select parameter-group-select">
+                        @foreach (var item in Enum.GetValues(typeof(AnalysisAlgorithm)).Cast<AnalysisAlgorithm>())
+                        {
+                            <option value="@item.ToString()" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                        }
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                            <span><i class="fas fa-question-circle"></i></span>
+                        </button>
+                    </div>
+                </div>
+                <span asp-description-for="Input.Algorithm" class="text-muted small">The algorithm to be used by the new analysis.</span>
+                <span asp-validation-for="Input.Algorithm" class="text-danger small"></span>
+                <template class="modal-group-item-template">
+                    <div class="mb-2">
+                        <span>There are several algorithms available:</span>
+                    </div>
+                    <ul class="mb-0">
+                        <li class="mb-2">
+                            <span><span class="font-weight-bold">Greedy</span>: The analysis will use the greedy algorithm described <a href="https://doi.org/10.1109/TCBB.2018.2797271" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+                        </li>
+                        <li class="mb-2">
+                            <span><span class="font-weight-bold">Genetic</span>: The analysis will use the genetic algorithm described <a href="https://arxiv.org/abs/2007.04853" target="_blank" rel="nofollow noopener noreferrer">here</a> <span class=""><i class="fas fa-external-link-alt"></i></span>.</span>
+                        </li>
+                    </ul>
+                    <div class="mb-2">
+                        <span>Each algorithm has different required parameters, with predefined default values. All parameters can be individually configured.</span>
+                    </div>
+                </template>
+            </div>
+            <div class="form-group">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" asp-for="Input.UseDefaultAlgorithmParameters" class="custom-control-input parameter-group-checkbox" />
+                    <label asp-for="Input.UseDefaultAlgorithmParameters" class="custom-control-label">Use the default values for the parameters of the algorithm.</label>
+                </div>
+            </div>
+            <div class="parameter-group-values" hidden>
+                <div class="parameter-group-parameters"></div>
+                <template class="parameter-group-template" data-algorithm="@AnalysisAlgorithm.Greedy.ToString()">
+                    <div class="row">
+                        <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                            <label asp-for="Input.MaximumIterations" class="font-weight-bold">Maximum iterations</label>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.MaximumIterations" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the maximum number of iterations for which the analysis will run.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>A single run of the greedy algorithm corresponds to one iteration of the analysis. Each iteration is independent of previous iterations. Higher values can lead to a longer search with more chances of finding a better result, at the cost of an increased analysis time.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                            <span asp-description-for="Input.MaximumIterations" class="text-muted small">The maximum number of iterations for which the analysis will run.</span>
+                            <span asp-validation-for="Input.MaximumIterations" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                            <label asp-for="Input.MaximumIterationsWithoutImprovement" class="font-weight-bold">Maximum iterations without improvement</label>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.MaximumIterationsWithoutImprovement" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the maximum number of iterations with no improvement in the size of the best obtained solution for which the analysis will run.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>A single run of the greedy algorithm corresponds to one iteration of the analysis. Each iteration is independent of previous iterations. Higher values can lead to a longer search with more chances of finding a better result, at the cost of an increased analysis time.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                            <span asp-description-for="Input.MaximumIterationsWithoutImprovement" class="text-muted small">The maximum number of iterations without improvement in the size of the best obtained solution for which the analysis will run.</span>
+                            <span asp-validation-for="Input.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                            <label asp-for="Input.GreedyAlgorithmParameters.RandomSeed" class="font-weight-bold">Random seed</label>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.GreedyAlgorithmParameters.RandomSeed" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the random seed to be used throughout the algorithm.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>As the algorithm is stochastic, the random seed is useful for the reproducibility of results.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GreedyAlgorithmParameters.RandomSeed" class="text-muted small">The random seed to be used throughout the algorithm.</span>
+                            <span asp-validation-for="Input.GreedyAlgorithmParameters.RandomSeed" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                            <label asp-for="Input.GreedyAlgorithmParameters.MaximumPathLength" class="font-weight-bold">Maximum path length</label>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.GreedyAlgorithmParameters.MaximumPathLength" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the maximum length of any path between a controlling input and a corresponding controlled target.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>Higher values allow for longer control paths to be formed, which can lead to solutions with a lower total number of controlling inputs. However, long control paths might limit the applicability of the obtained solutions.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GreedyAlgorithmParameters.MaximumPathLength" class="text-muted small">The maximum length of any path between a control input and a corresponding controlled target.</span>
+                            <span asp-validation-for="Input.GreedyAlgorithmParameters.MaximumPathLength" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="row" hidden>
+                        <div class="col-lg-12 order-1 order-lg-1 align-self-center">
+                            <label asp-for="Input.GreedyAlgorithmParameters.Repeats" class="font-weight-bold">Repeats</label>
+                        </div>
+                        <div class="col-lg-12 order-1 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.GreedyAlgorithmParameters.Repeats" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the number of times that the heuristics will be repeated in one iteration.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>Higher values can lead to more thorough optimization for each solution, at the cost of a loss in solution diversity and an increased analysis time.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-12 order-1 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GreedyAlgorithmParameters.Repeats" class="text-muted small">The number of times that the heuristics will be repeated in one iteration.</span>
+                            <span asp-validation-for="Input.GreedyAlgorithmParameters.Repeats" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="heuristics-group">
+                        <div class="row" hidden>
+                            <div class="col-lg-12 order-1 order-lg-1 align-self-center">
+                                <label asp-for="Input.GreedyAlgorithmParameters.Heuristics" class="font-weight-bold">Heuristics</label>
+                            </div>
+                            <div class="col-lg-12 order-1 order-lg-2">
+                                <textarea asp-for="Input.GreedyAlgorithmParameters.Heuristics" class="form-control heuristics-group-input"></textarea>
+                            </div>
+                            <div class="col-lg-12 order-1 order-lg-3 mb-3">
+                                <span asp-description-for="Input.GreedyAlgorithmParameters.Heuristics" class="text-muted small">The search heuristics for the algorithm. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                                <span asp-validation-for="Input.GreedyAlgorithmParameters.Heuristics" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-5 order-1 order-lg-1 align-self-center">
+                                <label for="heuristics-group-possible" class="font-weight-bold">Possible heuristics</label>
+                            </div>
+                            <div class="col-lg-5 order-1 order-lg-2">
+                                <select id="heuristics-group-possible" class="custom-select heuristics-group-possible" size="10" multiple title="Current heuristics">
+                                    <option value="" title="New group">--- New group ---</option>
+                                    @foreach (var item in Helpers.Algorithms.Analyses.Greedy.Parameters.PossibleHeuristics)
+                                    {
+                                        <option value="@item.Key" title="@item.Value">@item.Value</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-lg-2 order-2 order-lg-1 align-self-center"></div>
+                            <div class="col-lg-2 order-2 order-lg-2 align-self-center modal-group-item">
+                                <button type="button" class="btn btn-dark btn-block heuristics-group-add my-2" title="Add heuristic">
+                                    <span class="d-none d-lg-block"><i class="fas fa-angle-right"></i></span>
+                                    <span class="d-block d-lg-none"><i class="fas fa-angle-down"></i></span>
+                                </button>
+                                <button type="button" class="btn btn-dark btn-block heuristics-group-remove my-2" title="Remove heuristic">
+                                    <span class="d-none d-lg-block"><i class="fas fa-angle-left"></i></span>
+                                    <span class="d-block d-lg-none"><i class="fas fa-angle-up"></i></span>
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-block modal-group-item-button my-2" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                    <span><i class="fas fa-question-circle"></i></span>
+                                </button>
+                                <template class="modal-group-item-template">
+                                    <div class="mb-2">
+                                        <span>This parameter represents the search heuristics for the algorithm.</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span>There are several heuristics available:</span>
+                                    </div>
+                                    <ul class="mb-0">
+                                        <li class="mb-2">
+                                            <span><span class="font-weight-bold">Edges from previously seen source nodes</span>: the algorithm will prioritize edges coming from source nodes that have already appeared in the control paths of the current iteration.</span>
+                                        </li>
+                                        <li class="mb-2">
+                                            <span><span class="font-weight-bold">Edges from source nodes</span>: the algorithm will prioritize edges coming from source nodes.</span>
+                                        </li>
+                                        <li class="mb-2">
+                                            <span><span class="font-weight-bold">Edges from controlling nodes</span>: the algorithm will prioritize edges coming from controlling inputs that have already been identified in the current iteration.</span>
+                                        </li>
+                                        <li class="mb-2">
+                                            <span><span class="font-weight-bold">Edges from previously seen nodes</span>: the algorithm will prioritize edges coming from nodes that have already appeared in the control paths of the current iteration.</span>
+                                        </li>
+                                        <li class="mb-2">
+                                            <span><span class="font-weight-bold">Edges from nodes that have not appeared in the current path</span>: the algorithm will prioritize edges coming from nodes that have not already appeared in the current control path of the current iteration, to avoid loops.</span>
+                                        </li>
+                                        <li class="mb-2">
+                                            <span><span class="font-weight-bold">Any possible edge</span>: the algorithm will use any available edge.</span>
+                                        </li>
+                                    </ul>
+                                    <div class="mb-2">
+                                        <span>The chosen heuristics and their order determine the priority of choices when building the control paths in each iteration. Groups with a lower index will have a higher priority, while all of the heuristics in a group will have the same priority.</span>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="col-lg-5 order-3 order-lg-1 align-self-center">
+                                <label for="heuristics-group-current" class="font-weight-bold">Current heuristics</label>
+                            </div>
+                            <div class="col-lg-5 order-3 order-lg-2">
+                                <select id="heuristics-group-current" class="custom-select heuristics-group-current" size="10" multiple title="Current heuristics"></select>
+                            </div>
+                            <div class="col-lg-12 order-4 order-lg-3 mb-3">
+                                <span description-for="heuristics-group-current" class="text-muted small">The search heuristics for the algorithm. The current heuristics can be seen on the right (or lower) side. Selecting one or more options on the right (or lower) side, and clicking the <span class="font-italic">Remove heuristic</span> button will remove them. Selecting one or more options on the left (or upper) side, and clicking the <span class="font-italic">Add heuristic</span> button will add them to the selected group on the right side. If a new group needs to be inserted, the corresponding <span class="font-italic">--- New group ---</span> option must also be selected. A new group containing only the heuristic <span class="font-italic">Any possible edge</span> will be automatically added at the end of the list.</span>
+                                <span validation-for="heuristics-group-current" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <template class="parameter-group-template" data-algorithm="@AnalysisAlgorithm.Genetic.ToString()">
+                    <div class="row">
+                        <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                            <label asp-for="Input.MaximumIterations" class="font-weight-bold">Maximum iterations</label>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.MaximumIterations" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the maximum number of iterations for which the analysis will run.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>A single run of the genetic algorithm corresponds to multiple iterations of the analysis, translated to subsequent populations. Each iteration is dependent on previous iterations. Higher values can lead to a longer search with more chances of finding a better result, at the cost of an increased analysis time.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                            <span asp-description-for="Input.MaximumIterations" class="text-muted small">The maximum number of iterations for which the analysis to run.</span>
+                            <span asp-validation-for="Input.MaximumIterations" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                            <label asp-for="Input.MaximumIterationsWithoutImprovement" class="font-weight-bold">Maximum iterations without improvement</label>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.MaximumIterationsWithoutImprovement" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the maximum number of iterations with no improvement in the size of the best obtained solution for which the analysis will run.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>A single run of the greedy algorithm corresponds to one iteration of the analysis. Each iteration is independent of previous iterations. Higher values can lead to a longer search with more chances of finding a better result, at the cost of an increased analysis time.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                            <span asp-description-for="Input.MaximumIterationsWithoutImprovement" class="text-muted small">The maximum number of iterations without improvement in the size of the best solution for which the analysis to run.</span>
+                            <span asp-validation-for="Input.MaximumIterationsWithoutImprovement" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                            <label asp-for="Input.GeneticAlgorithmParameters.RandomSeed" class="font-weight-bold">Random seed</label>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.GeneticAlgorithmParameters.RandomSeed" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the random seed to be used throughout the algorithm.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>As the algorithm is stochastic, the random seed is useful for the reproducibility of results.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GeneticAlgorithmParameters.RandomSeed" class="text-muted small">The random seed to be used throughout the algorithm.</span>
+                            <span asp-validation-for="Input.GeneticAlgorithmParameters.RandomSeed" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                            <label asp-for="Input.GeneticAlgorithmParameters.MaximumPathLength" class="font-weight-bold">Maximum path length</label>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.GeneticAlgorithmParameters.MaximumPathLength" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the maximum length of any path between a controlling input and a corresponding controlled target.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>Higher values allow for longer control paths to be formed, which can lead to solutions with a lower total number of controlling inputs. However, long control paths might limit the applicability of the obtained solutions.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GeneticAlgorithmParameters.MaximumPathLength" class="text-muted small">The maximum length of any path between a source node and a target node.</span>
+                            <span asp-validation-for="Input.GeneticAlgorithmParameters.MaximumPathLength" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                            <label asp-for="Input.GeneticAlgorithmParameters.PopulationSize" class="font-weight-bold">Population size</label>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.GeneticAlgorithmParameters.PopulationSize" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the number of chromosomes in each population.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>Higher values can lead to a larger number and wider diversity of the obtained solutions, at the cost of an increased analysis time.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GeneticAlgorithmParameters.PopulationSize" class="text-muted small">The number of chromosomes in each population.</span>
+                            <span asp-validation-for="Input.GeneticAlgorithmParameters.PopulationSize" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                            <label asp-for="Input.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="font-weight-bold">Random genes per chromosome</label>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the maximum number of genes whose value can be simultaneously randomly generated.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>Higher values can lead to more diverse initial populations, covering a wider area of the search space, at the cost of a significantly increased analysis time.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="text-muted small">The maximum number of genes whose value can be simultaneously randomly generated.</span>
+                            <span asp-validation-for="Input.GeneticAlgorithmParameters.RandomGenesPerChromosome" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 order-1 order-lg-1 align-self-center">
+                            <label asp-for="Input.GeneticAlgorithmParameters.PercentageRandom" class="font-weight-bold">Percentage random</label>
+                        </div>
+                        <div class="col-lg-4 order-1 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.GeneticAlgorithmParameters.PercentageRandom" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the percentage of a population which is composed of randomly generated chromosomes.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>Higher values can lead to more diverse subsequent populations, covering a wider area of the search space, at the cost of significantly increased analysis time and slower convergence. A value of zero disables this feature, while a value of one will cause the search to be completely random.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-4 order-1 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GeneticAlgorithmParameters.PercentageRandom" class="text-muted small">The percentage of a population which is composed of randomly generated chromosomes.</span>
+                            <span asp-validation-for="Input.GeneticAlgorithmParameters.PercentageRandom" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-4 order-2 order-lg-1 align-self-center">
+                            <label asp-for="Input.GeneticAlgorithmParameters.PercentageElite" class="font-weight-bold">Percentage elite</label>
+                        </div>
+                        <div class="col-lg-4 order-2 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.GeneticAlgorithmParameters.PercentageElite" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the percentage of a population which is composed of the elite chromosomes of the previous population.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>Higher values can lead to more focused subsequent populations and a quicker convergence, at the cost of a significantly smaller search space. A value of zero disables this feature, while a value of one will cause the search to coverge after only a few iterations.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-4 order-2 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GeneticAlgorithmParameters.PercentageElite" class="text-muted small">The percentage of a population which is composed of the elite chromosomes of the previous population.</span>
+                            <span asp-validation-for="Input.GeneticAlgorithmParameters.PercentageElite" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-4 order-3 order-lg-1 align-self-center">
+                            <label asp-for="Input.GeneticAlgorithmParameters.ProbabilityMutation" class="font-weight-bold">Probability of mutation</label>
+                        </div>
+                        <div class="col-lg-4 order-3 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <input asp-for="Input.GeneticAlgorithmParameters.ProbabilityMutation" class="form-control" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the probability of mutation for each gene of a chromosome.</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span>Higher values can lead to more diverse subsequent populations, covering a wider area of the search space, at the cost of slower convergence. A value of zero disables this feature, while a value of one will cause the search to be completely random.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-4 order-3 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GeneticAlgorithmParameters.ProbabilityMutation" class="text-muted small">The probability of mutation for each gene of a chromosome.</span>
+                            <span asp-validation-for="Input.GeneticAlgorithmParameters.ProbabilityMutation" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 order-1 order-lg-1 align-self-center">
+                            <label asp-for="Input.GeneticAlgorithmParameters.CrossoverType" class="font-weight-bold">Crossover algorithm</label>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <select asp-for="Input.GeneticAlgorithmParameters.CrossoverType" class="custom-select">
+                                    @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Analyses.Genetic.CrossoverType)).Cast<Helpers.Algorithms.Analyses.Genetic.CrossoverType>())
+                                    {
+                                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                                    }
+                                </select>
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the crossover algorithm to be used.</span>
+                                </div>
+                                <ul class="mb-0">
+                                    <li class="mb-2">
+                                        <span><span class="font-weight-bold">Weighted random parent</span>: The crossover will choose randomly the parent chromosome which will provide the value a specific gene, based on the number of occurrences of the value.</span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <span><span class="font-weight-bold">Weighted random preferred parent</span>: The crossover will choose randomly the parent chromosome which will provide the value a specific gene, based on the number of occurrences of the value, with the values encoding preferred inputs being twice more likely to be chosen.</span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <span><span class="font-weight-bold">Dominant parent</span>: The crossover will choose the parent chromosome which will provide the value a specific gene, based on the number of occurrences of the value. A higher number of occurrences will always lead to the same choice. If none of the parent values are dominant, then the choice is random.</span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <span><span class="font-weight-bold">Dominant preferred parent</span>: The crossover will choose the parent chromosome which will provide the value a specific gene, based on the number of occurrences of the value, with the values encoding preferred inputs being given priority. A higher number of occurrences for the same priority will always lead to the same choice. If none of the parent values are dominant, then the choice is random.</span>
+                                    </li>
+                                </ul>
+                                <div class="mb-2">
+                                    <span>The weighted random crossover algortihms can lead to a more thorough search and more diverse solutions, while the dominant crossover algorithms can lead to quicker convergence and a decreased analysis time.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-6 order-1 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GeneticAlgorithmParameters.CrossoverType" class="text-muted small">The crossover algorithm to be used.</span>
+                            <span asp-validation-for="Input.GeneticAlgorithmParameters.CrossoverType" class="text-danger small"></span>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-1 align-self-center">
+                            <label asp-for="Input.GeneticAlgorithmParameters.MutationType" class="font-weight-bold">Mutation algorithm</label>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-2 modal-group-item">
+                            <div class="input-group">
+                                <select asp-for="Input.GeneticAlgorithmParameters.MutationType" class="custom-select">
+                                    @foreach (var item in Enum.GetValues(typeof(Helpers.Algorithms.Analyses.Genetic.MutationType)).Cast<Helpers.Algorithms.Analyses.Genetic.MutationType>())
+                                    {
+                                        <option value="@item" title="@item.GetDisplayDescription()">@item.GetDisplayName()</option>
+                                    }
+                                </select>
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary modal-group-item-button" type="button" data-toggle="modal" data-target=".modal-group-modal" title="Details">
+                                        <span><i class="fas fa-question-circle"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <template class="modal-group-item-template">
+                                <div class="mb-2">
+                                    <span>This parameter represents the mutation algorithm to be used.</span>
+                                </div>
+                                <ul class="mb-0">
+                                    <li class="mb-2">
+                                        <span><span class="font-weight-bold">Weighted random ancestor</span>: The mutation will choose randomly the new value of a mutated gene, based on the number of occurrences of each possible value.</span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <span><span class="font-weight-bold">Weighted random preferred ancestor</span>: The mutation will choose randomly the new value of a mutated gene, based on the number of occurrences of each possible value, with the values encoding preferred inputs being twice more likely to be chosen.</span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <span><span class="font-weight-bold">Random ancestor</span>: The mutation will choose randomly the new value of a mutated gene.</span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <span><span class="font-weight-bold">Random preferred ancestor</span>: The mutation will choose randomly the new value of a mutated gene, with the values encoding preferred inputs being twice more likely to be chosen.</span>
+                                    </li>
+                                </ul>
+                                <div class="mb-2">
+                                    <span>The weighted random mutation algortihms can lead to a more stable search and quicker convergence, while the random mutation algorithms can lead to more diverse solutions.</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="col-lg-6 order-2 order-lg-3 mb-3">
+                            <span asp-description-for="Input.GeneticAlgorithmParameters.MutationType" class="text-muted small">The mutation algorithm to be used.</span>
+                            <span asp-validation-for="Input.GeneticAlgorithmParameters.MutationType" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+        <div class="modal fade modal-group-modal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-title font-weight-bold">
+                            <span>Details</span>
+                        </div>
+                        <button type="button" class="btn close" data-dismiss="modal">
+                            <span><i class="fas fa-times"></i></span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-justify"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group" hidden>
+        <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+        <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+        <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+        <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+    </div>
+    <div class="loading-group">
+        <button type="submit" class="btn btn-block btn-success loading-group-button" title="Create">
+            <span><i class="fas fa-plus"></i></span>
+            <span>Create</span>
+        </button>
+        <template class="loading-group-template">
+            <span><i class="fas fa-spinner fa-spin"></i></span>
+            <span>Please wait...</span>
+        </template>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+    <partial name="_ScriptsReCaptchaPartial" />
+}

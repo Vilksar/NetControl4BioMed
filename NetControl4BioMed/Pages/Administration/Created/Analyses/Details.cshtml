@@ -5,7 +5,13 @@
 }
 
 <div class="row align-items-center">
-    <div class="col-lg-12 mb-3">
+    <div class="col-lg-6 mb-3">
+        <a asp-page="/Administration/Created/Analyses/Edit" asp-route-id="@Model.View.Analysis.Id" class="btn btn-warning btn-block" title="Edit">
+            <span><i class="fas fa-pencil-alt"></i></span>
+            <span>Edit</span>
+        </a>
+    </div>
+    <div class="col-lg-6 mb-3">
         <a asp-page="/Administration/Created/Analyses/Delete" asp-route-ids="@Model.View.Analysis.Id" class="btn btn-danger btn-block" title="Delete">
             <span><i class="fas fa-trash"></i></span>
             <span>Delete</span>
@@ -69,6 +75,12 @@
                 <span asp-validation-for="View.Analysis.IsPublic" class="text-danger small"></span>
             </div>
             <div class="form-group">
+                <label asp-for="View.Analysis.IsDemonstration" class="font-weight-bold">Set the analysis as demonstration?</label>
+                <input asp-for="View.Analysis.IsDemonstration" type="text" class="form-control" readonly />
+                <span asp-description-for="View.Analysis.IsDemonstration" class="text-muted small">The demonstration availability of the analysis.</span>
+                <span asp-validation-for="View.Analysis.IsDemonstration" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="View.Analysis.Status" class="font-weight-bold">Status</label>
                 <input asp-for="View.Analysis.Status" class="form-control" readonly />
                 <span asp-description-for="View.Analysis.Status" class="text-muted small">The status of the analysis.</span>
@@ -129,24 +141,6 @@
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
-                <span><i class="fas fa-user"></i></span>
-            </div>
-            <div>
-                <span>User invitations</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The analysis is currently assigned to @Model.View.UserInvitationCount user invitation@(Model.View.UserInvitationCount != 1 ? "s" : string.Empty).</span>
-        </div>
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
                 <span><i class="fas fa-database"></i></span>
             </div>
             <div>
@@ -168,14 +162,14 @@
                 <span><i class="fas fa-circle"></i></span>
             </div>
             <div>
-                <span>Nodes</span>
+                <span>Proteins</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The analysis currently contains @Model.View.NodeCount node@(Model.View.NodeCount != 1 ? "s" : string.Empty).</span>
+            <span>The analysis currently contains @Model.View.ProteinCount protein@(Model.View.ProteinCount != 1 ? "s" : string.Empty).</span>
         </div>
     </div>
 </div>
@@ -186,14 +180,14 @@
                 <span><i class="fas fa-arrow-right"></i></span>
             </div>
             <div>
-                <span>Edges</span>
+                <span>Interactions</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The analysis currently contains @Model.View.EdgeCount edge@(Model.View.EdgeCount != 1 ? "s" : string.Empty).</span>
+            <span>The analysis currently contains @Model.View.InteractionCount interaction@(Model.View.InteractionCount != 1 ? "s" : string.Empty).</span>
         </div>
     </div>
 </div>
@@ -204,14 +198,14 @@
                 <span><i class="fas fa-folder"></i></span>
             </div>
             <div>
-                <span>Node collections</span>
+                <span>Protein collections</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The analysis is currently assigned to @Model.View.NodeCollectionCount node collection@(Model.View.NodeCollectionCount != 1 ? "s" : string.Empty).</span>
+            <span>The analysis is currently assigned to @Model.View.ProteinCollectionCount protein collection@(Model.View.ProteinCollectionCount != 1 ? "s" : string.Empty).</span>
         </div>
     </div>
 </div>
@@ -222,14 +216,14 @@
                 <span><i class="fas fa-share-alt"></i></span>
             </div>
             <div>
-                <span>Networks</span>
+                <span>Network</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The analysis currently contains @Model.View.NetworkCount network@(Model.View.NetworkCount != 1 ? "s" : string.Empty).</span>
+            <span>The analysis is currently assigned to 1 network. You can <a asp-page="/Administration/Created/Networks/Index" asp-route-searchString="@Model.View.Analysis.Id" asp-route-searchIn="AnalysisId" class="alert-link">view the network</a>.</span>
         </div>
     </div>
 </div>

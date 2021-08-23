@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace NetControl4BioMed.Data.Enumerations
 {
@@ -20,7 +16,7 @@ namespace NetControl4BioMed.Data.Enumerations
         /// <summary>
         /// Represents an analysis which has been defined.
         /// </summary>
-        [Display(Name = "Defined", Description = "The analysis has been defined.")]
+        [Display(Name = "Defined", Description = "The analysis has been defined and is scheduled for generation.")]
         Defined,
 
         /// <summary>

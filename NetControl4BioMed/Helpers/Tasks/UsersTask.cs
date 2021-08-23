@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
@@ -10,7 +9,6 @@ using NetControl4BioMed.Helpers.InputModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -73,9 +71,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Define the list of items to get.
                 var validBatchIds = new List<string>();
                 // Define the dependent list of items to get.
-                var databaseUserInvitationInputs = new List<DatabaseUserInvitationInputModel>();
-                var networkUserInvitationInputs = new List<NetworkUserInvitationInputModel>();
-                var analysisUserInvitationInputs = new List<AnalysisUserInvitationInputModel>();
+                var databaseUserInputs = new List<DatabaseUserInputModel>();
+                var networkUserInputs = new List<NetworkUserInputModel>();
+                var analysisUserInputs = new List<AnalysisUserInputModel>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -88,10 +86,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                             .Select(item => item.Id))
                         .ToList();
                     // Get the IDs of the dependent items.
-                    databaseUserInvitationInputs = context.DatabaseUserInvitations
+                    databaseUserInputs = context.DatabaseUsers
                         .Where(item => batchEmails.Contains(item.Email))
                         .Distinct()
-                        .Select(item => new DatabaseUserInvitationInputModel
+                        .Select(item => new DatabaseUserInputModel
                         {
                             Database = new DatabaseInputModel
                             {
@@ -100,10 +98,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                             Email = item.Email
                         })
                         .ToList();
-                    networkUserInvitationInputs = context.NetworkUserInvitations
+                    networkUserInputs = context.NetworkUsers
                         .Where(item => batchEmails.Contains(item.Email))
                         .Distinct()
-                        .Select(item => new NetworkUserInvitationInputModel
+                        .Select(item => new NetworkUserInputModel
                         {
                             Network = new NetworkInputModel
                             {
@@ -112,10 +110,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                             Email = item.Email
                         })
                         .ToList();
-                    analysisUserInvitationInputs = context.AnalysisUserInvitations
+                    analysisUserInputs = context.AnalysisUsers
                         .Where(item => batchEmails.Contains(item.Email))
                         .Distinct()
-                        .Select(item => new AnalysisUserInvitationInputModel
+                        .Select(item => new AnalysisUserInputModel
                         {
                             Analysis = new AnalysisInputModel
                             {
@@ -193,10 +191,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Throw an exception.
                             throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                         }
-                        // Create the dependent entities.
+                        // Edit the dependent entities.
                         await new DatabaseUsersTask
                         {
-                            Items = databaseUserInvitationInputs
+                            Items = databaseUserInputs
                                 .Where(item => item.Email == user.Email)
                                 .Select(item => new DatabaseUserInputModel
                                 {
@@ -204,15 +202,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                                     {
                                         Id = item.Database.Id
                                     },
-                                    User = new UserInputModel
-                                    {
-                                        Id = user.Id
-                                    }
+                                    Email = user.Email
                                 })
-                        }.CreateAsync(serviceProvider, token);
+                        }.UpdateUserAsync(serviceProvider, token);
                         await new NetworkUsersTask
                         {
-                            Items = networkUserInvitationInputs
+                            Items = networkUserInputs
                                 .Where(item => item.Email == user.Email)
                                 .Select(item => new NetworkUserInputModel
                                 {
@@ -220,15 +215,12 @@ namespace NetControl4BioMed.Helpers.Tasks
                                     {
                                         Id = item.Network.Id
                                     },
-                                    User = new UserInputModel
-                                    {
-                                        Id = user.Id
-                                    }
+                                    Email = user.Email
                                 })
-                        }.CreateAsync(serviceProvider, token);
+                        }.UpdateUserAsync(serviceProvider, token);
                         await new AnalysisUsersTask
                         {
-                            Items = analysisUserInvitationInputs
+                            Items = analysisUserInputs
                                  .Where(item => item.Email == user.Email)
                                  .Select(item => new AnalysisUserInputModel
                                  {
@@ -236,28 +228,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                                      {
                                          Id = item.Analysis.Id
                                      },
-                                     User = new UserInputModel
-                                     {
-                                         Id = user.Id
-                                     }
+                                     Email = user.Email
                                  })
-                        }.CreateAsync(serviceProvider, token);
-                        // Delete the dependent entities.
-                        await new DatabaseUserInvitationsTask
-                        {
-                            Items = databaseUserInvitationInputs
-                                 .Where(item => item.Email == user.Email)
-                        }.DeleteAsync(serviceProvider, token);
-                        await new NetworkUserInvitationsTask
-                        {
-                            Items = networkUserInvitationInputs
-                                 .Where(item => item.Email == user.Email)
-                        }.DeleteAsync(serviceProvider, token);
-                        await new AnalysisUserInvitationsTask
-                        {
-                            Items = analysisUserInvitationInputs
-                                 .Where(item => item.Email == user.Email)
-                        }.DeleteAsync(serviceProvider, token);
+                        }.UpdateUserAsync(serviceProvider, token);
                     }
                 }
             }
@@ -305,9 +278,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Define the list of items to get.
                 var users = new List<User>();
                 // Define the dependent list of items to get.
-                var databaseUserInvitationInputs = new List<DatabaseUserInvitationInputModel>();
-                var networkUserInvitationInputs = new List<NetworkUserInvitationInputModel>();
-                var analysisUserInvitationInputs = new List<AnalysisUserInvitationInputModel>();
+                var databaseUserInputs = new List<DatabaseUserInputModel>();
+                var networkUserInputs = new List<NetworkUserInputModel>();
+                var analysisUserInputs = new List<AnalysisUserInputModel>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -326,10 +299,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                     users = items
                         .ToList();
                     // Get the IDs of the dependent items.
-                    databaseUserInvitationInputs = context.DatabaseUserInvitations
+                    databaseUserInputs = context.DatabaseUsers
                         .Where(item => batchEmails.Contains(item.Email))
                         .Distinct()
-                        .Select(item => new DatabaseUserInvitationInputModel
+                        .Select(item => new DatabaseUserInputModel
                         {
                             Database = new DatabaseInputModel
                             {
@@ -338,10 +311,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                             Email = item.Email
                         })
                         .ToList();
-                    networkUserInvitationInputs = context.NetworkUserInvitations
+                    networkUserInputs = context.NetworkUsers
                         .Where(item => batchEmails.Contains(item.Email))
                         .Distinct()
-                        .Select(item => new NetworkUserInvitationInputModel
+                        .Select(item => new NetworkUserInputModel
                         {
                             Network = new NetworkInputModel
                             {
@@ -350,10 +323,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                             Email = item.Email
                         })
                         .ToList();
-                    analysisUserInvitationInputs = context.AnalysisUserInvitations
+                    analysisUserInputs = context.AnalysisUsers
                         .Where(item => batchEmails.Contains(item.Email))
                         .Distinct()
-                        .Select(item => new AnalysisUserInvitationInputModel
+                        .Select(item => new AnalysisUserInputModel
                         {
                             Analysis = new AnalysisInputModel
                             {
@@ -385,8 +358,70 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Check if the e-mail is different from the current e-mail.
                         if (batchItem.Email != user.Email)
                         {
+                            // Get the old e-mail.
+                            var oldEmail = user.Email;
                             // Try to update the e-mail.
                             result = result.Succeeded ? await userManager.SetEmailAsync(user, batchItem.Email) : result;
+                            // Check if the update has succeeded.
+                            if (result.Succeeded)
+                            {
+                                // Create the dependent entities.
+                                await new DatabaseUsersTask
+                                {
+                                    Items = databaseUserInputs
+                                        .Where(item => item.Email == oldEmail)
+                                        .Select(item => new DatabaseUserInputModel
+                                        {
+                                            Database = new DatabaseInputModel
+                                            {
+                                                Id = item.Database.Id
+                                            },
+                                            Email = user.Email
+                                        })
+                                }.CreateAsync(serviceProvider, token);
+                                await new NetworkUsersTask
+                                {
+                                    Items = networkUserInputs
+                                        .Where(item => item.Email == oldEmail)
+                                        .Select(item => new NetworkUserInputModel
+                                        {
+                                            Network = new NetworkInputModel
+                                            {
+                                                Id = item.Network.Id
+                                            },
+                                            Email = user.Email
+                                        })
+                                }.CreateAsync(serviceProvider, token);
+                                await new AnalysisUsersTask
+                                {
+                                    Items = analysisUserInputs
+                                         .Where(item => item.Email == oldEmail)
+                                         .Select(item => new AnalysisUserInputModel
+                                         {
+                                             Analysis = new AnalysisInputModel
+                                             {
+                                                 Id = item.Analysis.Id
+                                             },
+                                             Email = user.Email
+                                         })
+                                }.CreateAsync(serviceProvider, token);
+                                // Delete the dependent entities.
+                                await new DatabaseUsersTask
+                                {
+                                    Items = databaseUserInputs
+                                         .Where(item => item.Email == oldEmail)
+                                }.DeleteAsync(serviceProvider, token);
+                                await new NetworkUsersTask
+                                {
+                                    Items = networkUserInputs
+                                         .Where(item => item.Email == oldEmail)
+                                }.DeleteAsync(serviceProvider, token);
+                                await new AnalysisUsersTask
+                                {
+                                    Items = analysisUserInputs
+                                         .Where(item => item.Email == oldEmail)
+                                }.DeleteAsync(serviceProvider, token);
+                            }
                         }
                         // Check if the e-mail is different from the current username.
                         if (batchItem.Email != user.UserName)
@@ -410,71 +445,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                             // Throw an exception.
                             throw new TaskException(string.Join(" ", messages), showExceptionItem, batchItem);
                         }
-                        // Create the dependent entities.
-                        await new DatabaseUsersTask
-                        {
-                            Items = databaseUserInvitationInputs
-                                .Where(item => item.Email == user.Email)
-                                .Select(item => new DatabaseUserInputModel
-                                {
-                                    Database = new DatabaseInputModel
-                                    {
-                                        Id = item.Database.Id
-                                    },
-                                    User = new UserInputModel
-                                    {
-                                        Id = user.Id
-                                    }
-                                })
-                        }.CreateAsync(serviceProvider, token);
-                        await new NetworkUsersTask
-                        {
-                            Items = networkUserInvitationInputs
-                                .Where(item => item.Email == user.Email)
-                                .Select(item => new NetworkUserInputModel
-                                {
-                                    Network = new NetworkInputModel
-                                    {
-                                        Id = item.Network.Id
-                                    },
-                                    User = new UserInputModel
-                                    {
-                                        Id = user.Id
-                                    }
-                                })
-                        }.CreateAsync(serviceProvider, token);
-                        await new AnalysisUsersTask
-                        {
-                            Items = analysisUserInvitationInputs
-                                 .Where(item => item.Email == user.Email)
-                                 .Select(item => new AnalysisUserInputModel
-                                 {
-                                     Analysis = new AnalysisInputModel
-                                     {
-                                         Id = item.Analysis.Id
-                                     },
-                                     User = new UserInputModel
-                                     {
-                                         Id = user.Id
-                                     }
-                                 })
-                        }.CreateAsync(serviceProvider, token);
-                        // Delete the dependent entities.
-                        await new DatabaseUserInvitationsTask
-                        {
-                            Items = databaseUserInvitationInputs
-                                 .Where(item => item.Email == user.Email)
-                        }.DeleteAsync(serviceProvider, token);
-                        await new NetworkUserInvitationsTask
-                        {
-                            Items = networkUserInvitationInputs
-                                 .Where(item => item.Email == user.Email)
-                        }.DeleteAsync(serviceProvider, token);
-                        await new AnalysisUserInvitationsTask
-                        {
-                            Items = analysisUserInvitationInputs
-                                 .Where(item => item.Email == user.Email)
-                        }.DeleteAsync(serviceProvider, token);
                     }
                 }
             }
@@ -543,17 +513,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items found.
                     var networks = context.Networks
-                        .Where(item => item.NetworkUsers.All(item1 => userIds.Contains(item1.User.Id)))
-                        .Select(item => item.NetworkEdges)
-                        .SelectMany(item => item)
-                        .Select(item => item.Network)
+                        .Where(item => item.NetworkUsers.Any(item1 => userIds.Contains(item1.User.Id)) && !item.NetworkUsers.Any(item1 => !userIds.Contains(item1.User.Id)))
                         .Distinct();
                     // Get the IDs of the dependent items.
                     analysisInputs = context.Analyses
-                        .Where(item => item.AnalysisUsers.All(item1 => userIds.Contains(item1.User.Id)) || item.AnalysisNetworks.Any(item1 => networks.Contains(item1.Network)))
-                        .Select(item => item.AnalysisEdges)
-                        .SelectMany(item => item)
-                        .Select(item => item.Analysis)
+                        .Where(item => item.AnalysisUsers.Any(item1 => userIds.Contains(item1.User.Id)) && !item.AnalysisUsers.Any(item1 => !userIds.Contains(item1.User.Id)) || networks.Contains(item.Network))
                         .Distinct()
                         .Select(item => new AnalysisInputModel
                         {

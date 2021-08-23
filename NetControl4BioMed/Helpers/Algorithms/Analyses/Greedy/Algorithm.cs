@@ -3,7 +3,6 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
-using NetControl4BioMed.Helpers.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,10 +27,10 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
         public static async Task Run(string analysisId, IServiceProvider serviceProvider, CancellationToken token)
         {
             // Define the required data.
-            var analysisNodeIds = new List<string>();
-            var analysisEdgeIds = new List<(string, string, string)>();
-            var nodes = new List<string>();
-            var edges = new List<(string, string)>();
+            var analysisProteinIds = new List<string>();
+            var analysisInteractionIds = new List<(string, string, string)>();
+            var proteins = new List<string>();
+            var interactions = new List<(string, string)>();
             var sources = new List<string>();
             var targets = new List<string>();
             var parameters = new Parameters();
@@ -52,52 +51,52 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                     return;
                 }
                 // Get the required data.
-                analysisNodeIds = context.AnalysisNodes
+                analysisProteinIds = context.AnalysisProteins
                     .Where(item => item.Analysis == analysis)
-                    .Where(item => item.Type == AnalysisNodeType.None)
-                    .Select(item => item.Node.Id)
+                    .Where(item => item.Type == AnalysisProteinType.None)
+                    .Select(item => item.Protein.Id)
                     .ToList();
-                analysisEdgeIds = context.AnalysisEdges
+                analysisInteractionIds = context.AnalysisInteractions
                     .Where(item => item.Analysis == analysis)
-                    .Select(item => item.Edge)
+                    .Select(item => item.Interaction)
                     .Select(item => new
                     {
-                        Edge = item.Id,
-                        SourceNodeId = item.EdgeNodes
-                            .Where(item1 => item1.Type == EdgeNodeType.Source)
-                            .Select(item1 => item1.Node.Id)
+                        Interaction = item.Id,
+                        SourceProteinId = item.InteractionProteins
+                            .Where(item1 => item1.Type == InteractionProteinType.Source)
+                            .Select(item1 => item1.Protein.Id)
                             .FirstOrDefault(),
-                        TargetNodeId = item.EdgeNodes
-                            .Where(item1 => item1.Type == EdgeNodeType.Target)
-                            .Select(item1 => item1.Node.Id)
+                        TargetProteinId = item.InteractionProteins
+                            .Where(item1 => item1.Type == InteractionProteinType.Target)
+                            .Select(item1 => item1.Protein.Id)
                             .FirstOrDefault()
                     })
-                    .Where(item => !string.IsNullOrEmpty(item.SourceNodeId) && !string.IsNullOrEmpty(item.TargetNodeId))
+                    .Where(item => !string.IsNullOrEmpty(item.SourceProteinId) && !string.IsNullOrEmpty(item.TargetProteinId))
                     .AsEnumerable()
-                    .Select(item => (item.SourceNodeId, item.TargetNodeId, item.Edge))
+                    .Select(item => (item.SourceProteinId, item.TargetProteinId, item.Interaction))
                     .Distinct()
                     .ToList();
-                // Get the nodes, edges, target nodes and source (preferred) nodes.
-                nodes = analysisNodeIds
+                // Get the proteins, interactions, target proteins and source (preferred) proteins.
+                proteins = analysisProteinIds
                     .ToList();
-                edges = analysisEdgeIds
+                interactions = analysisInteractionIds
                     .Select(item => (item.Item1, item.Item2))
                     .ToList();
-                sources = context.AnalysisNodes
+                sources = context.AnalysisProteins
                     .Where(item => item.Analysis == analysis)
-                    .Where(item => item.Type == AnalysisNodeType.Source)
-                    .Select(item => item.Node.Id)
+                    .Where(item => item.Type == AnalysisProteinType.Source)
+                    .Select(item => item.Protein.Id)
                     .ToList();
-                targets = context.AnalysisNodes
+                targets = context.AnalysisProteins
                     .Where(item => item.Analysis == analysis)
-                    .Where(item => item.Type == AnalysisNodeType.Target)
-                    .Select(item => item.Node.Id)
+                    .Where(item => item.Type == AnalysisProteinType.Target)
+                    .Select(item => item.Protein.Id)
                     .ToList();
-                // Check if there is any node in an edge that does not appear in the list of nodes.
-                if (edges.Select(item => item.Item1).Concat(edges.Select(item => item.Item2)).Distinct().Except(nodes).Any())
+                // Check if there is any protein in an interaction that does not appear in the list of proteins.
+                if (interactions.Select(item => item.Item1).Concat(interactions.Select(item => item.Item2)).Distinct().Except(proteins).Any())
                 {
                     // Update the analysis with an error message.
-                    analysis.Log = analysis.AppendToLog("There are edges which contain unknown nodes.");
+                    analysis.Log = analysis.AppendToLog("There are interactions which contain unknown proteins.");
                     // Update the analysis status.
                     analysis.Status = AnalysisStatus.Error;
                     // Update the analysis end time.
@@ -107,11 +106,11 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                     // End the function.
                     return;
                 }
-                // Check if there is any target node that does not appear in the list of nodes.
-                if (targets.Except(nodes).Any())
+                // Check if there is any target protein that does not appear in the list of proteins.
+                if (targets.Except(proteins).Any())
                 {
                     // Update the analysis with an error message.
-                    analysis.Log = analysis.AppendToLog("There are unknown target nodes.");
+                    analysis.Log = analysis.AppendToLog("There are unknown target proteins.");
                     // Update the analysis status.
                     analysis.Status = AnalysisStatus.Error;
                     // Update the analysis end time.
@@ -121,11 +120,11 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                     // End the function.
                     return;
                 }
-                // Check if there is any source node that does not appear in the list of nodes.
-                if (sources.Except(nodes).Any())
+                // Check if there is any source protein that does not appear in the list of proteins.
+                if (sources.Except(proteins).Any())
                 {
                     // Update the analysis with an error message.
-                    analysis.Log = analysis.AppendToLog("There are unknown source nodes.");
+                    analysis.Log = analysis.AppendToLog("There are unknown source proteins.");
                     // Update the analysis status.
                     analysis.Status = AnalysisStatus.Error;
                     // Update the analysis end time.
@@ -229,10 +228,10 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                     currentIterationWithoutImprovement += 1;
                     // Define a variable to store the control paths.
                     var controlPath = new Dictionary<string, List<string>>();
-                    // Set up the control path to start from the target nodes.
-                    foreach (var node in targets)
+                    // Set up the control path to start from the target proteins.
+                    foreach (var protein in targets)
                     {
-                        controlPath[node] = new List<string> { node };
+                        controlPath[protein] = new List<string> { protein };
                     }
                     // Start from no repeats.
                     var currentRepeat = 0;
@@ -243,64 +242,64 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                         var currentTargets = new List<string>(targets);
                         // Set the current path length to 0.
                         var currentPathLength = 0;
-                        // Get the target nodes to keep. If it is the first check of the current iteration, we have no kept nodes, so the current targets are simply the targets. This is a part of the "repeat" optimization.
-                        var keptTargetNodes = GetControllingNodes(controlPath)
+                        // Get the target proteins to keep. If it is the first check of the current iteration, we have no kept proteins, so the current targets are simply the targets. This is a part of the "repeat" optimization.
+                        var keptTargetProteins = GetControllingProteins(controlPath)
                             .Where(item => item.Value.Count() > 1)
                             .Select(item => item.Value)
                             .SelectMany(item => item)
                             .ToHashSet();
-                        // Go over each of the paths corresponding to the target nodes to reset.
-                        foreach (var item in controlPath.Keys.Except(keptTargetNodes).ToList())
+                        // Go over each of the paths corresponding to the target proteins to reset.
+                        foreach (var item in controlPath.Keys.Except(keptTargetProteins).ToList())
                         {
                             // Reset the control path.
                             controlPath[item] = new List<string>() { item };
                         }
                         // Get the new targets.
                         currentTargets = currentTargets
-                            .Except(keptTargetNodes)
+                            .Except(keptTargetProteins)
                             .ToList();
                         // Run until there are no current targets or we reached the maximum path length.
                         while (currentTargets.Any() && currentPathLength < parameters.MaximumPathLength)
                         {
                             // Set all of the current targets as unmatched.
-                            var unmatchedNodes = currentTargets.ToList();
-                            // Set all nodes in the network as available to match.
-                            var availableNodes = nodes.ToList();
-                            // If it is the first check of the current iteration, there are no kept nodes, so the left nodes and edges remain unchanged. Otherwise, remove from the left nodes the corresponding nodes in the current step in the control paths for the kept nodes. This is a part of the "repeat" optimization.
-                            availableNodes = availableNodes
+                            var unmatchedProteins = currentTargets.ToList();
+                            // Set all proteins in the network as available to match.
+                            var availableProteins = proteins.ToList();
+                            // If it is the first check of the current iteration, there are no kept proteins, so the left proteins and interactions remain unchanged. Otherwise, remove from the left proteins the corresponding proteins in the current step in the control paths for the kept proteins. This is a part of the "repeat" optimization.
+                            availableProteins = availableProteins
                                 .Except(controlPath
-                                    .Where(item => keptTargetNodes.Contains(item.Key))
+                                    .Where(item => keptTargetProteins.Contains(item.Key))
                                     .Select(item => item.Value)
                                     .Where(item => currentPathLength + 1 < item.Count())
                                     .Select(item => item[currentPathLength + 1]))
                                 .ToList();
-                            // Define a variable to store the matched edges of the matching.
-                            var matchedEdges = new List<(string, string)>();
+                            // Define a variable to store the matched interactions of the matching.
+                            var matchedInteractions = new List<(string, string)>();
                             // Go over each heuristic set.
                             foreach (var heuristicSet in heuristics)
                             {
-                                // Get the left nodes, right nodes, and edges of the current matching.
-                                var leftNodes = availableNodes.ToList();
-                                var rightNodes = unmatchedNodes.ToList();
-                                var currentEdges = GetSingleHeuristicEdges(leftNodes, rightNodes, edges, heuristicSet, controlPath, sources);
-                                var matchingEdges = GetMaximumMatching(leftNodes, rightNodes, currentEdges, random);
-                                // Add the matched edges to the list.
-                                matchedEdges.AddRange(matchingEdges);
-                                // Update the remaining nodes after the matching.
-                                availableNodes.RemoveAll(item => matchingEdges.Any(item1 => item1.Item1 == item));
-                                unmatchedNodes.RemoveAll(item => matchingEdges.Any(item1 => item1.Item2 == item));
+                                // Get the left proteins, right proteins, and interactions of the current matching.
+                                var leftProteins = availableProteins.ToList();
+                                var rightProteins = unmatchedProteins.ToList();
+                                var currentInteractions = GetSingleHeuristicInteractions(leftProteins, rightProteins, interactions, heuristicSet, controlPath, sources);
+                                var matchingInteractions = GetMaximumMatching(leftProteins, rightProteins, currentInteractions, random);
+                                // Add the matched interactions to the list.
+                                matchedInteractions.AddRange(matchingInteractions);
+                                // Update the remaining proteins after the matching.
+                                availableProteins.RemoveAll(item => matchingInteractions.Any(item1 => item1.Item1 == item));
+                                unmatchedProteins.RemoveAll(item => matchingInteractions.Any(item1 => item1.Item2 == item));
                             }
-                            // Update the current targets to the current matched edge source nodes, and the control path.
-                            currentTargets = matchedEdges.Select(item => item.Item1).ToList();
+                            // Update the current targets to the current matched interaction source proteins, and the control path.
+                            currentTargets = matchedInteractions.Select(item => item.Item1).ToList();
                             // Get the dictionary which stores, for each target, the corresponding new matched target to add to the path.
                             var currentTargetDictionary = controlPath
                                 .Where(item => item.Value.Count() == currentPathLength + 1)
-                                .ToDictionary(item => item.Key, item => matchedEdges.Where(item1 => item1.Item2 == item.Value.Last()).Select(item1 => item1.Item1).FirstOrDefault())
+                                .ToDictionary(item => item.Key, item => matchedInteractions.Where(item1 => item1.Item2 == item.Value.Last()).Select(item1 => item1.Item1).FirstOrDefault())
                                 .Where(item => item.Value != null);
                             // Go over all entries in dictionary.
                             foreach (var entry in currentTargetDictionary)
                             {
-                                // Update the control path with the first node of the corresponding matched edge.
+                                // Update the control path with the first protein of the corresponding matched interaction.
                                 controlPath[entry.Key].Add(entry.Value);
                             }
                             // Update the current path length.
@@ -316,18 +315,18 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                     {
                         // Reset the cut paths status.
                         pathCutsPerformed = false;
-                        // Get the controlling nodes for the path.
-                        var controllingNodes = GetControllingNodes(controlPath).Keys
+                        // Get the controlling proteins for the path.
+                        var controllingProteins = GetControllingProteins(controlPath).Keys
                             .ToHashSet();
                         // Go over each path in the control path.
                         foreach (var key in controlPath.Keys.ToList())
                         {
-                            // Get the first index of any control node.
-                            var index = controlPath[key].FindIndex(item => controllingNodes.Contains(item));
+                            // Get the first index of any control protein.
+                            var index = controlPath[key].FindIndex(item => controllingProteins.Contains(item));
                             // Check if the index doesn't correspond to the last element in the list.
                             if (index < controlPath[key].Count() - 1)
                             {
-                                // Cut the path up to the first index of any control node.
+                                // Cut the path up to the first index of any control protein.
                                 controlPath[key] = controlPath[key].Take(index + 1).ToList();
                                 // Mark the cut as performed.
                                 pathCutsPerformed = true;
@@ -335,21 +334,21 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                         }
                     } while (pathCutsPerformed);
                     // Compute the result.
-                    var controlNodes = GetControllingNodes(controlPath).Keys.ToList();
+                    var controlProteins = GetControllingProteins(controlPath).Keys.ToList();
                     // Check if the current solution is better than the previously obtained best solutions.
-                    if (controlNodes.Count() < bestSolutionSize)
+                    if (controlProteins.Count() < bestSolutionSize)
                     {
                         // Update the best solution.
-                        bestSolutionSize = controlNodes.Count();
+                        bestSolutionSize = controlProteins.Count();
                         // Reset the number of iterations.
                         currentIterationWithoutImprovement = 0;
                         // Reset the best control paths.
                         bestControlPaths.RemoveAll(item => true);
                     }
                     // Check if the current solution is as good as the previously obtained best solutions.
-                    if (controlNodes.Count() == bestSolutionSize)
+                    if (controlProteins.Count() == bestSolutionSize)
                     {
-                        // Check if none of the previous solutions has the same nodes.
+                        // Check if none of the previous solutions has the same proteins.
                         if (!bestControlPaths.Any(item => !item.Keys.Except(controlPath.Keys).Any() && !controlPath.Keys.Except(item.Keys).Any()))
                         {
                             // Update the best control paths.
@@ -362,27 +361,27 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                 {
                     Paths = item.Values.Select(item1 =>
                     {
-                    // Get the nodes and edges in the path.
-                    var pathNodes = item1
-                    .Select(item2 => analysisNodeIds.FirstOrDefault(item3 => item3 == item2))
-                    .Where(item2 => item2 != null)
-                    .Reverse()
-                    .ToList();
-                        var pathEdges = item1
+                        // Get the proteins and interactions in the path.
+                        var pathProteins = item1
+                        .Select(item2 => analysisProteinIds.FirstOrDefault(item3 => item3 == item2))
+                        .Where(item2 => item2 != null)
+                        .Reverse()
+                        .ToList();
+                        var pathInteractions = item1
                             .Zip(item1.Skip(1), (item2, item3) => (item3.ToString(), item2.ToString()))
-                            .Select(item2 => analysisEdgeIds.FirstOrDefault(item3 => item3.Item1 == item2.Item1 && item3.Item2 == item2.Item2))
+                            .Select(item2 => analysisInteractionIds.FirstOrDefault(item3 => item3.Item1 == item2.Item1 && item3.Item2 == item2.Item2))
                             .Select(item2 => item2.Item3)
                             .Where(item2 => !string.IsNullOrEmpty(item2))
                             .Reverse()
                             .ToList();
-                    // Return the path.
-                    return new Path
+                        // Return the path.
+                        return new Path
                         {
-                            PathNodes = pathNodes.Select((item2, index) => new PathNode { NodeId = item2, Type = PathNodeType.None, Index = index })
-                        .Append(new PathNode { NodeId = pathNodes.First(), Type = PathNodeType.Source, Index = -1 })
-                        .Append(new PathNode { NodeId = pathNodes.Last(), Type = PathNodeType.Target, Index = pathNodes.Count() })
-                        .ToList(),
-                            PathEdges = pathEdges.Select((item2, index) => new PathEdge { EdgeId = item2, Index = index }).ToList()
+                            PathProteins = pathProteins.Select((item2, index) => new PathProtein { ProteinId = item2, Type = PathProteinType.None, Index = index })
+                            .Append(new PathProtein { ProteinId = pathProteins.First(), Type = PathProteinType.Source, Index = -1 })
+                            .Append(new PathProtein { ProteinId = pathProteins.Last(), Type = PathProteinType.Target, Index = pathProteins.Count() })
+                            .ToList(),
+                            PathInteractions = pathInteractions.Select((item2, index) => new PathInteraction { InteractionId = item2, Index = index }).ToList()
                         };
                     }).ToList()
                 }).ToList();
@@ -415,81 +414,81 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
         }
 
         /// <summary>
-        /// Returns a dictionary containing, for each control node, the target nodes that it controls.
+        /// Returns a dictionary containing, for each control protein, the target proteins that it controls.
         /// </summary>
         /// <param name="controlPath">The control path of the current iteration.</param>
-        /// <returns>Returns the dictionary containing, for each control node, the target nodes that it controls.</returns>
-        private static Dictionary<string, IEnumerable<string>> GetControllingNodes(Dictionary<string, List<string>> controlPath)
+        /// <returns>Returns the dictionary containing, for each control protein, the target proteins that it controls.</returns>
+        private static Dictionary<string, IEnumerable<string>> GetControllingProteins(Dictionary<string, List<string>> controlPath)
         {
-            // Get the pairs of corresponding control nodes and target nodes for each path in the control path.
+            // Get the pairs of corresponding control proteins and target proteins for each path in the control path.
             var pairs = controlPath
                 .Select(item => new
                 {
-                    TargetNode = item.Key,
-                    ControlNode = item.Value.Last()
+                    TargetProtein = item.Key,
+                    ControlProtein = item.Value.Last()
                 });
-            // Return, for each control node, the target nodes that it controls.
+            // Return, for each control protein, the target proteins that it controls.
             return pairs
-                .Select(item => item.ControlNode)
+                .Select(item => item.ControlProtein)
                 .Distinct()
-                .ToDictionary(item => item, item => pairs.Where(item1 => item1.ControlNode == item).Select(item => item.TargetNode));
+                .ToDictionary(item => item, item => pairs.Where(item1 => item1.ControlProtein == item).Select(item => item.TargetProtein));
         }
 
         /// <summary>
-        /// Returns the edges defined by the current heuristic.
+        /// Returns the interactions defined by the current heuristic.
         /// </summary>
-        /// <param name="leftNodes">Represents the left nodes of the bipartite graph.</param>
-        /// <param name="rightNodes">Represents the right nodes of the bipartite graph.</param>
-        /// <param name="edges">Represents the edges of the bipartite graph.</param>
+        /// <param name="leftProteins">Represents the left proteins of the bipartite graph.</param>
+        /// <param name="rightProteins">Represents the right proteins of the bipartite graph.</param>
+        /// <param name="interactions">Represents the interactions of the bipartite graph.</param>
         /// <param name="heuristicSet">Represents the heuristic set to be used in the search.</param>
         /// <param name="controlPath">Represents the current control path.</param>
-        /// <param name="sources">Represents the source (drug-target) nodes.</param>
+        /// <param name="sources">Represents the source (drug-target) proteins.</param>
         /// <returns></returns>
-        private static List<(string, string)> GetSingleHeuristicEdges(List<string> leftNodes, List<string> rightNodes, List<(string, string)> edges, List<string> heuristicSet, Dictionary<string, List<string>> controlPath, List<string> sources)
+        private static List<(string, string)> GetSingleHeuristicInteractions(List<string> leftProteins, List<string> rightProteins, List<(string, string)> interactions, List<string> heuristicSet, Dictionary<string, List<string>> controlPath, List<string> sources)
         {
             // Define the variable to return.
-            var heuristicEdges = new List<(string, string)>();
-            // Get all already identified control nodes, if needed.
+            var heuristicInteractions = new List<(string, string)>();
+            // Get all already identified control proteins, if needed.
             var currentLength = controlPath.Max(item => item.Value.Count());
-            var controlNodes = heuristicSet.Contains("C") ?
+            var controlProteins = heuristicSet.Contains("C") ?
                 controlPath.Where(item => item.Value.Count() < currentLength)
                     .Select(item => item.Value.Last())
                     .Distinct()
                     .AsEnumerable() :
                 Enumerable.Empty<string>();
-            // Get all previously seen nodes in the control paths, if needed.
-            var seenNodes = heuristicSet.Contains("A") || heuristicSet.Contains("D") || heuristicSet.Contains("E") ?
+            // Get all previously seen proteins in the control paths, if needed.
+            var seenProteins = heuristicSet.Contains("A") || heuristicSet.Contains("D") || heuristicSet.Contains("E") ?
                 controlPath.Select(item => item.Value)
                     .SelectMany(item => item)
                     .Distinct()
                     .AsEnumerable() :
                 Enumerable.Empty<string>();
-            // Get all previously seen source nodes in the control paths, if needed.
-            var seenSourceNodes = heuristicSet.Contains("A") ?
-                seenNodes.Intersect(sources) :
+            // Get all previously seen source proteins in the control paths, if needed.
+            var seenSourceProteins = heuristicSet.Contains("A") ?
+                seenProteins.Intersect(sources) :
                 Enumerable.Empty<string>();
-            // Get all edges starting from a previously seen source node and ending in target nodes, if needed.
-            var seenSourceEdges = heuristicSet.Contains("A") ?
-                edges.Where(item => rightNodes.Contains(item.Item2) && seenSourceNodes.Contains(item.Item1)) :
+            // Get all interactions starting from a previously seen source protein and ending in target proteins, if needed.
+            var seenSourceInteractions = heuristicSet.Contains("A") ?
+                interactions.Where(item => rightProteins.Contains(item.Item2) && seenSourceProteins.Contains(item.Item1)) :
                 Enumerable.Empty<(string, string)>();
-            // Get all edges starting from a source node and ending in target nodes, if needed.
-            var sourceEdges = heuristicSet.Contains("B") ?
-                edges.Where(item => rightNodes.Contains(item.Item2) && sources.Contains(item.Item1)) :
+            // Get all interactions starting from a source protein and ending in target proteins, if needed.
+            var sourceInteractions = heuristicSet.Contains("B") ?
+                interactions.Where(item => rightProteins.Contains(item.Item2) && sources.Contains(item.Item1)) :
                 Enumerable.Empty<(string, string)>();
-            // Get all edges starting from an already identified control node and ending in target nodes, if needed.
-            var controlEdges = heuristicSet.Contains("C") ?
-                edges.Where(item => rightNodes.Contains(item.Item2) && controlNodes.Contains(item.Item1)) :
+            // Get all interactions starting from an already identified control protein and ending in target proteins, if needed.
+            var controlInteractions = heuristicSet.Contains("C") ?
+                interactions.Where(item => rightProteins.Contains(item.Item2) && controlProteins.Contains(item.Item1)) :
                 Enumerable.Empty<(string, string)>();
-            // Get all edges starting from a previously seen node, if needed.
-            var seenEdges = heuristicSet.Contains("D") ?
-                edges.Where(item => rightNodes.Contains(item.Item2) && seenNodes.Contains(item.Item1)) :
+            // Get all interactions starting from a previously seen protein, if needed.
+            var seenInteractions = heuristicSet.Contains("D") ?
+                interactions.Where(item => rightProteins.Contains(item.Item2) && seenProteins.Contains(item.Item1)) :
                 Enumerable.Empty<(string, string)>();
-            // Get all edges not starting from a node in the current control path, if needed (to avoid loops).
-            var differentEdges = heuristicSet.Contains("E") ?
-                edges.Where(item => rightNodes.Contains(item.Item2) && !controlPath.Where(item1 => item1.Value.Last() == item.Item2).Any(item1 => item1.Value.Contains(item.Item1))) :
+            // Get all interactions not starting from a protein in the current control path, if needed (to avoid loops).
+            var differentInteractions = heuristicSet.Contains("E") ?
+                interactions.Where(item => rightProteins.Contains(item.Item2) && !controlPath.Where(item1 => item1.Value.Last() == item.Item2).Any(item1 => item1.Value.Contains(item.Item1))) :
                 Enumerable.Empty<(string, string)>();
-            // Get all possible edges.
-            var allEdges = edges.Where(item => rightNodes.Contains(item.Item2));
+            // Get all possible interactions.
+            var allInteractions = interactions.Where(item => rightProteins.Contains(item.Item2));
             // Go over all heuristic items.
             foreach (var heuristic in heuristicSet)
             {
@@ -497,33 +496,33 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                 switch (heuristic)
                 {
                     case "A":
-                        // Add all edges from previously seen source nodes.
-                        heuristicEdges.AddRange(seenSourceEdges);
+                        // Add all interactions from previously seen source proteins.
+                        heuristicInteractions.AddRange(seenSourceInteractions);
                         // End the switch.
                         break;
                     case "B":
-                        // Add all edges from source nodes.
-                        heuristicEdges.AddRange(sourceEdges);
+                        // Add all interactions from source proteins.
+                        heuristicInteractions.AddRange(sourceInteractions);
                         // End the switch.
                         break;
                     case "C":
-                        // Add all edges from already identified controlling nodes.
-                        heuristicEdges.AddRange(controlEdges);
+                        // Add all interactions from already identified controlling proteins.
+                        heuristicInteractions.AddRange(controlInteractions);
                         // End the switch.
                         break;
                     case "D":
-                        // Add all edges from previously seen nodes.
-                        heuristicEdges.AddRange(seenEdges);
+                        // Add all interactions from previously seen proteins.
+                        heuristicInteractions.AddRange(seenInteractions);
                         // End the switch.
                         break;
                     case "E":
-                        // Add all edges not starting from a node in the current control path (to avoid loops).
-                        heuristicEdges.AddRange(differentEdges);
+                        // Add all interactions not starting from a protein in the current control path (to avoid loops).
+                        heuristicInteractions.AddRange(differentInteractions);
                         // End the switch.
                         break;
                     case "Z":
-                        // Add all possible edges.
-                        heuristicEdges.AddRange(allEdges);
+                        // Add all possible interactions.
+                        heuristicInteractions.AddRange(allInteractions);
                         // End the switch.
                         break;
                     default:
@@ -531,25 +530,25 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                         break;
                 }
             }
-            // Return all edges that start in a left node.
-            return heuristicEdges.Where(item => leftNodes.Contains(item.Item1)).ToList();
+            // Return all interactions that start in a left protein.
+            return heuristicInteractions.Where(item => leftProteins.Contains(item.Item1)).ToList();
         }
 
         /// <summary>
         /// Represents the Hopcroft-Karp algorithm for maximum matching in a bipartite graph.
         /// </summary>
-        /// <param name="leftNodes">Represents the left nodes of the bipartite graph.</param>
-        /// <param name="rightNodes">Represents the right nodes of the bipartite graph.</param>
-        /// <param name="edges">Represents the edges of the bipartite graph.</param>
+        /// <param name="leftProteins">Represents the left proteins of the bipartite graph.</param>
+        /// <param name="rightProteins">Represents the right proteins of the bipartite graph.</param>
+        /// <param name="interactions">Represents the interactions of the bipartite graph.</param>
         /// <param name="rand">Represents the random variable for choosing randomly a maximum matching.</param>
-        /// <returns>Returns the list of edges corresponding to a maximum matching for the bipartite graph.</returns>
+        /// <returns>Returns the list of interactions corresponding to a maximum matching for the bipartite graph.</returns>
         /// <remarks>The implementation is a slightly modified version from the one found on https://en.wikipedia.org/wiki/Hopcroft–Karp_algorithm, written in C#.</remarks>
-        private static List<(string, string)> GetMaximumMatching(List<string> leftNodes, List<string> rightNodes, List<(string, string)> edges, Random rand)
+        private static List<(string, string)> GetMaximumMatching(List<string> leftProteins, List<string> rightProteins, List<(string, string)> interactions, Random rand)
         {
-            // The Wikipedia algorithm uses considers the left nodes as U, and the right ones as V. But, as the unmatched nodes are considered, in order, from the left side of the bipartite graph, the obtained matching would not be truly random, especially on the first step. That is why I perform here a simple switch, by inter-changing the lists U and V (left and right side nodes), and using the opposite direction edges, in order to obtained a random maximum matching.
-            var U = rightNodes;
-            var V = leftNodes;
-            var oppositeEdges = edges.Select((item) => (item.Item2, item.Item1)).ToList();
+            // The Wikipedia algorithm uses considers the left proteins as U, and the right ones as V. But, as the unmatched proteins are considered, in order, from the left side of the bipartite graph, the obtained matching would not be truly random, especially on the first step. That is why I perform here a simple switch, by inter-changing the lists U and V (left and right side proteins), and using the opposite direction interactions, in order to obtained a random maximum matching.
+            var U = rightProteins;
+            var V = leftProteins;
+            var oppositeInteractions = interactions.Select((item) => (item.Item2, item.Item1)).ToList();
             // The actual algorithm starts from here.
             var PairU = new Dictionary<string, string>();
             var PairV = new Dictionary<string, string>();
@@ -563,46 +562,46 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                 PairV[v] = "null";
             }
             var matching = 0;
-            while (BreadthFirstSearch(U, PairU, PairV, dist, oppositeEdges, rand))
+            while (BreadthFirstSearch(U, PairU, PairV, dist, oppositeInteractions, rand))
             {
                 foreach (var u in U)
                 {
                     if (PairU[u] == "null")
                     {
-                        if (DepthFirstSearch(u, PairU, PairV, dist, oppositeEdges, rand))
+                        if (DepthFirstSearch(u, PairU, PairV, dist, oppositeInteractions, rand))
                         {
                             matching++;
                         }
                     }
                 }
             }
-            // Instead of the number of performed matchings, we will return the actual edges corresponding to these matchings.
-            // Because in the beginning of the function we switched the direction of the edges, now we switch back the direction of
-            // the matched edges, to fit in with the rest of the program.
-            var matchedEdges = new List<(string, string)>();
+            // Instead of the number of performed matchings, we will return the actual interactions corresponding to these matchings.
+            // Because in the beginning of the function we switched the direction of the interactions, now we switch back the direction of
+            // the matched interactions, to fit in with the rest of the program.
+            var matchedInteractions = new List<(string, string)>();
             foreach (var item in PairU)
             {
-                // We will return only edges corresponding to the matching, that is edges with both nodes not null.
+                // We will return only interactions corresponding to the matching, that is interactions with both proteins not null.
                 if (item.Value != "null")
                 {
                     // Here we perform the switch back to the original direction. Otherwise we would return the pair (key, value).
-                    matchedEdges.Add((item.Value, item.Key));
+                    matchedInteractions.Add((item.Value, item.Key));
                 }
             }
-            return matchedEdges;
+            return matchedInteractions;
         }
 
         /// <summary>
         /// The breadth-first search of the Hopcroft-Karp maximum matching algorithm.
         /// </summary>
-        /// <param name="U">The left nodes of the bipartite graph.</param>
-        /// <param name="PairU">Dictionary containing a matching from the nodes on the left to nodes on the right.</param>
-        /// <param name="PairV">Dictionary containing a matching from the nodes on the right to nodes on the left.</param>
+        /// <param name="U">The left proteins of the bipartite graph.</param>
+        /// <param name="PairU">Dictionary containing a matching from the proteins on the left to proteins on the right.</param>
+        /// <param name="PairV">Dictionary containing a matching from the proteins on the right to proteins on the left.</param>
         /// <param name="dist"></param>
-        /// <param name="edges">List of edges in the bipartite graph.</param>
+        /// <param name="interactions">List of interactions in the bipartite graph.</param>
         /// <param name="rand">The random variable for choosing randomly a maximum matching.</param>
         /// <returns></returns>
-        private static bool BreadthFirstSearch(List<string> U, Dictionary<string, string> PairU, Dictionary<string, string> PairV, Dictionary<string, int> dist, List<(string, string)> edges, Random rand)
+        private static bool BreadthFirstSearch(List<string> U, Dictionary<string, string> PairU, Dictionary<string, string> PairV, Dictionary<string, int> dist, List<(string, string)> interactions, Random rand)
         {
             var queue = new Queue<string>();
             foreach (var u in U)
@@ -623,7 +622,7 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
                 var u = queue.Dequeue();
                 if (dist[u] < dist["null"])
                 {
-                    var adj = edges.Where((edge) => edge.Item1 == u).Select((edge) => edge.Item2).OrderBy((item) => rand.Next());
+                    var adj = interactions.Where((interaction) => interaction.Item1 == u).Select((interaction) => interaction.Item2).OrderBy((item) => rand.Next());
                     foreach (var v in adj)
                     {
                         if (dist[PairV[v]] == int.MaxValue)
@@ -640,23 +639,23 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="u">A node from the left part of the bipartite graph.</param>
-        /// <param name="PairU">Dictionary containing a matching from the nodes on the left to nodes on the right.</param>
-        /// <param name="PairV">Dictionary containing a matching from the nodes on the right to nodes on the left.</param>
+        /// <param name="u">A protein from the left part of the bipartite graph.</param>
+        /// <param name="PairU">Dictionary containing a matching from the proteins on the left to proteins on the right.</param>
+        /// <param name="PairV">Dictionary containing a matching from the proteins on the right to proteins on the left.</param>
         /// <param name="dist"></param>
-        /// <param name="edges">List of edges in the bipartite graph.</param>
+        /// <param name="interactions">List of interactions in the bipartite graph.</param>
         /// <param name="rand">The random variable for choosing randomly a maximum matching.</param>
         /// <returns></returns>
-        private static bool DepthFirstSearch(string u, Dictionary<string, string> PairU, Dictionary<string, string> PairV, Dictionary<string, int> dist, List<(string, string)> edges, Random rand)
+        private static bool DepthFirstSearch(string u, Dictionary<string, string> PairU, Dictionary<string, string> PairV, Dictionary<string, int> dist, List<(string, string)> interactions, Random rand)
         {
             if (u != "null")
             {
-                var adj = edges.Where((edge) => edge.Item1 == u).Select((edge) => edge.Item2).OrderBy((item) => rand.Next());
+                var adj = interactions.Where((interaction) => interaction.Item1 == u).Select((interaction) => interaction.Item2).OrderBy((item) => rand.Next());
                 foreach (var v in adj)
                 {
                     if (dist[PairV[v]] == dist[u] + 1)
                     {
-                        if (DepthFirstSearch(PairV[v], PairU, PairV, dist, edges, rand))
+                        if (DepthFirstSearch(PairV[v], PairU, PairV, dist, interactions, rand))
                         {
                             PairV[v] = u;
                             PairU[u] = v;

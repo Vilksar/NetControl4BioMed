@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace NetControl4BioMed.Data.Enumerations
 {
@@ -18,39 +14,39 @@ namespace NetControl4BioMed.Data.Enumerations
         None,
 
         /// <summary>
-        /// Represents a network which contains all edges involving at least one seed node.
+        /// Represents a network which contains all interactions involving at least one seed protein.
         /// </summary>
-        [Display(Name = "Neighbors", Description = "The network contains all edges involving at least one seed node.")]
+        [Display(Name = "Neighbors", Description = "The network contains all interactions involving at least one seed protein.")]
         Neighbors,
 
         /// <summary>
-        /// Represents a network which contains only the edges between the seed nodes.
+        /// Represents a network which contains only the interactions between the seed proteins.
         /// </summary>
-        [Display(Name = "Gap 0", Description = "The network contains only the edges between the seed nodes.")]
+        [Display(Name = "Gap 0", Description = "The network contains only the interactions between the seed proteins.")]
         Gap0,
 
         /// <summary>
-        /// Represents a network which contains the edges between the seed nodes, with at most one additional node in-between.
+        /// Represents a network which contains the interactions between the seed proteins, with at most one additional protein in-between.
         /// </summary>
-        [Display(Name = "Gap 1", Description = "The network contains the edges between the seed nodes, with at most one additional node in-between.")]
+        [Display(Name = "Gap 1", Description = "The network contains the interactions between the seed proteins, with at most one additional protein in-between.")]
         Gap1,
 
         /// <summary>
-        /// Represents a network which contains the edges between the seed nodes, with at most two additional nodes in-between.
+        /// Represents a network which contains the interactions between the seed proteins, with at most two additional proteins in-between.
         /// </summary>
-        [Display(Name = "Gap 2", Description = "The network contains the edges between the seed nodes, with at most two additional nodes in-between.")]
+        [Display(Name = "Gap 2", Description = "The network contains the interactions between the seed proteins, with at most two additional proteins in-between.")]
         Gap2,
 
         /// <summary>
-        /// Represents a network which contains the edges between the seed nodes, with at most three additional nodes in-between.
+        /// Represents a network which contains the interactions between the seed proteins, with at most three additional proteins in-between.
         /// </summary>
-        [Display(Name = "Gap 3", Description = "The network contains the edges between the seed nodes, with at most three additional nodes in-between.")]
+        [Display(Name = "Gap 3", Description = "The network contains the interactions between the seed proteins, with at most three additional proteins in-between.")]
         Gap3,
 
         /// <summary>
-        /// Represents a network which contains the edges between the seed nodes, with at most four additional nodes in-between.
+        /// Represents a network which contains the interactions between the seed proteins, with at most four additional proteins in-between.
         /// </summary>
-        [Display(Name = "Gap 4", Description = "The network contains the edges between the seed nodes, with at most four additional nodes in-between.")]
+        [Display(Name = "Gap 4", Description = "The network contains the interactions between the seed proteins, with at most four additional proteins in-between.")]
         Gap4
     }
 }

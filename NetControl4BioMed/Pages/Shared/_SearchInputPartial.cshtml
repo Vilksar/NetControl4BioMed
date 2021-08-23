@@ -1,4 +1,4 @@
-﻿@model Helpers.ViewModels.SearchInputViewModel
+﻿@model NetControl4BioMed.Helpers.ViewModels.SearchInputViewModel
 
 <form method="get" class="text-justify">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger text-justify text-wrap"></div>
@@ -74,6 +74,10 @@
                 }
             </div>
         </div>
+        <button class="btn btn-dark btn-block" type="submit" title="Apply">
+            <span><i class="fas fa-search"></i></span>
+            <span>Apply</span>
+        </button>
     </div>
     <div class="collapse border rounded px-3 py-2 mb-3 search-input-sort">
         <div class="row text-left">
@@ -138,5 +142,9 @@
                 }
             </div>
         </div>
+        <button class="btn btn-dark btn-block" type="submit" title="Apply">
+            <span><i class="fas fa-sort-alpha-down"></i></span>
+            <span>Apply</span>
+        </button>
     </div>
 </form>

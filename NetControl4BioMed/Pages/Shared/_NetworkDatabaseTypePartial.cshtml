@@ -1,14 +1,14 @@
 ﻿@model NetworkDatabaseType
 @using NetControl4BioMed.Data.Enumerations
-@using Helpers.Extensions
+@using NetControl4BioMed.Helpers.Extensions
 
 <div class="text-uppercase">
     @switch (Model)
     {
-        case NetworkDatabaseType.Node:
+        case NetworkDatabaseType.Protein:
             <span style="color: lightgray;"><i class="fas fa-circle"></i></span>
             break;
-        case NetworkDatabaseType.Edge:
+        case NetworkDatabaseType.Interaction:
             <span style="color: lightgray;"><i class="fas fa-arrow-right"></i></span>
             break;
         default:

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,6 +7,9 @@ using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NetControl4BioMed.Pages.Administration.Created.Networks
 {
@@ -43,19 +42,23 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                     { "DatabaseName", "Database name" },
                     { "AnalysisId", "Analysis ID" },
                     { "AnalysisName", "Analysis name" },
-                    { "NodeCollectionId", "Node collection ID" },
-                    { "NodeCollectionName", "Node collection name" }
+                    { "ProteinCollectionId", "Protein collection ID" },
+                    { "ProteinCollectionName", "Protein collection name" }
                 },
                 Filter = new Dictionary<string, string>
                 {
-                    { "IsError", "Is error" },
-                    { "IsNotError", "Is not error" },
-                    { "IsDefined", "Is defined" },
-                    { "IsNotDefined", "Is not defined" },
-                    { "IsGenerating", "Is generating" },
-                    { "IsNotGenerating", "Is not generating" },
-                    { "IsCompleted", "Is completed" },
-                    { "IsNotCompleted", "Is not completed" },
+                    { "IsPublic", "Is public" },
+                    { "IsNotPublic", "Is not public" },
+                    { "IsDemonstration", "Is demonstration" },
+                    { "IsNotDemonstration", "Is not demonstration" },
+                    { "HasStatusError", "Has status \"Error\"" },
+                    { "HasNotStatusError", "Does not have status \"Error\"" },
+                    { "HasStatusDefined", "Has status \"Defined\"" },
+                    { "HasNotStatusDefined", "Does not have status \"Defined\"" },
+                    { "HasStatusGenerating", "Has status \"Generating\"" },
+                    { "HasNotStatusGenerating", "Does not have status \"Generating\"" },
+                    { "HasStatusCompleted", "Has status \"Completed\"" },
+                    { "HasNotStatusCompleted", "Does not have status \"Completed\"" },
                     { "UsesAlgorithmNone", "Was provided by user" },
                     { "UsesNotAlgorithmNone", "Was not provided by user" },
                     { "UsesAlgorithmNeighbors", "Was generated using \"Neighbors\" algorithm" },
@@ -72,18 +75,16 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                     { "UsesNotAlgorithmGap4", "Was not generated using \"Gap 4\" algorithm" },
                     { "HasNetworkUsers", "Has network users" },
                     { "HasNoNetworkUsers", "Does not have network users" },
-                    { "HasNetworkUserInvitations", "Has network user invitations" },
-                    { "HasNoNetworkUserInvitations", "Does not have network user invitations" },
-                    { "HasNetworkNodes", "Has network nodes" },
-                    { "HasNoNetworkNodes", "Does not have network nodes" },
-                    { "HasNetworkEdges", "Has network edges" },
-                    { "HasNoNetworkEdges", "Does not have network edges" },
-                    { "HasAnalysisNetworks", "Has analysis networks" },
-                    { "HasNoAnalysisNetworks", "Does not have analysis networks" },
+                    { "HasNetworkProteins", "Has network proteins" },
+                    { "HasNoNetworkProteins", "Does not have network proteins" },
+                    { "HasNetworkInteractions", "Has network interactions" },
+                    { "HasNoNetworkInteractions", "Does not have network interactions" },
+                    { "HasAnalyses", "Has analyses" },
+                    { "HasNoAnalyses", "Does not have analyses" },
                     { "HasNetworkDatabases", "Has network databases" },
                     { "HasNoNetworkDatabases", "Does not have network databases" },
-                    { "HasNetworkNodeCollections", "Has network node collections" },
-                    { "HasNoNetworkNodeCollections", "Does not have network node collections" }
+                    { "HasNetworkProteinCollections", "Has network protein collections" },
+                    { "HasNoNetworkProteinCollections", "Does not have network protein collections" }
                 },
                 SortBy = new Dictionary<string, string>
                 {
@@ -91,12 +92,11 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                     { "DateTimeCreated", "Date created" },
                     { "Name", "Name" },
                     { "NetworkUserCount", "Number of network users" },
-                    { "NetworkUserInvitationCount", "Number of network user invitations" },
-                    { "NetworkNodeCount", "Number of network nodes" },
-                    { "NetworkEdgeCount", "Number of network edges" },
-                    { "AnalysisNetworkCount", "Number of analysis networks" },
+                    { "NetworkProteinCount", "Number of network proteins" },
+                    { "NetworkInteractionCount", "Number of network interactions" },
+                    { "AnalysisCount", "Number of analyses" },
                     { "NetworkDatabaseCount", "Number of network databases" },
-                    { "NetworkNodeCollectionCount", "Number of network node collections" }
+                    { "NetworkProteinCollectionCount", "Number of network protein collections" }
                 }
             };
         }
@@ -122,20 +122,24 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                     input.SearchIn.Contains("Description") && item.Description.Contains(input.SearchString) ||
                     input.SearchIn.Contains("DatabaseId") && item.NetworkDatabases.Any(item1 => item1.Database.Id.Contains(input.SearchString)) ||
                     input.SearchIn.Contains("DatabaseName") && item.NetworkDatabases.Any(item1 => item1.Database.Name.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("AnalysisId") && item.AnalysisNetworks.Any(item1 => item1.Analysis.Id.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("AnalysisName") && item.AnalysisNetworks.Any(item1 => item1.Analysis.Name.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("NodeCollectionId") && item.NetworkNodeCollections.Any(item1 => item1.NodeCollection.Id.Contains(input.SearchString)) ||
-                    input.SearchIn.Contains("NodeCollectionName") && item.NetworkNodeCollections.Any(item1 => item1.NodeCollection.Name.Contains(input.SearchString)));
+                    input.SearchIn.Contains("AnalysisId") && item.Analyses.Any(item1 => item1.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("AnalysisName") && item.Analyses.Any(item1 => item1.Name.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("ProteinCollectionId") && item.NetworkProteinCollections.Any(item1 => item1.ProteinCollection.Id.Contains(input.SearchString)) ||
+                    input.SearchIn.Contains("ProteinCollectionName") && item.NetworkProteinCollections.Any(item1 => item1.ProteinCollection.Name.Contains(input.SearchString)));
             // Select the results matching the filter parameter.
             query = query
-                .Where(item => input.Filter.Contains("IsError") ? item.Status == NetworkStatus.Error : true)
-                .Where(item => input.Filter.Contains("IsNotError") ? item.Status != NetworkStatus.Error : true)
-                .Where(item => input.Filter.Contains("IsDefined") ? item.Status == NetworkStatus.Defined : true)
-                .Where(item => input.Filter.Contains("IsNotDefined") ? item.Status != NetworkStatus.Defined : true)
-                .Where(item => input.Filter.Contains("IsGenerating") ? item.Status == NetworkStatus.Generating : true)
-                .Where(item => input.Filter.Contains("IsNotGenerating") ? item.Status != NetworkStatus.Generating : true)
-                .Where(item => input.Filter.Contains("IsCompleted") ? item.Status == NetworkStatus.Completed : true)
-                .Where(item => input.Filter.Contains("IsNotCompleted") ? item.Status != NetworkStatus.Completed : true)
+                .Where(item => input.Filter.Contains("IsPublic") ? item.IsPublic : true)
+                .Where(item => input.Filter.Contains("IsNotPublic") ? !item.IsPublic : true)
+                .Where(item => input.Filter.Contains("IsDemonstration") ? item.IsDemonstration : true)
+                .Where(item => input.Filter.Contains("IsNotDemonstration") ? !item.IsDemonstration : true)
+                .Where(item => input.Filter.Contains("HasStatusError") ? item.Status == NetworkStatus.Error : true)
+                .Where(item => input.Filter.Contains("HasNotStatusError") ? item.Status != NetworkStatus.Error : true)
+                .Where(item => input.Filter.Contains("HasStatusDefined") ? item.Status == NetworkStatus.Defined : true)
+                .Where(item => input.Filter.Contains("HasNotStatusDefined") ? item.Status != NetworkStatus.Defined : true)
+                .Where(item => input.Filter.Contains("HasStatusGenerating") ? item.Status == NetworkStatus.Generating : true)
+                .Where(item => input.Filter.Contains("HasNotStatusGenerating") ? item.Status != NetworkStatus.Generating : true)
+                .Where(item => input.Filter.Contains("HasStatusCompleted") ? item.Status == NetworkStatus.Completed : true)
+                .Where(item => input.Filter.Contains("HasNotStatusCompleted") ? item.Status != NetworkStatus.Completed : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmNone") ? item.Algorithm == NetworkAlgorithm.None : true)
                 .Where(item => input.Filter.Contains("UsesNotAlgorithmNone") ? item.Algorithm != NetworkAlgorithm.None : true)
                 .Where(item => input.Filter.Contains("UsesAlgorithmNeighbors") ? item.Algorithm == NetworkAlgorithm.Neighbors : true)
@@ -152,18 +156,16 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                 .Where(item => input.Filter.Contains("UsesNotAlgorithmGap4") ? item.Algorithm != NetworkAlgorithm.Gap4 : true)
                 .Where(item => input.Filter.Contains("HasNetworkUsers") ? item.NetworkUsers.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoNetworkUsers") ? !item.NetworkUsers.Any() : true)
-                .Where(item => input.Filter.Contains("HasNetworkUserInvitations") ? item.NetworkUserInvitations.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoNetworkUserInvitations") ? !item.NetworkUserInvitations.Any() : true)
-                .Where(item => input.Filter.Contains("HasNetworkNodes") ? item.NetworkNodes.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoNetworkNodes") ? !item.NetworkNodes.Any() : true)
-                .Where(item => input.Filter.Contains("HasNetworkEdges") ? item.NetworkEdges.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoNetworkEdges") ? !item.NetworkEdges.Any() : true)
-                .Where(item => input.Filter.Contains("HasAnalysisNetworks") ? item.AnalysisNetworks.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoAnalysisNetworks") ? !item.AnalysisNetworks.Any() : true)
+                .Where(item => input.Filter.Contains("HasNetworkProteins") ? item.NetworkProteins.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoNetworkProteins") ? !item.NetworkProteins.Any() : true)
+                .Where(item => input.Filter.Contains("HasNetworkInteractions") ? item.NetworkInteractions.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoNetworkInteractions") ? !item.NetworkInteractions.Any() : true)
+                .Where(item => input.Filter.Contains("HasAnalyses") ? item.Analyses.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoAnalyses") ? !item.Analyses.Any() : true)
                 .Where(item => input.Filter.Contains("HasNetworkDatabases") ? item.NetworkDatabases.Any() : true)
                 .Where(item => input.Filter.Contains("HasNoNetworkDatabases") ? !item.NetworkDatabases.Any() : true)
-                .Where(item => input.Filter.Contains("HasNetworkNodeCollections") ? item.NetworkNodeCollections.Any() : true)
-                .Where(item => input.Filter.Contains("HasNoNetworkNodeCollections") ? !item.NetworkNodeCollections.Any() : true);
+                .Where(item => input.Filter.Contains("HasNetworkProteinCollections") ? item.NetworkProteinCollections.Any() : true)
+                .Where(item => input.Filter.Contains("HasNoNetworkProteinCollections") ? !item.NetworkProteinCollections.Any() : true);
             // Sort it according to the parameters.
             switch ((input.SortBy, input.SortDirection))
             {
@@ -191,29 +193,23 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                 case var sort when sort == ("NetworkUserCount", "Descending"):
                     query = query.OrderByDescending(item => item.NetworkUsers.Count());
                     break;
-                case var sort when sort == ("NetworkUserInvitationCount", "Ascending"):
-                    query = query.OrderBy(item => item.NetworkUserInvitations.Count());
+                case var sort when sort == ("NetworkProteinCount", "Ascending"):
+                    query = query.OrderBy(item => item.NetworkProteins.Count());
                     break;
-                case var sort when sort == ("NetworkUserInvitationCount", "Descending"):
-                    query = query.OrderByDescending(item => item.NetworkUserInvitations.Count());
+                case var sort when sort == ("NetworkProteinCount", "Descending"):
+                    query = query.OrderByDescending(item => item.NetworkProteins.Count());
                     break;
-                case var sort when sort == ("NetworkNodeCount", "Ascending"):
-                    query = query.OrderBy(item => item.NetworkNodes.Count());
+                case var sort when sort == ("NetworkInteractionCount", "Ascending"):
+                    query = query.OrderBy(item => item.NetworkInteractions.Count());
                     break;
-                case var sort when sort == ("NetworkNodeCount", "Descending"):
-                    query = query.OrderByDescending(item => item.NetworkNodes.Count());
+                case var sort when sort == ("NetworkInteractionCount", "Descending"):
+                    query = query.OrderByDescending(item => item.NetworkInteractions.Count());
                     break;
-                case var sort when sort == ("NetworkEdgeCount", "Ascending"):
-                    query = query.OrderBy(item => item.NetworkEdges.Count());
+                case var sort when sort == ("AnalysisCount", "Ascending"):
+                    query = query.OrderBy(item => item.Analyses.Count());
                     break;
-                case var sort when sort == ("NetworkEdgeCount", "Descending"):
-                    query = query.OrderByDescending(item => item.NetworkEdges.Count());
-                    break;
-                case var sort when sort == ("AnalysisNetworkCount", "Ascending"):
-                    query = query.OrderBy(item => item.AnalysisNetworks.Count());
-                    break;
-                case var sort when sort == ("AnalysisNetworkCount", "Descending"):
-                    query = query.OrderByDescending(item => item.AnalysisNetworks.Count());
+                case var sort when sort == ("AnalysisCount", "Descending"):
+                    query = query.OrderByDescending(item => item.Analyses.Count());
                     break;
                 case var sort when sort == ("NetworkDatabaseCount", "Ascending"):
                     query = query.OrderBy(item => item.NetworkDatabases.Count());
@@ -221,11 +217,11 @@ namespace NetControl4BioMed.Pages.Administration.Created.Networks
                 case var sort when sort == ("NetworkDatabaseCount", "Descending"):
                     query = query.OrderByDescending(item => item.NetworkDatabases.Count());
                     break;
-                case var sort when sort == ("NetworkNodeCollectionCount", "Ascending"):
-                    query = query.OrderBy(item => item.NetworkNodeCollections.Count());
+                case var sort when sort == ("NetworkProteinCollectionCount", "Ascending"):
+                    query = query.OrderBy(item => item.NetworkProteinCollections.Count());
                     break;
-                case var sort when sort == ("NetworkNodeCollectionCount", "Descending"):
-                    query = query.OrderByDescending(item => item.NetworkNodeCollections.Count());
+                case var sort when sort == ("NetworkProteinCollectionCount", "Descending"):
+                    query = query.OrderByDescending(item => item.NetworkProteinCollections.Count());
                     break;
                 default:
                     break;

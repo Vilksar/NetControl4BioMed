@@ -1,0 +1,7 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Overview";
+}
+
+<partial name="_NavigationQuickLinksPartial" model="@Helpers.ViewModels.NavigationQuickLinkViewModel.GetAvailableDataNavigationQuickLinks(Model.View.PublicItemCount)" />

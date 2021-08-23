@@ -28,6 +28,11 @@ namespace NetControl4BioMed.Helpers.InputModels
         public bool IsPublic { get; set; }
 
         /// <summary>
+        /// Gets or sets the demonstration availability of the network.
+        /// </summary>
+        public bool IsDemonstration { get; set; }
+
+        /// <summary>
         /// Represents the algorithm of the network.
         /// </summary>
         public string Algorithm { get; set; }
@@ -43,33 +48,28 @@ namespace NetControl4BioMed.Helpers.InputModels
         public IEnumerable<NetworkUserInputModel> NetworkUsers { get; set; }
 
         /// <summary>
-        /// Represents the network user invitations of the network.
-        /// </summary>
-        public IEnumerable<NetworkUserInvitationInputModel> NetworkUserInvitations { get; set; }
-
-        /// <summary>
         /// Represents the network databases of the network.
         /// </summary>
         public IEnumerable<NetworkDatabaseInputModel> NetworkDatabases { get; set; }
 
         /// <summary>
-        /// Represents the network nodes of the network.
+        /// Represents the network proteins of the network.
         /// </summary>
-        public IEnumerable<NetworkNodeInputModel> NetworkNodes { get; set; }
+        public IEnumerable<NetworkProteinInputModel> NetworkProteins { get; set; }
 
         /// <summary>
-        /// Represents the network edges of the network.
+        /// Represents the network interactions of the network.
         /// </summary>
-        public IEnumerable<NetworkEdgeInputModel> NetworkEdges { get; set; }
+        public IEnumerable<NetworkInteractionInputModel> NetworkInteractions { get; set; }
 
         /// <summary>
-        /// Represents the network node collections of the network.
+        /// Represents the network protein collections of the network.
         /// </summary>
-        public IEnumerable<NetworkNodeCollectionInputModel> NetworkNodeCollections { get; set; }
+        public IEnumerable<NetworkProteinCollectionInputModel> NetworkProteinCollections { get; set; }
 
         /// <summary>
-        /// Represents the analysis networks of the network.
+        /// Represents the analyses of the network.
         /// </summary>
-        public IEnumerable<AnalysisNetworkInputModel> AnalysisNetworks { get; set; }
+        public IEnumerable<AnalysisInputModel> Analyses { get; set; }
     }
 }

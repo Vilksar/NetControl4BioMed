@@ -14,5 +14,10 @@
         /// Represents the user of the network user.
         /// </summary>
         public UserInputModel User { get; set; }
+
+        /// <summary>
+        /// Represents the e-mail of the network user.
+        /// </summary>
+        public string Email { get; set; }
     }
 }

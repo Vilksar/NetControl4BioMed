@@ -1,17 +1,15 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using NetControl4BioMed.Data;
+using NetControl4BioMed.Helpers.InputModels;
+using NetControl4BioMed.Helpers.Tasks;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.DependencyInjection;
-using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Helpers.InputModels;
-using NetControl4BioMed.Helpers.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
 {
@@ -36,12 +34,12 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
             [Required(ErrorMessage = "This field is required.")]
             public string DatabaseId { get; set; }
 
-            [DataType(DataType.Text)]
+            [DataType(DataType.EmailAddress)]
             [Required(ErrorMessage = "This field is required.")]
-            public string UserId { get; set; }
+            public string Email { get; set; }
         }
 
-        public IActionResult OnGet(string databaseId = null, string userId = null)
+        public IActionResult OnGet(string databaseId = null, string email = null)
         {
             // Check if there aren't any databases.
             if (!_context.Databases.Any())
@@ -55,7 +53,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
             Input = new InputModel
             {
                 DatabaseId = databaseId,
-                UserId = userId
+                Email = email
             };
             // Return the page.
             return Page();
@@ -90,10 +88,7 @@ namespace NetControl4BioMed.Pages.Administration.Permissions.DatabaseUsers
                         {
                             Id = Input.DatabaseId
                         },
-                        User = new UserInputModel
-                        {
-                            Id = Input.UserId
-                        }
+                        Email = Input.Email
                     }
                 }
             };

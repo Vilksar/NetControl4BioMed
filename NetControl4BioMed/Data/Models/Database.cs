@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Data.Models
 {
@@ -41,54 +39,29 @@ namespace NetControl4BioMed.Data.Models
         public bool IsPublic { get; set; }
 
         /// <summary>
-        /// Gets or sets the type ID of the database.
-        /// </summary>
-        public string DatabaseTypeId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the type of the database.
-        /// </summary>
-        public DatabaseType DatabaseType { get; set; }
-
-        /// <summary>
         /// Gets or sets the registered users who have access to the database, even when it is not public.
         /// </summary>
         public ICollection<DatabaseUser> DatabaseUsers { get; set; }
 
         /// <summary>
-        /// Gets or sets the unregistered users that will have access to the database after regsitration, even when it is not public.
+        /// Gets or sets the protein fields which appear in the database.
         /// </summary>
-        public ICollection<DatabaseUserInvitation> DatabaseUserInvitations { get; set; }
+        public ICollection<DatabaseProteinField> DatabaseProteinFields { get; set; }
 
         /// <summary>
-        /// Gets or sets the node fields which appear in the database.
+        /// Gets or sets the interaction fields which appear in the database.
         /// </summary>
-        public ICollection<DatabaseNodeField> DatabaseNodeFields { get; set; }
+        public ICollection<DatabaseInteractionField> DatabaseInteractionFields { get; set; }
 
         /// <summary>
-        /// Gets or sets the edge fields which appear in the database.
+        /// Gets or sets the proteins which appear in the database.
         /// </summary>
-        public ICollection<DatabaseEdgeField> DatabaseEdgeFields { get; set; }
+        public ICollection<DatabaseProtein> DatabaseProteins { get; set; }
 
         /// <summary>
-        /// Gets or sets the nodes which appear in the database.
+        /// Gets or sets the interactions which appear in the database.
         /// </summary>
-        public ICollection<DatabaseNode> DatabaseNodes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the edges which appear in the database.
-        /// </summary>
-        public ICollection<DatabaseEdge> DatabaseEdges { get; set; }
-
-        /// <summary>
-        /// Gets or sets the node collections which use the database.
-        /// </summary>
-        public ICollection<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }
-
-        /// <summary>
-        /// Gets or sets the samples which use the database.
-        /// </summary>
-        public ICollection<SampleDatabase> SampleDatabases { get; set; }
+        public ICollection<DatabaseInteraction> DatabaseInteractions { get; set; }
 
         /// <summary>
         /// Gets or sets the networks which use the database.

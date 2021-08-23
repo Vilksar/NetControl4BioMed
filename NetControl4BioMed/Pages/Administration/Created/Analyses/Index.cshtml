@@ -56,10 +56,10 @@
                         </td>
                         <td class="text-left text-break">
                             <div>
-                                <span title="@item.Name" class="font-weight-bold">@item.Name</span>
+                                <a asp-page="/Administration/Created/Analyses/Details" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Name">@item.Name</a>
                             </div>
                             <div>
-                                <span title="@item.Id" class="small">@item.Id</span>
+                                <span class="small" title="@item.Id">@item.Id</span>
                             </div>
                         </td>
                         <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
@@ -73,6 +73,9 @@
                         <td class="text-center text-break">
                             <a asp-page="/Administration/Created/Analyses/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
                                 <span><i class="fas fa-info-circle"></i></span>
+                            </a>
+                            <a asp-page="/Administration/Created/Analyses/Edit" asp-route-id="@item.Id" class="btn btn-warning m-1" title="Edit">
+                                <span><i class="fas fa-pencil-alt"></i></span>
                             </a>
                             <a asp-page="/Administration/Created/Analyses/Delete" asp-route-ids="@item.Id" class="btn btn-danger m-1" title="Delete">
                                 <span><i class="fas fa-trash"></i></span>

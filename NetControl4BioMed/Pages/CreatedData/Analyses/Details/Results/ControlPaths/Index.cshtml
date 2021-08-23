@@ -1,0 +1,127 @@
+﻿@page
+@model IndexModel
+@using NetControl4BioMed.Data.Enumerations
+@{
+    ViewData["Title"] = "Analysis control paths";
+}
+
+@if (Model.View.Analysis.Status != AnalysisStatus.Stopped && Model.View.Analysis.Status != AnalysisStatus.Completed)
+{
+    <div class="alert alert-warning text-justify text-wrap">
+        <span><i class="fas fa-exclamation-triangle"></i></span>
+        <span>Results are available only for stopped or completed analyses.</span>
+    </div>
+}
+else
+{
+    <partial name="_SearchInputPartial" model="Model.View.Search.Input" />
+    <partial name="_SearchFiltersPartial" model="Model.View.Search.Filters" />
+    <form method="get" class="text-justify">
+        <div class="row align-items-center">
+            <div class="col-lg-12 mb-3">
+                <button type="submit" asp-page="/CreatedData/Analyses/Details/Results/ControlPaths/Download" class="btn btn-primary btn-block item-group-button" title="Download" disabled>
+                    <span><i class="fas fa-download"></i></span>
+                    <span>Download</span>
+                </button>
+            </div>
+        </div>
+        @if (!Model.View.Search.Items.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>No control paths have been found@(Model.View.Search.Filters.Any() ? " matching the applied filters" : string.Empty).</span>
+            </div>
+        }
+        else
+        {
+            <table class="table table-hover table-bordered item-group" data-paging="false" data-info="false" data-searching="false">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" id="select" class="custom-control-input item-group-select" title="Select" />
+                                <label for="select" class="custom-control-label"></label>
+                            </div>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Control path</span>
+                        </th>
+                        <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                            <div>
+                                <span>Number of</span>
+                            </div>
+                            <div>
+                                <span>control inputs</span>
+                            </div>
+                        </th>
+                        @if (Model.View.SourceProteins.Any())
+                        {
+                            <th class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                                <div>
+                                    <span>Number of preferred</span>
+                                </div>
+                                <div>
+                                    <span>control inputs</span>
+                                </div>
+                            </th>
+                        }
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.View.Search.Items)
+                    {
+                        var controlProteinCount = item.Paths
+                            .Select(item1 => item1.PathProteins)
+                            .SelectMany(item => item)
+                            .Where(item => item.Type == PathProteinType.Source)
+                            .Select(item => item.Protein)
+                            .Distinct()
+                            .Count();
+                        var controlSourceProteinCount = item.Paths
+                            .Select(item1 => item1.PathProteins)
+                            .SelectMany(item => item)
+                            .Where(item => item.Type == PathProteinType.Source)
+                            .Select(item => item.Protein)
+                            .Distinct()
+                            .Where(item => Model.View.SourceProteins.Contains(item))
+                            .Count();
+                        <tr class="item-group-item">
+                            <td class="text-center text-break">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" id="checkbox-@item.Id" name="ids" value="@item.Id" class="custom-control-input item-group-item-checkbox" title="Select" />
+                                    <label for="checkbox-@item.Id" class="custom-control-label"></label>
+                                </div>
+                            </td>
+                            <td class="text-left text-break">
+                                <div>
+                                    <a asp-page="/CreatedData/Analyses/Details/Results/ControlPaths/Details" asp-route-id="@item.Id" class="font-weight-bold" title="@item.Id">@item.Id</a>
+                                </div>
+                                <div>
+                                    <span class="small text-muted" title="@item.Id">@item.Id</span>
+                                </div>
+                            </td>
+                            <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                                <span title="@controlProteinCount">@controlProteinCount</span>
+                            </td>
+                            @if (Model.View.SourceProteins.Any())
+                            {
+                                <td class="d-none d-lg-table-cell text-center text-break text-nowrap">
+                                    <span title="@controlSourceProteinCount">@controlSourceProteinCount</span>
+                                </td>
+                            }
+                            <td class="text-center text-break">
+                                <a asp-page="/CreatedData/Analyses/Details/Results/ControlPaths/Details" asp-route-id="@item.Id" class="btn btn-info m-1" title="Details">
+                                    <span><i class="fas fa-info-circle"></i></span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <partial name="_SearchPaginationPartial" model="Model.View.Search.Pagination" />
+        }
+    </form>
+}

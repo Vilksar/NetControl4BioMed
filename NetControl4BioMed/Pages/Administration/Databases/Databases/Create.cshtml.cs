@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.InputModels;
 using NetControl4BioMed.Helpers.Tasks;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Pages.Administration.Databases.Databases
 {
@@ -45,41 +42,16 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             [DataType(DataType.Text)]
             [Required(ErrorMessage = "This field is required.")]
             public bool IsPublic { get; set; }
-
-            [DataType(DataType.Text)]
-            [Required(ErrorMessage = "This field is required.")]
-            public string DatabaseTypeId { get; set; }
         }
 
-        public IActionResult OnGet(string databaseTypeId = null)
+        public IActionResult OnGet()
         {
-            // Check if there aren't any non-generic database types.
-            if (!_context.DatabaseTypes.Any(item => item.Name != "Generic"))
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No non-generic database types could be found. Please create a database type first.";
-                // Redirect to the index page.
-                return RedirectToPage("/Administration/Databases/Databases/Index");
-            }
-            // Define the input.
-            Input = new InputModel
-            {
-                DatabaseTypeId = databaseTypeId
-            };
             // Return the page.
             return Page();
         }
 
         public async Task<IActionResult> OnPost()
         {
-            // Check if there aren't any non-generic database types.
-            if (!_context.DatabaseTypes.Any(item => item.Name != "Generic"))
-            {
-                // Display a message.
-                TempData["StatusMessage"] = "Error: No non-generic database types could be found. Please create a database type first.";
-                // Redirect to the index page.
-                return RedirectToPage("/Administration/Databases/Databases/Index");
-            }
             // Check if the provided model isn't valid.
             if (!ModelState.IsValid)
             {
@@ -98,11 +70,7 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                         Name = Input.Name,
                         Description = Input.Description,
                         Url = Input.Url,
-                        IsPublic = Input.IsPublic,
-                        DatabaseType = new DatabaseTypeInputModel
-                        {
-                            Id = Input.DatabaseTypeId
-                        }
+                        IsPublic = Input.IsPublic
                     }
                 }
             };

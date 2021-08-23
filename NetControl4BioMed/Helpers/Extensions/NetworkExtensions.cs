@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -132,9 +131,8 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                entityCount = context.AnalysisNetworks
+                entityCount = context.Analyses
                     .Where(item => networkIds.Contains(item.Network.Id))
-                    .Select(item => item.Analysis)
                     .Distinct()
                     .Count();
             }
@@ -157,9 +155,8 @@ namespace NetControl4BioMed.Helpers.Extensions
                     // Use a new context instance.
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items in the current batch.
-                    batchItemInputs = context.AnalysisNetworks
+                    batchItemInputs = context.Analyses
                         .Where(item => networkIds.Contains(item.Network.Id))
-                        .Select(item => item.Analysis)
                         .Distinct()
                         .Select(item => new AnalysisInputModel
                         {
@@ -180,12 +177,12 @@ namespace NetControl4BioMed.Helpers.Extensions
         }
 
         /// <summary>
-        /// Deletes the dependent generic edges of the corresponding networks.
+        /// Deletes the dependent generic interactions of the corresponding networks.
         /// </summary>
         /// <param name="networkIds">The networks whose entities should be deleted.</param>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public static async Task DeleteDependentGenericEdgesAsync(IEnumerable<string> networkIds, IServiceProvider serviceProvider, CancellationToken token)
+        public static async Task DeleteDependentInteractionsAsync(IEnumerable<string> networkIds, IServiceProvider serviceProvider, CancellationToken token)
         {
             // Define a variable to store the total number of entities.
             var entityCount = 0;
@@ -195,10 +192,10 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                entityCount = context.NetworkEdges
+                entityCount = context.NetworkInteractions
                     .Where(item => networkIds.Contains(item.Network.Id))
-                    .Where(item => item.Network.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Select(item => item.Edge)
+                    .Where(item => item.Network.Algorithm == NetworkAlgorithm.None)
+                    .Select(item => item.Interaction)
                     .Distinct()
                     .Count();
             }
@@ -214,46 +211,46 @@ namespace NetControl4BioMed.Helpers.Extensions
                     break;
                 }
                 // Define the batch items.
-                var edges = new List<Edge>();
+                var interactions = new List<Interaction>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
                     // Use a new context instance.
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items in the current batch.
-                    edges = context.NetworkEdges
+                    interactions = context.NetworkInteractions
                         .Where(item => networkIds.Contains(item.Network.Id))
-                        .Where(item => item.Network.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                        .Select(item => item.Edge)
+                        .Where(item => item.Network.Algorithm == NetworkAlgorithm.None)
+                        .Select(item => item.Interaction)
                         .Distinct()
                         .Take(ApplicationDbContext.BatchSize)
                         .ToList();
                     // Check if there were no items found.
-                    if (edges == null || !edges.Any())
+                    if (interactions == null || !interactions.Any())
                     {
                         // Continue.
                         continue;
                     }
                 }
                 // Get the IDs of the items.
-                var edgeIds = edges
+                var interactionIds = interactions
                     .Select(item => item.Id);
                 // Delete the related entities.
-                await EdgeExtensions.DeleteRelatedEntitiesAsync<EdgeNode>(edgeIds, serviceProvider, token);
-                await EdgeExtensions.DeleteRelatedEntitiesAsync<DatabaseEdgeFieldEdge>(edgeIds, serviceProvider, token);
-                await EdgeExtensions.DeleteRelatedEntitiesAsync<DatabaseEdge>(edgeIds, serviceProvider, token);
+                await InteractionExtensions.DeleteRelatedEntitiesAsync<InteractionProtein>(interactionIds, serviceProvider, token);
+                await InteractionExtensions.DeleteRelatedEntitiesAsync<DatabaseInteractionFieldInteraction>(interactionIds, serviceProvider, token);
+                await InteractionExtensions.DeleteRelatedEntitiesAsync<DatabaseInteraction>(interactionIds, serviceProvider, token);
                 // Delete the items.
-                await IEnumerableExtensions.DeleteAsync(edges, serviceProvider, token);
+                await IEnumerableExtensions.DeleteAsync(interactions, serviceProvider, token);
             }
         }
 
         /// <summary>
-        /// Deletes the dependent generic nodes of the corresponding networks.
+        /// Deletes the dependent generic proteins of the corresponding networks.
         /// </summary>
         /// <param name="networkIds">The networks whose entities should be deleted.</param>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public static async Task DeleteDependentGenericNodesAsync(IEnumerable<string> networkIds, IServiceProvider serviceProvider, CancellationToken token)
+        public static async Task DeleteDependentProteinsAsync(IEnumerable<string> networkIds, IServiceProvider serviceProvider, CancellationToken token)
         {
             // Define a variable to store the total number of entities.
             var entityCount = 0;
@@ -263,10 +260,10 @@ namespace NetControl4BioMed.Helpers.Extensions
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 // Get the items in the current batch.
-                entityCount = context.NetworkNodes
+                entityCount = context.NetworkProteins
                     .Where(item => networkIds.Contains(item.Network.Id))
-                    .Where(item => item.Network.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                    .Select(item => item.Node)
+                    .Where(item => item.Network.Algorithm == NetworkAlgorithm.None)
+                    .Select(item => item.Protein)
                     .Distinct()
                     .Count();
             }
@@ -282,35 +279,35 @@ namespace NetControl4BioMed.Helpers.Extensions
                     break;
                 }
                 // Define the batch items.
-                var nodes = new List<Node>();
+                var proteins = new List<Protein>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
                 {
                     // Use a new context instance.
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items in the current batch.
-                    nodes = context.NetworkNodes
+                    proteins = context.NetworkProteins
                         .Where(item => networkIds.Contains(item.Network.Id))
-                        .Where(item => item.Network.NetworkDatabases.Any(item1 => item1.Database.DatabaseType.Name == "Generic"))
-                        .Select(item => item.Node)
+                        .Where(item => item.Network.Algorithm == NetworkAlgorithm.None)
+                        .Select(item => item.Protein)
                         .Distinct()
                         .Take(ApplicationDbContext.BatchSize)
                         .ToList();
                     // Check if there were no items found.
-                    if (nodes == null || !nodes.Any())
+                    if (proteins == null || !proteins.Any())
                     {
                         // Continue.
                         continue;
                     }
                 }
                 // Get the IDs of the items.
-                var nodeIds = nodes
+                var proteinIds = proteins
                     .Select(item => item.Id);
                 // Delete the related entities.
-                await NodeExtensions.DeleteRelatedEntitiesAsync<DatabaseNodeFieldNode>(nodeIds, serviceProvider, token);
-                await NodeExtensions.DeleteRelatedEntitiesAsync<DatabaseNode>(nodeIds, serviceProvider, token);
+                await ProteinExtensions.DeleteRelatedEntitiesAsync<DatabaseProteinFieldProtein>(proteinIds, serviceProvider, token);
+                await ProteinExtensions.DeleteRelatedEntitiesAsync<DatabaseProtein>(proteinIds, serviceProvider, token);
                 // Delete the items.
-                await IEnumerableExtensions.DeleteAsync(nodes, serviceProvider, token);
+                await IEnumerableExtensions.DeleteAsync(proteins, serviceProvider, token);
             }
         }
 
@@ -322,76 +319,71 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <param name="linkGenerator">The link generator.</param>
         /// <param name="context">The application database context.</param>
         /// <returns>The Cytoscape view model corresponding to the provided network.</returns>
-        public static CytoscapeViewModel GetCytoscapeViewModel(this Network network, HttpContext httpContext, LinkGenerator linkGenerator, ApplicationDbContext context)
+        public static FileCyjsViewModel GetCytoscapeViewModel(this Network network, HttpContext httpContext, LinkGenerator linkGenerator, ApplicationDbContext context)
         {
-            // Get the required values.
-            var databaseTypeName = context.NetworkDatabases
-                .Where(item => item.Network == network)
-                .Select(item => item.Database.DatabaseType.Name)
-                .First();
             // Return the view model.
-            return new CytoscapeViewModel
+            return new FileCyjsViewModel
             {
-                Elements = new CytoscapeViewModel.CytoscapeElements
+                Elements = new FileCyjsViewModel.CyjsElements
                 {
-                    Nodes = context.NetworkNodes
+                    Nodes = context.NetworkProteins
                         .Where(item => item.Network == network)
-                        .Where(item => item.Type == NetworkNodeType.None)
-                        .Select(item => item.Node)
+                        .Where(item => item.Type == NetworkProteinType.None)
+                        .Select(item => item.Protein)
                         .Select(item => new
                         {
                             Id = item.Id,
                             Name = item.Name,
-                            Classes = item.NetworkNodes
+                            Classes = item.NetworkProteins
                                 .Where(item1 => item1.Network == network)
                                 .Select(item => item.Type.ToString().ToLower())
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeNode
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsNode
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeNode.CytoscapeNodeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsNode.CyjsNodeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
-                                Href = linkGenerator.GetUriByPage(httpContext, $"/Content/DatabaseTypes/{databaseTypeName}/Data/Nodes/Details", handler: null, values: new { id = item.Id })
+                                Href = linkGenerator.GetUriByPage(httpContext, $"/AvailableData/Data/Proteins/Details", handler: null, values: new { id = item.Id })
                             },
                             Classes = item.Classes
                         }),
-                    Edges = context.NetworkEdges
+                    Edges = context.NetworkInteractions
                         .Where(item => item.Network == network)
-                        .Select(item => item.Edge)
+                        .Select(item => item.Interaction)
                         .Select(item => new
                         {
                             Id = item.Id,
                             Name = item.Name,
-                            SourceNodeId = item.EdgeNodes
-                                .Where(item1 => item1.Type == EdgeNodeType.Source)
-                                .Select(item1 => item1.Node)
+                            SourceProteinId = item.InteractionProteins
+                                .Where(item1 => item1.Type == InteractionProteinType.Source)
+                                .Select(item1 => item1.Protein)
                                 .Where(item1 => item1 != null)
                                 .Select(item1 => item1.Id)
                                 .FirstOrDefault(),
-                            TargetNodeId = item.EdgeNodes
-                                .Where(item1 => item1.Type == EdgeNodeType.Target)
-                                .Select(item1 => item1.Node)
+                            TargetProteinId = item.InteractionProteins
+                                .Where(item1 => item1.Type == InteractionProteinType.Target)
+                                .Select(item1 => item1.Protein)
                                 .Where(item1 => item1 != null)
                                 .Select(item1 => item1.Id)
                                 .FirstOrDefault()
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsEdge
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge.CytoscapeEdgeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsEdge.CyjsEdgeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
-                                Href = linkGenerator.GetUriByPage(httpContext, $"/Content/DatabaseTypes/{databaseTypeName}/Data/Edges/Details", handler: null, values: new { id = item.Id }),
-                                Source = item.SourceNodeId,
-                                Target = item.TargetNodeId
+                                Href = linkGenerator.GetUriByPage(httpContext, $"/AvailableData/Data/Interactions/Details", handler: null, values: new { id = item.Id }),
+                                Source = item.SourceProteinId,
+                                Target = item.TargetProteinId
                             }
                         })
                 },
-                Layout = CytoscapeViewModel.DefaultLayout,
-                Styles = CytoscapeViewModel.DefaultStyles.Concat(CytoscapeViewModel.DefaultNetworkStyles)
+                Layout = FileCyjsViewModel.DefaultLayout,
+                Styles = FileCyjsViewModel.DefaultStyles.Concat(FileCyjsViewModel.DefaultNetworkStyles)
             };
         }
 
@@ -420,13 +412,10 @@ namespace NetControl4BioMed.Helpers.Extensions
                 .Select(item => new
                 {
                     Id = item.Id,
-                    Name = item.Name,
-                    DatabaseTypeName = item.NetworkDatabases
-                        .Select(item1 => item1.Database.DatabaseType.Name)
-                        .FirstOrDefault()
+                    Name = item.Name
                 })
                 .AsEnumerable()
-                .Select(item => $"{item.Name} - {linkGenerator.GetUriByPage($"/Content/DatabaseTypes/{item.DatabaseTypeName}/Created/Networks/Details/Index", handler: null, values: new { id = item.Id }, scheme: scheme, host: host)}")));
+                .Select(item => $"{item.Name} - {linkGenerator.GetUriByPage($"/CreatedData/Networks/Details/Index", handler: null, values: new { id = item.Id }, scheme: scheme, host: host)}")));
             // Write the data to the stream.
             await streamWriter.WriteAsync(data);
         }
@@ -447,26 +436,26 @@ namespace NetControl4BioMed.Helpers.Extensions
             // Define the stream writer for the file.
             using var streamWriter = new StreamWriter(stream);
             // Get the required data.
-            var data = string.Join("\n", context.NetworkEdges
+            var data = string.Join("\n", context.NetworkInteractions
                 .Where(item => item.Network == network)
-                .Select(item => item.Edge)
+                .Select(item => item.Interaction)
                 .Select(item => new
                 {
-                    SourceNodeName = item.EdgeNodes
-                        .Where(item1 => item1.Type == EdgeNodeType.Source)
-                        .Select(item1 => item1.Node)
+                    SourceProteinName = item.InteractionProteins
+                        .Where(item1 => item1.Type == InteractionProteinType.Source)
+                        .Select(item1 => item1.Protein)
                         .Where(item1 => item1 != null)
                         .Select(item1 => item1.Name)
                         .FirstOrDefault(),
-                    TargetNodeName = item.EdgeNodes
-                        .Where(item1 => item1.Type == EdgeNodeType.Target)
-                        .Select(item1 => item1.Node)
+                    TargetProteinName = item.InteractionProteins
+                        .Where(item1 => item1.Type == InteractionProteinType.Target)
+                        .Select(item1 => item1.Protein)
                         .Where(item1 => item1 != null)
                         .Select(item1 => item1.Name)
                         .FirstOrDefault()
                 })
-                .Where(item => !string.IsNullOrEmpty(item.SourceNodeName) && !string.IsNullOrEmpty(item.TargetNodeName))
-                .Select(item => $"{item.SourceNodeName};{item.TargetNodeName}"));
+                .Where(item => !string.IsNullOrEmpty(item.SourceProteinName) && !string.IsNullOrEmpty(item.TargetProteinName))
+                .Select(item => $"{item.SourceProteinName};{item.TargetProteinName}"));
             // Write the data to the stream.
             await streamWriter.WriteAsync(data);
         }
@@ -487,26 +476,26 @@ namespace NetControl4BioMed.Helpers.Extensions
             // Define the stream writer for the file.
             using var streamWriter = new StreamWriter(stream);
             // Get the required data.
-            var data = string.Join("\n", context.NetworkEdges
+            var data = string.Join("\n", context.NetworkInteractions
                 .Where(item => item.Network == network)
-                .Select(item => item.Edge)
+                .Select(item => item.Interaction)
                 .Select(item => new
                 {
-                    SourceNodeName = item.EdgeNodes
-                        .Where(item1 => item1.Type == EdgeNodeType.Source)
-                        .Select(item1 => item1.Node)
+                    SourceProteinName = item.InteractionProteins
+                        .Where(item1 => item1.Type == InteractionProteinType.Source)
+                        .Select(item1 => item1.Protein)
                         .Where(item1 => item1 != null)
                         .Select(item1 => item1.Name)
                         .FirstOrDefault(),
-                    TargetNodeName = item.EdgeNodes
-                        .Where(item1 => item1.Type == EdgeNodeType.Target)
-                        .Select(item1 => item1.Node)
+                    TargetProteinName = item.InteractionProteins
+                        .Where(item1 => item1.Type == InteractionProteinType.Target)
+                        .Select(item1 => item1.Protein)
                         .Where(item1 => item1 != null)
                         .Select(item1 => item1.Name)
                         .FirstOrDefault()
                 })
-                .Where(item => !string.IsNullOrEmpty(item.SourceNodeName) && !string.IsNullOrEmpty(item.TargetNodeName))
-                .Select(item => $"{item.SourceNodeName}\tinteracts with\t{item.TargetNodeName}"));
+                .Where(item => !string.IsNullOrEmpty(item.SourceProteinName) && !string.IsNullOrEmpty(item.TargetProteinName))
+                .Select(item => $"{item.SourceProteinName}\tinteracts with\t{item.TargetProteinName}"));
             // Write the data to the stream.
             await streamWriter.WriteAsync(data);
         }
@@ -533,45 +522,41 @@ namespace NetControl4BioMed.Helpers.Extensions
                 Description = network.Description,
                 IsPublic = network.IsPublic,
                 Algorithm = network.Algorithm.ToString(),
-                DatabaseType = context.NetworkDatabases
+                ProteinDatabaseData = context.NetworkDatabases
                     .Where(item => item.Network == network)
-                    .Select(item => item.Database.DatabaseType.Name)
-                    .FirstOrDefault(),
-                NodeDatabaseData = context.NetworkDatabases
-                    .Where(item => item.Network == network)
-                    .Where(item => item.Type == NetworkDatabaseType.Node)
+                    .Where(item => item.Type == NetworkDatabaseType.Protein)
                     .Select(item => item.Database.Id),
-                EdgeDatabaseData = context.NetworkDatabases
+                InteractionDatabaseData = context.NetworkDatabases
                     .Where(item => item.Network == network)
-                    .Where(item => item.Type == NetworkDatabaseType.Edge)
+                    .Where(item => item.Type == NetworkDatabaseType.Interaction)
                     .Select(item => item.Database.Id),
-                SeedNodeData = context.NetworkNodes
+                SeedProteinData = context.NetworkProteins
                     .Where(item => item.Network == network)
-                    .Where(item => item.Type == NetworkNodeType.Seed)
-                    .Select(item => item.Node.Name),
-                SeedNodeCollectionData = context.NetworkNodeCollections
+                    .Where(item => item.Type == NetworkProteinType.Seed)
+                    .Select(item => item.Protein.Name),
+                SeedProteinCollectionData = context.NetworkProteinCollections
                     .Where(item => item.Network == network)
-                    .Where(item => item.Type == NetworkNodeCollectionType.Seed)
-                    .Select(item => item.NodeCollection.Id),
-                SeedEdgeData = context.NetworkEdges
+                    .Where(item => item.Type == NetworkProteinCollectionType.Seed)
+                    .Select(item => item.ProteinCollection.Id),
+                SeedInteractionData = context.NetworkInteractions
                     .Where(item => item.Network == network)
-                    .Select(item => item.Edge)
+                    .Select(item => item.Interaction)
                     .Select(item => new
                     {
-                        SourceNode = item.EdgeNodes
-                            .Where(item1 => item1.Type == EdgeNodeType.Source)
-                            .Select(item1 => item1.Node)
+                        SourceProtein = item.InteractionProteins
+                            .Where(item1 => item1.Type == InteractionProteinType.Source)
+                            .Select(item1 => item1.Protein)
                             .Where(item1 => item1 != null)
                             .Select(item1 => item1.Name)
                             .FirstOrDefault(),
-                        TargetNode = item.EdgeNodes
-                            .Where(item1 => item1.Type == EdgeNodeType.Target)
-                            .Select(item1 => item1.Node)
+                        TargetProtein = item.InteractionProteins
+                            .Where(item1 => item1.Type == InteractionProteinType.Target)
+                            .Select(item1 => item1.Protein)
                             .Where(item1 => item1 != null)
                             .Select(item1 => item1.Name)
                             .FirstOrDefault()
                     })
-                    .Where(item => !string.IsNullOrEmpty(item.SourceNode) && !string.IsNullOrEmpty(item.TargetNode))
+                    .Where(item => !string.IsNullOrEmpty(item.SourceProtein) && !string.IsNullOrEmpty(item.TargetProtein))
             };
             // Write the data corresponding to the file.
             await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { IgnoreNullValues = true });
@@ -591,67 +576,67 @@ namespace NetControl4BioMed.Helpers.Extensions
             // Use a new context instance.
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get the required data.
-            var data = new CytoscapeViewModel
+            var data = new FileCyjsViewModel
             {
-                Data = new CytoscapeViewModel.CytoscapeData
+                Data = new FileCyjsViewModel.CyjsData
                 {
                     Id = network.Id,
                     Name = network.Name,
                     Description = network.Description
                 },
-                Elements = new CytoscapeViewModel.CytoscapeElements
+                Elements = new FileCyjsViewModel.CyjsElements
                 {
-                    Nodes = context.NetworkNodes
+                    Nodes = context.NetworkProteins
                         .Where(item => item.Network == network)
-                        .Where(item => item.Type == NetworkNodeType.None)
-                        .Select(item => item.Node)
+                        .Where(item => item.Type == NetworkProteinType.None)
+                        .Select(item => item.Protein)
                         .Select(item => new
                         {
                             Id = item.Id,
                             Name = item.Name,
-                            Classes = item.NetworkNodes
+                            Classes = item.NetworkProteins
                                 .Where(item1 => item1.Network == network)
                                 .Select(item => item.Type.ToString().ToLower())
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeNode
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsNode
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeNode.CytoscapeNodeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsNode.CyjsNodeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
                                 Type = string.Join(",", item.Classes.OrderBy(item => item))
                             }
                         }),
-                    Edges = context.NetworkEdges
+                    Edges = context.NetworkInteractions
                         .Where(item => item.Network == network)
-                        .Select(item => item.Edge)
+                        .Select(item => item.Interaction)
                         .Select(item => new
                         {
                             Id = item.Id,
                             Name = item.Name,
-                            SourceNodeId = item.EdgeNodes
-                                .Where(item1 => item1.Type == EdgeNodeType.Source)
-                                .Select(item1 => item1.Node)
+                            SourceProteinId = item.InteractionProteins
+                                .Where(item1 => item1.Type == InteractionProteinType.Source)
+                                .Select(item1 => item1.Protein)
                                 .Where(item1 => item1 != null)
                                 .Select(item1 => item1.Id)
                                 .FirstOrDefault(),
-                            TargetNodeId = item.EdgeNodes
-                                .Where(item1 => item1.Type == EdgeNodeType.Target)
-                                .Select(item1 => item1.Node)
+                            TargetProteinId = item.InteractionProteins
+                                .Where(item1 => item1.Type == InteractionProteinType.Target)
+                                .Select(item1 => item1.Protein)
                                 .Where(item1 => item1 != null)
                                 .Select(item1 => item1.Id)
                                 .FirstOrDefault()
                         })
                         .AsEnumerable()
-                        .Select(item => new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge
+                        .Select(item => new FileCyjsViewModel.CyjsElements.CyjsEdge
                         {
-                            Data = new CytoscapeViewModel.CytoscapeElements.CytoscapeEdge.CytoscapeEdgeData
+                            Data = new FileCyjsViewModel.CyjsElements.CyjsEdge.CyjsEdgeData
                             {
                                 Id = item.Id,
                                 Name = item.Name,
-                                Source = item.SourceNodeId,
-                                Target = item.TargetNodeId
+                                Source = item.SourceProteinId,
+                                Target = item.TargetProteinId
                             }
                         })
                 }
@@ -661,38 +646,205 @@ namespace NetControl4BioMed.Helpers.Extensions
         }
 
         /// <summary>
-        /// Gets the content of an Excel file to download corresponding to the provided network.
+        /// Gets the content of a JSON file to download corresponding to the provided network.
         /// </summary>
         /// <param name="network">The current network.</param>
         /// <param name="stream">The stream to which to write to.</param>
         /// <param name="serviceProvider">The application service provider.</param>
+        /// <returns>The content of the JSON file corresponding to the provided network.</returns>
+        public static async Task WriteToStreamCxFileContent(this Network network, Stream stream, IServiceProvider serviceProvider)
+        {
+            // Use a new scope.
+            using var scope = serviceProvider.CreateScope();
+            // Use a new context instance.
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Get the related protein data.
+            var proteinList = context.NetworkProteins
+                .Where(item => item.Network == network)
+                .Where(item => item.Type == NetworkProteinType.None)
+                .Select(item => item.Protein)
+                .OrderBy(item => item.Id)
+                .Select(item => new
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Types = item.NetworkProteins
+                        .Where(item1 => item1.Network == network)
+                        .Select(item => item.Type.ToString().ToLower())
+                })
+                .AsEnumerable()
+                .Select((item, index) => new
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Index = index + 1,
+                    Types = item.Types
+                });
+            var proteinListCount = proteinList.Count();
+            // Get the related interaction data.
+            var interactionList = context.NetworkInteractions
+                .Where(item => item.Network == network)
+                .Select(item => item.Interaction)
+                .OrderBy(item => item.Id)
+                .Select(item => new
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    SourceProteinId = item.InteractionProteins
+                        .Where(item1 => item1.Type == InteractionProteinType.Source)
+                        .Select(item1 => item1.Protein)
+                        .Where(item1 => item1 != null)
+                        .Select(item1 => item1.Id)
+                        .FirstOrDefault(),
+                    TargetProteinId = item.InteractionProteins
+                        .Where(item1 => item1.Type == InteractionProteinType.Target)
+                        .Select(item1 => item1.Protein)
+                        .Where(item1 => item1 != null)
+                        .Select(item1 => item1.Id)
+                        .FirstOrDefault()
+                })
+                .Where(item => !string.IsNullOrEmpty(item.SourceProteinId) && !string.IsNullOrEmpty(item.TargetProteinId))
+                .AsEnumerable()
+                .Select((item, index) => new
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Index = index + proteinListCount + 1,
+                    SourceProteinId = item.SourceProteinId,
+                    TargetProteinId = item.TargetProteinId
+                });
+            // Get the related additional data.
+            var proteinIdDictionary = proteinList.ToDictionary(item => item.Id, item => item);
+            // Get the required data.
+            var data = new List<FileCxViewModel.CxBaseObject>
+            {
+                new FileCxViewModel.CxBaseObject
+                {
+                    NetworkAttributes = new List<FileCxViewModel.CxBaseObject.CxNetworkAttribute>
+                    {
+                        new FileCxViewModel.CxBaseObject.CxNetworkAttribute
+                        {
+                            Name = "name",
+                            Value = network.Name
+                        },
+                        new FileCxViewModel.CxBaseObject.CxNetworkAttribute
+                        {
+                            Name = "description",
+                            Value = network.Description
+                        },
+                        new FileCxViewModel.CxBaseObject.CxNetworkAttribute
+                        {
+                            Name = "source",
+                            Value = "NetControl4BioMed"
+                        }
+                    }
+                },
+                new FileCxViewModel.CxBaseObject
+                {
+                    Nodes = proteinList
+                        .Select(item => new FileCxViewModel.CxBaseObject.CxNode
+                        {
+                            Id = item.Index,
+                            Name = item.Name
+                        })
+                },
+                new FileCxViewModel.CxBaseObject
+                {
+                    NodeAttributes = proteinList
+                        .Select(item => new FileCxViewModel.CxBaseObject.CxNodeAttribute
+                        {
+                            Id = item.Index,
+                            Name = "type",
+                            Value = string.Join(",", item.Types.OrderBy(item => item))
+                        })
+                },
+                new FileCxViewModel.CxBaseObject
+                {
+                    Edges = interactionList
+                        .Select(item => new
+                        {
+                            Id = item.Index,
+                            Source = proteinIdDictionary.GetValueOrDefault(item.SourceProteinId),
+                            Target = proteinIdDictionary.GetValueOrDefault(item.TargetProteinId)
+                        })
+                        .Where(item => item.Source != null && item.Target != null)
+                        .Select(item => new FileCxViewModel.CxBaseObject.CxEdge
+                        {
+                            Id = item.Id,
+                            Source = item.Source.Index,
+                            Target = item.Target.Index,
+                            Type = "interacts with"
+                        })
+                        .Where(item => item.Source != 0 && item.Target != 0)
+                },
+                new FileCxViewModel.CxBaseObject
+                {
+                    EdgeAttributes = interactionList
+                        .Select(item => new
+                        {
+                            Id = item.Index,
+                            Source = proteinIdDictionary.GetValueOrDefault(item.SourceProteinId),
+                            Target = proteinIdDictionary.GetValueOrDefault(item.TargetProteinId)
+                        })
+                        .Where(item => item.Source != null && item.Target != null)
+                        .Select(item => new FileCxViewModel.CxBaseObject.CxEdgeAttribute
+                        {
+                            Id = item.Id,
+                            Name = "name",
+                            Value = $"{item.Source.Name} (interacts with) {item.Target.Name}"
+                        })
+                },
+                new FileCxViewModel.CxBaseObject
+                {
+                    CytoscapeTableColumns = FileCxViewModel.DefaultCytoscapeTableColumns
+                },
+                new FileCxViewModel.CxBaseObject
+                {
+                    Status = new List<FileCxViewModel.CxBaseObject.CxStatus>
+                    {
+                        new FileCxViewModel.CxBaseObject.CxStatus
+                        {
+                            ErrorMessage = string.Empty,
+                            IsSuccessful = true
+                        }
+                    }
+                }
+            };
+            // Update the meta data.
+            FileCxViewModel.AddMetaData(data);
+            // Write the data corresponding to the file.
+            await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { IgnoreNullValues = true });
+        }
+
+        /// <summary>
+        /// Gets the content of an Excel file to download corresponding to the provided network.
+        /// </summary>
+        /// <param name="network">The current network.</param>
+        /// <param name="user">The current user.</param>
+        /// <param name="stream">The stream to which to write to.</param>
+        /// <param name="serviceProvider">The application service provider.</param>
         /// <returns>The content of the Excel file corresponding to the provided network.</returns>
-        public static async Task WriteToStreamXlsxFileContent(this Network network, Stream stream, IServiceProvider serviceProvider)
+        public static async Task WriteToStreamXlsxFileContent(this Network network, User user, Stream stream, IServiceProvider serviceProvider)
         {
             // Use a new scope.
             using var scope = serviceProvider.CreateScope();
             // Use a new context instance.
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             // Get the required data.
-            var databaseTypeName = context.NetworkDatabases
+            var databaseProteinFields = context.NetworkDatabases
                 .Where(item => item.Network == network)
-                .Select(item => item.Database.DatabaseType.Name)
-                .FirstOrDefault();
-            var databaseNodeFields = context.NetworkDatabases
-                .Where(item => item.Network == network)
-                .Where(item => item.Type == NetworkDatabaseType.Node)
-                .Select(item => item.Database.DatabaseNodeFields)
+                .Where(item => item.Type == NetworkDatabaseType.Protein)
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item => item.Email == user.Email)))
+                .Select(item => item.Database.DatabaseProteinFields)
                 .SelectMany(item => item)
                 .ToList();
-            var databaseEdgeFields = context.NetworkDatabases
+            var databaseInteractionFields = context.NetworkDatabases
                 .Where(item => item.Network == network)
-                .Where(item => item.Type == NetworkDatabaseType.Edge)
-                .Select(item => item.Database.DatabaseEdgeFields)
+                .Where(item => item.Type == NetworkDatabaseType.Interaction)
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item => item.Email == user.Email)))
+                .Select(item => item.Database.DatabaseInteractionFields)
                 .SelectMany(item => item)
                 .ToList();
-            // Get the required variables.
-            var nodeTitle = databaseTypeName == "PPI" ? "Protein" : "Node";
-            var edgeTitle = databaseTypeName == "PPI" ? "Interaction" : "Edge";
             // Define the rows in the first sheet.
             var worksheet1Rows = new List<List<string>>
             {
@@ -733,18 +885,22 @@ namespace NetControl4BioMed.Helpers.Extensions
                 }
             }.Concat(context.NetworkDatabases
                 .Where(item => item.Network == network)
+                .Where(item => item.Database.IsPublic || (user != null && item.Database.DatabaseUsers.Any(item => item.Email == user.Email)))
+                .Select(item => item.Database)
                 .Select(item => new
                 {
-                    DatabaseId = item.Database.Id,
-                    DatabaseName = item.Database.Name,
-                    Type = item.Type
+                    Id = item.Id,
+                    Name = item.Name,
+                    Types = item.NetworkDatabases
+                        .Where(item1 => item1.Network == network)
+                        .Select(item => item.Type.ToString().ToLower())
                 })
                 .AsEnumerable()
                 .Select(item => new List<string>
                 {
-                    item.DatabaseId,
-                    item.DatabaseName,
-                    item.Type == NetworkDatabaseType.Node ? nodeTitle : item.Type == NetworkDatabaseType.Edge ? edgeTitle : string.Empty
+                    item.Id,
+                    item.Name,
+                    string.Join(",", item.Types)
                 })
                 .ToList())
             .ToList();
@@ -756,27 +912,27 @@ namespace NetControl4BioMed.Helpers.Extensions
                     "Internal ID",
                     "Name",
                     "Type"
-                }.Concat(databaseNodeFields
+                }.Concat(databaseProteinFields
                     .Select(item => item.Name)
                     .ToList())
                 .ToList()
             }
-            .Concat(context.NetworkNodes
+            .Concat(context.NetworkProteins
                 .Where(item => item.Network == network)
-                .Where(item => item.Type == NetworkNodeType.None)
-                .Select(item => item.Node)
+                .Where(item => item.Type == NetworkProteinType.None)
+                .Select(item => item.Protein)
                 .Select(item => new
                 {
                     Id = item.Id,
                     Name = item.Name,
                     Description = item.Description,
-                    Values = item.DatabaseNodeFieldNodes
+                    Values = item.DatabaseProteinFieldProteins
                         .Select(item1 => new
                         {
-                            DatabaseNodeFieldId = item1.DatabaseNodeField.Id,
+                            DatabaseProteinFieldId = item1.DatabaseProteinField.Id,
                             Value = item1.Value
                         }),
-                    Types = item.NetworkNodes
+                    Types = item.NetworkProteins
                         .Where(item1 => item1.Network == network)
                         .Select(item => item.Type.ToString().ToLower())
                 })
@@ -786,8 +942,8 @@ namespace NetControl4BioMed.Helpers.Extensions
                         item.Id,
                         item.Name,
                         string.Join(",", item.Types)
-                    }.Concat(databaseNodeFields
-                        .Select(item1 => item.Values.FirstOrDefault(item2 => item2.DatabaseNodeFieldId == item1.Id))
+                    }.Concat(databaseProteinFields
+                        .Select(item1 => item.Values.FirstOrDefault(item2 => item2.DatabaseProteinFieldId == item1.Id))
                         .Select(item1 => item1 == null ? string.Empty : item1.Value)
                         .ToList())))
             .ToList();
@@ -797,47 +953,47 @@ namespace NetControl4BioMed.Helpers.Extensions
                 new List<string>
                 {
                     "Internal ID",
-                    $"Source {nodeTitle.ToLower()} ID",
-                    $"Source {nodeTitle.ToLower()} name",
-                    $"Target {nodeTitle.ToLower()} ID",
-                    $"Target {nodeTitle.ToLower()} name"
-                }.Concat(databaseEdgeFields
+                    $"Source protein ID",
+                    $"Source protein name",
+                    $"Target protein ID",
+                    $"Target protein name"
+                }.Concat(databaseInteractionFields
                     .Select(item => item.Name)
                     .ToList())
                 .ToList()
             }
-            .Concat(context.NetworkEdges
+            .Concat(context.NetworkInteractions
                 .Where(item => item.Network == network)
-                .Select(item => item.Edge)
+                .Select(item => item.Interaction)
                 .Select(item => new
                 {
                     Id = item.Id,
-                    SourceNode = item.EdgeNodes
-                        .Where(item1 => item1.Type == EdgeNodeType.Source)
-                        .Select(item1 => item1.Node)
+                    SourceProtein = item.InteractionProteins
+                        .Where(item1 => item1.Type == InteractionProteinType.Source)
+                        .Select(item1 => item1.Protein)
                         .FirstOrDefault(),
-                    TargetNode = item.EdgeNodes
-                        .Where(item1 => item1.Type == EdgeNodeType.Target)
-                        .Select(item1 => item1.Node)
+                    TargetProtein = item.InteractionProteins
+                        .Where(item1 => item1.Type == InteractionProteinType.Target)
+                        .Select(item1 => item1.Protein)
                         .FirstOrDefault(),
-                    Values = item.DatabaseEdgeFieldEdges
+                    Values = item.DatabaseInteractionFieldInteractions
                         .Select(item1 => new
                         {
-                            DatabaseEdgeFieldId = item1.DatabaseEdgeField.Id,
+                            DatabaseInteractionFieldId = item1.DatabaseInteractionField.Id,
                             Value = item1.Value
                         })
                 })
-                .Where(item => item.SourceNode != null && item.TargetNode != null)
+                .Where(item => item.SourceProtein != null && item.TargetProtein != null)
                 .AsEnumerable()
                 .Select(item => new List<string>
                 {
                     item.Id,
-                    item.SourceNode.Id,
-                    item.SourceNode.Name,
-                    item.TargetNode.Id,
-                    item.TargetNode.Name
-                }.Concat(databaseEdgeFields
-                    .Select(item1 => item.Values.FirstOrDefault(item2 => item2.DatabaseEdgeFieldId == item1.Id))
+                    item.SourceProtein.Id,
+                    item.SourceProtein.Name,
+                    item.TargetProtein.Id,
+                    item.TargetProtein.Name
+                }.Concat(databaseInteractionFields
+                    .Select(item1 => item.Values.FirstOrDefault(item2 => item2.DatabaseInteractionFieldId == item1.Id))
                     .Select(item1 => item1 == null ? string.Empty : item1.Value)
                     .ToList())))
             .ToList();
@@ -866,14 +1022,14 @@ namespace NetControl4BioMed.Helpers.Extensions
             // Define the third worksheet.
             var worksheet3Part = workbookPart.AddNewPart<WorksheetPart>();
             var worksheet3Data = new SheetData();
-            var worksheet3 = new Sheet { Id = workbookPart.GetIdOfPart(worksheet3Part), SheetId = 3, Name = $"{nodeTitle}s" };
+            var worksheet3 = new Sheet { Id = workbookPart.GetIdOfPart(worksheet3Part), SheetId = 3, Name = $"Proteins" };
             worksheet3Part.Worksheet = new Worksheet(worksheet3Data);
             worksheet3Data.Append(worksheet3Rows.Select(item => new Row(item.Select(item1 => new Cell { DataType = CellValues.String, CellValue = new CellValue(item1) }))));
             worksheets.Append(worksheet3);
             // Define the fourth worksheet.
             var worksheet4Part = workbookPart.AddNewPart<WorksheetPart>();
             var worksheet4Data = new SheetData();
-            var worksheet4 = new Sheet { Id = workbookPart.GetIdOfPart(worksheet4Part), SheetId = 4, Name = $"{edgeTitle}s" };
+            var worksheet4 = new Sheet { Id = workbookPart.GetIdOfPart(worksheet4Part), SheetId = 4, Name = $"Interactions" };
             worksheet4Part.Worksheet = new Worksheet(worksheet4Data);
             worksheet4Data.Append(worksheet4Rows.Select(item => new Row(item.Select(item1 => new Cell { DataType = CellValues.String, CellValue = new CellValue(item1) }))));
             worksheets.Append(worksheet4);

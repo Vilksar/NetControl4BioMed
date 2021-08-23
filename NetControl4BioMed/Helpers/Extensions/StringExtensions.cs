@@ -110,15 +110,15 @@ namespace NetControl4BioMed.Helpers.Extensions
                     .Except(uniqueCharacters)
                     .OrderBy(item => random.NextDouble())
                     .Take(passwordOptions.RequiredUniqueChars - uniqueCharacters.Count());
-                // Insert it at a random position.
+                // Go over each unused character.
                 foreach (var unusedCharacter in unusedCharacters)
                 {
-                    // Insert it at a random position.
-                    passwordCharacterList.Insert(random.Next(passwordCharacterList.Count()), unusedCharacter);
+                    // Add it to the end of the password.
+                    passwordCharacterList.Add(unusedCharacter);
                 }
             }
             // Return the password.
             return new string(passwordCharacterList.ToArray());
-       }
+        }
     }
 }

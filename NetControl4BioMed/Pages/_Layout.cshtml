@@ -4,14 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - NetControl4BioMed</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" asp-fallback-href="~/lib/twitter-bootstrap/css/bootstrap.min.css" asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" integrity="sha256-L/W5Wfqfa0sdBNIKN9cG6QA5F2qx4qICmU2VgLruv9Y=" crossorigin="anonymous" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/css/dataTables.bootstrap4.min.css" asp-fallback-href="~/lib/datatables/css/dataTables.bootstrap4.min.js" asp-fallback-test-class="dataTable" integrity="sha256-F+DaKAClQut87heMIC6oThARMuWne8+WzxIDT7jXuPA=" crossorigin="anonymous" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" asp-fallback-href="~/lib/twitter-bootstrap/css/bootstrap.min.css" asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" integrity="sha512-P5MgMn1jBN01asBgU0z60Qk4QxiXo86+wlFahKrsQf37c9cro517WzVSPPV1tDKzhku2iJ2FVgL67wG03SGnNA==" crossorigin="anonymous" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" asp-fallback-href="~/lib/datatables/css/dataTables.bootstrap4.min.css" asp-fallback-test-class="dataTable" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="false" />
 </head>
 <body class="d-flex flex-column">
     <header class="flex-grow-0">
         <div class="container">
-            <nav class="navbar navbar-expand-md navbar-light">
+            <nav class="navbar navbar-expand-xl navbar-light">
                 <a asp-page="/Index" class="navbar-brand">
                     <img src="~/img/netcontrol4biomed-icon.png" width="30" height="30" class="align-top" />
                     <span>NetControl4BioMed</span>
@@ -21,23 +21,37 @@
                 </button>
                 <div class="collapse navbar-collapse justify-content-end">
                     <div class="navbar-nav align-items-center">
-                        <a class="nav-item nav-link" asp-page="/Content/Index">
-                            <span><i class="fas fa-box-open"></i></span>
-                            <span>Content</span>
+                        <a class="nav-item nav-link" asp-page="/PublicData/Index" title="Public networks">
+                            <span><i class="fas fa-users"></i></span>
+                            <span>Public networks</span>
                         </a>
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <a class="nav-item nav-link" asp-page="/Account/Index">
+                            <a class="nav-item nav-link" asp-page="/PrivateData/Index" title="My networks">
                                 <span><i class="fas fa-user"></i></span>
+                                <span>My networks</span>
+                            </a>
+                        }
+                        <a class="nav-item nav-link" asp-page="/AvailableData/Index" title="Available data">
+                            <span><i class="fas fa-database"></i></span>
+                            <span>Available data</span>
+                        </a>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a class="nav-item nav-link" asp-page="/Account/Index" title="Account">
+                                <span><i class="fas fa-user-circle"></i></span>
                                 <span>Account</span>
                             </a>
-                            @if (User.IsInRole("Administrator"))
-                            {
-                                <a class="nav-item nav-link" asp-page="/Administration/Index">
-                                    <span><i class="fas fa-cog"></i></span>
-                                    <span>Administration</span>
-                                </a>
-                            }
+                        }
+                        @if (User.IsInRole("Administrator"))
+                        {
+                            <a class="nav-item nav-link" asp-page="/Administration/Index" title="Administration">
+                                <span><i class="fas fa-toolbox"></i></span>
+                                <span>Administration</span>
+                            </a>
+                        }
+                        @if (User.Identity.IsAuthenticated)
+                        {
                             <form asp-page="/Identity/Logout" method="post">
                                 <button type="submit" title="Log out" class="btn nav-item nav-link">
                                     <span><i class="fas fa-sign-out-alt"></i></span>
@@ -47,7 +61,7 @@
                         }
                         else
                         {
-                            <a class="nav-item nav-link" asp-page="/Identity/Login">
+                            <a class="nav-item nav-link" asp-page="/Identity/Login" title="Log in">
                                 <span><i class="fas fa-sign-in-alt"></i></span>
                                 <span>Log in</span>
                             </a>
@@ -69,7 +83,7 @@
             @if (IsSectionDefined("Breadcrumbs"))
             {
                 <nav class="breadcrumb mb-3">
-                    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.NavigationBreadcrumb" />
+                    <partial name="_NavigationBreadcrumbPartial" model="@NetControl4BioMed.Helpers.ViewModels.NavigationBreadcrumbViewModel.NavigationBreadcrumb" />
                     @RenderSection("Breadcrumbs", required: false)
                 </nav>
             }
@@ -96,27 +110,30 @@
                     </span>
                 </div>
                 <div class="navbar-nav align-items-center">
-                    <a class="nav-item nav-link" asp-page="/About">
+                    <a class="nav-item nav-link" asp-page="/About" title="About">
                         <span>About</span>
                     </a>
-                    <a class="nav-item nav-link" asp-page="/PrivacyPolicy">
+                    <a class="nav-item nav-link" asp-page="/Tutorial" title="Tutorial">
+                        <span>Tutorial</span>
+                    </a>
+                    <a class="nav-item nav-link" asp-page="/PrivacyPolicy" title="Privacy policy">
                         <span>Privacy policy</span>
                     </a>
-                    <a class="nav-item nav-link" asp-page="/TermsOfService">
+                    <a class="nav-item nav-link" asp-page="/TermsOfService" title="Terms of service">
                         <span>Terms of service</span>
                     </a>
-                    <a class="nav-item nav-link" asp-page="/Contact">
+                    <a class="nav-item nav-link" asp-page="/Contact" title="Contact">
                         <span>Contact</span>
                     </a>
                 </div>
             </nav>
         </div>
     </footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" asp-fallback-src="~/lib/jquery/jquery.min.js" asp-fallback-test="window.jQuery" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous" asp-append-version="true"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.bundle.min.js" asp-fallback-src="~/lib/twitter-bootstrap/js/bootstrap.bundle.min.js" asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal" integrity="sha256-OUFW7hFO0/r5aEGTQOz9F/aXQOt+TwqI1Z4fbVvww04=" crossorigin="anonymous" asp-append-version="true"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/js/jquery.dataTables.min.js" asp-fallback-src="~/lib/datatables/js/jquery.dataTables.min.js" asp-fallback-test="" integrity="sha256-t5ZQTZsbQi8NxszC10CseKjJ5QeMw5NINtOXQrESGSU=" crossorigin="anonymous" asp-append-version="true"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/js/dataTables.bootstrap4.min.js" asp-fallback-src="~/lib/datatables/js/dataTables.bootstrap4.min.js" asp-fallback-test="" integrity="sha256-hJ44ymhBmRPJKIaKRf3DSX5uiFEZ9xB/qx8cNbJvIMU=" crossorigin="anonymous" asp-append-version="true"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.min.js" asp-fallback-src="~/lib/font-awesome/js/all.min.js" asp-fallback-test="" integrity="sha256-qM7QTJSlvtPSxVRjVWNM2OfTAz/3k5ovHOKmKXuYMO4=" crossorigin="anonymous" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" asp-fallback-src="~/lib/jquery/jquery.min.js" asp-fallback-test="window.jQuery" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js" asp-fallback-src="~/lib/twitter-bootstrap/js/bootstrap.bundle.min.js" asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal" integrity="sha512-wV7Yj1alIZDqZFCUQJy85VN+qvEIly93fIQAN7iqDFCPEucLCeNFz4r35FCo9s6WrpdDQPi80xbljXB8Bjtvcg==" crossorigin="anonymous" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" asp-fallback-src="~/lib/datatables/js/jquery.dataTables.min.js" asp-fallback-test="" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" asp-fallback-src="~/lib/datatables/js/dataTables.bootstrap4.min.js" asp-fallback-test="" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" asp-fallback-src="~/lib/font-awesome/js/all.min.js" asp-fallback-test="" integrity="sha512-RXf+QSDCUQs5uwRKaDoXt55jygZZm2V++WUZduaU/Ui/9EGp3f/2KZVahFZBKGH0s774sd3HmrhUy+SgOFQLVQ==" crossorigin="anonymous" asp-append-version="true"></script>
     <partial name="_ScriptsAnalyticsPartial" />
     <script src="~/js/site.js" asp-append-version="false"></script>
     @RenderSection("Scripts", required: false)

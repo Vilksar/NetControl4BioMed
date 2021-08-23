@@ -1,8 +1,4 @@
 ﻿using Hangfire;
-using NetControl4BioMed.Helpers.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,84 +11,64 @@ namespace NetControl4BioMed.Helpers.Interfaces
     public interface IAdministrationTaskManager
     {
         /// <summary>
-        /// Creates nodes in the database.
+        /// Creates proteins in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task CreateNodesAsync(string id, CancellationToken token);
+        Task CreateProteinsAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Creates edges in the database.
+        /// Creates interactions in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task CreateEdgesAsync(string id, CancellationToken token);
+        Task CreateInteractionsAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Creates node collections in the database.
+        /// Creates protein collections in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 0)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task CreateNodeCollectionsAsync(string id, CancellationToken token);
+        Task CreateProteinCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Creates samples in the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        [AutomaticRetry(Attempts = 0)]
-        [DisableConcurrentExecution(86400)]
-        [Queue("administration")]
-        Task CreateSamplesAsync(string id, CancellationToken token);
-
-        /// <summary>
-        /// Edits nodes in the database.
+        /// Edits proteins in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task EditNodesAsync(string id, CancellationToken token);
+        Task EditProteinsAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Edits edges in the database.
+        /// Edits interactions in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task EditEdgesAsync(string id, CancellationToken token);
+        Task EditInteractionsAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Edits node collections in the database.
+        /// Edits protein collections in the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task EditNodeCollectionsAsync(string id, CancellationToken token);
-
-        /// <summary>
-        /// Edits samples in the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        [AutomaticRetry(Attempts = 2)]
-        [DisableConcurrentExecution(86400)]
-        [Queue("administration")]
-        Task EditSamplesAsync(string id, CancellationToken token);
+        Task EditProteinCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes users from the database.
@@ -125,16 +101,6 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task DeleteUserRolesAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Deletes database types from the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        [AutomaticRetry(Attempts = 2)]
-        [DisableConcurrentExecution(86400)]
-        [Queue("administration")]
-        Task DeleteDatabaseTypesAsync(string id, CancellationToken token);
-
-        /// <summary>
         /// Deletes databases from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
@@ -155,74 +121,54 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task DeleteDatabaseUsersAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Deletes database user invitations from the database.
+        /// Deletes database protein fields from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task DeleteDatabaseUserInvitationsAsync(string id, CancellationToken token);
+        Task DeleteDatabaseProteinFieldsAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Deletes database node fields from the database.
+        /// Deletes database interaction fields from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task DeleteDatabaseNodeFieldsAsync(string id, CancellationToken token);
+        Task DeleteDatabaseInteractionFieldsAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Deletes database edge fields from the database.
+        /// Deletes proteins from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task DeleteDatabaseEdgeFieldsAsync(string id, CancellationToken token);
+        Task DeleteProteinsAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Deletes nodes from the database.
+        /// Deletes interactions from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task DeleteNodesAsync(string id, CancellationToken token);
+        Task DeleteInteractionsAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Deletes edges from the database.
+        /// Deletes protein collections from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task DeleteEdgesAsync(string id, CancellationToken token);
-
-        /// <summary>
-        /// Deletes node collections from the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        [AutomaticRetry(Attempts = 2)]
-        [DisableConcurrentExecution(86400)]
-        [Queue("administration")]
-        Task DeleteNodeCollectionsAsync(string id, CancellationToken token);
-
-        /// <summary>
-        /// Deletes samples from the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        [AutomaticRetry(Attempts = 2)]
-        [DisableConcurrentExecution(86400)]
-        [Queue("administration")]
-        Task DeleteSamplesAsync(string id, CancellationToken token);
+        Task DeleteProteinCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes networks from the database.
@@ -255,34 +201,34 @@ namespace NetControl4BioMed.Helpers.Interfaces
         Task StopAnalysesAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Deletes all nodes from the database.
+        /// Deletes all proteins from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task DeleteAllNodesAsync(string id, CancellationToken token);
+        Task DeleteAllProteinsAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Deletes all edges from the database.
+        /// Deletes all interactions from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task DeleteAllEdgesAsync(string id, CancellationToken token);
+        Task DeleteAllInteractionsAsync(string id, CancellationToken token);
 
         /// <summary>
-        /// Deletes all node collections from the database.
+        /// Deletes all protein collections from the database.
         /// </summary>
         /// <param name="id">The ID of the background task.</param>
         /// <param name="token">The cancellation token for the task.</param>
         [AutomaticRetry(Attempts = 2)]
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
-        Task DeleteAllNodeCollectionsAsync(string id, CancellationToken token);
+        Task DeleteAllProteinCollectionsAsync(string id, CancellationToken token);
 
         /// <summary>
         /// Deletes all networks from the database.
@@ -303,15 +249,5 @@ namespace NetControl4BioMed.Helpers.Interfaces
         [DisableConcurrentExecution(86400)]
         [Queue("administration")]
         Task DeleteAllAnalysesAsync(string id, CancellationToken token);
-
-        /// <summary>
-        /// Deletes all samples from the database.
-        /// </summary>
-        /// <param name="id">The ID of the background task.</param>
-        /// <param name="token">The cancellation token for the task.</param>
-        [AutomaticRetry(Attempts = 2)]
-        [DisableConcurrentExecution(86400)]
-        [Queue("administration")]
-        Task DeleteAllSamplesAsync(string id, CancellationToken token);
     }
 }

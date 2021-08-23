@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
-using NetControl4BioMed.Data.Enumerations;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
@@ -68,15 +67,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Throw an exception.
                     throw new TaskException("Two or more of the manually provided IDs are duplicated.");
                 }
-                // Get the IDs of the related entities that appear in the current batch.
-                var batchDatabaseTypeIds = batchItems
-                    .Where(item => item.DatabaseType != null)
-                    .Select(item => item.DatabaseType)
-                    .Where(item => !string.IsNullOrEmpty(item.Id))
-                    .Select(item => item.Id)
-                    .Distinct();
                 // Define the list of items to get.
-                var databaseTypes = new List<DatabaseType>();
                 var existingDatabaseNames = new List<string>();
                 var validBatchIds = new List<string>();
                 // Use a new scope.
@@ -85,9 +76,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Use a new context instance.
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the related entities that appear in the current batch.
-                    databaseTypes = context.DatabaseTypes
-                        .Where(item => batchDatabaseTypeIds.Contains(item.Id))
-                        .ToList();
                     existingDatabaseNames = context.Databases
                         .Where(item => batchNames.Contains(item.Name))
                         .Select(item => item.Name)
@@ -116,27 +104,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("A database with the same name already exists.", showExceptionItem, batchItem);
                     }
-                    // Check if there was no database type provided.
-                    if (batchItem.DatabaseType == null || string.IsNullOrEmpty(batchItem.DatabaseType.Id))
-                    {
-                        // Throw an exception.
-                        throw new TaskException("There was no database type provided.", showExceptionItem, batchItem);
-                    }
-                    // Get the database type.
-                    var databaseType = databaseTypes
-                        .FirstOrDefault(item => item.Id == batchItem.DatabaseType.Id);
-                    // Check if there was no database type found.
-                    if (databaseType == null)
-                    {
-                        // Throw an exception.
-                        throw new TaskException("There was no database type found.", showExceptionItem, batchItem);
-                    }
-                    // Check if the database type is generic.
-                    if (databaseType.Name == "Generic")
-                    {
-                        // Throw an exception.
-                        throw new TaskException($"The database can't be generic.", showExceptionItem, batchItem);
-                    }
                     // Define the new item.
                     var database = new Database
                     {
@@ -144,8 +111,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                         Name = batchItem.Name,
                         Description = batchItem.Description,
                         Url = batchItem.Url,
-                        IsPublic = batchItem.IsPublic,
-                        DatabaseTypeId = databaseType.Id
+                        IsPublic = batchItem.IsPublic
                     };
                     // Check if there is any ID provided.
                     if (!string.IsNullOrEmpty(batchItem.Id))
@@ -210,7 +176,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items with the provided IDs.
                     var items = context.Databases
-                        .Include(item => item.DatabaseType)
                         .Where(item => batchIds.Contains(item.Id));
                     // Check if there were no items found.
                     if (items == null || !items.Any())
@@ -239,12 +204,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     {
                         // Continue.
                         continue;
-                    }
-                    // Check if the database type of the database is generic.
-                    if (database.DatabaseType.Name == "Generic")
-                    {
-                        // Throw an exception.
-                        throw new TaskException("The generic database can't be edited.", showExceptionItem, batchItem);
                     }
                     // Check if there is another database with the same name.
                     if (existingDatabases.Any(item => item.Id != database.Id && item.Name == batchItem.Name) || databasesToEdit.Any(item => item.Name == batchItem.Name))
@@ -319,11 +278,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var databaseIds = databases
                     .Select(item => item.Id);
                 // Delete the dependent entities.
-                await DatabaseExtensions.DeleteDependentSamplesAsync(databaseIds, serviceProvider, token);
-                await DatabaseExtensions.DeleteDependentDatabaseEdgeFieldsAsync(databaseIds, serviceProvider, token);
-                await DatabaseExtensions.DeleteDependentDatabaseNodeFieldsAsync(databaseIds, serviceProvider, token);
+                await DatabaseExtensions.DeleteDependentDatabaseInteractionFieldsAsync(databaseIds, serviceProvider, token);
+                await DatabaseExtensions.DeleteDependentDatabaseProteinFieldsAsync(databaseIds, serviceProvider, token);
                 // Delete the related entities.
-                await DatabaseExtensions.DeleteRelatedEntitiesAsync<DatabaseUserInvitation>(databaseIds, serviceProvider, token);
                 await DatabaseExtensions.DeleteRelatedEntitiesAsync<DatabaseUser>(databaseIds, serviceProvider, token);
                 // Delete the items.
                 await IEnumerableExtensions.DeleteAsync(databases, serviceProvider, token);

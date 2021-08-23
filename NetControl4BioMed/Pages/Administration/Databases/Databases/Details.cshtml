@@ -72,24 +72,11 @@
                 <span asp-description-for="View.Database.Url" class="text-muted small">The URL of the database.</span>
                 <span asp-validation-for="View.Database.Url" class="text-danger small"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-0">
                 <label asp-for="View.Database.IsPublic" class="font-weight-bold">Set the database as public?</label>
                 <input asp-for="View.Database.IsPublic" type="text" class="form-control" readonly />
                 <span asp-description-for="View.Database.IsPublic" class="text-muted small">The public availability of the database.</span>
                 <span asp-validation-for="View.Database.IsPublic" class="text-danger small"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="View.Database.DatabaseType.Name" class="font-weight-bold">Type</label>
-                <div class="input-group">
-                    <input asp-for="View.Database.DatabaseType.Name" class="form-control" readonly />
-                    <div class="input-group-append">
-                        <a asp-page="/Administration/Databases/DatabaseTypes/Details" asp-route-id="@Model.View.Database.DatabaseType.Id" class="btn btn-info">
-                            <span><i class="fas fa-info-circle"></i></span>
-                        </a>
-                    </div>
-                </div>
-                <span asp-description-for="View.Database.DatabaseType.Name" class="text-muted small">The type of the database.</span>
-                <span asp-validation-for="View.Database.DatabaseType.Name" class="text-danger small"></span>
             </div>
         </form>
     </div>
@@ -117,35 +104,17 @@
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
-                <span><i class="fas fa-envelope-open"></i></span>
-            </div>
-            <div>
-                <span>User invitations</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The database is currently assigned to @Model.View.UserInvitationCount user invitation@(Model.View.UserInvitationCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the user invitations</a>, or <a asp-page="/Administration/Permissions/DatabaseUserInvitations/Create" asp-route-databaseId="@Model.View.Database.Id" class="alert-link">add a new one</a>.</span>
-        </div>
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
                 <span><i class="fas fa-circle"></i></span>
             </div>
             <div>
-                <span>Database node fields</span>
+                <span>Database protein fields</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.DatabaseNodeFieldCount database node field@(Model.View.DatabaseNodeFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseNodeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the database node fields</a>, or <a asp-page="/Administration/Databases/DatabaseNodeFields/Create" asp-route-databaseId="@Model.View.Database.Id" class="alert-link">add a new one</a>.</span>
+            <span>The database currently contains @Model.View.DatabaseProteinFieldCount database protein field@(Model.View.DatabaseProteinFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseProteinFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the database protein fields</a>, or <a asp-page="/Administration/Databases/DatabaseProteinFields/Create" asp-route-databaseId="@Model.View.Database.Id" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>
@@ -156,14 +125,14 @@
                 <span><i class="fas fa-arrow-right"></i></span>
             </div>
             <div>
-                <span>Database edge fields</span>
+                <span>Database interaction fields</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.DatabaseEdgeFieldCount database edge field@(Model.View.DatabaseEdgeFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseEdgeFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the database edge fields</a>, or <a asp-page="/Administration/Databases/DatabaseEdgeFields/Create" asp-route-databaseId="@Model.View.Database.Id" class="alert-link">add a new one</a>.</span>
+            <span>The database currently contains @Model.View.DatabaseInteractionFieldCount database interaction field@(Model.View.DatabaseInteractionFieldCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Databases/DatabaseInteractionFields/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the database interaction fields</a>, or <a asp-page="/Administration/Databases/DatabaseInteractionFields/Create" asp-route-databaseId="@Model.View.Database.Id" class="alert-link">add a new one</a>.</span>
         </div>
     </div>
 </div>
@@ -174,14 +143,14 @@
                 <span><i class="fas fa-circle"></i></span>
             </div>
             <div>
-                <span>Nodes</span>
+                <span>Proteins</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.NodeCount node@(Model.View.NodeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseNodes/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the nodes</a>.</span>
+            <span>The database currently contains @Model.View.ProteinCount protein@(Model.View.ProteinCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseProteins/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the proteins</a>.</span>
         </div>
     </div>
 </div>
@@ -192,32 +161,14 @@
                 <span><i class="fas fa-arrow-right"></i></span>
             </div>
             <div>
-                <span>Edges</span>
+                <span>Interactions</span>
             </div>
         </div>
     </div>
     <div class="card-body">
         <div class="alert alert-info text-justify text-wrap mb-0">
             <span><i class="fas fa-info-circle"></i></span>
-            <span>The database currently contains @Model.View.EdgeCount edge@(Model.View.EdgeCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseEdges/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the edges</a>.</span>
-        </div>
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header font-weight-bold">
-        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
-            <div>
-                <span><i class="fas fa-folder"></i></span>
-            </div>
-            <div>
-                <span>Node collections</span>
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-info text-justify text-wrap mb-0">
-            <span><i class="fas fa-info-circle"></i></span>
-            <span>The database is currently assigned to @Model.View.NodeCollectionCount node collection@(Model.View.NodeCollectionCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/NodeCollectionDatabases/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the node collections</a>.</span>
+            <span>The database currently contains @Model.View.InteractionCount interaction@(Model.View.InteractionCount != 1 ? "s" : string.Empty). You can <a asp-page="/Administration/Relationships/DatabaseInteractions/Index" asp-route-searchString="@Model.View.Database.Id" asp-route-searchIn="DatabaseId" class="alert-link">view the interactions</a>.</span>
         </div>
     </div>
 </div>
@@ -243,7 +194,7 @@
     <div class="card-header font-weight-bold">
         <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
             <div>
-                <span><i class="fas fa-desktop"></i></span>
+                <span><i class="fas fa-code-branch"></i></span>
             </div>
             <div>
                 <span>Analyses</span>

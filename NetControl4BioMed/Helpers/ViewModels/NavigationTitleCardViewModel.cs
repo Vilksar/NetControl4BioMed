@@ -1,8 +1,4 @@
 ﻿using NetControl4BioMed.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.ViewModels
 {
@@ -41,15 +37,6 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the navigation title card for the database type details page.
-        /// </summary>
-        public static NavigationTitleCardViewModel DatabaseTypeNavigationTitleCard { get; } = new NavigationTitleCardViewModel
-        {
-            Id = "DatabaseType",
-            Icon = "fa-font"
-        };
-
-        /// <summary>
         /// Gets the navigation title card for the database details page.
         /// </summary>
         public static NavigationTitleCardViewModel DatabaseNavigationTitleCard { get; } = new NavigationTitleCardViewModel
@@ -59,57 +46,48 @@ namespace NetControl4BioMed.Helpers.ViewModels
         };
 
         /// <summary>
-        /// Gets the navigation title card for the database node field details page.
+        /// Gets the navigation title card for the database protein field details page.
         /// </summary>
-        public static NavigationTitleCardViewModel DatabaseNodeFieldNavigationTitleCard { get; } = new NavigationTitleCardViewModel
+        public static NavigationTitleCardViewModel DatabaseProteinFieldNavigationTitleCard { get; } = new NavigationTitleCardViewModel
         {
-            Id = "DatabaseNodeField",
+            Id = "DatabaseProteinField",
             Icon = "fa-circle"
         };
 
         /// <summary>
-        /// Gets the navigation title card for the database edge field details page.
+        /// Gets the navigation title card for the database interaction field details page.
         /// </summary>
-        public static NavigationTitleCardViewModel DatabaseEdgeFieldNavigationTitleCard { get; } = new NavigationTitleCardViewModel
+        public static NavigationTitleCardViewModel DatabaseInteractionFieldNavigationTitleCard { get; } = new NavigationTitleCardViewModel
         {
-            Id = "DatabaseEdgeField",
+            Id = "DatabaseInteractionField",
             Icon = "fa-arrow-right"
         };
 
         /// <summary>
-        /// Gets the navigation title card for the edge details page.
+        /// Gets the navigation title card for the protein details page.
         /// </summary>
-        public static NavigationTitleCardViewModel EdgeNavigationTitleCard { get; } = new NavigationTitleCardViewModel
+        public static NavigationTitleCardViewModel ProteinNavigationTitleCard { get; } = new NavigationTitleCardViewModel
         {
-            Id = "Edge",
-            Icon = "fa-arrow-right"
-        };
-
-        /// <summary>
-        /// Gets the navigation title card for the node details page.
-        /// </summary>
-        public static NavigationTitleCardViewModel NodeNavigationTitleCard { get; } = new NavigationTitleCardViewModel
-        {
-            Id = "Node",
+            Id = "Protein",
             Icon = "fa-circle"
         };
 
         /// <summary>
-        /// Gets the navigation title card for the node collection details page.
+        /// Gets the navigation title card for the interaction details page.
         /// </summary>
-        public static NavigationTitleCardViewModel NodeCollectionNavigationTitleCard { get; } = new NavigationTitleCardViewModel
+        public static NavigationTitleCardViewModel InteractionNavigationTitleCard { get; } = new NavigationTitleCardViewModel
         {
-            Id = "NodeCollection",
+            Id = "Interaction",
+            Icon = "fa-arrow-right"
+        };
+
+        /// <summary>
+        /// Gets the navigation title card for the protein collection details page.
+        /// </summary>
+        public static NavigationTitleCardViewModel ProteinCollectionNavigationTitleCard { get; } = new NavigationTitleCardViewModel
+        {
+            Id = "ProteinCollection",
             Icon = "fa-folder"
-        };
-
-        /// <summary>
-        /// Gets the navigation title card for the sample details page.
-        /// </summary>
-        public static NavigationTitleCardViewModel SampleNavigationTitleCard { get; } = new NavigationTitleCardViewModel
-        {
-            Id = "Sample",
-            Icon = "fa-paste"
         };
 
         /// <summary>
@@ -127,7 +105,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationTitleCardViewModel AnalysisNavigationTitleCard { get; } = new NavigationTitleCardViewModel
         {
             Id = "Analysis",
-            Icon = "fa-desktop"
+            Icon = "fa-code-branch"
         };
 
         /// <summary>
@@ -136,13 +114,22 @@ namespace NetControl4BioMed.Helpers.ViewModels
         public static NavigationTitleCardViewModel ControlPathNavigationTitleCard { get; } = new NavigationTitleCardViewModel
         {
             Id = "ControlPath",
-            Icon = "fa-gamepad"
+            Icon = "fa-exchange-alt"
+        };
+
+        /// <summary>
+        /// Gets the navigation title card for the path details page.
+        /// </summary>
+        public static NavigationTitleCardViewModel PathNavigationTitleCard { get; } = new NavigationTitleCardViewModel
+        {
+            Id = "Path",
+            Icon = "fa-long-arrow-alt-right"
         };
 
         /// <summary>
         /// Gets the updated navigation title card for the user details page.
         /// </summary>
-        /// <param name="user">Represents the current user.</param>
+        /// <param name="user">The current user.</param>
         /// <returns>The navigation title card for the user details page.</returns>
         public static NavigationTitleCardViewModel GetUserNavigationTitleCard(User user)
         {
@@ -156,25 +143,9 @@ namespace NetControl4BioMed.Helpers.ViewModels
         }
 
         /// <summary>
-        /// Gets the updated navigation title card for the database type details page.
-        /// </summary>
-        /// <param name="databaseType">Represents the current database type.</param>
-        /// <returns>The navigation title card for the database type pages.</returns>
-        public static NavigationTitleCardViewModel GetDatabaseTypeNavigationTitleCard(DatabaseType databaseType)
-        {
-            // Get the corresponding navigation title card.
-            var navigationTitleCard = DatabaseTypeNavigationTitleCard;
-            // Update the title and subtitle.
-            navigationTitleCard.Title = databaseType.Name;
-            navigationTitleCard.Subtitle = databaseType.Id;
-            // Return the navigation title card.
-            return navigationTitleCard;
-        }
-
-        /// <summary>
         /// Gets the updated navigation title card for the database details page.
         /// </summary>
-        /// <param name="database">Represents the current database.</param>
+        /// <param name="database">The current database.</param>
         /// <returns>The navigation title card for the database details page.</returns>
         public static NavigationTitleCardViewModel GetDatabaseNavigationTitleCard(Database database)
         {
@@ -188,97 +159,81 @@ namespace NetControl4BioMed.Helpers.ViewModels
         }
 
         /// <summary>
-        /// Gets the updated navigation title card for the database node field details page.
+        /// Gets the updated navigation title card for the database protein field details page.
         /// </summary>
-        /// <param name="databaseNodeField">Represents the current database node field.</param>
-        /// <returns>The navigation title card for the database node field details page.</returns>
-        public static NavigationTitleCardViewModel GetDatabaseNodeFieldNavigationTitleCard(DatabaseNodeField databaseNodeField)
+        /// <param name="databaseProteinField">The current database protein field.</param>
+        /// <returns>The navigation title card for the database protein field details page.</returns>
+        public static NavigationTitleCardViewModel GetDatabaseProteinFieldNavigationTitleCard(DatabaseProteinField databaseProteinField)
         {
             // Get the corresponding navigation title card.
-            var navigationTitleCard = DatabaseNodeFieldNavigationTitleCard;
+            var navigationTitleCard = DatabaseProteinFieldNavigationTitleCard;
             // Update the title and subtitle.
-            navigationTitleCard.Title = databaseNodeField.Name;
-            navigationTitleCard.Subtitle = databaseNodeField.Id;
+            navigationTitleCard.Title = databaseProteinField.Name;
+            navigationTitleCard.Subtitle = databaseProteinField.Id;
             // Return the navigation title card.
             return navigationTitleCard;
         }
 
         /// <summary>
-        /// Gets the updated navigation title card for the database edge field details page.
+        /// Gets the updated navigation title card for the database interaction field details page.
         /// </summary>
-        /// <param name="databaseEdgeField">Represents the current database edge field.</param>
-        /// <returns>The navigation title card for the database edge field details page.</returns>
-        public static NavigationTitleCardViewModel GetDatabaseEdgeFieldNavigationTitleCard(DatabaseEdgeField databaseEdgeField)
+        /// <param name="databaseInteractionField">The current database interaction field.</param>
+        /// <returns>The navigation title card for the database interaction field details page.</returns>
+        public static NavigationTitleCardViewModel GetDatabaseInteractionFieldNavigationTitleCard(DatabaseInteractionField databaseInteractionField)
         {
             // Get the corresponding navigation title card.
-            var navigationTitleCard = DatabaseEdgeFieldNavigationTitleCard;
+            var navigationTitleCard = DatabaseInteractionFieldNavigationTitleCard;
             // Update the title and subtitle.
-            navigationTitleCard.Title = databaseEdgeField.Name;
-            navigationTitleCard.Subtitle = databaseEdgeField.Id;
+            navigationTitleCard.Title = databaseInteractionField.Name;
+            navigationTitleCard.Subtitle = databaseInteractionField.Id;
             // Return the navigation title card.
             return navigationTitleCard;
         }
 
         /// <summary>
-        /// Gets the updated navigation title card for the node details page.
+        /// Gets the updated navigation title card for the protein details page.
         /// </summary>
-        /// <param name="node">Represents the current node.</param>
-        /// <returns>The navigation title card for the node details page.</returns>
-        public static NavigationTitleCardViewModel GetNodeNavigationTitleCard(Node node)
+        /// <param name="protein">The current protein.</param>
+        /// <returns>The navigation title card for the protein details page.</returns>
+        public static NavigationTitleCardViewModel GetProteinNavigationTitleCard(Protein protein)
         {
             // Get the corresponding navigation title card.
-            var navigationTitleCard = NodeNavigationTitleCard;
+            var navigationTitleCard = ProteinNavigationTitleCard;
             // Update the title and subtitle.
-            navigationTitleCard.Title = node.Name;
-            navigationTitleCard.Subtitle = node.Id;
+            navigationTitleCard.Title = protein.Name;
+            navigationTitleCard.Subtitle = protein.Id;
             // Return the navigation title card.
             return navigationTitleCard;
         }
 
         /// <summary>
-        /// Gets the updated navigation title card for the edge details page.
+        /// Gets the updated navigation title card for the interaction details page.
         /// </summary>
-        /// <param name="edge">Represents the current edge.</param>
-        /// <returns>The navigation title card for the edge details page.</returns>
-        public static NavigationTitleCardViewModel GetEdgeNavigationTitleCard(Edge edge)
+        /// <param name="interaction">The current interaction.</param>
+        /// <returns>The navigation title card for the interaction details page.</returns>
+        public static NavigationTitleCardViewModel GetInteractionNavigationTitleCard(Interaction interaction)
         {
             // Get the corresponding navigation title card.
-            var navigationTitleCard = EdgeNavigationTitleCard;
+            var navigationTitleCard = InteractionNavigationTitleCard;
             // Update the title and subtitle.
-            navigationTitleCard.Title = edge.Name;
-            navigationTitleCard.Subtitle = edge.Id;
+            navigationTitleCard.Title = interaction.Name;
+            navigationTitleCard.Subtitle = interaction.Id;
             // Return the navigation title card.
             return navigationTitleCard;
         }
 
         /// <summary>
-        /// Gets the updated navigation title card for the node collection details page.
+        /// Gets the updated navigation title card for the protein collection details page.
         /// </summary>
-        /// <param name="nodeCollection">Represents the current node collection.</param>
-        /// <returns>The navigation title card for the node collection details page.</returns>
-        public static NavigationTitleCardViewModel GetNodeCollectionNavigationTitleCard(NodeCollection nodeCollection)
+        /// <param name="proteinCollection">The current protein collection.</param>
+        /// <returns>The navigation title card for the protein collection details page.</returns>
+        public static NavigationTitleCardViewModel GetProteinCollectionNavigationTitleCard(ProteinCollection proteinCollection)
         {
             // Get the corresponding navigation title card.
-            var navigationTitleCard = NodeCollectionNavigationTitleCard;
+            var navigationTitleCard = ProteinCollectionNavigationTitleCard;
             // Update the title and subtitle.
-            navigationTitleCard.Title = nodeCollection.Name;
-            navigationTitleCard.Subtitle = nodeCollection.Id;
-            // Return the navigation title card.
-            return navigationTitleCard;
-        }
-
-        /// <summary>
-        /// Gets the updated navigation title card for the sample details page.
-        /// </summary>
-        /// <param name="nodeCollection">Represents the current sample.</param>
-        /// <returns>The navigation title card for the sample details page.</returns>
-        public static NavigationTitleCardViewModel GetSampleNavigationTitleCard(Sample sample)
-        {
-            // Get the corresponding navigation title card.
-            var navigationTitleCard = SampleNavigationTitleCard;
-            // Update the title and subtitle.
-            navigationTitleCard.Title = sample.Name;
-            navigationTitleCard.Subtitle = sample.Id;
+            navigationTitleCard.Title = proteinCollection.Name;
+            navigationTitleCard.Subtitle = proteinCollection.Id;
             // Return the navigation title card.
             return navigationTitleCard;
         }
@@ -286,7 +241,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets the updated navigation title card for the network details page.
         /// </summary>
-        /// <param name="network">Represents the current network.</param>
+        /// <param name="network">The current network.</param>
         /// <returns>The navigation title card for the network page.</returns>
         public static NavigationTitleCardViewModel GetNetworkNavigationTitleCard(Network network)
         {
@@ -302,7 +257,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets the updated navigation title card for the analysis details page.
         /// </summary>
-        /// <param name="analysis">Represents the current analysis.</param>
+        /// <param name="analysis">The current analysis.</param>
         /// <returns>The navigation title card for the analysis page.</returns>
         public static NavigationTitleCardViewModel GetAnalysisNavigationTitleCard(Analysis analysis)
         {
@@ -318,7 +273,7 @@ namespace NetControl4BioMed.Helpers.ViewModels
         /// <summary>
         /// Gets the updated navigation title card for the analysis details page.
         /// </summary>
-        /// <param name="analysis">Represents the current analysis.</param>
+        /// <param name="controlPath">The current analysis.</param>
         /// <returns>The navigation title card for the analysis page.</returns>
         public static NavigationTitleCardViewModel GetControlPathNavigationTitleCard(ControlPath controlPath)
         {
@@ -327,6 +282,22 @@ namespace NetControl4BioMed.Helpers.ViewModels
             // Update the title and subtitle.
             navigationTitleCard.Title = "Control path";
             navigationTitleCard.Subtitle = controlPath.Id;
+            // Return the navigation title card.
+            return navigationTitleCard;
+        }
+
+        /// <summary>
+        /// Gets the updated navigation title card for the analysis details page.
+        /// </summary>
+        /// <param name="path">The current analysis.</param>
+        /// <returns>The navigation title card for the analysis page.</returns>
+        public static NavigationTitleCardViewModel GetPathNavigationTitleCard(Path path)
+        {
+            // Get the corresponding navigation title card.
+            var navigationTitleCard = PathNavigationTitleCard;
+            // Update the title and subtitle.
+            navigationTitleCard.Title = "Path";
+            navigationTitleCard.Subtitle = path.Id;
             // Return the navigation title card.
             return navigationTitleCard;
         }

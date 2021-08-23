@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Enumerations;
-using NetControl4BioMed.Data.Interfaces;
 using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.Extensions;
@@ -99,19 +98,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                var batchNodeCollectionIds = batchItems
-                    .Where(item => item.AnalysisNodeCollections != null)
-                    .Select(item => item.AnalysisNodeCollections)
+                var batchProteinCollectionIds = batchItems
+                    .Where(item => item.AnalysisProteinCollections != null)
+                    .Select(item => item.AnalysisProteinCollections)
                     .SelectMany(item => item)
-                    .Where(item => item.NodeCollection != null)
-                    .Select(item => item.NodeCollection)
+                    .Where(item => item.ProteinCollection != null)
+                    .Select(item => item.ProteinCollection)
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
                 var batchNetworkIds = batchItems
-                    .Where(item => item.AnalysisNetworks != null)
-                    .Select(item => item.AnalysisNetworks)
-                    .SelectMany(item => item)
                     .Where(item => item.Network != null)
                     .Select(item => item.Network)
                     .Where(item => !string.IsNullOrEmpty(item.Id))
@@ -119,7 +115,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Distinct();
                 // Define the list of items to get.
                 var users = new List<User>();
-                var nodeCollections = new List<NodeCollection>();
+                var proteinCollections = new List<ProteinCollection>();
                 var networks = new List<Network>();
                 var validBatchIds = new List<string>();
                 // Use a new scope.
@@ -131,10 +127,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     users = context.Users
                         .Where(item => batchUserIds.Contains(item.Id))
                         .ToList();
-                    nodeCollections = context.NodeCollections
-                        .Include(item => item.NodeCollectionDatabases)
-                            .ThenInclude(item => item.Database)
-                        .Where(item => batchNodeCollectionIds.Contains(item.Id))
+                    proteinCollections = context.ProteinCollections
+                        .Where(item => batchProteinCollectionIds.Contains(item.Id))
                         .ToList();
                     networks = context.Networks
                         .Include(item => item.NetworkDatabases)
@@ -167,15 +161,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     // Get the analysis users.
                     var analysisUsers = batchItem.AnalysisUsers
-                        .Where(item => item.User != null)
+                        .Where(item => item.User != null && !string.IsNullOrEmpty(item.Email))
                         .Where(item => !string.IsNullOrEmpty(item.User.Id))
-                        .Select(item => item.User.Id)
+                        .Select(item => (item.User.Id, item.Email))
                         .Distinct()
-                        .Where(item => users.Any(item1 => item1.Id == item))
+                        .Where(item => users.Any(item1 => item1.Id == item.Item1))
                         .Select(item => new AnalysisUser
                         {
                             DateTimeCreated = DateTime.UtcNow,
-                            UserId = item
+                            UserId = item.Item1,
+                            Email = item.Item2
                         });
                     // Check if there were no analysis users found.
                     if (!batchItem.IsPublic && (analysisUsers == null || !analysisUsers.Any()))
@@ -183,107 +178,76 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no analysis users found and the analysis is not public.", showExceptionItem, batchItem);
                     }
-                    // Check if there are no analysis networks provided.
-                    if (batchItem.AnalysisNetworks == null || !batchItem.AnalysisNetworks.Any())
+                    // Check if there is no network provided.
+                    if (batchItem.Network == null || string.IsNullOrEmpty(batchItem.Network.Id))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no analysis networks provided.", showExceptionItem, batchItem);
+                        throw new TaskException("There was no network provided.", showExceptionItem, batchItem);
                     }
-                    // Get the analysis networks.
-                    var analysisNetworks = batchItem.AnalysisNetworks
-                        .Where(item => item.Network != null)
-                        .Where(item => !string.IsNullOrEmpty(item.Network.Id))
-                        .Select(item => item.Network.Id)
-                        .Distinct()
-                        .Where(item => networks.Any(item1 => item1.Id == item))
-                        .Select(item => new AnalysisNetwork
-                        {
-                            NetworkId = item
-                        });
-                    // Check if there were no analysis networks found.
-                    if (analysisNetworks == null || !analysisNetworks.Any())
+                    // Get the network.
+                    var network = networks.FirstOrDefault(item => batchItem.Network.Id == item.Id);
+                    // Check if there was no network found.
+                    if (network == null || network.Status != NetworkStatus.Completed)
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no analysis networks found.", showExceptionItem, batchItem);
+                        throw new TaskException("There was no network found or the network is not yet ready to be used in an analysis.", showExceptionItem, batchItem);
                     }
-                    // Get the IDs of the used networks.
-                    var networkIds = analysisNetworks
-                        .Select(item => item.NetworkId);
-                    // Get the node analysis databases.
-                    var nodeAnalysisDatabases = networks
-                            .Where(item => networkIds.Contains(item.Id))
-                            .Select(item => item.NetworkDatabases)
-                            .SelectMany(item => item)
-                            .Where(item => item.Type == NetworkDatabaseType.Node)
+                    // Get the protein analysis databases.
+                    var proteinAnalysisDatabases = network.NetworkDatabases
+                            .Where(item => item.Type == NetworkDatabaseType.Protein)
                             .Select(item => item.Database)
                             .Distinct()
                             .Select(item => new AnalysisDatabase
                             {
                                 DatabaseId = item.Id,
-                                Type = AnalysisDatabaseType.Node
+                                Type = AnalysisDatabaseType.Protein
                             });
-                    // Check if there were no node analysis databases found.
-                    if (nodeAnalysisDatabases == null || !nodeAnalysisDatabases.Any())
-                    {
-                        // Throw an exception.
-                        throw new TaskException("There were no node analysis databases found.", showExceptionItem, batchItem);
-                    }
-                    // Get the edge analysis databases.
-                    var edgeAnalysisDatabases = networks
-                            .Where(item => networkIds.Contains(item.Id))
-                            .Select(item => item.NetworkDatabases)
-                            .SelectMany(item => item)
-                            .Where(item => item.Type == NetworkDatabaseType.Edge)
+                    // Get the interaction analysis databases.
+                    var interactionAnalysisDatabases = network.NetworkDatabases
+                            .Where(item => item.Type == NetworkDatabaseType.Interaction)
                             .Select(item => item.Database)
                             .Distinct()
                             .Select(item => new AnalysisDatabase
                             {
                                 DatabaseId = item.Id,
-                                Type = AnalysisDatabaseType.Edge
+                                Type = AnalysisDatabaseType.Interaction
                             });
-                    // Check if there were no edge analysis databases found.
-                    if (edgeAnalysisDatabases == null || !edgeAnalysisDatabases.Any())
-                    {
-                        // Throw an exception.
-                        throw new TaskException("There were no edge analysis databases found.", showExceptionItem, batchItem);
-                    }
-                    // Get the node database IDs.
-                    var nodeDatabaseIds = nodeAnalysisDatabases
-                        .Select(item => item.DatabaseId);
-                    // Get the analysis node collections.
-                    var analysisNodeCollections = batchItem.AnalysisNodeCollections != null ?
-                        batchItem.AnalysisNodeCollections
-                            .Where(item => item.NodeCollection != null)
-                            .Where(item => !string.IsNullOrEmpty(item.NodeCollection.Id))
+                    // Get the analysis protein collections.
+                    var analysisProteinCollections = batchItem.AnalysisProteinCollections != null ?
+                        batchItem.AnalysisProteinCollections
+                            .Where(item => item.ProteinCollection != null)
+                            .Where(item => !string.IsNullOrEmpty(item.ProteinCollection.Id))
                             .Where(item => item.Type == "Source" || item.Type == "Target")
-                            .Select(item => (item.NodeCollection.Id, item.Type))
+                            .Select(item => (item.ProteinCollection.Id, item.Type))
                             .Distinct()
-                            .Where(item => nodeCollections.Any(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabaseIds.Contains(item2.Database.Id))))
-                            .Select(item => new AnalysisNodeCollection
+                            .Where(item => proteinCollections.Any(item1 => item1.Id == item.Item1))
+                            .Select(item => new AnalysisProteinCollection
                             {
-                                NodeCollectionId = item.Item1,
-                                Type = EnumerationExtensions.GetEnumerationValue<AnalysisNodeCollectionType>(item.Item2)
+                                ProteinCollectionId = item.Item1,
+                                Type = EnumerationExtensions.GetEnumerationValue<AnalysisProteinCollectionType>(item.Item2)
                             }) :
-                        Enumerable.Empty<AnalysisNodeCollection>();
+                        Enumerable.Empty<AnalysisProteinCollection>();
                     // Define the new item.
                     var analysis = new Analysis
                     {
                         DateTimeCreated = DateTime.UtcNow,
+                        DateTimeToDelete = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete),
                         Name = batchItem.Name,
                         Description = batchItem.Description,
                         IsPublic = batchItem.IsPublic,
+                        IsDemonstration = false,
                         Status = AnalysisStatus.Defined,
                         Log = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                         Data = batchItem.Data,
                         MaximumIterations = batchItem.MaximumIterations,
                         MaximumIterationsWithoutImprovement = batchItem.MaximumIterationsWithoutImprovement,
                         Parameters = batchItem.Parameters,
+                        NetworkId = network.Id,
                         AnalysisUsers = analysisUsers.ToList(),
-                        AnalysisDatabases = nodeAnalysisDatabases
-                            .Concat(edgeAnalysisDatabases)
+                        AnalysisDatabases = proteinAnalysisDatabases
+                            .Concat(interactionAnalysisDatabases)
                             .ToList(),
-                        AnalysisNodeCollections = analysisNodeCollections.ToList(),
-                        AnalysisNetworks = analysisNetworks.ToList()
+                        AnalysisProteinCollections = analysisProteinCollections.ToList()
                     };
                     // Try to get the algorithm.
                     try
@@ -293,10 +257,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     catch (Exception exception)
                     {
-                        // Get the exception message.
-                        var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
                         // Throw a new exception.
-                        throw new TaskException("The algorithm couldn't be determined from the provided string." + message, showExceptionItem, batchItem);
+                        throw new TaskException(exception.Message, showExceptionItem, batchItem);
                     }
                     // Append a message to the log.
                     analysis.Log = analysis.AppendToLog("The analysis has been defined and stored in the database.");
@@ -387,6 +349,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     // Get the items with the provided IDs.
                     var items = context.Analyses
+                        .Include(item => item.Network)
                         .Include(item => item.AnalysisUsers)
                         .Where(item => batchIds.Contains(item.Id));
                     // Check if there were no items found.
@@ -419,10 +382,23 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no analysis users found, so the analysis must be public.", showExceptionItem, batchItem);
                     }
+                    // Check if the analysis is not public.
+                    if (batchItem.IsDemonstration && !batchItem.IsPublic)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("The analysis must be public in order to be a demonstration.", showExceptionItem, batchItem);
+                    }
+                    // Check if the corresponding network is not public and demonstration.
+                    if (batchItem.IsDemonstration && (analysis.Network == null || !analysis.Network.IsPublic || !analysis.Network.IsDemonstration))
+                    {
+                        // Throw an exception.
+                        throw new TaskException("The corresponding network doesn't exist, or is not public or demonstration.", showExceptionItem, batchItem);
+                    }
                     // Update the data.
                     analysis.Name = batchItem.Name;
                     analysis.Description = batchItem.Description;
                     analysis.IsPublic = batchItem.IsPublic;
+                    analysis.IsDemonstration = batchItem.IsDemonstration;
                     // Append a message to the log.
                     analysis.Log = analysis.AppendToLog("The analysis details have been updated.");
                     // Add the item to the list.
@@ -489,15 +465,88 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Delete the dependent entities.
                 await AnalysisExtensions.DeleteDependentControlPathsAsync(analysisIds, serviceProvider, token);
                 // Delete the related entities.
-                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisNetwork>(analysisIds, serviceProvider, token);
-                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisNodeCollection>(analysisIds, serviceProvider, token);
-                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisEdge>(analysisIds, serviceProvider, token);
-                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisNode>(analysisIds, serviceProvider, token);
+                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisProteinCollection>(analysisIds, serviceProvider, token);
+                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisInteraction>(analysisIds, serviceProvider, token);
+                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisProtein>(analysisIds, serviceProvider, token);
                 await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisDatabase>(analysisIds, serviceProvider, token);
-                await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisUserInvitation>(analysisIds, serviceProvider, token);
                 await AnalysisExtensions.DeleteRelatedEntitiesAsync<AnalysisUser>(analysisIds, serviceProvider, token);
                 // Delete the items.
                 await IEnumerableExtensions.DeleteAsync(analyses, serviceProvider, token);
+            }
+        }
+
+        /// <summary>
+        /// Extends the time until the items are automatically deleted.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task ExtendTimeUntilDeleteAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Check if there weren't any valid items found.
+            if (Items == null)
+            {
+                // Throw an exception.
+                throw new TaskException("No valid items could be found with the provided data.");
+            }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (var index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Get the items in the current batch.
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
+                // Define the list of items to get.
+                var analyses = new List<Analysis>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Analyses
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    analyses = items
+                        .ToList();
+                }
+                // Save the items to add.
+                var analysesToEdit = new List<Analysis>();
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
+                {
+                    // Get the corresponding item.
+                    var analysis = analyses.FirstOrDefault(item => item.Id == batchItem.Id);
+                    // Check if there was no item found.
+                    if (analysis == null)
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Update the data.
+                    analysis.DateTimeToDelete = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
+                    // Add the item to the list.
+                    analysesToEdit.Add(analysis);
+                }
+                // Edit the items.
+                await IEnumerableExtensions.EditAsync(analysesToEdit, serviceProvider, token);
             }
         }
 
@@ -612,12 +661,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                             await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                         }
                         // Define the required data.
-                        var data = new List<AnalysisNodeInputModel>();
-                        var nodeDatabaseIds = new List<string>();
-                        var edgeDatabaseIds = new List<string>();
-                        var sourceNodeCollectionIds = new List<string>();
-                        var targetNodeCollectionIds = new List<string>();
-                        var networkIds = new List<string>();
+                        var data = new List<AnalysisProteinInputModel>();
+                        var proteinDatabaseIds = new List<string>();
+                        var interactionDatabaseIds = new List<string>();
+                        var sourceProteinCollectionIds = new List<string>();
+                        var targetProteinCollectionIds = new List<string>();
                         // Use a new scope.
                         using (var scope = serviceProvider.CreateScope())
                         {
@@ -633,7 +681,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 continue;
                             }
                             // Try to deserialize the data.
-                            if (!analysis.Data.TryDeserializeJsonObject<List<AnalysisNodeInputModel>>(out data) || data == null)
+                            if (!analysis.Data.TryDeserializeJsonObject<List<AnalysisProteinInputModel>>(out data) || data == null)
                             {
                                 // Update the status of the item.
                                 analysis.Status = AnalysisStatus.Error;
@@ -645,61 +693,55 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 continue;
                             }
                             // Get the IDs of the required related data.
-                            nodeDatabaseIds = context.AnalysisDatabases
+                            proteinDatabaseIds = context.AnalysisDatabases
                                 .Where(item => item.Analysis == analysis)
-                                .Where(item => item.Type == AnalysisDatabaseType.Node)
+                                .Where(item => item.Type == AnalysisDatabaseType.Protein)
                                 .Select(item => item.Database)
                                 .Distinct()
                                 .Select(item => item.Id)
                                 .ToList();
-                            edgeDatabaseIds = context.AnalysisDatabases
+                            interactionDatabaseIds = context.AnalysisDatabases
                                 .Where(item => item.Analysis == analysis)
-                                .Where(item => item.Type == AnalysisDatabaseType.Edge)
+                                .Where(item => item.Type == AnalysisDatabaseType.Interaction)
                                 .Select(item => item.Database)
                                 .Distinct()
                                 .Select(item => item.Id)
                                 .ToList();
-                            sourceNodeCollectionIds = context.AnalysisNodeCollections
+                            sourceProteinCollectionIds = context.AnalysisProteinCollections
                                 .Where(item => item.Analysis == analysis)
-                                .Where(item => item.Type == AnalysisNodeCollectionType.Source)
-                                .Select(item => item.NodeCollection)
+                                .Where(item => item.Type == AnalysisProteinCollectionType.Source)
+                                .Select(item => item.ProteinCollection)
                                 .Distinct()
                                 .Select(item => item.Id)
                                 .ToList();
-                            targetNodeCollectionIds = context.AnalysisNodeCollections
+                            targetProteinCollectionIds = context.AnalysisProteinCollections
                                 .Where(item => item.Analysis == analysis)
-                                .Where(item => item.Type == AnalysisNodeCollectionType.Target)
-                                .Select(item => item.NodeCollection)
-                                .Distinct()
-                                .Select(item => item.Id)
-                                .ToList();
-                            networkIds = context.AnalysisNetworks
-                                .Where(item => item.Analysis == analysis)
-                                .Select(item => item.Network)
+                                .Where(item => item.Type == AnalysisProteinCollectionType.Target)
+                                .Select(item => item.ProteinCollection)
                                 .Distinct()
                                 .Select(item => item.Id)
                                 .ToList();
                         }
-                        // Get the identifiers of the nodes in the provided data.
-                        var sourceNodeIdentifiers = data
+                        // Get the identifiers of the proteins in the provided data.
+                        var sourceProteinIdentifiers = data
                             .Where(item => item.Type == "Source")
-                            .Where(item => item.Node != null)
-                            .Select(item => item.Node)
+                            .Where(item => item.Protein != null)
+                            .Select(item => item.Protein)
                             .Where(item => !string.IsNullOrEmpty(item.Id))
                             .Select(item => item.Id)
                             .Distinct();
-                        var targetNodeIdentifiers = data
+                        var targetProteinIdentifiers = data
                             .Where(item => item.Type == "Target")
-                            .Where(item => item.Node != null)
-                            .Select(item => item.Node)
+                            .Where(item => item.Protein != null)
+                            .Select(item => item.Protein)
                             .Where(item => !string.IsNullOrEmpty(item.Id))
                             .Select(item => item.Id)
                             .Distinct();
                         // Define the required data.
-                        var sourceNodeIds = new List<string>();
-                        var targetNodeIds = new List<string>();
-                        var nodeIds = new List<string>();
-                        var edgeIds = new List<string>();
+                        var sourceProteinIds = new List<string>();
+                        var targetProteinIds = new List<string>();
+                        var proteinIds = new List<string>();
+                        var interactionIds = new List<string>();
                         // Use a new scope.
                         using (var scope = serviceProvider.CreateScope())
                         {
@@ -707,6 +749,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                             // Reload the analysis.
                             var analysis = context.Analyses
+                                .Include(item => item.Network)
                                 .FirstOrDefault(item => item.Id == batchAnalysis.Id);
                             // Check if there was no item found.
                             if (analysis == null)
@@ -714,78 +757,74 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 // Continue.
                                 continue;
                             }
-                            // Get the available nodes.
-                            var availableNodes = context.Nodes
-                                .Where(item => item.DatabaseNodes.Any(item1 => nodeDatabaseIds.Contains(item1.Database.Id)));
-                            // Get the nodes by identifier.
-                            var sourceNodesByIdentifier = availableNodes
-                                .Where(item => sourceNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.IsSearchable && sourceNodeIdentifiers.Contains(item1.Value)));
-                            var targetNodesByIdentifier = availableNodes
-                                .Where(item => targetNodeIdentifiers.Contains(item.Id) || item.DatabaseNodeFieldNodes.Any(item1 => item1.DatabaseNodeField.IsSearchable && targetNodeIdentifiers.Contains(item1.Value)));
-                            // Get the nodes by node collection.
-                            var sourceNodesByNodeCollection = availableNodes
-                                .Where(item => item.NodeCollectionNodes.Any(item1 => sourceNodeCollectionIds.Contains(item1.NodeCollection.Id)));
-                            var targetNodesByNodeCollection = availableNodes
-                                .Where(item => item.NodeCollectionNodes.Any(item1 => targetNodeCollectionIds.Contains(item1.NodeCollection.Id)));
-                            // Get the nodes in the analysis.
-                            var nodes = availableNodes
-                                .Where(item => item.NetworkNodes.Any(item1 => networkIds.Contains(item1.Network.Id)));
-                            // Check if there haven't been any nodes found.
-                            if (nodes == null || !nodes.Any())
+                            // Get the available proteins.
+                            var proteins = context.Proteins
+                                .Where(item => item.NetworkProteins.Any(item1 => item1.Network.Id == analysis.Network.Id));
+                            // Check if there haven't been any proteins found.
+                            if (proteins == null || !proteins.Any())
                             {
                                 // Update the status of the item.
                                 analysis.Status = AnalysisStatus.Error;
                                 // Add a message to the log.
-                                analysis.Log = analysis.AppendToLog("No nodes could be found within the provided networks.");
+                                analysis.Log = analysis.AppendToLog("No proteins could be found within the provided network.");
                                 // Edit the analysis.
                                 await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                                 // Continue.
                                 continue;
                             }
-                            // Get the edges in the analysis.
-                            var edges = context.Edges
-                                .Where(item => item.DatabaseEdges.Any(item1 => edgeDatabaseIds.Contains(item1.Database.Id)))
-                                .Where(item => item.NetworkEdges.Any(item1 => networkIds.Contains(item1.Network.Id)));
-                            // Check if there haven't been any edges found.
-                            if (edges == null || !edges.Any())
+                            // Get the proteins by identifier.
+                            var sourceProteinsByIdentifier = proteins
+                                .Where(item => sourceProteinIdentifiers.Contains(item.Id) || sourceProteinIdentifiers.Contains(item.Name) || item.DatabaseProteinFieldProteins.Any(item1 => item1.DatabaseProteinField.IsSearchable && sourceProteinIdentifiers.Contains(item1.Value)));
+                            var targetProteinsByIdentifier = proteins
+                                .Where(item => targetProteinIdentifiers.Contains(item.Id) || targetProteinIdentifiers.Contains(item.Name) || item.DatabaseProteinFieldProteins.Any(item1 => item1.DatabaseProteinField.IsSearchable && targetProteinIdentifiers.Contains(item1.Value)));
+                            // Get the proteins by protein collection.
+                            var sourceProteinsByProteinCollection = proteins
+                                .Where(item => item.ProteinCollectionProteins.Any(item1 => sourceProteinCollectionIds.Contains(item1.ProteinCollection.Id)));
+                            var targetProteinsByProteinCollection = proteins
+                                .Where(item => item.ProteinCollectionProteins.Any(item1 => targetProteinCollectionIds.Contains(item1.ProteinCollection.Id)));
+                            // Get the interactions in the analysis.
+                            var interactions = context.Interactions
+                                .Where(item => item.NetworkInteractions.Any(item1 => item1.Network.Id == analysis.Network.Id));
+                            // Check if there haven't been any interactions found.
+                            if (interactions == null || !interactions.Any())
                             {
                                 // Update the status of the item.
                                 analysis.Status = AnalysisStatus.Error;
                                 // Add a message to the log.
-                                analysis.Log = analysis.AppendToLog("No edges could be found within the provided networks.");
+                                analysis.Log = analysis.AppendToLog("No interactions could be found within the provided network.");
                                 // Edit the analysis.
                                 await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                                 // Continue.
                                 continue;
                             }
-                            // Get the nodes in the analysis.
-                            sourceNodeIds = sourceNodesByIdentifier
-                                .Concat(sourceNodesByNodeCollection)
+                            // Get the proteins in the analysis.
+                            sourceProteinIds = sourceProteinsByIdentifier
+                                .Concat(sourceProteinsByProteinCollection)
                                 .Distinct()
-                                .Intersect(nodes)
+                                .Intersect(proteins)
                                 .Select(item => item.Id)
                                 .ToList();
-                            targetNodeIds = targetNodesByIdentifier
-                                .Concat(targetNodesByNodeCollection)
+                            targetProteinIds = targetProteinsByIdentifier
+                                .Concat(targetProteinsByProteinCollection)
                                 .Distinct()
-                                .Intersect(nodes)
+                                .Intersect(proteins)
                                 .Select(item => item.Id)
                                 .ToList();
-                            nodeIds = nodes
-                                .Distinct()
-                                .Select(item => item.Id)
-                                .ToList();
-                            edgeIds = edges
+                            proteinIds = proteins
                                 .Distinct()
                                 .Select(item => item.Id)
                                 .ToList();
-                            // Check if there haven't been any target nodes found.
-                            if (targetNodeIds == null || !targetNodeIds.Any())
+                            interactionIds = interactions
+                                .Distinct()
+                                .Select(item => item.Id)
+                                .ToList();
+                            // Check if there haven't been any target proteins found.
+                            if (targetProteinIds == null || !targetProteinIds.Any())
                             {
                                 // Update the status of the item.
                                 analysis.Status = AnalysisStatus.Error;
                                 // Add a message to the log.
-                                analysis.Log = analysis.AppendToLog("No target nodes could be found with the provided target data.");
+                                analysis.Log = analysis.AppendToLog("No target proteins could be found with the provided target data.");
                                 // Edit the analysis.
                                 await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
                                 // Continue.
@@ -793,11 +832,11 @@ namespace NetControl4BioMed.Helpers.Tasks
                             }
                         }
                         // Define the required items.
-                        var analysisNodes = new List<AnalysisNode>();
+                        var analysisProteins = new List<AnalysisProtein>();
                         // Get the total number of batches.
-                        var sourceNodeBatchCount = Math.Ceiling((double)sourceNodeIds.Count() / ApplicationDbContext.BatchSize);
+                        var sourceProteinBatchCount = Math.Ceiling((double)sourceProteinIds.Count() / ApplicationDbContext.BatchSize);
                         // Go over each batch.
-                        for (var currentBatchIndex = 0; currentBatchIndex < sourceNodeBatchCount; currentBatchIndex++)
+                        for (var currentBatchIndex = 0; currentBatchIndex < sourceProteinBatchCount; currentBatchIndex++)
                         {
                             // Use a new scope.
                             using (var scope = serviceProvider.CreateScope())
@@ -805,25 +844,25 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 // Use a new context instance.
                                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                                 // Get the items in the current batch.
-                                var currentBatchItems = sourceNodeIds
+                                var currentBatchItems = sourceProteinIds
                                     .Skip(currentBatchIndex * ApplicationDbContext.BatchSize)
                                     .Take(ApplicationDbContext.BatchSize);
                                 // Get the corresponding items.
-                                var currentItems = context.Nodes
+                                var currentItems = context.Proteins
                                     .Where(item => currentBatchItems.Contains(item.Id))
-                                    .Select(item => new AnalysisNode
+                                    .Select(item => new AnalysisProtein
                                     {
-                                        NodeId = item.Id,
-                                        Type = AnalysisNodeType.Source
+                                        ProteinId = item.Id,
+                                        Type = AnalysisProteinType.Source
                                     });
                                 // Add the items to the list.
-                                analysisNodes.AddRange(currentItems);
+                                analysisProteins.AddRange(currentItems);
                             }
                         }
                         // Get the total number of batches.
-                        var targetNodeBatchCount = Math.Ceiling((double)targetNodeIds.Count() / ApplicationDbContext.BatchSize);
+                        var targetProteinBatchCount = Math.Ceiling((double)targetProteinIds.Count() / ApplicationDbContext.BatchSize);
                         // Go over each batch.
-                        for (var currentBatchIndex = 0; currentBatchIndex < targetNodeBatchCount; currentBatchIndex++)
+                        for (var currentBatchIndex = 0; currentBatchIndex < targetProteinBatchCount; currentBatchIndex++)
                         {
                             // Use a new scope.
                             using (var scope = serviceProvider.CreateScope())
@@ -831,25 +870,25 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 // Use a new context instance.
                                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                                 // Get the items in the current batch.
-                                var currentBatchItems = targetNodeIds
+                                var currentBatchItems = targetProteinIds
                                     .Skip(currentBatchIndex * ApplicationDbContext.BatchSize)
                                     .Take(ApplicationDbContext.BatchSize);
                                 // Get the corresponding items.
-                                var currentItems = context.Nodes
+                                var currentItems = context.Proteins
                                     .Where(item => currentBatchItems.Contains(item.Id))
-                                    .Select(item => new AnalysisNode
+                                    .Select(item => new AnalysisProtein
                                     {
-                                        NodeId = item.Id,
-                                        Type = AnalysisNodeType.Target
+                                        ProteinId = item.Id,
+                                        Type = AnalysisProteinType.Target
                                     });
                                 // Add the items to the list.
-                                analysisNodes.AddRange(currentItems);
+                                analysisProteins.AddRange(currentItems);
                             }
                         }
                         // Get the total number of batches.
-                        var nodeBatchCount = Math.Ceiling((double)nodeIds.Count() / ApplicationDbContext.BatchSize);
+                        var proteinBatchCount = Math.Ceiling((double)proteinIds.Count() / ApplicationDbContext.BatchSize);
                         // Go over each batch.
-                        for (var currentBatchIndex = 0; currentBatchIndex < nodeBatchCount; currentBatchIndex++)
+                        for (var currentBatchIndex = 0; currentBatchIndex < proteinBatchCount; currentBatchIndex++)
                         {
                             // Use a new scope.
                             using (var scope = serviceProvider.CreateScope())
@@ -857,27 +896,27 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 // Use a new context instance.
                                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                                 // Get the items in the current batch.
-                                var currentBatchItems = nodeIds
+                                var currentBatchItems = proteinIds
                                     .Skip(currentBatchIndex * ApplicationDbContext.BatchSize)
                                     .Take(ApplicationDbContext.BatchSize);
                                 // Get the corresponding items.
-                                var currentItems = context.Nodes
+                                var currentItems = context.Proteins
                                     .Where(item => currentBatchItems.Contains(item.Id))
-                                    .Select(item => new AnalysisNode
+                                    .Select(item => new AnalysisProtein
                                     {
-                                        NodeId = item.Id,
-                                        Type = AnalysisNodeType.None
+                                        ProteinId = item.Id,
+                                        Type = AnalysisProteinType.None
                                     });
                                 // Add the items to the list.
-                                analysisNodes.AddRange(currentItems);
+                                analysisProteins.AddRange(currentItems);
                             }
                         }
                         // Define the required items.
-                        var analysisEdges = new List<AnalysisEdge>();
+                        var analysisInteractions = new List<AnalysisInteraction>();
                         // Get the total number of batches.
-                        var edgeBatchCount = Math.Ceiling((double)edgeIds.Count() / ApplicationDbContext.BatchSize);
+                        var interactionBatchCount = Math.Ceiling((double)interactionIds.Count() / ApplicationDbContext.BatchSize);
                         // Go over each batch.
-                        for (var currentBatchIndex = 0; currentBatchIndex < edgeBatchCount; currentBatchIndex++)
+                        for (var currentBatchIndex = 0; currentBatchIndex < interactionBatchCount; currentBatchIndex++)
                         {
                             // Use a new scope.
                             using (var scope = serviceProvider.CreateScope())
@@ -885,18 +924,18 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 // Use a new context instance.
                                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                                 // Get the items in the current batch.
-                                var currentBatchItems = edgeIds
+                                var currentBatchItems = interactionIds
                                     .Skip(currentBatchIndex * ApplicationDbContext.BatchSize)
                                     .Take(ApplicationDbContext.BatchSize);
                                 // Get the corresponding items.
-                                var currentItems = context.Edges
+                                var currentItems = context.Interactions
                                     .Where(item => currentBatchItems.Contains(item.Id))
-                                    .Select(item => new AnalysisEdge
+                                    .Select(item => new AnalysisInteraction
                                     {
-                                        EdgeId = item.Id
+                                        InteractionId = item.Id
                                     });
                                 // Add the items to the list.
-                                analysisEdges.AddRange(currentItems);
+                                analysisInteractions.AddRange(currentItems);
                             }
                         }
                         // Use a new scope.
@@ -914,8 +953,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                                 continue;
                             }
                             // Define the related entities.
-                            analysis.AnalysisNodes = analysisNodes;
-                            analysis.AnalysisEdges = analysisEdges;
+                            analysis.AnalysisProteins = analysisProteins;
+                            analysis.AnalysisInteractions = analysisInteractions;
                             analysis.ControlPaths = new List<ControlPath>();
                             // Edit the network.
                             await IEnumerableExtensions.EditAsync(analysis.Yield(), serviceProvider, token);
@@ -1425,9 +1464,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var analyses = context.Analyses
                     .Include(item => item.AnalysisUsers)
                         .ThenInclude(item => item.User)
-                    .Include(item => item.AnalysisDatabases)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseType)
                     .Where(item => batchIds.Contains(item.Id));
                 // Go over each item in the current batch.
                 foreach (var batchItem in batchItems)
@@ -1437,16 +1473,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .FirstOrDefault(item => item.Id == batchItem.Id);
                     // Check if there was no item found.
                     if (analysis == null)
-                    {
-                        // Continue.
-                        continue;
-                    }
-                    // Get the database type name.
-                    var databaseTypeName = analysis.AnalysisDatabases
-                        .Select(item => item.Database.DatabaseType.Name)
-                        .FirstOrDefault();
-                    // Check if there was no database type name found.
-                    if (string.IsNullOrEmpty(databaseTypeName))
                     {
                         // Continue.
                         continue;
@@ -1463,7 +1489,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             Id = analysis.Id,
                             Name = analysis.Name,
                             Status = analysis.Status.GetDisplayName(),
-                            Url = linkGenerator.GetUriByPage($"/Content/DatabaseTypes/{databaseTypeName}/Created/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }, scheme: Scheme, host: host),
+                            Url = linkGenerator.GetUriByPage($"/CreatedData/Analyses/Details/Index", handler: null, values: new { id = analysis.Id }, scheme: Scheme, host: host),
                             ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
                         });
                     }

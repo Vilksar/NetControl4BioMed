@@ -107,19 +107,19 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
-                var batchNodeCollectionIds = batchItems
-                    .Where(item => item.NetworkNodeCollections != null)
-                    .Select(item => item.NetworkNodeCollections)
+                var batchProteinCollectionIds = batchItems
+                    .Where(item => item.NetworkProteinCollections != null)
+                    .Select(item => item.NetworkProteinCollections)
                     .SelectMany(item => item)
-                    .Where(item => item.NodeCollection != null)
-                    .Select(item => item.NodeCollection)
+                    .Where(item => item.ProteinCollection != null)
+                    .Select(item => item.ProteinCollection)
                     .Where(item => !string.IsNullOrEmpty(item.Id))
                     .Select(item => item.Id)
                     .Distinct();
                 // Define the list of items to get.
                 var users = new List<User>();
                 var databases = new List<Database>();
-                var nodeCollections = new List<NodeCollection>();
+                var proteinCollections = new List<ProteinCollection>();
                 var validBatchIds = new List<string>();
                 // Use a new scope.
                 using (var scope = serviceProvider.CreateScope())
@@ -131,13 +131,10 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .Where(item => batchUserIds.Contains(item.Id))
                         .ToList();
                     databases = context.Databases
-                        .Include(item => item.DatabaseType)
                         .Where(item => batchDatabaseIds.Contains(item.Id))
                         .ToList();
-                    nodeCollections = context.NodeCollections
-                        .Include(item => item.NodeCollectionDatabases)
-                            .ThenInclude(item => item.Database)
-                        .Where(item => batchNodeCollectionIds.Contains(item.Id))
+                    proteinCollections = context.ProteinCollections
+                        .Where(item => batchProteinCollectionIds.Contains(item.Id))
                         .ToList();
                     // Get the valid IDs, that do not appear in the database.
                     validBatchIds = batchIds
@@ -165,15 +162,16 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     // Get the network users.
                     var networkUsers = batchItem.NetworkUsers
-                        .Where(item => item.User != null)
+                        .Where(item => item.User != null && !string.IsNullOrEmpty(item.Email))
                         .Where(item => !string.IsNullOrEmpty(item.User.Id))
-                        .Select(item => item.User.Id)
+                        .Select(item => (item.User.Id, item.Email))
                         .Distinct()
-                        .Where(item => users.Any(item1 => item1.Id == item))
+                        .Where(item => users.Any(item1 => item1.Id == item.Item1))
                         .Select(item => new NetworkUser
                         {
                             DateTimeCreated = DateTime.UtcNow,
-                            UserId = item
+                            UserId = item.Item1,
+                            Email = item.Item2
                         });
                     // Check if there were no network users found.
                     if (!batchItem.IsPublic && (networkUsers == null || !networkUsers.Any()))
@@ -181,70 +179,51 @@ namespace NetControl4BioMed.Helpers.Tasks
                         // Throw an exception.
                         throw new TaskException("There were no network users found and the network is not public.", showExceptionItem, batchItem);
                     }
-                    // Check if there are no network databases provided.
-                    if (batchItem.NetworkDatabases == null || !batchItem.NetworkDatabases.Any())
-                    {
-                        // Throw an exception.
-                        throw new TaskException("There were no network databases provided.", showExceptionItem, batchItem);
-                    }
                     // Get the network databases.
-                    var networkDatabases = batchItem.NetworkDatabases
-                        .Where(item => item.Database != null)
-                        .Where(item => !string.IsNullOrEmpty(item.Database.Id))
-                        .Where(item => item.Type == "Node" || item.Type == "Edge")
-                        .Select(item => (item.Database.Id, item.Type))
-                        .Distinct()
-                        .Where(item => databases.Any(item1 => item1.Id == item.Item1))
-                        .Select(item => new NetworkDatabase
-                        {
-                            DatabaseId = item.Item1,
-                            Type = EnumerationExtensions.GetEnumerationValue<NetworkDatabaseType>(item.Item2)
-                        });
-                    // Check if there were no network databases found.
-                    if (networkDatabases == null || !networkDatabases.Any())
-                    {
-                        // Throw an exception.
-                        throw new TaskException("There were no network databases found.", showExceptionItem, batchItem);
-                    }
-                    // Check if the network databases have different database types.
-                    var batchNetworkDatabaseIds = networkDatabases.Select(item => item.DatabaseId);
-                    if (databases.Where(item => batchNetworkDatabaseIds.Contains(item.Id)).Select(item => item.DatabaseType).Distinct().Count() > 1)
-                    {
-                        // Throw an exception.
-                        throw new TaskException("The network databases found have different database types.", showExceptionItem, batchItem);
-                    }
-                    // Get the node database IDs.
-                    var nodeDatabaseIds = networkDatabases
-                        .Where(item => item.Type == NetworkDatabaseType.Node)
-                        .Select(item => item.DatabaseId);
-                    // Get the network node collections.
-                    var networkNodeCollections = batchItem.NetworkNodeCollections != null ?
-                        batchItem.NetworkNodeCollections
-                            .Where(item => item.NodeCollection != null)
-                            .Where(item => !string.IsNullOrEmpty(item.NodeCollection.Id))
-                            .Where(item => item.Type == "Seed")
-                            .Select(item => (item.NodeCollection.Id, item.Type))
+                    var networkDatabases = batchItem.NetworkDatabases != null ?
+                        batchItem.NetworkDatabases
+                            .Where(item => item.Database != null)
+                            .Where(item => !string.IsNullOrEmpty(item.Database.Id))
+                            .Where(item => item.Type == "Protein" || item.Type == "Interaction")
+                            .Select(item => (item.Database.Id, item.Type))
                             .Distinct()
-                            .Where(item => nodeCollections.Any(item1 => item1.Id == item.Item1 && item1.NodeCollectionDatabases.Any(item2 => nodeDatabaseIds.Contains(item2.Database.Id))))
-                            .Select(item => new NetworkNodeCollection
+                            .Where(item => databases.Any(item1 => item1.Id == item.Item1))
+                            .Select(item => new NetworkDatabase
                             {
-                                NodeCollectionId = item.Item1,
-                                Type = EnumerationExtensions.GetEnumerationValue<NetworkNodeCollectionType>(item.Item2)
+                                DatabaseId = item.Item1,
+                                Type = EnumerationExtensions.GetEnumerationValue<NetworkDatabaseType>(item.Item2)
                             }) :
-                        Enumerable.Empty<NetworkNodeCollection>();
+                        Enumerable.Empty<NetworkDatabase>();
+                    // Get the network protein collections.
+                    var networkProteinCollections = batchItem.NetworkProteinCollections != null ?
+                        batchItem.NetworkProteinCollections
+                            .Where(item => item.ProteinCollection != null)
+                            .Where(item => !string.IsNullOrEmpty(item.ProteinCollection.Id))
+                            .Where(item => item.Type == "Seed")
+                            .Select(item => (item.ProteinCollection.Id, item.Type))
+                            .Distinct()
+                            .Where(item => proteinCollections.Any(item1 => item1.Id == item.Item1))
+                            .Select(item => new NetworkProteinCollection
+                            {
+                                ProteinCollectionId = item.Item1,
+                                Type = EnumerationExtensions.GetEnumerationValue<NetworkProteinCollectionType>(item.Item2)
+                            }) :
+                        Enumerable.Empty<NetworkProteinCollection>();
                     // Define the new item.
                     var network = new Network
                     {
                         DateTimeCreated = DateTime.UtcNow,
+                        DateTimeToDelete = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete),
                         Name = batchItem.Name,
                         Description = batchItem.Description,
                         IsPublic = batchItem.IsPublic,
+                        IsDemonstration = false,
                         Status = NetworkStatus.Defined,
                         Log = JsonSerializer.Serialize(Enumerable.Empty<string>()),
                         Data = batchItem.Data,
                         NetworkDatabases = networkDatabases.ToList(),
                         NetworkUsers = networkUsers.ToList(),
-                        NetworkNodeCollections = networkNodeCollections.ToList()
+                        NetworkProteinCollections = networkProteinCollections.ToList()
                     };
                     // Try to get the algorithm.
                     try
@@ -254,10 +233,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                     }
                     catch (Exception exception)
                     {
-                        // Get the exception message.
-                        var message = string.IsNullOrEmpty(exception.Message) ? string.Empty : " " + exception.Message;
-                        // Throw an exception.
-                        throw new TaskException("The algorithm couldn't be determined from the provided string." + message, showExceptionItem, batchItem);
+                        // Throw a new exception.
+                        throw new TaskException(exception.Message, showExceptionItem, batchItem);
                     }
                     // Append a message to the log.
                     network.Log = network.AppendToLog("The network has been defined and stored in the database.");
@@ -377,12 +354,19 @@ namespace NetControl4BioMed.Helpers.Tasks
                     if (!batchItem.IsPublic && (network.NetworkUsers == null || !network.NetworkUsers.Any()))
                     {
                         // Throw an exception.
-                        throw new TaskException("There were no analysis users found, so the analysis must be public.", showExceptionItem, batchItem);
+                        throw new TaskException("There were no network users found, so the network must be public.", showExceptionItem, batchItem);
+                    }
+                    // Check if the network is not public.
+                    if (batchItem.IsDemonstration && !batchItem.IsPublic)
+                    {
+                        // Throw an exception.
+                        throw new TaskException("The network must be public in order to be a demonstration.", showExceptionItem, batchItem);
                     }
                     // Update the data.
                     network.Name = batchItem.Name;
                     network.Description = batchItem.Description;
                     network.IsPublic = batchItem.IsPublic;
+                    network.IsDemonstration = batchItem.IsDemonstration;
                     // Append a message to the log.
                     network.Log = network.AppendToLog("The network details have been updated.");
                     // Add the item to the list.
@@ -448,17 +432,91 @@ namespace NetControl4BioMed.Helpers.Tasks
                     .Select(item => item.Id);
                 // Delete the dependent entities.
                 await NetworkExtensions.DeleteDependentAnalysesAsync(networkIds, serviceProvider, token);
-                await NetworkExtensions.DeleteDependentGenericEdgesAsync(networkIds, serviceProvider, token);
-                await NetworkExtensions.DeleteDependentGenericNodesAsync(networkIds, serviceProvider, token);
+                await NetworkExtensions.DeleteDependentInteractionsAsync(networkIds, serviceProvider, token);
+                await NetworkExtensions.DeleteDependentProteinsAsync(networkIds, serviceProvider, token);
                 // Delete the related entities.
-                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkNodeCollection>(networkIds, serviceProvider, token);
-                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkEdge>(networkIds, serviceProvider, token);
-                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkNode>(networkIds, serviceProvider, token);
+                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkProteinCollection>(networkIds, serviceProvider, token);
+                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkInteraction>(networkIds, serviceProvider, token);
+                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkProtein>(networkIds, serviceProvider, token);
                 await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkDatabase>(networkIds, serviceProvider, token);
-                await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkUserInvitation>(networkIds, serviceProvider, token);
                 await NetworkExtensions.DeleteRelatedEntitiesAsync<NetworkUser>(networkIds, serviceProvider, token);
                 // Delete the items.
                 await IEnumerableExtensions.DeleteAsync(networks, serviceProvider, token);
+            }
+        }
+
+        /// <summary>
+        /// Extends the time until the items are automatically deleted.
+        /// </summary>
+        /// <param name="serviceProvider">The application service provider.</param>
+        /// <param name="token">The cancellation token for the task.</param>
+        public async Task ExtendTimeUntilDeleteAsync(IServiceProvider serviceProvider, CancellationToken token)
+        {
+            // Check if there weren't any valid items found.
+            if (Items == null)
+            {
+                // Throw an exception.
+                throw new TaskException("No valid items could be found with the provided data.");
+            }
+            // Check if the exception item should be shown.
+            var showExceptionItem = Items.Count() > 1;
+            // Get the total number of batches.
+            var count = Math.Ceiling((double)Items.Count() / ApplicationDbContext.BatchSize);
+            // Go over each batch.
+            for (var index = 0; index < count; index++)
+            {
+                // Check if the cancellation was requested.
+                if (token.IsCancellationRequested)
+                {
+                    // Break.
+                    break;
+                }
+                // Get the items in the current batch.
+                var batchItems = Items
+                    .Skip(index * ApplicationDbContext.BatchSize)
+                    .Take(ApplicationDbContext.BatchSize);
+                // Get the IDs of the items in the current batch.
+                var batchIds = batchItems.Select(item => item.Id);
+                // Define the list of items to get.
+                var networks = new List<Network>();
+                // Use a new scope.
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    // Use a new context instance.
+                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    // Get the items with the provided IDs.
+                    var items = context.Networks
+                        .Where(item => batchIds.Contains(item.Id));
+                    // Check if there were no items found.
+                    if (items == null || !items.Any())
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Get the items found.
+                    networks = items
+                        .ToList();
+                }
+                // Save the items to add.
+                var networksToEdit = new List<Network>();
+                // Go over each item in the current batch.
+                foreach (var batchItem in batchItems)
+                {
+                    // Get the corresponding item.
+                    var network = networks.FirstOrDefault(item => item.Id == batchItem.Id);
+                    // Check if there was no item found.
+                    if (network == null)
+                    {
+                        // Continue.
+                        continue;
+                    }
+                    // Update the data.
+                    network.DateTimeToDelete = DateTime.Today + TimeSpan.FromDays(ApplicationDbContext.DaysBeforeDelete);
+                    // Add the item to the list.
+                    networksToEdit.Add(network);
+                }
+                // Edit the items.
+                await IEnumerableExtensions.EditAsync(networksToEdit, serviceProvider, token);
             }
         }
 
@@ -800,9 +858,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var networks = context.Networks
                     .Include(item => item.NetworkUsers)
                         .ThenInclude(item => item.User)
-                    .Include(item => item.NetworkDatabases)
-                        .ThenInclude(item => item.Database)
-                            .ThenInclude(item => item.DatabaseType)
                     .Where(item => batchIds.Contains(item.Id));
                 // Go over each item in the current batch.
                 foreach (var batchItem in batchItems)
@@ -812,16 +867,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                         .FirstOrDefault(item => item.Id == batchItem.Id);
                     // Check if there was no item found.
                     if (network == null)
-                    {
-                        // Continue.
-                        continue;
-                    }
-                    // Get the database type name.
-                    var databaseTypeName = network.NetworkDatabases
-                        .Select(item => item.Database.DatabaseType.Name)
-                        .FirstOrDefault();
-                    // Check if there was no database type name found.
-                    if (string.IsNullOrEmpty(databaseTypeName))
                     {
                         // Continue.
                         continue;
@@ -838,7 +883,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                             Id = network.Id,
                             Name = network.Name,
                             Status = network.Status.GetDisplayName(),
-                            Url = linkGenerator.GetUriByPage($"/Content/DatabaseTypes/{databaseTypeName}/Created/Networks/Details/Index", handler: null, values: new { id = network.Id }, scheme: Scheme, host: host),
+                            Url = linkGenerator.GetUriByPage($"/CreatedData/Networks/Details/Index", handler: null, values: new { id = network.Id }, scheme: Scheme, host: host),
                             ApplicationUrl = linkGenerator.GetUriByPage("/Index", handler: null, values: null, scheme: Scheme, host: host)
                         });
                     }

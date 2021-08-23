@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -19,7 +14,7 @@ using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
 using NetControl4BioMed.Helpers.Interfaces;
 using NetControl4BioMed.Helpers.Services;
-using NetControl4BioMed.Helpers.ViewModels;
+using System;
 
 namespace NetControl4BioMed
 {
@@ -51,6 +46,7 @@ namespace NetControl4BioMed
         /// <param name="services">Represents the service collection to be configured.</param>
         public void ConfigureServices(IServiceCollection services)
         {
+
             // Configure the cookie options.
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -59,17 +55,18 @@ namespace NetControl4BioMed
                 options.Secure = CookieSecurePolicy.SameAsRequest;
             });
             // Enable cookies for temporary data.
-            services.Configure<CookieTempDataProviderOptions>(options => {
+            services.Configure<CookieTempDataProviderOptions>(options =>
+            {
                 options.Cookie.IsEssential = true;
             });
             // Add the database context and connection.
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]);
+                options.UseSqlServer(Configuration["ConnectionStrings:SqlConnection"]);
             });
             services.AddHangfire(options =>
             {
-                options.UseSqlServerStorage(Configuration["ConnectionStrings:DefaultConnection"]);
+                options.UseSqlServerStorage(Configuration["ConnectionStrings:SqlConnection"]);
             });
             // Add the default Identity functions for users and roles.
             services.AddIdentity<User, Role>(options =>
@@ -118,59 +115,59 @@ namespace NetControl4BioMed
         /// <remarks>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </remarks>
-        /// <param name="app">Represents the application builder.</param>
-        /// <param name="env">Represents the hosting environment of the application.</param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        /// <param name="applicationBuilder">The application builder.</param>
+        /// <param name="webHostEnvironment">The hosting environment of the application.</param>
+        public void Configure(IApplicationBuilder applicationBuilder, IWebHostEnvironment webHostEnvironment)
         {
             // Check the environment in which it is running.
-            if (env.IsDevelopment())
+            if (webHostEnvironment.IsDevelopment())
             {
                 // Display more details about the errors.
-                app.UseDeveloperExceptionPage();
+                applicationBuilder.UseDeveloperExceptionPage();
             }
             else
             {
                 // Redirect to a generic "Error" page.
-                app.UseExceptionHandler("/Error");
+                applicationBuilder.UseExceptionHandler("/Error");
                 // Use re-execution for the HTTP error status codes, to the same "Error" page.
-                app.UseStatusCodePagesWithReExecute("/Error", "?errorCode={0}");
+                applicationBuilder.UseStatusCodePagesWithReExecute("/Error", "?errorCode={0}");
                 // The default HSTS value is 30 days. This may change for production scenarios, as in https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                applicationBuilder.UseHsts();
             }
             // Parameters for the application.
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            applicationBuilder.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedProto
             });
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseCookiePolicy();
-            app.UseRouting();
+            applicationBuilder.UseHttpsRedirection();
+            applicationBuilder.UseStaticFiles();
+            applicationBuilder.UseCookiePolicy();
+            applicationBuilder.UseRouting();
             // Use authentication.
-            app.UseAuthentication();
-            app.UseAuthorization();
+            applicationBuilder.UseAuthentication();
+            applicationBuilder.UseAuthorization();
             // Use Razor pages.
-            app.UseEndpoints(endpoints =>
+            applicationBuilder.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
             });
             // Use Hangfire.
-            app.UseHangfireDashboard("/Hangfire", new DashboardOptions
+            applicationBuilder.UseHangfireDashboard("/Hangfire", new DashboardOptions
             {
                 Authorization = new[] { new HangfireAuthorizationFilter() }
             });
-            app.UseHangfireServer(new BackgroundJobServerOptions
+            applicationBuilder.UseHangfireServer(new BackgroundJobServerOptions
             {
                 WorkerCount = 4 < Environment.ProcessorCount ? Environment.ProcessorCount - 3 : 1,
                 Queues = new[] { "recurring", "default" }
             });
-            app.UseHangfireServer(new BackgroundJobServerOptions
+            applicationBuilder.UseHangfireServer(new BackgroundJobServerOptions
             {
                 WorkerCount = 4 < Environment.ProcessorCount ? 2 : 1,
                 Queues = new[] { "administration", "background" }
             });
             // Seed the database.
-            app.SeedDatabaseAsync(Configuration).Wait();
+            applicationBuilder.SeedDatabaseAsync(Configuration).Wait();
         }
     }
 }

@@ -25,6 +25,19 @@ th, td {
     vertical-align: middle !important;
 }
 
+/* Style for the DataTables. */
+.dataTables_wrapper label {
+    margin-bottom: 0;
+}
+
+.dataTables_wrapper .row {
+    align-items: center;
+}
+
+.dataTables_wrapper .dataTables_info {
+    padding-top: 0 !important;
+}
+
 /* Style for the forms. */
 label {
     text-align: left;
@@ -35,16 +48,102 @@ label {
     min-height: 25rem !important;
 }
 
+/* Style for the hidden groups. */
+.hidden-group-toggle {
+    cursor: pointer;
+}
+
+/* Style for the heuristic groups. */
+.heuristics-group-possible, .heuristics-group-current {
+    overflow-x: scroll;
+}
+
 /* Style for the figures. */
 .figure-group {
     counter-reset: figures;
 }
 
-.figure-group figure {
-    counter-increment: figures;
+    .figure-group figure {
+        counter-increment: figures;
+    }
+
+        .figure-group figure figcaption:before {
+            content: "Figure " counter(figures) ". ";
+            font-style: italic;
+        }
+
+/* Style for the SVG diagram. */
+svg .border-circle {
+    stroke: #dee2e6;
+    stroke-width: 3;
+    fill: #ffffff;
+    fill-opacity: 0.1;
 }
 
-.figure-group figure figcaption:before {
-    content: "Figure " counter(figures) ". ";
-    font-style: italic;
+svg .circle-link circle {
+    stroke: #000000;
+    stroke-width: 3;
+}
+
+svg .circle-link image {
+    fill: #ffffff;
+}
+
+svg .circle-link text {
+    font-size: 2rem;
+    fill: #ffffff;
+    text-anchor: middle;
+}
+
+svg .circle-link:hover {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+svg .circle-danger circle {
+    fill: #dc3545;
+}
+
+svg .circle-danger:hover circle {
+    fill: #c82333;
+}
+
+svg .circle-info circle {
+    fill: #17a2b8;
+}
+
+svg .circle-info:hover circle {
+    fill: #138496;
+}
+
+svg .circle-primary circle {
+    fill: #007bff;
+}
+
+svg .circle-primary:hover circle {
+    fill: #0069d9;
+}
+
+svg .circle-warning circle {
+    fill: #ffc107;
+}
+
+svg .circle-warning:hover circle {
+    fill: #e0a800;
+}
+
+svg .circle-success circle {
+    fill: #28a745;
+}
+
+svg .circle-success:hover circle {
+    fill: #218838;
+}
+
+svg .curved-black-arrow {
+    stroke: #000000;
+    stroke-width: 5;
+    fill: #ffffff;
+    fill-opacity: 0.1;
+    marker-end: url(#black-arrow);
 }

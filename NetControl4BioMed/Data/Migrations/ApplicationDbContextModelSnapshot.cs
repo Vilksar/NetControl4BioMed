@@ -15,16 +15,16 @@ namespace NetControl4BioMed.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.2");
+                .HasAnnotation("ProductVersion", "5.0.7")
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -48,7 +48,7 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -135,8 +135,14 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<DateTime?>("DateTimeStarted")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("DateTimeToDelete")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDemonstration")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsPublic")
                         .HasColumnType("bit");
@@ -153,6 +159,10 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("NetworkId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Parameters")
                         .HasColumnType("nvarchar(max)");
 
@@ -160,6 +170,8 @@ namespace NetControl4BioMed.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("NetworkId");
 
                     b.ToTable("Analyses");
                 });
@@ -182,91 +194,58 @@ namespace NetControl4BioMed.Data.Migrations
                     b.ToTable("AnalysisDatabases");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisEdge", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisInteraction", b =>
                 {
                     b.Property<string>("AnalysisId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("EdgeId")
+                    b.Property<string>("InteractionId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("AnalysisId", "EdgeId");
+                    b.HasKey("AnalysisId", "InteractionId");
 
-                    b.HasIndex("EdgeId");
+                    b.HasIndex("InteractionId");
 
-                    b.ToTable("AnalysisEdges");
+                    b.ToTable("AnalysisInteractions");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisNetwork", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisProtein", b =>
                 {
                     b.Property<string>("AnalysisId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("NetworkId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("AnalysisId", "NetworkId");
-
-                    b.HasIndex("NetworkId");
-
-                    b.ToTable("AnalysisNetworks");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisNode", b =>
-                {
-                    b.Property<string>("AnalysisId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("NodeId")
+                    b.Property<string>("ProteinId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.HasKey("AnalysisId", "NodeId", "Type");
+                    b.HasKey("AnalysisId", "ProteinId", "Type");
 
-                    b.HasIndex("NodeId");
+                    b.HasIndex("ProteinId");
 
-                    b.ToTable("AnalysisNodes");
+                    b.ToTable("AnalysisProteins");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisNodeCollection", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisProteinCollection", b =>
                 {
                     b.Property<string>("AnalysisId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("NodeCollectionId")
+                    b.Property<string>("ProteinCollectionId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.HasKey("AnalysisId", "NodeCollectionId", "Type");
+                    b.HasKey("AnalysisId", "ProteinCollectionId", "Type");
 
-                    b.HasIndex("NodeCollectionId");
+                    b.HasIndex("ProteinCollectionId");
 
-                    b.ToTable("AnalysisNodeCollections");
+                    b.ToTable("AnalysisProteinCollections");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisUser", b =>
-                {
-                    b.Property<string>("AnalysisId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("DateTimeCreated")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("AnalysisId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AnalysisUsers");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisUserInvitation", b =>
                 {
                     b.Property<string>("AnalysisId")
                         .HasColumnType("nvarchar(450)");
@@ -277,9 +256,14 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("AnalysisId", "Email");
 
-                    b.ToTable("AnalysisUserInvitations");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AnalysisUsers");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.BackgroundTask", b =>
@@ -328,10 +312,6 @@ namespace NetControl4BioMed.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("DatabaseTypeId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
@@ -349,27 +329,25 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DatabaseTypeId");
-
                     b.ToTable("Databases");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseEdge", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseInteraction", b =>
                 {
                     b.Property<string>("DatabaseId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("EdgeId")
+                    b.Property<string>("InteractionId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("DatabaseId", "EdgeId");
+                    b.HasKey("DatabaseId", "InteractionId");
 
-                    b.HasIndex("EdgeId");
+                    b.HasIndex("InteractionId");
 
-                    b.ToTable("DatabaseEdges");
+                    b.ToTable("DatabaseInteractions");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseEdgeField", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseInteractionField", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -398,43 +376,43 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.HasIndex("DatabaseId");
 
-                    b.ToTable("DatabaseEdgeFields");
+                    b.ToTable("DatabaseInteractionFields");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseEdgeFieldEdge", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseInteractionFieldInteraction", b =>
                 {
-                    b.Property<string>("DatabaseEdgeFieldId")
+                    b.Property<string>("DatabaseInteractionFieldId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("EdgeId")
+                    b.Property<string>("InteractionId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("DatabaseEdgeFieldId", "EdgeId", "Value");
+                    b.HasKey("DatabaseInteractionFieldId", "InteractionId", "Value");
 
-                    b.HasIndex("EdgeId");
+                    b.HasIndex("InteractionId");
 
-                    b.ToTable("DatabaseEdgeFieldEdges");
+                    b.ToTable("DatabaseInteractionFieldInteractions");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseNode", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseProtein", b =>
                 {
                     b.Property<string>("DatabaseId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("NodeId")
+                    b.Property<string>("ProteinId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("DatabaseId", "NodeId");
+                    b.HasKey("DatabaseId", "ProteinId");
 
-                    b.HasIndex("NodeId");
+                    b.HasIndex("ProteinId");
 
-                    b.ToTable("DatabaseNodes");
+                    b.ToTable("DatabaseProteins");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseNodeField", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseProteinField", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -463,66 +441,28 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.HasIndex("DatabaseId");
 
-                    b.ToTable("DatabaseNodeFields");
+                    b.ToTable("DatabaseProteinFields");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseNodeFieldNode", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseProteinFieldProtein", b =>
                 {
-                    b.Property<string>("DatabaseNodeFieldId")
+                    b.Property<string>("DatabaseProteinFieldId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("NodeId")
+                    b.Property<string>("ProteinId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("DatabaseNodeFieldId", "NodeId", "Value");
+                    b.HasKey("DatabaseProteinFieldId", "ProteinId", "Value");
 
-                    b.HasIndex("NodeId");
+                    b.HasIndex("ProteinId");
 
-                    b.ToTable("DatabaseNodeFieldNodes");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseType", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("DateTimeCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DatabaseTypes");
+                    b.ToTable("DatabaseProteinFieldProteins");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseUser", b =>
-                {
-                    b.Property<string>("DatabaseId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("DateTimeCreated")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("DatabaseId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("DatabaseUsers");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseUserInvitation", b =>
                 {
                     b.Property<string>("DatabaseId")
                         .HasColumnType("nvarchar(450)");
@@ -533,12 +473,17 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("DatabaseId", "Email");
 
-                    b.ToTable("DatabaseUserInvitations");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("DatabaseUsers");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.Edge", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.Interaction", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -555,25 +500,25 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Edges");
+                    b.ToTable("Interactions");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.EdgeNode", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.InteractionProtein", b =>
                 {
-                    b.Property<string>("EdgeId")
+                    b.Property<string>("InteractionId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("NodeId")
+                    b.Property<string>("ProteinId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.HasKey("EdgeId", "NodeId", "Type");
+                    b.HasKey("InteractionId", "ProteinId", "Type");
 
-                    b.HasIndex("NodeId");
+                    b.HasIndex("ProteinId");
 
-                    b.ToTable("EdgeNodes");
+                    b.ToTable("InteractionProteins");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Network", b =>
@@ -591,8 +536,14 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("DateTimeToDelete")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDemonstration")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsPublic")
                         .HasColumnType("bit");
@@ -629,76 +580,58 @@ namespace NetControl4BioMed.Data.Migrations
                     b.ToTable("NetworkDatabases");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkEdge", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkInteraction", b =>
                 {
                     b.Property<string>("NetworkId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("EdgeId")
+                    b.Property<string>("InteractionId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("NetworkId", "EdgeId");
+                    b.HasKey("NetworkId", "InteractionId");
 
-                    b.HasIndex("EdgeId");
+                    b.HasIndex("InteractionId");
 
-                    b.ToTable("NetworkEdges");
+                    b.ToTable("NetworkInteractions");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkNode", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkProtein", b =>
                 {
                     b.Property<string>("NetworkId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("NodeId")
+                    b.Property<string>("ProteinId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.HasKey("NetworkId", "NodeId", "Type");
+                    b.HasKey("NetworkId", "ProteinId", "Type");
 
-                    b.HasIndex("NodeId");
+                    b.HasIndex("ProteinId");
 
-                    b.ToTable("NetworkNodes");
+                    b.ToTable("NetworkProteins");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkNodeCollection", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkProteinCollection", b =>
                 {
                     b.Property<string>("NetworkId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("NodeCollectionId")
+                    b.Property<string>("ProteinCollectionId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.HasKey("NetworkId", "NodeCollectionId", "Type");
+                    b.HasKey("NetworkId", "ProteinCollectionId", "Type");
 
-                    b.HasIndex("NodeCollectionId");
+                    b.HasIndex("ProteinCollectionId");
 
-                    b.ToTable("NetworkNodeCollections");
+                    b.ToTable("NetworkProteinCollections");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkUser", b =>
-                {
-                    b.Property<string>("NetworkId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("DateTimeCreated")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("NetworkId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("NetworkUsers");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkUserInvitation", b =>
                 {
                     b.Property<string>("NetworkId")
                         .HasColumnType("nvarchar(450)");
@@ -709,92 +642,14 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<DateTime>("DateTimeCreated")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("NetworkId", "Email");
 
-                    b.ToTable("NetworkUserInvitations");
-                });
+                    b.HasIndex("UserId");
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.Node", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("DateTimeCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Nodes");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NodeCollection", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("DateTimeCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NodeCollections");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NodeCollectionDatabase", b =>
-                {
-                    b.Property<string>("NodeCollectionId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DatabaseId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("NodeCollectionId", "DatabaseId");
-
-                    b.HasIndex("DatabaseId");
-
-                    b.ToTable("NodeCollectionDatabases");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NodeCollectionNode", b =>
-                {
-                    b.Property<string>("NodeCollectionId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("NodeId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("NodeCollectionId", "NodeId");
-
-                    b.HasIndex("NodeId");
-
-                    b.ToTable("NodeCollectionNodes");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NodeCollectionType", b =>
-                {
-                    b.Property<string>("NodeCollectionId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("NodeCollectionId", "Type");
-
-                    b.ToTable("NodeCollectionTypes");
+                    b.ToTable("NetworkUsers");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Path", b =>
@@ -814,30 +669,30 @@ namespace NetControl4BioMed.Data.Migrations
                     b.ToTable("Paths");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.PathEdge", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.PathInteraction", b =>
                 {
                     b.Property<string>("PathId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("EdgeId")
+                    b.Property<string>("InteractionId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Index")
                         .HasColumnType("int");
 
-                    b.HasKey("PathId", "EdgeId", "Index");
+                    b.HasKey("PathId", "InteractionId", "Index");
 
-                    b.HasIndex("EdgeId");
+                    b.HasIndex("InteractionId");
 
-                    b.ToTable("PathEdges");
+                    b.ToTable("PathInteractions");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.PathNode", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.PathProtein", b =>
                 {
                     b.Property<string>("PathId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("NodeId")
+                    b.Property<string>("ProteinId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Type")
@@ -846,11 +701,79 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Property<int>("Index")
                         .HasColumnType("int");
 
-                    b.HasKey("PathId", "NodeId", "Type", "Index");
+                    b.HasKey("PathId", "ProteinId", "Type", "Index");
 
-                    b.HasIndex("NodeId");
+                    b.HasIndex("ProteinId");
 
-                    b.ToTable("PathNodes");
+                    b.ToTable("PathProteins");
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.Protein", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Proteins");
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.ProteinCollection", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProteinCollections");
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.ProteinCollectionProtein", b =>
+                {
+                    b.Property<string>("ProteinCollectionId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProteinId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ProteinCollectionId", "ProteinId");
+
+                    b.HasIndex("ProteinId");
+
+                    b.ToTable("ProteinCollectionProteins");
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.ProteinCollectionType", b =>
+                {
+                    b.Property<string>("ProteinCollectionId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProteinCollectionId", "Type");
+
+                    b.ToTable("ProteinCollectionTypes");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Role", b =>
@@ -881,86 +804,6 @@ namespace NetControl4BioMed.Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.Sample", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("AnalysisDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AnalysisName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AnalysisNetworkData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AnalysisSourceNodeCollectionData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AnalysisSourceNodeData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AnalysisTargetNodeCollectionData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AnalysisTargetNodeData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DateTimeCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("NetworkAlgorithm")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NetworkDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NetworkEdgeDatabaseData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NetworkName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NetworkNodeDatabaseData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NetworkSeedEdgeData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NetworkSeedNodeCollectionData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NetworkSeedNodeData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Samples");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.SampleDatabase", b =>
-                {
-                    b.Property<string>("SampleId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DatabaseId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("SampleId", "DatabaseId");
-
-                    b.HasIndex("DatabaseId");
-
-                    b.ToTable("SampleDatabases");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.User", b =>
@@ -1082,6 +925,17 @@ namespace NetControl4BioMed.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.Analysis", b =>
+                {
+                    b.HasOne("NetControl4BioMed.Data.Models.Network", "Network")
+                        .WithMany("Analyses")
+                        .HasForeignKey("NetworkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Network");
+                });
+
             modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisDatabase", b =>
                 {
                     b.HasOne("NetControl4BioMed.Data.Models.Analysis", "Analysis")
@@ -1101,80 +955,61 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Navigation("Database");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisEdge", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisInteraction", b =>
                 {
                     b.HasOne("NetControl4BioMed.Data.Models.Analysis", "Analysis")
-                        .WithMany("AnalysisEdges")
+                        .WithMany("AnalysisInteractions")
                         .HasForeignKey("AnalysisId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NetControl4BioMed.Data.Models.Edge", "Edge")
-                        .WithMany("AnalysisEdges")
-                        .HasForeignKey("EdgeId")
+                    b.HasOne("NetControl4BioMed.Data.Models.Interaction", "Interaction")
+                        .WithMany("AnalysisInteractions")
+                        .HasForeignKey("InteractionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Analysis");
 
-                    b.Navigation("Edge");
+                    b.Navigation("Interaction");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisNetwork", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisProtein", b =>
                 {
                     b.HasOne("NetControl4BioMed.Data.Models.Analysis", "Analysis")
-                        .WithMany("AnalysisNetworks")
+                        .WithMany("AnalysisProteins")
                         .HasForeignKey("AnalysisId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NetControl4BioMed.Data.Models.Network", "Network")
-                        .WithMany("AnalysisNetworks")
-                        .HasForeignKey("NetworkId")
+                    b.HasOne("NetControl4BioMed.Data.Models.Protein", "Protein")
+                        .WithMany("AnalysisProteins")
+                        .HasForeignKey("ProteinId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Analysis");
 
-                    b.Navigation("Network");
+                    b.Navigation("Protein");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisNode", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisProteinCollection", b =>
                 {
                     b.HasOne("NetControl4BioMed.Data.Models.Analysis", "Analysis")
-                        .WithMany("AnalysisNodes")
+                        .WithMany("AnalysisProteinCollections")
                         .HasForeignKey("AnalysisId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NetControl4BioMed.Data.Models.Node", "Node")
-                        .WithMany("AnalysisNodes")
-                        .HasForeignKey("NodeId")
+                    b.HasOne("NetControl4BioMed.Data.Models.ProteinCollection", "ProteinCollection")
+                        .WithMany("AnalysisProteinCollections")
+                        .HasForeignKey("ProteinCollectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Analysis");
 
-                    b.Navigation("Node");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisNodeCollection", b =>
-                {
-                    b.HasOne("NetControl4BioMed.Data.Models.Analysis", "Analysis")
-                        .WithMany("AnalysisNodeCollections")
-                        .HasForeignKey("AnalysisId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NetControl4BioMed.Data.Models.NodeCollection", "NodeCollection")
-                        .WithMany("AnalysisNodeCollections")
-                        .HasForeignKey("NodeCollectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Analysis");
-
-                    b.Navigation("NodeCollection");
+                    b.Navigation("ProteinCollection");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisUser", b =>
@@ -1187,24 +1022,11 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.HasOne("NetControl4BioMed.Data.Models.User", "User")
                         .WithMany("AnalysisUsers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Analysis");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.AnalysisUserInvitation", b =>
-                {
-                    b.HasOne("NetControl4BioMed.Data.Models.Analysis", "Analysis")
-                        .WithMany("AnalysisUserInvitations")
-                        .HasForeignKey("AnalysisId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Analysis");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.ControlPath", b =>
@@ -1218,40 +1040,29 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Navigation("Analysis");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.Database", b =>
-                {
-                    b.HasOne("NetControl4BioMed.Data.Models.DatabaseType", "DatabaseType")
-                        .WithMany("Databases")
-                        .HasForeignKey("DatabaseTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DatabaseType");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseEdge", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseInteraction", b =>
                 {
                     b.HasOne("NetControl4BioMed.Data.Models.Database", "Database")
-                        .WithMany("DatabaseEdges")
+                        .WithMany("DatabaseInteractions")
                         .HasForeignKey("DatabaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NetControl4BioMed.Data.Models.Edge", "Edge")
-                        .WithMany("DatabaseEdges")
-                        .HasForeignKey("EdgeId")
+                    b.HasOne("NetControl4BioMed.Data.Models.Interaction", "Interaction")
+                        .WithMany("DatabaseInteractions")
+                        .HasForeignKey("InteractionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Database");
 
-                    b.Navigation("Edge");
+                    b.Navigation("Interaction");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseEdgeField", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseInteractionField", b =>
                 {
                     b.HasOne("NetControl4BioMed.Data.Models.Database", "Database")
-                        .WithMany("DatabaseEdgeFields")
+                        .WithMany("DatabaseInteractionFields")
                         .HasForeignKey("DatabaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1259,48 +1070,48 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Navigation("Database");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseEdgeFieldEdge", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseInteractionFieldInteraction", b =>
                 {
-                    b.HasOne("NetControl4BioMed.Data.Models.DatabaseEdgeField", "DatabaseEdgeField")
-                        .WithMany("DatabaseEdgeFieldEdges")
-                        .HasForeignKey("DatabaseEdgeFieldId")
+                    b.HasOne("NetControl4BioMed.Data.Models.DatabaseInteractionField", "DatabaseInteractionField")
+                        .WithMany("DatabaseInteractionFieldInteractions")
+                        .HasForeignKey("DatabaseInteractionFieldId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NetControl4BioMed.Data.Models.Edge", "Edge")
-                        .WithMany("DatabaseEdgeFieldEdges")
-                        .HasForeignKey("EdgeId")
+                    b.HasOne("NetControl4BioMed.Data.Models.Interaction", "Interaction")
+                        .WithMany("DatabaseInteractionFieldInteractions")
+                        .HasForeignKey("InteractionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("DatabaseEdgeField");
+                    b.Navigation("DatabaseInteractionField");
 
-                    b.Navigation("Edge");
+                    b.Navigation("Interaction");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseNode", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseProtein", b =>
                 {
                     b.HasOne("NetControl4BioMed.Data.Models.Database", "Database")
-                        .WithMany("DatabaseNodes")
+                        .WithMany("DatabaseProteins")
                         .HasForeignKey("DatabaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NetControl4BioMed.Data.Models.Node", "Node")
-                        .WithMany("DatabaseNodes")
-                        .HasForeignKey("NodeId")
+                    b.HasOne("NetControl4BioMed.Data.Models.Protein", "Protein")
+                        .WithMany("DatabaseProteins")
+                        .HasForeignKey("ProteinId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Database");
 
-                    b.Navigation("Node");
+                    b.Navigation("Protein");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseNodeField", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseProteinField", b =>
                 {
                     b.HasOne("NetControl4BioMed.Data.Models.Database", "Database")
-                        .WithMany("DatabaseNodeFields")
+                        .WithMany("DatabaseProteinFields")
                         .HasForeignKey("DatabaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1308,23 +1119,23 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Navigation("Database");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseNodeFieldNode", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseProteinFieldProtein", b =>
                 {
-                    b.HasOne("NetControl4BioMed.Data.Models.DatabaseNodeField", "DatabaseNodeField")
-                        .WithMany("DatabaseNodeFieldNodes")
-                        .HasForeignKey("DatabaseNodeFieldId")
+                    b.HasOne("NetControl4BioMed.Data.Models.DatabaseProteinField", "DatabaseProteinField")
+                        .WithMany("DatabaseProteinFieldProteins")
+                        .HasForeignKey("DatabaseProteinFieldId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NetControl4BioMed.Data.Models.Node", "Node")
-                        .WithMany("DatabaseNodeFieldNodes")
-                        .HasForeignKey("NodeId")
+                    b.HasOne("NetControl4BioMed.Data.Models.Protein", "Protein")
+                        .WithMany("DatabaseProteinFieldProteins")
+                        .HasForeignKey("ProteinId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("DatabaseNodeField");
+                    b.Navigation("DatabaseProteinField");
 
-                    b.Navigation("Node");
+                    b.Navigation("Protein");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseUser", b =>
@@ -1337,43 +1148,30 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.HasOne("NetControl4BioMed.Data.Models.User", "User")
                         .WithMany("DatabaseUsers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Database");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseUserInvitation", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.InteractionProtein", b =>
                 {
-                    b.HasOne("NetControl4BioMed.Data.Models.Database", "Database")
-                        .WithMany("DatabaseUserInvitations")
-                        .HasForeignKey("DatabaseId")
+                    b.HasOne("NetControl4BioMed.Data.Models.Interaction", "Interaction")
+                        .WithMany("InteractionProteins")
+                        .HasForeignKey("InteractionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Database");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.EdgeNode", b =>
-                {
-                    b.HasOne("NetControl4BioMed.Data.Models.Edge", "Edge")
-                        .WithMany("EdgeNodes")
-                        .HasForeignKey("EdgeId")
+                    b.HasOne("NetControl4BioMed.Data.Models.Protein", "Protein")
+                        .WithMany("InteractionProteins")
+                        .HasForeignKey("ProteinId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NetControl4BioMed.Data.Models.Node", "Node")
-                        .WithMany("EdgeNodes")
-                        .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Interaction");
 
-                    b.Navigation("Edge");
-
-                    b.Navigation("Node");
+                    b.Navigation("Protein");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkDatabase", b =>
@@ -1395,61 +1193,61 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Navigation("Network");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkEdge", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkInteraction", b =>
                 {
-                    b.HasOne("NetControl4BioMed.Data.Models.Edge", "Edge")
-                        .WithMany("NetworkEdges")
-                        .HasForeignKey("EdgeId")
+                    b.HasOne("NetControl4BioMed.Data.Models.Interaction", "Interaction")
+                        .WithMany("NetworkInteractions")
+                        .HasForeignKey("InteractionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("NetControl4BioMed.Data.Models.Network", "Network")
-                        .WithMany("NetworkEdges")
+                        .WithMany("NetworkInteractions")
                         .HasForeignKey("NetworkId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Edge");
+                    b.Navigation("Interaction");
 
                     b.Navigation("Network");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkNode", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkProtein", b =>
                 {
                     b.HasOne("NetControl4BioMed.Data.Models.Network", "Network")
-                        .WithMany("NetworkNodes")
+                        .WithMany("NetworkProteins")
                         .HasForeignKey("NetworkId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NetControl4BioMed.Data.Models.Node", "Node")
-                        .WithMany("NetworkNodes")
-                        .HasForeignKey("NodeId")
+                    b.HasOne("NetControl4BioMed.Data.Models.Protein", "Protein")
+                        .WithMany("NetworkProteins")
+                        .HasForeignKey("ProteinId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Network");
 
-                    b.Navigation("Node");
+                    b.Navigation("Protein");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkNodeCollection", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkProteinCollection", b =>
                 {
                     b.HasOne("NetControl4BioMed.Data.Models.Network", "Network")
-                        .WithMany("NetworkNodeCollections")
+                        .WithMany("NetworkProteinCollections")
                         .HasForeignKey("NetworkId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NetControl4BioMed.Data.Models.NodeCollection", "NodeCollection")
-                        .WithMany("NetworkNodeCollections")
-                        .HasForeignKey("NodeCollectionId")
+                    b.HasOne("NetControl4BioMed.Data.Models.ProteinCollection", "ProteinCollection")
+                        .WithMany("NetworkProteinCollections")
+                        .HasForeignKey("ProteinCollectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Network");
 
-                    b.Navigation("NodeCollection");
+                    b.Navigation("ProteinCollection");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkUser", b =>
@@ -1462,73 +1260,11 @@ namespace NetControl4BioMed.Data.Migrations
 
                     b.HasOne("NetControl4BioMed.Data.Models.User", "User")
                         .WithMany("NetworkUsers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Network");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NetworkUserInvitation", b =>
-                {
-                    b.HasOne("NetControl4BioMed.Data.Models.Network", "Network")
-                        .WithMany("NetworkUserInvitations")
-                        .HasForeignKey("NetworkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Network");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NodeCollectionDatabase", b =>
-                {
-                    b.HasOne("NetControl4BioMed.Data.Models.Database", "Database")
-                        .WithMany("NodeCollectionDatabases")
-                        .HasForeignKey("DatabaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NetControl4BioMed.Data.Models.NodeCollection", "NodeCollection")
-                        .WithMany("NodeCollectionDatabases")
-                        .HasForeignKey("NodeCollectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Database");
-
-                    b.Navigation("NodeCollection");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NodeCollectionNode", b =>
-                {
-                    b.HasOne("NetControl4BioMed.Data.Models.NodeCollection", "NodeCollection")
-                        .WithMany("NodeCollectionNodes")
-                        .HasForeignKey("NodeCollectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NetControl4BioMed.Data.Models.Node", "Node")
-                        .WithMany("NodeCollectionNodes")
-                        .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Node");
-
-                    b.Navigation("NodeCollection");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NodeCollectionType", b =>
-                {
-                    b.HasOne("NetControl4BioMed.Data.Models.NodeCollection", "NodeCollection")
-                        .WithMany("NodeCollectionTypes")
-                        .HasForeignKey("NodeCollectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("NodeCollection");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Path", b =>
@@ -1542,61 +1278,72 @@ namespace NetControl4BioMed.Data.Migrations
                     b.Navigation("ControlPath");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.PathEdge", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.PathInteraction", b =>
                 {
-                    b.HasOne("NetControl4BioMed.Data.Models.Edge", "Edge")
-                        .WithMany("PathEdges")
-                        .HasForeignKey("EdgeId")
+                    b.HasOne("NetControl4BioMed.Data.Models.Interaction", "Interaction")
+                        .WithMany("PathInteractions")
+                        .HasForeignKey("InteractionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("NetControl4BioMed.Data.Models.Path", "Path")
-                        .WithMany("PathEdges")
+                        .WithMany("PathInteractions")
                         .HasForeignKey("PathId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Edge");
+                    b.Navigation("Interaction");
 
                     b.Navigation("Path");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.PathNode", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.PathProtein", b =>
                 {
-                    b.HasOne("NetControl4BioMed.Data.Models.Node", "Node")
-                        .WithMany("PathNodes")
-                        .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("NetControl4BioMed.Data.Models.Path", "Path")
-                        .WithMany("PathNodes")
+                        .WithMany("PathProteins")
                         .HasForeignKey("PathId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Node");
+                    b.HasOne("NetControl4BioMed.Data.Models.Protein", "Protein")
+                        .WithMany("PathProteins")
+                        .HasForeignKey("ProteinId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Path");
+
+                    b.Navigation("Protein");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.SampleDatabase", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.ProteinCollectionProtein", b =>
                 {
-                    b.HasOne("NetControl4BioMed.Data.Models.Database", "Database")
-                        .WithMany("SampleDatabases")
-                        .HasForeignKey("DatabaseId")
+                    b.HasOne("NetControl4BioMed.Data.Models.ProteinCollection", "ProteinCollection")
+                        .WithMany("ProteinCollectionProteins")
+                        .HasForeignKey("ProteinCollectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("NetControl4BioMed.Data.Models.Sample", "Sample")
-                        .WithMany("SampleDatabases")
-                        .HasForeignKey("SampleId")
+                    b.HasOne("NetControl4BioMed.Data.Models.Protein", "Protein")
+                        .WithMany("ProteinCollectionProteins")
+                        .HasForeignKey("ProteinId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Database");
+                    b.Navigation("Protein");
 
-                    b.Navigation("Sample");
+                    b.Navigation("ProteinCollection");
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.ProteinCollectionType", b =>
+                {
+                    b.HasOne("NetControl4BioMed.Data.Models.ProteinCollection", "ProteinCollection")
+                        .WithMany("ProteinCollectionTypes")
+                        .HasForeignKey("ProteinCollectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProteinCollection");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.UserRole", b =>
@@ -1622,15 +1369,11 @@ namespace NetControl4BioMed.Data.Migrations
                 {
                     b.Navigation("AnalysisDatabases");
 
-                    b.Navigation("AnalysisEdges");
+                    b.Navigation("AnalysisInteractions");
 
-                    b.Navigation("AnalysisNetworks");
+                    b.Navigation("AnalysisProteinCollections");
 
-                    b.Navigation("AnalysisNodeCollections");
-
-                    b.Navigation("AnalysisNodes");
-
-                    b.Navigation("AnalysisUserInvitations");
+                    b.Navigation("AnalysisProteins");
 
                     b.Navigation("AnalysisUsers");
 
@@ -1646,117 +1389,97 @@ namespace NetControl4BioMed.Data.Migrations
                 {
                     b.Navigation("AnalysisDatabases");
 
-                    b.Navigation("DatabaseEdgeFields");
+                    b.Navigation("DatabaseInteractionFields");
 
-                    b.Navigation("DatabaseEdges");
+                    b.Navigation("DatabaseInteractions");
 
-                    b.Navigation("DatabaseNodeFields");
+                    b.Navigation("DatabaseProteinFields");
 
-                    b.Navigation("DatabaseNodes");
-
-                    b.Navigation("DatabaseUserInvitations");
+                    b.Navigation("DatabaseProteins");
 
                     b.Navigation("DatabaseUsers");
 
                     b.Navigation("NetworkDatabases");
-
-                    b.Navigation("NodeCollectionDatabases");
-
-                    b.Navigation("SampleDatabases");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseEdgeField", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseInteractionField", b =>
                 {
-                    b.Navigation("DatabaseEdgeFieldEdges");
+                    b.Navigation("DatabaseInteractionFieldInteractions");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseNodeField", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseProteinField", b =>
                 {
-                    b.Navigation("DatabaseNodeFieldNodes");
+                    b.Navigation("DatabaseProteinFieldProteins");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.DatabaseType", b =>
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.Interaction", b =>
                 {
-                    b.Navigation("Databases");
-                });
+                    b.Navigation("AnalysisInteractions");
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.Edge", b =>
-                {
-                    b.Navigation("AnalysisEdges");
+                    b.Navigation("DatabaseInteractionFieldInteractions");
 
-                    b.Navigation("DatabaseEdgeFieldEdges");
+                    b.Navigation("DatabaseInteractions");
 
-                    b.Navigation("DatabaseEdges");
+                    b.Navigation("InteractionProteins");
 
-                    b.Navigation("EdgeNodes");
+                    b.Navigation("NetworkInteractions");
 
-                    b.Navigation("NetworkEdges");
-
-                    b.Navigation("PathEdges");
+                    b.Navigation("PathInteractions");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Network", b =>
                 {
-                    b.Navigation("AnalysisNetworks");
+                    b.Navigation("Analyses");
 
                     b.Navigation("NetworkDatabases");
 
-                    b.Navigation("NetworkEdges");
+                    b.Navigation("NetworkInteractions");
 
-                    b.Navigation("NetworkNodeCollections");
+                    b.Navigation("NetworkProteinCollections");
 
-                    b.Navigation("NetworkNodes");
-
-                    b.Navigation("NetworkUserInvitations");
+                    b.Navigation("NetworkProteins");
 
                     b.Navigation("NetworkUsers");
                 });
 
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.Node", b =>
-                {
-                    b.Navigation("AnalysisNodes");
-
-                    b.Navigation("DatabaseNodeFieldNodes");
-
-                    b.Navigation("DatabaseNodes");
-
-                    b.Navigation("EdgeNodes");
-
-                    b.Navigation("NetworkNodes");
-
-                    b.Navigation("NodeCollectionNodes");
-
-                    b.Navigation("PathNodes");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.NodeCollection", b =>
-                {
-                    b.Navigation("AnalysisNodeCollections");
-
-                    b.Navigation("NetworkNodeCollections");
-
-                    b.Navigation("NodeCollectionDatabases");
-
-                    b.Navigation("NodeCollectionNodes");
-
-                    b.Navigation("NodeCollectionTypes");
-                });
-
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Path", b =>
                 {
-                    b.Navigation("PathEdges");
+                    b.Navigation("PathInteractions");
 
-                    b.Navigation("PathNodes");
+                    b.Navigation("PathProteins");
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.Protein", b =>
+                {
+                    b.Navigation("AnalysisProteins");
+
+                    b.Navigation("DatabaseProteinFieldProteins");
+
+                    b.Navigation("DatabaseProteins");
+
+                    b.Navigation("InteractionProteins");
+
+                    b.Navigation("NetworkProteins");
+
+                    b.Navigation("PathProteins");
+
+                    b.Navigation("ProteinCollectionProteins");
+                });
+
+            modelBuilder.Entity("NetControl4BioMed.Data.Models.ProteinCollection", b =>
+                {
+                    b.Navigation("AnalysisProteinCollections");
+
+                    b.Navigation("NetworkProteinCollections");
+
+                    b.Navigation("ProteinCollectionProteins");
+
+                    b.Navigation("ProteinCollectionTypes");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.Role", b =>
                 {
                     b.Navigation("UserRoles");
-                });
-
-            modelBuilder.Entity("NetControl4BioMed.Data.Models.Sample", b =>
-                {
-                    b.Navigation("SampleDatabases");
                 });
 
             modelBuilder.Entity("NetControl4BioMed.Data.Models.User", b =>

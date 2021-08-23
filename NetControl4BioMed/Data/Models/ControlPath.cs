@@ -1,14 +1,12 @@
-﻿using System;
+﻿using NetControl4BioMed.Data.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Data.Models
 {
     /// <summary>
     /// Represents the database model of a control path corresponding to an analysis.
     /// </summary>
-    public class ControlPath
+    public class ControlPath : IAnalysisDependent
     {
         /// <summary>
         /// Gets or sets the unique internal ID of the control path.

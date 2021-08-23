@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace NetControl4BioMed.Helpers.ViewModels
+﻿namespace NetControl4BioMed.Helpers.ViewModels
 {
     /// <summary>
     /// Represents the variables for an analysis end e-mail.

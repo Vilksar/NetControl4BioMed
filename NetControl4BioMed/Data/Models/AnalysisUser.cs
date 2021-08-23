@@ -1,8 +1,5 @@
 ﻿using NetControl4BioMed.Data.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Data.Models
 {
@@ -35,5 +32,10 @@ namespace NetControl4BioMed.Data.Models
         /// Gets or sets the user of the relationship.
         /// </summary>
         public User User { get; set; }
+
+        /// <summary>
+        /// Gets or sets the e-mail of the relationship.
+        /// </summary>
+        public string Email { get; set; }
     }
 }

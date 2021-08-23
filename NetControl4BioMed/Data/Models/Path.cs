@@ -1,14 +1,12 @@
-﻿using System;
+﻿using NetControl4BioMed.Data.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Data.Models
 {
     /// <summary>
     /// Represents the database model of a path in a control path corresponding to an analysis.
     /// </summary>
-    public class Path
+    public class Path : IControlPathDependent
     {
         /// <summary>
         /// Gets or sets the unique internal ID of the path.
@@ -26,13 +24,13 @@ namespace NetControl4BioMed.Data.Models
         public ControlPath ControlPath { get; set; }
 
         /// <summary>
-        /// Gets or sets the nodes which appear in the path.
+        /// Gets or sets the proteins which appear in the path.
         /// </summary>
-        public ICollection<PathNode> PathNodes { get; set; }
+        public ICollection<PathProtein> PathProteins { get; set; }
 
         /// <summary>
-        /// Gets or sets the edges which appear in the path.
+        /// Gets or sets the interactions which appear in the path.
         /// </summary>
-        public ICollection<PathEdge> PathEdges { get; set; }
+        public ICollection<PathInteraction> PathInteractions { get; set; }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace NetControl4BioMed.Data.Enumerations
 {
@@ -14,13 +10,13 @@ namespace NetControl4BioMed.Data.Enumerations
         /// <summary>
         /// Represents the greedy algorithm.
         /// </summary>
-        [Display(Name = "Greedy", Description = "The analysis runs using a greedy algorithm.")]
+        [Display(Name = "Greedy", Description = "The analysis uses a greedy algorithm.")]
         Greedy,
 
         /// <summary>
         /// Represents the genetic algorithm.
         /// </summary>
-        [Display(Name = "Genetic", Description = "The analysis runs using a genetic algorithm.")]
+        [Display(Name = "Genetic", Description = "The analysis uses a genetic algorithm.")]
         Genetic
     }
 }

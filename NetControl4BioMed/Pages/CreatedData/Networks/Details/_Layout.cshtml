@@ -1,0 +1,23 @@
+﻿@{
+    Layout = "/Pages/CreatedData/Networks/_Layout.cshtml";
+}
+
+@section Banner {
+    @RenderSection("Banner", required: false)
+}
+
+@section Breadcrumbs {
+    <partial name="_NavigationBreadcrumbPartial" model="@Helpers.ViewModels.NavigationBreadcrumbViewModel.GetCreatedDataNetworksDetailsNavigationBreadcrumb(Model.View.Network.Id)" />
+    @RenderSection("Breadcrumbs", required: false)
+}
+
+@section Navigation {
+    <partial name="_NavigationAreaPartial" model="@Helpers.ViewModels.NavigationAreaViewModel.GetCreatedDataNetworksDetailsNavigationArea(Model.View.Network.Id)" />
+    @RenderSection("Navigation", required: false)
+}
+
+@RenderBody()
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

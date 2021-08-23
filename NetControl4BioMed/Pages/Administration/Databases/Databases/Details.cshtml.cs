@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data;
 using NetControl4BioMed.Data.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NetControl4BioMed.Pages.Administration.Databases.Databases
 {
@@ -30,17 +26,13 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
 
             public int UserCount { get; set; }
 
-            public int UserInvitationCount { get; set; }
+            public int DatabaseProteinFieldCount { get; set; }
 
-            public int DatabaseNodeFieldCount { get; set; }
+            public int DatabaseInteractionFieldCount { get; set; }
 
-            public int DatabaseEdgeFieldCount { get; set; }
+            public int ProteinCount { get; set; }
 
-            public int NodeCount { get; set; }
-
-            public int EdgeCount { get; set; }
-
-            public int NodeCollectionCount { get; set; }
+            public int InteractionCount { get; set; }
 
             public int NetworkCount { get; set; }
 
@@ -64,7 +56,6 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
             View = new ViewModel
             {
                 Database = query
-                    .Include(item => item.DatabaseType)
                     .FirstOrDefault(),
                 UserCount = query
                     .Select(item => item.DatabaseUsers)
@@ -72,38 +63,26 @@ namespace NetControl4BioMed.Pages.Administration.Databases.Databases
                     .Select(item => item.User)
                     .Distinct()
                     .Count(),
-                UserInvitationCount = query
-                    .Select(item => item.DatabaseUserInvitations)
-                    .SelectMany(item => item)
-                    .Select(item => item.Email)
-                    .Distinct()
-                    .Count(),
-                DatabaseNodeFieldCount = query
-                    .Select(item => item.DatabaseNodeFields)
+                DatabaseProteinFieldCount = query
+                    .Select(item => item.DatabaseProteinFields)
                     .SelectMany(item => item)
                     .Distinct()
                     .Count(),
-                DatabaseEdgeFieldCount = query
-                    .Select(item => item.DatabaseEdgeFields)
+                DatabaseInteractionFieldCount = query
+                    .Select(item => item.DatabaseInteractionFields)
                     .SelectMany(item => item)
                     .Distinct()
                     .Count(),
-                NodeCount = query
-                    .Select(item => item.DatabaseNodes)
+                ProteinCount = query
+                    .Select(item => item.DatabaseProteins)
                     .SelectMany(item => item)
-                    .Select(item => item.Node)
+                    .Select(item => item.Protein)
                     .Distinct()
                     .Count(),
-                EdgeCount = query
-                    .Select(item => item.DatabaseEdges)
+                InteractionCount = query
+                    .Select(item => item.DatabaseInteractions)
                     .SelectMany(item => item)
-                    .Select(item => item.Edge)
-                    .Distinct()
-                    .Count(),
-                NodeCollectionCount = query
-                    .Select(item => item.NodeCollectionDatabases)
-                    .SelectMany(item => item)
-                    .Select(item => item.NodeCollection)
+                    .Select(item => item.Interaction)
                     .Distinct()
                     .Count(),
                 NetworkCount = query

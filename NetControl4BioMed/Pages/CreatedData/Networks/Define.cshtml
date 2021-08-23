@@ -1,0 +1,141 @@
+﻿@page
+@model DefineModel
+@{
+    ViewData["Title"] = "Define network";
+}
+
+<div class="alert alert-primary text-wrap text-justify">
+    <span><i class="fas fa-info-circle"></i></span>
+    <span>In order to define a network, the interactions in the network need to be specified. The network will be defined as-is and can be afterwards inspected and analyzed, but it will not be automatically integrated with the internal databases or data.</span>
+</div>
+<form method="post" class="text-justify">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger text-wrap text-justify"></div>
+    <div class="card mb-3">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-info-circle"></i></span>
+                </div>
+                <div>
+                    <span>Details</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>Input here the general details of the new network.</span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Name" class="font-weight-bold">Name</label>
+                <input asp-for="Input.Name" class="form-control" />
+                <span asp-description-for="Input.Name" class="text-muted small">The name of the new network.</span>
+                <span asp-validation-for="Input.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Description" class="font-weight-bold">Description</label>
+                <textarea asp-for="Input.Description" class="form-control"></textarea>
+                <span asp-description-for="Input.Description" class="text-muted small">The description of the new network. This field is optional.</span>
+                <span asp-validation-for="Input.Description" class="text-danger small"></span>
+            </div>
+            <div class="form-group" hidden="@(User.Identity.IsAuthenticated ? null : "hidden")">
+                <label asp-for="Input.IsPublic" class="font-weight-bold">Set the network as public?</label>
+                <select asp-for="Input.IsPublic" class="custom-select form-control">
+                    <option value="false" selected="@(User.Identity.IsAuthenticated ? "selected" : null)">No</option>
+                    <option value="true" selected="@(User.Identity.IsAuthenticated ? null : "selected")">Yes</option>
+                </select>
+                <span asp-description-for="Input.IsPublic" class="text-muted small">The availability of the network in the list of public networks. If public, anyone can access it.</span>
+                <span asp-validation-for="Input.IsPublic" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3 file-group" data-type="pairs">
+        <div class="card-header font-weight-bold">
+            <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+                <div>
+                    <span><i class="fas fa-list"></i></span>
+                </div>
+                <div>
+                    <span>Interactions</span>
+                    <span class="badge badge-dark file-group-count">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>Input here the interactions of the new network, as pairs of protein identifiers. Unlike for the network generation, these identifiers do not need to match any of the existing databases.</span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="Input.SeedInteractionData" class="font-weight-bold">Data</label>
+                <textarea asp-for="Input.SeedInteractionData" class="form-control file-group-input"></textarea>
+                <span asp-description-for="Input.SeedInteractionData" class="text-muted small">The interactions of the new network, formatted as a JSON object array. This field should not be directly interacted with, the form entries below should be used to edit the data instead.</span>
+                <span asp-validation-for="Input.SeedInteractionData" class="text-danger small"></span>
+            </div>
+            <div class="form-group">
+                <div class="row align-items-center mb-2">
+                    <div class="col-lg-4">
+                        <label for="data-textarea-seed-protein" class="font-weight-bold mb-0">Interactions</label>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="row align-items-center mb-1">
+                            <div class="col-6 col-form-label-sm text-right">
+                                <label for="data-in-line-separator-seed" class="font-weight-normal mb-0">In-line separator:</label>
+                            </div>
+                            <div class="col-6 text-left">
+                                <select id="data-in-line-separator-seed" class="custom-select custom-select-sm file-group-separator file-group-in-line-separator">
+                                    <option value=",">comma (",")</option>
+                                    <option value=";" selected>semicolon (";")</option>
+                                    <option value="\t">tab ("\t")</option>
+                                    <option value="\s">space (" ")</option>
+                                    <option value="\n">new line ("\n")</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col-6 col-form-label-sm text-right">
+                                <label for="data-line-separator-seed" class="font-weight-normal mb-0">Line separator:</label>
+                            </div>
+                            <div class="col-6 text-left">
+                                <select id="data-line-separator-seed" class="custom-select custom-select-sm file-group-separator file-group-line-separator">
+                                    <option value=",">comma (",")</option>
+                                    <option value=";">semicolon (";")</option>
+                                    <option value="\t">tab ("\t")</option>
+                                    <option value="\s">space (" ")</option>
+                                    <option value="\n" selected>new line ("\n")</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <textarea id="data-textarea-seed-protein" class="form-control file-group-text mb-2"></textarea>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input file-group-file-upload" />
+                    <label class="custom-file-label file-group-file-label">Choose file</label>
+                </div>
+                <span class="text-muted small">The interactions the new network. The data can also be uploaded from a file; in this case, the file content will appear, unchanged, above.</span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group" hidden>
+        <label asp-for="Input.ReCaptchaToken" class="font-weight-bold">reCaptcha token</label>
+        <input asp-for="Input.ReCaptchaToken" class="form-control recaptcha-input" />
+        <span asp-description-for="Input.ReCaptchaToken" class="text-muted small">The reCaptcha token corresponding to the current request.</span>
+        <span asp-validation-for="Input.ReCaptchaToken" class="text-danger small"></span>
+    </div>
+    <div class="loading-group">
+        <button type="submit" class="btn btn-block btn-success loading-group-button" title="Create">
+            <span><i class="fas fa-plus"></i></span>
+            <span>Create</span>
+        </button>
+        <template class="loading-group-template">
+            <span><i class="fas fa-spinner fa-spin"></i></span>
+            <span>Please wait...</span>
+        </template>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ScriptsValidationPartial" />
+    <partial name="_ScriptsReCaptchaPartial" />
+}

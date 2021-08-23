@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NetControl4BioMed.Data;
-using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Data.Models;
+using NetControl4BioMed.Helpers.Exceptions;
 using NetControl4BioMed.Helpers.InputModels;
 using System;
 using System.Collections.Generic;

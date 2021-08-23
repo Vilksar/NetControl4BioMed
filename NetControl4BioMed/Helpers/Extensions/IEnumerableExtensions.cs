@@ -3,7 +3,6 @@ using NetControl4BioMed.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,7 +26,7 @@ namespace NetControl4BioMed.Helpers.Extensions
             if (items == null)
             {
                 // Throw an exception.
-                throw new ArgumentNullException("There provided items can't be null.");
+                throw new ArgumentNullException("The provided items can't be null.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)items.Count() / ApplicationDbContext.BatchSize);
@@ -76,7 +75,7 @@ namespace NetControl4BioMed.Helpers.Extensions
             if (items == null)
             {
                 // Throw an exception.
-                throw new ArgumentNullException("There provided items can't be null.");
+                throw new ArgumentNullException("The provided items can't be null.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)items.Count() / ApplicationDbContext.BatchSize);
@@ -125,7 +124,7 @@ namespace NetControl4BioMed.Helpers.Extensions
             if (items == null)
             {
                 // Throw an exception.
-                throw new ArgumentNullException("There provided items can't be null.");
+                throw new ArgumentNullException("The provided items can't be null.");
             }
             // Get the total number of batches.
             var count = Math.Ceiling((double)items.Count() / ApplicationDbContext.BatchSize);

@@ -1,12 +1,10 @@
-﻿using NetControl4BioMed.Data.Models;
-using NetControl4BioMed.Helpers.Extensions;
+﻿using NetControl4BioMed.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
 {
@@ -96,10 +94,10 @@ namespace NetControl4BioMed.Helpers.Algorithms.Analyses.Greedy
         public static Dictionary<string, string> PossibleHeuristics { get; } = new Dictionary<string, string>()
         {
             { "A", "Edges from previously seen source nodes" },
-            { "B", "Edges from any source node" },
-            { "C", "Edges from any controlling node" },
+            { "B", "Edges from source nodes" },
+            { "C", "Edges from controlling nodes" },
             { "D", "Edges from previously seen nodes" },
-            { "E", "Edges from a node that has not appeared in the current path" },
+            { "E", "Edges from nodes that have not appeared in the current path" },
             { "Z", "Any possible edge" }
         };
     }

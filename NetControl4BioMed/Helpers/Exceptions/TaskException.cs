@@ -1,11 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Runtime.Serialization;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Helpers.Exceptions
 {

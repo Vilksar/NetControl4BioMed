@@ -1,0 +1,6 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["ActiveArea"] = !User.Identity.IsAuthenticated ? "PublicData" : "PrivateData";
+    ViewData["ActiveGroup"] = "Analyses";
+    ViewData["ActivePage"] = "Analyses";
+}

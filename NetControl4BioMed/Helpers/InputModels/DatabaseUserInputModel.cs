@@ -14,5 +14,10 @@
         /// Represents the user of the database user.
         /// </summary>
         public UserInputModel User { get; set; }
+
+        /// <summary>
+        /// Represents the e-mail of the database user.
+        /// </summary>
+        public string Email { get; set; }
     }
 }

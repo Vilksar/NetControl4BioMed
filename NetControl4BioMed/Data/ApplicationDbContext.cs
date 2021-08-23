@@ -2,16 +2,11 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NetControl4BioMed.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Data
-{
-    /// <summary>
-    /// Represents the database context of the application.
-    /// </summary>
+{/// <summary>
+ /// Represents the database context of the application.
+ /// </summary>
     public class ApplicationDbContext : IdentityDbContext<User, Role, string, IdentityUserClaim<string>, UserRole, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
         /// <summary>
@@ -27,12 +22,12 @@ namespace NetControl4BioMed.Data
         /// <summary>
         /// Gets or sets the number of days before an alert on user-created database items close to deletion will be automatically sent.
         /// </summary>
-        public static int DaysBeforeAlert { get; } = 6;
+        public static int DaysBeforeAlert { get; } = 83;
 
         /// <summary>
         /// Gets or sets the number of days before user-created database items will be automatically deleted.
         /// </summary>
-        public static int DaysBeforeDelete { get; } = 7;
+        public static int DaysBeforeDelete { get; } = 90;
 
         /// <summary>
         /// Gets or sets the database table containing the analyses.
@@ -45,34 +40,24 @@ namespace NetControl4BioMed.Data
         public DbSet<AnalysisDatabase> AnalysisDatabases { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between analyses and edges.
+        /// Gets or sets the database table containing the one-to-one relationship between analyses and interactions.
         /// </summary>
-        public DbSet<AnalysisEdge> AnalysisEdges { get; set; }
+        public DbSet<AnalysisInteraction> AnalysisInteractions { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between analyses and networks.
+        /// Gets or sets the database table containing the one-to-one relationship between analyses and proteins.
         /// </summary>
-        public DbSet<AnalysisNetwork> AnalysisNetworks { get; set; }
+        public DbSet<AnalysisProtein> AnalysisProteins { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between analyses and nodes.
+        /// Gets or sets the database table containing the one-to-one relationship between analyses and protein collections.
         /// </summary>
-        public DbSet<AnalysisNode> AnalysisNodes { get; set; }
+        public DbSet<AnalysisProteinCollection> AnalysisProteinCollections { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between analyses and node collections.
-        /// </summary>
-        public DbSet<AnalysisNodeCollection> AnalysisNodeCollections { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between analyses and regsitered users.
+        /// Gets or sets the database table containing the one-to-one relationship between analyses and users.
         /// </summary>
         public DbSet<AnalysisUser> AnalysisUsers { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between analyses and unregistered users.
-        /// </summary>
-        public DbSet<AnalysisUserInvitation> AnalysisUserInvitations { get; set; }
 
         /// <summary>
         /// Gets or sets the database table containing the background tasks.
@@ -90,39 +75,34 @@ namespace NetControl4BioMed.Data
         public DbSet<Database> Databases { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between databases and edges.
+        /// Gets or sets the database table containing the one-to-one relationship between databases and interactions.
         /// </summary>
-        public DbSet<DatabaseEdge> DatabaseEdges { get; set; }
+        public DbSet<DatabaseInteraction> DatabaseInteractions { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the database edge fields.
+        /// Gets or sets the database table containing the database interaction fields.
         /// </summary>
-        public DbSet<DatabaseEdgeField> DatabaseEdgeFields { get; set; }
+        public DbSet<DatabaseInteractionField> DatabaseInteractionFields { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between database edge fields and edges.
+        /// Gets or sets the database table containing the one-to-one relationship between database interaction fields and interactions.
         /// </summary>
-        public DbSet<DatabaseEdgeFieldEdge> DatabaseEdgeFieldEdges { get; set; }
+        public DbSet<DatabaseInteractionFieldInteraction> DatabaseInteractionFieldInteractions { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between databases and nodes.
+        /// Gets or sets the database table containing the one-to-one relationship between databases and proteins.
         /// </summary>
-        public DbSet<DatabaseNode> DatabaseNodes { get; set; }
+        public DbSet<DatabaseProtein> DatabaseProteins { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the database node fields.
+        /// Gets or sets the database table containing the database protein fields.
         /// </summary>
-        public DbSet<DatabaseNodeField> DatabaseNodeFields { get; set; }
+        public DbSet<DatabaseProteinField> DatabaseProteinFields { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between database node fields and nodes.
+        /// Gets or sets the database table containing the one-to-one relationship between database protein fields and proteins.
         /// </summary>
-        public DbSet<DatabaseNodeFieldNode> DatabaseNodeFieldNodes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database table containing the databases.
-        /// </summary>
-        public DbSet<DatabaseType> DatabaseTypes { get; set; }
+        public DbSet<DatabaseProteinFieldProtein> DatabaseProteinFieldProteins { get; set; }
 
         /// <summary>
         /// Gets or sets the database table containing the one-to-one relationship between databases and users.
@@ -130,19 +110,14 @@ namespace NetControl4BioMed.Data
         public DbSet<DatabaseUser> DatabaseUsers { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between databases and unregistered users.
+        /// Gets or sets the database table containing the interactions.
         /// </summary>
-        public DbSet<DatabaseUserInvitation> DatabaseUserInvitations { get; set; }
+        public DbSet<Interaction> Interactions { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the edges.
+        /// Gets or sets the database table containing the one-to-one relationship between interactions and proteins.
         /// </summary>
-        public DbSet<Edge> Edges { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between edges and nodes.
-        /// </summary>
-        public DbSet<EdgeNode> EdgeNodes { get; set; }
+        public DbSet<InteractionProtein> InteractionProteins { get; set; }
 
         /// <summary>
         /// Gets or sets the database table containing the networks.
@@ -155,19 +130,19 @@ namespace NetControl4BioMed.Data
         public DbSet<NetworkDatabase> NetworkDatabases { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between networks and edges.
+        /// Gets or sets the database table containing the one-to-one relationship between networks and interactions.
         /// </summary>
-        public DbSet<NetworkEdge> NetworkEdges { get; set; }
+        public DbSet<NetworkInteraction> NetworkInteractions { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between networks and nodes.
+        /// Gets or sets the database table containing the one-to-one relationship between networks and proteins.
         /// </summary>
-        public DbSet<NetworkNode> NetworkNodes { get; set; }
+        public DbSet<NetworkProtein> NetworkProteins { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between networks and node collections.
+        /// Gets or sets the database table containing the one-to-one relationship between networks and protein collections.
         /// </summary>
-        public DbSet<NetworkNodeCollection> NetworkNodeCollections { get; set; }
+        public DbSet<NetworkProteinCollection> NetworkProteinCollections { get; set; }
 
         /// <summary>
         /// Gets or sets the database table containing the one-to-one relationship between networks and users.
@@ -175,34 +150,24 @@ namespace NetControl4BioMed.Data
         public DbSet<NetworkUser> NetworkUsers { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between networks and unregistered users.
+        /// Gets or sets the database table containing the proteins.
         /// </summary>
-        public DbSet<NetworkUserInvitation> NetworkUserInvitations { get; set; }
+        public DbSet<Protein> Proteins { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the nodes.
+        /// Gets or sets the database table containing the protein collections.
         /// </summary>
-        public DbSet<Node> Nodes { get; set; }
+        public DbSet<ProteinCollection> ProteinCollections { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the node collections.
+        /// Gets or sets the database table containing the one-to-one relationship between protein collections and proteins.
         /// </summary>
-        public DbSet<NodeCollection> NodeCollections { get; set; }
+        public DbSet<ProteinCollectionProtein> ProteinCollectionProteins { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between databases and node collections.
+        /// Gets or sets the database table containing the one-to-one relationship between protein collections and types.
         /// </summary>
-        public DbSet<NodeCollectionDatabase> NodeCollectionDatabases { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between node collections and nodes.
-        /// </summary>
-        public DbSet<NodeCollectionNode> NodeCollectionNodes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between node collections and types.
-        /// </summary>
-        public DbSet<NodeCollectionType> NodeCollectionTypes { get; set; }
+        public DbSet<ProteinCollectionType> ProteinCollectionTypes { get; set; }
 
         /// <summary>
         /// Gets or sets the database table containing the paths in control paths for analyses.
@@ -210,24 +175,14 @@ namespace NetControl4BioMed.Data
         public DbSet<Path> Paths { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between paths and edges.
+        /// Gets or sets the database table containing the one-to-one relationship between paths and interactions.
         /// </summary>
-        public DbSet<PathEdge> PathEdges { get; set; }
+        public DbSet<PathInteraction> PathInteractions { get; set; }
 
         /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between paths and nodes.
+        /// Gets or sets the database table containing the one-to-one relationship between paths and proteins.
         /// </summary>
-        public DbSet<PathNode> PathNodes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database table containing the samples.
-        /// </summary>
-        public DbSet<Sample> Samples { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database table containing the one-to-one relationship between samples and databases.
-        /// </summary>
-        public DbSet<SampleDatabase> SampleDatabases { get; set; }
+        public DbSet<PathProtein> PathProteins { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the database context.
@@ -248,6 +203,10 @@ namespace NetControl4BioMed.Data
             {
                 entity.Property(item => item.Id)
                     .ValueGeneratedOnAdd();
+                entity.HasOne(item => item.Network)
+                    .WithMany(item => item.Analyses)
+                    .HasForeignKey(item => item.NetworkId)
+                    .IsRequired();
             });
             modelBuilder.Entity<AnalysisDatabase>(entity =>
             {
@@ -261,73 +220,52 @@ namespace NetControl4BioMed.Data
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
             });
-            modelBuilder.Entity<AnalysisEdge>(entity =>
+            modelBuilder.Entity<AnalysisInteraction>(entity =>
             {
-                entity.HasKey(item => new { item.AnalysisId, item.EdgeId });
+                entity.HasKey(item => new { item.AnalysisId, item.InteractionId });
                 entity.HasOne(item => item.Analysis)
-                    .WithMany(item => item.AnalysisEdges)
+                    .WithMany(item => item.AnalysisInteractions)
                     .HasForeignKey(item => item.AnalysisId)
                     .IsRequired();
-                entity.HasOne(item => item.Edge)
-                    .WithMany(item => item.AnalysisEdges)
-                    .HasForeignKey(item => item.EdgeId)
+                entity.HasOne(item => item.Interaction)
+                    .WithMany(item => item.AnalysisInteractions)
+                    .HasForeignKey(item => item.InteractionId)
                     .IsRequired();
             });
-            modelBuilder.Entity<AnalysisNetwork>(entity =>
+            modelBuilder.Entity<AnalysisProtein>(entity =>
             {
-                entity.HasKey(item => new { item.AnalysisId, item.NetworkId });
+                entity.HasKey(item => new { item.AnalysisId, item.ProteinId, item.Type });
                 entity.HasOne(item => item.Analysis)
-                    .WithMany(item => item.AnalysisNetworks)
+                    .WithMany(item => item.AnalysisProteins)
                     .HasForeignKey(item => item.AnalysisId)
                     .IsRequired();
-                entity.HasOne(item => item.Network)
-                    .WithMany(item => item.AnalysisNetworks)
-                    .HasForeignKey(item => item.NetworkId)
+                entity.HasOne(item => item.Protein)
+                    .WithMany(item => item.AnalysisProteins)
+                    .HasForeignKey(item => item.ProteinId)
                     .IsRequired();
             });
-            modelBuilder.Entity<AnalysisNode>(entity =>
+            modelBuilder.Entity<AnalysisProteinCollection>(entity =>
             {
-                entity.HasKey(item => new { item.AnalysisId, item.NodeId, item.Type });
+                entity.HasKey(item => new { item.AnalysisId, item.ProteinCollectionId, item.Type });
                 entity.HasOne(item => item.Analysis)
-                    .WithMany(item => item.AnalysisNodes)
+                    .WithMany(item => item.AnalysisProteinCollections)
                     .HasForeignKey(item => item.AnalysisId)
                     .IsRequired();
-                entity.HasOne(item => item.Node)
-                    .WithMany(item => item.AnalysisNodes)
-                    .HasForeignKey(item => item.NodeId)
-                    .IsRequired();
-            });
-            modelBuilder.Entity<AnalysisNodeCollection>(entity =>
-            {
-                entity.HasKey(item => new { item.AnalysisId, item.NodeCollectionId, item.Type });
-                entity.HasOne(item => item.Analysis)
-                    .WithMany(item => item.AnalysisNodeCollections)
-                    .HasForeignKey(item => item.AnalysisId)
-                    .IsRequired();
-                entity.HasOne(item => item.NodeCollection)
-                    .WithMany(item => item.AnalysisNodeCollections)
-                    .HasForeignKey(item => item.NodeCollectionId)
+                entity.HasOne(item => item.ProteinCollection)
+                    .WithMany(item => item.AnalysisProteinCollections)
+                    .HasForeignKey(item => item.ProteinCollectionId)
                     .IsRequired();
             });
             modelBuilder.Entity<AnalysisUser>(entity =>
             {
-                entity.HasKey(item => new { item.AnalysisId, item.UserId });
+                entity.HasKey(item => new { item.AnalysisId, item.Email });
                 entity.HasOne(item => item.Analysis)
                     .WithMany(item => item.AnalysisUsers)
                     .HasForeignKey(item => item.AnalysisId)
                     .IsRequired();
                 entity.HasOne(item => item.User)
                     .WithMany(item => item.AnalysisUsers)
-                    .HasForeignKey(item => item.UserId)
-                    .IsRequired();
-            });
-            modelBuilder.Entity<AnalysisUserInvitation>(entity =>
-            {
-                entity.HasKey(item => new { item.AnalysisId, item.Email });
-                entity.HasOne(item => item.Analysis)
-                    .WithMany(item => item.AnalysisUserInvitations)
-                    .HasForeignKey(item => item.AnalysisId)
-                    .IsRequired();
+                    .HasForeignKey(item => item.UserId);
             });
             modelBuilder.Entity<BackgroundTask>(entity =>
             {
@@ -347,117 +285,99 @@ namespace NetControl4BioMed.Data
             {
                 entity.Property(item => item.Id)
                     .ValueGeneratedOnAdd();
-                entity.HasOne(item => item.DatabaseType)
-                    .WithMany(item => item.Databases)
-                    .HasForeignKey(item => item.DatabaseTypeId)
-                    .IsRequired();
             });
-            modelBuilder.Entity<DatabaseEdge>(entity =>
+            modelBuilder.Entity<DatabaseInteraction>(entity =>
             {
-                entity.HasKey(item => new { item.DatabaseId, item.EdgeId });
+                entity.HasKey(item => new { item.DatabaseId, item.InteractionId });
                 entity.HasOne(item => item.Database)
-                    .WithMany(item => item.DatabaseEdges)
+                    .WithMany(item => item.DatabaseInteractions)
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
-                entity.HasOne(item => item.Edge)
-                    .WithMany(item => item.DatabaseEdges)
-                    .HasForeignKey(item => item.EdgeId)
+                entity.HasOne(item => item.Interaction)
+                    .WithMany(item => item.DatabaseInteractions)
+                    .HasForeignKey(item => item.InteractionId)
                     .IsRequired();
             });
-            modelBuilder.Entity<DatabaseEdgeField>(entity =>
+            modelBuilder.Entity<DatabaseInteractionField>(entity =>
             {
                 entity.Property(item => item.Id)
                     .ValueGeneratedOnAdd();
                 entity.HasOne(item => item.Database)
-                    .WithMany(item => item.DatabaseEdgeFields)
+                    .WithMany(item => item.DatabaseInteractionFields)
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
             });
-            modelBuilder.Entity<DatabaseEdgeFieldEdge>(entity =>
+            modelBuilder.Entity<DatabaseInteractionFieldInteraction>(entity =>
             {
-                entity.HasKey(item => new { item.DatabaseEdgeFieldId, item.EdgeId, item.Value });
-                entity.HasOne(item => item.DatabaseEdgeField)
-                    .WithMany(item => item.DatabaseEdgeFieldEdges)
-                    .HasForeignKey(item => item.DatabaseEdgeFieldId)
+                entity.HasKey(item => new { item.DatabaseInteractionFieldId, item.InteractionId, item.Value });
+                entity.HasOne(item => item.DatabaseInteractionField)
+                    .WithMany(item => item.DatabaseInteractionFieldInteractions)
+                    .HasForeignKey(item => item.DatabaseInteractionFieldId)
                     .IsRequired();
-                entity.HasOne(item => item.Edge)
-                    .WithMany(item => item.DatabaseEdgeFieldEdges)
-                    .HasForeignKey(item => item.EdgeId)
+                entity.HasOne(item => item.Interaction)
+                    .WithMany(item => item.DatabaseInteractionFieldInteractions)
+                    .HasForeignKey(item => item.InteractionId)
                     .IsRequired();
             });
-            modelBuilder.Entity<DatabaseNode>(entity =>
+            modelBuilder.Entity<DatabaseProtein>(entity =>
             {
-                entity.HasKey(item => new { item.DatabaseId, item.NodeId });
+                entity.HasKey(item => new { item.DatabaseId, item.ProteinId });
                 entity.HasOne(item => item.Database)
-                    .WithMany(item => item.DatabaseNodes)
+                    .WithMany(item => item.DatabaseProteins)
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
-                entity.HasOne(item => item.Node)
-                    .WithMany(item => item.DatabaseNodes)
-                    .HasForeignKey(item => item.NodeId)
+                entity.HasOne(item => item.Protein)
+                    .WithMany(item => item.DatabaseProteins)
+                    .HasForeignKey(item => item.ProteinId)
                     .IsRequired();
             });
-            modelBuilder.Entity<DatabaseNodeField>(entity =>
+            modelBuilder.Entity<DatabaseProteinField>(entity =>
             {
                 entity.Property(item => item.Id)
                     .ValueGeneratedOnAdd();
                 entity.HasOne(item => item.Database)
-                    .WithMany(item => item.DatabaseNodeFields)
+                    .WithMany(item => item.DatabaseProteinFields)
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
             });
-            modelBuilder.Entity<DatabaseNodeFieldNode>(entity =>
+            modelBuilder.Entity<DatabaseProteinFieldProtein>(entity =>
             {
-                entity.HasKey(item => new { item.DatabaseNodeFieldId, item.NodeId, item.Value });
-                entity.HasOne(item => item.DatabaseNodeField)
-                    .WithMany(item => item.DatabaseNodeFieldNodes)
-                    .HasForeignKey(item => item.DatabaseNodeFieldId)
+                entity.HasKey(item => new { item.DatabaseProteinFieldId, item.ProteinId, item.Value });
+                entity.HasOne(item => item.DatabaseProteinField)
+                    .WithMany(item => item.DatabaseProteinFieldProteins)
+                    .HasForeignKey(item => item.DatabaseProteinFieldId)
                     .IsRequired();
-                entity.HasOne(item => item.Node)
-                    .WithMany(item => item.DatabaseNodeFieldNodes)
-                    .HasForeignKey(item => item.NodeId)
+                entity.HasOne(item => item.Protein)
+                    .WithMany(item => item.DatabaseProteinFieldProteins)
+                    .HasForeignKey(item => item.ProteinId)
                     .IsRequired();
-            });
-            modelBuilder.Entity<DatabaseType>(entity =>
-            {
-                entity.Property(item => item.Id)
-                    .ValueGeneratedOnAdd();
             });
             modelBuilder.Entity<DatabaseUser>(entity =>
             {
-                entity.HasKey(item => new { item.DatabaseId, item.UserId });
+                entity.HasKey(item => new { item.DatabaseId, item.Email });
                 entity.HasOne(item => item.Database)
                     .WithMany(item => item.DatabaseUsers)
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
                 entity.HasOne(item => item.User)
                     .WithMany(item => item.DatabaseUsers)
-                    .HasForeignKey(item => item.UserId)
-                    .IsRequired();
+                    .HasForeignKey(item => item.UserId);
             });
-            modelBuilder.Entity<DatabaseUserInvitation>(entity =>
-            {
-                entity.HasKey(item => new { item.DatabaseId, item.Email });
-                entity.HasOne(item => item.Database)
-                    .WithMany(item => item.DatabaseUserInvitations)
-                    .HasForeignKey(item => item.DatabaseId)
-                    .IsRequired();
-            });
-            modelBuilder.Entity<Edge>(entity =>
+            modelBuilder.Entity<Interaction>(entity =>
             {
                 entity.Property(item => item.Id)
                     .ValueGeneratedOnAdd();
             });
-            modelBuilder.Entity<EdgeNode>(entity =>
+            modelBuilder.Entity<InteractionProtein>(entity =>
             {
-                entity.HasKey(item => new { item.EdgeId, item.NodeId, item.Type });
-                entity.HasOne(item => item.Edge)
-                    .WithMany(item => item.EdgeNodes)
-                    .HasForeignKey(item => item.EdgeId)
+                entity.HasKey(item => new { item.InteractionId, item.ProteinId, item.Type });
+                entity.HasOne(item => item.Interaction)
+                    .WithMany(item => item.InteractionProteins)
+                    .HasForeignKey(item => item.InteractionId)
                     .IsRequired();
-                entity.HasOne(item => item.Node)
-                    .WithMany(item => item.EdgeNodes)
-                    .HasForeignKey(item => item.NodeId)
+                entity.HasOne(item => item.Protein)
+                    .WithMany(item => item.InteractionProteins)
+                    .HasForeignKey(item => item.ProteinId)
                     .IsRequired();
             });
             modelBuilder.Entity<Network>(entity =>
@@ -477,102 +397,81 @@ namespace NetControl4BioMed.Data
                     .HasForeignKey(item => item.DatabaseId)
                     .IsRequired();
             });
-            modelBuilder.Entity<NetworkEdge>(entity =>
+            modelBuilder.Entity<NetworkInteraction>(entity =>
             {
-                entity.HasKey(item => new { item.NetworkId, item.EdgeId });
+                entity.HasKey(item => new { item.NetworkId, item.InteractionId });
                 entity.HasOne(item => item.Network)
-                    .WithMany(item => item.NetworkEdges)
+                    .WithMany(item => item.NetworkInteractions)
                     .HasForeignKey(item => item.NetworkId)
                     .IsRequired();
-                entity.HasOne(item => item.Edge)
-                    .WithMany(item => item.NetworkEdges)
-                    .HasForeignKey(item => item.EdgeId)
+                entity.HasOne(item => item.Interaction)
+                    .WithMany(item => item.NetworkInteractions)
+                    .HasForeignKey(item => item.InteractionId)
                     .IsRequired();
             });
-            modelBuilder.Entity<NetworkNode>(entity =>
+            modelBuilder.Entity<NetworkProtein>(entity =>
             {
-                entity.HasKey(item => new { item.NetworkId, item.NodeId, item.Type });
+                entity.HasKey(item => new { item.NetworkId, item.ProteinId, item.Type });
                 entity.HasOne(item => item.Network)
-                    .WithMany(item => item.NetworkNodes)
+                    .WithMany(item => item.NetworkProteins)
                     .HasForeignKey(item => item.NetworkId)
                     .IsRequired();
-                entity.HasOne(item => item.Node)
-                    .WithMany(item => item.NetworkNodes)
-                    .HasForeignKey(item => item.NodeId)
+                entity.HasOne(item => item.Protein)
+                    .WithMany(item => item.NetworkProteins)
+                    .HasForeignKey(item => item.ProteinId)
                     .IsRequired();
             });
-            modelBuilder.Entity<NetworkNodeCollection>(entity =>
+            modelBuilder.Entity<NetworkProteinCollection>(entity =>
             {
-                entity.HasKey(item => new { item.NetworkId, item.NodeCollectionId, item.Type });
+                entity.HasKey(item => new { item.NetworkId, item.ProteinCollectionId, item.Type });
                 entity.HasOne(item => item.Network)
-                    .WithMany(item => item.NetworkNodeCollections)
+                    .WithMany(item => item.NetworkProteinCollections)
                     .HasForeignKey(item => item.NetworkId)
                     .IsRequired();
-                entity.HasOne(item => item.NodeCollection)
-                    .WithMany(item => item.NetworkNodeCollections)
-                    .HasForeignKey(item => item.NodeCollectionId)
+                entity.HasOne(item => item.ProteinCollection)
+                    .WithMany(item => item.NetworkProteinCollections)
+                    .HasForeignKey(item => item.ProteinCollectionId)
                     .IsRequired();
             });
             modelBuilder.Entity<NetworkUser>(entity =>
             {
-                entity.HasKey(item => new { item.NetworkId, item.UserId });
+                entity.HasKey(item => new { item.NetworkId, item.Email });
                 entity.HasOne(item => item.Network)
                     .WithMany(item => item.NetworkUsers)
                     .HasForeignKey(item => item.NetworkId)
                     .IsRequired();
                 entity.HasOne(item => item.User)
                     .WithMany(item => item.NetworkUsers)
-                    .HasForeignKey(item => item.UserId)
-                    .IsRequired();
+                    .HasForeignKey(item => item.UserId);
             });
-            modelBuilder.Entity<NetworkUserInvitation>(entity =>
-            {
-                entity.HasKey(item => new { item.NetworkId, item.Email });
-                entity.HasOne(item => item.Network)
-                    .WithMany(item => item.NetworkUserInvitations)
-                    .HasForeignKey(item => item.NetworkId)
-                    .IsRequired();
-            });
-            modelBuilder.Entity<Node>(entity =>
+            modelBuilder.Entity<Protein>(entity =>
             {
                 entity.Property(item => item.Id)
                     .ValueGeneratedOnAdd();
             });
-            modelBuilder.Entity<NodeCollection>(entity =>
+            modelBuilder.Entity<ProteinCollection>(entity =>
             {
                 entity.Property(item => item.Id)
                     .ValueGeneratedOnAdd();
             });
-            modelBuilder.Entity<NodeCollectionDatabase>(entity =>
+            modelBuilder.Entity<ProteinCollectionProtein>(entity =>
             {
-                entity.HasKey(item => new { item.NodeCollectionId, item.DatabaseId });
-                entity.HasOne(item => item.NodeCollection)
-                    .WithMany(item => item.NodeCollectionDatabases)
-                    .HasForeignKey(item => item.NodeCollectionId)
+                entity.HasKey(item => new { item.ProteinCollectionId, item.ProteinId });
+                entity.HasOne(item => item.ProteinCollection)
+                    .WithMany(item => item.ProteinCollectionProteins)
+                    .HasForeignKey(item => item.ProteinCollectionId)
                     .IsRequired();
-                entity.HasOne(item => item.Database)
-                    .WithMany(item => item.NodeCollectionDatabases)
-                    .HasForeignKey(item => item.DatabaseId)
+                entity.HasOne(item => item.Protein)
+                    .WithMany(item => item.ProteinCollectionProteins)
+                    .HasForeignKey(item => item.ProteinId)
                     .IsRequired();
             });
-            modelBuilder.Entity<NodeCollectionNode>(entity =>
+            modelBuilder.Entity<ProteinCollectionType>(entity =>
             {
-                entity.HasKey(item => new { item.NodeCollectionId, item.NodeId });
-                entity.HasOne(item => item.NodeCollection)
-                    .WithMany(item => item.NodeCollectionNodes)
-                    .HasForeignKey(item => item.NodeCollectionId)
-                    .IsRequired();
-                entity.HasOne(item => item.Node)
-                    .WithMany(item => item.NodeCollectionNodes)
-                    .HasForeignKey(item => item.NodeId)
-                    .IsRequired();
-            });
-            modelBuilder.Entity<NodeCollectionType>(entity =>
-            {
-                entity.HasKey(item => new { item.NodeCollectionId, item.Type });
-                entity.HasOne(item => item.NodeCollection)
-                    .WithMany(item => item.NodeCollectionTypes)
-                    .HasForeignKey(item => item.NodeCollectionId)
+                entity.HasKey(item => new { item.ProteinCollectionId, item.Type });
+                entity.HasOne(item => item.ProteinCollection)
+                    .WithMany(item => item.ProteinCollectionTypes)
+                    .HasForeignKey(item => item.ProteinCollectionId)
                     .IsRequired();
             });
             modelBuilder.Entity<Path>(entity =>
@@ -584,45 +483,28 @@ namespace NetControl4BioMed.Data
                     .HasForeignKey(item => item.ControlPathId)
                     .IsRequired();
             });
-            modelBuilder.Entity<PathEdge>(entity =>
+            modelBuilder.Entity<PathInteraction>(entity =>
             {
-                entity.HasKey(item => new { item.PathId, item.EdgeId, item.Index });
+                entity.HasKey(item => new { item.PathId, item.InteractionId, item.Index });
                 entity.HasOne(item => item.Path)
-                    .WithMany(item => item.PathEdges)
+                    .WithMany(item => item.PathInteractions)
                     .HasForeignKey(item => item.PathId)
                     .IsRequired();
-                entity.HasOne(item => item.Edge)
-                    .WithMany(item => item.PathEdges)
-                    .HasForeignKey(item => item.EdgeId)
+                entity.HasOne(item => item.Interaction)
+                    .WithMany(item => item.PathInteractions)
+                    .HasForeignKey(item => item.InteractionId)
                     .IsRequired();
             });
-            modelBuilder.Entity<PathNode>(entity =>
+            modelBuilder.Entity<PathProtein>(entity =>
             {
-                entity.HasKey(item => new { item.PathId, item.NodeId, item.Type, item.Index });
+                entity.HasKey(item => new { item.PathId, item.ProteinId, item.Type, item.Index });
                 entity.HasOne(item => item.Path)
-                    .WithMany(item => item.PathNodes)
+                    .WithMany(item => item.PathProteins)
                     .HasForeignKey(item => item.PathId)
                     .IsRequired();
-                entity.HasOne(item => item.Node)
-                    .WithMany(item => item.PathNodes)
-                    .HasForeignKey(item => item.NodeId)
-                    .IsRequired();
-            });
-            modelBuilder.Entity<Sample>(entity =>
-            {
-                entity.Property(item => item.Id)
-                    .ValueGeneratedOnAdd();
-            });
-            modelBuilder.Entity<SampleDatabase>(entity =>
-            {
-                entity.HasKey(item => new { item.SampleId, item.DatabaseId });
-                entity.HasOne(item => item.Sample)
-                    .WithMany(item => item.SampleDatabases)
-                    .HasForeignKey(item => item.SampleId)
-                    .IsRequired();
-                entity.HasOne(item => item.Database)
-                    .WithMany(item => item.SampleDatabases)
-                    .HasForeignKey(item => item.DatabaseId)
+                entity.HasOne(item => item.Protein)
+                    .WithMany(item => item.PathProteins)
+                    .HasForeignKey(item => item.ProteinId)
                     .IsRequired();
             });
             modelBuilder.Entity<UserRole>(entity =>

@@ -1,0 +1,91 @@
+﻿@page
+@model DetailsModel
+@{
+    ViewData["Title"] = "Collection details";
+}
+
+<partial name="_NavigationTitleCardPartial" model="@Helpers.ViewModels.NavigationTitleCardViewModel.GetProteinCollectionNavigationTitleCard(Model.View.ProteinCollection)" />
+@if (User.IsInRole("Administrator"))
+{
+    <a asp-page="/Administration/Data/ProteinCollections/Details" asp-route-id="@Model.View.ProteinCollection.Id" class="btn btn-info btn-block mb-3" title="Details">
+        <span><i class="fas fa-info-circle"></i></span>
+        <span>Details</span>
+    </a>
+}
+@if (!string.IsNullOrEmpty(Model.View.ProteinCollection.Description))
+{
+    <div class="card mb-3" title="Description">
+        <div class="card-body text-center small">
+            <span>@Model.View.ProteinCollection.Description</span>
+        </div>
+    </div>
+}
+<div class="row align-items-center">
+    <div class="col-lg mb-3">
+        <a asp-page="/AvailableData/Data/ProteinCollections/Download" asp-route-ids="@Model.View.ProteinCollection.Id" class="btn btn-primary btn-block" title="Download">
+            <span><i class="fas fa-download"></i></span>
+            <span>Download</span>
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header font-weight-bold">
+        <div class="d-flex flex-column flex-lg-row-reverse justify-content-center align-items-center justify-content-lg-between">
+            <div>
+                <span><i class="fas fa-circle"></i></span>
+            </div>
+            <div>
+                <span>Proteins</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (!Model.View.ProteinCollectionProteins.Any())
+        {
+            <div class="alert alert-info text-justify text-wrap mb-0">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>There are no proteins currently assigned.</span>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-justify text-wrap">
+                <span><i class="fas fa-info-circle"></i></span>
+                <span>The collection currently contains @Model.View.ProteinCollectionProteins.Count() protein@(Model.View.ProteinCollectionProteins.Count() != 1 ? "s" : string.Empty).</span>
+            </div>
+            <table class="table table-striped table-bordered table-datatable" data-order="[[1]]">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center text-break text-nowrap" data-orderable="false" data-searchable="false" data-name="index">
+                            <span>#</span>
+                        </th>
+                        <th class="text-left text-break">
+                            <span>Protein</span>
+                        </th>
+                        <th class="text-center text-break" data-orderable="false" data-searchable="false">
+                            <span>Links</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var proteinCollectionProtein in Model.View.ProteinCollectionProteins)
+                    {
+                        <tr>
+                            <td class="text-center text-break text-nowrap">
+                                <span></span>
+                            </td>
+                            <td class="text-left text-break">
+                                <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@proteinCollectionProtein.Protein.Id" title="@proteinCollectionProtein.Protein.Name">@proteinCollectionProtein.Protein.Name</a>
+                            </td>
+                            <td class="text-center text-break">
+                                <a asp-page="/AvailableData/Data/Proteins/Details" asp-route-id="@proteinCollectionProtein.Protein.Id" title="Details">
+                                    <span>Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

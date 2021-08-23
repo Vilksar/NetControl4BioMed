@@ -33,49 +33,29 @@ namespace NetControl4BioMed.Helpers.InputModels
         public bool IsPublic { get; set; }
 
         /// <summary>
-        /// Represents the database type of the database.
-        /// </summary>
-        public DatabaseTypeInputModel DatabaseType { get; set; }
-
-        /// <summary>
         /// Represents the database users of the database.
         /// </summary>
         public IEnumerable<DatabaseUserInputModel> DatabaseUsers { get; set; }
 
         /// <summary>
-        /// Represents the database user invitations of the database.
+        /// Represents the database protein fields of the database.
         /// </summary>
-        public IEnumerable<DatabaseUserInvitationInputModel> DatabaseUserInvitations { get; set; }
+        public IEnumerable<DatabaseProteinFieldInputModel> DatabaseProteinFields { get; set; }
 
         /// <summary>
-        /// Represents the database node fields of the database.
+        /// Represents the database interaction fields of the database.
         /// </summary>
-        public IEnumerable<DatabaseNodeFieldInputModel> DatabaseNodeFields { get; set; }
+        public IEnumerable<DatabaseInteractionFieldInputModel> DatabaseInteractionFields { get; set; }
 
         /// <summary>
-        /// Represents the database edge fields of the database.
+        /// Represents the database proteins of the database.
         /// </summary>
-        public IEnumerable<DatabaseEdgeFieldInputModel> DatabaseEdgeFields { get; set; }
+        public IEnumerable<DatabaseProteinInputModel> DatabaseProteins { get; set; }
 
         /// <summary>
-        /// Represents the database nodes of the database.
+        /// Represents the database interactions of the database.
         /// </summary>
-        public IEnumerable<DatabaseNodeInputModel> DatabaseNodes { get; set; }
-
-        /// <summary>
-        /// Represents the database edges of the database.
-        /// </summary>
-        public IEnumerable<DatabaseEdgeInputModel> DatabaseEdges { get; set; }
-
-        /// <summary>
-        /// Represents the node collection databases of the database.
-        /// </summary>
-        public IEnumerable<NodeCollectionDatabaseInputModel> NodeCollectionDatabases { get; set; }
-
-        /// <summary>
-        /// Represents the sample databases of the database.
-        /// </summary>
-        public IEnumerable<SampleDatabaseInputModel> SampleDatabases { get; set; }
+        public IEnumerable<DatabaseInteractionInputModel> DatabaseInteractions { get; set; }
 
         /// <summary>
         /// Represents the network databases of the database.
