@@ -14,6 +14,17 @@ namespace NetControl4BioMed.Data.Seed
         /// </summary>
         public static ICollection<DatabaseInteractionField> Seed { get; } = new List<DatabaseInteractionField>
         {
+            // The interaction fields in the Human Interactome database.
+            new DatabaseInteractionField
+            {
+                Id = "97d904b1-db56-43f7-82e8-37e824003a2e",
+                DateTimeCreated = DateTime.UtcNow,
+                Name = "Human Interactome Identified In",
+                Description = "The platform in which the interaction has been identified in order to be included in the Human Interactome database.",
+                IsSearchable = false,
+                Url = null,
+                DatabaseId = "f5255a6a-d71a-473c-8435-8a528fb63b81"
+            },
             // The interaction fields in the InnateDb database.
             new DatabaseInteractionField
             {

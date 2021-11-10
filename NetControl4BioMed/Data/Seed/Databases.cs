@@ -43,6 +43,15 @@ namespace NetControl4BioMed.Data.Seed
             },
             new Database
             {
+                Id = "f5255a6a-d71a-473c-8435-8a528fb63b81",
+                DateTimeCreated = DateTime.UtcNow,
+                Name = "Human Interactome",
+                Description = "Pairwise combinations of human protein-coding genes are tested systematically using high throughput yeast two-hybrid screens to detect protein-protein interactions. The quality of these interactions is further validated in multiple orthogonal assays. In addition to systematically identifying PPIs experimentally, this web portal also includes PPIs of comparable high quality extracted from literature.",
+                IsPublic = false,
+                Url = "http://www.interactome-atlas.org/"
+            },
+            new Database
+            {
                 Id = "ae5e13e7-62c7-4c57-ad04-cc83db996d5d",
                 DateTimeCreated = DateTime.UtcNow,
                 Name = "InnateDB",
