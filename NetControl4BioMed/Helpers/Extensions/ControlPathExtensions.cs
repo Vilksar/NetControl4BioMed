@@ -37,7 +37,7 @@ namespace NetControl4BioMed.Helpers.Extensions
         /// <param name="controlPathIds">The control paths whose entities should be deleted.</param>
         /// <param name="serviceProvider">The application service provider.</param>
         /// <param name="token">The cancellation token for the task.</param>
-        public static async Task DeleteDependentAnalysesAsync(IEnumerable<string> controlPathIds, IServiceProvider serviceProvider, CancellationToken token)
+        public static async Task DeleteDependentPathsAsync(IEnumerable<string> controlPathIds, IServiceProvider serviceProvider, CancellationToken token)
         {
             // Define a variable to store the total number of entities.
             var entityCount = 0;

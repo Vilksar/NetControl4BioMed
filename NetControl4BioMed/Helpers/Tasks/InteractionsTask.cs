@@ -435,9 +435,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Add the interaction to the list.
                     interactionsToEdit.Add(interaction);
                 }
-                // Delete the dependent entities.
-                await InteractionExtensions.DeleteDependentAnalysesAsync(interactionIds, serviceProvider, token);
-                await InteractionExtensions.DeleteDependentNetworksAsync(interactionIds, serviceProvider, token);
                 // Delete the related entities.
                 await InteractionExtensions.DeleteRelatedEntitiesAsync<InteractionProtein>(interactionIds, serviceProvider, token);
                 await InteractionExtensions.DeleteRelatedEntitiesAsync<DatabaseInteractionFieldInteraction>(interactionIds, serviceProvider, token);

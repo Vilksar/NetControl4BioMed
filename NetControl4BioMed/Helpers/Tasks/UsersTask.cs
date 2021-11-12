@@ -503,37 +503,9 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Get the IDs of the items.
                 var userIds = users
                     .Select(item => item.Id);
-                // Define the dependent list of items to get.
-                var analysisInputs = new List<AnalysisInputModel>();
-                var networkInputs = new List<NetworkInputModel>();
-                // Use a new scope.
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    // Use a new context instance.
-                    using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    // Get the items found.
-                    var networks = context.Networks
-                        .Where(item => item.NetworkUsers.Any(item1 => userIds.Contains(item1.User.Id)) && !item.NetworkUsers.Any(item1 => !userIds.Contains(item1.User.Id)))
-                        .Distinct();
-                    // Get the IDs of the dependent items.
-                    analysisInputs = context.Analyses
-                        .Where(item => item.AnalysisUsers.Any(item1 => userIds.Contains(item1.User.Id)) && !item.AnalysisUsers.Any(item1 => !userIds.Contains(item1.User.Id)) || networks.Contains(item.Network))
-                        .Distinct()
-                        .Select(item => new AnalysisInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
-                    networkInputs = networks
-                        .Select(item => new NetworkInputModel
-                        {
-                            Id = item.Id
-                        })
-                        .ToList();
-                }
                 // Delete the dependent entities.
-                await new AnalysesTask { Items = analysisInputs }.DeleteAsync(serviceProvider, token);
-                await new NetworksTask { Items = networkInputs }.DeleteAsync(serviceProvider, token);
+                await UserExtensions.DeleteDependentAnalysesAsync(userIds, serviceProvider, token);
+                await UserExtensions.DeleteDependentNetworksAsync(userIds, serviceProvider, token);
                 // Delete the related entities.
                 await UserExtensions.DeleteRelatedEntitiesAsync<AnalysisUser>(userIds, serviceProvider, token);
                 await UserExtensions.DeleteRelatedEntitiesAsync<NetworkUser>(userIds, serviceProvider, token);

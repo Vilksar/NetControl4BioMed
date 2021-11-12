@@ -77,7 +77,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 var controlPathIds = controlPaths
                     .Select(item => item.Id);
                 // Delete the dependent entities.
-                await ControlPathExtensions.DeleteDependentAnalysesAsync(controlPathIds, serviceProvider, token);
+                await ControlPathExtensions.DeleteDependentPathsAsync(controlPathIds, serviceProvider, token);
                 // Delete the items.
                 await IEnumerableExtensions.DeleteAsync(controlPaths, serviceProvider, token);
             }

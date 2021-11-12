@@ -320,11 +320,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                     // Add the protein to the list.
                     proteinsToEdit.Add(protein);
                 }
-                // Delete the dependent entities.
-                await ProteinExtensions.DeleteDependentAnalysesAsync(proteinIds, serviceProvider, token);
-                await ProteinExtensions.DeleteDependentNetworksAsync(proteinIds, serviceProvider, token);
-                await ProteinExtensions.DeleteDependentProteinCollectionsAsync(proteinIds, serviceProvider, token);
-                await ProteinExtensions.DeleteDependentInteractionsAsync(proteinIds, serviceProvider, token);
                 // Delete the related entities.
                 await ProteinExtensions.DeleteRelatedEntitiesAsync<DatabaseProteinFieldProtein>(proteinIds, serviceProvider, token);
                 await ProteinExtensions.DeleteRelatedEntitiesAsync<DatabaseProtein>(proteinIds, serviceProvider, token);
