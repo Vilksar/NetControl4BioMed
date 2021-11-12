@@ -45,6 +45,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Users"] = await context.Users
                     .CountAsync();
@@ -54,6 +56,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Roles"] = await context.Roles
                     .CountAsync();
@@ -63,6 +67,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Databases"] = await context.Databases
                     .CountAsync();
@@ -72,6 +78,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["DatabaseProteinFields"] = await context.DatabaseProteinFields
                     .CountAsync();
@@ -81,6 +89,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["DatabaseInteractionFields"] = await context.DatabaseInteractionFields
                     .CountAsync();
@@ -90,6 +100,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Proteins"] = await context.Proteins
                     .Where(item => item.DatabaseProteins.Any())
@@ -100,6 +112,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Interactions"] = await context.Interactions
                     .Where(item => item.DatabaseInteractions.Any())
@@ -110,6 +124,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["ProteinCollections"] = await context.ProteinCollections
                     .CountAsync();
@@ -119,6 +135,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Networks"] = await context.Networks
                     .CountAsync();
@@ -128,6 +146,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Analyses"] = await context.Analyses
                     .CountAsync();
@@ -151,6 +171,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Databases"] = await context.Databases
                     .Where(item => item.IsPublic)
@@ -161,6 +183,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["DatabaseProteinFields"] = await context.DatabaseProteinFields
                     .Where(item => item.Database.IsPublic)
@@ -171,6 +195,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["DatabaseInteractionFields"] = await context.DatabaseInteractionFields
                     .Where(item => item.Database.IsPublic)
@@ -181,6 +207,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Proteins"] = await context.Proteins
                     .Where(item => item.DatabaseProteins.Any(item1 => item1.Database.IsPublic))
@@ -191,6 +219,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Interactions"] = await context.Interactions
                     .Where(item => item.DatabaseInteractions.Any(item1 => item1.Database.IsPublic))
@@ -201,6 +231,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["ProteinCollections"] = await context.ProteinCollections
                     .CountAsync();
@@ -210,6 +242,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Networks"] = await context.Networks
                     .Where(item => item.IsPublic)
@@ -220,6 +254,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Analyses"] = await context.Analyses
                     .Where(item => item.IsPublic)
@@ -244,6 +280,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Databases"] = await context.Databases
                     .GroupBy(item => item.Name)
@@ -256,6 +294,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["DatabaseProteinFields"] = await context.DatabaseProteinFields
                     .GroupBy(item => item.Name)
@@ -268,6 +308,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["DatabaseInteractionFields"] = await context.DatabaseInteractionFields
                     .GroupBy(item => item.Name)
@@ -280,6 +322,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["DatabaseProteinFieldProteins"] = await context.DatabaseProteinFieldProteins
                     .Where(item => item.DatabaseProteinField.IsSearchable)
@@ -293,6 +337,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["DatabaseInteractionFieldInteractions"] = await context.DatabaseInteractionFieldInteractions
                     .Where(item => item.DatabaseInteractionField.IsSearchable)
@@ -306,6 +352,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Proteins"] = await context.Proteins
                     .Where(item => item.DatabaseProteins.Any())
@@ -319,6 +367,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Interactions"] = await context.Interactions
                     .Where(item => item.DatabaseInteractions.Any())
@@ -332,6 +382,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["ProteinCollections"] = await context.ProteinCollections
                     .GroupBy(item => item.Name)
@@ -358,6 +410,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Proteins"] = await context.Proteins
                     .Where(item => !item.DatabaseProteins.Any() && !item.NetworkProteins.Any())
@@ -368,6 +422,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Interactions"] = await context.Interactions
                     .Where(item => (!item.DatabaseInteractions.Any() && !item.NetworkInteractions.Any()) || item.InteractionProteins.Count() < 2)
@@ -378,6 +434,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["ProteinCollections"] = await context.ProteinCollections
                     .Where(item => !item.ProteinCollectionProteins.Any())
@@ -388,6 +446,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Networks"] = await context.Networks
                     .Where(item => !item.NetworkProteins.Any() || !item.NetworkInteractions.Any())
@@ -398,6 +458,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the items with the provided IDs.
                 dictionary["Analyses"] = await context.Analyses
                     .Where(item => !item.AnalysisProteins.Any() || !item.AnalysisInteractions.Any() || item.Network == null)
@@ -423,6 +485,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the IDs of the items to stop.
                 itemIds = context.Analyses
                     .Where(item => item.Status == AnalysisStatus.Initializing || item.Status == AnalysisStatus.Ongoing)
@@ -460,6 +524,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the IDs of the items to stop.
                 networkIds = context.Networks
                     .Where(item => item.IsDemonstration)
@@ -514,6 +580,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the networks and analyses.
                 alertNetworks = context.Networks
                     .Where(item => limitDateStart < item.DateTimeToDelete && item.DateTimeToDelete < limitDateEnd)
@@ -620,6 +688,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the IDs of the items to delete.
                 userIds = context.Users
                     .Where(item => !item.EmailConfirmed)
@@ -724,6 +794,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the input models of the items to delete.
                 var itemInputModels = context.Proteins
                     .Where(item => !item.DatabaseProteins.Any() && !item.NetworkProteins.Any())
@@ -740,6 +812,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the input models of the items to delete.
                 var itemInputModels = context.Interactions
                     .Where(item => (!item.DatabaseInteractions.Any() && !item.NetworkInteractions.Any()) || item.InteractionProteins.Count() < 2)
@@ -756,6 +830,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the input models of the items to delete.
                 var itemInputModels = context.ProteinCollections
                     .Where(item => !item.ProteinCollectionProteins.Any())
@@ -772,6 +848,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the input models of the items to delete.
                 var itemInputModels = context.Networks
                     .Where(item => !item.NetworkProteins.Any() || !item.NetworkInteractions.Any())
@@ -788,6 +866,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the input models of the items to delete.
                 var itemInputModels = context.Analyses
                     .Where(item => !item.AnalysisProteins.Any() || !item.AnalysisInteractions.Any() || item.Network == null)
@@ -817,6 +897,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the IDs of the items to delete.
                 itemIds = context.Networks
                     .Where(item => item.DateTimeToDelete < limitDate)
@@ -852,6 +934,8 @@ namespace NetControl4BioMed.Helpers.Tasks
             {
                 // Use a new context instance.
                 using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // Increase the command timeout.
+                context.Database.SetCommandTimeout(60);
                 // Get the IDs of the items to delete.
                 itemIds = context.Analyses
                     .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
