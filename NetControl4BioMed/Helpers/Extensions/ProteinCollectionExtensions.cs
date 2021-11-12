@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -290,7 +291,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                     .Select(item => item.Protein.Name)
             };
             // Write the data corresponding to the file.
-            await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { IgnoreNullValues = true });
+            await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
         }
 
         /// <summary>

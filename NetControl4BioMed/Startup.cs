@@ -64,10 +64,6 @@ namespace NetControl4BioMed
             {
                 options.UseSqlServer(Configuration["ConnectionStrings:SqlConnection"]);
             });
-            services.AddHangfire(options =>
-            {
-                options.UseSqlServerStorage(Configuration["ConnectionStrings:SqlConnection"]);
-            });
             // Add the default Identity functions for users and roles.
             services.AddIdentity<User, Role>(options =>
             {
@@ -98,6 +94,21 @@ namespace NetControl4BioMed
                 });
             // Add the HTTP client dependency.
             services.AddHttpClient();
+            // Add the Hangfire server options.
+            services.AddHangfire(options =>
+            {
+                options.UseSqlServerStorage(Configuration["ConnectionStrings:SqlConnection"]);
+            });
+            services.AddHangfireServer(options =>
+            {
+                options.WorkerCount = 4 < Environment.ProcessorCount ? Environment.ProcessorCount - 3 : 1;
+                options.Queues = new[] { "recurring", "default" };
+            });
+            services.AddHangfireServer(options =>
+            {
+                options.WorkerCount = 4 < Environment.ProcessorCount ? 2 : 1;
+                options.Queues = new[] { "administration", "background" };
+            });
             // Add the dependency injections.
             services.AddTransient<IPartialViewRenderer, PartialViewRenderer>();
             services.AddTransient<IReCaptchaChecker, ReCaptchaChecker>();
@@ -155,16 +166,6 @@ namespace NetControl4BioMed
             applicationBuilder.UseHangfireDashboard("/Hangfire", new DashboardOptions
             {
                 Authorization = new[] { new HangfireAuthorizationFilter() }
-            });
-            applicationBuilder.UseHangfireServer(new BackgroundJobServerOptions
-            {
-                WorkerCount = 4 < Environment.ProcessorCount ? Environment.ProcessorCount - 3 : 1,
-                Queues = new[] { "recurring", "default" }
-            });
-            applicationBuilder.UseHangfireServer(new BackgroundJobServerOptions
-            {
-                WorkerCount = 4 < Environment.ProcessorCount ? 2 : 1,
-                Queues = new[] { "administration", "background" }
             });
             // Seed the database.
             applicationBuilder.SeedDatabaseAsync(Configuration).Wait();

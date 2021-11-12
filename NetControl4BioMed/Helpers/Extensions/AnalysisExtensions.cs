@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -413,7 +414,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 AlgorithmParameters = analysis.Parameters
             };
             // Write the data corresponding to the file.
-            await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { IgnoreNullValues = true });
+            await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
         }
 
         /// <summary>
@@ -496,7 +497,7 @@ namespace NetControl4BioMed.Helpers.Extensions
                 }
             };
             // Write the data corresponding to the file.
-            await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { IgnoreNullValues = true });
+            await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
         }
 
         /// <summary>
@@ -667,7 +668,7 @@ namespace NetControl4BioMed.Helpers.Extensions
             // Update the meta data.
             FileCxViewModel.AddMetaData(data);
             // Write the data corresponding to the file.
-            await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { IgnoreNullValues = true });
+            await JsonSerializer.SerializeAsync(stream, data, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
         }
 
         /// <summary>

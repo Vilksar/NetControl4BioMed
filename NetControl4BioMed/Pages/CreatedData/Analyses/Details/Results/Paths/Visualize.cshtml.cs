@@ -7,6 +7,7 @@ using NetControl4BioMed.Data.Models;
 using NetControl4BioMed.Helpers.Extensions;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace NetControl4BioMed.Pages.CreatedData.Analyses.Details.Results.Paths
@@ -63,7 +64,7 @@ namespace NetControl4BioMed.Pages.CreatedData.Analyses.Details.Results.Paths
                 Analysis = items
                     .Select(item => item.ControlPath.Analysis)
                     .First(),
-                CytoscapeJson = JsonSerializer.Serialize(items.First().GetCytoscapeViewModel(HttpContext, _linkGenerator, _context), new JsonSerializerOptions { IgnoreNullValues = true })
+                CytoscapeJson = JsonSerializer.Serialize(items.First().GetCytoscapeViewModel(HttpContext, _linkGenerator, _context), new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull })
             };
             // Return the page.
             return Page();

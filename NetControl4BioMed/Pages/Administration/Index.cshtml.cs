@@ -18,6 +18,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net.Mime;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -824,7 +825,7 @@ namespace NetControl4BioMed.Pages.Administration
             // Define the JSON serializer options.
             var jsonSerializerOptions = new JsonSerializerOptions
             {
-                IgnoreNullValues = true
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
             // Check the items to delete.
             if (deleteItems.Contains("Proteins"))

@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -57,7 +58,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Proteins
             var jsonSerializerOptions = new JsonSerializerOptions
             {
                 WriteIndented = true,
-                IgnoreNullValues = true
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
             // Define the view.
             View = new ViewModel
@@ -119,7 +120,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Proteins
             var jsonSerializerOptions = new JsonSerializerOptions
             {
                 WriteIndented = true,
-                IgnoreNullValues = true
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
             // Define the view.
             View = new ViewModel
@@ -200,7 +201,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Proteins
                     Data = JsonSerializer.Serialize(new ProteinsTask
                     {
                         Items = items
-                    }, new JsonSerializerOptions { IgnoreNullValues = true })
+                    }, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull })
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(task);
@@ -234,7 +235,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Proteins
                     Data = JsonSerializer.Serialize(new ProteinsTask
                     {
                         Items = items
-                    }, new JsonSerializerOptions { IgnoreNullValues = true })
+                    }, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull })
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(task);
@@ -269,7 +270,7 @@ namespace NetControl4BioMed.Pages.Administration.Data.Proteins
                         {
                             Id = item.Id
                         })
-                    }, new JsonSerializerOptions { IgnoreNullValues = true })
+                    }, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull })
                 };
                 // Mark the background task for addition.
                 _context.BackgroundTasks.Add(task);

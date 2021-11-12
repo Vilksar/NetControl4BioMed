@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -164,7 +165,7 @@ namespace NetControl4BioMed.Pages.Administration.Accounts.UserRoles
                             Id = item.Role.Id
                         }
                     })
-                }, new JsonSerializerOptions { IgnoreNullValues = true })
+                }, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull })
             };
             // Mark the task for addition.
             _context.BackgroundTasks.Add(task);
