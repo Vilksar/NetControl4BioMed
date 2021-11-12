@@ -56,8 +56,6 @@ namespace NetControl4BioMed.Pages.CreatedData.Networks.Details.Accounts.Users
 
         public class ViewModel
         {
-            public bool IsUserOwner { get; set; }
-
             public Network Network { get; set; }
         }
 
@@ -163,7 +161,7 @@ namespace NetControl4BioMed.Pages.CreatedData.Networks.Details.Accounts.Users
                 return Page();
             }
             // Check if the provided e-mail address already has access to the network.
-            if (View.Network.NetworkUsers.Any(item => item.User.Email == Input.Email))
+            if (items.Any(item => item.NetworkUsers.Any(item1 => item1.User.Email == Input.Email)))
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The user with the provided e-mail already has access to the network.");

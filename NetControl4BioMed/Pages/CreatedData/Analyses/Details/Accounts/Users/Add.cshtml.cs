@@ -160,8 +160,8 @@ namespace NetControl4BioMed.Pages.CreatedData.Analyses.Details.Accounts.Users
                 // Return the page.
                 return Page();
             }
-            // Check if the provided e-mail address already has access to the network.
-            if (View.Analysis.AnalysisUsers.Any(item => item.User.Email == Input.Email))
+            // Check if the provided e-mail address already has access to the analysis.
+            if (items.Any(item => item.AnalysisUsers.Any(item1 => item1.User.Email == Input.Email)))
             {
                 // Add an error to the model.
                 ModelState.AddModelError(string.Empty, "The user with the provided e-mail already has access to the analysis.");
