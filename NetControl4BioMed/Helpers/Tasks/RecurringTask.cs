@@ -596,11 +596,6 @@ namespace NetControl4BioMed.Helpers.Tasks
                 alertAnalyses = context.Analyses
                     .Where(item => item.Status == AnalysisStatus.Stopped || item.Status == AnalysisStatus.Completed || item.Status == AnalysisStatus.Error)
                     .Where(item => limitDateStart < item.DateTimeToDelete && item.DateTimeToDelete < limitDateEnd)
-                    .Concat(context.Networks
-                        .Where(item => limitDateStart < item.DateTimeToDelete && item.DateTimeToDelete < limitDateEnd)
-                        .Select(item => item.Analyses)
-                        .SelectMany(item => item))
-                    .Distinct()
                     .Select(item => new AlertItemModel
                     {
                         Id = item.Id,
@@ -608,6 +603,20 @@ namespace NetControl4BioMed.Helpers.Tasks
                         Emails = item.AnalysisUsers
                             .Select(item1 => item1.User.Email)
                     })
+                    .ToList()
+                    .Concat(context.Networks
+                        .Where(item => limitDateStart < item.DateTimeToDelete && item.DateTimeToDelete < limitDateEnd)
+                        .Select(item => item.Analyses)
+                        .SelectMany(item => item)
+                        .Select(item => new AlertItemModel
+                        {
+                            Id = item.Id,
+                            Name = item.Name,
+                            Emails = item.AnalysisUsers
+                                .Select(item1 => item1.User.Email)
+                        })
+                        .ToList())
+                    .DistinctBy(item => item.Id)
                     .ToList();
             }
             // Define the user items to get.
