@@ -14,7 +14,7 @@ This is a C# / .NET web application which aims to solve the target network contr
 
 ## Download
 
-The repository consists of a Visual Studio 2019 project. You can download it to run or build the application yourself. You need to have [.NET 5](https://dotnet.microsoft.com/download/dotnet/5.0) installed in order to run it, or the corresponding SDK in order to also be able to build it.
+The repository consists of a Visual Studio 2022 project. You can download it to run or build the application yourself. You need to have [.NET 6](https://dotnet.microsoft.com/download/dotnet/6.0) installed in order to run it, or the corresponding SDK in order to also be able to build it.
 
 ## Usage
 
