@@ -136,7 +136,7 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
                 // Send the e-mail change e-mail to the user.
                 await _emailSender.SendEmailChangeEmailAsync(emailChangeEmailViewModel);
                 // Display a message.
-                TempData["StatusMessage"] = $"Success: An e-mail has been sent to your current e-mail address. Please follow the instructions there in order to change the e-mail address associated with the account.";
+                TempData["StatusMessage"] = $"Success: An e-mail has been sent to the specified e-mail address. Please follow the instructions there in order to change the e-mail address associated with the account.";
                 // Redirect to page.
                 return RedirectToPage();
             }

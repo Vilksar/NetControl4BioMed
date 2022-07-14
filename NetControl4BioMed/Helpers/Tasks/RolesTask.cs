@@ -197,7 +197,8 @@ namespace NetControl4BioMed.Helpers.Tasks
                         if (batchItem.Name != role.Name)
                         {
                             // Try to set the new role name.
-                            result = await roleManager.SetRoleNameAsync(role, batchItem.Name);
+                            result = result.Succeeded ? await roleManager.SetRoleNameAsync(role, batchItem.Name) : result;
+                            result = result.Succeeded ? await roleManager.UpdateAsync(role) : result;
                         }
                         // Check if any of the operations has failed.
                         if (!result.Succeeded)

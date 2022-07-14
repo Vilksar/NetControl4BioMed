@@ -345,8 +345,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                     foreach (var batchItem in batchItems)
                     {
                         // Get the corresponding item.
-                        var user = users
-                            .FirstOrDefault(item => item.Id == batchItem.Id);
+                        var user = await userManager.FindByIdAsync(batchItem.Id);
                         // Check if there was no item found.
                         if (user == null)
                         {

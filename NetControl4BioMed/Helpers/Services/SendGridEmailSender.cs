@@ -80,7 +80,7 @@ namespace NetControl4BioMed.Helpers.Services
             var apiKey = _configuration.GetSection("Authentication:SendGrid:AppKey").Value;
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(_configuration.GetSection("EmailSender:Email").Value, _configuration.GetSection("EmailSender:Name").Value);
-            var to = new EmailAddress(viewModel.OldEmail, viewModel.OldEmail);
+            var to = new EmailAddress(viewModel.NewEmail, viewModel.NewEmail);
             var subject = "NetControl4BioMed - Change your e-mail address";
             var htmlContent = await _renderer.RenderPartialToStringAsync("_EmailEmailChangePartial", viewModel);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
