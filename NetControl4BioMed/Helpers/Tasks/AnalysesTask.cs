@@ -1451,7 +1451,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 // Use a new user manager instance.
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 // Use a new e-mail sender instance.
-                var emailSender = scope.ServiceProvider.GetRequiredService<ISendGridEmailSender>();
+                var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
                 // Use a new link generator instance.
                 var linkGenerator = scope.ServiceProvider.GetRequiredService<LinkGenerator>();
                 // Get the items in the current batch.

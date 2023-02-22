@@ -22,11 +22,11 @@ namespace NetControl4BioMed.Pages.Identity
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
-        private readonly ISendGridEmailSender _emailSender;
+        private readonly IEmailSender _emailSender;
         private readonly LinkGenerator _linkGenerator;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public RegisterModel(IServiceProvider serviceProvider, UserManager<User> userManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public RegisterModel(IServiceProvider serviceProvider, UserManager<User> userManager, IEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
             _serviceProvider = serviceProvider;
             _userManager = userManager;

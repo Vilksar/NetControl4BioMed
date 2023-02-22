@@ -22,11 +22,11 @@ namespace NetControl4BioMed.Pages.CreatedData.Analyses.Details.Accounts.Users
         private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
-        private readonly ISendGridEmailSender _emailSender;
+        private readonly IEmailSender _emailSender;
         private readonly LinkGenerator _linkGenerator;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public AddModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public AddModel(IServiceProvider serviceProvider, UserManager<User> userManager, ApplicationDbContext context, IEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
             _serviceProvider = serviceProvider;
             _userManager = userManager;

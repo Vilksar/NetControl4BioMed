@@ -112,7 +112,7 @@ namespace NetControl4BioMed
             // Add the dependency injections.
             services.AddTransient<IPartialViewRenderer, PartialViewRenderer>();
             services.AddTransient<IReCaptchaChecker, ReCaptchaChecker>();
-            services.AddTransient<ISendGridEmailSender, SendGridEmailSender>();
+            services.AddTransient<IEmailSender, MailKitEmailSender>();
             services.AddTransient<IRecurringTaskManager, RecurringTaskManager>();
             services.AddTransient<IAdministrationTaskManager, AdministrationTaskManager>();
             services.AddTransient<IContentTaskManager, ContentTaskManager>();

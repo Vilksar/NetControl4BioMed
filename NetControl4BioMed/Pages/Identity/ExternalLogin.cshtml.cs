@@ -24,10 +24,10 @@ namespace NetControl4BioMed.Pages.Identity
         private readonly IServiceProvider _serviceProvider;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
-        private readonly ISendGridEmailSender _emailSender;
+        private readonly IEmailSender _emailSender;
         private readonly LinkGenerator _linkGenerator;
 
-        public ExternalLoginModel(IServiceProvider serviceProvider, SignInManager<User> signInManager, UserManager<User> userManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator)
+        public ExternalLoginModel(IServiceProvider serviceProvider, SignInManager<User> signInManager, UserManager<User> userManager, IEmailSender emailSender, LinkGenerator linkGenerator)
         {
             _serviceProvider = serviceProvider;
             _signInManager = signInManager;

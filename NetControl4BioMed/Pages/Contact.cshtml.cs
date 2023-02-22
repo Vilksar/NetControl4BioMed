@@ -16,11 +16,11 @@ namespace NetControl4BioMed.Pages
     public class ContactModel : PageModel
     {
         private readonly UserManager<User> _userManager;
-        private readonly ISendGridEmailSender _emailSender;
+        private readonly IEmailSender _emailSender;
         private readonly LinkGenerator _linkGenerator;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public ContactModel(UserManager<User> userManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public ContactModel(UserManager<User> userManager, IEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
             _userManager = userManager;
             _emailSender = emailSender;

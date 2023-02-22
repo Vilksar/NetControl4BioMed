@@ -18,11 +18,11 @@ namespace NetControl4BioMed.Pages.Account.Manage.Profile
         private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly ISendGridEmailSender _emailSender;
+        private readonly IEmailSender _emailSender;
         private readonly LinkGenerator _linkGenerator;
         private readonly IReCaptchaChecker _reCaptchaChecker;
 
-        public IndexModel(IServiceProvider serviceProvider, UserManager<User> userManager, SignInManager<User> signInManager, ISendGridEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
+        public IndexModel(IServiceProvider serviceProvider, UserManager<User> userManager, SignInManager<User> signInManager, IEmailSender emailSender, LinkGenerator linkGenerator, IReCaptchaChecker reCaptchaChecker)
         {
             _serviceProvider = serviceProvider;
             _userManager = userManager;

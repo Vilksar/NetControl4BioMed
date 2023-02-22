@@ -662,7 +662,7 @@ namespace NetControl4BioMed.Helpers.Tasks
                 using (var scope = serviceProvider.CreateScope())
                 {
                     // Use a new e-mail sender instance.
-                    var emailSender = scope.ServiceProvider.GetRequiredService<ISendGridEmailSender>();
+                    var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
                     // Use a new link generator instance.
                     var linkGenerator = scope.ServiceProvider.GetRequiredService<LinkGenerator>();
                     // Send an alert delete e-mail.

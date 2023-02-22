@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 namespace NetControl4BioMed.Helpers.Interfaces
 {
     /// <summary>
-    /// Provides an abstraction for the SendGrid e-mail sender.
+    /// Provides an abstraction for the e-mail sender.
     /// </summary>
-    public interface ISendGridEmailSender
+    public interface IEmailSender
     {
         /// <summary>
         /// Sends an e-mail with instructions on confirming the user e-mail address.
